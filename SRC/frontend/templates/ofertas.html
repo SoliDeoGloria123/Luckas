@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofertas</title>
+    <link rel="icon" href="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/productlist.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <nav class="nav-bar">
+        <div class="logo">
+            <span class="luckas">Luckas</span>
+            <span class="ent">ent</span>
+        </div>
+        <form method="get" action="/categoria" class="search-bar">
+            <input type="text" name="q" value="{{ query }}" autocomplete="off" placeholder="Busca un producto o tienda">
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+
+        <nav class="nav-menu">
+            <a href="{{ url_for('page') }}">Inicio</a>
+            <a href="{{ url_for('nosotros')}}">Nosotros</a>
+            <a href="{{ url_for('cuenta') }}">Mi perfil</a>
+        </nav>
+    </nav>
+    <nav class="menu-container">
+        <ul class="menu-navigation">
+            <li><a class="menu-link" href="{{ url_for('categoria') }}">Categorías</a></li>
+            <li><a class="menu-link" href="{{ url_for('ofertas') }}">Ofertas</a></li>
+            <li><a class="menu-link" href="{{ url_for('tulista') }}">Mi Lista</a></li>
+            <li><a class="menu-link" href="{{ url_for('cuenta') }}#seccion-destino">Favoritos</a></li>
+            <li><a class="menu-link" href="#">Ayuda</a></li>
+        </ul>
+    </nav>
+    <div class="main-container">
+        <!-- Información de resultados -->
+        {% if total_productos is defined %}
+        <div class="resultados-info">
+            <p>Se encontraron <strong>{{ total_productos }}</strong> productos{% if categoria_actual %} en la categoría
+                <strong>{{ categoria_actual|replace('_', ' ')|title }}</strong>{% endif %}
+            </p>
+        </div>
+        {% endif %}
+        <!-- Título de la página -->
+        <div class="page-header">
+            <h1 class="letra">Ofertas</h1>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const prevBtn = document.getElementById("prev-page");
+                const nextBtn = document.getElementById("next-page");
+                const pageNumbers = document.querySelectorAll(".page-number");
+
+                function getCurrentPageIndex() {
+                    return [...pageNumbers].findIndex(p => p.classList.contains("active"));
+                }
+
+                function setActivePage(index) {
+                    pageNumbers.forEach(p => p.classList.remove("active"));
+                    pageNumbers[index].classList.add("active");
+                }
+
+                prevBtn.addEventListener("click", function () {
+                    const currentIndex = getCurrentPageIndex();
+                    if (currentIndex > 0) {
+                        // Get the current active page number
+                        const currentPage = parseInt(pageNumbers[currentIndex].textContent);
+                        // Redirect to the previous page
+                        window.location.href = `/categoria?page=${currentPage - 1}`;
+                    }
+                });
+
+                nextBtn.addEventListener("click", function () {
+                    const currentIndex = getCurrentPageIndex();
+                    if (currentIndex < pageNumbers.length - 1) {
+                        // Get the current active page number
+                        const currentPage = parseInt(pageNumbers[currentIndex].textContent);
+                        // Redirect to the next page
+                        window.location.href = `/categoria?page=${currentPage + 1}`;
+                    }
+                });
+
+                pageNumbers.forEach((btn, index) => {
+                    btn.addEventListener("click", () => {
+                        // Get the page number from the clicked button
+                        const pageNumber = parseInt(btn.textContent);
+                        // Redirect to the selected page
+                        window.location.href = `/categoria?page=${pageNumber}`;
+                    });
+                });
+            });
+
+        </script>
+        <!-- Contenedor de contenido -->
+        <div class="content-wrapper">
+            <!-- Sidebar con filtros -->
+            <div class="sidebar">
+                <!-- Categoría -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Categoría</h3>
+                    <div class="filter-divider"></div>
+                    <div class="category-list">
+                        <a href="{{ url_for('categoria_frutas') }}{% if query %}?q={{ query }}{% endif %}{% if stores %}{% for store in stores %}&stores={{ store }}{% endfor %}{% endif %}"
+                            class="category-item {% if categorias_activas and categorias_activas.frutas_verduras %}active{% endif %}">
+                            <div class="category-icon">
+                                <img src="https://static.codia.ai/image/2025-03-11/ca1bb570-b208-481a-8412-28737cba9bd7.png"
+                                    alt="Frutas y Verduras" />
+                            </div>
+                            <span class="category-name">Frutas y Verduras</span>
+                        </a>
+                        <a href="{{ url_for('categoria_carne') }}{% if query %}?q={{ query }}{% endif %}{% if stores %}{% for store in stores %}&stores={{ store }}{% endfor %}{% endif %}"
+                            class="category-item {% if categorias_activas and categorias_activas.carnicos %}active{% endif %}">
+                            <div class="category-icon">
+                                <img src="https://static.codia.ai/image/2025-03-11/a08a5d37-05b2-4f7b-90cf-405f096bb842.svg"
+                                    alt="Cárnicos" />
+                            </div>
+                            <span class="category-name">Cárnicos</span>
+                        </a>
+                        <a href="{{ url_for('categoria_pescado') }}{% if query %}?q={{ query }}{% endif %}{% if stores %}{% for store in stores %}&stores={{ store }}{% endfor %}{% endif %}"
+                            class="category-item {% if categorias_activas and categorias_activas.pescados %}active{% endif %}">
+                            <div class="category-icon">
+                                <img src="https://static.codia.ai/image/2025-03-11/8748a356-35f8-4418-99ca-b3a27c1936ad.png"
+                                    alt="Pescados" />
+                            </div>
+                            <span class="category-name">Pescados</span>
+                        </a>
+                        <a href="{{ url_for('categoria_pan') }}{% if query %}?q={{ query }}{% endif %}{% if stores %}{% for store in stores %}&stores={{ store }}{% endfor %}{% endif %}"
+                            class="category-item {% if categorias_activas and categorias_activas.panaderia %}active{% endif %}">
+                            <div class="category-icon">
+                                <img src="https://static.codia.ai/image/2025-03-11/3a07efec-fbee-4a67-b961-10c98ccc36e9.png"
+                                    alt="Panadería" />
+                            </div>
+                            <span class="category-name">Panadería</span>
+                        </a>
+                        <a href="{{ url_for('categoria_dulce') }}{% if query %}?q={{ query }}{% endif %}{% if stores %}{% for store in stores %}&stores={{ store }}{% endfor %}{% endif %}"
+                            class="category-item {% if categorias_activas and categorias_activas.dulces_abarrotes %}active{% endif %}">
+                            <div class="category-icon">
+                                <img src="https://static.codia.ai/image/2025-03-11/69cda9e8-204c-4088-bb26-48281fa66fc1.png"
+                                    alt="Dulces y Abarrotes" />
+                            </div>
+                            <span class="category-name">Dulces y Abarrotes</span>
+                        </a>
+                        <a href="{{ url_for('categoria_bebida') }}{% if query %}?q={{ query }}{% endif %}{% if stores %}{% for store in stores %}&stores={{ store }}{% endfor %}{% endif %}"
+                            class="category-item {% if categorias_activas and categorias_activas.bebidas %}active{% endif %}">
+                            <div class="category-icon">
+                                <img src="https://static.codia.ai/image/2025-03-11/734371ac-7366-4129-bf5f-42efaa873bae.png"
+                                    alt="Bebidas" />
+                            </div>
+                            <span class="category-name">Bebidas</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tiendas -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Tiendas</h3>
+                    <div class="filter-divider"></div>
+                    <form method="get" action="/categoria" id="filtro-tiendas-form">
+                        <!-- Mantener otros parámetros -->
+                        <input type="hidden" name="q" value="{{ query }}">
+                        <input type="hidden" name="page" value="1">
+
+                        <div class="checkbox-list">
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" name="stores" value="Makro" {% if "Makro"
+                                    in stores %}checked{% endif %} onchange="this.form.submit()">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">Makro</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" name="stores" value="Exito" {% if "Exito"
+                                    in stores %}checked{% endif %} onchange="this.form.submit()">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">Éxito</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" name="stores" value="Jumbo" {% if "Jumbo"
+                                    in stores %}checked{% endif %} onchange="this.form.submit()">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">Jumbo</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" name="stores" value="D1" {% if "D1" in
+                                    stores %}checked{% endif %} onchange="this.form.submit()">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">D1</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" name="stores" value="Carulla" {%
+                                    if "Carulla" in stores %}checked{% endif %} onchange="this.form.submit()">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">Carulla</span>
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Precio -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Precio</h3>
+                    <div class="filter-divider"></div>
+                    <div class="checkbox-list">
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="checkbox-input">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">0 - $5.000</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="checkbox-input" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">$5.000 - $15.000</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="checkbox-input">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">$15.000 - $20.000</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="checkbox-input">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">$20.000 - $35.000</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="checkbox-input">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">$35.000 - $50.000</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="checkbox-input">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">$50.000 - $100.000</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="checkbox-input">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">$100.000 - $200.000</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- Ubicación -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Ubicación</h3>
+                    <div class="filter-divider"></div>
+                    <div class="location-list">
+                        <label class="location-item">
+                            <i class="fas fa-map-marker-alt location-icon"></i>
+                            <span class="location-label">Bogotá</span>
+                        </label>
+                        <label class="location-item">
+                            <i class="fas fa-map-marker-alt location-icon"></i>
+                            <span class="location-label">Medellín</span>
+                        </label>
+                        <label class="location-item">
+                            <i class="fas fa-map-marker-alt location-icon"></i>
+                            <span class="location-label">Cali</span>
+                        </label>
+                        <label class="location-item">
+                            <i class="fas fa-map-marker-alt location-icon"></i>
+                            <span class="location-label">Barranquilla</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CUADRÍCULA DE PRODUCTOS -->
+            <div class="product-grid">
+                {% for producto in best_products %}
+                <div class="product-card">
+                    <div class="product-card__image-container" style="background-image: url('{{ producto.Imagen}}')">
+                        <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
+                    </div>
+                    <div class="product-card__content">
+                        <h3 class="product-card__title">{{ producto.Product_Name }}</h3>
+                        <p class="product-card__weight">{{ producto.Weight }}</p>
+                        <p class="product-card__weight">Vendido por: {{ producto.Parner | default('N/A') }}</p>
+                        <p class="product-card__price">Precio: {{ producto.Total_Price }}</p>
+                        <div class="product-card__actions">
+                            <button class="product-card__btn product-card__btn--primary btn-agregar-lista"
+                                data-product-id="{{ producto._id }}"> <!-- <--- AÑADIDO data-product-id y clase -->
+                                <span class="product-card__btn-icon"></span>
+                                Agregar
+                            </button>
+                            <button class="product-card__btn product-card__btn--secondary">
+                                Ver detalles
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="pagination-controls">
+            <button class="pagination-btn" id="prev-page" {% if pagina_actual==1 %}disabled{% endif %}>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            {% for i in range(1, total_paginas + 1) %}
+            {% if i == pagina_actual %}
+            <span class="page-number active">{{ i }}</span>
+            {% else %}
+            <span class="page-number" onclick="window.location.href='/ofertas?q={{ query }}&page={{ i }}'">{{ i
+                }}</span>
+            {% endif %}
+            {% endfor %}
+
+            <button class="pagination-btn" id="next-page" {% if pagina_actual==total_paginas %}disabled{% endif %}>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <!-- Mensaje de notificación -->
+        <div class="message">
+            Producto añadido al carrito
+            <span class="message__close-btn">×</span>
+            <div class="message__progress-bar"></div>
+        </div>
+        <script src="{{ url_for('static', path='js/categoriasP.js') }}"></script>
+</body>
+<footer>
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <div class="footer-info">
+                    <div class="footer-heading">Comparte y ahorra en tus compras diarias</div>
+                    <div class="footer-text">
+                        Encuentra los mejores precios en supermercados y toma decisiones
+                        inteligentes para tu hogar.
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <button class="footer-btn-primary">
+                        <a href="{{ url_for('registro') }}" class="footer-btn-text-primary">Explorar</a>
+                    </button>
+
+                    <button class="footer-btn-secondary">
+                        <a id="Ayuda" href="{{ url_for('registro') }}" class="footer-btn-text-secondary">Ayuda</a>
+                    </button>
+                </div>
+            </div>
+            <div class="footer-links-column">
+                <div class="footer-link-list">
+                    <div class="footer-link-item">
+                        <a href="#" class="footer-link">Inicio</a>
+                    </div>
+                    <div class="footer-link-item">
+                        <a href="#" class="footer-link">Contáctanos</a>
+                    </div>
+                    <div class="footer-link-item">
+                        <a href="#" class="footer-link">Ayuda Online</a>
+                    </div>
+                    <div class="footer-link-item">
+                        <a href="#" class="footer-link">Política de Privacidad</a>
+                    </div>
+                    <div class="footer-link-item">
+                        <a href="{{ url_for('termino') }}" class="footer-link">Términos de Uso</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-credits">
+            <div class="footer-logo-row">
+                <div class="footer-logo-container">
+                    <img class="footer-logo" src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt.png') }}" />
+                </div>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-bottom-row">
+                <div class="footer-copyright">
+                    © 2024 LuckasEnt. Todos los derechos reservados.
+                </div>
+                <div id="contacto" class="footer-social-links">
+                    <a href="https://facebook.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/Facebook.png') }}"
+                            alt="Facebook" />
+                    </a>
+                    <a href="https://twitter.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/X.png') }}" alt="Twitter" />
+                    </a>
+                    <a href="https://instagram.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/Instagram.png') }}"
+                            alt="Instagram" />
+                    </a>
+                    <a href="https://linkedin.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/LinkedIn.png') }}"
+                            alt="LinkedIn" />
+                    </a>
+                    <a href="https://youtube.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/Youtube.png') }}"
+                            alt="YouTube" />
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+</html>

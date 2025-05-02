@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conocenos</title>
+    <link rel="icon" href="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/termino_uso.css') }}">
+
+
+</head>
+
+<body>
+    <nav class="nav-bar">
+        <div class="logo">
+            <span class="luckas">Luckas</span>
+            <span class="ent">ent</span>
+        </div>
+        <div class="menu-container">
+            <ul class="menu-links">
+                <li class="menu-item">
+                    <a href="{{ url_for('home') }}" class="menu-link">Inicio</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+
+    <div class="main-container">
+        <div class="sidebar">
+            <h3>Documentación</h3>
+            <ul class="doc-list">
+                <li><a href="#" onclick="loadPDF('Propuesta_tecnica.pdf'); return false;" class="active">Propuesta Técnica</a></li>
+                <li><a href="#" onclick="loadPDF('DespliegueV1.pdf'); return false;">Diagrama de despligue</a></li>
+                <li><a href="#" onclick="loadPDF('DiagramaClasesV1.pdf'); return false;">Diagrama de clases</a></li>
+                <li><a href="#" onclick="loadPDF('Diagrama_clasesV2.pdf'); return false;">Especificaciones</a></li>
+                <li><a href="#" onclick="loadPDF('Contrato.pdf'); return false;">Contrato</a></li>
+            </ul>
+        </div>
+    
+        <div class="pdf-viewer">
+            <!-- Cambia la ruta inicial si quieres que empiece con otro PDF -->
+            <iframe id="pdf-viewer" src="{{ url_for('static', path='propuesta/Propuesta_tecnica.pdf') }}" width="100%" height="600px"></iframe>
+            <iframe id="pdf-viewer" src="{{ url_for('static', path='despliegue/DespligueV1.pdf') }}" width="100%" height="600px"></iframe>
+            <iframe id="pdf-viewer" src="{{ url_for('static', path='DiagramaClasesV1/DiagramaClasesV1.pdf') }}" width="100%" height="600px"></iframe>
+            <iframe id="pdf-viewer" src="{{ url_for('static', path='Diagrama_clasesV2/Diagrama_clasesV2.pdf') }}" width="100%" height="600px"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function loadPDF(pdfName) {
+        // Cambia el src del iframe para cargar dinámicamente el PDF seleccionado
+        document.getElementById('pdf-viewer').src = `static/propuesta/${pdfName}`;
+        
+        // Manejo de clase activa para resaltar el documento seleccionado
+        const links = document.querySelectorAll('.doc-list a');
+        links.forEach(link => link.classList.remove('active')); // Quitar la clase activa
+        event.target.classList.add('active'); // Agregar clase activa al enlace clicado
+        
+        // Evitar comportamiento predeterminado del enlace
+        return false;
+    }
+    </script>
+</body>
+
+<footer>
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <div class="footer-info">
+                    <div class="footer-heading">Comparte y ahorra en tus compras diarias</div>
+                    <div class="footer-text">
+                        Encuentra los mejores precios en supermercados y toma decisiones
+                        inteligentes para tu hogar.
+                    </div>
+                </div>
+               <div class="footer-actions">
+                    <button class="footer-btn-primary">
+                        <a  href="#"class="footer-btn-text-primary">Explorar</a>
+                    </button>
+
+                    <button class="footer-btn-secondary" >
+                        <a id="Ayuda"  href="#"class="footer-btn-text-secondary">Ayuda</a>
+                    </button>
+                </div>
+            </div>
+            <div class="footer-links-column">
+                <div class="footer-link-list">
+                    <div class="footer-link-item">
+                        <a href="#" class="footer-link">Inicio</a>
+                    </div>
+                    <div class="footer-link-item">
+                        <a href="#" class="footer-link">Contáctanos</a>
+                    </div>
+                    <div class="footer-link-item">
+                        <a href="#" class="footer-link">Ayuda Online</a>
+                    </div>
+                    <div class="footer-link-item">
+                        <a href="#" class="footer-link">Política de Privacidad</a>
+                    </div>
+                    <div class="footer-link-item">
+                        <a href="{{ url_for('termino') }}" class="footer-link">Términos de Uso</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-credits">
+            <div class="footer-logo-row">
+                <div class="footer-logo-container">
+                    <img class="footer-logo" src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt.png') }}" />
+                </div>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-bottom-row">
+                <div class="footer-copyright">
+                    © 2024 LuckasEnt. Todos los derechos reservados.
+                </div>
+                <div  id="contacto" class="footer-social-links">
+                    <a href="https://facebook.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/Facebook.png') }}"
+                            alt="Facebook" />
+                    </a>
+                    <a href="https://twitter.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/X.png') }}" alt="Twitter" />
+                    </a>
+                    <a href="https://instagram.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/Instagram.png') }}"
+                            alt="Instagram" />
+                    </a>
+                    <a href="https://linkedin.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/LinkedIn.png') }}"
+                            alt="LinkedIn" />
+                    </a>
+                    <a href="https://youtube.com" target="_blank">
+                        <img class="footer-social-icon" src="{{ url_for('static', path='img/Youtube.png') }}"
+                            alt="YouTube" />
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</html>

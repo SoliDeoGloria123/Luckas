@@ -1,0 +1,12 @@
+# Ignorar archivos de configuración sensibles
+.env
+/Ent
+/.vent
+.venv
+Ent/
+.venv/
+/Ent
+/.vent
+.venv
+.env
+.env
