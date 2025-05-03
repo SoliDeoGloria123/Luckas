@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Eventos</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/GestionPerso.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+</head>
+<body>
+    {% include "include/Nav.html" %}
+    <div class="main-container">
+        <!-- Primera imagen - Gestión de personas -->
+        <div class="panel gestion-personas">
+            <h1>Gestión de personas</h1>
+            <p>Aquí podrás registrarte para eventos del Seminario</p>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2>Tu proceso de Inscripción</h2>
+                <p>Aquí podrás ver tu proceso de <strong>Inscripción</strong> al evento: XXXXXX</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h3>Ver Más</h3>
+                <div class="date">Fecha: DD/MM/YYYY</div>
+            </div>
+            
+            <div class="section">
+                <h3>Datos</h3>
+                <div class="item">Verbas</div>
+                <div class="item">Fecha: DD/MM/YYYY</div>
+            </div>
+            
+            <div class="section">
+                <h3>Vacaciones</h3>
+                <div class="item"><a href="#" class="action-link">Ver Más</a></div>
+                <div class="item">Fecha: DD/MM/YYYY</div>
+            </div>
+            
+            <div class="section">
+                <h3>Recaudo</h3>
+                <div class="item">Vale de Inscripción</div>
+            </div>
+        </div>
+
+        <!-- Segunda imagen - Eventos -->
+        <div class="panel eventos">
+            <h1>Eventos Actuales</h1>
+            
+            <div class="event">
+                <div class="event-title">Matrimonio de Derby y Alex</div>
+                <div class="event-date">Fecha límite: 1/01/2026</div>
+                <div class="event-cost">Costo: SXX.XX</div>
+                <a href="#" class="btn">Inscribirse</a>
+            </div>
+            
+            <div class="event">
+                <div class="event-title">Por Su Causa 2024</div>
+                <div class="event-date">Fecha límite: 1/01/2026</div>
+                <div class="event-cost">Costo: SXX.XX</div>
+                <a href="#" class="btn">Inscribirse</a>
+            </div>
+            
+            <div class="event">
+                <div class="event-title">Hombrada</div>
+                <div class="event-date">Fecha límite: 1/01/2026</div>
+                <div class="event-cost">Costo: SXX.XX</div>
+                <a href="#" class="btn">Inscribirse</a>
+            </div>
+            
+            <div class="event">
+                <div class="event-title">Product 1</div>
+                <div class="event-date">Fecha límite: 1/01/2026</div>
+                <div class="event-cost">Costo: SXX.XX</div>
+                <a href="#" class="btn">Inscribirse</a>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="more-link">
+                <a href="#">Ver Más Eventos</a>
+            </div>
+            
+            <div class="past-events">
+                <h2>Eventos Anteriores</h2>
+                
+                <div class="past-event">
+                    <span class="past-event-title">Active</span>
+                    <div class="past-event-detail">Imagenit</div>
+                </div>
+                
+                <div class="past-event">
+                    <span class="past-event-title">Active</span>
+                    <div class="past-event-detail">Singent</div>
+                </div>
+                
+                <div class="past-event">
+                    <span class="past-event-title">Active</span>
+                    <div class="past-event-detail">Emgenit</div>
+                </div>
+                
+                <div class="past-event">
+                    <span class="past-event-title">Exición 1</span>
+                    <div class="past-event-detail">Participantes: 50</div>
+                </div>
+                
+                <div class="past-event">
+                    <span class="past-event-title">Exición 2</span>
+                    <div class="past-event-detail">Participantes: 45</div>
+                </div>
+                
+                <div class="past-event">
+                    <span class="past-event-title">Exición 3</span>
+                    <div class="past-event-detail">Participantes: 60</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<footer>{% include "include/piepag.html" %}</footer>
+</html>
