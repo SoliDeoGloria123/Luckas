@@ -1,0 +1,327 @@
+/* Reset básico */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+  }
+  
+  /* Header principal */
+  header {
+    text-align: center;
+    padding: 20px;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+  }
+  
+  /* Contenedor de módulos: 3 columnas fijas, con espacio reducido */
+  .modules-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Siempre 3 tarjetas por fila */
+    gap: 10px;       /* Espacio decrecido entre tarjetas */
+    padding: 20px;   /* Espacio interno general */
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* Tarjeta individual */
+  .module-card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 300px; /* Opcional: limitar ancho */
+  }
+  
+  .module-card img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    object-fit: contain;
+  }
+  
+  .module-card h2 {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .module-card p {
+    font-size: 14px;
+    color: #666;
+    margin: 10px 0;
+  }
+  
+  .module-card button {
+    background-color: #0047FF;
+    color: white;
+    border: none;
+    padding: 10px 26px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .module-card button:hover {
+    background-color: #0036cc;
+  }
+  
+  .announcement-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Encabezado de la sección */
+  .announcement-header h1 {
+    font-size: 36px;
+    text-align: center;
+    color: #333;
+  }
+  
+  .announcement-header .subtitle {
+    font-size: 18px;
+    text-align: center;
+    color: #777;
+    margin-top: 10px;
+  }
+  
+  /* Bloque de anuncio */
+  .announcement {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .announcement-date {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 5px;
+  }
+  
+  .announcement-title {
+    font-size: 24px;
+    color: #0047FF;
+    margin-bottom: 10px;
+  }
+  
+  .announcement-text {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.5;
+  }
+  
+  /* Enlace para ver más anuncios */
+  .more-announcements {
+    text-align: right;
+    margin-top: 20px;
+  }
+  
+  .more-announcements a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #0047FF;
+    transition: color 0.2s;
+  }
+  
+  .more-announcements a:hover {
+    color: #0036cc;
+  }
+  /* Contenedor principal del formulario */
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Título e instrucción */
+  .form-container h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #333;
+  }
+  
+  .form-instruction {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #777;
+  }
+  
+  /* Grupos del formulario */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  /* Estilo para los inputs de texto y file */
+  .form-group input[type="text"],
+  .form-group input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Texto adicional para el file input */
+  .file-label {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  /* Sección de radio buttons */
+  .radios p {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .radio-options {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .radio-options label {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  /* Botón de envío */
+  .submit-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #0047FF;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+  }
+  
+  .submit-btn:hover {
+    background-color: #0036cc;
+  }
+  /* Contenedor del carrusel */
+.carousel {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  
+  /* Carrusel interno (contiene todos los items) */
+  .carousel-inner {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 300%; /* 100% * número de items (3 en este caso) */
+  }
+  
+  /* Cada item del carrusel */
+  .carousel-item {
+    flex: 0 0 100%;
+    position: relative;
+  }
+  
+  /* Imagen del item */
+  .carousel-item img {
+    width: 15%;
+    display: block;
+  }
+  
+  /* Leyenda del carrusel */
+  .carousel-caption {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    color: #fff;
+  }
+  
+  .carousel-caption h3 {
+    font-size: 20px;
+    margin-bottom: 5px;
+  }
+  
+  .carousel-caption p {
+    font-size: 16px;
+  }
+  
+  /* Etiqueta de Estado */
+  .status {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: #28a745;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  
+  /* Controles del carrusel */
+  .carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 50%;
+    transition: background 0.3s;
+  }
+  
+  .carousel-control:hover {
+    background: rgba(0, 0, 0, 0.6);
+  }
+  
+  .carousel-control.prev {
+    left: 15px;
+  }
+  
+  .carousel-control.next {
+    right: 15px;
+  }
+  /* Media queries para responsividad */
+  @media (max-width: 900px) {
+    .modules-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .modules-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  

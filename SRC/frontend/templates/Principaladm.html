@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Admin{% endblock %}</title>
+    <!-- Estilos propios y de terceros -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/Principal.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+</head>
+<body>
+    {% include "include/Nav.html" %}
+    
+    <header>
+        <h1>Mis Módulos</h1>
+    </header>
+    
+    <section class="modules-container">
+        <div class="module-card">
+          <img src="{{ url_for('static', path='img/OIP_1.jpg') }}" alt="Gestión de personas" />
+          <h2>Gestión de personas</h2>
+          <p>Aquí podrás registrarte para eventos.</p>
+          <button>Ver módulo</button>
+        </div>
+    
+        <div class="module-card">
+          <img src="{{ url_for('static', path='img/gestion_inscripciones.png') }}" alt="Gestión de Inscripciones" />
+          <h2>Gestión de Inscripciones</h2>
+          <p>Consulta y administra inscripciones.</p>
+          <button>Ver módulo</button>
+        </div>
+    
+        <div class="module-card">
+          <img src="{{ url_for('static', path='img/OIP_1.jpg') }}" alt="Gestión de eventos" />
+          <h2>Gestión de eventos</h2>
+          <p>Organiza y planifica tus eventos.</p>
+          <button>Ver módulo</button>
+        </div>
+    
+        <div class="module-card">
+            <img src="{{ url_for('static', path='img/gestion_inscripciones.png') }}" alt="Gestión de Inscripciones" />
+            <h2>Gestión de Inscripciones</h2>
+            <p>Consulta y administra inscripciones.</p>
+            <button>Ver módulo</button>
+        </div>
+    
+        <div class="module-card">
+            <img src="{{ url_for('static', path='img/gestion_inscripciones.png') }}" alt="Gestión de Inscripciones" />
+            <h2>Gestión de Inscripciones</h2>
+            <p>Consulta y administra inscripciones.</p>
+            <button>Ver módulo</button>
+        </div>
+    
+        <div class="module-card">
+            <img src="{{ url_for('static', path='img/image 4.png') }}" alt="Gestión de Inscripciones" />
+            <h2>Gestión de Inscripciones</h2>
+            <p>Consulta y administra inscripciones.</p>
+            <button>Ver módulo</button>
+        </div>
+    </section>
+    <section>
+        <div class="announcement-container">
+            <header class="announcement-header">
+              <h1>Anuncios</h1>
+              <p class="subtitle">Podrás ver las actividades del seminario.</p>
+            </header>
+        
+            <div class="announcement">
+              <div class="announcement-date">1/01/2026</div>
+              <h2 class="announcement-title">Examenes Trimestrales y sus resultados</h2>
+              <p class="announcement-text">
+                Querido estudiante, te informamos que los resultados de tus pruebas ya se pueden ver.
+              </p>
+            </div>
+        
+            <div class="more-announcements">
+              <a href="#">Ver Más Anuncios</a>
+            </div>
+          </div>
+    </section>
+    <section>
+        <div class="form-container">
+            <h1>Crear un anuncio</h1>
+            <p class="form-instruction">Por favor, complete la información solicitada</p>
+            <form action="#" method="post" enctype="multipart/form-data">
+              
+              <!-- Imagen del anuncio (opcional) -->
+              <div class="form-group">
+                <label for="anuncio-imagen">Imagen del anuncio (opcional)</label>
+                <input type="file" id="anuncio-imagen" name="anuncio-imagen">
+                <span class="file-label">Carga la Imagen Aquí</span>
+              </div>
+              
+              <!-- Título del anuncio -->
+              <div class="form-group">
+                <label for="titulo">Título del Anuncio</label>
+                <input type="text" id="titulo" name="titulo" placeholder="Ingresa el Título Aquí" required>
+              </div>
+              
+              <!-- Descripción del anuncio -->
+              <div class="form-group">
+                <label for="descripcion">Descripción del Anuncio</label>
+                <input type="text" id="descripcion" name="descripcion" placeholder="Ingresa el Precio del curso" required>
+              </div>
+              
+              <!-- Envío de correos -->
+              <div class="form-group radios">
+                <p>Desea enviar correos a los suscritos a este sistema sobre el anuncio?</p>
+                <div class="radio-options">
+                  <label>
+                    <input type="radio" name="enviar-correo" value="si" checked>
+                    Sí, quiero
+                  </label>
+                  <label>
+                    <input type="radio" name="enviar-correo" value="no">
+                    NO, gracias
+                  </label>
+                </div>
+              </div>
+              
+              <!-- Botón de envío -->
+              <div class="form-group">
+                <button type="submit" class="submit-btn">¡Listo!, he terminado</button>
+              </div>
+            </form>
+          </div>
+    </section>
+    <section>
+        <div class="carousel">
+            <div class="carousel-inner">
+              <!-- Primer item -->
+              <div class="carousel-item active">
+                <img src="{{ url_for('static', path='img/OIP_1.jpg') }}" alt="Edición 1">
+                <div class="carousel-caption">
+                  <span class="status">Activo</span>
+                  <h3>Edición 1</h3>
+                  <p>Participantes: 50</p>
+                </div>
+              </div>
+              <!-- Segundo item -->
+              <div class="carousel-item">
+                <img src="{{ url_for('static', path='img/OIP_1.jpg') }}" alt="Edición 2">
+                <div class="carousel-caption">
+                  <span class="status">Activo</span>
+                  <h3>Edición 2</h3>
+                  <p>Participantes: 45</p>
+                </div>
+              </div>
+              <!-- Tercer item -->
+              <div class="carousel-item">
+                <img src="{{ url_for('static', path='img/OIP_1.jpg') }}" alt="Edición 3">
+                <div class="carousel-caption">
+                  <span class="status">Activo</span>
+                  <h3>Edición 3</h3>
+                  <p>Participantes: 60</p>
+                </div>
+              </div>
+              <!-- Cuarto item -->
+              <div class="carousel-item">
+                <img src="{{ url_for('static', path='img/OIP_1.jpg') }}" alt="Edición 3">
+                <div class="carousel-caption">
+                  <span class="status">Activo</span>
+                  <h3>Edición 4</h3>
+                  <p>Participantes: 60</p>
+                </div>
+              </div>
+            </div>
+            <!-- Controles -->
+            <button class="carousel-control prev" aria-label="Anterior">&laquo;</button>
+            <button class="carousel-control next" aria-label="Siguiente">&raquo;</button>
+
+          </div>
+    </section>
+    <script src="{{ url_for('static', path='js/carrusel.js') }}"></script>
+</body>
+<footer>{% include "include/piepag.html" %}</footer>
+</html>
