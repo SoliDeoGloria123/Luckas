@@ -7,17 +7,21 @@
     <link rel="stylesheet" href="{{ url_for('static', path='css/header.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/footer.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/Principal.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
 </head>
 <body>
     {% include "include/Nav.html" %}
-    <header>
-        <h1>Mis Módulos</h1>
-    </header>
+    <div class="products">
+      <div class="container">
+        <div class="title">Modulos</div>
+      </div>
+    </div>
+    
     
     <section class="modules-container">
         <div class="module-card">
-          <img src="{{ url_for('static', path='img/OIP_1.jpg') }}" alt="Gestión de personas" />
+          <img src="{{ url_for('static', path='img/gestion_personas.jpg') }}" alt="Gestión de personas" />
           <h2>Gestión de personas</h2>
           <p>Aquí podrás registrarte para eventos.</p>
           <button>Ver módulo</button>
@@ -31,100 +35,88 @@
         </div>
     
         <div class="module-card">
-          <img src="{{ url_for('static', path='img/OIP_1.jpg') }}" alt="Gestión de eventos" />
+          <img src="{{ url_for('static', path='img/gestion_eventos.png') }}" alt="Gestión de eventos" />
           <h2>Gestión de eventos</h2>
           <p>Organiza y planifica tus eventos.</p>
           <button>Ver módulo</button>
         </div>
     
         <div class="module-card">
-            <img src="{{ url_for('static', path='img/gestion_inscripciones.png') }}" alt="Gestión de Inscripciones" />
-            <h2>Gestión de Inscripciones</h2>
+            <img src="{{ url_for('static', path='img/gestion_cabaña.jpg') }}" alt="Gestión de Inscripciones" />
+            <h2>Gestión Asignacions de Cabañas</h2>
             <p>Consulta y administra inscripciones.</p>
             <button>Ver módulo</button>
         </div>
     
         <div class="module-card">
-            <img src="{{ url_for('static', path='img/gestion_inscripciones.png') }}" alt="Gestión de Inscripciones" />
-            <h2>Gestión de Inscripciones</h2>
+            <img src="{{ url_for('static', path='img/gestion_tareas.png') }}" alt="Gestión de Inscripciones" />
+            <h2>Gestión de  Asignación de tareas</h2>
             <p>Consulta y administra inscripciones.</p>
             <button>Ver módulo</button>
         </div>
     
         <div class="module-card">
-            <img src="{{ url_for('static', path='img/image 4.png') }}" alt="Gestión de Inscripciones" />
-            <h2>Gestión de Inscripciones</h2>
+            <img src="{{ url_for('static', path='img/ver reportes.png') }}" alt="Gestión de Inscripciones" />
+            <h2>Ver Reportes</h2>
             <p>Consulta y administra inscripciones.</p>
             <button>Ver módulo</button>
         </div>
     </section>
-    <section>
-        <div class="announcement-container">
-            <header class="announcement-header">
-              <h1>Anuncios</h1>
-              <p class="subtitle">Podrás ver las actividades del seminario.</p>
-            </header>
-        
-            <div class="announcement">
-              <div class="announcement-date">1/01/2026</div>
-              <h2 class="announcement-title">Examenes Trimestrales y sus resultados</h2>
-              <p class="announcement-text">
-                Querido estudiante, te informamos que los resultados de tus pruebas ya se pueden ver.
-              </p>
-            </div>
-        
-            <div class="more-announcements">
-              <a href="#">Ver Más Anuncios</a>
-            </div>
-          </div>
-    </section>
-    <section>
-        <div class="form-container">
-            <h1>Crear un anuncio</h1>
-            <p class="form-instruction">Por favor, complete la información solicitada</p>
-            <form action="#" method="post" enctype="multipart/form-data">
-              
-              <!-- Imagen del anuncio (opcional) -->
-              <div class="form-group">
-                <label for="anuncio-imagen">Imagen del anuncio (opcional)</label>
-                <input type="file" id="anuncio-imagen" name="anuncio-imagen">
-                <span class="file-label">Carga la Imagen Aquí</span>
-              </div>
-              
-              <!-- Título del anuncio -->
-              <div class="form-group">
-                <label for="titulo">Título del Anuncio</label>
-                <input type="text" id="titulo" name="titulo" placeholder="Ingresa el Título Aquí" required>
-              </div>
-              
-              <!-- Descripción del anuncio -->
-              <div class="form-group">
-                <label for="descripcion">Descripción del Anuncio</label>
-                <input type="text" id="descripcion" name="descripcion" placeholder="Ingresa el Precio del curso" required>
-              </div>
-              
-              <!-- Envío de correos -->
-              <div class="form-group radios">
-                <p>Desea enviar correos a los suscritos a este sistema sobre el anuncio?</p>
-                <div class="radio-options">
-                  <label>
-                    <input type="radio" name="enviar-correo" value="si" checked>
-                    Sí, quiero
-                  </label>
-                  <label>
-                    <input type="radio" name="enviar-correo" value="no">
-                    NO, gracias
-                  </label>
-                </div>
-              </div>
-              
-              <!-- Botón de envío -->
-              <div class="form-group">
-                <button type="submit" class="submit-btn">¡Listo!, he terminado</button>
-              </div>
-            </form>
-          </div>
-    </section>
+   <!--  mostrar los anuncios  -->
+<div class="announcements-section">
+  <div class="announcements-header">
+    <div class="header-content">
+      <div class="section-title">Anuncios</div>
+      <div class="section-subtitle">Podras ver las actividades del seminario.</div>
+    </div>
+  </div>
+  <div class="announcements-list">
+    <div class="announcement-row">
+      <div class="announcement-card">
+        <div class="announcement-date">1/01/2026</div>
+        <div class="announcement-title">Exameles Trimestrales y sus resultados</div>
+        <div class="announcement-description">
+          Querido estudiante, te informamos que los resultados de tus pruebas ya
+          se pueden ver
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="see-more-announcements">Ver Más Anuncios</div>
+</div>
+<!--  formulario de anuncios  -->
+  <div class="suggestion-form">
+    <div class="form-container">
+      <h2 class="form-title">Crear un anuncio</h2>
+      <p class="form-description">
+        Por favor, complete la información solicitada
+      </p>
+    </div>
+    
+    <form class="form-content" action="#" method="POST">
+      <div class="form-group">
+        <label for="imagen" class="form-label">Imagen del anuncio(opcional)</label>
+        <input type="file" id="imagen" name="imagen" class="form-input" required>
+        <small class="form-info">Carga la Imagen Aquí</small>
+      </div>
+      
+      <div class="form-group">
+        <label for="anuncio" class="form-label">Titulo del Anuncio</label>
+        <input type="text" id="anuncio" name="anuncio" class="form-input" placeholder="Ingresa el Tutulo Aquí">
+      </div>
+      
+      <div class="form-group">
+        <label for="descripción" class="form-label">Descripción del Anuncio</label>
+        <textarea id="descripción" name="descripción" class="form-textarea" placeholder="Ingresa el Precio del Producto"></textarea>
+
+      </div>
+      
+      <div class="form-buttons">
+    
+        <button type="submit" class="btn-primary">¡Listo!, he terminado</button>
+      </div>
+    </form>
+  </div>
     <section>
         <div class="carousel">
             <div class="carousel-inner">

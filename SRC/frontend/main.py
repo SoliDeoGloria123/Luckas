@@ -17,9 +17,9 @@ templates = Jinja2Templates(directory=templates_path)
 # Página principal
 @app.get("/")
 async def home(request: Request):
-    return templates.TemplateResponse("Principalamd.html", {"request": request})
+    return templates.TemplateResponse("Principaladm.html", {"request": request})
 
 # Página secundaria: Gestión de personas
-@app.get("/GestionPersona")
+@app.get("/gestion_persona", name="gestion_persona")
 async def gestion_persona(request: Request):
     return templates.TemplateResponse("GestionPersona.html", {"request": request})
