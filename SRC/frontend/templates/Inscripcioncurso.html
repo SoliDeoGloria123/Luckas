@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Evento</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/Inscripcioncurso.css') }}">´
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+</head>
+<body>
+    {% include "include/Nav.html" %}
+    <div class="evento-container">
+        <div class="evento-header">
+            <h1>Nombre del Evento</h1>
+            <p class="evento-fecha">Esta 3 cuenta la fecha frente a la NAVIGOS</p>
+        </div>
+
+        <div class="evento-precio">
+            <span class="precio">$50.000</span>
+        </div>
+
+        <div class="evento-descripcion">
+            <p>Descripción del evento</p>
+            <p class="pregunta">¿Défase reservar una nombre antes del verano?</p>
+            <p class="opcion">Saltosaben la opción</p>
+        </div>
+
+        <div class="evento-pago">
+            <button class="boton-pse">Pagar con PSE</button>
+        </div>
+
+        <div class="evento-faq">
+            <h3 class="pregunta-titulo">Título de la pregunta</h3>
+            <p class="pregunta-respuesta">Respuesta a la pregunta</p>
+        </div>
+
+        <div class="evento-detalles-pago">
+            <h3>Detalles del Pago</h3>
+            <p class="nota">Piensa que exististe en la proporcionalidad de comunicación</p>
+        </div>
+    </div>
+</body>
+<footer>{% include "include/piepag.html" %}</footer>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Inscripción</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/pago.css') }}">´
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    {% include "include/Nav.html" %}
+    <div class="contenedor-formulario">
+        <h1>Formulario de Inscripción</h1>
+        <p class="instrucciones">Complete el siguiente formulario para inscribirse</p>
+        
+        <form class="formulario-inscripcion">
+            <div class="campo-formulario">
+                <h2>Nombre y Apellidos del Asistente</h2>
+                <input type="text" placeholder="Ingrese su nombre" required>
+            </div>
+            
+            <div class="campo-formulario">
+                <h3>Correo Electrónico</h3>
+                <input type="email" placeholder="Ingrese su correo electrónico" required>
+            </div>
+            
+            <div class="campo-formulario">
+                <h3>TIPO DE DOCUMENTO</h3>
+                <div class="opciones-documento">
+                    <label>
+                        <input type="radio" name="tipo-documento" value="CC" checked> C.C
+                    </label>
+                    <label>
+                        <input type="radio" name="tipo-documento" value="TI"> T.I
+                    </label>
+                    <label>
+                        <input type="radio" name="tipo-documento" value="CE"> C.E
+                    </label>
+                </div>
+            </div>
+            
+            <div class="campo-formulario">
+                <h3>NÚMERO DE DOCUMENTO</h3>
+                <input type="text" placeholder="Ingrese su NÚMERO DE DOCUMENTO" required>
+            </div>
+            
+            <div class="campo-formulario">
+                <h3>Inscripción con Google</h3>
+                <button type="submit" class="boton-enviar">Enviar</button>
+            </div>
+        </form>
+        
+        <div class="info-evento">
+            <p class="evento-actual"><strong>Actualmente te estas inscribiendo a: XXXXXXX</strong></p>
+            <p class="inscripciones-linea">[Inscripciones en line]</p>
+            <p class="llamado-accion">Inscriptuase ahora para participar</p>
+        </div>
+        
+        <div class="mas-detalles">
+            <a href="#" class="enlace-detalles">Ver más detalles</a>
+        </div>
+        
+        <div class="metodos-pago">
+            <h3>Tarjetas de Pago Aceptadas</h3>
+            <div class="iconos-pago">
+                <span class="metodo-pago">PSE</span>
+                <span class="metodo-pago">Visa</span>
+                <span class="metodo-pago">Mastercard</span>
+                <span class="metodo-pago">Amex</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

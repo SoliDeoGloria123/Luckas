@@ -1,0 +1,117 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+/* Contenedor principal */
+.evento-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+}
+
+/* Encabezado del evento */
+.evento-header h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.evento-fecha {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-top: 0;
+}
+
+/* Precio */
+.evento-precio {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.precio {
+    font-size: 28px;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+/* Descripción */
+.evento-descripcion {
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.pregunta {
+    font-style: italic;
+    color: #e74c3c;
+    margin: 10px 0;
+}
+
+.opcion {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+/* Botón de pago */
+.evento-pago {
+    text-align: center;
+    margin: 25px 0;
+}
+
+.boton-pse {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.boton-pse:hover {
+    background-color: #2980b9;
+}
+
+/* Preguntas frecuentes */
+.evento-faq {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.pregunta-titulo {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+.pregunta-respuesta {
+    margin-bottom: 0;
+}
+
+/* Detalles de pago */
+.evento-detalles-pago {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #ecf0f1;
+}
+
+.evento-detalles-pago h3 {
+    color: #2c3e50;
+    margin-top: 0;
+}
+
+.nota {
+    font-size: 13px;
+    color: #95a5a6;
+    font-style: italic;
+}
