@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/form_inscription.css') }}">
+  </head>
+  <body>
+    <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario de Inscripción</title>
+</head>
+
+<body>
+  <div class="form-event">
+    <div class="form">
+      <div class="container">
+        <div class="title">Formulario de Inscripción</div>
+        <div class="description">Complete el siguiente formulario para inscribirse</div>
+      </div>
+      <div class="list">
+        <div class="row">
+          <div class="input">
+            <div class="title2">Nombres y Apellidos del Asistente</div>
+            <div class="textfield2">
+              <input id="name" type="text" placeholder="Ingrese su nombre">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input">
+            <div class="title2">Correo Electrónico</div>
+            <div class="textfield2">
+              <input id="email" type="email" placeholder="Ingrese su correo electrónico">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="selection">
+            <div class="title2">TIPO DE DOCUMENTO</div>
+            <div class="chip-group">
+              <div class="chip" data-type="CC" onclick="selectChip(this)">
+                <div class="text3">C.C</div>
+              </div>
+              <div class="chip" data-type="TI" onclick="selectChip(this)">
+                <div class="text3">T.I</div>
+              </div>
+              <div class="chip" data-type="CE" onclick="selectChip(this)">
+                <div class="text3">C.E</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input">
+            <div class="title2">NUMERO DE DOCUMENTO</div>
+            <div class="textfield2">
+              <input id="documentNumber" type="text" placeholder="Ingrese su NUMERO DE DOCUMENTO">
+            </div>
+          </div>
+        </div>
+        <div class="button">
+          <div class="primary">
+            <a href="{{ url_for('gest_personas_pro') }}" class="inscription-link">Enviar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="avatar"></div>
+      <div class="container2">
+        <div class="title5">Actualmente te estas inscribiendo a: XXXXXXX</div>
+        <div class="selection2">
+          <div class="label-normal">
+            <div class="label-text">Inscripciones en línea</div>
+          </div>
+        </div>
+      </div>
+      <div class="button2">
+        <div class="primary2" onclick="viewMoreDetails()">
+          <div class="title4">Ver más detalles</div>
+        </div>
+      </div>
+      <img class="vector-2002" src="vector-2001.svg" />
+    </div>
+    <div class="list2">
+      <div class="container">
+        <div class="title">Métodos de Pago Aceptados</div>
+      </div>
+      <div class="list3">
+        <div class="row2">
+          <div class="item">
+            <div class="frame">
+              <div class="icon">💳</div>
+            </div>
+            <div class="frame-427318906">
+              <div class="title6">PSE</div>
+              <div class="subtitle">Mediante PSE, podras pagar con tu banco u App, favorita :)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function selectChip(selectedChip) {
+      const chips = document.querySelectorAll('.chip');
+      chips.forEach(chip => {
+        if (chip === selectedChip) {
+          chip.classList.add('active');
+          chip.classList.remove('inactive');
+        } else {
+          chip.classList.remove('active');
+          chip.classList.add('inactive');
+        }
+      });
+    }
+
+    function submitForm() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const documentNumber = document.getElementById('documentNumber').value;
+      const selectedChip = document.querySelector('.chip.active');
+
+      if (!name || !email || !documentNumber || !selectedChip) {
+        alert("Por favor complete todos los campos antes de enviar.");
+        return;
+      }
+
+      console.log("Formulario enviado con éxito:");
+      console.log("Nombre:", name);
+      console.log("Correo:", email);
+      console.log("Tipo de Documento:", selectedChip.dataset.type);
+      console.log("Número de Documento:", documentNumber);
+      alert("Formulario enviado con éxito.");
+    }
+  </script>
+</body>
+
+</html>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>

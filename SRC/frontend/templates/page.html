@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luckas Header</title>
     <link rel="icon" href="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='css/page_content.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/page.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
 
@@ -20,7 +20,7 @@
         </div>
 
         <div class="search-bar">
-            <input type="text" placeholder="Busca un producto o tienda">
+            <input type="text" placeholder="Ingresa algo que no encuentres">
             <button><i class="fas fa-search"></i></button>
         </div>
 
@@ -32,385 +32,150 @@
 
     </nav>
     <!-- Menú de arriba -->
-    <nav class="menu-container">
-        <ul class="menu-navigation">
-            <li><a class="menu-link" href="{{ url_for('categoria') }}">Categorías</a></li>
-            <li><a class="menu-link" href="{{ url_for('ofertas') }}">Ofertas</a></li>
-            <li><a class="menu-link" href="{{ url_for('tulista') }}">Mi Lista</a></li>
-            <li><a class="menu-link" href="{{ url_for('cuenta') }}#seccion-destino">Favoritos</a></li>
-            <li><a class="menu-link" href="#">Ayuda</a></li>
-        </ul>
-    </nav>
 
-    <section class="hero">
-        <div class="hero-container">
-
-
-            <!-- Texto central -->
-            <div class="hero-content">
-                <h1>Descubre y Compara</h1>
-                <p>Encuentra la mejor selección de productos</p>
-
-                <!-- Barra de búsqueda -->
-                <div class="hero-search">
-                    <input type="text" placeholder="Busca un producto o tienda">
-                    <button><i class="fas fa-search"></i></button>
-                </div>
-
-                <!-- Botón de buscar -->
-                <button class="hero-button">Buscar</button>
-            </div>
-        </div>
-    </section>
-
-    <section class="productos-destacados">
-        <h2>Productos Destacados</h2>
-
-        <div class="carousel-container">
-            <!-- Flecha izquierda -->
-            <button class="arrow left">&lt;</button>
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    // Seleccionar todos los botones con la clase .btn-detalles
-                    const detalleBtns = document.querySelectorAll('.btn-detalles');
-
-                    // Agregar un evento de clic a cada botón
-                    detalleBtns.forEach(btn => {
-                        btn.addEventListener('click', function () {
-                            wwindow.location.href = "{{ url_for('detalle_producto', product_id='id_del_producto') }}";  // Redirige a Flask
-                        });
-                    });
-                });
-            </script>
-            <!-- Cards de productos -->
-            <div class="carousel">
-                <!-- Card 1 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP.jpg') }}" alt="Carne para asar">
-                    <div class="card-content">
-                        <h3>Carne para asar</h3>
-                        <p>500 g</p>
-                        <p><strong>Precio Promedio:</strong> $17.000</p>
-                        <div class="btn-group">
-                            <button class="btn-azul">Agregar</button>
-                            <button id="detalle" class="btn-detalles">Ver detalles</button>
+    <div class="pageuser-products">
+        <div class="pageuser-container3"><span class="pageuser-text15">Modulos</span></div>
+        <div class="pageuser-frame427318919">
+            <div class="pageuser-list1">
+                <div class="pageuser-row1">
+                    <div class="pageuser-card1">
+                        <div class="pageuser-frame4273203151"><img
+                                src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="Gestión de personas" class="pageuser-unsplash-dvrxfih42d01" />
+                        </div>
+                        <div class="pageuser-textcontent1">
+                            <h3 class="pageuser-text16">Gestión de personas</h3>
+                            <p class="pageuser-text17">Aquí podrás registrarte para eventos del Seminario</p>
+                            <button class="pageuser-buttonprimary2">
+                                <a class="pageuser-text21" href="{{ url_for('gest_personas') }}">Ver módulo</a>
+                            </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_1.jpg') }}" alt="Papa Pastusa">
-                    <div class="card-content">
-                        <h3>Papa Pastusa</h3>
-                        <p>1 kg</p>
-                        <p><strong>Precio Promedio:</strong> $12.000</p>
-                        <div class="btn-group">
-                            <button class="btn-azul">Agregar</button>
-                            <button id="detalle" class="btn-detalles">Ver detalles</button>
+                    <div class="pageuser-card2">
+                        <div class="pageuser-frame4273203151"><img
+                                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="Gestión de personas" class="pageuser-unsplash-dvrxfih42d01" />
+                        </div>
+                        <div class="pageuser-textcontent1">
+                            <h3 class="pageuser-text19">Inscripciones</h3>
+                            <p class="pageuser-text20">Aquí podrás inscribirte como Seminarista fácilmente.</p>
+                            <button class="pageuser-buttonprimary2">
+                                <span class="pageuser-text21">Ver módulo</span>
+                            </button>
                         </div>
                     </div>
-                </div>
-
-
-                <!-- Card 3 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3>Salsa de tomate Graco</h3>
-                        <p>135 g</p>
-                        <p><strong>Precio:</strong> $6.000</p>
-                        <div class="btn-group">
-                            <button class="btn-azul">Agregar</button>
-                            <button id="detalle" class="btn-detalles">Ver detalles</button>
+                    <div class="pageuser-card3">
+                        <div class="pageuser-frame4273203151"><img
+                                src="https://images.unsplash.com/photo-1506784365847-bbad939e9335?q=80&w=2068&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="Gestión de personas" class="pageuser-unsplash-dvrxfih42d01" /></div>
+                        <div class="pageuser-textcontent1">
+                            <h3 class="pageuser-text16">Ver Calendario de eventos</h3>
+                            <p class="pageuser-text17">Planificar y comunicar las actividades del seminario.</p>
+                            <button class="pageuser-buttonprimary2"><span class="pageuser-text21">Ver módulo</span>
+                            </button>
                         </div>
                     </div>
-                </div>
-                <!-- Card 4 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3>Salsa de tomate Graco</h3>
-                        <p>135 g</p>
-                        <p><strong>Precio:</strong> $6.000</p>
-                        <div class="btn-group">
-                            <button class="btn-azul">Agregar</button>
-                            <button id="detalle" class="btn-detalles">Ver detalles</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 5  -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3>Salsa de tomate Graco</h3>
-                        <p>135 g</p>
-                        <p><strong>Precio:</strong> $6.000</p>
-                        <div class="btn-group">
-                            <button class="btn-azul">Agregar</button>
-                            <button id="detalle" class="btn-detalles">Ver detalles</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 6 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3>Salsa de tomate Graco</h3>
-                        <p>135 g</p>
-                        <p><strong>Precio:</strong> $6.000</p>
-                        <div class="btn-group">
-                            <button class="btn-azul">Agregar</button>
-                            <button id="detalle" class="btn-detalles">Ver detalles</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 7 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3>Salsa de tomate Graco</h3>
-                        <p>135 g</p>
-                        <p><strong>Precio:</strong> $6.000</p>
-                        <div class="btn-group">
-                            <button class="btn-azul">Agregar</button>
-                            <button id="detalle" class="btn-detalles">Ver detalles</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Flecha derecha -->
-            <button class="arrow right">&gt;</button>
-        </div>
-
-    </section>
-
-    <section class="categorias">
-        <h2>Explora&nbsp; nuestras categorías</h2>
-
-        <div class="grid-categorias">
-            <!-- Card 1 -->
-            <div class="categoria-card">
-                <div class="icono">
-                    <img src="{{ url_for('static', path='img/bicolor_icon_strawberry.png') }}" alt="Frutas y Verduras">
-                </div>
-                <h3>Frutas y Verduras</h3>
-                <p>Descubre las carnes de más alta calidad</p>
-            </div>
-
-            <!-- Card 2 -->
-            <div class="categoria-card">
-                <div class="icono">
-                    <img src="{{ url_for('static', path='img/bicolor_icon_chicken.png') }}" alt="Cárnicos">
-                </div>
-                <h3>Cárnicos</h3>
-                <p>Descubre las carnes de más alta calidad</p>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="categoria-card">
-                <div class="icono">
-                    <img src="{{ url_for('static', path='img/bicolor_icon_fish.png') }}" alt="Pescados">
-                </div>
-                <h3>Pescados</h3>
-                <p>Descubre las carnes de más alta calidad</p>
-            </div>
-
-            <!-- Card 4 -->
-            <div class="categoria-card">
-                <div class="icono">
-                    <img src="{{ url_for('static', path='img/bicolor_icon_bread.png') }}" alt="Panadería">
-                </div>
-                <h3>Panadería</h3>
-                <p>Descubre las carnes de más alta calidad</p>
-            </div>
-
-            <!-- Card 5 -->
-            <div class="categoria-card">
-                <div class="icono">
-                    <img src="{{ url_for('static', path='img/bicolor_icon_candy.png') }}" alt="Dulces y Abarrotes">
-                </div>
-                <h3>Dulces y Abarrotes</h3>
-                <p>Descubre las carnes de más alta calidad</p>
-            </div>
-
-            <!-- Card 6 -->
-            <div class="categoria-card">
-                <div class="icono">
-                    <img src="{{ url_for('static', path='img/bicolor_icon_bottle copy.png') }}" alt="Bebidas">
-                </div>
-                <h3>Bebidas</h3>
-                <p>Descubre las carnes de más alta calidad</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="favoritos">
-        <h2>Tus favoritos <span>💙</span></h2>
-
-        <div class="carousel-container">
-            <!-- Flecha izquierda -->
-            <button class="arrow left">&lt;</button>
-
-            <!-- Carrusel de productos -->
-            <div class="carousel">
-                <!-- Producto 1 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3 aling center>lechuga romana</h3>
-                        <div class="btn-group">
-                            <button class="btn-azul">Ver</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Producto 2 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3 aling center>lechuga crespa</h3>
-                        <div class="btn-group">
-                            <button class="btn-azul">Ver</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Producto 3 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3 aling center>Zanahorias</h3>
-                        <div class="btn-group">
-                            <button class="btn-azul">Ver</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Producto 4 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3 aling center>lechuga romana</h3>
-                        <div class="btn-group">
-                            <button class="btn-azul">Ver</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Producto 5 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3 aling center>lechuga romana</h3>
-                        <div class="btn-group">
-                            <button class="btn-azul">Ver</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Producto 6 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3 aling center>lechuga romana</h3>
-                        <div class="btn-group">
-                            <button class="btn-azul">Ver</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Producto 7 -->
-                <div class="card">
-                    <button class="product-card__favorite-btn" aria-label="Añadir a favoritos"></button>
-                    <img src="{{ url_for('static', path='img/OIP_2.jpg') }}" alt="Salsa de tomate Graco">
-                    <div class="card-content">
-                        <h3 aling center>lechuga romana</h3>
-                        <div class="btn-group">
-                            <button class="btn-azul">Ver</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Puedes agregar más productos aquí -->
-            </div>
-            <!-- Flecha derecha -->
-            <button class="arrow right">&gt;</button>
-        </div>
-    </section>
-    <section class="reviews">
-        <h2>Reseñas de Productos</h2>
-
-        <div class="reviews-container">
-            <div class="review-card">
-                <div class="user">
-                    <img src="https://cdn-icons-png.flaticon.com/512/194/194938.png" alt="Juan David" />
-                    <span>Juan David</span>
-                </div>
-                <p>Excelente producto, lo recomiendo</p>
-                <div class="stars">
-                    <span class="star" data-value="1">★</span>
-                    <span class="star" data-value="2">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="5">★</span>
-                </div>
-            </div>
-
-            <div class="review-card">
-                <div class="user">
-                    <img src="https://cdn-icons-png.flaticon.com/512/194/194935.png" alt="Luis Felipe" />
-                    <span>Luis Felipe</span>
-                </div>
-                <p>Buena calidad y precio accesible</p>
-                <div class="stars">
-                    <span class="star" data-value="1">★</span>
-                    <span class="star" data-value="2">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="5">★</span>
-                </div>
-            </div>
-
-            <div class="review-card">
-                <div class="user">
-                    <img src="https://cdn-icons-png.flaticon.com/512/194/194936.png" alt="Susana Robles" />
-                    <span>Susana Robles</span>
-                </div>
-                <p>Cumplió con mis expectativas</p>
-                <div class="stars">
-                    <span class="star" data-value="1">★</span>
-                    <span class="star" data-value="2">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="5">★</span>
                 </div>
             </div>
         </div>
-    </section>
-
-    <script src="{{ url_for('static', path='js/carousel2.js') }}"></script>
-
+        <div class="pageuser-row2">
+            <div class="pageuser-card4">
+                <div class="pageuser-frame4273203151"><img
+                        src="https://images.unsplash.com/photo-1642612374066-afa81e251991?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="Gestión de personas" class="pageuser-unsplash-dvrxfih42d01" /></div>
+                <div class="pageuser-textcontent1">
+                    <h3 class="pageuser-text16">Ver Asignación de cabañas</h3>
+                    <p class="pageuser-text17">Aquí pudes ver donde te toco alojarte</p>
+                    <button class="pageuser-buttonprimary2"><span class="pageuser-text21">Ver módulo</span>
+                    </button>
+                </div>
+            </div>
+            <div class="pageuser-card5">
+                <div class="pageuser-frame4273203151"><img
+                        src="https://images.unsplash.com/photo-1585853088189-7c7fadd9b38e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="Gestión de personas" class="pageuser-unsplash-dvrxfih42d01" /></div>
+                <div class="pageuser-textcontent1">
+                    <h3 class="pageuser-text16">Asignación de tareas</h3>
+                    <p class="pageuser-text17">Permite conocer las tareas de los equipos</p>
+                    <button class="pageuser-buttonprimary2"><span class="pageuser-text21">Ver módulo</span>
+                    </button>
+                </div>
+            </div>
+            <div class="pageuser-card6">
+                <div class="pageuser-frame4273203151"><img
+                        src="https://images.unsplash.com/photo-1667314048804-9137e456dd00?q=80&w=2075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="Gestión de personas" class="pageuser-unsplash-dvrxfih42d01" /></div>
+                <div class="pageuser-textcontent1">
+                    <h3 class="pageuser-text16">Ver Calendario para alquilar finca</h3>
+                    <p class="pageuser-text17">Generar información útil para análisis, planificación y presentación.</p>
+                    <button class="pageuser-buttonprimary2"><span class="pageuser-text21">Ver módulo</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pageuser-data-metrics">
+        <div class="pageuser-container5">
+            <div class="pageuser-container6"><span class="pageuser-text51">Anuncios</span>
+                <span class="pageuser-text52">Podras ver las actividades del seminario.</span>
+            </div>
+        </div>
+        <div class="pageuser-list3">
+            <div class="pageuser-row4">
+                <div class="pageuser-metric"><span class="pageuser-text53">1/01/2026</span><span
+                        class="pageuser-text54">Exameles Trimestrales y sus resultados</span><span
+                        class="pageuser-text55">Querido estudiante, te informamos que los resultados de tus
+                        pruebas ya se pueden ver</span></div>
+            </div>
+        </div>
+        <span class="pageuser-text56"> Ver Más Anuncios</span>
+    </div>
+    <div class="pageuser-list2">
+        <div class="pageuser-container4"><span class="pageuser-text38">Eventos Anteriores</span></div>
+        <div class="pageuser-vitrinafavoritoschevron"><img
+                src="{{ url_for('static', path='img/chevronleft5078-8qwk.svg') }}" alt="chevronleft5078"
+                class="pageuser-chevronleft" />
+            <div class="pageuser-row3">
+                <div class="pageuser-card7">
+                    <div class="pageuser-imagecontainer5">
+                        <div class="pageuser-image5"><span class="pageuser-text39">Imagen1</span>
+                            <div class="pageuser-tag1"><span class="pageuser-text40">Activo</span></div>
+                        </div>
+                    </div>
+                    <div class="pageuser-textcontent7"><span class="pageuser-text41">Edición 1</span><span
+                            class="pageuser-text42">Participantes: 50</span></div>
+                </div>
+                <div class="pageuser-card8">
+                    <div class="pageuser-imagecontainer6">
+                        <div class="pageuser-image6"><span class="pageuser-text43">Imagen2</span>
+                            <div class="pageuser-tag2"><span class="pageuser-text44">Activo</span></div>
+                        </div>
+                    </div>
+                    <div class="pageuser-textcontent8"><span class="pageuser-text45">Edición 2</span><span
+                            class="pageuser-text46">Participantes: 45</span></div>
+                </div>
+                <div class="pageuser-card9">
+                    <div class="pageuser-imagecontainer7">
+                        <div class="pageuser-image7"><span class="pageuser-text47">Imagen3</span>
+                            <div class="pageuser-tag3"><span class="pageuser-text48">Activo</span></div>
+                        </div>
+                    </div>
+                    <div class="pageuser-textcontent9"><span class="pageuser-text49">Edición 3</span><span
+                            class="pageuser-text50">Participantes: 60</span></div>
+                </div>
+            </div><img src="{{ url_for('static', path='img/chevronright5078-agt8.svg') }}" alt="chevronright5078"
+                class="pageuser-chevronright" />
+        </div>
+    </div>
 </body>
 <footer>
     <div class="footer">
         <div class="footer-content">
             <div class="footer-column">
                 <div class="footer-info">
-                    <div class="footer-heading">Comparte y ahorra en tus compras diarias</div>
+                    <div class="footer-heading">SBC</div>
                     <div class="footer-text">
-                        Encuentra los mejores precios en supermercados y toma decisiones
-                        inteligentes para tu hogar.
+                        Gestiona los procesos de Inscripcion y calendarios
                     </div>
                 </div>
                 <div class="footer-actions">

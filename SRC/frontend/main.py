@@ -22,7 +22,7 @@ import re
 from dotenv import load_dotenv
 import os
 from typing import List
-from SRC.back_end.ofertas import data_analist_products
+
 
 # Mapeo de categorías a términos de búsqueda
 CATEGORIAS_MAPPING = {
@@ -207,9 +207,10 @@ async def page (request: Request, current_user=Depends(require_login)):
     return templates.TemplateResponse("page.html", {"request": request, "usuario": current_user})
 
 # Rutas de la aplicación FastAPI para manejar la autenticación y el acceso a las páginas del sitio LuckasEnt
-@app.get("/")
-async def home(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
+@app.get("/", name="root")
+async def root():
+    # Redirige a la página de login
+    return RedirectResponse(url="/login")
 
 @app.get("/login", name="login")
 async def login(request: Request):
@@ -753,19 +754,19 @@ async def detalle_producto(request: Request, product_id: str):
 @app.get("/ofertas", name="ofertas")
 async def ofertas(request: Request, q: str = "", page: int = Query(1, gt=0)):
     page_size = 10  # Número de productos por página
-    result = data_analist_products(search_query=q, page=page, page_size=page_size)
-    productos = result["productos"]
-    total_productos = result["total_productos"]
-    total_paginas = (total_productos + page_size - 1) // page_size  # Calcular total de páginas
+    #result = data_analist_products(search_query=q, page=page, page_size=page_size)
+    #productos = result["productos"]
+    #total_productos = result["total_productos"]
+    #total_paginas = (total_productos + page_size - 1) // page_size  # Calcular total de páginas
 
     return templates.TemplateResponse(
         "ofertas.html",
         {
             "request": request,
-            "best_products": productos,
-            "total_productos": total_productos,
+    #        "best_products": productos,
+    #        "total_productos": total_productos,
             "pagina_actual": page,
-            "total_paginas": total_paginas,
+    #        "total_paginas": total_paginas,
             "query": q,
         },
     )
@@ -884,6 +885,21 @@ async def categoria_bebida(request: Request, q: str = "", page: int = Query(1, g
 async def nosotros(request: Request):  # ✔️ Nombre correcto de la función
     return templates.TemplateResponse("nosotros.html", {"request": request})
 
+@app.get("/gest_personas", name="gest_personas")
+async def gest_personas(request: Request):
+    return templates.TemplateResponse("gest_personas.html", {"request": request})
+
+@app.get("/gest_personas_pro", name="gest_personas_pro")
+async def gest_personas_prosess(request: Request):
+    return templates.TemplateResponse("gest_personas_pro.html", {"request": request})
+
+@app.get("/form_inscription", name="form_inscription")
+async def form_inscription(request: Request):
+    return templates.TemplateResponse("form_inscription.html", {"request": request})
+
+@app.get("/pagos_eventos", name="pagos_eventos")
+async def pagos_eventos(request: Request):
+    return templates.TemplateResponse("pagos_eventos.html", {"request": request})
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):

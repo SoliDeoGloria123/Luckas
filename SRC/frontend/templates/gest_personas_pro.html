@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Personas</title>
+  <link rel="icon" href="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/gest_personas_pro.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="nav-bar">
+    <div class="logo">
+      <span class="luckas">Luckas</span>
+      <span class="ent">ent</span>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" placeholder="Ingresa algo que no encuentres">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+
+    <nav class="nav-menu">
+      <a href="{{ url_for('home') }}">Inicio</a>
+      <a href="{{ url_for('nosotros') }}">Nosotros</a>
+      <a href="{{ url_for('cuenta') }}">Mi perfil</a>
+    </nav>
+  </nav>
+
+  <!-- Contenido principal -->
+  <div class="gesti-n-de-personas">
+    <div class="section">
+      <div class="container">
+        <div class="title">Gestión de personas</div>
+        <div class="description">
+          Aquí podras registrarte para eventos del Seminario
+        </div>
+      </div>
+      <div class="image-container">
+        <img class="image"
+          src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+      </div>
+      <img class="vector-200" src="vector-2000.svg" />
+    </div>
+    <div class="prosses">
+      <div class="container-title">
+        <div class="title-prosses">Tu proceso de Inscripción</div>
+        <div class="description-prosses">
+          <span>
+            <span class="description-prosses-span">
+              Aquí podras ver tu proceso de
+            </span>
+            <span class="description-prosses-span2">Inscripción</span>
+            <span class="description-prosses-span">al evento: XXXXXX</span>
+          </span>
+        </div>
+      </div>
+      <div class="list-visual-prosess">
+        <div class="row-prosses">
+          <div class="item-prosess">
+            <img class="line-prosses-people" src="{{ url_for('static', path='img/line_prosses_people.svg') }}"/>
+            <div class="frame-pro">
+              <div class="icon">🥳</div>
+            </div>
+            <div class="detalles">
+              <div class="title-datalles">
+                <a href="{{ url_for('form_inscription') }}" class="details-link">Ver Más Detalles</a>
+              </div>
+              <div class="date">Fecha: DD/MM/YYYY</div>
+            </div>
+            <div class="subtitle-prosses">Datos</div>
+          </div>
+          <div class="item-prosess">
+            <img class="line-prosses2" src="{{ url_for('static', path='img/line_prosses.svg') }}" />
+            <div class="frame-pro">
+              <div class="icon">🤨</div>
+            </div>
+            <div class="detalles">
+              <div class="title-datalles">
+                <a href="{{ url_for('pagos_eventos') }}" class="details-link">Ver Más Detalles</a>
+              </div>
+              <div class="date">Fecha: DD/MM/YYYY</div>
+            </div>
+            <div class="subtitle-prosses">Recaudo</div>
+          </div>
+          <div class="item-prosess">
+            <img class="line-prosses2" src="{{ url_for('static', path='img/line_prosses.svg') }}" />
+            <div class="frame-pro">
+              <div class="icon">🤨</div>
+            </div>
+            <div class="detalles">
+              <div class="title-datalles">
+                <a href="{{ url_for('form_inscription') }}" class="details-link">Ver Más Detalles</a>
+              </div>
+              <div class="date">Fecha: DD/MM/YYYY</div>
+            </div>
+            <div class="subtitle-prosses">Vale de Inscripción</div>
+          </div>
+        </div>
+      </div>
+      <img class="vector-200" src="vector-2000.svg" />
+    </div>
+
+    <div class="products">
+      <div class="container2">
+        <div class="container">
+          <div class="title">Eventos Actuales</div>
+        </div>
+      </div>
+      <div class="list">
+        <div class="row">
+          <div class="card">
+            <img class="image-container2" src="image-container1.png" />
+            <div class="text-content">
+              <div class="title2">Matrimonio de Derly y Alex</div>
+              <div class="title3">Fecha limite: 1/01/2026</div>
+              <div class="subtitle">Costo: $XX.XX</div>
+              <div class="description2">
+                <a href="{{ url_for('form_inscription') }}" class="inscription-link">Inscribirse</a>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <img class="image-container2" src="image-container2.png" />
+            <div class="text-content">
+              <div class="title2">Por Su Causa 2024</div>
+              <div class="title3">Fecha limite: 1/01/2026</div>
+              <div class="subtitle">Costo: $XX.XX</div>
+              <div class="description2">
+                <a href="{{ url_for('form_inscription') }}" class="inscription-link">Inscribirse</a>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="image-container3">
+              <div class="image2" style="
+                  background: url(image1.png) center;
+                  background-size: cover;
+                  background-repeat: no-repeat;
+                ">
+                <div class="tag">
+                  <div class="text2">Ultimos cupos</div>
+                </div>
+              </div>
+            </div>
+            <div class="text-content">
+              <div class="title2">Hombradia</div>
+              <div class="title3">Fecha limite: 1/01/2026</div>
+              <div class="subtitle">Costo: $XX.XX</div>
+              <div class="description2">
+                <a href="{{ url_for('form_inscription') }}" class="inscription-link">Inscribirse</a>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="image-container3">
+              <div class="image2" style="
+                  background: url(image2.png) center;
+                  background-size: cover;
+                  background-repeat: no-repeat;
+                ">
+                <div class="tag">
+                  <div class="text2">Nuevo</div>
+                </div>
+              </div>
+            </div>
+            <div class="text-content">
+              <div class="title2">Product 1</div>
+              <div class="title3">Fecha limite: 1/01/2026</div>
+              <div class="subtitle">Costo: $XX.XX</div>
+              <div class="description2">
+                <a href="{{ url_for('form_inscription') }}" class="inscription-link">Inscribirse</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="description3">
+        <a href="{{ url_for('form_inscription') }}" class="inscription-link">Ver Más Eventos</a>
+      </div>
+      <img class="vector-2002" src="vector-2001.svg" />
+    </div>
+    <div class="list2">
+      <div class="container3">
+        <div class="title4">Eventos Anteriores</div>
+      </div>
+      <div class="vitrina-favoritos-chevron">
+        <img class="chevron-left" src="{{ url_for('static', path='img/chevronleft5078-8qwk.svg') }}" />
+        <div class="row2">
+          <div class="card">
+            <div class="image-container4">
+              <div class="image3">
+                <div class="title5">Imagen1</div>
+                <div class="tag">
+                  <div class="text2">Activo</div>
+                </div>
+              </div>
+            </div>
+            <div class="text-content">
+              <div class="title2">Edición 1</div>
+              <div class="subtitle">Participantes: 50</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="image-container4">
+              <div class="image3">
+                <div class="title5">Imagen2</div>
+                <div class="tag">
+                  <div class="text2">Activo</div>
+                </div>
+              </div>
+            </div>
+            <div class="text-content">
+              <div class="title2">Edición 2</div>
+              <div class="subtitle">Participantes: 45</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="image-container4">
+              <div class="image3">
+                <div class="title5">Imagen3</div>
+                <div class="tag">
+                  <div class="text2">Activo</div>
+                </div>
+              </div>
+            </div>
+            <div class="text-content">
+              <div class="title2">Edición 3</div>
+              <div class="subtitle">Participantes: 60</div>
+            </div>
+          </div>
+        </div>
+        <img class="chevron-right" src="{{ url_for('static', path='img/chevronright5078-agt8.svg') }}" />
+      </div>
+      <img class="vector-2003" src="vector-2002.svg" />
+    </div>
+</body>
+<!-- Footer -->
+<footer>
+  <div class="footer">
+    <div class="footer-content">
+      <div class="footer-column">
+        <div class="footer-info">
+          <div class="footer-heading">SBC</div>
+          <div class="footer-text">
+            Gestiona los procesos de Inscripción y calendarios
+          </div>
+        </div>
+        <div class="footer-actions">
+          <button class="footer-btn-primary">
+            <a href="#" class="footer-btn-text-primary">Explorar</a>
+          </button>
+          <button class="footer-btn-secondary">
+            <a id="Ayuda" href="#" class="footer-btn-text-secondary">Ayuda</a>
+          </button>
+        </div>
+      </div>
+      <div class="footer-links-column">
+        <div class="footer-link-list">
+          <div class="footer-link-item">
+            <a href="#" class="footer-link">Inicio</a>
+          </div>
+          <div class="footer-link-item">
+            <a href="#" class="footer-link">Contáctanos</a>
+          </div>
+          <div class="footer-link-item">
+            <a href="#" class="footer-link">Ayuda Online</a>
+          </div>
+          <div class="footer-link-item">
+            <a href="#" class="footer-link">Política de Privacidad</a>
+          </div>
+          <div class="footer-link-item">
+            <a href="{{ url_for('termino') }}" class="footer-link">Términos de Uso</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-credits">
+      <div class="footer-logo-row">
+        <div class="footer-logo-container">
+          <img class="footer-logo" src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt.png') }}" />
+        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom-row">
+        <div class="footer-copyright">
+          © 2024 LuckasEnt. Todos los derechos reservados.
+        </div>
+        <div id="contacto" class="footer-social-links">
+          <a href="https://facebook.com" target="_blank">
+            <img class="footer-social-icon" src="{{ url_for('static', path='img/Facebook.png') }}" alt="Facebook" />
+          </a>
+          <a href="https://twitter.com" target="_blank">
+            <img class="footer-social-icon" src="{{ url_for('static', path='img/X.png') }}" alt="Twitter" />
+          </a>
+          <a href="https://instagram.com" target="_blank">
+            <img class="footer-social-icon" src="{{ url_for('static', path='img/Instagram.png') }}" alt="Instagram" />
+          </a>
+          <a href="https://linkedin.com" target="_blank">
+            <img class="footer-social-icon" src="{{ url_for('static', path='img/LinkedIn.png') }}" alt="LinkedIn" />
+          </a>
+          <a href="https://youtube.com" target="_blank">
+            <img class="footer-social-icon" src="{{ url_for('static', path='img/Youtube.png') }}" alt="YouTube" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</html>
