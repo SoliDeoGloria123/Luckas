@@ -901,6 +901,10 @@ async def form_inscription(request: Request):
 async def pagos_eventos(request: Request):
     return templates.TemplateResponse("pagos_eventos.html", {"request": request})
 
+@app.get("/confirmacion_inscript", name="confirmacion_inscript")
+async def confirmacion_inscript(request: Request):
+    return templates.TemplateResponse("confirmacion_inscript.html", {"request": request})
+
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     return templates.TemplateResponse(
