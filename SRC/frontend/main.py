@@ -905,6 +905,17 @@ async def pagos_eventos(request: Request):
 async def confirmacion_inscript(request: Request):
     return templates.TemplateResponse("confirmacion_inscript.html", {"request": request})
 
+@app.get("/cabana", name="cabana")
+async def cabana(request: Request):
+    return templates.TemplateResponse("cabana.html", {"request": request})
+
+@app.post("/submit_cabana", name="submit_cabana")
+async def submit_cabana(request: Request, nombre: str = Form(...), cedula: str = Form(...), explicacion: str = Form(...), respuesta_email: str = Form(...)):
+    # Aquí puedes procesar los datos del formulario
+    print(f"Nombre: {nombre}, Cédula: {cedula}, Explicación: {explicacion}, Respuesta por email: {respuesta_email}")
+    # Redirigir al usuario a una página de confirmación
+    return templates.TemplateResponse("cabana.html", {"request": request, "success": "Propuesta enviada correctamente."})
+
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     return templates.TemplateResponse(
