@@ -23,3 +23,8 @@ async def home(request: Request):
 @app.get("/gestion_persona", name="gestion_persona")
 async def gestion_persona(request: Request):
     return templates.TemplateResponse("GestionPersona.html", {"request": request})
+
+#Pagina segundaria: Gestion de pagos
+@app.get("/gestionpagos", name="gestionpagos")
+async def gestionpagos(request: Request):
+    return templates.TemplateResponse("gestionpagos.html", {"request": request})

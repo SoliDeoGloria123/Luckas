@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion pagos</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/Evento.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+</head>
+<body>
+    {% include "include/Nav.html" %}
+    <header class="header">
+        <div>
+          <h1>Gestión de Eventos</h1>
+          <p>Planifica, organiza y colabora en eventos</p>
+        </div>
+        <button>Subir</button>
+      </header>
+    
+      <main>
+        <section class="crear-evento">
+          <h2>Crea un Evento</h2>
+          <div class="crear-form">
+            <form>
+              <label>Nombre del Evento:<br><input type="text" required></label>
+              <label>Fecha:<br><input type="date" required></label>
+              <label>Hora:<br><input type="time" required></label>
+              <label>Ubicación:<br><input type="text"></label>
+              <label>Tipo:<br>
+                <select>
+                  <option>Virtual</option>
+                  <option>Presencial</option>
+                  <option>Híbrido</option>
+                </select>
+              </label>
+              <label>Descripción:<br><textarea></textarea></label>
+              <div class="buttons">
+                <button type="submit">Publicar</button>
+                <button type="reset">Cancelar</button>
+              </div>
+            </form>
+            <div class="preview">[ Vista previa del evento ]</div>
+          </div>
+        </section>
+    
+        <section>
+          <h2>Próximos eventos</h2>
+          <button>Ver Todos</button>
+          <div class="event-cards">
+            <div class="event">🌐 Seminario de Marketing<br>12 Mayo 2025</div>
+            <div class="event">📱 Meetup de Transformación Digital<br>15 Mayo 2025</div>
+            <div class="event">🏢 Conferencia de Innovación<br>20 Mayo 2025</div>
+          </div>
+        </section>
+    
+        <section>
+          <h2>Recordatorios de eventos</h2>
+          <ul class="reminders">
+            <li>Seminario UX – Virtual</li>
+            <li>Workshop IA – Sala 2</li>
+            <li>Conferencia Innovación – Centro Cultural</li>
+          </ul>
+        </section>
+    
+        <section>
+          <h2>Community Buzz</h2>
+          <button>Ver Comentarios</button>
+          <div class="buzz">
+            <div class="comment">
+              <p>Juan comentó: “¡Excelente organización del último evento!”</p>
+            </div>
+            <div class="comment">
+              <p>María publicó una foto</p>
+              <div class="preview">[ Imagen del evento ]</div>
+            </div>
+          </div>
+        </section>
+      </main>
+  
+  </body>
+  <footer>{% include "include/piepag.html" %}</footer>
+</html>

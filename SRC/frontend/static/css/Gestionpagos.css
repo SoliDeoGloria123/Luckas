@@ -1,0 +1,80 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+  }
+  
+  header.hero {
+    background-color: #ffffff;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  button {
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    background-color: black;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  section {
+    background-color: white;
+    padding: 2rem;
+    margin: 1rem auto;
+    max-width: 800px;
+    border-radius: 10px;
+  }
+  
+  .cards {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1rem;
+  }
+  
+  .card {
+    text-align: center;
+  }
+  
+  .card img {
+    width: 50px;
+  }
+  
+  form {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 1rem;
+  }
+  
+  form input {
+    padding: 0.5rem;
+    flex: 1;
+  }
+  
+  .metricas .resumen {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1rem;
+  }
+  
+  .grafica img {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #eeeeee;
+    font-size: 0.9rem;
+  }
+  
