@@ -24,7 +24,7 @@ ENV OAUTHLIB_INSECURE_TRANSPORT=1
 EXPOSE 5001
 
 # Comando para arrancar el server con uvicorn
-CMD ["uvicorn", "SRC.front_end.main:app", "--reload", "--host", "0.0.0.0", "--port", "5001"]
+CMD ["uvicorn", "SRC.frontend.main:app", "--reload", "--host", "0.0.0.0", "--port", "5001"]
 
 
 

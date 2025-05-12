@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es" class="dark-theme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursos - Luckas</title>
+    <!-- Google Font - Bebas Neue -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/cursos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/animations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/theme-switcher.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Fondo animado para toda la página -->
+    <div class="animated-bg"></div>
+    
+    <header class="neo-header">
+        <!-- Header content -->
+        <div class="logo-container">
+            <img src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt de Kent.png') }}" alt="Logo del Seminario" class="logo">
+            <h1 class="seminary-title">Luckas</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                <li><a href="{{ url_for('cursos') }}" class="active">Cursos</a></li>
+                <li><a href="{{ url_for('inscripcion') }}">Inscripción</a></li>
+                <li><a href="{{ url_for('nosotros') }}">Contacto</a></li>
+            </ul>
+            <a href="{{ url_for('login') }}" class="neo-button login-button">Iniciar Sesión</a>
+        </nav>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-title neo-container fade-in">
+            <h1 class="elegant-title">Nuestros Cursos</h1>
+            <p>Explora nuestra oferta académica diseñada para equiparte en tu camino ministerial.</p>
+        </section>
+
+        <section class="curso-filters neo-container fade-in">
+            <h2>Filtrar Cursos</h2>
+            <div class="filter-options">
+                <div class="filter-group">
+                    <label for="nivel">Nivel:</label>
+                    <div class="custom-select-wrapper">
+                        <select id="nivel" class="neo-select">
+                            <option value="">Todos los niveles</option>
+                            <option value="basico">Básico</option>
+                            <option value="intermedio">Intermedio</option>
+                            <option value="avanzado">Avanzado</option>
+                        </select>
+                        <div class="select-icon"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="categoria">Categoría:</label>
+                    <div class="custom-select-wrapper">
+                        <select id="categoria" class="neo-select">
+                            <option value="">Todas las categorías</option>
+                            <option value="biblia">Estudios Bíblicos</option>
+                            <option value="teologia">Teología</option>
+                            <option value="liderazgo">Liderazgo</option>
+                            <option value="ministerio">Ministerio Práctico</option>
+                        </select>
+                        <div class="select-icon"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="duracion">Duración:</label>
+                    <div class="custom-select-wrapper">
+                        <select id="duracion" class="neo-select">
+                            <option value="">Cualquier duración</option>
+                            <option value="corto">1-2 meses</option>
+                            <option value="medio">3-4 meses</option>
+                            <option value="largo">5+ meses</option>
+                        </select>
+                        <div class="select-icon"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cursos-lista neo-container" id="fundamentos">
+            <h2>Estudios Bíblicos</h2>
+            <div class="curso-cards">
+                <div class="neo-card curso-card fade-in">
+                    <div class="curso-imagen" style="background-image: url('images/curso-biblia-1.jpg');"></div>
+                    <span class="curso-nivel">Nivel Básico</span>
+                    <h3>Fundamentos Bíblicos</h3>
+                    <p>Introducción a los principios fundamentales de la Biblia y su interpretación. Un curso esencial para todo creyente.</p>
+                    <div class="curso-info">
+                        <span><i class="fas fa-calendar"></i> 3 meses</span>
+                        <span><i class="fas fa-clock"></i> 60 horas</span>
+                        <span><i class="fas fa-user-graduate"></i> Certificado</span>
+                    </div>
+                    <div class="curso-precio">
+                        <p>$250 USD</p>
+                    </div>
+                    <div class="curso-botones">
+                        <a href="detalle-curso.html?id=fundamentos" class="neo-button">Ver Detalles</a>
+                        <a href="inscripcion.html?curso=fundamentos" class="neo-button primary">Inscribirme</a>
+                    </div>
+                </div>
+                <div class="neo-card curso-card fade-in">
+                    <div class="curso-imagen" style="background-image: url('images/curso-biblia-2.jpg');"></div>
+                    <span class="curso-nivel">Nivel Intermedio</span>
+                    <h3>Hermenéutica Bíblica</h3>
+                    <p>Aprende métodos y principios para interpretar correctamente las Escrituras en sus contextos originales.</p>
+                    <div class="curso-info">
+                        <span><i class="fas fa-calendar"></i> 4 meses</span>
+                        <span><i class="fas fa-clock"></i> 80 horas</span>
+                        <span><i class="fas fa-user-graduate"></i> Certificado</span>
+                    </div>
+                    <div class="curso-precio">
+                        <p>$320 USD</p>
+                    </div>
+                    <div class="curso-botones">
+                        <a href="detalle-curso.html?id=hermeneutica" class="neo-button">Ver Detalles</a>
+                        <a href="inscripcion.html?curso=hermeneutica" class="neo-button primary">Inscribirme</a>
+                    </div>
+                </div>
+                <div class="neo-card curso-card fade-in">
+                    <div class="curso-imagen" style="background-image: url('images/curso-biblia-3.jpg');"></div>
+                    <span class="curso-nivel">Nivel Avanzado</span>
+                    <h3>Exégesis del Nuevo Testamento</h3>
+                    <p>Estudio profundo de los textos del Nuevo Testamento en sus idiomas originales y contexto histórico.</p>
+                    <div class="curso-info">
+                        <span><i class="fas fa-calendar"></i> 5 meses</span>
+                        <span><i class="fas fa-clock"></i> 100 horas</span>
+                        <span><i class="fas fa-user-graduate"></i> Certificado</span>
+                    </div>
+                    <div class="curso-precio">
+                        <p>$400 USD</p>
+                    </div>
+                    <div class="curso-botones">
+                        <a href="detalle-curso.html?id=exegesis" class="neo-button">Ver Detalles</a>
+                        <a href="inscripcion.html?curso=exegesis" class="neo-button primary">Inscribirme</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cursos-lista neo-container" id="teologia">
+            <h2>Teología</h2>
+            <div class="curso-cards">
+                <div class="neo-card curso-card fade-in">
+                    <div class="curso-imagen" style="background-image: url('images/curso-teologia-1.jpg');"></div>
+                    <span class="curso-nivel">Nivel Básico</span>
+                    <h3>Teología Sistemática</h3>
+                    <p>Estudio organizado de las doctrinas cristianas fundamentales y su aplicación para la vida de fe.</p>
+                    <div class="curso-info">
+                        <span><i class="fas fa-calendar"></i> 4 meses</span>
+                        <span><i class="fas fa-clock"></i> 80 horas</span>
+                        <span><i class="fas fa-user-graduate"></i> Certificado</span>
+                    </div>
+                    <div class="curso-precio">
+                        <p>$320 USD</p>
+                    </div>
+                    <div class="curso-botones">
+                        <a href="detalle-curso.html?id=teologia-sistematica" class="neo-button">Ver Detalles</a>
+                        <a href="inscripcion.html?curso=teologia-sistematica" class="neo-button primary">Inscribirme</a>
+                    </div>
+                </div>
+                <div class="neo-card curso-card fade-in">
+                    <div class="curso-imagen" style="background-image: url('images/curso-teologia-2.jpg');"></div>
+                    <span class="curso-nivel">Nivel Intermedio</span>
+                    <h3>Historia de la Iglesia</h3>
+                    <p>Recorrido por los eventos más importantes en el desarrollo del cristianismo desde sus inicios.</p>
+                    <div class="curso-info">
+                        <span><i class="fas fa-calendar"></i> 3 meses</span>
+                        <span><i class="fas fa-clock"></i> 60 horas</span>
+                        <span><i class="fas fa-user-graduate"></i> Certificado</span>
+                    </div>
+                    <div class="curso-precio">
+                        <p>$280 USD</p>
+                    </div>
+                    <div class="curso-botones">
+                        <a href="detalle-curso.html?id=historia-iglesia" class="neo-button">Ver Detalles</a>
+                        <a href="inscripcion.html?curso=historia-iglesia" class="neo-button primary">Inscribirme</a>
+                    </div>
+                </div>
+                <div class="neo-card curso-card fade-in">
+                    <div class="curso-imagen" style="background-image: url('images/curso-teologia-3.jpg');"></div>
+                    <span class="curso-nivel">Nivel Avanzado</span>
+                    <h3>Teología Bautista</h3>
+                    <p>Estudio profundo de los distintivos doctrinales y prácticas de la tradición bautista.</p>
+                    <div class="curso-info">
+                        <span><i class="fas fa-calendar"></i> 3 meses</span>
+                        <span><i class="fas fa-clock"></i> 60 horas</span>
+                        <span><i class="fas fa-user-graduate"></i> Certificado</span>
+                    </div>
+                    <div class="curso-precio">
+                        <p>$300 USD</p>
+                    </div>
+                    <div class="curso-botones">
+                        <a href="detalle-curso.html?id=teologia-bautista" class="neo-button">Ver Detalles</a>
+                        <a href="inscripcion.html?curso=teologia-bautista" class="neo-button primary">Inscribirme</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cursos-lista neo-container" id="liderazgo">
+            <h2>Liderazgo y Ministerio</h2>
+            <div class="curso-cards">
+                <div class="neo-card curso-card fade-in">
+                    <div class="curso-imagen" style="background-image: url('images/curso-liderazgo-1.jpg');"></div>
+                    <span class="curso-nivel">Nivel Intermedio</span>
+                    <h3>Liderazgo Pastoral</h3>
+                    <p>Desarrollo de habilidades para el liderazgo efectivo en el contexto de la iglesia local.</p>
+                    <div class="curso-info">
+                        <span><i class="fas fa-calendar"></i> 3 meses</span>
+                        <span><i class="fas fa-clock"></i> 60 horas</span>
+                        <span><i class="fas fa-user-graduate"></i> Certificado</span>
+                    </div>
+                    <div class="curso-precio">
+                        <p>$280 USD</p>
+                    </div>
+                    <div class="curso-botones">
+                        <a href="detalle-curso.html?id=liderazgo-pastoral" class="neo-button">Ver Detalles</a>
+                        <a href="inscripcion.html?curso=liderazgo-pastoral" class="neo-button primary">Inscribirme</a>
+                    </div>
+                </div>
+                <div class="neo-card curso-card fade-in">
+                    <div class="curso-imagen" style="background-image: url('images/curso-liderazgo-2.jpg');"></div>
+                    <span class="curso-nivel">Nivel Básico</span>
+                    <h3>Homilética</h3>
+                    <p>Principios y prácticas para la preparación y presentación efectiva de sermones bíblicos.</p>
+                    <div class="curso-info">
+                        <span><i class="fas fa-calendar"></i> 2 meses</span>
+                        <span><i class="fas fa-clock"></i> 40 horas</span>
+                        <span><i class="fas fa-user-graduate"></i> Certificado</span>
+                    </div>
+                    <div class="curso-precio">
+                        <p>$200 USD</p>
+                    </div>
+                    <div class="curso-botones">
+                        <a href="detalle-curso.html?id=homiletica" class="neo-button">Ver Detalles</a>
+                        <a href="inscripcion.html?curso=homiletica" class="neo-button primary">Inscribirme</a>
+                    </div>
+                </div>
+                <div class="neo-card curso-card fade-in">
+                    <div class="curso-imagen" style="background-image: url('images/curso-liderazgo-3.jpg');"></div>
+                    <span class="curso-nivel">Nivel Avanzado</span>
+                    <h3>Plantación de Iglesias</h3>
+                    <p>Estrategias y principios para establecer nuevas congregaciones que sean saludables y efectivas.</p>
+                    <div class="curso-info">
+                        <span><i class="fas fa-calendar"></i> 4 meses</span>
+                        <span><i class="fas fa-clock"></i> 80 horas</span>
+                        <span><i class="fas fa-user-graduate"></i> Certificado</span>
+                    </div>
+                    <div class="curso-precio">
+                        <p>$350 USD</p>
+                    </div>
+                    <div class="curso-botones">
+                        <a href="detalle-curso.html?id=plantacion-iglesias" class="neo-button">Ver Detalles</a>
+                        <a href="inscripcion.html?curso=plantacion-iglesias" class="neo-button primary">Inscribirme</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="inscripcion-cta neo-container fade-in">
+            <h2>¿Listo para comenzar tu formación?</h2>
+            <p>Inscríbete ahora en nuestro seminario y da el primer paso hacia tu crecimiento ministerial.</p>
+            <a href="inscripcion.html" class="neo-button">Inscríbete Ahora</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Luckas</h3>
+                <p>Formando líderes con fundamento bíblico desde 1990.</p>
+                <div class="social-links">
+                    <a href="#" class="neo-social"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="neo-social"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="neo-social"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="neo-social"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Enlaces Rápidos</h3>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="cursos.html">Cursos</a></li>
+                    <li><a href="inscripcion.html">Inscripción</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Contacto</h3>
+                <ul class="contact-info">
+                    <li><i class="fas fa-map-marker-alt"></i> SBC Berea, Tenjo, Cundinamarca</li>
+                    <li><i class="fas fa-phone"></i> +57 (601) 123-4567</li>
+                    <li><i class="fas fa-envelope"></i> info@luckas.org</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Luckas. Todos los derechos reservados. <span class="signature">SoliDeoGloria123</span></p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
+    <script src="{{ url_for('static', path='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', path='js/cursos.js') }}"></script>
+    <script src="{{ url_for('static', path='js/theme-switcher.js') }}"></script>
+</body>
+</html>

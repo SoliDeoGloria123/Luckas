@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es" class="dark-theme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programa Servicio Cristiano - Luckas</title>
+    <!-- Google Font - Bebas Neue -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/programa-servicio-cristiano.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/animations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/theme-switcher.css') }}">
+</head>
+<body>
+    <!-- Fondo animado para toda la página -->
+    <div class="animated-bg"></div>
+    
+    <header class="neo-header">
+        <div class="logo-container">
+            <img src="lOGO PROYECTO LuckasEnt de Kent.png" alt="Logo del Seminario" class="logo">
+            <h1 class="seminary-title">Luckas</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                <li><a href="{{ url_for('cursos') }}">Cursos</a></li>
+                <li><a href="{{ url_for('inscripcion') }}" class="active">Inscripción</a></li>
+                <li><a href="{{ url_for('nosotros') }}">Contacto</a></li>
+            </ul>
+            <a href="{{ url_for('login') }}" class="neo-button login-button">Iniciar Sesión</a>
+        </nav>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+    
+    <main>
+        <!-- Hero 3D del programa -->
+        <section class="programa-hero section-color" data-color="#121212">
+            <div class="programa-hero-content">
+                <div class="programa-hero-3d">
+                    <div class="programa-3d-container">
+                        <div class="programa-3d-card">
+                            <div class="front">
+                                <h1>Servicio Cristiano</h1>
+                                <p>Licenciatura en Estudios Teológicos</p>
+                            </div>
+                            <div class="back">
+                                <p>SBC Berea</p>
+                                <p>Tenjo, Cundinamarca</p>
+                                <p>Colombia</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="programa-info-banner">
+                    <div class="info-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>4 semestres</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Intensivo</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Pregrado</span>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <p>Conoce el programa</p>
+                <div class="scroll-arrow"></div>
+            </div>
+        </section>
+
+        <!-- Descripción del Programa -->
+        <section class="programa-descripcion section-color" data-color="#0d1a35">
+            <div class="neo-container">
+                <h2 class="section-title">Sobre el Programa</h2>
+                
+                <div class="descripcion-content">
+                    <div class="descripcion-text">
+                        <p>El programa de <strong>Servicio Cristiano</strong> está diseñado para formar líderes con una base sólida en las Escrituras, teología y ministerio práctico. Los estudiantes desarrollarán las habilidades necesarias para servir efectivamente en la iglesia local y enfrentar los desafíos ministeriales contemporáneos.</p>
+                        <p>Este programa combina la excelencia académica con la formación espiritual y práctica, proporcionando a los estudiantes una comprensión profunda de la Biblia y su aplicación en el ministerio cristiano.</p>
+                    </div>
+                    
+                    <div class="programa-caracteristicas">
+                        <h3>Características del Programa</h3>
+                        <ul>
+                            <li><span>Modalidad:</span> Interno Intensiva</li>
+                            <li><span>Duración Estimada:</span> Cuatro (4) semestres (aprox. 2 años)</li>
+                            <li><span>Jornada:</span> Diurna y nocturna</li>
+                            <li><span>Título que otorga:</span> Licenciatura en Estudios Teológicos</li>
+                            <li><span>Tipo de formación:</span> Pregrado</li>
+                            <li><span>Lugar donde se oferta:</span> Tenjo, Cundinamarca, Colombia</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="acreditacion-info">
+                    <h3>Acreditación</h3>
+                    <p>El programa está registrado ante el Departamento de Educación del Estado de Florida (EE. UU.) según el Estatuto de la Florida 1005.06 (1) (f), que exime a las instituciones religiosas de la jurisdicción de la Comisión. Luckas ha sido aceptado como miembro de la agencia de acreditación independiente (Association of Reformed Theological Seminaries) y está en proceso de acreditación con ellos.</p>
+                    <p>Asimismo, en Colombia, Luckas se encuentra en proceso de acreditación ante la Secretaría de Educación. Sin embargo, es importante destacar que Luckas no cuenta con acreditación estatal ni en Estados Unidos ni en Colombia, ya que nuestros grados son exclusivamente religiosos.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Perfil del Aspirante y Egresado -->
+        <section class="perfiles-section section-color" data-color="#162447">
+            <div class="neo-container">
+                <div class="perfiles-grid">
+                    <div class="perfil-card">
+                        <div class="perfil-header">
+                            <div class="perfil-icon">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <h2>Perfil del Aspirante</h2>
+                        </div>
+                        <div class="perfil-content">
+                            <p>El aspirante al programa de Servicio Cristiano debe ser:</p>
+                            <ul>
+                                <li>Un creyente comprometido con testimonio cristiano sólido</li>
+                                <li>Apasionado por el estudio de la Palabra de Dios</li>
+                                <li>Activamente involucrado en una iglesia local</li>
+                                <li>Con deseo de servir en el ministerio cristiano</li>
+                                <li>Dispuesto a someterse a un proceso de formación integral</li>
+                                <li>Con habilidades básicas de lectura, comunicación y pensamiento crítico</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="perfil-card">
+                        <div class="perfil-header">
+                            <div class="perfil-icon">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <h2>Perfil del Egresado</h2>
+                        </div>
+                        <div class="perfil-content">
+                            <p>Al completar el programa, el egresado estará capacitado para:</p>
+                            <ul>
+                                <li>Interpretar y aplicar las Escrituras correctamente</li>
+                                <li>Comunicar verdades bíblicas de manera clara y efectiva</li>
+                                <li>Desarrollar y liderar ministerios en la iglesia local</li>
+                                <li>Proporcionar consejería bíblica básica</li>
+                                <li>Aplicar principios teológicos a situaciones contemporáneas</li>
+                                <li>Continuar estudios teológicos de nivel superior</li>
+                                <li>Servir en diferentes áreas del ministerio cristiano</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Plan de Estudios -->
+        <section class="plan-estudios section-color" data-color="#1f4068">
+            <div class="neo-container">
+                <h2 class="section-title">Plan de Estudios</h2>
+                <p class="section-description">El programa está organizado en 4 semestres con un total de 120 créditos académicos.</p>
+                
+                <div class="plan-tabs">
+                    <div class="plan-tabs-header">
+                        <button class="tab-btn active" data-tab="semestre1">1er Semestre</button>
+                        <button class="tab-btn" data-tab="semestre2">2do Semestre</button>
+                        <button class="tab-btn" data-tab="semestre3">3er Semestre</button>
+                        <button class="tab-btn" data-tab="semestre4">4to Semestre</button>
+                    </div>
+                    
+                    <div class="plan-tabs-content">
+                        <div class="tab-content active" id="semestre1">
+                            <h3>Primer Semestre <span class="creditos">30 créditos</span></h3>
+                            <div class="materias-grid">
+                                <div class="materia-card">
+                                    <h4>Introducción a la Biblia</h4>
+                                    <p>Visión general de la estructura, historia y mensaje de la Biblia.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Hermenéutica Básica</h4>
+                                    <p>Principios fundamentales para la interpretación bíblica.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Historia de la Iglesia I</h4>
+                                    <p>Desarrollo del cristianismo desde sus inicios hasta la Reforma.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Teología Sistemática I</h4>
+                                    <p>Estudio de la doctrina de Dios, revelación y Escrituras.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Vida Espiritual</h4>
+                                    <p>Disciplinas espirituales y desarrollo del carácter cristiano.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Antiguo Testamento I</h4>
+                                    <p>Estudio del Pentateuco y libros históricos.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Evangelismo Práctico</h4>
+                                    <p>Métodos y principios para compartir el evangelio efectivamente.</p>
+                                    <div class="materia-info">
+                                        <span>3 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Comunicación Cristiana</h4>
+                                    <p>Fundamentos de comunicación oral y escrita en contexto ministerial.</p>
+                                    <div class="materia-info">
+                                        <span>3 créditos</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="semestre2">
+                            <h3>Segundo Semestre <span class="creditos">30 créditos</span></h3>
+                            <div class="materias-grid">
+                                <div class="materia-card">
+                                    <h4>Antiguo Testamento II</h4>
+                                    <p>Estudio de los libros poéticos y proféticos.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Nuevo Testamento I</h4>
+                                    <p>Estudio de los evangelios y Hechos.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Teología Sistemática II</h4>
+                                    <p>Cristología, soteriología y antropología.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Historia de la Iglesia II</h4>
+                                    <p>Desarrollo del cristianismo desde la Reforma hasta la actualidad.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Homilética I</h4>
+                                    <p>Principios básicos de preparación y presentación de sermones.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Ministerio Pastoral</h4>
+                                    <p>Funciones y responsabilidades del liderazgo pastoral.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Administración Eclesiástica</h4>
+                                    <p>Principios de administración y liderazgo en la iglesia.</p>
+                                    <div class="materia-info">
+                                        <span>3 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Práctica Ministerial I</h4>
+                                    <p>Experiencia práctica supervisada en ministerio.</p>
+                                    <div class="materia-info">
+                                        <span>3 créditos</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="semestre3">
+                            <h3>Tercer Semestre <span class="creditos">30 créditos</span></h3>
+                            <div class="materias-grid">
+                                <div class="materia-card">
+                                    <h4>Nuevo Testamento II</h4>
+                                    <p>Estudio de las epístolas paulinas.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Teología Sistemática III</h4>
+                                    <p>Pneumatología, eclesiología y angelología.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Homilética II</h4>
+                                    <p>Métodos avanzados de predicación expositiva.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Consejería Bíblica</h4>
+                                    <p>Fundamentos de consejería desde una perspectiva bíblica.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Educación Cristiana</h4>
+                                    <p>Principios pedagógicos para la enseñanza en la iglesia.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Misiones</h4>
+                                    <p>Historia, principios y estrategias misioneras.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Apologética</h4>
+                                    <p>Defensa racional de la fe cristiana.</p>
+                                    <div class="materia-info">
+                                        <span>3 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Práctica Ministerial II</h4>
+                                    <p>Experiencia práctica avanzada en ministerio.</p>
+                                    <div class="materia-info">
+                                        <span>3 créditos</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="semestre4">
+                            <h3>Cuarto Semestre <span class="creditos">30 créditos</span></h3>
+                            <div class="materias-grid">
+                                <div class="materia-card">
+                                    <h4>Nuevo Testamento III</h4>
+                                    <p>Estudio de epístolas generales y Apocalipsis.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Teología Sistemática IV</h4>
+                                    <p>Escatología y ética cristiana.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Liderazgo Ministerial</h4>
+                                    <p>Principios y prácticas de liderazgo efectivo en el ministerio.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Teología Contemporánea</h4>
+                                    <p>Análisis de corrientes teológicas modernas.</p>
+                                    <div class="materia-info">
+                                        <span>4 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Culto Cristiano</h4>
+                                    <p>Teología y práctica de la adoración cristiana.</p>
+                                    <div class="materia-info">
+                                        <span>3 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Discipulado</h4>
+                                    <p>Estrategias para la formación y multiplicación de discípulos.</p>
+                                    <div class="materia-info">
+                                        <span>3 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Familia Cristiana</h4>
+                                    <p>Principios bíblicos para el matrimonio y familia.</p>
+                                    <div class="materia-info">
+                                        <span>3 créditos</span>
+                                    </div>
+                                </div>
+                                <div class="materia-card">
+                                    <h4>Proyecto Final</h4>
+                                    <p>Investigación y proyecto ministerial culminante.</p>
+                                    <div class="materia-info">
+                                        <span>5 créditos</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-creditos">
+                    <div class="creditos-totales">
+                        <h3>Créditos Totales: 120</h3>
+                        <p>Para obtener la titulación, se requiere completar satisfactoriamente todos los cursos del programa.</p>
+                    </div>
+                    <div class="homologacion-info">
+                        <h3>Homologación</h3>
+                        <p>Luckas ofrece la posibilidad de homologar materias cursadas en otras instituciones teológicas reconocidas. La homologación está sujeta a evaluación académica y puede representar hasta un 40% del total de créditos del programa.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Costos y Matrículas -->
+        <section class="costos-section section-color" data-color="#072142">
+            <div class="neo-container">
+                <h2 class="section-title">Inversión Académica</h2>
+                <p class="section-description">Información sobre costos y matrícula para el programa de Servicio Cristiano.</p>
+                
+                <div class="costos-grid">
+                    <div class="costo-card">
+                        <div class="costo-header">
+                            <h3>Inscripción al programa (única)</h3>
+                        </div>
+                        <div class="costo-precio">
+                            <div class="precio-local">$350.000 COP</div>
+                            <div class="precio-usd">USD $90</div>
+                        </div>
+                        <div class="costo-descripcion">
+                            <p>Pago único al iniciar el proceso de admisión.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="costo-card">
+                        <div class="costo-header">
+                            <h3>Matrícula Semestral</h3>
+                        </div>
+                        <div class="costo-precio">
+                            <div class="precio-local">$4.800.000 COP</div>
+                            <div class="precio-usd">USD $1.250</div>
+                        </div>
+                        <div class="costo-descripcion">
+                            <p>Incluye docencia, material académico básico y acceso a instalaciones.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="costo-card">
+                        <div class="costo-header">
+                            <h3>Pensión Completa (Internado)</h3>
+                        </div>
+                        <div class="costo-precio">
+                            <div class="precio-local">$3.600.000 COP</div>
+                            <div class="precio-usd">USD $950</div>
+                        </div>
+                        <div class="costo-descripcion">
+                            <p>Alojamiento y alimentación (opcional para internos).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="costo-card">
+                        <div class="costo-header">
+                            <h3>Derecho de Grado</h3>
+                        </div>
+                        <div class="costo-precio">
+                            <div class="precio-local">$650.000 COP</div>
+                            <div class="precio-usd">USD $170</div>
+                        </div>
+                        <div class="costo-descripcion">
+                            <p>Incluye diploma, acto de graduación y documentación.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="costos-notas">
+                    <p><strong>Nota:</strong> Los costos están sujetos a ajuste anual según tasa de inflación. Existen planes de financiamiento y becas disponibles para estudiantes que califiquen.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Requisitos y Admisión -->
+        <section class="requisitos-section section-color" data-color="#1a1a2e">
+            <div class="neo-container">
+                <h2 class="section-title">Requisitos de Admisión</h2>
+                <p class="section-description">Para aplicar al programa de Servicio Cristiano, los candidatos deben cumplir los siguientes requisitos:</p>
+                
+                <div class="requisitos-grid">
+                    <div class="requisito-card">
+                        <div class="requisito-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Requisitos Generales</h3>
+                        <ul>
+                            <li>Ser cristiano bautizado con al menos 2 años de testimonio</li>
+                            <li>Tener 18 años cumplidos</li>
+                            <li>Bachillerato completo o equivalente</li>
+                            <li>Membresía activa en una iglesia local</li>
+                            <li>Examen médico general reciente</li>
+                            <li>Entrevista personal o virtual</li>
+                            <li>Prueba académica de ingreso</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="requisito-card">
+                        <div class="requisito-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3>Documentación</h3>
+                        <ul>
+                            <li>Formulario de solicitud completo</li>
+                            <li>Copia del documento de identidad</li>
+                            <li>Diploma y acta de bachiller o equivalente</li>
+                            <li>Carta de recomendación pastoral</li>
+                            <li>Carta de recomendación académica</li>
+                            <li>Testimonio personal de conversión (escrito)</li>
+                            <li>Carta explicando su llamado al ministerio</li>
+                            <li>3 fotografías recientes tamaño documento</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="requisito-card">
+                        <div class="requisito-icon">
+                            <i class="fas fa-church"></i>
+                        </div>
+                        <h3>Requisitos para Pastores</h3>
+                        <ul>
+                            <li>Mínimo 3 años de experiencia en ministerio pastoral</li>
+                            <li>Carta de respaldo de su congregación</li>
+                            <li>Plan de continuidad ministerial durante estudios</li>
+                            <li>Posibilidad de solicitar modalidad intensiva especial</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="requisito-card">
+                        <div class="requisito-icon">
+                            <i class="fas fa-globe-americas"></i>
+                        </div>
+                        <h3>Estudiantes Internacionales</h3>
+                        <ul>
+                            <li>Todos los requisitos generales</li>
+                            <li>Visa de estudiante vigente</li>
+                            <li>Seguro médico internacional</li>
+                            <li>Documentos académicos apostillados</li>
+                            <li>Demostración de suficiencia en español</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="proceso-admision">
+                    <h3>Proceso de Admisión</h3>
+                    <ol>
+                        <li>Solicitar información y formularios (en línea o presencial)</li>
+                        <li>Enviar documentación completa</li>
+                        <li>Pagar cuota de inscripción</li>
+                        <li>Presentar pruebas de admisión</li>
+                        <li>Asistir a entrevista personal</li>
+                        <li>Esperar resultado de admisión (15 días hábiles)</li>
+                        <li>Completar matrícula y pago de cuotas correspondientes</li>
+                        <li>Asistir a jornada de orientación</li>
+                    </ol>
+                    
+                    <div class="contacto-admisiones">
+                        <a href="inscripcion.html#contacto" class="neo-button primary">Contactar a Admisiones</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA para Aplicar -->
+        <section class="aplicar-section section-color" data-color="#010048">
+            <div class="neo-container">
+                <div class="aplicar-content">
+                    <div class="aplicar-text">
+                        <h2>¿Listo para dar el siguiente paso?</h2>
+                        <p>Inicia hoy tu camino de formación ministerial en Luckas. Nuestro equipo de admisiones está listo para guiarte en cada paso del proceso.</p>
+                        <div class="aplicar-btns">
+                            <a href="#" class="neo-button primary">Solicitar Admisión</a>
+                            <a href="#" class="neo-button">Descargar Brochure</a>
+                        </div>
+                    </div>
+                    <div class="fechas-importantes">
+                        <h3>Próximas Fechas</h3>
+                        <div class="fecha-item">
+                            <div class="fecha-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="fecha-info">
+                                <h4>Cierre de Admisiones</h4>
+                                <p>30 de Noviembre, 2025</p>
+                            </div>
+                        </div>
+                        <div class="fecha-item">
+                            <div class="fecha-icon"><i class="fas fa-user-graduate"></i></div>
+                            <div class="fecha-info">
+                                <h4>Inicio de Clases</h4>
+                                <p>3 de Febrero, 2026</p>
+                            </div>
+                        </div>
+                        <div class="fecha-item">
+                            <div class="fecha-icon"><i class="fas fa-door-open"></i></div>
+                            <div class="fecha-info">
+                                <h4>Jornada de Puertas Abiertas</h4>
+                                <p>15 de Octubre, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Luckas</h3>
+                <p>Formando líderes con fundamento bíblico desde 1990.</p>
+                <div class="social-links">
+                    <a href="#" class="neo-social"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="neo-social"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="neo-social"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="neo-social"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Enlaces Rápidos</h3>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="cursos.html">Cursos</a></li>
+                    <li><a href="inscripcion.html">Inscripción</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Contacto</h3>
+                <ul class="contact-info">
+                    <li><i class="fas fa-map-marker-alt"></i> SBC Berea, Tenjo, Cundinamarca</li>
+                    <li><i class="fas fa-phone"></i> +57 (601) 123-4567</li>
+                    <li><i class="fas fa-envelope"></i> info@luckas.org</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Luckas. Todos los derechos reservados. <span class="signature">SoliDeoGloria123</span></p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
+    <script src="{{ url_for('static', path='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', path='js/programa-servicio-cristiano.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,587 @@
+/* Estilos para página de inscripción - Luckas */
+
+/* Hero sección */
+.inscripcion-hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #1a237e, #121212);
+}
+
+.inscripcion-hero-content {
+    text-align: center;
+    max-width: 1000px;
+    padding: 2rem;
+    z-index: 10;
+}
+
+.hero-description {
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 3rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--light-text);
+}
+
+/* Corrección para el scroll indicator - centrado perfecto para cualquier tamaño de pantalla */
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0; /* usando left y right en 0 para centrar perfectamente */
+    margin: 0 auto; /* centrado horizontal automático */
+    text-align: center;
+    width: fit-content; /* ancho automático según contenido */
+    animation: fadeInUp 1s ease-out 1s forwards, scrollBounce 2s infinite 2s;
+    opacity: 0;
+    z-index: 10;
+    padding: 10px 20px; /* agregar padding para mejor visibilidad */
+    background-color: rgba(0,0,0,0.2); /* fondo sutil */
+    backdrop-filter: blur(5px);
+    border-radius: 25px;
+}
+
+.scroll-indicator p {
+    color: white;
+    margin-bottom: 10px;
+    font-weight: 300;
+    font-size: 1rem;
+    white-space: nowrap; /* evitar que el texto se divida en líneas */
+}
+
+.scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    transform: rotate(45deg);
+    margin: 0 auto;
+}
+
+/* Tarjetas de programas */
+.programas-section {
+    padding: 4rem 0;
+}
+
+.section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+    color: var(--white-color);
+}
+
+.section-description {
+    text-align: center;
+    color: var(--light-text);
+    max-width: 800px;
+    margin: 0 auto 3rem;
+}
+
+.programas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.programa-card {
+    height: 480px;
+    perspective: 1500px;
+    cursor: pointer;
+}
+
+.programa-front, .programa-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+}
+
+.programa-front {
+    background-color: var(--card-background);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    box-shadow: 
+        5px 5px 15px var(--dark-shadow),
+        -2px -2px 10px var(--light-shadow);
+}
+
+.programa-back {
+    background: linear-gradient(145deg, var(--primary-color), #0d1a35);
+    transform: rotateY(180deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 
+        5px 5px 15px var(--dark-shadow),
+        -2px -2px 10px var(--light-shadow);
+}
+
+.programa-card:hover .programa-front {
+    transform: rotateY(-180deg);
+}
+
+.programa-card:hover .programa-back {
+    transform: rotateY(0);
+}
+
+.programa-imagen {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.programa-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
+}
+
+.programa-titulo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--white-color);
+    margin: 1.5rem 1.5rem 1rem;
+    letter-spacing: 1px;
+}
+
+.programa-descripcion {
+    padding: 0 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--light-text);
+    flex-grow: 1;
+}
+
+.programa-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    color: var(--muted-text);
+    margin-bottom: 1.5rem;
+}
+
+.programa-info span {
+    display: flex;
+    align-items: center;
+}
+
+.programa-info i {
+    color: var(--accent-color);
+    margin-right: 0.5rem;
+}
+
+.programa-btn {
+    margin: 0 1.5rem 1.5rem;
+}
+
+.programa-contenido-back h4 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    color: var(--white-color);
+}
+
+.programa-contenido-back ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.programa-contenido-back li {
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+}
+
+.programa-contenido-back li i {
+    color: var(--white-color);
+    margin-right: 0.8rem;
+}
+
+/* Proceso de admisión */
+.proceso-section {
+    padding: 4rem 0;
+}
+
+.proceso-timeline {
+    max-width: 900px;
+    margin: 3rem auto 0;
+    position: relative;
+}
+
+.proceso-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50px;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+    transform: translateX(-50%);
+    opacity: 0.6; /* Reduced opacity for less eye strain */
+}
+
+.proceso-item {
+    display: flex;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.proceso-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2rem;
+    flex-shrink: 0;
+    box-shadow: 
+        5px 5px 15px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+    z-index: 1;
+    opacity: 0.85; /* Softened for less eye strain */
+}
+
+.proceso-icon i {
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.9); /* Softened white color */
+}
+
+.proceso-content {
+    flex-grow: 1;
+    padding-top: 0.5rem;
+}
+
+.proceso-content h3 {
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+    color: var(--accent-color);
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+    opacity: 0.9; /* Softened for less eye strain */
+}
+
+/* Becas y ayudas */
+.becas-section {
+    padding: 4rem 0;
+}
+
+.becas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.beca-card {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+    box-shadow: 
+        5px 5px 15px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+}
+
+.beca-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 
+        8px 8px 20px var(--dark-shadow),
+        -3px -3px 12px var(--light-shadow);
+}
+
+.beca-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    opacity: 0.85; /* Softened for less eye strain */
+}
+
+.beca-icon i {
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.9); /* Softened white color */
+}
+
+.beca-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--white-color);
+}
+
+/* Asesor sección - Estilos completos */
+.asesor-section {
+    padding: 4rem 0;
+}
+
+.asesor-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.asesor-form {
+    flex: 1;
+    min-width: 300px;
+}
+
+.neo-form {
+    background-color: var(--card-background);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 
+        8px 8px 16px var(--dark-shadow),
+        -3px -3px 10px var(--light-shadow);
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 250px;
+}
+
+.form-group.full-width {
+    flex-basis: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.8rem;
+    color: var(--light-text);
+    font-weight: 500;
+}
+
+.neo-input, .neo-textarea {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--form-background);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--white-color);
+    box-shadow: 
+        inset 3px 3px 6px var(--dark-shadow),
+        inset -1px -1px 3px var(--light-shadow);
+    transition: all 0.3s ease;
+}
+
+.neo-input:focus, .neo-textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 
+        inset 3px 3px 6px var(--dark-shadow),
+        inset -1px -1px 3px var(--light-shadow),
+        0 0 0 2px rgba(0, 51, 255, 0.2);
+    outline: none;
+}
+
+.neo-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.neo-button.primary.full-width {
+    width: 100%;
+    margin: 1.5rem 0 0;
+    padding: 1rem;
+    font-size: 1.1rem;
+    text-align: center;
+    display: block;
+}
+
+/* Estilos para la información de contacto */
+.asesor-info {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.info-card {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+    box-shadow: 
+        5px 5px 10px var(--dark-shadow),
+        -2px -2px 6px var(--light-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.info-card:hover {
+    transform: translateX(-10px);
+}
+
+.info-card h3 {
+    color: var(--accent-color);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+}
+
+.info-card h3 i {
+    margin-right: 0.8rem;
+    font-size: 1.2rem;
+}
+
+/* Custom Select Styling for Asesor Form */
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.neo-select {
+    width: 100%;
+    padding: 1rem 2.5rem 1rem 1rem;
+    background-color: var(--form-background);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--white-color);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    box-shadow: 
+        inset 3px 3px 6px var(--dark-shadow),
+        inset -1px -1px 3px var(--light-shadow);
+    transition: all 0.3s ease;
+}
+
+.neo-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 
+        inset 3px 3px 6px var(--dark-shadow),
+        inset -1px -1px 3px var(--light-shadow),
+        0 0 0 2px rgba(0, 51, 255, 0.2);
+    outline: none;
+}
+
+.select-icon {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    color: var(--accent-color);
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+.neo-select:focus + .select-icon {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.custom-select-wrapper:hover .select-icon {
+    color: var(--primary-color);
+}
+
+/* Cambios de color por sección - transición suave entre colores */
+.section-color {
+    transition: background-color 0.8s ease;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+    .asesor-content {
+        flex-direction: column;
+    }
+    
+    .proceso-timeline::before {
+        left: 35px;
+    }
+    
+    .proceso-icon {
+        width: 70px;
+        height: 70px;
+        margin-right: 1.5rem;
+    }
+    
+    .proceso-icon i {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .programas-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .programa-card {
+        height: 450px;
+    }
+    
+    .becas-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-title {
+        font-size: 2.5rem;
+    }
+    
+    .proceso-timeline::before {
+        left: 25px;
+    }
+    
+    .proceso-icon {
+        width: 50px;
+        height: 50px;
+        margin-right: 1rem;
+    }
+    
+    .proceso-icon i {
+        font-size: 1.3rem;
+    }
+    
+    .proceso-content h3 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .scroll-indicator {
+        bottom: 20px;
+        padding: 8px 15px;
+    }
+    
+    .scroll-indicator p {
+        font-size: 0.9rem;
+    }
+    
+    .scroll-arrow {
+        width: 15px;
+        height: 15px;
+    }
+}

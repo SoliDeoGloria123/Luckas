@@ -1,0 +1,821 @@
+/* Estilos para página de detalle de programa - Luckas */
+
+/* Hero 3D del programa */
+.programa-hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #1a237e, #121212);
+}
+
+.programa-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Contenedor 3D y efecto de tarjeta giratoria */
+.programa-hero-3d {
+    width: 100%;
+    perspective: 3000px;
+    margin-bottom: 2rem;
+}
+
+.programa-3d-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    height: 250px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) rotateY(0);
+    }
+
+    25% {
+        transform: translateY(-10px) rotateY(10deg);
+    }
+
+    50% {
+        transform: translateY(0) rotateY(0);
+    }
+
+    75% {
+        transform: translateY(10px) rotateY(-10deg);
+    }
+}
+
+.programa-3d-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: rotateSlow 12s linear infinite;
+}
+
+@keyframes rotateSlow {
+    0% {
+        transform: rotateY(0);
+    }
+
+    100% {
+        transform: rotateY(360deg);
+    }
+}
+
+.programa-3d-card .front,
+.programa-3d-card .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(145deg, var(--primary-color), #0d1a35);
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.5),
+        0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.programa-3d-card .back {
+    transform: rotateY(180deg);
+}
+
+.programa-3d-card h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.programa-3d-card p {
+    font-size: 1.5rem;
+    color: var(--light-text);
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+.programa-3d-card .back p {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.programa-3d-card .front::before,
+.programa-3d-card .back::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 50%);
+    border-radius: 20px;
+    pointer-events: none;
+}
+
+/* Banner de información */
+.programa-info-banner {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 800px;
+    margin-top: 2rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(30, 30, 50, 0.5);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    min-width: 150px;
+}
+
+.info-item i {
+    font-size: 2rem;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+}
+
+.info-item span {
+    font-size: 1.2rem;
+    color: var(--white-color);
+}
+
+/* Sección de descripciones */
+.programa-descripcion {
+    padding: 4rem 0;
+}
+
+.descripcion-content {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin: 3rem 0;
+}
+
+.descripcion-text {
+    flex: 2;
+    min-width: 300px;
+}
+
+.descripcion-text p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.programa-caracteristicas {
+    flex: 1;
+    min-width: 300px;
+    background-color: var(--card-background);
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow:
+        5px 5px 15px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+}
+
+.programa-caracteristicas h3 {
+    color: var(--accent-color);
+    margin-bottom: 1.2rem;
+    font-size: 1.5rem;
+}
+
+.programa-caracteristicas ul {
+    list-style: none;
+    padding: 0;
+}
+
+.programa-caracteristicas li {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.programa-caracteristicas li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.programa-caracteristicas li span {
+    color: var(--muted-text);
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.acreditacion-info {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow:
+        5px 5px 15px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+}
+
+.acreditacion-info h3 {
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+.acreditacion-info p {
+    margin-bottom: 1rem;
+}
+
+/* Perfiles de aspirante y egresado */
+.perfiles-section {
+    padding: 4rem 0;
+}
+
+.perfiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.perfil-card {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow:
+        8px 8px 16px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+    transition: transform 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.perfil-card:hover {
+    transform: translateY(-5px);
+}
+
+.perfil-header {
+    background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.perfil-icon {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.perfil-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.perfil-header h2 {
+    color: var(--white-color);
+    font-size: 1.8rem;
+}
+
+.perfil-content {
+    padding: 2rem;
+}
+
+.perfil-content p {
+    margin-bottom: 1.5rem;
+}
+
+.perfil-content ul {
+    padding-left: 1.5rem;
+}
+
+.perfil-content ul li {
+    margin-bottom: 0.8rem;
+    position: relative;
+    padding-left: 0.5rem;
+}
+
+.perfil-content ul li::before {
+    content: '•';
+    color: var(--accent-color);
+    font-size: 1.5rem;
+    position: absolute;
+    left: -1rem;
+    top: -0.5rem;
+}
+
+/* Plan de estudios y materias */
+.plan-estudios {
+    padding: 4rem 0;
+}
+
+.plan-tabs {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    overflow: hidden;
+    margin-top: 3rem;
+    box-shadow:
+        8px 8px 16px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.plan-tabs-header {
+    display: flex;
+    background-color: var(--card-background);
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+.tab-btn {
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    color: var(--light-text);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    color: var(--accent-color);
+    box-shadow: inset 0 -3px 0 var(--accent-color);
+    background-color: rgba(0, 51, 255, 0.05);
+}
+
+.tab-btn:hover:not(.active) {
+    color: var(--white-color);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.plan-tabs-content {
+    padding: 2rem;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.tab-content h3 {
+    color: var(--white-color);
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.creditos {
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    background: rgba(0, 51, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: normal;
+}
+
+.materias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.materia-card {
+    background-color: var(--form-background);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+    box-shadow:
+        3px 3px 8px var(--dark-shadow),
+        -1px -1px 4px var(--light-shadow);
+}
+
+.materia-card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        6px 6px 12px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+}
+
+.materia-card h4 {
+    color: var(--white-color);
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+}
+
+.materia-info {
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.materia-info span {
+    color: var(--accent-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.info-creditos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.creditos-totales,
+.homologacion-info {
+    flex: 1;
+    min-width: 300px;
+}
+
+.creditos-totales h3,
+.homologacion-info h3 {
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Costos y matrículas */
+.costos-section {
+    padding: 4rem 0;
+}
+
+.costos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.costo-card {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow:
+        5px 5px 15px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.costo-card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        8px 8px 20px var(--dark-shadow),
+        -3px -3px 12px var(--light-shadow);
+}
+
+.costo-header {
+    background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.costo-header h3 {
+    color: var(--white-color);
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.costo-precio {
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.precio-local {
+    color: var(--white-color);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.precio-usd {
+    color: var(--accent-color);
+    font-size: 1.3rem;
+}
+
+.costo-descripcion {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.costos-notas {
+    margin-top: 2.5rem;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border-left: 4px solid var(--accent-color);
+}
+
+/* Requisitos y Admisión */
+.requisitos-section {
+    padding: 4rem 0;
+}
+
+.requisitos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+.requisito-card {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    padding: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow:
+        5px 5px 15px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.requisito-card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        8px 8px 20px var(--dark-shadow),
+        -3px -3px 12px var(--light-shadow);
+}
+
+.requisito-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.requisito-icon i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.requisito-card h3 {
+    color: var(--white-color);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.requisito-card ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+.requisito-card li {
+    margin-bottom: 0.8rem;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.requisito-card li::before {
+    content: '•';
+    color: var(--accent-color);
+    font-weight: bold;
+    font-size: 1.5rem;
+    position: absolute;
+    left: 0;
+    top: -0.5rem;
+}
+
+.proceso-admision {
+    background-color: var(--card-background);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow:
+        5px 5px 15px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.proceso-admision h3 {
+    color: var(--accent-color);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.proceso-admision ol {
+    padding-left: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.proceso-admision ol li {
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+}
+
+.contacto-admisiones {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* CTA para Aplicar */
+.aplicar-section {
+    padding: 4rem 0;
+}
+
+.aplicar-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+}
+
+.aplicar-text {
+    flex: 1;
+    min-width: 300px;
+}
+
+.aplicar-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--white-color);
+}
+
+.aplicar-btns {
+    margin-top: 2rem;
+}
+
+.fechas-importantes {
+    flex: 1;
+    min-width: 300px;
+    background-color: var(--card-background);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow:
+        8px 8px 16px var(--dark-shadow),
+        -2px -2px 8px var(--light-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.fechas-importantes h3 {
+    color: var(--accent-color);
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.fecha-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.fecha-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.fecha-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+.fecha-icon i {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.fecha-info h4 {
+    color: var(--white-color);
+    margin-bottom: 0.3rem;
+}
+
+.fecha-info p {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* Success Message Styles */
+.success-message {
+    text-align: center;
+    padding: 2rem;
+    animation: fadeIn 0.5s ease;
+}
+
+.success-message i {
+    font-size: 4rem;
+    color: #4caf50;
+    margin-bottom: 1rem;
+}
+
+.success-message h3 {
+    margin-bottom: 1rem;
+    color: var(--white-color);
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+    .programa-3d-card h1 {
+        font-size: 2.5rem;
+    }
+
+    .programa-info-banner {
+        gap: 1rem;
+    }
+
+    .info-item {
+        padding: 0.8rem 1.2rem;
+        min-width: 120px;
+    }
+
+    .perfiles-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .programa-3d-card h1 {
+        font-size: 2rem;
+    }
+
+    .programa-3d-card p {
+        font-size: 1.2rem;
+    }
+
+    .info-item {
+        min-width: 100px;
+    }
+
+    .info-item i {
+        font-size: 1.5rem;
+    }
+
+    .info-item span {
+        font-size: 1rem;
+    }
+
+    .materias-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tab-btn {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+    }
+}

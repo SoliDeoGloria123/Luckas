@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es" class="dark-theme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripción - Luckas</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/inscripcion.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/animations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/theme-switcher.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Fondo animado para toda la página -->
+    <div class="animated-bg"></div>
+    
+    <header class="neo-header">
+        <div class="logo-container">
+            <img src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt de Kent.png') }}" alt="Logo del Seminario" class="logo">
+            <h1 class="seminary-title">Luckas</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                <li><a href="{{ url_for('cursos') }}">Cursos</a></li>
+                <li><a href="{{ url_for('inscripcion') }}" class="active">Inscripción</a></li>
+                <li><a href="{{ url_for('nosotros') }}">Contacto</a></li>
+            </ul>
+            <a href="{{ url_for('login') }}" class="neo-button login-button">Iniciar Sesión</a>
+        </nav>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+    
+    <main>
+        <!-- Hero de página de inscripción -->
+        <section class="inscripcion-hero section-color" data-color="#121212">
+            <div class="inscripcion-hero-content">
+                <h1 class="elegant-title">Programas Académicos</h1>
+                <p class="hero-description">Formamos líderes con fundamento bíblico para impactar el mundo. Descubre nuestros programas académicos y comienza tu formación ministerial.</p>
+                <div class="scroll-indicator">
+                    <p>Explora nuestros programas</p>
+                    <div class="scroll-arrow"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Programas académicos -->
+        <section class="programas-section section-color" data-color="#0d1a35">
+            <div class="neo-container">
+                <h2 class="section-title">Elige tu Camino</h2>
+                <p class="section-description">Ofrecemos programas académicos de alta calidad diseñados para equiparte con el conocimiento bíblico y las herramientas prácticas para tu ministerio.</p>
+                
+                <div class="programas-grid">
+                    <!-- Programa 1 -->
+                    <div class="programa-card" data-programa="servicio-cristiano">
+                        <div class="programa-front">
+                            <div class="programa-imagen" style="background-image: url('images/programa-servicio.jpg');">
+                                <div class="programa-overlay"></div>
+                            </div>
+                            <h3 class="programa-titulo">Servicio Cristiano</h3>
+                            <p class="programa-descripcion">Formación fundamental para el servicio efectivo en la iglesia local y la comunidad cristiana.</p>
+                            <div class="programa-info">
+                                <span><i class="fas fa-clock"></i> 2 años</span>
+                                <span><i class="fas fa-graduation-cap"></i> Pregrado</span>
+                            </div>
+                            <button class="programa-btn neo-button primary">Ver Programa</button>
+                        </div>
+                        <div class="programa-back">
+                            <div class="programa-contenido-back">
+                                <h4>Características Principales</h4>
+                                <ul>
+                                    <li><i class="fas fa-check-circle"></i> Modalidad: Presencial intensiva</li>
+                                    <li><i class="fas fa-check-circle"></i> Duración: 4 semestres</li>
+                                    <li><i class="fas fa-check-circle"></i> Título: Licenciatura en Estudios Teológicos</li>
+                                </ul>
+                                <a href="{{ url_for('programa') }}" class="neo-button">Más información</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Programa 2 -->
+                    <div class="programa-card" data-programa="servicio-integral">
+                        <div class="programa-front">
+                            <div class="programa-imagen" style="background-image: url('images/programa-integral.jpg');">
+                                <div class="programa-overlay"></div>
+                            </div>
+                            <h3 class="programa-titulo">Servicio Integral y Ministerial</h3>
+                            <p class="programa-descripcion">Preparación completa para el servicio ministerial con enfoque en misiones y cuidado pastoral.</p>
+                            <div class="programa-info">
+                                <span><i class="fas fa-clock"></i> 3 años</span>
+                                <span><i class="fas fa-graduation-cap"></i> Pregrado</span>
+                            </div>
+                            <button class="programa-btn neo-button primary">Ver Programa</button>
+                        </div>
+                        <div class="programa-back">
+                            <div class="programa-contenido-back">
+                                <h4>Características Principales</h4>
+                                <ul>
+                                    <li><i class="fas fa-check-circle"></i> Modalidad: Presencial intensiva</li>
+                                    <li><i class="fas fa-check-circle"></i> Duración: 6 semestres</li>
+                                    <li><i class="fas fa-check-circle"></i> Título: Licenciatura en Ministerio Cristiano</li>
+                                </ul>
+                                <a href="programa-servicio-integral.html" class="neo-button">Más información</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Programa 3 -->
+                    <div class="programa-card" data-programa="liderazgo-biblico">
+                        <div class="programa-front">
+                            <div class="programa-imagen" style="background-image: url('images/programa-liderazgo.jpg');">
+                                <div class="programa-overlay"></div>
+                            </div>
+                            <h3 class="programa-titulo">Liderazgo Bíblico</h3>
+                            <p class="programa-descripcion">Formación avanzada para líderes que buscan profundizar en teología y desarrollar capacidades de liderazgo.</p>
+                            <div class="programa-info">
+                                <span><i class="fas fa-clock"></i> 4 años</span>
+                                <span><i class="fas fa-graduation-cap"></i> Pregrado avanzado</span>
+                            </div>
+                            <button class="programa-btn neo-button primary">Ver Programa</button>
+                        </div>
+                        <div class="programa-back">
+                            <div class="programa-contenido-back">
+                                <h4>Características Principales</h4>
+                                <ul>
+                                    <li><i class="fas fa-check-circle"></i> Modalidad: Presencial intensiva</li>
+                                    <li><i class="fas fa-check-circle"></i> Duración: 8 semestres</li>
+                                    <li><i class="fas fa-check-circle"></i> Título: Licenciatura en Teología</li>
+                                </ul>
+                                <a href="programa-liderazgo-biblico.html" class="neo-button">Más información</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Proceso de Admisión -->
+        <section class="proceso-section section-color" data-color="#162447">
+            <div class="neo-container">
+                <h2 class="section-title">Proceso de Admisión</h2>
+                <p class="section-description">Dar el primer paso hacia tu formación ministerial es simple. Sigue estos pasos para aplicar a cualquiera de nuestros programas académicos.</p>
+                
+                <div class="proceso-timeline">
+                    <div class="proceso-item">
+                        <div class="proceso-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="proceso-content">
+                            <h3>1. Solicitud</h3>
+                            <p>Completa el formulario de solicitud en línea y envía los documentos requeridos.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="proceso-item">
+                        <div class="proceso-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="proceso-content">
+                            <h3>2. Documentación</h3>
+                            <p>Presenta los documentos académicos, carta pastoral y demás requisitos.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="proceso-item">
+                        <div class="proceso-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="proceso-content">
+                            <h3>3. Entrevista</h3>
+                            <p>Participa en una entrevista personal o virtual con nuestro comité de admisiones.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="proceso-item">
+                        <div class="proceso-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="proceso-content">
+                            <h3>4. Admisión</h3>
+                            <p>Recibe tu carta de aceptación y completa el proceso de matrícula.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Becas y Ayudas -->
+        <section class="becas-section section-color" data-color="#1f4068">
+            <div class="neo-container">
+                <h2 class="section-title">Becas y Ayudas Financieras</h2>
+                <p class="section-description">Ofrecemos varias opciones para ayudarte a financiar tus estudios. Conoce nuestras becas y planes de financiamiento.</p>
+                
+                <div class="becas-grid">
+                    <div class="beca-card">
+                        <div class="beca-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h3>Beca Académica</h3>
+                        <p>Cubre hasta el 50% del costo de matrícula para estudiantes con excelencia académica.</p>
+                    </div>
+                    
+                    <div class="beca-card">
+                        <div class="beca-icon">
+                            <i class="fas fa-church"></i>
+                        </div>
+                        <h3>Beca Ministerial</h3>
+                        <p>Descuento del 30% para líderes activos en ministerios y pastores.</p>
+                    </div>
+                    
+                    <div class="beca-card">
+                        <div class="beca-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h3>Plan de Servicio</h3>
+                        <p>Oportunidades de trabajo-estudio dentro del campus para cubrir parte de los costos.</p>
+                    </div>
+                    
+                    <div class="beca-card">
+                        <div class="beca-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3>Convenios con Iglesias</h3>
+                        <p>Descuentos especiales para estudiantes enviados oficialmente por iglesias asociadas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contacto con Asesor -->
+        <section class="asesor-section section-color" data-color="#072142">
+            <div class="neo-container">
+                <h2 class="section-title">Habla con un Asesor</h2>
+                <p class="section-description">¿Tienes preguntas sobre nuestros programas? Nuestros asesores académicos están listos para ayudarte en tu proceso de decisión.</p>
+                
+                <div class="asesor-content">
+                    <div class="asesor-form">
+                        <form id="contacto-form" class="neo-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="nombre">Nombre completo *</label>
+                                    <input type="text" id="nombre" class="neo-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Correo electrónico *</label>
+                                    <input type="email" id="email" class="neo-input" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="telefono">Teléfono *</label>
+                                    <input type="tel" id="telefono" class="neo-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="programa">Programa de interés *</label>
+                                    <div class="custom-select-wrapper">
+                                        <select id="programa" class="neo-select" required>
+                                            <option value="">Seleccionar programa</option>
+                                            <option value="servicio-cristiano">Servicio Cristiano</option>
+                                            <option value="servicio-integral">Servicio Integral y Ministerial</option>
+                                            <option value="liderazgo-biblico">Liderazgo Bíblico</option>
+                                        </select>
+                                        <div class="select-icon"><i class="fas fa-chevron-down"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="mensaje">Mensaje *</label>
+                                    <textarea id="mensaje" class="neo-textarea" rows="4" required></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="neo-button primary full-width">Enviar Consulta</button>
+                        </form>
+                    </div>
+                    <div class="asesor-info">
+                        <div class="info-card">
+                            <h3><i class="fas fa-map-marker-alt"></i> Ubicación</h3>
+                            <p>SBC Berea, Tenjo, Cundinamarca<br>Colombia</p>
+                        </div>
+                        <div class="info-card">
+                            <h3><i class="fas fa-phone"></i> Teléfono</h3>
+                            <p>+57 (601) 123-4567<br>+57 310 123-4567</p>
+                        </div>
+                        <div class="info-card">
+                            <h3><i class="fas fa-envelope"></i> Correo</h3>
+                            <p>admisiones@luckas.org<br>info@luckas.org</p>
+                        </div>
+                        <div class="info-card">
+                            <h3><i class="fas fa-clock"></i> Horario de Atención</h3>
+                            <p>Lunes a Viernes: 8am - 5pm<br>Sábado: 9am - 12m</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Luckas</h3>
+                <p>Formando líderes con fundamento bíblico desde 1990.</p>
+                <div class="social-links">
+                    <a href="#" class="neo-social"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="neo-social"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="neo-social"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="neo-social"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Enlaces Rápidos</h3>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="cursos.html">Cursos</a></li>
+                    <li><a href="inscripcion.html">Inscripción</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Contacto</h3>
+                <ul class="contact-info">
+                    <li><i class="fas fa-map-marker-alt"></i> SBC Berea, Tenjo, Cundinamarca</li>
+                    <li><i class="fas fa-phone"></i> +57 (601) 123-4567</li>
+                    <li><i class="fas fa-envelope"></i> info@luckas.org</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Luckas. Todos los derechos reservados. <span class="signature">SoliDeoGloria123</span></p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
+    <script src="{{ url_for('static', path='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', path='js/inscripcion.js') }}"></script>
+    <script src="{{ url_for('static', path='js/theme-switcher.js') }}"></script>
+</body>
+</html>

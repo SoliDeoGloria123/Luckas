@@ -22,7 +22,7 @@ import re
 from dotenv import load_dotenv
 import os
 from typing import List
-from SRC.back_end.ofertas import data_analist_products
+#from SRC.backend.ofertas import data_analist_products
 
 # Mapeo de categorías a términos de búsqueda
 CATEGORIAS_MAPPING = {
@@ -196,22 +196,12 @@ async def require_login(request: Request):
     print(">>> DEBUG: SI hay sesión, PERMITIENDO acceso <<<")
     return user_session_data
 
-# Ruta protegida de ejemplo
-@app.get("/page", name="page")
-async def page (request: Request, current_user=Depends(require_login)):
-    print("### DEBUG: Ejecutando ruta /page ###")
-    if isinstance(current_user, RedirectResponse):
-        print("### DEBUG: current_user es RedirectResponse, retornando... ###")
-        return current_user
-    print(f"### DEBUG: Usuario en /page: {current_user.get('email')} ###")
-    return templates.TemplateResponse("page.html", {"request": request, "usuario": current_user})
-
 # Rutas de la aplicación FastAPI para manejar la autenticación y el acceso a las páginas del sitio LuckasEnt
 @app.get("/")
 async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
-@app.get("/login", name="login")
+@app.get("/login_principal", name="login_principal")
 async def login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
@@ -373,6 +363,7 @@ El equipo de LuckasEnt"""
 # --- FIN: RUTA MODIFICADA ---
 
 
+
 # --- INICIO: NUEVAS RUTAS PARA RESTABLECER ---
 @app.get("/restablecer_pass", name="mostrar_reset_form") # Ruta para MOSTRAR el formulario
 async def mostrar_reset_form(request: Request, token: str = Query(...)):
@@ -473,6 +464,29 @@ async def cuenta(request: Request, current_user: dict = Depends(require_login)):
         return RedirectResponse(url=request.url_for('login'), status_code=status.HTTP_303_SEE_OTHER)
     return templates.TemplateResponse("Mi_Cuenta.html", {"request": request, "usuario": usuario})
 
+@app.get("/index", name="index")
+async def index(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/cursos", name="cursos")
+async def cursos(request: Request):
+    return templates.TemplateResponse("cursos.html", {"request": request})
+
+@app.get("/inscripcion", name="inscripcion")
+async def inscripcion(request: Request):
+    return templates.TemplateResponse("inscripcion.html", {"request": request})
+
+@app.get("/programa", name="programa")
+async def program_inscripcion(request: Request):
+    return templates.TemplateResponse("programa-servicio-cristiano.html", {"request": request})
+
+@app.get("/nosotros", name="nosotros")
+async def nosotros(request: Request):
+    return templates.TemplateResponse("nosotros.html", {"request": request})
+
+@app.get("/login", name="login")
+async def login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
 @app.get("/logout", name="logout")
 async def logout(response: Response):
@@ -545,99 +559,6 @@ async def eliminar_cuenta(request: Request, email: str = Form(...)):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return RedirectResponse(url="/registro", status_code=303)
-
-
-
-@app.get("/Tiendas", name="Tiendas")
-async def Tiendas(request: Request):
-    usuario = {"nombre": "Luis Felipe"}  # o lo que corresponda según tu app
-    return templates.TemplateResponse("Tiendas.html", {"request": request, "usuario": usuario})
-
-@app.get("/precioproduc/{product_id}", name="precioproduc")
-async def precioproduc(request: Request, product_id: str):  # ✔️ Nombre correcto de la función
-    try:
-        producto = collection.find_one({"_id": ObjectId(product_id)})
-        if producto is None:
-            return templates.TemplateResponse("error.html", {"request": request, "mensaje": "Producto no encontrado"})
-    except Exception as e:
-        print(f"Error al buscar producto: {e}")
-        return templates.TemplateResponse("error.html", {"request": request, "mensaje": "ID de producto inválido"})
-    
-    # Pasar los datos del producto al template
-    return templates.TemplateResponse("productoprecio.html", {
-        "request": request,
-        "producto": producto
-    })
-
-@app.get("/ubicacionproduc/{product_id}", name="ubicacionproduc")
-async def ubicacionproduc(request: Request, product_id: str):
-    # Buscar el producto en la base de datos usando el ID
-    try:
-        producto = collection.find_one({"_id": ObjectId(product_id)})
-        if producto is None:
-            return templates.TemplateResponse("error.html", {"request": request, "mensaje": "Producto no encontrado"})
-    except Exception as e:
-        print(f"Error al buscar producto: {e}")
-        return templates.TemplateResponse("error.html", {"request": request, "mensaje": "ID de producto inválido"})
-    
-    # Pasar los datos del producto al template
-    return templates.TemplateResponse("productoubica.html", {
-        "request": request,
-        "producto": producto
-    })
-
-
-@app.get("/reseñaproduc/{product_id}", name="reseñaproduc")
-async def reseñaproduc(request: Request, product_id: str):  # ✔️ Nombre correcto de la función
-    try:  # <- Indentación corregida (4 espacios)
-        producto = collection.find_one({"_id": ObjectId(product_id)})
-        if producto is None:
-            return templates.TemplateResponse("error.html", {"request": request, "mensaje": "Producto no encontrado"})
-    except Exception as e:
-        print(f"Error al buscar producto: {e}")
-        return templates.TemplateResponse("error.html", {"request": request, "mensaje": "ID de producto inválido"})
-    
-    # Pasar los datos del producto al template
-    return templates.TemplateResponse("productoreseña.html", {
-        "request": request,
-        "producto": producto
-    })
-
-
-@app.post("/agregar_a_lista/{product_id}", name="agregar_a_lista")
-async def agregar_a_lista(request: Request, product_id: str, current_user: dict = Depends(require_api_login)):
-    user_email = current_user["email"]
-    # 1. Verificar si el usuario está logueado
-    user_session_data = get_current_user(request)
-    if not user_session_data:
-        raise HTTPException(status_code=401, detail="Debes iniciar sesión para agregar productos")
-
-    user_email = user_session_data["email"]
-
-    # 2. Validar el product_id (que es el _id de MongoDB)
-    try:
-        obj_product_id = ObjectId(product_id)
-    except Exception:
-        raise HTTPException(status_code=400, detail="ID de producto inválido")
-    if not collection.find_one({"_id": obj_product_id}):
-         raise HTTPException(status_code=404, detail="Producto no encontrado")
-    result = listas_collection.update_one(
-        {"user_email": user_email}, # Busca el documento por el email del usuario
-        {"$addToSet": {"productos_ids": obj_product_id}}, # Añade el ObjectId al array
-        upsert=True # Crea el documento si el usuario no tiene lista aún
-    )
-
-    # 5. Devolver una respuesta
-    if result.upserted_id:
-        return {"status": "success", "message": "Producto agregado a tu lista"}
-    elif result.modified_count > 0:
-        return {"status": "success", "message": "Producto agregado a tu lista"}
-    elif result.matched_count > 0:
-         # Si encontró el documento pero no modificó (el producto ya estaba)
-         return {"status": "info", "message": "Este producto ya está en tu lista"}
-    else:
-         # Error inesperado
-         raise HTTPException(status_code=500, detail="Error al actualizar la lista")
 
 
 @app.get("/tulista", name="tulista")
@@ -737,153 +658,25 @@ async def tienda(request: Request, current_user = Depends(require_login)):
 async def productlista(request: Request):  # ✔️ Nombre correcto de la función
     return templates.TemplateResponse("categorias.html", {"request": request})
 
-
-@app.get("/detalle_producto/{product_id}", name="detalle_producto")
-async def detalle_producto(request: Request, product_id: str):
-    producto = collection.find_one({"_id": ObjectId(product_id)})
-    if producto is None:
-        return templates.TemplateResponse("error.html", {"request": request, "mensaje": "Producto no encontrado"})
-
-    return templates.TemplateResponse("detalleproduct.html", {
-        "request": request,
-        "producto": producto
-    })
-
-
-@app.get("/ofertas", name="ofertas")
-async def ofertas(request: Request, q: str = "", page: int = Query(1, gt=0)):
-    page_size = 10  # Número de productos por página
-    result = data_analist_products(search_query=q, page=page, page_size=page_size)
-    productos = result["productos"]
-    total_productos = result["total_productos"]
-    total_paginas = (total_productos + page_size - 1) // page_size  # Calcular total de páginas
-
-    return templates.TemplateResponse(
-        "ofertas.html",
-        {
-            "request": request,
-            "best_products": productos,
-            "total_productos": total_productos,
-            "pagina_actual": page,
-            "total_paginas": total_paginas,
-            "query": q,
-        },
-    )
-
-@app.get("/categoria", name="categoria")
-async def categoria(
-    request: Request, 
-    q: str = "", 
-    page: int = Query(1, gt=0), 
-    stores: List[str] = Query(None),
-    categoria_id: str = None,
-    current_user = Depends(require_login)
-):
-    """
-    Muestra una lista paginada de productos con opción de búsqueda y filtros.
-    """
-    
-    if isinstance(current_user, RedirectResponse):
-        print("### DEBUG: categoria - current_user es RedirectResponse, retornando... ###")
-        return current_user
-    print(f"### DEBUG: categoria - Usuario en /categoria: {current_user.get('email')} ###")
-    
-    productos_por_pagina = 38
-    skip = (page - 1) * productos_por_pagina
-
-    # Construir filtro
-    filtro = {}
-    
-    # Filtrar por categoría si se especificó
-    if categoria_id in CATEGORIAS_MAPPING:
-        # Crear expresión regular para buscar términos relacionados con la categoría
-        terminos = CATEGORIAS_MAPPING[categoria_id]
-        regex_pattern = "|".join(terminos)
-        filtro["Product_Name"] = {"$regex": regex_pattern, "$options": "i"}
-    
-    # Filtrar por tiendas si se seleccionaron
-    if stores:
-        filtro["Parner"] = {"$in": stores}
-    
-    # Si hay término de búsqueda adicional, añadir al filtro
-    if q:
-        # Si ya hay un filtro de Product_Name, lo combinamos con el término de búsqueda
-        if "Product_Name" in filtro:
-            # Guardamos el filtro original de categoría
-            categoria_regex = filtro["Product_Name"]["$regex"]
-            # Creamos un nuevo filtro que combine ambos criterios
-            filtro["$and"] = [
-                {"Product_Name": {"$regex": categoria_regex, "$options": "i"}},
-                {"Product_Name": {"$regex": re.escape(q), "$options": "i"}}
-            ]
-            # Eliminamos el filtro original para evitar conflictos
-            del filtro["Product_Name"]
-        else:
-            filtro["Product_Name"] = {"$regex": re.escape(q), "$options": "i"}
-
-    # Consulta MongoDB con filtro + paginación
-    productos = list(collection.find(filtro).skip(skip).limit(productos_por_pagina))
-
-    # Total de productos para la paginación
-    total_productos = collection.count_documents(filtro)
-    total_paginas = (total_productos + productos_por_pagina - 1) // productos_por_pagina
-
-    # Determinar qué categoría está activa
-    categorias_activas = {
-        "frutas_verduras": categoria_id == "frutas_verduras",
-        "carnicos": categoria_id == "carnicos",
-        "pescados": categoria_id == "pescados",
-        "panaderia": categoria_id == "panaderia",
-        "dulces_abarrotes": categoria_id == "dulces_abarrotes",
-        "bebidas": categoria_id == "bebidas"
-    }
-
-    # Determinar el título de la página según la categoría
-    titulo_pagina = "Productos"
-    if categoria_id:
-        titulo_pagina = categoria_id.replace("_", " ").title()
-
-    return templates.TemplateResponse("categorias.html", {
-        "request": request,
-        "productos": productos,
-        "pagina_actual": page,
-        "total_paginas": total_paginas,
-        "query": q,
-        "stores": stores or [],
-        "categoria_actual": categoria_id,
-        "categorias_activas": categorias_activas,
-        "total_productos": total_productos,
-        "titulo_pagina": titulo_pagina
-    })
-
-@app.get("/categoria_frutas", name="categoria_frutas")
-async def categoria_frutas(request: Request, q: str = "", page: int = Query(1, gt=0), stores: List[str] = Query(None), current_user = Depends(require_login)):
-    return await categoria(request, q, page, stores, "frutas_verduras", current_user)
-
-@app.get("/categoria_carne", name="categoria_carne")
-async def categoria_carne(request: Request, q: str = "", page: int = Query(1, gt=0), stores: List[str] = Query(None), current_user = Depends(require_login)):
-    return await categoria(request, q, page, stores, "carnicos", current_user)
-
-@app.get("/categoria_pescado", name="categoria_pescado")
-async def categoria_pescado(request: Request, q: str = "", page: int = Query(1, gt=0), stores: List[str] = Query(None), current_user = Depends(require_login)):
-    return await categoria(request, q, page, stores, "pescados", current_user)
-
-@app.get("/categoria_pan", name="categoria_pan")
-async def categoria_pan(request: Request, q: str = "", page: int = Query(1, gt=0), stores: List[str] = Query(None), current_user = Depends(require_login)):
-    return await categoria(request, q, page, stores, "panaderia", current_user)
-
-@app.get("/categoria_dulce", name="categoria_dulce")
-async def categoria_dulce(request: Request, q: str = "", page: int = Query(1, gt=0), stores: List[str] = Query(None), current_user = Depends(require_login)):
-    return await categoria(request, q, page, stores, "dulces_abarrotes", current_user)
-
-@app.get("/categoria_bebida", name="categoria_bebida")
-async def categoria_bebida(request: Request, q: str = "", page: int = Query(1, gt=0), stores: List[str] = Query(None), current_user = Depends(require_login)):
-    return await categoria(request, q, page, stores, "bebidas", current_user)
-
 @app.get("/nosotros", name="nosotros")
 async def nosotros(request: Request):  # ✔️ Nombre correcto de la función
     return templates.TemplateResponse("nosotros.html", {"request": request})
 
+@app.get("/cursos", name="cursos")
+async def cursos(request: Request):
+    return templates.TemplateResponse("cursos.html", {"request": request})
+
+@app.get("/inscripcion", name="inscripcion")
+async def inscripcion(request: Request):
+    return templates.TemplateResponse("inscripcion.html", {"request": request})
+
+@app.get("/programa-servicio-cristiano", name="programa_servicio_cristiano")
+async def programa_servicio_cristiano(request: Request):
+    return templates.TemplateResponse("programa-servicio-cristiano.html", {"request": request})
+
+@app.get("/index", name="index")
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
