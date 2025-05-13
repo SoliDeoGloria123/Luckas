@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="es" class="theme-dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Seminario Bautista de Colombia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Dashboard elegante para Seminario Bautista de Colombia con paleta de azules */
+
+        :root {
+            /* Nuevos colores - escala de azules */
+            --black: #000000;
+            --white: #ffffff;
+            --dark-gray: #121212;
+            --medium-gray: #333333;
+            --light-gray: #f5f5f5;
+            
+            /* Nueva paleta de azules */
+            --blue-light: #d4e0f7;     /* Azul claro/celeste */
+            --blue-medium: #6a85b6;    /* Azul medio */
+            --blue-medium-dark: #3b5998; /* Azul medio-oscuro */
+            --blue-navy: #1e3a8a;      /* Azul marino */
+            --blue-dark: #0a1128;      /* Azul oscuro casi negro */
+            
+            --accent: var(--blue-medium);  /* Antes era dorado, ahora azul medio */
+            --accent-hover: var(--blue-light);
+            --error: #c14343;
+            --success: #43a047;
+            --warning: #f9a825;
+            --info: var(--blue-medium);
+
+            /* Variables funcionales */
+            --text: var(--white);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --background: var(--black);
+            --surface: var(--dark-gray);
+            --border: #2a2a2a;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            
+            /* Variables específicas para el sidebar */
+            --sidebar-bg: rgba(18, 18, 18, 0.95);
+            --sidebar-border: #2a2a2a;
+        }
+
+        /* Estilos para tema claro (preparados pero no activados por defecto) */
+        .theme-light {
+            --text: var(--black);
+            --text-secondary: rgba(0, 0, 0, 0.7);
+            --text-muted: rgba(0, 0, 0, 0.5);
+            --background: var(--white);
+            --surface: var(--light-gray);
+            --border: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            
+            /* Variables específicas para el sidebar en tema claro */
+            --sidebar-bg: rgba(245, 245, 250, 0.95);
+            --sidebar-border: #e0e0e0;
+        }
+
+        /* Fondo animado de ondas */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 80% 10%, var(--blue-medium-dark) 0%, transparent 25%),
+                radial-gradient(circle at 20% 30%, var(--blue-navy) 0%, transparent 20%),
+                var(--background);
+            z-index: -2;
+            opacity: 0.4;
+        }
+
+        .wave-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: rgba(30, 58, 138, 0.05); /* Azul marino con baja opacidad */
+            border-radius: 43%;
+        }
+
+        .wave:nth-child(1) {
+            bottom: -70%;
+            left: -50%;
+            animation: rotate 20s linear infinite;
+        }
+
+        .wave:nth-child(2) {
+            bottom: -80%;
+            left: -30%;
+            animation: rotate 25s linear infinite reverse;
+            background: rgba(106, 133, 182, 0.03); /* Azul medio con baja opacidad */
+        }
+
+        .wave:nth-child(3) {
+            bottom: -75%;
+            left: -70%;
+            animation: rotate 30s linear infinite;
+            background: rgba(10, 17, 40, 0.04); /* Azul oscuro con baja opacidad */
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            font-weight: 300;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar elegante */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 0;
+            border-right: 1px solid var(--sidebar-border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid var(--sidebar-border);
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 48px;
+            height: auto;
+            margin-right: 1rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .user-profile {
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-image-container {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--blue-medium);
+            box-shadow: 0 0 15px rgba(106, 133, 182, 0.3);
+        }
+
+        .user-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .main-nav {
+            flex-grow: 1;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+
+        .nav-section h4 {
+            padding: 0 1rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .nav-section a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 400;
+        }
+
+        .nav-section a:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+            color: var(--text);
+        }
+
+        .nav-section li.active a {
+            background-color: rgba(106, 133, 182, 0.2);
+            color: var(--blue-light);
+            box-shadow: 0 0 10px rgba(106, 133, 182, 0.1);
+        }
+
+        .nav-section a i {
+            margin-right: 1rem;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-section a .badge {
+            margin-left: auto;
+            background-color: var(--blue-medium);
+            color: var(--white);
+            font-size: 0.75rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .sidebar-footer {
+            padding: 2rem;
+            border-top: 1px solid var(--sidebar-border);
+            text-align: center;
+        }
+
+        .sidebar-footer p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .version {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Enlaces de navegación especiales */
+        .logout {
+            color: var(--error) !important;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex-grow: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            max-width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Encabezado de página */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.2rem;
+            font-weight: 400;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .search-container {
+            position: relative;
+            width: 250px;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: none;
+            background-color: var(--surface);
+            color: var(--text);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .header-icon-button {
+            background: none;
+            border: none;
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+
+        .header-icon-button:hover {
+            background-color: var(--surface);
+        }
+
+        .header-icon-button .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--blue-medium);
+            color: var(--white);
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle .fa-sun {
+            display: none;
+        }
+
+        .theme-light .theme-toggle .fa-moon {
+            display: none;
+        }
+
+        .theme-light .theme-toggle .fa-sun {
+            display: block;
+        }
+
+        /* Estilos específicos para la página de perfil */
+        .profile-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-sidebar {
+            background-color: rgba(18, 18, 18, 0.8);
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-picture-container {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            border: 3px solid var(--blue-medium);
+            box-shadow: 0 0 20px rgba(106, 133, 182, 0.4);
+            position: relative;
+        }
+
+        .profile-picture-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .change-picture-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(10, 17, 40, 0.7);
+            color: var(--white);
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .profile-picture-container:hover .change-picture-overlay {
+            opacity: 1;
+        }
+
+        .profile-sidebar h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .user-role-tag {
+            display: inline-block;
+            background-color: rgba(106, 133, 182, 0.2);
+            color: var(--blue-light);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .stat-item {
+            background-color: rgba(30, 30, 40, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .profile-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .profile-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .profile-tab.active {
+            color: var(--blue-light);
+        }
+
+        .profile-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--blue-medium);
+        }
+
+        .profile-tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .profile-tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-section {
+            background-color: rgba(18, 18, 18, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            width: 100%;
+            background-color: rgba(30, 30, 40, 0.5);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--blue-medium);
+            box-shadow: 0 0 0 2px rgba(106, 133, 182, 0.2);
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--blue-medium);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--blue-medium-dark);
+            box-shadow: 0 0 15px rgba(106, 133, 182, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: rgba(30, 30, 40, 0.5);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(50, 50, 60, 0.5);
+        }
+
+        /* Actividad reciente en perfil */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: rgba(30, 30, 40, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        .activity-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            background-color: var(--blue-medium);
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex-grow: 1;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .activity-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .activity-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Notificaciones y preferencias */
+        .notification-option, .preference-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            background-color: rgba(30, 30, 40, 0.5);
+        }
+
+        .option-label h4 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .option-label p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(50, 50, 60, 0.5);
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--text);
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--blue-medium);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Estilos para cambio de contraseña */
+        .password-strength {
+            margin-top: 0.5rem;
+            height: 5px;
+            background-color: rgba(50, 50, 60, 0.5);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .password-strength-meter {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease, background-color 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .password-strength-meter.weak {
+            width: 33%;
+            background-color: var(--error);
+        }
+
+        .password-strength-meter.medium {
+            width: 66%;
+            background-color: var(--warning);
+        }
+
+        .password-strength-meter.strong {
+            width: 100%;
+            background-color: var(--success);
+        }
+
+        .password-strength-text {
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        /* Estilos personalizados para scrollbar - Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--blue-medium) rgba(30, 30, 40, 0.3);
+        }
+
+        /* Estilos personalizados para scrollbar - Chrome, Edge, Safari */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 30, 40, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--blue-medium), var(--blue-medium-dark));
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--blue-medium-dark);
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+
+        /* Estilos específicos para la sidebar que tiene su propio scroll */
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(10, 10, 20, 0.3);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--blue-medium-dark), var(--blue-navy));
+            box-shadow: 0 0 10px rgba(106, 133, 182, 0.2);
+        }
+
+        /* Estilos especiales para la versión clara */
+        .theme-light .sidebar-header {
+            border-bottom-color: var(--sidebar-border);
+        }
+
+        .theme-light .sidebar-footer {
+            border-top-color: var(--sidebar-border);
+        }
+
+        .theme-light .nav-section a:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+        }
+
+        .theme-light .nav-section li.active a {
+            background-color: rgba(106, 133, 182, 0.15);
+            color: var(--blue-medium-dark);
+        }
+
+        .theme-light::-webkit-scrollbar-track {
+            background: rgba(240, 240, 250, 0.5);
+        }
+
+        .theme-light::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--blue-medium), var(--blue-light));
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-sidebar {
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-container {
+                flex-grow: 1;
+            }
+
+            .profile-sidebar {
+                padding: 1.5rem;
+            }
+
+            .profile-picture-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fondo de ondas animadas -->
+    <div class="wave-background">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar elegante -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/logo-white.png" alt="Logo SBC" class="logo">
+                <h1>Luckas</h1>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-image-container">
+                    <img src="images/profile.jpg" alt="Perfil de usuario" class="user-image">
+                </div>
+                <div class="user-info">
+                    <h3>Juan Pérez</h3>
+                    <p>Estudiante</p>
+                </div>
+            </div>
+            
+            <nav class="main-nav">
+                <div class="nav-section">
+                    <h4>Principal</h4>
+                    <ul>
+                        <li>
+                            <a href="dashboard.html">
+                                <i class="fas fa-th-large"></i>
+                                <span>Panel Principal</span>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="perfil.html">
+                                <i class="fas fa-user"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="notificaciones.html">
+                                <i class="fas fa-bell"></i>
+                                <span>Notificaciones</span>
+                                <span class="badge">3</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>Gestión</h4>
+                    <ul>
+                        <li>
+                            <a href="eventos.html">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Eventos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="programas-academicos.html">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Programas Académicos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="cabanas.html">
+                                <i class="fas fa-home"></i>
+                                <span>Reservas de Cabañas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>Cuenta</h4>
+                    <ul>
+                        <li>
+                            <a href="configuracion.html">
+                                <i class="fas fa-cog"></i>
+                                <span>Configuración</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="ayuda.html">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Ayuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html" class="logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Cerrar Sesión</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>Seminario Bautista de Colombia</p>
+                <p class="version">Luckas v2.1.0</p>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Mi Perfil</h1>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle header-icon-button">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="profile-container">
+                <!-- Sidebar del perfil -->
+                <div class="profile-sidebar">
+                    <div class="profile-picture-container">
+                        <img src="images/profile-large.jpg" alt="Juan Pérez">
+                        <div class="change-picture-overlay">Cambiar foto</div>
+                    </div>
+                    <h2>Juan Pérez</h2>
+                    <div class="user-role-tag">Estudiante</div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">Cursos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Eventos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Certificados</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">2</div>
+                            <div class="stat-label">Programas</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contenido principal del perfil -->
+                <div class="profile-main">
+                    <div class="profile-tabs">
+                        <div class="profile-tab active" data-tab="personal">Información Personal</div>
+                        <div class="profile-tab" data-tab="security">Seguridad</div>
+                        <div class="profile-tab" data-tab="activity">Actividad Reciente</div>
+                        <div class="profile-tab" data-tab="preferences">Preferencias</div>
+                    </div>
+                    
+                    <!-- Tab: Información Personal -->
+                    <div class="profile-tab-content active" id="personal">
+                        <div class="profile-section">
+                            <h3>Datos Personales</h3>
+                            <form id="personal-form">
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label for="first-name">Nombres</label>
+                                        <input type="text" id="first-name" class="form-control" value="Juan">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="last-name">Apellidos</label>
+                                        <input type="text" id="last-name" class="form-control" value="Pérez">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Correo Electrónico</label>
+                                    <input type="email" id="email" class="form-control" value="juan.perez@example.com">
+                                </div>
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label for="phone">Teléfono</label>
+                                        <input type="tel" id="phone" class="form-control" value="300-123-4567">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="birth-date">Fecha de Nacimiento</label>
+                                        <input type="date" id="birth-date" class="form-control" value="1995-06-15">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-buttons">
+                                    <button type="button" class="btn btn-secondary">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h3>Información Académica</h3>
+                            <form id="academic-form">
+                                <div class="form-group">
+                                    <label for="degree">Nivel Académico</label>
+                                    <select id="degree" class="form-control">
+                                        <option value="bachelor">Pregrado</option>
+                                        <option value="master" selected>Maestría</option>
+                                        <option value="doctorate">Doctorado</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="institution">Institución</label>
+                                    <input type="text" id="institution" class="form-control" value="Universidad Nacional">
+                                </div>
+                                <div class="form-group">
+                                    <label for="field">Campo de Estudio</label>
+                                    <input type="text" id="field" class="form-control" value="Teología Pastoral">
+                                </div>
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label for="start-year">Año de Inicio</label>
+                                        <input type="number" id="start-year" class="form-control" value="2022">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="end-year">Año de Finalización (o esperado)</label>
+                                        <input type="number" id="end-year" class="form-control" value="2024">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-buttons">
+                                    <button type="button" class="btn btn-secondary">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab: Seguridad -->
+                    <div class="profile-tab-content" id="security">
+                        <div class="profile-section">
+                            <h3>Cambiar Contraseña</h3>
+                            <form id="password-form">
+                                <div class="form-group">
+                                    <label for="current-password">Contraseña Actual</label>
+                                    <input type="password" id="current-password" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-password">Nueva Contraseña</label>
+                                    <input type="password" id="new-password" class="form-control">
+                                    <div class="password-strength">
+                                        <div class="password-strength-meter"></div>
+                                    </div>
+                                    <div class="password-strength-text"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm-password">Confirmar Nueva Contraseña</label>
+                                    <input type="password" id="confirm-password" class="form-control">
+                                </div>
+                                
+                                <div class="form-buttons">
+                                    <button type="button" class="btn btn-secondary">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h3>Verificación en Dos Pasos</h3>
+                            <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Añade una capa adicional de seguridad a tu cuenta mediante la verificación de dos pasos.</p>
+                            
+                            <div class="notification-option">
+                                <div class="option-label">
+                                    <h4>Verificación en Dos Pasos</h4>
+                                    <p>Recibe un código por SMS cada vez que inicies sesión desde un dispositivo desconocido.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-option">
+                                <div class="option-label">
+                                    <h4>Notificaciones de Inicio de Sesión</h4>
+                                    <p>Recibe alertas por correo electrónico cuando tu cuenta sea accedida desde una ubicación nueva.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab: Actividad Reciente -->
+                    <div class="profile-tab-content" id="activity">
+                        <div class="profile-section">
+                            <h3>Actividad Reciente</h3>
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-user-edit"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-header">
+                                            <h4 class="activity-title">Perfil actualizado</h4>
+                                            <span class="activity-date">Hoy, 10:30</span>
+                                        </div>
+                                        <p class="activity-description">Has actualizado tu información de perfil.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-header">
+                                            <h4 class="activity-title">Inicio de sesión</h4>
+                                            <span class="activity-date">Ayer, 15:45</span>
+                                        </div>
+                                        <p class="activity-description">Inicio de sesión desde Chrome en Windows.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-header">
+                                            <h4 class="activity-title">Inscripción a evento</h4>
+                                            <span class="activity-date">12/05/2025, 09:15</span>
+                                        </div>
+                                        <p class="activity-description">Te has inscrito al evento "Taller de Liderazgo".</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-header">
+                                            <h4 class="activity-title">Pago realizado</h4>
+                                            <span class="activity-date">10/05/2025, 14:22</span>
+                                        </div>
+                                        <p class="activity-description">Has realizado un pago de $120.000 para "Hermenéutica Bíblica".</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-header">
+                                            <h4 class="activity-title">Solicitud enviada</h4>
+                                            <span class="activity-date">05/05/2025, 11:30</span>
+                                        </div>
+                                        <p class="activity-description">Has enviado una solicitud para el programa "Licenciatura en Teología".</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-buttons">
+                            <button type="button" class="btn btn-secondary">Ver Todas las Actividades</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab: Preferencias -->
+                    <div class="profile-tab-content" id="preferences">
+                        <div class="profile-section">
+                            <h3>Preferencias de Notificaciones</h3>
+                            
+                            <div class="notification-option">
+                                <div class="option-label">
+                                    <h4>Notificaciones por Correo</h4>
+                                    <p>Recibe actualizaciones e información importante por correo electrónico.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-option">
+                                <div class="option-label">
+                                    <h4>Recordatorios de Eventos</h4>
+                                    <p>Recibe recordatorios sobre eventos próximos a los que estás inscrito.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-option">
+                                <div class="option-label">
+                                    <h4>Actualización de Programas</h4>
+                                    <p>Recibe notificaciones cuando haya cambios en los programas académicos.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-option">
+                                <div class="option-label">
+                                    <h4>Boletín Mensual</h4>
+                                    <p>Mantente informado con nuestro boletín mensual y noticias importantes.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h3>Preferencias de Privacidad</h3>
+                            
+                            <div class="preference-option">
+                                <div class="option-label">
+                                    <h4>Perfil Público</h4>
+                                    <p>Permite que otros estudiantes y profesores vean tu perfil.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="preference-option">
+                                <div class="option-label">
+                                    <h4>Mostrar Progreso Académico</h4>
+                                    <p>Muestra tu progreso en cursos y programas en tu perfil público.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-buttons">
+                                <button type="button" class="btn btn-secondary">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">Guardar Preferencias</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle para el menú en dispositivos móviles
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('open');
+                });
+            }
+            
+            // Cerrar el sidebar cuando se haga clic fuera de él (en móviles)
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 992 && 
+                    sidebar && 
+                    sidebar.classList.contains('open') &&
+                    !sidebar.contains(event.target) && 
+                    !menuToggle.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+            
+            // Toggle para el tema (claro/oscuro)
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (themeToggle) {
+                // Función para aplicar estilos específicos
+                function applyThemeStyles(isLight) {
+                    // Componentes específicos que necesitan cambio manual
+                    const componentsToFix = [
+                        '.profile-sidebar',
+                        '.profile-sidebar h2', 
+                        '.profile-sidebar p',
+                        '.profile-section',
+                        '.profile-section h3',
+                        '.stat-item',
+                        '.form-control',
+                        '.activity-item',
+                        '.notification-option',
+                        '.preference-option'
+                    ];
+                    
+                    if (isLight) {
+                        // Aplicar estilos para tema claro
+                        componentsToFix.forEach(selector => {
+                            document.querySelectorAll(selector).forEach(element => {
+                                if (selector.includes('h2') || selector.includes('h3') || selector.includes('p')) {
+                                    element.style.color = '#121212'; // Texto oscuro para tema claro
+                                }
+                                
+                                if (selector.includes('profile-sidebar') || selector.includes('profile-section') || 
+                                    selector.includes('stat-item') || selector.includes('activity-item') ||
+                                    selector.includes('notification-option') || selector.includes('preference-option')) {
+                                    element.style.backgroundColor = 'rgba(245, 245, 250, 0.95)'; // Fondo claro
+                                    element.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                                }
+                                
+                                if (selector.includes('form-control')) {
+                                    element.style.backgroundColor = 'rgba(240, 240, 245, 0.7)';
+                                    element.style.color = '#121212';
+                                    element.style.borderColor = '#e0e0e0';
+                                }
+                            });
+                        });
+                        
+                    } else {
+                        // Restaurar estilos para tema oscuro
+                        componentsToFix.forEach(selector => {
+                            document.querySelectorAll(selector).forEach(element => {
+                                if (selector.includes('h2') || selector.includes('h3') || selector.includes('p')) {
+                                    element.style.color = ''; // Restaurar al valor predeterminado
+                                }
+                                
+                                if (selector.includes('profile-sidebar') || selector.includes('profile-section') || 
+                                    selector.includes('stat-item') || selector.includes('activity-item') ||
+                                    selector.includes('notification-option') || selector.includes('preference-option')) {
+                                    element.style.backgroundColor = ''; // Restaurar al valor predeterminado
+                                    element.style.boxShadow = '';
+                                }
+                                
+                                if (selector.includes('form-control')) {
+                                    element.style.backgroundColor = '';
+                                    element.style.color = '';
+                                    element.style.borderColor = '';
+                                }
+                            });
+                        });
+                    }
+                }
+                
+                themeToggle.addEventListener('click', function() {
+                    document.documentElement.classList.toggle('theme-light');
+                    
+                    const isLightTheme = document.documentElement.classList.contains('theme-light');
+                    localStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
+                    
+                    // Aplicar los estilos específicos para los componentes mencionados
+                    applyThemeStyles(isLightTheme);
+                });
+                
+                // Aplicar el tema guardado al cargar la página
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'light') {
+                    document.documentElement.classList.add('theme-light');
+                    applyThemeStyles(true);
+                }
+            }
+            
+            // Tabs de perfil
+            const profileTabs = document.querySelectorAll('.profile-tab');
+            const profileContents = document.querySelectorAll('.profile-tab-content');
+            
+            profileTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const target = this.getAttribute('data-tab');
+                    
+                    // Desactivar todas las tabs y contenidos
+                    profileTabs.forEach(t => t.classList.remove('active'));
+                    profileContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Activar la tab seleccionada y su contenido
+                    this.classList.add('active');
+                    document.getElementById(target).classList.add('active');
+                });
+            });
+            
+            // Cambiar foto de perfil
+            const profilePic = document.querySelector('.profile-picture-container');
+            
+            if (profilePic) {
+                profilePic.addEventListener('click', function() {
+                    // Simular el click en un input file (en una implementación real)
+                    alert('Esta función permitiría seleccionar una nueva imagen de perfil.');
+                });
+            }
+            
+            // Medidor de contraseña
+            const newPasswordInput = document.getElementById('new-password');
+            const passwordStrengthMeter = document.querySelector('.password-strength-meter');
+            const passwordStrengthText = document.querySelector('.password-strength-text');
+            
+            if (newPasswordInput) {
+                newPasswordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    
+                    // Lógica simple de verificación de fortaleza
+                    let strength = 0;
+                    if (password.length >= 8) strength += 1;
+                    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) strength += 1;
+                    if (/[0-9]/.test(password)) strength += 1;
+                    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+                    
+                    // Actualizar visual
+                    passwordStrengthMeter.className = 'password-strength-meter';
+                    
+                    if (password.length === 0) {
+                        passwordStrengthMeter.style.width = '0';
+                        passwordStrengthText.textContent = '';
+                    } else if (strength < 2) {
+                        passwordStrengthMeter.classList.add('weak');
+                        passwordStrengthText.textContent = 'Débil';
+                        passwordStrengthText.style.color = '#c14343';
+                    } else if (strength < 4) {
+                        passwordStrengthMeter.classList.add('medium');
+                        passwordStrengthText.textContent = 'Media';
+                        passwordStrengthText.style.color = '#f9a825';
+                    } else {
+                        passwordStrengthMeter.classList.add('strong');
+                        passwordStrengthText.textContent = 'Fuerte';
+                        passwordStrengthText.style.color = '#43a047';
+                    }
+                });
+            }
+            
+            // Validación de formularios (simulada)
+            const forms = document.querySelectorAll('form');
+            
+            forms.forEach(form => {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    
+                    // En una implementación real, aquí se enviarían los datos del formulario
+                    alert('Cambios guardados correctamente (simulado).');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

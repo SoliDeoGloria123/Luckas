@@ -99,7 +99,7 @@ def google_login_callback():
     # Verificar si el usuario ya está en sesión
     if 'usuario' in session:
         print(f"--- DEBUG: Usuario ya en sesión: {session['usuario']} ---")
-        return redirect("/page")
+        return redirect("/dashboard")
 
     # Verificar si el usuario está autorizado con Google
     if not google.authorized:
@@ -141,7 +141,7 @@ def google_login_callback():
     # Configurar la cookie de sesión
     cookie_value = serializer.dumps({"email": user_info.get("email")})
     print(f"--- DEBUG: Valor de la cookie firmada: {cookie_value} ---")
-    response = redirect("/page")
+    response = redirect("/dashboard")
     response.set_cookie(
         "session",
         cookie_value,
@@ -235,7 +235,7 @@ async def login_post(request: Request, response: Response, email: str = Form(...
     if usuario and bcrypt.check_password_hash(usuario["password"], password):
         session_data = {"email": email}
         session_cookie = serializer.dumps(session_data)
-        response = RedirectResponse(url="/page", status_code=303)
+        response = RedirectResponse(url="/dashboard", status_code=303)
         response.set_cookie(key="session", value=session_cookie, httponly=True)
         return response
     else:
@@ -506,7 +506,7 @@ async def perfil(request: Request, current_user: dict = Depends(require_login)):
     print(f"--- DEBUG: Usuario obtenido para /perfil: {usuario} ---")  # Depuración
     if not usuario:
         return RedirectResponse(url=request.url_for('login'), status_code=status.HTTP_303_SEE_OTHER)
-    return templates.TemplateResponse("mi_informacion.html", {"request": request, "usuario": usuario})
+    return templates.TemplateResponse("perfil.html", {"request": request, "usuario": usuario})
 
 
 @app.post("/perfil", name="actualizar_perfil")
@@ -677,6 +677,10 @@ async def programa_servicio_cristiano(request: Request):
 @app.get("/index", name="index")
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/dashboard", name="dashboard")
+async def dashboard(request: Request):
+    return templates.TemplateResponse("dashboard.html", {"request": request})
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
