@@ -480,9 +480,9 @@ async def inscripcion(request: Request):
 async def program_inscripcion(request: Request):
     return templates.TemplateResponse("programa-servicio-cristiano.html", {"request": request})
 
-@app.get("/nosotros", name="nosotros")
+@app.get("/notificaciones", name="notificaciones")
 async def nosotros(request: Request):
-    return templates.TemplateResponse("nosotros.html", {"request": request})
+    return templates.TemplateResponse("notificaciones.html", {"request": request})
 
 @app.get("/login", name="login")
 async def login(request: Request):

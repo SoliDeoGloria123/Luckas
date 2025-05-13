@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="es" class="theme-dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificaciones - Seminario Bautista de Colombia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Dashboard elegante para Seminario Bautista de Colombia con paleta de azules */
+
+        :root {
+            /* Nuevos colores - escala de azules */
+            --black: #000000;
+            --white: #ffffff;
+            --dark-gray: #121212;
+            --medium-gray: #333333;
+            --light-gray: #f5f5f5;
+
+            /* Nueva paleta de azules */
+            --blue-light: #d4e0f7;
+            /* Azul claro/celeste */
+            --blue-medium: #6a85b6;
+            /* Azul medio */
+            --blue-medium-dark: #3b5998;
+            /* Azul medio-oscuro */
+            --blue-navy: #1e3a8a;
+            /* Azul marino */
+            --blue-dark: #0a1128;
+            /* Azul oscuro casi negro */
+
+            --accent: var(--blue-medium);
+            /* Antes era dorado, ahora azul medio */
+            --accent-hover: var(--blue-light);
+            --error: #c14343;
+            --success: #43a047;
+            --warning: #f9a825;
+            --info: var(--blue-medium);
+
+            /* Variables funcionales */
+            --text: var(--white);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --background: var(--black);
+            --surface: var(--dark-gray);
+            --border: #2a2a2a;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+
+            /* Variables específicas para el sidebar */
+            --sidebar-bg: rgba(18, 18, 18, 0.95);
+            --sidebar-border: #2a2a2a;
+        }
+
+        /* Estilos para tema claro (preparados pero no activados por defecto) */
+        .theme-light {
+            --text: var(--black);
+            --text-secondary: rgba(0, 0, 0, 0.7);
+            --text-muted: rgba(0, 0, 0, 0.5);
+            --background: var(--white);
+            --surface: var(--light-gray);
+            --border: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+
+            /* Variables específicas para el sidebar en tema claro */
+            --sidebar-bg: rgba(245, 245, 250, 0.95);
+            --sidebar-border: #e0e0e0;
+        }
+
+        /* Fondo animado de ondas */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 80% 10%, var(--blue-medium-dark) 0%, transparent 25%),
+                radial-gradient(circle at 20% 30%, var(--blue-navy) 0%, transparent 20%),
+                var(--background);
+            z-index: -2;
+            opacity: 0.4;
+        }
+
+        .wave-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: rgba(30, 58, 138, 0.05);
+            /* Azul marino con baja opacidad */
+            border-radius: 43%;
+        }
+
+        .wave:nth-child(1) {
+            bottom: -70%;
+            left: -50%;
+            animation: rotate 20s linear infinite;
+        }
+
+        .wave:nth-child(2) {
+            bottom: -80%;
+            left: -30%;
+            animation: rotate 25s linear infinite reverse;
+            background: rgba(106, 133, 182, 0.03);
+            /* Azul medio con baja opacidad */
+        }
+
+        .wave:nth-child(3) {
+            bottom: -75%;
+            left: -70%;
+            animation: rotate 30s linear infinite;
+            background: rgba(10, 17, 40, 0.04);
+            /* Azul oscuro con baja opacidad */
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            font-weight: 300;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar elegante */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 0;
+            border-right: 1px solid var(--sidebar-border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid var(--sidebar-border);
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 48px;
+            height: auto;
+            margin-right: 1rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .user-profile {
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-image-container {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--blue-medium);
+            box-shadow: 0 0 15px rgba(106, 133, 182, 0.3);
+        }
+
+        .user-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .main-nav {
+            flex-grow: 1;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+
+        .nav-section h4 {
+            padding: 0 1rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .nav-section a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 400;
+        }
+
+        .nav-section a:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+            color: var(--text);
+        }
+
+        .nav-section li.active a {
+            background-color: rgba(106, 133, 182, 0.2);
+            color: var(--blue-light);
+            box-shadow: 0 0 10px rgba(106, 133, 182, 0.1);
+        }
+
+        .nav-section a i {
+            margin-right: 1rem;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-section a .badge {
+            margin-left: auto;
+            background-color: var(--blue-medium);
+            color: var(--white);
+            font-size: 0.75rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .sidebar-footer {
+            padding: 2rem;
+            border-top: 1px solid var(--sidebar-border);
+            text-align: center;
+        }
+
+        .sidebar-footer p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .version {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Enlaces de navegación especiales */
+        .logout {
+            color: var(--error) !important;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex-grow: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            max-width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Encabezado de página */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.2rem;
+            font-weight: 400;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .search-container {
+            position: relative;
+            width: 250px;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: none;
+            background-color: var(--surface);
+            color: var(--text);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .header-icon-button {
+            background: none;
+            border: none;
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+
+        .header-icon-button:hover {
+            background-color: var(--surface);
+        }
+
+        .header-icon-button .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--blue-medium);
+            color: var(--white);
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle .fa-sun {
+            display: none;
+        }
+
+        .theme-light .theme-toggle .fa-moon {
+            display: none;
+        }
+
+        .theme-light .theme-toggle .fa-sun {
+            display: block;
+        }
+
+        /* Estilos específicos para la página de notificaciones */
+        .notifications-container {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .notifications-sidebar {
+            background-color: rgba(18, 18, 18, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            height: fit-content;
+        }
+
+        .notifications-sidebar h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-group {
+            margin-bottom: 2rem;
+        }
+
+        .filter-group h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .filter-option {
+            cursor: pointer;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .filter-option:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+        }
+
+        .filter-option.active {
+            background-color: rgba(106, 133, 182, 0.2);
+            color: var(--blue-light);
+        }
+
+        .filter-option-text {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .filter-option-text i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .filter-option .badge {
+            background-color: rgba(106, 133, 182, 0.3);
+            color: var(--text);
+            font-size: 0.75rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .filter-option.active .badge {
+            background-color: var(--blue-medium);
+            color: var(--white);
+        }
+
+        .date-filter {
+            background-color: rgba(30, 30, 40, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.7rem;
+            width: 100%;
+            color: var(--text);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .notifications-main {
+            background-color: rgba(18, 18, 18, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .notifications-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .notifications-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+            border-color: var(--blue-medium);
+        }
+
+        .btn-primary {
+            background-color: var(--blue-medium);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--blue-medium-dark);
+            box-shadow: 0 0 15px rgba(106, 133, 182, 0.3);
+        }
+
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .notification-item {
+            padding: 1.2rem;
+            border-radius: 8px;
+            background-color: rgba(30, 30, 40, 0.5);
+            display: flex;
+            gap: 1.2rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .notification-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .notification-item.unread {
+            background-color: rgba(59, 89, 152, 0.15);
+        }
+
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--blue-medium);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .notification-icon {
+            width: 45px;
+            height: 45px;
+            min-width: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--white);
+        }
+
+        .notification-icon.event {
+            background-color: var(--blue-medium);
+        }
+
+        .notification-icon.message {
+            background-color: var(--info);
+        }
+
+        .notification-icon.payment {
+            background-color: var(--success);
+        }
+
+        .notification-icon.academic {
+            background-color: var(--blue-navy);
+        }
+
+        .notification-icon.alert {
+            background-color: var(--warning);
+        }
+
+        .notification-icon.system {
+            background-color: var(--medium-gray);
+        }
+
+        .notification-content {
+            flex-grow: 1;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-title {
+            font-weight: 500;
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .notification-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.7rem;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .notification-link {
+            color: var(--blue-light);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .notification-link:hover {
+            color: var(--blue-medium);
+        }
+
+        .notification-action {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .notification-action:hover {
+            color: var(--text);
+        }
+
+        .notification-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-left: auto;
+            position: relative;
+        }
+
+        .options-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .options-toggle:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+            color: var(--text);
+        }
+
+        .notification-options-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            width: 180px;
+            z-index: 10;
+            overflow: hidden;
+            display: none;
+        }
+
+        .notification-options-menu.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .option-item {
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .option-item:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+        }
+
+        .option-item.delete {
+            color: var(--error);
+        }
+
+        .option-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .empty-notifications {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .empty-notifications i {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-notifications h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-notifications p {
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .pagination-item {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 0.3rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .pagination-item:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+        }
+
+        .pagination-item.active {
+            background-color: var(--blue-medium);
+            color: var(--white);
+        }
+
+        .pagination-nav {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            margin: 0 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-nav:hover {
+            color: var(--text);
+        }
+
+        .pagination-nav:disabled {
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* Transición animada para los elementos */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Estilos personalizados para scrollbar - Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--blue-medium) rgba(30, 30, 40, 0.3);
+        }
+
+        /* Estilos personalizados para scrollbar - Chrome, Edge, Safari */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 30, 40, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--blue-medium), var(--blue-medium-dark));
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--blue-medium-dark);
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+
+        /* Estilos específicos para la sidebar que tiene su propio scroll */
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(10, 10, 20, 0.3);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--blue-medium-dark), var(--blue-navy));
+            box-shadow: 0 0 10px rgba(106, 133, 182, 0.2);
+        }
+
+        /* Estilos especiales para la versión clara */
+        .theme-light .sidebar-header {
+            border-bottom-color: var(--sidebar-border);
+        }
+
+        .theme-light .sidebar-footer {
+            border-top-color: var(--sidebar-border);
+        }
+
+        .theme-light .nav-section a:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+        }
+
+        .theme-light .nav-section li.active a {
+            background-color: rgba(106, 133, 182, 0.15);
+            color: var(--blue-medium-dark);
+        }
+
+        .theme-light::-webkit-scrollbar-track {
+            background: rgba(240, 240, 250, 0.5);
+        }
+
+        .theme-light::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--blue-medium), var(--blue-light));
+        }
+
+        .theme-light .notification-item.unread {
+            background-color: rgba(212, 224, 247, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .notifications-container {
+                grid-template-columns: 1fr;
+            }
+
+            .notifications-sidebar {
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .notifications-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .notification-item {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .notification-icon {
+                align-self: flex-start;
+            }
+
+            .notification-options {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .notifications-sidebar {
+                padding: 1rem;
+            }
+
+            .notifications-main {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Fondo de ondas animadas -->
+    <div class="wave-background">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar elegante -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/logo-white.png" alt="Logo SBC" class="logo">
+                <h1>Luckas</h1>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-image-container">
+                    <img src="images/profile.jpg" alt="Perfil de usuario" class="user-image">
+                </div>
+                <div class="user-info">
+                    <h3>Juan Pérez</h3>
+                    <p>Estudiante</p>
+                </div>
+            </div>
+
+            <nav class="main-nav">
+                <div class="nav-section">
+                    <h4>Principal</h4>
+                    <ul>
+                        <li>
+                            <a href="{{ url_for('dashboard') }}">
+                                <i class="fas fa-th-large"></i>
+                                <span>Panel Principal</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('perfil') }}">
+                                <i class="fas fa-user"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="notificaciones.html">
+                                <i class="fas fa-bell"></i>
+                                <span>Notificaciones</span>
+                                <span class="badge">3</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h4>Gestión</h4>
+                    <ul>
+                        <li>
+                            <a href="eventos.html">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Eventos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="programas-academicos.html">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Programas Académicos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="cabanas.html">
+                                <i class="fas fa-home"></i>
+                                <span>Reservas de Cabañas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h4>Cuenta</h4>
+                    <ul>
+                        <li>
+                            <a href="configuracion.html">
+                                <i class="fas fa-cog"></i>
+                                <span>Configuración</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="ayuda.html">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Ayuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html" class="logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Cerrar Sesión</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>Seminario Bautista de Colombia</p>
+                <p class="version">Luckas v2.1.0</p>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Notificaciones</h1>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle header-icon-button">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="notifications-container">
+                <!-- Sidebar de filtros de notificaciones -->
+                <div class="notifications-sidebar">
+                    <h2>Filtros</h2>
+
+                    <div class="filter-group">
+                        <h3>Estado</h3>
+                        <div class="filter-options">
+                            <div class="filter-option active" data-filter="all">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-layer-group"></i>
+                                    <span>Todas</span>
+                                </div>
+                                <span class="badge">12</span>
+                            </div>
+                            <div class="filter-option" data-filter="unread">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>No leídas</span>
+                                </div>
+                                <span class="badge">3</span>
+                            </div>
+                            <div class="filter-option" data-filter="read">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Leídas</span>
+                                </div>
+                                <span class="badge">9</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h3>Categoría</h3>
+                        <div class="filter-options">
+                            <div class="filter-option" data-filter="event">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Eventos</span>
+                                </div>
+                                <span class="badge">4</span>
+                            </div>
+                            <div class="filter-option" data-filter="academic">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>Académico</span>
+                                </div>
+                                <span class="badge">3</span>
+                            </div>
+                            <div class="filter-option" data-filter="payment">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Pagos</span>
+                                </div>
+                                <span class="badge">2</span>
+                            </div>
+                            <div class="filter-option" data-filter="message">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-comment-alt"></i>
+                                    <span>Mensajes</span>
+                                </div>
+                                <span class="badge">2</span>
+                            </div>
+                            <div class="filter-option" data-filter="alert">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>Alertas</span>
+                                </div>
+                                <span class="badge">1</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h3>Fecha</h3>
+                        <div class="filter-options">
+                            <div class="filter-option" data-filter="today">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span>Hoy</span>
+                                </div>
+                                <span class="badge">2</span>
+                            </div>
+                            <div class="filter-option" data-filter="week">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-calendar-week"></i>
+                                    <span>Esta semana</span>
+                                </div>
+                                <span class="badge">5</span>
+                            </div>
+                            <div class="filter-option" data-filter="month">
+                                <div class="filter-option-text">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Este mes</span>
+                                </div>
+                                <span class="badge">12</span>
+                            </div>
+                            <input type="date" class="date-filter" placeholder="Fecha específica">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel principal de notificaciones -->
+                <div class="notifications-main">
+                    <div class="notifications-header">
+                        <h2>Todas las notificaciones</h2>
+                        <div class="notifications-actions">
+                            <button class="btn btn-outline" id="mark-all-read">
+                                <i class="fas fa-check-double"></i>
+                                <span>Marcar todo como leído</span>
+                            </button>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Actualizar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notifications-list">
+                        <!-- Notificación no leída - Evento -->
+                        <div class="notification-item unread" data-type="event" data-date="2025-05-13">
+                            <div class="notification-icon event">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h3 class="notification-title">Recordatorio de Evento</h3>
+                                    <span class="notification-time">Hoy, 10:30 AM</span>
+                                </div>
+                                <p class="notification-text">El evento "Conferencia de Teología" comienza en 3 días. No
+                                    olvides preparar tus materiales.</p>
+                                <div class="notification-actions">
+                                    <a href="eventos.html" class="notification-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Ver detalles del evento</span>
+                                    </a>
+                                    <button class="notification-action" data-action="mark-read">
+                                        <i class="fas fa-check"></i>
+                                        <span>Marcar como leído</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-options">
+                                <button class="options-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="notification-options-menu">
+                                    <div class="option-item" data-action="mark-read">
+                                        <i class="fas fa-check"></i>
+                                        <span>Marcar como leído</span>
+                                    </div>
+                                    <div class="option-item" data-action="snooze">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Posponer</span>
+                                    </div>
+                                    <div class="option-item delete" data-action="delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Eliminar</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificación no leída - Académico -->
+                        <div class="notification-item unread" data-type="academic" data-date="2025-05-13">
+                            <div class="notification-icon academic">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h3 class="notification-title">Solicitud Aprobada</h3>
+                                    <span class="notification-time">Hoy, 08:15 AM</span>
+                                </div>
+                                <p class="notification-text">Tu solicitud para el programa "Licenciatura en Teología" ha
+                                    sido aprobada. Revisa los detalles de inscripción.</p>
+                                <div class="notification-actions">
+                                    <a href="programas-academicos.html" class="notification-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Ver programa</span>
+                                    </a>
+                                    <button class="notification-action" data-action="mark-read">
+                                        <i class="fas fa-check"></i>
+                                        <span>Marcar como leído</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-options">
+                                <button class="options-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="notification-options-menu">
+                                    <div class="option-item" data-action="mark-read">
+                                        <i class="fas fa-check"></i>
+                                        <span>Marcar como leído</span>
+                                    </div>
+                                    <div class="option-item" data-action="snooze">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Posponer</span>
+                                    </div>
+                                    <div class="option-item delete" data-action="delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Eliminar</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificación no leída - Pago -->
+                        <div class="notification-item unread" data-type="payment" data-date="2025-05-12">
+                            <div class="notification-icon payment">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h3 class="notification-title">Pago Exitoso</h3>
+                                    <span class="notification-time">Ayer, 15:45</span>
+                                </div>
+                                <p class="notification-text">Tu pago de $120.000 para el curso "Hermenéutica Bíblica" ha
+                                    sido procesado correctamente.</p>
+                                <div class="notification-actions">
+                                    <a href="#" class="notification-link">
+                                        <i class="fas fa-file-invoice"></i>
+                                        <span>Ver recibo</span>
+                                    </a>
+                                    <button class="notification-action" data-action="mark-read">
+                                        <i class="fas fa-check"></i>
+                                        <span>Marcar como leído</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-options">
+                                <button class="options-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="notification-options-menu">
+                                    <div class="option-item" data-action="mark-read">
+                                        <i class="fas fa-check"></i>
+                                        <span>Marcar como leído</span>
+                                    </div>
+                                    <div class="option-item" data-action="snooze">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Posponer</span>
+                                    </div>
+                                    <div class="option-item delete" data-action="delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Eliminar</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificación leída - Mensaje -->
+                        <div class="notification-item" data-type="message" data-date="2025-05-11">
+                            <div class="notification-icon message">
+                                <i class="fas fa-comment-alt"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h3 class="notification-title">Mensaje Nuevo</h3>
+                                    <span class="notification-time">11/05/2025, 09:30</span>
+                                </div>
+                                <p class="notification-text">Has recibido un mensaje del Profesor Carlos Martínez sobre
+                                    tu participación en el seminario de Homilética.</p>
+                                <div class="notification-actions">
+                                    <a href="#" class="notification-link">
+                                        <i class="fas fa-envelope-open-text"></i>
+                                        <span>Leer mensaje</span>
+                                    </a>
+                                    <button class="notification-action" data-action="mark-unread">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Marcar como no leído</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-options">
+                                <button class="options-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="notification-options-menu">
+                                    <div class="option-item" data-action="mark-unread">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Marcar como no leído</span>
+                                    </div>
+                                    <div class="option-item" data-action="snooze">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Posponer</span>
+                                    </div>
+                                    <div class="option-item delete" data-action="delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Eliminar</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificación leída - Evento -->
+                        <div class="notification-item" data-type="event" data-date="2025-05-10">
+                            <div class="notification-icon event">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h3 class="notification-title">Inscripción Confirmada</h3>
+                                    <span class="notification-time">10/05/2025, 14:20</span>
+                                </div>
+                                <p class="notification-text">Tu inscripción al "Taller de Liderazgo" ha sido confirmada.
+                                    El evento se llevará a cabo el 19 de mayo.</p>
+                                <div class="notification-actions">
+                                    <a href="eventos.html" class="notification-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Ver detalles</span>
+                                    </a>
+                                    <button class="notification-action" data-action="mark-unread">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Marcar como no leído</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-options">
+                                <button class="options-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="notification-options-menu">
+                                    <div class="option-item" data-action="mark-unread">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Marcar como no leído</span>
+                                    </div>
+                                    <div class="option-item" data-action="snooze">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Posponer</span>
+                                    </div>
+                                    <div class="option-item delete" data-action="delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Eliminar</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificación leída - Alerta -->
+                        <div class="notification-item" data-type="alert" data-date="2025-05-08">
+                            <div class="notification-icon alert">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h3 class="notification-title">Fecha Límite Próxima</h3>
+                                    <span class="notification-time">08/05/2025, 11:00</span>
+                                </div>
+                                <p class="notification-text">La fecha límite para entregar el ensayo de Teología
+                                    Sistemática es el 15 de mayo. Asegúrate de completar la tarea a tiempo.</p>
+                                <div class="notification-actions">
+                                    <a href="#" class="notification-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Ver asignación</span>
+                                    </a>
+                                    <button class="notification-action" data-action="mark-unread">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Marcar como no leído</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-options">
+                                <button class="options-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="notification-options-menu">
+                                    <div class="option-item" data-action="mark-unread">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Marcar como no leído</span>
+                                    </div>
+                                    <div class="option-item" data-action="snooze">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Posponer</span>
+                                    </div>
+                                    <div class="option-item delete" data-action="delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Eliminar</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificación leída - Sistema -->
+                        <div class="notification-item" data-type="system" data-date="2025-05-05">
+                            <div class="notification-icon system">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h3 class="notification-title">Actualización del Sistema</h3>
+                                    <span class="notification-time">05/05/2025, 08:00</span>
+                                </div>
+                                <p class="notification-text">El sistema Luckas ha sido actualizado a la versión 2.1.0.
+                                    Descubre las nuevas funciones disponibles en la plataforma.</p>
+                                <div class="notification-actions">
+                                    <a href="#" class="notification-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Ver novedades</span>
+                                    </a>
+                                    <button class="notification-action" data-action="mark-unread">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Marcar como no leído</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-options">
+                                <button class="options-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="notification-options-menu">
+                                    <div class="option-item" data-action="mark-unread">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Marcar como no leído</span>
+                                    </div>
+                                    <div class="option-item" data-action="snooze">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Posponer</span>
+                                    </div>
+                                    <div class="option-item delete" data-action="delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Eliminar</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div class="pagination">
+                        <button class="pagination-nav" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="pagination-item active">1</div>
+                        <div class="pagination-item">2</div>
+                        <div class="pagination-item">3</div>
+                        <button class="pagination-nav">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Toggle para el menú en dispositivos móviles (mantener este código)
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('open');
+            });
+        }
+
+        // Cerrar el sidebar cuando se haga clic fuera de él (mantener este código)
+        document.addEventListener('click', function (event) {
+            if (window.innerWidth <= 992 &&
+                sidebar &&
+                sidebar.classList.contains('open') &&
+                !sidebar.contains(event.target) &&
+                !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Toggle para el tema (claro/oscuro) - CÓDIGO MEJORADO
+        const themeToggle = document.querySelector('.theme-toggle');
+
+        if (themeToggle) {
+            // Función mejorada para aplicar estilos específicos
+            function applyThemeStyles(isLight) {
+                // Lista completa de elementos para actualizar
+                const elementsToUpdate = {
+                    backgrounds: [
+                        '.notifications-sidebar',
+                        '.notifications-main',
+                        '.notification-item',
+                        '.filter-option',
+                        '.notification-options-menu',
+                        '.option-item',
+                        '.date-filter'
+                    ],
+                    texts: [
+                        '.notifications-sidebar h2',
+                        '.notifications-sidebar h3',
+                        '.filter-option span',
+                        '.notifications-main h2',
+                        '.notification-title',
+                        '.notification-text',
+                        '.filter-group h3',
+                        '.option-item span',
+                        '.pagination-item',
+                        '.btn-outline'
+                    ]
+                };
+
+                if (isLight) {
+                    // Aplicar estilos para tema claro
+
+                    // Actualizar fondos
+                    elementsToUpdate.backgrounds.forEach(selector => {
+                        document.querySelectorAll(selector).forEach(element => {
+                            if (selector.includes('notifications-sidebar') || selector.includes('notifications-main')) {
+                                element.style.backgroundColor = 'rgba(245, 245, 250, 0.95)';
+                                element.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                            } else if (selector.includes('notification-item')) {
+                                element.style.backgroundColor = 'rgba(240, 240, 245, 0.7)';
+                            } else if (selector.includes('filter-option') || selector.includes('option-item')) {
+                                element.style.backgroundColor = 'transparent';
+                            } else if (selector.includes('date-filter')) {
+                                element.style.backgroundColor = 'rgba(240, 240, 245, 0.7)';
+                                element.style.borderColor = '#e0e0e0';
+                            } else if (selector.includes('notification-options-menu')) {
+                                element.style.backgroundColor = 'rgba(245, 245, 250, 0.95)';
+                            }
+                        });
+                    });
+
+                    // Actualizar textos
+                    elementsToUpdate.texts.forEach(selector => {
+                        document.querySelectorAll(selector).forEach(element => {
+                            element.style.color = selector.includes('option-item.delete') ?
+                                '#c14343' : '#121212';
+                        });
+                    });
+
+                    // Estado específico para notificaciones no leídas
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.style.backgroundColor = 'rgba(212, 224, 247, 0.3)';
+                    });
+
+                    // Estado de hover para filtros
+                    document.querySelectorAll('.filter-option').forEach(filter => {
+                        filter.addEventListener('mouseover', function () {
+                            this.style.backgroundColor = 'rgba(106, 133, 182, 0.1)';
+                        });
+
+                        filter.addEventListener('mouseout', function () {
+                            if (!this.classList.contains('active')) {
+                                this.style.backgroundColor = 'transparent';
+                            }
+                        });
+                    });
+
+                } else {
+                    // Restaurar estilos para tema oscuro
+
+                    // Restaurar todos los estilos a sus valores predeterminados
+                    [...elementsToUpdate.backgrounds, ...elementsToUpdate.texts].forEach(selector => {
+                        document.querySelectorAll(selector).forEach(element => {
+                            element.style.backgroundColor = '';
+                            element.style.color = '';
+                            element.style.boxShadow = '';
+                            element.style.borderColor = '';
+                        });
+                    });
+
+                    // Restaurar el estilo específico para notificaciones no leídas
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.style.backgroundColor = 'rgba(59, 89, 152, 0.15)';
+                    });
+
+                    // Restaurar eventos de hover
+                    document.querySelectorAll('.filter-option').forEach(filter => {
+                        filter.removeEventListener('mouseover', null);
+                        filter.removeEventListener('mouseout', null);
+                    });
+                }
+            }
+
+            // Agregar el evento click al botón de cambio de tema
+            themeToggle.addEventListener('click', function () {
+                document.documentElement.classList.toggle('theme-light');
+
+                const isLightTheme = document.documentElement.classList.contains('theme-light');
+                localStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
+
+                // Aplicar los estilos específicos para los elementos
+                applyThemeStyles(isLightTheme);
+            });
+
+            // Aplicar el tema guardado al cargar la página
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('theme-light');
+                applyThemeStyles(true);
+            }
+        }
+
+        // Menú de opciones para cada notificación
+        const optionsToggles = document.querySelectorAll('.options-toggle');
+
+        optionsToggles.forEach(toggle => {
+            toggle.addEventListener('click', function (event) {
+                event.stopPropagation();
+                const menu = this.nextElementSibling;
+
+                // Cerrar todos los demás menús abiertos
+                document.querySelectorAll('.notification-options-menu.show').forEach(openMenu => {
+                    if (openMenu !== menu) {
+                        openMenu.classList.remove('show');
+                    }
+                });
+
+                // Alternar el estado de visibilidad del menú actual
+                menu.classList.toggle('show');
+            });
+        });
+
+        // Cerrar menús de opciones al hacer clic fuera de ellos
+        document.addEventListener('click', function () {
+            document.querySelectorAll('.notification-options-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        });
+
+        // Filtros de notificaciones
+        const filterOptions = document.querySelectorAll('.filter-option');
+
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                const filterType = this.getAttribute('data-filter');
+
+                // Actualizar estado activo del filtro
+                document.querySelectorAll('.filter-option.active').forEach(active => {
+                    if (active.parentElement === this.parentElement) {
+                        active.classList.remove('active');
+                    }
+                });
+                this.classList.add('active');
+
+                // Aquí irías la lógica para filtrar las notificaciones
+                console.log(`Filtrando por: ${filterType}`);
+
+                // Simular filtrado (en una implementación real, filtrarías las notificaciones)
+                if (filterType === 'all') {
+                    document.querySelectorAll('.notification-item').forEach(item => {
+                        item.style.display = 'flex';
+                    });
+                } else {
+                    document.querySelectorAll('.notification-item').forEach(item => {
+                        if (item.getAttribute('data-type') === filterType ||
+                            (filterType === 'unread' && item.classList.contains('unread')) ||
+                            (filterType === 'read' && !item.classList.contains('unread'))) {
+                            item.style.display = 'flex';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        });
+
+        // Botón para marcar todas como leídas
+        const markAllReadBtn = document.getElementById('mark-all-read');
+
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', function () {
+                document.querySelectorAll('.notification-item.unread').forEach(item => {
+                    item.classList.remove('unread');
+
+                    // Actualizar el texto del botón dentro de cada notificación
+                    const actionBtn = item.querySelector('[data-action="mark-read"]');
+                    if (actionBtn) {
+                        actionBtn.innerHTML = '<i class="fas fa-envelope"></i><span>Marcar como no leído</span>';
+                        actionBtn.setAttribute('data-action', 'mark-unread');
+                    }
+                });
+
+                // Actualizar contadores de filtros (simulado)
+                document.querySelector('.filter-option[data-filter="unread"] .badge').textContent = '0';
+
+                // Mensaje de confirmación
+                alert('Todas las notificaciones han sido marcadas como leídas.');
+            });
+        }
+
+        // Acciones individuales de notificación (marcar como leído/no leído, eliminar)
+        document.addEventListener('click', function (event) {
+            const target = event.target.closest('.notification-action, .option-item');
+
+            if (target) {
+                const action = target.getAttribute('data-action');
+                const notificationItem = target.closest('.notification-item');
+
+                if (action === 'mark-read' && notificationItem) {
+                    notificationItem.classList.remove('unread');
+                    // Actualizar el texto del botón
+                    const actionBtns = notificationItem.querySelectorAll('[data-action="mark-read"]');
+                    actionBtns.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-envelope"></i><span>Marcar como no leído</span>';
+                        btn.setAttribute('data-action', 'mark-unread');
+                    });
+                } else if (action === 'mark-unread' && notificationItem) {
+                    notificationItem.classList.add('unread');
+                    // Actualizar el texto del botón
+                    const actionBtns = notificationItem.querySelectorAll('[data-action="mark-unread"]');
+                    actionBtns.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-check"></i><span>Marcar como leído</span>';
+                        btn.setAttribute('data-action', 'mark-read');
+                    });
+                } else if (action === 'delete' && notificationItem) {
+                    if (confirm('¿Estás seguro de que deseas eliminar esta notificación?')) {
+                        notificationItem.style.opacity = '0';
+                        setTimeout(() => {
+                            notificationItem.style.display = 'none';
+                            notificationItem.style.height = '0';
+                            notificationItem.style.margin = '0';
+                            notificationItem.style.padding = '0';
+                            notificationItem.style.overflow = 'hidden';
+                        }, 300);
+                    }
+                } else if (action === 'snooze' && notificationItem) {
+                    alert('Esta notificación ha sido pospuesta por 1 día.');
+                    // Aquí irías la lógica para posponer la notificación
+                }
+
+                // Cerrar menú de opciones si está abierto
+                const optionsMenu = notificationItem.querySelector('.notification-options-menu');
+                if (optionsMenu) {
+                    optionsMenu.classList.remove('show');
+                }
+            }
+        });
+
+        // Paginación 
+        const paginationItems = document.querySelectorAll('.pagination-item');
+
+        paginationItems.forEach(item => {
+            item.addEventListener('click', function () {
+                document.querySelectorAll('.pagination-item').forEach(pi => {
+                    pi.classList.remove('active');
+                });
+                this.classList.add('active');
+
+                // Aquí iría la lógica para cargar la página correspondiente
+                const pageNumber = this.textContent;
+                console.log(`Cargando página ${pageNumber}`);
+            });
+        });
+    });
+
+</script>
+
+</html>
