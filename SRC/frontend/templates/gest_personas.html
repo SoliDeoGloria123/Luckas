@@ -7,30 +7,15 @@
   <title>Gestión de Personas</title>
   <link rel="icon" href="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', path='css/gest_personas.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/header.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
 </head>
 
 <body>
-  <!-- Navbar -->
-  <nav class="nav-bar">
-    <div class="logo">
-      <span class="luckas">Luckas</span>
-      <span class="ent">ent</span>
-    </div>
-
-    <div class="search-bar">
-      <input type="text" placeholder="Ingresa algo que no encuentres">
-      <button><i class="fas fa-search"></i></button>
-    </div>
-
-    <nav class="nav-menu">
-      <a href="{{ url_for('home') }}">Inicio</a>
-      <a href="{{ url_for('nosotros') }}">Nosotros</a>
-      <a href="{{ url_for('cuenta') }}">Mi perfil</a>
-    </nav>
-  </nav>
-
+  {% include "include/Nav.html" %}
+  
   <!-- Contenido principal -->
   <div class="gesti-n-de-personas">
     <div class="section">
@@ -61,7 +46,7 @@
               <div class="title3">Fecha limite: 1/01/2026</div>
               <div class="subtitle">Costo: $XX.XX</div>
               <div class="description2">
-                <a href="{{ url_for('form_inscription') }}" class="inscription-link">Inscribirse</a>
+                <a href="" class="inscription-link">Inscribirse</a>
               </div>
             </div>
           </div>
@@ -72,7 +57,7 @@
               <div class="title3">Fecha limite: 1/01/2026</div>
               <div class="subtitle">Costo: $XX.XX</div>
               <div class="description2">
-                <a href="{{ url_for('form_inscription') }}" class="inscription-link">Inscribirse</a>
+                <a href="" class="inscription-link">Inscribirse</a>
               </div>
             </div>
           </div>
@@ -93,7 +78,7 @@
               <div class="title3">Fecha limite: 1/01/2026</div>
               <div class="subtitle">Costo: $XX.XX</div>
               <div class="description2">
-                <a href="{{ url_for('form_inscription') }}" class="inscription-link">Inscribirse</a>
+                <a href="" class="inscription-link">Inscribirse</a>
               </div>
             </div>
           </div>
@@ -114,14 +99,14 @@
               <div class="title3">Fecha limite: 1/01/2026</div>
               <div class="subtitle">Costo: $XX.XX</div>
               <div class="description2">
-                <a href="{{ url_for('form_inscription') }}" class="inscription-link">Inscribirse</a>
+                <a href="" class="inscription-link">Inscribirse</a>
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="description3">
-        <a href="{{ url_for('form_inscription') }}" class="inscription-link">Ver Más Eventos</a>
+        <a href="" class="inscription-link">Ver Más Eventos</a>
       </div>
       <img class="vector-2002" src="vector-2001.svg" />
     </div>
@@ -181,76 +166,5 @@
     </div>
 </body>
 <!-- Footer -->
-<footer>
-  <div class="footer">
-    <div class="footer-content">
-      <div class="footer-column">
-        <div class="footer-info">
-          <div class="footer-heading">SBC</div>
-          <div class="footer-text">
-            Gestiona los procesos de Inscripción y calendarios
-          </div>
-        </div>
-        <div class="footer-actions">
-          <button class="footer-btn-primary">
-            <a href="#" class="footer-btn-text-primary">Explorar</a>
-          </button>
-          <button class="footer-btn-secondary">
-            <a id="Ayuda" href="#" class="footer-btn-text-secondary">Ayuda</a>
-          </button>
-        </div>
-      </div>
-      <div class="footer-links-column">
-        <div class="footer-link-list">
-          <div class="footer-link-item">
-            <a href="#" class="footer-link">Inicio</a>
-          </div>
-          <div class="footer-link-item">
-            <a href="#" class="footer-link">Contáctanos</a>
-          </div>
-          <div class="footer-link-item">
-            <a href="#" class="footer-link">Ayuda Online</a>
-          </div>
-          <div class="footer-link-item">
-            <a href="#" class="footer-link">Política de Privacidad</a>
-          </div>
-          <div class="footer-link-item">
-            <a href="{{ url_for('termino') }}" class="footer-link">Términos de Uso</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="footer-credits">
-      <div class="footer-logo-row">
-        <div class="footer-logo-container">
-          <img class="footer-logo" src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt.png') }}" />
-        </div>
-      </div>
-      <div class="footer-divider"></div>
-      <div class="footer-bottom-row">
-        <div class="footer-copyright">
-          © 2024 LuckasEnt. Todos los derechos reservados.
-        </div>
-        <div id="contacto" class="footer-social-links">
-          <a href="https://facebook.com" target="_blank">
-            <img class="footer-social-icon" src="{{ url_for('static', path='img/Facebook.png') }}" alt="Facebook" />
-          </a>
-          <a href="https://twitter.com" target="_blank">
-            <img class="footer-social-icon" src="{{ url_for('static', path='img/X.png') }}" alt="Twitter" />
-          </a>
-          <a href="https://instagram.com" target="_blank">
-            <img class="footer-social-icon" src="{{ url_for('static', path='img/Instagram.png') }}" alt="Instagram" />
-          </a>
-          <a href="https://linkedin.com" target="_blank">
-            <img class="footer-social-icon" src="{{ url_for('static', path='img/LinkedIn.png') }}" alt="LinkedIn" />
-          </a>
-          <a href="https://youtube.com" target="_blank">
-            <img class="footer-social-icon" src="{{ url_for('static', path='img/Youtube.png') }}" alt="YouTube" />
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
-
+<footer>{% include "include/piepag.html" %}</footer>
 </html>
