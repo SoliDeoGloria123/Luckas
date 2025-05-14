@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="es" class="theme-dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos - Seminario Bautista de Colombia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/eventos.css') }}">
+    
+    <!-- Estilos específicos para el modal de detalles -->
+    <style>
+        /* Modal de detalles del evento */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background-color: var(--surface);
+            border-radius: 12px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-container {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: var(--text);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Contenedor de detalles del evento */
+        .event-details-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Panel principal con detalles */
+        .event-details-main {
+            background-color: rgba(18, 18, 18, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Imagen de portada */
+        .event-cover {
+            height: 280px;
+            position: relative;
+        }
+
+        .event-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .event-cover-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+            padding: 2rem;
+            padding-top: 6rem;
+        }
+
+        .event-cover-overlay h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .event-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .event-tag {
+            background-color: rgba(106, 133, 182, 0.2);
+            color: var(--blue-light);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .event-info-container {
+            padding: 2rem;
+        }
+
+        .event-info-section {
+            margin-bottom: 2rem;
+        }
+
+        .event-info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .event-info-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .event-description-full {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .event-description-full p {
+            margin-bottom: 1rem;
+        }
+
+        /* Programa del evento */
+        .event-schedule {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .schedule-item {
+            display: flex;
+            padding: 1rem;
+            background-color: rgba(30, 30, 40, 0.5);
+            border-radius: 8px;
+            gap: 1rem;
+        }
+
+        .schedule-time {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
+            color: var(--blue-light);
+        }
+
+        .schedule-time-start {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .schedule-time-end {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .schedule-content {
+            flex-grow: 1;
+        }
+
+        .schedule-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .schedule-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Ubicación */
+        .location-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .location-address {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .location-address i {
+            color: var(--blue-light);
+            margin-top: 0.2rem;
+            font-size: 1.2rem;
+        }
+
+        .location-address-text {
+            color: var(--text-secondary);
+        }
+
+        .location-address-text p {
+            margin-bottom: 0.3rem;
+        }
+
+        .location-map {
+            height: 200px;
+            background-color: rgba(30, 30, 40, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .location-map iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Sidebar con información adicional */
+        .event-details-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .event-actions {
+            background-color: rgba(18, 18, 18, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .event-actions h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .event-price-large {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 1.5rem;
+        }
+
+        .event-price-large-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--blue-light);
+        }
+
+        .event-price-large-text {
+            margin-left: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .ticket-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .ticket-selector label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .ticket-counter {
+            display: flex;
+            align-items: center;
+            background-color: rgba(30, 30, 40, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .ticket-button {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .ticket-button:hover {
+            background-color: rgba(106, 133, 182, 0.1);
+            color: var(--blue-light);
+        }
+
+        .ticket-count {
+            flex-grow: 1;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            text-decoration: none;
+        }
+
+        .action-button.primary {
+            background-color: var(--blue-medium);
+            color: var(--white);
+        }
+
+        .action-button.primary:hover {
+            background-color: var(--blue-medium-dark);
+            box-shadow: 0 0 15px rgba(106, 133, 182, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .action-button.secondary {
+            background-color: rgba(30, 30, 40, 0.5);
+            color: var(--text);
+        }
+
+        .action-button.secondary:hover {
+            background-color: rgba(50, 50, 60, 0.5);
+        }
+
+        .event-details {
+            background-color: rgba(18, 18, 18, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .event-details h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .event-detail-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .event-detail-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .event-detail-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(30, 30, 40, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .event-detail-icon i {
+            color: var(--blue-light);
+            font-size: 1.1rem;
+        }
+
+        .event-detail-content {
+            flex-grow: 1;
+        }
+
+        .event-detail-label {
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+
+        .event-detail-value {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Información del organizador */
+        .organizer-info {
+            background-color: rgba(18, 18, 18, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .organizer-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .organizer-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .organizer-details {
+            flex-grow: 1;
+        }
+
+        .organizer-name {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .organizer-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .organizer-contact {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .organizer-contact-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(30, 30, 40, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--blue-light);
+            transition: all 0.2s ease;
+        }
+
+        .organizer-contact-button:hover {
+            background-color: rgba(106, 133, 182, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Responsividad del modal */
+        @media (max-width: 992px) {
+            .event-details-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .event-cover {
+                height: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .schedule-item {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .schedule-time {
+                flex-direction: row;
+                gap: 0.5rem;
+                justify-content: flex-start;
+                min-width: auto;
+            }
+            
+            .organizer-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .modal-container {
+                width: 95%;
+                max-height: 95vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- El resto del contenido HTML es igual que antes -->
+    <!-- Fondo de ondas animadas -->
+    <div class="wave-background">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar elegante -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/logo-white.png" alt="Logo SBC" class="logo">
+                <h1>Luckas</h1>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-image-container">
+                    <img src="images/profile.jpg" alt="Perfil de usuario" class="user-image">
+                </div>
+                <div class="user-info">
+                    <h3>Juan Pérez</h3>
+                    <p>Estudiante</p>
+                </div>
+            </div>
+            
+            <nav class="main-nav">
+                <div class="nav-section">
+                    <h4>Principal</h4>
+                    <ul>
+                        <li>
+                            <a href="{{ url_for('dashboard') }}">
+                                <i class="fas fa-th-large"></i>
+                                <span>Panel Principal</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('perfil') }}">
+                                <i class="fas fa-user"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('notificaciones') }}">
+                                <i class="fas fa-bell"></i>
+                                <span>Notificaciones</span>
+                                <span class="badge">3</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>Gestión</h4>
+                    <ul>
+                        <li class="active">
+                            <a href="{{ url_for('eventos') }}">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Eventos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="programas-academicos.html">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Programas Académicos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="cabanas.html">
+                                <i class="fas fa-home"></i>
+                                <span>Reservas de Cabañas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>Cuenta</h4>
+                    <ul>
+                        <li>
+                            <a href="configuracion.html">
+                                <i class="fas fa-cog"></i>
+                                <span>Configuración</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="ayuda.html">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Ayuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html" class="logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Cerrar Sesión</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>Seminario Bautista de Colombia</p>
+                <p class="version">Luckas v2.1.0</p>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Eventos</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar eventos..." class="search-input">
+                    </div>
+                    <a href="mis-eventos.html" class="header-icon-button">
+                        <i class="fas fa-bookmark"></i>
+                    </a>
+                    <a href="notificaciones.html" class="header-icon-button notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </a>
+                    <button class="theme-toggle header-icon-button">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Filtros de eventos -->
+            <div class="filter-bar">
+                <div class="filter-options">
+                    <div class="filter-dropdown">
+                        <div class="dropdown-toggle">
+                            <i class="fas fa-filter"></i>
+                            <span>Categoría</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item" data-value="all">
+                                <i class="fas fa-check"></i>
+                                <span>Todos</span>
+                            </div>
+                            <div class="dropdown-item" data-value="conference">
+                                <i class="fas fa-book"></i>
+                                <span>Conferencias</span>
+                            </div>
+                            <div class="dropdown-item" data-value="workshop">
+                                <i class="fas fa-hands"></i>
+                                <span>Talleres</span>
+                            </div>
+                            <div class="dropdown-item" data-value="retreat">
+                                <i class="fas fa-mountain"></i>
+                                <span>Retiros</span>
+                            </div>
+                            <div class="dropdown-item" data-value="seminar">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>Seminarios</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-dropdown">
+                        <div class="dropdown-toggle">
+                            <i class="fas fa-calendar"></i>
+                            <span>Fecha</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item" data-value="all">
+                                <i class="fas fa-check"></i>
+                                <span>Todos los meses</span>
+                            </div>
+                            <div class="dropdown-item" data-value="may-2025">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Mayo 2025</span>
+                            </div>
+                            <div class="dropdown-item" data-value="jun-2025">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Junio 2025</span>
+                            </div>
+                            <div class="dropdown-item" data-value="jul-2025">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Julio 2025</span>
+                            </div>
+                            <div class="dropdown-item" data-value="aug-2025">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Agosto 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="view-buttons">
+                        <button class="btn btn-icon btn-outline view-grid active">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="btn btn-icon btn-outline view-list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <a href="eventos-pasados.html" class="btn btn-outline">
+                        <i class="fas fa-history"></i>
+                        <span>Ver eventos pasados</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Listado de eventos en grid -->
+            <div class="events-grid">
+                <!-- Evento 1 -->
+                <div class="event-card" data-event-id="evento1">
+                    <div class="event-card-image">
+                        <div class="event-overlay"></div>
+                        <img src="images/events/conference.jpg" alt="Conferencia de Teología">
+                        <div class="event-date-badge">
+                            <span class="day">16</span>
+                            <span class="month">MAY</span>
+                        </div>
+                        <div class="event-status-badge upcoming">Próximo</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Conferencia de Teología</h3>
+                        <p class="event-description">Un evento dedicado al estudio profundo de la teología bíblica con expertos en la materia.</p>
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>9:00 - 17:00</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Auditorio Principal</span>
+                            </div>
+                        </div>
+                        <div class="event-footer">
+                            <div class="event-price">
+                                <div class="event-price-value">$150.000</div>
+                                <div class="event-price-text">por persona</div>
+                            </div>
+                            <button class="btn btn-primary show-details" data-event-id="evento1">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evento 2 -->
+                <div class="event-card" data-event-id="evento2">
+                    <div class="event-card-image">
+                        <div class="event-overlay"></div>
+                        <img src="images/events/workshop.jpg" alt="Taller de Liderazgo">
+                        <div class="event-date-badge">
+                            <span class="day">19</span>
+                            <span class="month">MAY</span>
+                        </div>
+                        <div class="event-status-badge upcoming">Próximo</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Taller de Liderazgo</h3>
+                        <p class="event-description">Aprende habilidades esenciales de liderazgo basadas en principios bíblicos para tu ministerio o comunidad.</p>
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>14:00 - 18:00</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Sala 203</span>
+                            </div>
+                        </div>
+                        <div class="event-footer">
+                            <div class="event-price">
+                                <div class="event-price-value">$80.000</div>
+                                <div class="event-price-text">por persona</div>
+                            </div>
+                            <button class="btn btn-primary show-details" data-event-id="evento2">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evento 3 -->
+                <div class="event-card" data-event-id="evento3">
+                    <div class="event-card-image">
+                        <div class="event-overlay"></div>
+                        <img src="images/events/retreat.jpg" alt="Retiro Espiritual">
+                        <div class="event-date-badge">
+                            <span class="day">26</span>
+                            <span class="month">MAY</span>
+                        </div>
+                        <div class="event-status-badge upcoming">Próximo</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Retiro Espiritual</h3>
+                        <p class="event-description">Tres días de renovación espiritual, oración, meditación y comunión en un entorno natural.</p>
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>3 días completos</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Centro El Redil</span>
+                            </div>
+                        </div>
+                        <div class="event-footer">
+                            <div class="event-price">
+                                <div class="event-price-value">$350.000</div>
+                                <div class="event-price-text">todo incluido</div>
+                            </div>
+                            <button class="btn btn-primary show-details" data-event-id="evento3">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evento 4 -->
+                <div class="event-card" data-event-id="evento4">
+                    <div class="event-card-image">
+                        <div class="event-overlay"></div>
+                        <img src="images/events/seminar.jpg" alt="Seminario de Homilética">
+                        <div class="event-date-badge">
+                            <span class="day">05</span>
+                            <span class="month">JUN</span>
+                        </div>
+                        <div class="event-status-badge upcoming">Próximo</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Seminario de Homilética</h3>
+                        <p class="event-description">Perfecciona el arte de la predicación con técnicas modernas basadas en fundamentos bíblicos sólidos.</p>
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>10:00 - 16:00</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Aula Magna</span>
+                            </div>
+                        </div>
+                        <div class="event-footer">
+                            <div class="event-price">
+                                <div class="event-price-value">$120.000</div>
+                                <div class="event-price-text">por persona</div>
+                            </div>
+                            <button class="btn btn-primary show-details" data-event-id="evento4">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evento 5 -->
+                <div class="event-card" data-event-id="evento5">
+                    <div class="event-card-image">
+                        <div class="event-overlay"></div>
+                        <img src="images/events/conference2.jpg" alt="Congreso de Misiones">
+                        <div class="event-date-badge">
+                            <span class="day">12</span>
+                            <span class="month">JUN</span>
+                        </div>
+                        <div class="event-status-badge full">Completo</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Congreso de Misiones</h3>
+                        <p class="event-description">Un evento para conectar con misioneros de todo el mundo y conocer oportunidades de servicio global.</p>
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>2 días</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Centro de Convenciones</span>
+                            </div>
+                        </div>
+                        <div class="event-footer">
+                            <div class="event-price">
+                                <div class="event-price-value">$180.000</div>
+                                <div class="event-price-text">por persona</div>
+                            </div>
+                            <button class="btn btn-primary show-details" data-event-id="evento5">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evento 6 -->
+                <div class="event-card" data-event-id="evento6">
+                    <div class="event-card-image">
+                        <div class="event-overlay"></div>
+                        <img src="images/events/workshop2.jpg" alt="Taller de Música Cristiana">
+                        <div class="event-date-badge">
+                            <span class="day">20</span>
+                            <span class="month">JUN</span>
+                        </div>
+                        <div class="event-status-badge upcoming">Próximo</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Taller de Música Cristiana</h3>
+                        <p class="event-description">Desarrolla tus habilidades musicales para el ministerio de alabanza y adoración en tu iglesia local.</p>
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>15:00 - 19:00</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Sala de Música</span>
+                            </div>
+                        </div>
+                        <div class="event-footer">
+                            <div class="event-price">
+                                <div class="event-price-value">$100.000</div>
+                                <div class="event-price-text">por persona</div>
+                            </div>
+                            <button class="btn btn-primary show-details" data-event-id="evento6">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Paginación -->
+            <div class="pagination">
+                <button class="pagination-nav" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="pagination-item active">1</div>
+                <div class="pagination-item">2</div>
+                <div class="pagination-item">3</div>
+                <button class="pagination-nav">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal de detalles del evento -->
+    <div class="modal-overlay" id="event-details-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Detalles del Evento</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="event-details-container">
+                    <!-- Información principal del evento -->
+                    <div class="event-details-main">
+                        <div class="event-cover">
+                            <img id="modal-event-image" src="images/events/conference.jpg" alt="Evento">
+                            <div class="event-cover-overlay">
+                                <h2 id="modal-event-title">Conferencia de Teología</h2>
+                                <div class="event-tags">
+                                    <div class="event-tag" id="modal-event-category">Conferencia</div>
+                                    <div class="event-tag">Teología</div>
+                                    <div class="event-tag">Formación</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="event-info-container">
+                            <!-- Descripción -->
+                            <div class="event-info-section">
+                                <h3>Descripción</h3>
+                                <div class="event-description-full" id="modal-event-description">
+                                    <p>La Conferencia de Teología del Seminario Bautista de Colombia es un evento dedicado al estudio profundo de la teología bíblica con expertos en la materia. Durante esta jornada intensiva, exploraremos temas fundamentales de la doctrina cristiana desde una perspectiva bautista conservadora.</p>
+                                    <p>Los participantes tendrán la oportunidad de profundizar en el conocimiento bíblico, fortalecer sus fundamentos teológicos y desarrollar herramientas para la aplicación de estos principios en su ministerio y vida cotidiana.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Programa -->
+                            <div class="event-info-section">
+                                <h3>Programa</h3>
+                                <div class="event-schedule" id="modal-event-schedule">
+                                    <div class="schedule-item">
+                                        <div class="schedule-time">
+                                            <div class="schedule-time-start">9:00</div>
+                                            <div class="schedule-time-end">10:30</div>
+                                        </div>
+                                        <div class="schedule-content">
+                                            <div class="schedule-title">Fundamentos de Hermenéutica</div>
+                                            <div class="schedule-description">Principios para una correcta interpretación de las Escrituras en el contexto contemporáneo</div>
+                                        </div>
+                                    </div>
+                                    <div class="schedule-item">
+                                        <div class="schedule-time">
+                                            <div class="schedule-time-start">10:45</div>
+                                            <div class="schedule-time-end">12:15</div>
+                                        </div>
+                                        <div class="schedule-content">
+                                            <div class="schedule-title">Cristología Aplicada</div>
+                                            <div class="schedule-description">La persona y obra de Cristo como centro de la teología</div>
+                                        </div>
+                                    </div>
+                                    <div class="schedule-item">
+                                        <div class="schedule-time">
+                                            <div class="schedule-time-start">12:15</div>
+                                            <div class="schedule-time-end">13:30</div>
+                                        </div>
+                                        <div class="schedule-content">
+                                            <div class="schedule-title">Almuerzo</div>
+                                            <div class="schedule-description">Tiempo para compartir y networking</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Ubicación -->
+                            <div class="event-info-section">
+                                <h3>Ubicación</h3>
+                                <div class="location-info">
+                                    <div class="location-address">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <div class="location-address-text" id="modal-event-location">
+                                            <p>Auditorio Principal</p>
+                                            <p>Seminario Bautista de Colombia</p>
+                                            <p>Carrera 45 #50-12, Bogotá</p>
+                                        </div>
+                                    </div>
+                                    <div class="location-map">
+                                        <iframe id="modal-event-map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.8101263330753!2d-74.09626638573687!4d4.6506096964083965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMzknMDIuMiJOIDc0wrAwNSc0Ni42Ilc!5e0!3m2!1ses!2sco!4v1620000000000!5m2!1ses!2sco" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar con información adicional -->
+                    <div class="event-details-sidebar">
+                        <!-- Acciones de evento -->
+                        <div class="event-actions">
+                            <h3>Inscripción</h3>
+                            <div class="event-price-large">
+                                <div class="event-price-large-value" id="modal-event-price">$150.000</div>
+                                <div class="event-price-large-text">por persona</div>
+                            </div>
+                            <div class="ticket-selector">
+                                <label>Número de participantes:</label>
+                                <div class="ticket-counter">
+                                    <button class="ticket-button" id="decrease-tickets">-</button>
+                                    <div class="ticket-count" id="ticket-count">1</div>
+                                    <button class="ticket-button" id="increase-tickets">+</button>
+                                </div>
+                            </div>
+                            <a href="inscripcion.html" class="action-button primary" id="register-btn">
+                                <i class="fas fa-user-plus"></i> Inscribirme ahora
+                            </a>
+                            <button class="action-button secondary">
+                                <i class="fas fa-share-alt"></i> Compartir evento
+                            </button>
+                        </div>
+                        
+                        <!-- Detalles adicionales -->
+                        <div class="event-details">
+                            <h3>Detalles del evento</h3>
+                            <div class="event-detail-item">
+                                <div class="event-detail-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="event-detail-content">
+                                    <div class="event-detail-label">Fecha</div>
+                                    <div class="event-detail-value" id="modal-event-date">16 de mayo, 2025</div>
+                                </div>
+                            </div>
+                            <div class="event-detail-item">
+                                <div class="event-detail-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="event-detail-content">
+                                    <div class="event-detail-label">Hora</div>
+                                    <div class="event-detail-value" id="modal-event-time">9:00 AM - 5:00 PM</div>
+                                </div>
+                            </div>
+                            <div class="event-detail-item">
+                                <div class="event-detail-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="event-detail-content">
+                                    <div class="event-detail-label">Cupos disponibles</div>
+                                    <div class="event-detail-value" id="modal-event-capacity">45 de 120</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Información del organizador -->
+                        <div class="organizer-info">
+                            <div class="organizer-image">
+                                <img src="images/organizer.jpg" alt="Organizador">
+                            </div>
+                            <div class="organizer-details">
+                                <h4 class="organizer-name" id="modal-event-organizer">Facultad de Teología</h4>
+                                <p class="organizer-description">Departamento académico encargado de la formación teológica en el Seminario Bautista de Colombia.</p>
+                                <div class="organizer-contact">
+                                    <a href="mailto:teologia@sbc.edu.co" class="organizer-contact-button"><i class="fas fa-envelope"></i></a>
+                                    <a href="https://sbc.edu.co" class="organizer-contact-button"><i class="fas fa-globe"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="close-details-btn">Cerrar</button>
+                <a href="inscripcion.html" class="btn btn-primary">Inscribirme ahora</a>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Datos de eventos para mostrar en el modal
+    const eventosData = {
+        evento1: {
+            id: "evento1",
+            title: "Conferencia de Teología",
+            image: "images/events/conference.jpg",
+            description: "<p>La Conferencia de Teología del Seminario Bautista de Colombia es un evento dedicado al estudio profundo de la teología bíblica con expertos en la materia. Durante esta jornada intensiva, exploraremos temas fundamentales de la doctrina cristiana desde una perspectiva bautista conservadora.</p><p>Los participantes tendrán la oportunidad de profundizar en el conocimiento bíblico, fortalecer sus fundamentos teológicos y desarrollar herramientas para la aplicación de estos principios en su ministerio y vida cotidiana.</p>",
+            category: "Conferencia",
+            date: "16 de mayo, 2025",
+            time: "9:00 AM - 5:00 PM",
+            location: "<p>Auditorio Principal</p><p>Seminario Bautista de Colombia</p><p>Carrera 45 #50-12, Bogotá</p>",
+            price: "$150.000",
+            capacity: "45 de 120",
+            organizer: "Facultad de Teología",
+            schedule: `
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">9:00</div>
+                        <div class="schedule-time-end">10:30</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Fundamentos de Hermenéutica</div>
+                        <div class="schedule-description">Principios para una correcta interpretación de las Escrituras en el contexto contemporáneo</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">10:45</div>
+                        <div class="schedule-time-end">12:15</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Cristología Aplicada</div>
+                        <div class="schedule-description">La persona y obra de Cristo como centro de la teología</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">12:15</div>
+                        <div class="schedule-time-end">13:30</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Almuerzo</div>
+                        <div class="schedule-description">Tiempo para compartir y networking</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">13:30</div>
+                        <div class="schedule-time-end">15:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Eclesiología y Misión</div>
+                        <div class="schedule-description">El propósito de la iglesia en el plan redentor de Dios</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">15:15</div>
+                        <div class="schedule-time-end">17:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Panel y Conclusiones</div>
+                        <div class="schedule-description">Discusión abierta y cierre del evento</div>
+                    </div>
+                </div>
+            `
+        },
+        evento2: {
+            id: "evento2",
+            title: "Taller de Liderazgo",
+            image: "images/events/workshop.jpg",
+            description: "<p>El Taller de Liderazgo es un programa diseñado para capacitar a líderes actuales y potenciales en principios de liderazgo cristiano efectivo. Con un enfoque práctico y fundamentado en la Biblia, este taller te proporcionará herramientas esenciales para guiar equipos y ministerios con integridad y visión.</p><p>Este taller es ideal para pastores, líderes de ministerios, estudiantes de teología y cualquier persona que desee mejorar sus habilidades de liderazgo en un contexto cristiano.</p>",
+            category: "Taller",
+            date: "19 de mayo, 2025",
+            time: "14:00 - 18:00",
+            location: "<p>Sala 203</p><p>Seminario Bautista de Colombia</p><p>Carrera 45 #50-12, Bogotá</p>",
+            price: "$80.000",
+            capacity: "30 de 40",
+            organizer: "Departamento de Liderazgo",
+            schedule: `
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">14:00</div>
+                        <div class="schedule-time-end">15:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Fundamentos Bíblicos del Liderazgo</div>
+                        <div class="schedule-description">Principios extraídos de líderes bíblicos y su aplicación actual</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">15:15</div>
+                        <div class="schedule-time-end">16:15</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Desarrollo de Equipos Efectivos</div>
+                        <div class="schedule-description">Estrategias para formar y guiar equipos ministeriales</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">16:30</div>
+                        <div class="schedule-time-end">18:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Prácticas de Liderazgo</div>
+                        <div class="schedule-description">Ejercicios prácticos y simulaciones</div>
+                    </div>
+                </div>
+            `
+        },
+        evento3: {
+            id: "evento3",
+            title: "Retiro Espiritual",
+            image: "images/events/retreat.jpg",
+            description: "<p>El Retiro Espiritual es una oportunidad única para apartarse de las distracciones cotidianas y enfocarse en un tiempo de renovación espiritual y comunión con Dios. Durante tres días, los participantes experimentarán un entorno tranquilo y natural que propicia la reflexión, la oración y el crecimiento espiritual.</p><p>El programa incluye devocionales matutinos, sesiones de enseñanza bíblica, momentos de oración personal y grupal, adoración, y actividades diseñadas para fortalecer la comunidad entre los participantes.</p>",
+            category: "Retiro",
+            date: "26 - 28 de mayo, 2025",
+            time: "Inicia: 26 de mayo a las 8:00 AM",
+            location: "<p>Centro El Redil</p><p>Km 15 vía La Calera</p><p>Cundinamarca, Colombia</p>",
+            price: "$350.000",
+            capacity: "25 de 50",
+            organizer: "Ministerio de Vida Espiritual",
+            schedule: `
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">Día 1</div>
+                        <div class="schedule-time-end">26 de mayo</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Llegada y Bienvenida</div>
+                        <div class="schedule-description">Registro, instalación en cabañas y orientación general</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">Día 2</div>
+                        <div class="schedule-time-end">27 de mayo</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Vida de Oración</div>
+                        <div class="schedule-description">Sesiones de enseñanza sobre la oración y tiempos extensos de práctica</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">Día 3</div>
+                        <div class="schedule-time-end">28 de mayo</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Aplicación y Regreso</div>
+                        <div class="schedule-description">Planes de acción personal y regreso a casa renovados</div>
+                    </div>
+                </div>
+            `
+        },
+        evento4: {
+            id: "evento4",
+            title: "Seminario de Homilética",
+            image: "images/events/seminar.jpg",
+            description: "<p>El Seminario de Homilética ofrece capacitación avanzada en el arte y la ciencia de la predicación efectiva. Diseñado tanto para predicadores experimentados como para aquellos que están comenzando, este seminario combina principios bíblicos sólidos con técnicas comunicativas modernas.</p><p>Los participantes aprenderán a desarrollar sermones claros, bíblicamente fieles y relevantes para las audiencias contemporáneas. El enfoque práctico incluye talleres donde los participantes recibirán retroalimentación constructiva sobre sus predicaciones.</p>",
+            category: "Seminario",
+            date: "5 de junio, 2025",
+            time: "10:00 - 16:00",
+            location: "<p>Aula Magna</p><p>Seminario Bautista de Colombia</p><p>Carrera 45 #50-12, Bogotá</p>",
+            price: "$120.000",
+            capacity: "35 de 60",
+            organizer: "Departamento de Predicación",
+            schedule: `
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">10:00</div>
+                        <div class="schedule-time-end">11:30</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Exégesis para Predicadores</div>
+                        <div class="schedule-description">Métodos para extraer fielmente el significado del texto bíblico</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">11:45</div>
+                        <div class="schedule-time-end">13:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Estructura y Organización del Sermón</div>
+                        <div class="schedule-description">Técnicas para construir mensajes claros y persuasivos</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">14:00</div>
+                        <div class="schedule-time-end">16:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Talleres Prácticos</div>
+                        <div class="schedule-description">Ejercicios de predicación y retroalimentación</div>
+                    </div>
+                </div>
+            `
+        },
+        evento5: {
+            id: "evento5",
+            title: "Congreso de Misiones",
+            image: "images/events/conference2.jpg",
+            description: "<p>El Congreso de Misiones es un evento que reúne a misioneros, organizaciones misioneras y líderes eclesiásticos para compartir experiencias, desafíos y oportunidades en el campo misionero global. Durante estos dos días intensivos, los participantes podrán conectar con misioneros activos en diversos contextos culturales.</p><p>El programa incluye plenarias inspiradoras, talleres prácticos, testimonios impactantes y espacios para establecer conexiones con organizaciones misioneras que buscan voluntarios y personal a tiempo completo.</p>",
+            category: "Conferencia",
+            date: "12 - 13 de junio, 2025",
+            time: "8:00 AM - 6:00 PM (ambos días)",
+            location: "<p>Centro de Convenciones</p><p>Seminario Bautista de Colombia</p><p>Carrera 45 #50-12, Bogotá</p>",
+            price: "$180.000",
+            capacity: "100 de 100",
+            organizer: "Departamento de Misiones",
+            schedule: `
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">Día 1</div>
+                        <div class="schedule-time-end">8:00 - 10:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Plenaria de apertura</div>
+                        <div class="schedule-description">Desafíos y oportunidades misionales en el siglo XXI</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">Día 1</div>
+                        <div class="schedule-time-end">10:30 - 17:30</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Talleres y testimonios</div>
+                        <div class="schedule-description">Sesiones divididas por regiones geográficas y tipos de ministerio</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">Día 2</div>
+                        <div class="schedule-time-end">8:00 - 18:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Feria misionera y llamado</div>
+                        <div class="schedule-description">Exposición de organizaciones y oportunidad de compromiso misional</div>
+                    </div>
+                </div>
+            `
+        },
+        evento6: {
+            id: "evento6",
+            title: "Taller de Música Cristiana",
+            image: "images/events/workshop2.jpg",
+            description: "<p>El Taller de Música Cristiana es un espacio práctico para músicos de iglesias que desean mejorar sus habilidades y entender más profundamente el propósito de la música en la adoración. El taller está dirigido a músicos de todos los niveles, desde principiantes hasta experimentados.</p><p>Los participantes podrán aprender sobre teoría musical aplicada a la adoración, técnicas vocales e instrumentales, dirección musical de grupos de alabanza, y aspectos teológicos de la adoración a través de la música.</p>",
+            category: "Taller",
+            date: "20 de junio, 2025",
+            time: "15:00 - 19:00",
+            location: "<p>Sala de Música</p><p>Seminario Bautista de Colombia</p><p>Carrera 45 #50-12, Bogotá</p>",
+            price: "$100.000",
+            capacity: "28 de 35",
+            organizer: "Ministerio de Alabanza",
+            schedule: `
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">15:00</div>
+                        <div class="schedule-time-end">16:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Fundamentos Teológicos de la Alabanza</div>
+                        <div class="schedule-description">El propósito bíblico de la música en la adoración</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">16:15</div>
+                        <div class="schedule-time-end">17:30</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Técnicas Musicales para la Adoración</div>
+                        <div class="schedule-description">Ensamble, armonía y técnicas de interpretación</div>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">
+                        <div class="schedule-time-start">17:45</div>
+                        <div class="schedule-time-end">19:00</div>
+                    </div>
+                    <div class="schedule-content">
+                        <div class="schedule-title">Práctica en Grupos</div>
+                        <div class="schedule-description">Aplicación práctica de lo aprendido en grupos pequeños</div>
+                    </div>
+                </div>
+            `
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Funcionalidad para el menú de navegación móvil
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+            });
+        }
+        
+        // Toggle para cambiar entre tema claro y oscuro
+        const themeToggle = document.querySelector('.theme-toggle');
+        
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                document.documentElement.classList.toggle('theme-light');
+                // Opcionalmente, guardar la preferencia en localStorage
+                const currentTheme = document.documentElement.classList.contains('theme-light') ? 'light' : 'dark';
+                localStorage.setItem('theme', currentTheme);
+            });
+        }
+
+        // Funcionalidad para los dropdowns de filtros
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const menu = this.nextElementSibling;
+                menu.classList.toggle('show');
+                
+                // Cerrar otros menús abiertos
+                document.querySelectorAll('.dropdown-menu.show').forEach(openMenu => {
+                    if (openMenu !== menu) {
+                        openMenu.classList.remove('show');
+                    }
+                });
+            });
+        });
+        
+        // Cerrar dropdowns al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.filter-dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+        
+        // Funcionalidad para los items del dropdown
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                const toggle = this.closest('.filter-dropdown').querySelector('.dropdown-toggle span');
+                toggle.textContent = this.querySelector('span').textContent;
+                this.closest('.dropdown-menu').classList.remove('show');
+                
+                // Implementación real del filtrado de eventos
+                filterEvents(value);
+            });
+        });
+        
+        // Toggle entre vista de grid y lista
+        const gridButton = document.querySelector('.view-grid');
+        const listButton = document.querySelector('.view-list');
+        const eventsContainer = document.querySelector('.events-grid');
+        
+        if (gridButton && listButton && eventsContainer) {
+            gridButton.addEventListener('click', function() {
+                gridButton.classList.add('active');
+                listButton.classList.remove('active');
+                eventsContainer.classList.remove('events-list-view');
+                eventsContainer.classList.add('events-grid');
+            });
+            
+            listButton.addEventListener('click', function() {
+                listButton.classList.add('active');
+                gridButton.classList.remove('active');
+                eventsContainer.classList.remove('events-grid');
+                eventsContainer.classList.add('events-list-view');
+            });
+        }
+        
+        // Funcionalidad para paginación
+        const paginationItems = document.querySelectorAll('.pagination-item');
+        
+        paginationItems.forEach(item => {
+            item.addEventListener('click', function() {
+                paginationItems.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                // Aquí se podría implementar cambio de página
+            });
+        });
+        
+        // Mostrar detalles del evento al hacer clic en el botón
+        const eventModalOverlay = document.getElementById('event-details-modal');
+        const eventDetailsBtns = document.querySelectorAll('.show-details');
+        const closeModalBtn = document.querySelector('.modal-close');
+        const closeDetailsBtnFooter = document.getElementById('close-details-btn');
+        
+        if (eventModalOverlay && eventDetailsBtns.length && closeModalBtn && closeDetailsBtnFooter) {
+            eventDetailsBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const eventId = this.getAttribute('data-event-id');
+                    showEventDetails(eventId);
+                });
+            });
+            
+            closeModalBtn.addEventListener('click', function() {
+                eventModalOverlay.classList.remove('show');
+            });
+            
+            closeDetailsBtnFooter.addEventListener('click', function() {
+                eventModalOverlay.classList.remove('show');
+            });
+            
+            // Cerrar modal al hacer clic fuera
+            eventModalOverlay.addEventListener('click', function(e) {
+                if (e.target === eventModalOverlay) {
+                    eventModalOverlay.classList.remove('show');
+                }
+            });
+        }
+        
+        // Contador de tickets en el modal
+        const decreaseBtn = document.getElementById('decrease-tickets');
+        const increaseBtn = document.getElementById('increase-tickets');
+        const ticketCount = document.getElementById('ticket-count');
+        
+        if (decreaseBtn && increaseBtn && ticketCount) {
+            decreaseBtn.addEventListener('click', function() {
+                let count = parseInt(ticketCount.textContent);
+                if (count > 1) {
+                    ticketCount.textContent = count - 1;
+                }
+            });
+            
+            increaseBtn.addEventListener('click', function() {
+                let count = parseInt(ticketCount.textContent);
+                ticketCount.textContent = count + 1;
+            });
+        }
+    });
+    
+    // Función para mostrar los detalles del evento en el modal
+    function showEventDetails(eventId) {
+        const event = eventosData[eventId];
+        if (!event) return;
+        
+        document.getElementById('modal-event-image').src = event.image;
+        document.getElementById('modal-event-title').textContent = event.title;
+        document.getElementById('modal-event-category').textContent = event.category;
+        document.getElementById('modal-event-description').innerHTML = event.description;
+        document.getElementById('modal-event-date').textContent = event.date;
+        document.getElementById('modal-event-time').textContent = event.time;
+        document.getElementById('modal-event-location').innerHTML = event.location;
+        document.getElementById('modal-event-price').textContent = event.price;
+        document.getElementById('modal-event-capacity').textContent = event.capacity;
+        document.getElementById('modal-event-organizer').textContent = event.organizer;
+        document.getElementById('modal-event-schedule').innerHTML = event.schedule;
+        
+        // Actualizar el enlace de inscripción
+        document.getElementById('register-btn').href = `inscripcion.html?id=${eventId}`;
+        document.querySelector('.modal-footer .btn-primary').href = `inscripcion.html?id=${eventId}`;
+        
+        // Mostrar modal
+        document.getElementById('event-details-modal').classList.add('show');
+    }
+    
+    // Función mejorada para filtrar eventos
+    function filterEvents(filter) {
+        console.log("Filtrando por:", filter);
+        
+        // Obtener todos los eventos
+        const events = document.querySelectorAll('.event-card');
+        
+        // Si es "all", mostrar todos
+        if (filter === 'all') {
+            events.forEach(event => {
+                event.style.display = '';
+            });
+            return;
+        }
+        
+        // Filtrar por categoría
+        if (['conference', 'workshop', 'retreat', 'seminar'].includes(filter)) {
+            events.forEach(event => {
+                const eventId = event.getAttribute('data-event-id');
+                const eventData = eventosData[eventId];
+                
+                if (eventData && eventData.category.toLowerCase().includes(filter)) {
+                    event.style.display = '';
+                } else {
+                    event.style.display = 'none';
+                }
+            });
+        }
+        
+        // Filtrar por fecha (mes)
+        if (filter.includes('-2025')) {
+            const month = filter.split('-')[0].toLowerCase();
+            const monthMap = {
+                'may': 'mayo',
+                'jun': 'junio',
+                'jul': 'julio',
+                'aug': 'agosto'
+            };
+            
+            const monthName = monthMap[month];
+            
+            events.forEach(event => {
+                const eventId = event.getAttribute('data-event-id');
+                const eventData = eventosData[eventId];
+                
+                if (eventData && eventData.date.toLowerCase().includes(monthName)) {
+                    event.style.display = '';
+                } else {
+                    event.style.display = 'none';
+                }
+            });
+        }
+    }
+</script>

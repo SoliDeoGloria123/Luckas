@@ -682,6 +682,10 @@ async def index(request: Request):
 async def dashboard(request: Request):
     return templates.TemplateResponse("dashboard.html", {"request": request})
 
+@app.get("/eventos", name="eventos")
+async def dashboard(request: Request):
+    return templates.TemplateResponse("eventos.html", {"request": request})
+
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     return templates.TemplateResponse(
