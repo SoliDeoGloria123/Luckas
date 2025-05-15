@@ -473,8 +473,9 @@ async def cursos(request: Request):
     return templates.TemplateResponse("cursos.html", {"request": request})
 
 @app.get("/inscripcion", name="inscripcion")
-async def inscripcion(request: Request):
-    return templates.TemplateResponse("inscripcion.html", {"request": request})
+async def inscripcion(request: Request, evento: str = None):
+    # Devolver la plantilla con el parámetro evento si existe
+    return templates.TemplateResponse("inscripcion.html", {"request": request, "evento": evento})
 
 @app.get("/programa", name="programa")
 async def program_inscripcion(request: Request):
@@ -667,8 +668,9 @@ async def cursos(request: Request):
     return templates.TemplateResponse("cursos.html", {"request": request})
 
 @app.get("/inscripcion", name="inscripcion")
-async def inscripcion(request: Request):
-    return templates.TemplateResponse("inscripcion.html", {"request": request})
+async def inscripcion(request: Request, evento: str = None):
+    # Devolver la plantilla con el parámetro evento si existe
+    return templates.TemplateResponse("inscripcion.html", {"request": request, "evento": evento})
 
 @app.get("/programa-servicio-cristiano", name="programa_servicio_cristiano")
 async def programa_servicio_cristiano(request: Request):

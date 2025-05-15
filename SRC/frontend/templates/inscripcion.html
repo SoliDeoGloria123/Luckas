@@ -1,340 +1,643 @@
 <!DOCTYPE html>
-<html lang="es" class="dark-theme">
+<html lang="es" class="theme-dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscripción - Luckas</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='css/inscripcion.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='css/animations.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='css/theme-switcher.css') }}">
+    <title>Inscripción a Evento - Seminario Bautista de Colombia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/inscripcion.css') }}">
 </head>
-<body>
-    <!-- Fondo animado para toda la página -->
-    <div class="animated-bg"></div>
-    
-    <header class="neo-header">
-        <div class="logo-container">
-            <img src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt de Kent.png') }}" alt="Logo del Seminario" class="logo">
-            <h1 class="seminary-title">Luckas</h1>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('index') }}">Inicio</a></li>
-                <li><a href="{{ url_for('cursos') }}">Cursos</a></li>
-                <li><a href="{{ url_for('inscripcion') }}" class="active">Inscripción</a></li>
-            </ul>
-            <a href="{{ url_for('login') }}" class="neo-button login-button">Iniciar Sesión</a>
-        </nav>
-        <div class="menu-toggle">
-            <i class="fas fa-bars"></i>
-        </div>
-    </header>
-    
-    <main>
-        <!-- Hero de página de inscripción -->
-        <section class="inscripcion-hero section-color" data-color="#121212">
-            <div class="inscripcion-hero-content">
-                <h1 class="elegant-title">Programas Académicos</h1>
-                <p class="hero-description">Formamos líderes con fundamento bíblico para impactar el mundo. Descubre nuestros programas académicos y comienza tu formación ministerial.</p>
-                <div class="scroll-indicator">
-                    <p>Explora nuestros programas</p>
-                    <div class="scroll-arrow"></div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Programas académicos -->
-        <section class="programas-section section-color" data-color="#0d1a35">
-            <div class="neo-container">
-                <h2 class="section-title">Elige tu Camino</h2>
-                <p class="section-description">Ofrecemos programas académicos de alta calidad diseñados para equiparte con el conocimiento bíblico y las herramientas prácticas para tu ministerio.</p>
-                
-                <div class="programas-grid">
-                    <!-- Programa 1 -->
-                    <div class="programa-card" data-programa="servicio-cristiano">
-                        <div class="programa-front">
-                            <div class="programa-imagen" style="background-image: url('images/programa-servicio.jpg');">
-                                <div class="programa-overlay"></div>
+<body>
+    <!-- Fondo de ondas animadas -->
+    <div class="wave-background">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar elegante -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/logo-white.png" alt="Logo SBC" class="logo">
+                <h1>Luckas</h1>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-image-container">
+                    <img src="images/profile.jpg" alt="Perfil de usuario" class="user-image">
+                </div>
+                <div class="user-info">
+                    <h3>Juan Pérez</h3>
+                    <p>Estudiante</p>
+                </div>
+            </div>
+
+            <nav class="main-nav">
+                <div class="nav-section">
+                    <h4>Principal</h4>
+                    <ul>
+                        <li>
+                            <a href="dashboard.html">
+                                <i class="fas fa-th-large"></i>
+                                <span>Panel Principal</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="perfil.html">
+                                <i class="fas fa-user"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="notificaciones.html">
+                                <i class="fas fa-bell"></i>
+                                <span>Notificaciones</span>
+                                <span class="badge">3</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h4>Gestión</h4>
+                    <ul>
+                        <li class="active">
+                            <a href="eventos.html">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Eventos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="programas-academicos.html">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Programas Académicos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="cabanas.html">
+                                <i class="fas fa-home"></i>
+                                <span>Reservas de Cabañas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h4>Cuenta</h4>
+                    <ul>
+                        <li>
+                            <a href="configuracion.html">
+                                <i class="fas fa-cog"></i>
+                                <span>Configuración</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="ayuda.html">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Ayuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html" class="logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Cerrar Sesión</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>Seminario Bautista de Colombia</p>
+                <p class="version">Luckas v2.1.0</p>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Inscripción a Evento</h1>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle header-icon-button">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Navegación por pasos -->
+            <div class="steps-navigation">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Datos de Inscripción</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Pago</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Confirmación</div>
+                </div>
+            </div>
+
+            <!-- Resumen del evento -->
+            <div class="event-summary">
+                <div class="event-image">
+                    <img src="images/events/conference.jpg" alt="Conferencia de Teología" id="event-image">
+                </div>
+                <div class="event-info">
+                    <div>
+                        <h2 id="event-title">Conferencia de Teología</h2>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span id="event-date">16 de mayo, 2025</span>
                             </div>
-                            <h3 class="programa-titulo">Servicio Cristiano</h3>
-                            <p class="programa-descripcion">Formación fundamental para el servicio efectivo en la iglesia local y la comunidad cristiana.</p>
-                            <div class="programa-info">
-                                <span><i class="fas fa-clock"></i> 2 años</span>
-                                <span><i class="fas fa-graduation-cap"></i> Pregrado</span>
+                            <div class="event-detail">
+                                <i class="fas fa-clock"></i>
+                                <span id="event-time">9:00 AM - 5:00 PM</span>
                             </div>
-                            <button class="programa-btn neo-button primary">Ver Programa</button>
-                        </div>
-                        <div class="programa-back">
-                            <div class="programa-contenido-back">
-                                <h4>Características Principales</h4>
-                                <ul>
-                                    <li><i class="fas fa-check-circle"></i> Modalidad: Presencial intensiva</li>
-                                    <li><i class="fas fa-check-circle"></i> Duración: 4 semestres</li>
-                                    <li><i class="fas fa-check-circle"></i> Título: Licenciatura en Estudios Teológicos</li>
-                                </ul>
-                                <a href="{{ url_for('programa') }}" class="neo-button">Más información</a>
+                            <div class="event-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="event-location">Auditorio Principal</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Programa 2 -->
-                    <div class="programa-card" data-programa="servicio-integral">
-                        <div class="programa-front">
-                            <div class="programa-imagen" style="background-image: url('images/programa-integral.jpg');">
-                                <div class="programa-overlay"></div>
+                    <div class="event-price">
+                        <div class="price" id="event-price">$150.000</div>
+                        <div class="per-person">por persona</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 1: Formulario de Inscripción -->
+            <div class="form-section active" id="step1">
+                <h3>Información del Participante Principal</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombres">Nombres</label>
+                        <input type="text" id="nombres" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellidos">Apellidos</label>
+                        <input type="text" id="apellidos" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo-documento">Tipo de Documento</label>
+                        <select id="tipo-documento" class="form-control" required>
+                            <option value="">Seleccione</option>
+                            <option value="cc">Cédula de Ciudadanía</option>
+                            <option value="ce">Cédula de Extranjería</option>
+                            <option value="pasaporte">Pasaporte</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="documento">Número de Documento</label>
+                        <input type="text" id="documento" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="correo">Correo Electrónico</label>
+                        <input type="email" id="correo" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edad">Edad</label>
+                        <input type="number" id="edad" class="form-control" min="18" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="iglesia">Iglesia a la que pertenece</label>
+                        <select id="iglesia" class="form-control" required>
+                            <option value="">Seleccione</option>
+                            <option value="iglesia1">Primera Iglesia Bautista de Bogotá</option>
+                            <option value="iglesia2">Iglesia Bautista Central de Medellín</option>
+                            <option value="iglesia3">Iglesia Bautista El Redil</option>
+                            <option value="iglesia4">Iglesia Bautista Esperanza Viva</option>
+                            <option value="iglesia5">Otra</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Necesita hospedaje la noche anterior al evento?</label>
+                    <div class="form-check">
+                        <input type="radio" name="hospedaje-anterior" id="hospedaje-anterior-si" value="si">
+                        <label for="hospedaje-anterior-si">Sí, deseo reservar ($14.000 por noche)</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="hospedaje-anterior" id="hospedaje-anterior-no" value="no" checked>
+                        <label for="hospedaje-anterior-no">No</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Desea inscribir a otra persona?</label>
+                    <div class="form-check">
+                        <input type="radio" name="otra-persona" id="otra-persona-si" value="si">
+                        <label for="otra-persona-si">Sí</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="otra-persona" id="otra-persona-no" value="no" checked>
+                        <label for="otra-persona-no">No</label>
+                    </div>
+                </div>
+
+                <!-- Formulario para personas adicionales (oculto inicialmente) -->
+                <div id="personas-adicionales" class="hidden">
+                    <!-- Será llenado dinámicamente con JavaScript -->
+                </div>
+
+                <!-- Botón para añadir más personas -->
+                <button type="button" id="agregar-persona" class="btn btn-outline add-person hidden">
+                    <i class="fas fa-user-plus"></i> Añadir otra persona
+                </button>
+
+                <div class="form-actions">
+                    <a href="eventos.html" class="btn btn-outline">Cancelar</a>
+                    <button type="button" class="btn btn-primary" id="btn-siguiente-paso1">Continuar al Pago</button>
+                </div>
+            </div>
+
+            <!-- Paso 2: Método de Pago -->
+            <div class="form-section" id="step2">
+                <h3>Método de Pago</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="metodo-pago">Seleccione un método de pago</label>
+                        <select id="metodo-pago" class="form-control" required>
+                            <option value="">Seleccione</option>
+                            <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                            <option value="pse">PSE - Pagos en línea</option>
+                            <option value="transferencia">Transferencia Bancaria</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Detalles del pago seleccionado -->
+                <div id="detalles-pago" class="hidden">
+                    <!-- Tarjeta de crédito/débito -->
+                    <div id="pago-tarjeta" class="hidden">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="numero-tarjeta">Número de Tarjeta</label>
+                                <input type="text" id="numero-tarjeta" class="form-control"
+                                    placeholder="1234 5678 9012 3456">
                             </div>
-                            <h3 class="programa-titulo">Servicio Integral y Ministerial</h3>
-                            <p class="programa-descripcion">Preparación completa para el servicio ministerial con enfoque en misiones y cuidado pastoral.</p>
-                            <div class="programa-info">
-                                <span><i class="fas fa-clock"></i> 3 años</span>
-                                <span><i class="fas fa-graduation-cap"></i> Pregrado</span>
-                            </div>
-                            <button class="programa-btn neo-button primary">Ver Programa</button>
                         </div>
-                        <div class="programa-back">
-                            <div class="programa-contenido-back">
-                                <h4>Características Principales</h4>
-                                <ul>
-                                    <li><i class="fas fa-check-circle"></i> Modalidad: Presencial intensiva</li>
-                                    <li><i class="fas fa-check-circle"></i> Duración: 6 semestres</li>
-                                    <li><i class="fas fa-check-circle"></i> Título: Licenciatura en Ministerio Cristiano</li>
-                                </ul>
-                                <a href="programa-servicio-integral.html" class="neo-button">Más información</a>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre-tarjeta">Nombre en la Tarjeta</label>
+                                <input type="text" id="nombre-tarjeta" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiracion">Fecha de Expiración</label>
+                                <input type="text" id="expiracion" class="form-control" placeholder="MM/AA">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" class="form-control" maxlength="4">
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Programa 3 -->
-                    <div class="programa-card" data-programa="liderazgo-biblico">
-                        <div class="programa-front">
-                            <div class="programa-imagen" style="background-image: url('images/programa-liderazgo.jpg');">
-                                <div class="programa-overlay"></div>
+
+                    <!-- PSE -->
+                    <div id="pago-pse" class="hidden">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="banco">Seleccione su Banco</label>
+                                <select id="banco" class="form-control">
+                                    <option value="">Seleccione</option>
+                                    <option value="bancolombia">Bancolombia</option>
+                                    <option value="davivienda">Davivienda</option>
+                                    <option value="bbva">BBVA</option>
+                                    <option value="popular">Banco Popular</option>
+                                    <option value="bogota">Banco de Bogotá</option>
+                                </select>
                             </div>
-                            <h3 class="programa-titulo">Liderazgo Bíblico</h3>
-                            <p class="programa-descripcion">Formación avanzada para líderes que buscan profundizar en teología y desarrollar capacidades de liderazgo.</p>
-                            <div class="programa-info">
-                                <span><i class="fas fa-clock"></i> 4 años</span>
-                                <span><i class="fas fa-graduation-cap"></i> Pregrado avanzado</span>
-                            </div>
-                            <button class="programa-btn neo-button primary">Ver Programa</button>
                         </div>
-                        <div class="programa-back">
-                            <div class="programa-contenido-back">
-                                <h4>Características Principales</h4>
-                                <ul>
-                                    <li><i class="fas fa-check-circle"></i> Modalidad: Presencial intensiva</li>
-                                    <li><i class="fas fa-check-circle"></i> Duración: 8 semestres</li>
-                                    <li><i class="fas fa-check-circle"></i> Título: Licenciatura en Teología</li>
-                                </ul>
-                                <a href="programa-liderazgo-biblico.html" class="neo-button">Más información</a>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tipo-cuenta">Tipo de Cuenta</label>
+                                <select id="tipo-cuenta" class="form-control">
+                                    <option value="">Seleccione</option>
+                                    <option value="ahorros">Ahorros</option>
+                                    <option value="corriente">Corriente</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transferencia Bancaria -->
+                    <div id="pago-transferencia" class="hidden">
+                        <div class="info-text">
+                            <p>Realice una transferencia a la siguiente cuenta bancaria:</p>
+                            <p><strong>Banco:</strong> Bancolombia</p>
+                            <p><strong>Tipo de Cuenta:</strong> Ahorros</p>
+                            <p><strong>Número de Cuenta:</strong> 123-456789-00</p>
+                            <p><strong>Titular:</strong> Seminario Bautista de Colombia</p>
+                            <p><strong>NIT:</strong> 900.123.456-7</p>
+                            <p>Una vez realizada la transferencia, por favor cargue el comprobante de pago:</p>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="comprobante">Comprobante de Pago</label>
+                                <input type="file" id="comprobante" class="form-control" accept="image/*,.pdf">
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        
-        <!-- Proceso de Admisión -->
-        <section class="proceso-section section-color" data-color="#162447">
-            <div class="neo-container">
-                <h2 class="section-title">Proceso de Admisión</h2>
-                <p class="section-description">Dar el primer paso hacia tu formación ministerial es simple. Sigue estos pasos para aplicar a cualquiera de nuestros programas académicos.</p>
-                
-                <div class="proceso-timeline">
-                    <div class="proceso-item">
-                        <div class="proceso-icon">
-                            <i class="fas fa-clipboard-list"></i>
-                        </div>
-                        <div class="proceso-content">
-                            <h3>1. Solicitud</h3>
-                            <p>Completa el formulario de solicitud en línea y envía los documentos requeridos.</p>
-                        </div>
+
+                <!-- Resumen de costos -->
+                <div class="summary-section">
+                    <h4>Resumen de su Inscripción</h4>
+
+                    <div id="resumen-inscripcion">
+                        <!-- Será llenado dinámicamente con JavaScript -->
                     </div>
-                    
-                    <div class="proceso-item">
-                        <div class="proceso-icon">
-                            <i class="fas fa-file-alt"></i>
+
+                    <div class="summary-costs">
+                        <div class="cost-item">
+                            <div class="cost-label">Subtotal Inscripciones:</div>
+                            <div class="cost-value" id="subtotal-inscripciones">$150.000</div>
                         </div>
-                        <div class="proceso-content">
-                            <h3>2. Documentación</h3>
-                            <p>Presenta los documentos académicos, carta pastoral y demás requisitos.</p>
+                        <div class="cost-item">
+                            <div class="cost-label">Hospedaje adicional:</div>
+                            <div class="cost-value" id="costo-hospedaje">$0</div>
                         </div>
-                    </div>
-                    
-                    <div class="proceso-item">
-                        <div class="proceso-icon">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="proceso-content">
-                            <h3>3. Entrevista</h3>
-                            <p>Participa en una entrevista personal o virtual con nuestro comité de admisiones.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="proceso-item">
-                        <div class="proceso-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="proceso-content">
-                            <h3>4. Admisión</h3>
-                            <p>Recibe tu carta de aceptación y completa el proceso de matrícula.</p>
+                        <div class="cost-item total">
+                            <div class="cost-label">Total a pagar:</div>
+                            <div class="cost-value" id="total-pagar">$150.000</div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        
-        <!-- Becas y Ayudas -->
-        <section class="becas-section section-color" data-color="#1f4068">
-            <div class="neo-container">
-                <h2 class="section-title">Becas y Ayudas Financieras</h2>
-                <p class="section-description">Ofrecemos varias opciones para ayudarte a financiar tus estudios. Conoce nuestras becas y planes de financiamiento.</p>
-                
-                <div class="becas-grid">
-                    <div class="beca-card">
-                        <div class="beca-icon">
-                            <i class="fas fa-medal"></i>
-                        </div>
-                        <h3>Beca Académica</h3>
-                        <p>Cubre hasta el 50% del costo de matrícula para estudiantes con excelencia académica.</p>
-                    </div>
-                    
-                    <div class="beca-card">
-                        <div class="beca-icon">
-                            <i class="fas fa-church"></i>
-                        </div>
-                        <h3>Beca Ministerial</h3>
-                        <p>Descuento del 30% para líderes activos en ministerios y pastores.</p>
-                    </div>
-                    
-                    <div class="beca-card">
-                        <div class="beca-icon">
-                            <i class="fas fa-hands-helping"></i>
-                        </div>
-                        <h3>Plan de Servicio</h3>
-                        <p>Oportunidades de trabajo-estudio dentro del campus para cubrir parte de los costos.</p>
-                    </div>
-                    
-                    <div class="beca-card">
-                        <div class="beca-icon">
-                            <i class="fas fa-handshake"></i>
-                        </div>
-                        <h3>Convenios con Iglesias</h3>
-                        <p>Descuentos especiales para estudiantes enviados oficialmente por iglesias asociadas.</p>
-                    </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="btn-regresar-paso2">Regresar</button>
+                    <button type="button" class="btn btn-primary" id="btn-siguiente-paso2">Confirmar Pago</button>
                 </div>
             </div>
-        </section>
-        
-        <!-- Contacto con Asesor -->
-        <section class="asesor-section section-color" data-color="#072142">
-            <div class="neo-container">
-                <h2 class="section-title">Habla con un Asesor</h2>
-                <p class="section-description">¿Tienes preguntas sobre nuestros programas? Nuestros asesores académicos están listos para ayudarte en tu proceso de decisión.</p>
-                
-                <div class="asesor-content">
-                    <div class="asesor-form">
-                        <form id="contacto-form" class="neo-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="nombre">Nombre completo *</label>
-                                    <input type="text" id="nombre" class="neo-input" required>
+
+            <!-- Paso 3: Confirmación -->
+            <div class="form-section" id="step3">
+                <h3>Estado de su Inscripción</h3>
+
+                <div class="confirmation-status" id="estado-pendiente">
+                    <div class="status-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h4>Inscripción en Proceso</h4>
+                    <p>Estamos verificando su pago. Este proceso puede tomar hasta 24 horas hábiles.</p>
+                </div>
+
+                <div class="confirmation-status hidden" id="estado-aprobado">
+                    <div class="status-icon approved">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h4>¡Inscripción Confirmada!</h4>
+                    <p>Su pago ha sido confirmado. Se ha enviado la información a su correo electrónico.</p>
+                </div>
+
+                <div class="confirmation-status hidden" id="estado-rechazado">
+                    <div class="status-icon rejected">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <h4>Inscripción Rechazada</h4>
+                    <p>Ha ocurrido un problema con su pago. Por favor contacte a soporte para obtener asistencia.</p>
+                </div>
+
+                <!-- Resumen de la inscripción -->
+                <div class="summary-section">
+                    <h4>Detalles de su Inscripción</h4>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Evento:</div>
+                        <div class="summary-value" id="resumen-evento">Conferencia de Teología</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Fecha:</div>
+                        <div class="summary-value" id="resumen-fecha">16 de mayo, 2025</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Participante principal:</div>
+                        <div class="summary-value" id="resumen-participante">Juan Pérez</div>
+                    </div>
+
+                    <div id="resumen-adicionales">
+                        <!-- Será llenado dinámicamente con JavaScript si hay participantes adicionales -->
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Método de pago:</div>
+                        <div class="summary-value" id="resumen-pago">Transferencia Bancaria</div>
+                    </div>
+
+                    <div class="summary-costs">
+                        <div class="cost-item total">
+                            <div class="cost-label">Total pagado:</div>
+                            <div class="cost-value" id="resumen-total">$150.000</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="eventos.html" class="btn btn-outline">Volver a Eventos</a>
+                    <a href="#" class="btn btn-primary" id="btn-descargar-comprobante">Descargar Comprobante</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script para la lógica de la página -->
+    <script src="{{ url_for('static', path='js/inscripcion.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Obtener los parámetros de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventoId = urlParams.get('evento');
+            const numParticipantes = parseInt(urlParams.get('participantes')) || 1;
+
+            if (eventoId) {
+                // Datos de los eventos
+                const eventosData = {
+                    evento1: {
+                        title: "Conferencia de Teología",
+                        date: "16 de mayo, 2025",
+                        time: "9:00 AM - 5:00 PM",
+                        location: "Auditorio Principal",
+                        price: "$150.000"
+                    },
+                    // ...otros eventos...
+                };
+
+                // Si existe el evento, actualizar la información en el formulario
+                if (eventosData[eventoId]) {
+                    const evento = eventosData[eventoId];
+                    document.getElementById("event-title").textContent = evento.title;
+                    document.getElementById("event-date").textContent = evento.date;
+                    document.getElementById("event-time").textContent = evento.time;
+                    document.getElementById("event-location").textContent = evento.location;
+                    document.getElementById("event-price").textContent = evento.price;
+                    // También actualizar los campos del resumen
+                    document.getElementById("resumen-evento").textContent = evento.title;
+                    document.getElementById("resumen-fecha").textContent = evento.date;
+                    
+                    // Actualizar subtotal y total según número de participantes
+                    const precioBase = evento.price.replace('$', '').replace('.', '').trim();
+                    const subtotal = parseInt(precioBase) * numParticipantes;
+                    document.getElementById("subtotal-inscripciones").textContent = `$${subtotal.toLocaleString()}`;
+                    document.getElementById("total-pagar").textContent = `$${subtotal.toLocaleString()}`;
+                }
+
+                // Si hay más de 1 participante, mostrar los formularios adicionales
+                if (numParticipantes > 1) {
+                    document.getElementById("otra-persona-si").checked = true;
+                    const personasAdicionalesContainer = document.getElementById("personas-adicionales");
+                    personasAdicionalesContainer.classList.remove("hidden");
+                    
+                    // Generar formularios para participantes adicionales
+                    for (let i = 2; i <= numParticipantes; i++) {
+                        const personaHtml = `
+                            <div class="additional-person" data-person-id="${i}">
+                                <h4>Participante ${i} <button type="button" class="remove-person" data-person-id="${i}">&times;</button></h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="nombres-${i}">Nombres</label>
+                                        <input type="text" id="nombres-${i}" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="apellidos-${i}">Apellidos</label>
+                                        <input type="text" id="apellidos-${i}" class="form-control" required>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="email">Correo electrónico *</label>
-                                    <input type="email" id="email" class="neo-input" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="telefono">Teléfono *</label>
-                                    <input type="tel" id="telefono" class="neo-input" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="programa">Programa de interés *</label>
-                                    <div class="custom-select-wrapper">
-                                        <select id="programa" class="neo-select" required>
-                                            <option value="">Seleccionar programa</option>
-                                            <option value="servicio-cristiano">Servicio Cristiano</option>
-                                            <option value="servicio-integral">Servicio Integral y Ministerial</option>
-                                            <option value="liderazgo-biblico">Liderazgo Bíblico</option>
-                                        </select>
-                                        <div class="select-icon"><i class="fas fa-chevron-down"></i></div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="documento-${i}">Número de Documento</label>
+                                        <input type="text" id="documento-${i}" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edad-${i}">Edad</label>
+                                        <input type="number" id="edad-${i}" class="form-control" min="18" max="100" required>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group full-width">
-                                    <label for="mensaje">Mensaje *</label>
-                                    <textarea id="mensaje" class="neo-textarea" rows="4" required></textarea>
-                                </div>
+                        `;
+                        personasAdicionalesContainer.innerHTML += personaHtml;
+                    }
+                    
+                    // Configurar los botones de eliminar
+                    document.querySelectorAll('.remove-person').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const personId = this.getAttribute('data-person-id');
+                            const personElement = document.querySelector(`.additional-person[data-person-id="${personId}"]`);
+                            personElement.remove();
+                            // Actualizar el formulario y recalcular los costos
+                            actualizarCostos();
+                        });
+                    });
+                }
+            }
+
+            // Función para actualizar costos al cambiar opciones
+            function actualizarCostos() {
+                // Implementa la lógica para recalcular los costos
+                // basado en el número actual de participantes y otras opciones
+            }
+
+            // Configurar botón para añadir más personas
+            document.getElementById('otra-persona-si').addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('personas-adicionales').classList.remove('hidden');
+                    document.getElementById('agregar-persona').classList.remove('hidden');
+                }
+            });
+
+            document.getElementById('otra-persona-no').addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('personas-adicionales').classList.add('hidden');
+                    document.getElementById('agregar-persona').classList.add('hidden');
+                }
+            });
+
+            // Configurar botón para agregar más personas
+            document.getElementById('agregar-persona').addEventListener('click', function() {
+                const personasAdicionalesContainer = document.getElementById('personas-adicionales');
+                const numActual = personasAdicionalesContainer.querySelectorAll('.additional-person').length + 1;
+                const newPersonId = numActual + 1;
+                
+                const personaHtml = `
+                    <div class="additional-person" data-person-id="${newPersonId}">
+                        <h4>Participante ${newPersonId} <button type="button" class="remove-person" data-person-id="${newPersonId}">&times;</button></h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombres-${newPersonId}">Nombres</label>
+                                <input type="text" id="nombres-${newPersonId}" class="form-control" required>
                             </div>
-                            <button type="submit" class="neo-button primary full-width">Enviar Consulta</button>
-                        </form>
-                    </div>
-                    <div class="asesor-info">
-                        <div class="info-card">
-                            <h3><i class="fas fa-map-marker-alt"></i> Ubicación</h3>
-                            <p>SBC Berea, Tenjo, Cundinamarca<br>Colombia</p>
+                            <div class="form-group">
+                                <label for="apellidos-${newPersonId}">Apellidos</label>
+                                <input type="text" id="apellidos-${newPersonId}" class="form-control" required>
+                            </div>
                         </div>
-                        <div class="info-card">
-                            <h3><i class="fas fa-phone"></i> Teléfono</h3>
-                            <p>+57 (601) 123-4567<br>+57 310 123-4567</p>
-                        </div>
-                        <div class="info-card">
-                            <h3><i class="fas fa-envelope"></i> Correo</h3>
-                            <p>admisiones@luckas.org<br>info@luckas.org</p>
-                        </div>
-                        <div class="info-card">
-                            <h3><i class="fas fa-clock"></i> Horario de Atención</h3>
-                            <p>Lunes a Viernes: 8am - 5pm<br>Sábado: 9am - 12m</p>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="documento-${newPersonId}">Número de Documento</label>
+                                <input type="text" id="documento-${newPersonId}" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edad-${newPersonId}">Edad</label>
+                                <input type="number" id="edad-${newPersonId}" class="form-control" min="18" max="100" required>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-column">
-                <h3>Luckas</h3>
-                <p>Formando líderes con fundamento bíblico desde 1990.</p>
-                <div class="social-links">
-                    <a href="#" class="neo-social"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="neo-social"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="neo-social"><i class="fab fa-youtube"></i></a>
-                    <a href="#" class="neo-social"><i class="fab fa-whatsapp"></i></a>
-                </div>
-            </div>
-            <div class="footer-column">
-                <h3>Enlaces Rápidos</h3>
-                <ul>
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="cursos.html">Cursos</a></li>
-                    <li><a href="inscripcion.html">Inscripción</a></li>
-                    <li><a href="contacto.html">Contacto</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Contacto</h3>
-                <ul class="contact-info">
-                    <li><i class="fas fa-map-marker-alt"></i> SBC Berea, Tenjo, Cundinamarca</li>
-                    <li><i class="fas fa-phone"></i> +57 (601) 123-4567</li>
-                    <li><i class="fas fa-envelope"></i> info@luckas.org</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 Luckas. Todos los derechos reservados. <span class="signature">SoliDeoGloria123</span></p>
-        </div>
-    </footer>
-
-    <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
-    <script src="{{ url_for('static', path='js/animations.js') }}"></script>
-    <script src="{{ url_for('static', path='js/inscripcion.js') }}"></script>
-    <script src="{{ url_for('static', path='js/theme-switcher.js') }}"></script>
+                `;
+                
+                personasAdicionalesContainer.innerHTML += personaHtml;
+                
+                // Configurar el nuevo botón de eliminar
+                const removeBtn = personasAdicionalesContainer.querySelector(`.additional-person[data-person-id="${newPersonId}"] .remove-person`);
+                removeBtn.addEventListener('click', function() {
+                    const personElement = document.querySelector(`.additional-person[data-person-id="${newPersonId}"]`);
+                    personElement.remove();
+                    // Actualizar el formulario y recalcular los costos
+                    actualizarCostos();
+                });
+                
+                // Actualizar costos
+                actualizarCostos();
+            });
+        });
+    </script>
 </body>
+
 </html>

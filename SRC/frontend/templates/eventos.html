@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/eventos.css') }}">
-    
+     
     <!-- Estilos específicos para el modal de detalles -->
     <style>
         /* Modal de detalles del evento */
@@ -597,7 +597,7 @@
                     <h4>Gestión</h4>
                     <ul>
                         <li class="active">
-                            <a href="{{ url_for('eventos') }}">
+                            <a href="eventos.html">
                                 <i class="fas fa-calendar-alt"></i>
                                 <span>Eventos</span>
                             </a>
@@ -1085,7 +1085,7 @@
                                     <button class="ticket-button" id="increase-tickets">+</button>
                                 </div>
                             </div>
-                            <a href="inscripcion.html" class="action-button primary" id="register-btn">
+                            <a href="{{ url_for('inscripcion') }}" class="action-button primary" id="register-btn">
                                 <i class="fas fa-user-plus"></i> Inscribirme ahora
                             </a>
                             <button class="action-button secondary">
@@ -1144,7 +1144,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" id="close-details-btn">Cerrar</button>
-                <a href="inscripcion.html" class="btn btn-primary">Inscribirme ahora</a>
+                <a href="{{ url_for('inscripcion') }}" class="btn btn-primary">Inscribirme ahora</a>
             </div>
         </div>
     </div>
@@ -1588,6 +1588,68 @@
                 ticketCount.textContent = count + 1;
             });
         }
+
+        // Configurar botón para añadir más personas
+        document.getElementById('otra-persona-si').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('personas-adicionales').classList.remove('hidden');
+                document.getElementById('agregar-persona').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('otra-persona-no').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('personas-adicionales').classList.add('hidden');
+                document.getElementById('agregar-persona').classList.add('hidden');
+            }
+        });
+
+        // Configurar botón para agregar más personas
+        document.getElementById('agregar-persona').addEventListener('click', function() {
+            const personasAdicionalesContainer = document.getElementById('personas-adicionales');
+            const numActual = personasAdicionalesContainer.querySelectorAll('.additional-person').length + 1;
+            const newPersonId = numActual + 1;
+            
+            const personaHtml = `
+                <div class="additional-person" data-person-id="${newPersonId}">
+                    <h4>Participante ${newPersonId} <button type="button" class="remove-person" data-person-id="${newPersonId}">&times;</button></h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombres-${newPersonId}">Nombres</label>
+                            <input type="text" id="nombres-${newPersonId}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellidos-${newPersonId}">Apellidos</label>
+                            <input type="text" id="apellidos-${newPersonId}" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="documento-${newPersonId}">Número de Documento</label>
+                            <input type="text" id="documento-${newPersonId}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edad-${newPersonId}">Edad</label>
+                            <input type="number" id="edad-${newPersonId}" class="form-control" min="18" max="100" required>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            personasAdicionalesContainer.innerHTML += personaHtml;
+            
+            // Configurar el nuevo botón de eliminar
+            const removeBtn = personasAdicionalesContainer.querySelector(`.additional-person[data-person-id="${newPersonId}"] .remove-person`);
+            removeBtn.addEventListener('click', function() {
+                const personElement = document.querySelector(`.additional-person[data-person-id="${newPersonId}"]`);
+                personElement.remove();
+                // Actualizar el formulario y recalcular los costos
+                actualizarCostos();
+            });
+            
+            // Actualizar costos
+            actualizarCostos();
+        });
     });
     
     // Función para mostrar los detalles del evento en el modal
@@ -1608,8 +1670,18 @@
         document.getElementById('modal-event-schedule').innerHTML = event.schedule;
         
         // Actualizar el enlace de inscripción
-        document.getElementById('register-btn').href = `inscripcion.html?id=${eventId}`;
-        document.querySelector('.modal-footer .btn-primary').href = `inscripcion.html?id=${eventId}`;
+        const ticketCount = document.getElementById('ticket-count').textContent;
+        const inscripcionBase = "{{ url_for('inscripcion') }}";
+        const inscripcionUrl = `${inscripcionBase}?evento=${eventId}&participantes=${ticketCount}`;
+
+        // Si existe el elemento register-btn, actualizar su href
+        const registerBtn = document.getElementById('register-btn');
+        if (registerBtn) {
+            registerBtn.href = inscripcionUrl;
+        }
+
+        // Actualizar el botón de inscripción en el footer modal
+        document.querySelector('.modal-footer .btn-primary').href = inscripcionUrl;
         
         // Mostrar modal
         document.getElementById('event-details-modal').classList.add('show');
