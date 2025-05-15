@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es" class="theme-dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Principal - Seminario Bautista de Colombia</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Dashboard elegante para Seminario Bautista de Colombia con paleta de azules */
@@ -18,15 +21,21 @@
             --dark-gray: #121212;
             --medium-gray: #333333;
             --light-gray: #f5f5f5;
-            
+
             /* Nueva paleta de azules */
-            --blue-light: #d4e0f7;     /* Azul claro/celeste */
-            --blue-medium: #6a85b6;    /* Azul medio */
-            --blue-medium-dark: #3b5998; /* Azul medio-oscuro */
-            --blue-navy: #1e3a8a;      /* Azul marino */
-            --blue-dark: #0a1128;      /* Azul oscuro casi negro */
-            
-            --accent: var(--blue-medium);  /* Antes era dorado, ahora azul medio */
+            --blue-light: #d4e0f7;
+            /* Azul claro/celeste */
+            --blue-medium: #6a85b6;
+            /* Azul medio */
+            --blue-medium-dark: #3b5998;
+            /* Azul medio-oscuro */
+            --blue-navy: #1e3a8a;
+            /* Azul marino */
+            --blue-dark: #0a1128;
+            /* Azul oscuro casi negro */
+
+            --accent: var(--blue-medium);
+            /* Antes era dorado, ahora azul medio */
             --accent-hover: var(--blue-light);
             --error: #c14343;
             --success: #43a047;
@@ -41,7 +50,7 @@
             --surface: var(--dark-gray);
             --border: #2a2a2a;
             --shadow-color: rgba(0, 0, 0, 0.3);
-            
+
             /* Variables específicas para el sidebar */
             --sidebar-bg: rgba(18, 18, 18, 0.95);
             --sidebar-border: #2a2a2a;
@@ -56,7 +65,7 @@
             --surface: var(--light-gray);
             --border: #e0e0e0;
             --shadow-color: rgba(0, 0, 0, 0.1);
-            
+
             /* Variables específicas para el sidebar en tema claro */
             --sidebar-bg: rgba(245, 245, 250, 0.95);
             --sidebar-border: #e0e0e0;
@@ -70,7 +79,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 radial-gradient(circle at 80% 10%, var(--blue-medium-dark) 0%, transparent 25%),
                 radial-gradient(circle at 20% 30%, var(--blue-navy) 0%, transparent 20%),
                 var(--background);
@@ -92,7 +101,8 @@
             position: absolute;
             width: 200%;
             height: 200%;
-            background: rgba(30, 58, 138, 0.05); /* Azul marino con baja opacidad */
+            background: rgba(30, 58, 138, 0.05);
+            /* Azul marino con baja opacidad */
             border-radius: 43%;
         }
 
@@ -106,20 +116,23 @@
             bottom: -80%;
             left: -30%;
             animation: rotate 25s linear infinite reverse;
-            background: rgba(106, 133, 182, 0.03); /* Azul medio con baja opacidad */
+            background: rgba(106, 133, 182, 0.03);
+            /* Azul medio con baja opacidad */
         }
 
         .wave:nth-child(3) {
             bottom: -75%;
             left: -70%;
             animation: rotate 30s linear infinite;
-            background: rgba(10, 17, 40, 0.04); /* Azul oscuro con baja opacidad */
+            background: rgba(10, 17, 40, 0.04);
+            /* Azul oscuro con baja opacidad */
         }
 
         @keyframes rotate {
             from {
                 transform: rotate(0deg);
             }
+
             to {
                 transform: rotate(360deg);
             }
@@ -142,7 +155,10 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        h1, h2, h3, h4 {
+        h1,
+        h2,
+        h3,
+        h4 {
             font-family: 'Playfair Display', serif;
             font-weight: 500;
         }
@@ -1060,6 +1076,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Fondo de ondas animadas -->
     <div class="wave-background">
@@ -1072,10 +1089,11 @@
         <!-- Sidebar elegante -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt de Kent.png') }}" alt="Logo SBC" class="logo">
+                <img src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt de Kent.png') }}" alt="Logo SBC"
+                    class="logo">
                 <h1>Luckas</h1>
             </div>
-            
+
             <div class="user-profile">
                 <div class="user-image-container">
                     <img src="{{ url_for('static', path='img/meme.jpg') }}" alt="Perfil de usuario" class="user-image">
@@ -1085,7 +1103,7 @@
                     <p>Estudiante</p>
                 </div>
             </div>
-            
+
             <nav class="main-nav">
                 <div class="nav-section">
                     <h4>Principal</h4>
@@ -1111,7 +1129,7 @@
                         </li>
                     </ul>
                 </div>
-                
+
                 <div class="nav-section">
                     <h4>Gestión</h4>
                     <ul>
@@ -1135,7 +1153,7 @@
                         </li>
                     </ul>
                 </div>
-                
+
                 <div class="nav-section">
                     <h4>Cuenta</h4>
                     <ul>
@@ -1160,7 +1178,7 @@
                     </ul>
                 </div>
             </nav>
-            
+
             <div class="sidebar-footer">
                 <p>Seminario Bautista de Colombia</p>
                 <p class="version">Luckas v2.1.0</p>
@@ -1221,7 +1239,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="quick-card programas">
                         <div class="quick-card-image">
                             <img src="images/programs-cover.jpg" alt="Programas Académicos">
@@ -1237,7 +1255,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="quick-card cabanas">
                         <div class="quick-card-image">
                             <img src="images/cabins-cover.jpg" alt="Cabañas">
@@ -1398,7 +1416,8 @@
                                 <h3>Pago procesado</h3>
                                 <span class="time">Ayer, 15:45</span>
                             </div>
-                            <p>Tu pago de $120.000 para la matrícula de Hermenéutica Bíblica ha sido procesado correctamente.</p>
+                            <p>Tu pago de $120.000 para la matrícula de Hermenéutica Bíblica ha sido procesado
+                                correctamente.</p>
                             <a href="#" class="timeline-link">Ver recibo</a>
                         </div>
                     </div>
@@ -1421,36 +1440,36 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Toggle para el menú en dispositivos móviles
             const menuToggle = document.querySelector('.menu-toggle');
             const sidebar = document.querySelector('.sidebar');
-            
+
             if (menuToggle && sidebar) {
-                menuToggle.addEventListener('click', function() {
+                menuToggle.addEventListener('click', function () {
                     sidebar.classList.toggle('open');
                 });
             }
-            
+
             // Cerrar el sidebar cuando se haga clic fuera de él (en móviles)
-            document.addEventListener('click', function(event) {
-                if (window.innerWidth <= 992 && 
-                    sidebar && 
+            document.addEventListener('click', function (event) {
+                if (window.innerWidth <= 992 &&
+                    sidebar &&
                     sidebar.classList.contains('open') &&
-                    !sidebar.contains(event.target) && 
+                    !sidebar.contains(event.target) &&
                     !menuToggle.contains(event.target)) {
                     sidebar.classList.remove('open');
                 }
             });
-            
+
             // Toggle para el tema (claro/oscuro)
             const themeToggle = document.querySelector('.theme-toggle');
-            
+
             if (themeToggle) {
-                themeToggle.addEventListener('click', function() {
+                themeToggle.addEventListener('click', function () {
                     // Cambiamos la clase en el HTML para que afecte a todo el documento
                     document.documentElement.classList.toggle('theme-light');
-                    
+
                     // Guardar la preferencia del usuario
                     if (document.documentElement.classList.contains('theme-light')) {
                         localStorage.setItem('theme', 'light');
@@ -1458,21 +1477,21 @@
                         localStorage.setItem('theme', 'dark');
                     }
                 });
-                
+
                 // Aplicar el tema guardado
                 const savedTheme = localStorage.getItem('theme');
                 if (savedTheme === 'light') {
                     document.documentElement.classList.add('theme-light');
                 }
             }
-            
+
             // Tooltips para los eventos en el calendario
             const eventDays = document.querySelectorAll('.days span.event');
-            
+
             eventDays.forEach(day => {
                 const title = day.getAttribute('title');
                 if (title) {
-                    day.addEventListener('mouseover', function(e) {
+                    day.addEventListener('mouseover', function (e) {
                         const tooltip = document.createElement('div');
                         tooltip.className = 'calendar-tooltip';
                         tooltip.textContent = title;
@@ -1487,13 +1506,13 @@
                         tooltip.style.zIndex = '1000';
                         tooltip.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
                         document.body.appendChild(tooltip);
-                        
-                        day.addEventListener('mousemove', function(e) {
+
+                        day.addEventListener('mousemove', function (e) {
                             tooltip.style.top = (e.pageY - 40) + 'px';
                             tooltip.style.left = (e.pageX + 10) + 'px';
                         });
-                        
-                        day.addEventListener('mouseout', function() {
+
+                        day.addEventListener('mouseout', function () {
                             document.body.removeChild(tooltip);
                         });
                     });
@@ -1501,5 +1520,239 @@
             });
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Cargar inscripciones desde localStorage
+            cargarInscripciones();
+
+            // Cargar notificaciones
+            actualizarNotificaciones();
+
+            // Funcionalidad para el menú de navegación móvil
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('open');
+                });
+            }
+
+            // Toggle para cambiar entre tema claro y oscuro
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function () {
+                    document.documentElement.classList.toggle('theme-light');
+                    const currentTheme = document.documentElement.classList.contains('theme-light') ? 'light' : 'dark';
+                    localStorage.setItem('theme', currentTheme);
+                });
+            }
+
+            // Aplicar tema guardado previamente
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('theme-light');
+            }
+        });
+
+        // Función para cargar inscripciones en el dashboard
+        function cargarInscripciones() {
+            const actividadRecienteContainer = document.querySelector('.recent-activity');
+
+            if (actividadRecienteContainer) {
+                const inscripciones = JSON.parse(localStorage.getItem('inscripciones') || '[]');
+
+                // Limpiar el contenedor si ya tiene datos
+                const listItems = actividadRecienteContainer.querySelectorAll('.activity-item');
+                if (listItems.length > 0) {
+                    // Conservar solo el primer elemento (título) si existe
+                    const firstItem = listItems[0];
+                    if (firstItem.querySelector('h3')) {
+                        actividadRecienteContainer.innerHTML = '';
+                        actividadRecienteContainer.appendChild(firstItem);
+                    } else {
+                        actividadRecienteContainer.innerHTML = '<h3>Actividad Reciente</h3>';
+                    }
+                } else {
+                    actividadRecienteContainer.innerHTML = '<h3>Actividad Reciente</h3>';
+                }
+
+                // Mostrar mensaje si no hay inscripciones
+                if (inscripciones.length === 0) {
+                    const noActivityItem = document.createElement('div');
+                    noActivityItem.className = 'activity-item';
+                    noActivityItem.innerHTML = `
+                <div class="activity-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-message">No hay actividad reciente para mostrar.</div>
+                </div>
+            `;
+                    actividadRecienteContainer.appendChild(noActivityItem);
+                    return;
+                }
+
+                // Mostrar las inscripciones más recientes
+                inscripciones.slice(0, 5).forEach(inscripcion => {
+                    const fechaFormateada = new Date(inscripcion.fecha).toLocaleDateString('es-CO', {
+                        day: '2-digit',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+
+                    let iconClass = 'fa-calendar-check';
+                    let colorClass = '';
+
+                    switch (inscripcion.estado) {
+                        case 'pendiente':
+                            iconClass = 'fa-clock';
+                            colorClass = 'warning';
+                            break;
+                        case 'aprobado':
+                            iconClass = 'fa-check-circle';
+                            colorClass = 'success';
+                            break;
+                        case 'rechazado':
+                            iconClass = 'fa-times-circle';
+                            colorClass = 'danger';
+                            break;
+                    }
+
+                    activityItem.innerHTML = `
+                <div class="activity-icon ${colorClass}">
+                    <i class="fas ${iconClass}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">
+                        <span>Inscripción a evento</span>
+                        <span class="activity-time">${fechaFormateada}</span>
+                    </div>
+                    <div class="activity-message">Te has inscrito al evento: <strong>${inscripcion.eventoTitulo}</strong></div>
+                </div>
+            `;
+
+                    actividadRecienteContainer.appendChild(activityItem);
+                });
+            }
+        }
+
+        // Función para actualizar las notificaciones en el header
+        function actualizarNotificaciones() {
+            const notificacionesCount = parseInt(localStorage.getItem('contadorNotificaciones') || '0');
+            const badgeElements = document.querySelectorAll('.notifications .badge');
+
+            badgeElements.forEach(badge => {
+                badge.textContent = notificacionesCount;
+
+                // Mostrar u ocultar según haya notificaciones
+                if (notificacionesCount > 0) {
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            });
+
+            // Si estamos en la página de notificaciones, cargar la lista
+            const notificacionesContainer = document.querySelector('.notifications-list');
+            if (notificacionesContainer) {
+                const notificaciones = JSON.parse(localStorage.getItem('notificaciones') || '[]');
+
+                if (notificaciones.length === 0) {
+                    notificacionesContainer.innerHTML = `
+                <div class="notification-item empty-state">
+                    <div class="empty-icon"><i class="fas fa-bell-slash"></i></div>
+                    <p>No tienes notificaciones pendientes</p>
+                </div>
+            `;
+                    return;
+                }
+
+                notificacionesContainer.innerHTML = '';
+
+                notificaciones.forEach(notificacion => {
+                    const fechaFormateada = new Date(notificacion.fecha).toLocaleDateString('es-CO', {
+                        day: '2-digit',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    let iconClass = 'fa-bell';
+                    let colorClass = '';
+
+                    switch (notificacion.tipo) {
+                        case 'inscripcion':
+                            iconClass = 'fa-user-check';
+                            colorClass = 'success';
+                            break;
+                        case 'pago':
+                            iconClass = 'fa-money-check-alt';
+                            colorClass = 'primary';
+                            break;
+                        case 'alerta':
+                            iconClass = 'fa-exclamation-triangle';
+                            colorClass = 'warning';
+                            break;
+                    }
+
+                    const notificationItem = document.createElement('div');
+                    notificationItem.className = `notification-item ${notificacion.leida ? 'read' : ''}`;
+                    notificationItem.dataset.id = notificacion.id;
+
+                    notificationItem.innerHTML = `
+                <div class="notification-icon ${colorClass}">
+                    <i class="fas ${iconClass}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-message">${notificacion.mensaje}</div>
+                    <div class="notification-time">${fechaFormateada}</div>
+                </div>
+                <div class="notification-actions">
+                    <button class="notification-action mark-read" title="Marcar como leída">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            `;
+
+                    notificacionesContainer.appendChild(notificationItem);
+                });
+
+                // Añadir manejadores de eventos para marcar como leídas
+                document.querySelectorAll('.notification-action.mark-read').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const notificationItem = this.closest('.notification-item');
+                        const notificationId = parseInt(notificationItem.dataset.id);
+
+                        marcarNotificacionComoLeida(notificationId);
+                        notificationItem.classList.add('read');
+                    });
+                });
+            }
+        }
+
+        // Función para marcar una notificación como leída
+        function marcarNotificacionComoLeida(id) {
+            const notificaciones = JSON.parse(localStorage.getItem('notificaciones') || '[]');
+
+            const notificacionIndex = notificaciones.findIndex(n => n.id === id);
+            if (notificacionIndex !== -1) {
+                notificaciones[notificacionIndex].leida = true;
+                localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
+
+                // Actualizar contador
+                const noLeidasCount = notificaciones.filter(n => !n.leida).length;
+                localStorage.setItem('contadorNotificaciones', noLeidasCount);
+
+                actualizarNotificaciones();
+            }
+        }
+    </script>
 </body>
+
 </html>

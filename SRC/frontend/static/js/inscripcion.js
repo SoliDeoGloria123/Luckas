@@ -32,6 +32,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Estado del formulario
     let formState = {
         participantePrincipal: {
+            nombres: '',
+            apellidos: '',
+            tipoDocumento: '',
+            documento: '',
+            correo: '',
+            telefono: '',
+            edad: '',
+            iglesia: '',
             hospedajeAnterior: false
         },
         participantesAdicionales: [],
@@ -39,7 +47,9 @@ document.addEventListener('DOMContentLoaded', function() {
             id: '',
             titulo: 'Conferencia de Teología',
             precio: 150000,
-            fecha: '16 de mayo, 2025'
+            fecha: '16 de mayo, 2025',
+            imagen: 'images/events/conference.jpg',
+            ubicacion: 'Auditorio Principal'
         },
         costos: {
             precioEvento: 150000,
@@ -47,7 +57,9 @@ document.addEventListener('DOMContentLoaded', function() {
             totalHospedaje: 0,
             total: 150000
         },
-        metodoPago: ''
+        metodoPago: '',
+        fechaInscripcion: new Date(),
+        codigoInscripcion: generarCodigoInscripcion()
     };
     
     // Obtener datos del evento desde URL
@@ -55,10 +67,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const params = new URLSearchParams(window.location.search);
         const eventoId = params.get('id');
         
-        if (eventoId) {
+        if (eventoId && eventosData[eventoId]) {
+            const evento = eventosData[eventoId];
             formState.evento.id = eventoId;
-            // Aquí normalmente harías una petición para obtener los datos del evento
-            // Pero para este ejemplo, usaremos datos estáticos
+            formState.evento.titulo = evento.title;
+            formState.evento.imagen = evento.image;
+            formState.evento.fecha = evento.date;
+            formState.evento.precio = parseFloat(evento.price.replace(/[^\d]/g, ''));
+            formState.costos.precioEvento = formState.evento.precio;
+            formState.costos.total = formState.evento.precio;
+            formState.evento.ubicacion = evento.location.split('<p>')[1].split('</p>')[0];
+            
+            // Actualizar elementos visuales
+            document.getElementById('event-title').textContent = formState.evento.titulo;
+            document.getElementById('event-date').textContent = formState.evento.fecha;
+            document.getElementById('event-location').textContent = formState.evento.ubicacion;
+            document.getElementById('event-price').textContent = `$${formatNumber(formState.evento.precio)}`;
+            document.getElementById('event-image').src = formState.evento.imagen;
         }
     }
     
@@ -68,9 +93,17 @@ document.addEventListener('DOMContentLoaded', function() {
         actualizarResumenCostos();
         
         // Event listeners para navegación
-        btnSiguientePaso1.addEventListener('click', irPaso2);
-        btnRegresarPaso2.addEventListener('click', irPaso1);
-        btnSiguientePaso2.addEventListener('click', irPaso3);
+        if (btnSiguientePaso1) btnSiguientePaso1.addEventListener('click', irPaso2);
+        if (btnRegresarPaso2) btnRegresarPaso2.addEventListener('click', irPaso1);
+        if (btnSiguientePaso2) btnSiguientePaso2.addEventListener('click', irPaso3);
+        
+        // Evento para el botón de descargar comprobante
+        if (btnDescargarComprobante) {
+            btnDescargarComprobante.addEventListener('click', function(e) {
+                e.preventDefault();
+                generarComprobantePDF();
+            });
+        }
         
         // Mostrar/ocultar formularios para personas adicionales
         radioOtraPersona.forEach(radio => {
@@ -90,7 +123,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Añadir nueva persona
-        btnAgregarPersona.addEventListener('click', agregarPersonaAdicional);
+        if (btnAgregarPersona) {
+            btnAgregarPersona.addEventListener('click', agregarPersonaAdicional);
+        }
         
         // Actualizar costos cuando cambia la opción de hospedaje
         radioHospedajeAnterior.forEach(radio => {
@@ -101,37 +136,142 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Mostrar campos según el método de pago
-        selectMetodoPago.addEventListener('change', function() {
-            const metodoPago = this.value;
-            formState.metodoPago = metodoPago;
-            
-            if (metodoPago) {
-                detallesPago.classList.remove('hidden');
-                pagoTarjeta.classList.add('hidden');
-                pagoPSE.classList.add('hidden');
-                pagoTransferencia.classList.add('hidden');
+        if (selectMetodoPago) {
+            selectMetodoPago.addEventListener('change', function() {
+                const metodoPago = this.value;
+                formState.metodoPago = metodoPago;
                 
-                switch (metodoPago) {
-                    case 'tarjeta':
-                        pagoTarjeta.classList.remove('hidden');
-                        break;
-                    case 'pse':
-                        pagoPSE.classList.remove('hidden');
-                        break;
-                    case 'transferencia':
-                        pagoTransferencia.classList.remove('hidden');
-                        break;
+                if (metodoPago) {
+                    detallesPago.classList.remove('hidden');
+                    pagoTarjeta.classList.add('hidden');
+                    pagoPSE.classList.add('hidden');
+                    pagoTransferencia.classList.add('hidden');
+                    
+                    switch (metodoPago) {
+                        case 'tarjeta':
+                            pagoTarjeta.classList.remove('hidden');
+                            break;
+                        case 'pse':
+                            pagoPSE.classList.remove('hidden');
+                            break;
+                        case 'transferencia':
+                            pagoTransferencia.classList.remove('hidden');
+                            break;
+                    }
+                } else {
+                    detallesPago.classList.add('hidden');
                 }
-            } else {
-                detallesPago.classList.add('hidden');
-            }
+            });
+        }
+        
+        // Capturar datos del participante principal cuando cambian
+        document.getElementById('nombres')?.addEventListener('change', function() {
+            formState.participantePrincipal.nombres = this.value;
+        });
+        
+        document.getElementById('apellidos')?.addEventListener('change', function() {
+            formState.participantePrincipal.apellidos = this.value;
+        });
+        
+        document.getElementById('tipo-documento')?.addEventListener('change', function() {
+            formState.participantePrincipal.tipoDocumento = this.value;
+        });
+        
+        document.getElementById('documento')?.addEventListener('change', function() {
+            formState.participantePrincipal.documento = this.value;
+        });
+        
+        document.getElementById('correo')?.addEventListener('change', function() {
+            formState.participantePrincipal.correo = this.value;
+        });
+        
+        document.getElementById('telefono')?.addEventListener('change', function() {
+            formState.participantePrincipal.telefono = this.value;
+        });
+        
+        document.getElementById('edad')?.addEventListener('change', function() {
+            formState.participantePrincipal.edad = this.value;
+        });
+        
+        document.getElementById('iglesia')?.addEventListener('change', function() {
+            formState.participantePrincipal.iglesia = this.value;
         });
         
         // Simular cambio de estado (en una aplicación real esto vendría del servidor)
         setTimeout(function() {
-            document.getElementById('estado-pendiente').classList.add('hidden');
-            document.getElementById('estado-aprobado').classList.remove('hidden');
+            document.getElementById('estado-pendiente')?.classList.add('hidden');
+            document.getElementById('estado-aprobado')?.classList.remove('hidden');
+            
+            // Guardar la inscripción en localStorage para mostrar en el dashboard
+            guardarInscripcionEnLocal();
+            
+            // Añadir notificación
+            crearNotificacion();
         }, 5000);
+    }
+    
+    // Guardar la inscripción en localStorage para mostrarla en el dashboard
+    function guardarInscripcionEnLocal() {
+        // Construir datos de la inscripción
+        const inscripcion = {
+            id: formState.codigoInscripcion,
+            eventoId: formState.evento.id,
+            eventoTitulo: formState.evento.titulo,
+            eventoImagen: formState.evento.imagen,
+            fecha: formState.fechaInscripcion.toISOString(),
+            participante: `${formState.participantePrincipal.nombres} ${formState.participantePrincipal.apellidos}`,
+            monto: formState.costos.total,
+            estado: 'aprobado',
+            metodoPago: formState.metodoPago
+        };
+        
+        // Recuperar inscripciones existentes o crear nuevo array
+        let inscripciones = JSON.parse(localStorage.getItem('inscripciones') || '[]');
+        inscripciones.unshift(inscripcion); // Añadir al principio para que aparezca primero
+        
+        // Limitar a 10 inscripciones para no sobrecargar el localStorage
+        if (inscripciones.length > 10) {
+            inscripciones = inscripciones.slice(0, 10);
+        }
+        
+        // Guardar en localStorage
+        localStorage.setItem('inscripciones', JSON.stringify(inscripciones));
+        
+        // Actualizar contador de notificaciones
+        let notificaciones = JSON.parse(localStorage.getItem('notificaciones') || '[]');
+        notificaciones.unshift({
+            id: Date.now(),
+            tipo: 'inscripcion',
+            mensaje: `Inscripción confirmada: ${formState.evento.titulo}`,
+            leida: false,
+            fecha: new Date().toISOString()
+        });
+        
+        // Limitar notificaciones
+        if (notificaciones.length > 10) {
+            notificaciones = notificaciones.slice(0, 10);
+        }
+        
+        localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
+        localStorage.setItem('contadorNotificaciones', notificaciones.filter(n => !n.leida).length);
+    }
+    
+    // Crear notificación para mostrar al usuario
+    function crearNotificacion() {
+        // En una implementación real, esto se conectaría con un sistema de notificaciones
+        // Por ahora, lo simulamos actualizando el contador de notificaciones en el header
+        const badgeElement = document.querySelector('.header-icon-button.notifications .badge');
+        if (badgeElement) {
+            const currentCount = parseInt(badgeElement.textContent) || 0;
+            badgeElement.textContent = currentCount + 1;
+        }
+    }
+    
+    // Generar un código único para la inscripción
+    function generarCodigoInscripcion() {
+        const timestamp = Date.now().toString().slice(-6);
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        return `SBC-${timestamp}-${random}`;
     }
     
     // Crear formulario para una persona adicional
@@ -230,6 +370,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Añadir a estado del formulario
         formState.participantesAdicionales.push({
             id: personaId,
+            nombres: '',
+            apellidos: '',
+            tipoDocumento: '',
+            documento: '',
+            correo: '',
+            edad: '',
+            iglesia: '',
             hospedajeAnterior: false
         });
         
@@ -251,11 +398,77 @@ document.addEventListener('DOMContentLoaded', function() {
                 personaElement.querySelector(`#${personaId}-nombres`).value = document.getElementById('nombres').value;
                 personaElement.querySelector(`#${personaId}-apellidos`).value = document.getElementById('apellidos').value;
                 personaElement.querySelector(`#${personaId}-correo`).value = document.getElementById('correo').value;
+                
+                // Actualizar el estado
+                const personaIndex = formState.participantesAdicionales.findIndex(p => p.id === personaId);
+                if (personaIndex !== -1) {
+                    formState.participantesAdicionales[personaIndex].nombres = formState.participantePrincipal.nombres;
+                    formState.participantesAdicionales[personaIndex].apellidos = formState.participantePrincipal.apellidos;
+                    formState.participantesAdicionales[personaIndex].correo = formState.participantePrincipal.correo;
+                }
             } else {
                 // Limpiar campos
                 personaElement.querySelector(`#${personaId}-nombres`).value = '';
                 personaElement.querySelector(`#${personaId}-apellidos`).value = '';
                 personaElement.querySelector(`#${personaId}-correo`).value = '';
+                
+                // Actualizar el estado
+                const personaIndex = formState.participantesAdicionales.findIndex(p => p.id === personaId);
+                if (personaIndex !== -1) {
+                    formState.participantesAdicionales[personaIndex].nombres = '';
+                    formState.participantesAdicionales[personaIndex].apellidos = '';
+                    formState.participantesAdicionales[personaIndex].correo = '';
+                }
+            }
+        });
+        
+        // Event listener para los campos de texto
+        personaElement.querySelector(`#${personaId}-nombres`).addEventListener('change', function() {
+            const personaIndex = formState.participantesAdicionales.findIndex(p => p.id === personaId);
+            if (personaIndex !== -1) {
+                formState.participantesAdicionales[personaIndex].nombres = this.value;
+            }
+        });
+        
+        personaElement.querySelector(`#${personaId}-apellidos`).addEventListener('change', function() {
+            const personaIndex = formState.participantesAdicionales.findIndex(p => p.id === personaId);
+            if (personaIndex !== -1) {
+                formState.participantesAdicionales[personaIndex].apellidos = this.value;
+            }
+        });
+        
+        personaElement.querySelector(`#${personaId}-tipo-documento`).addEventListener('change', function() {
+            const personaIndex = formState.participantesAdicionales.findIndex(p => p.id === personaId);
+            if (personaIndex !== -1) {
+                formState.participantesAdicionales[personaIndex].tipoDocumento = this.value;
+            }
+        });
+        
+        personaElement.querySelector(`#${personaId}-documento`).addEventListener('change', function() {
+            const personaIndex = formState.participantesAdicionales.findIndex(p => p.id === personaId);
+            if (personaIndex !== -1) {
+                formState.participantesAdicionales[personaIndex].documento = this.value;
+            }
+        });
+        
+        personaElement.querySelector(`#${personaId}-correo`).addEventListener('change', function() {
+            const personaIndex = formState.participantesAdicionales.findIndex(p => p.id === personaId);
+            if (personaIndex !== -1) {
+                formState.participantesAdicionales[personaIndex].correo = this.value;
+            }
+        });
+        
+        personaElement.querySelector(`#${personaId}-edad`).addEventListener('change', function() {
+            const personaIndex = formState.participantesAdicionales.findIndex(p => p.id === personaId);
+            if (personaIndex !== -1) {
+                formState.participantesAdicionales[personaIndex].edad = this.value;
+            }
+        });
+        
+        personaElement.querySelector(`#${personaId}-iglesia`).addEventListener('change', function() {
+            const personaIndex = formState.participantesAdicionales.findIndex(p => p.id === personaId);
+            if (personaIndex !== -1) {
+                formState.participantesAdicionales[personaIndex].iglesia = this.value;
             }
         });
         
@@ -315,9 +528,9 @@ document.addEventListener('DOMContentLoaded', function() {
         formState.costos.total = costoInscripciones + costoTotalHospedaje;
         
         // Actualizar UI
-        subtotalInscripciones.textContent = `$${formatNumber(costoInscripciones)}`;
-        costoHospedaje.textContent = `$${formatNumber(costoTotalHospedaje)}`;
-        totalPagar.textContent = `$${formatNumber(formState.costos.total)}`;
+        if (subtotalInscripciones) subtotalInscripciones.textContent = `$${formatNumber(costoInscripciones)}`;
+        if (costoHospedaje) costoHospedaje.textContent = `$${formatNumber(costoTotalHospedaje)}`;
+        if (totalPagar) totalPagar.textContent = `$${formatNumber(formState.costos.total)}`;
         
         // Actualizar resumen de inscripción
         actualizarResumenInscripcion();
@@ -370,6 +583,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const resumenTotal = document.getElementById('resumen-total');
         const resumenAdicionales = document.getElementById('resumen-adicionales');
         const resumenPago = document.getElementById('resumen-pago');
+        const resumenCodigo = document.getElementById('resumen-codigo');
         
         if (resumenParticipante && nombreCompleto.trim() !== ' ') {
             resumenParticipante.textContent = nombreCompleto;
@@ -385,6 +599,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (resumenTotal) {
             resumenTotal.textContent = `$${formatNumber(formState.costos.total)}`;
+        }
+        
+        if (resumenCodigo) {
+            resumenCodigo.textContent = formState.codigoInscripcion;
         }
         
         if (resumenPago) {
@@ -485,14 +703,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // Validar campos del paso 1 (básico)
     function validarPaso1() {
         // En una implementación real, se validarían todos los campos requeridos
-        const nombres = document.getElementById('nombres').value;
-        const apellidos = document.getElementById('apellidos').value;
-        const tipoDocumento = document.getElementById('tipo-documento').value;
-        const documento = document.getElementById('documento').value;
+        const nombres = document.getElementById('nombres')?.value;
+        const apellidos = document.getElementById('apellidos')?.value;
+        const tipoDocumento = document.getElementById('tipo-documento')?.value;
+        const documento = document.getElementById('documento')?.value;
+        const correo = document.getElementById('correo')?.value;
         
-        if (!nombres || !apellidos || !tipoDocumento || !documento) {
-            alert('Por favor complete los campos obligatorios.');
+        if (!nombres || !apellidos || !tipoDocumento || !documento || !correo) {
+            alert('Por favor complete los campos obligatorios del participante principal.');
             return false;
+        }
+        
+        // Actualizar el estado
+        formState.participantePrincipal.nombres = nombres;
+        formState.participantePrincipal.apellidos = apellidos;
+        formState.participantePrincipal.tipoDocumento = tipoDocumento;
+        formState.participantePrincipal.documento = documento;
+        formState.participantePrincipal.correo = correo;
+        
+        // Validar participantes adicionales
+        if (formState.participantesAdicionales.length > 0) {
+            for (const participante of formState.participantesAdicionales) {
+                const personaElement = document.querySelector(`.additional-person[data-persona-id="${participante.id}"]`);
+                if (personaElement) {
+                    const nombre = personaElement.querySelector(`#${participante.id}-nombres`)?.value;
+                    const apellido = personaElement.querySelector(`#${participante.id}-apellidos`)?.value;
+                    const doc = personaElement.querySelector(`#${participante.id}-documento`)?.value;
+                    
+                    if (!nombre || !apellido || !doc) {
+                        alert(`Por favor complete los campos obligatorios del participante adicional.`);
+                        return false;
+                    }
+                }
+            }
         }
         
         return true;
@@ -500,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Validar campos del paso 2 (básico)
     function validarPaso2() {
-        const metodoPago = document.getElementById('metodo-pago').value;
+        const metodoPago = document.getElementById('metodo-pago')?.value;
         
         if (!metodoPago) {
             alert('Por favor seleccione un método de pago.');
@@ -509,22 +752,22 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Validaciones específicas según el método de pago
         if (metodoPago === 'tarjeta') {
-            const numeroTarjeta = document.getElementById('numero-tarjeta').value;
-            const nombreTarjeta = document.getElementById('nombre-tarjeta').value;
+            const numeroTarjeta = document.getElementById('numero-tarjeta')?.value;
+            const nombreTarjeta = document.getElementById('nombre-tarjeta')?.value;
             
             if (!numeroTarjeta || !nombreTarjeta) {
                 alert('Por favor complete los datos de la tarjeta.');
                 return false;
             }
         } else if (metodoPago === 'pse') {
-            const banco = document.getElementById('banco').value;
+            const banco = document.getElementById('banco')?.value;
             
             if (!banco) {
                 alert('Por favor seleccione un banco.');
                 return false;
             }
         } else if (metodoPago === 'transferencia') {
-            const comprobante = document.getElementById('comprobante').value;
+            const comprobante = document.getElementById('comprobante')?.value;
             
             if (!comprobante) {
                 alert('Por favor cargue el comprobante de pago.');
@@ -543,6 +786,213 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función para formatear números como moneda
     function formatNumber(number) {
         return new Intl.NumberFormat('es-CO').format(number);
+    }
+    
+    // Función para generar el PDF del comprobante de pago
+    function generarComprobantePDF() {
+        // Cargar la biblioteca jsPDF si aún no está disponible
+        if (typeof jspdf === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            document.head.appendChild(script);
+            
+            script.onload = function() {
+                const fontScript = document.createElement('script');
+                fontScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js';
+                document.head.appendChild(fontScript);
+                
+                fontScript.onload = function() {
+                    crearPDF();
+                };
+            };
+        } else {
+            crearPDF();
+        }
+    }
+    
+    function crearPDF() {
+        // Usar la biblioteca jsPDF para generar el PDF
+        const { jsPDF } = window.jspdf;
+        
+        // Crear un nuevo documento PDF
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+        });
+        
+        // Configuración de fuentes y colores
+        const azulOscuro = [14, 26, 64]; // #0A1A40
+        const azulMedio = [59, 89, 182]; // #3B59B6
+        const grisTexto = [60, 60, 60]; // #3C3C3C
+        
+        // Fecha actual formateada
+        const hoy = new Date();
+        const fechaFormateada = hoy.toLocaleDateString('es-CO', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+        
+        // Header con logo (simulado con texto para este ejemplo)
+        doc.setFillColor(255, 255, 255);
+        doc.rect(0, 0, 210, 40, 'F');
+        
+        doc.setFontSize(24);
+        doc.setTextColor(azulOscuro[0], azulOscuro[1], azulOscuro[2]);
+        doc.setFont("helvetica", "bold");
+        doc.text("SEMINARIO BAUTISTA DE COLOMBIA", 105, 15, { align: "center" });
+        
+        doc.setFontSize(14);
+        doc.setTextColor(azulMedio[0], azulMedio[1], azulMedio[2]);
+        doc.text("COMPROBANTE DE INSCRIPCIÓN", 105, 25, { align: "center" });
+        
+        // Información del evento
+        doc.setDrawColor(200, 200, 200);
+        doc.line(15, 45, 195, 45); // Línea separadora
+        
+        doc.setFontSize(16);
+        doc.setTextColor(azulOscuro[0], azulOscuro[1], azulOscuro[2]);
+        doc.text(`${formState.evento.titulo}`, 15, 55);
+        
+        doc.setFontSize(12);
+        doc.setTextColor(grisTexto[0], grisTexto[1], grisTexto[2]);
+        doc.text(`Fecha del evento: ${formState.evento.fecha}`, 15, 63);
+        doc.text(`Lugar: ${formState.evento.ubicacion}`, 15, 70);
+        
+        // Detalles de la inscripción
+        doc.setFillColor(240, 240, 245);
+        doc.rect(15, 80, 180, 25, 'F');
+        
+        doc.setFontSize(12);
+        doc.setTextColor(azulOscuro[0], azulOscuro[1], azulOscuro[2]);
+        doc.setFont("helvetica", "bold");
+        doc.text("INFORMACIÓN DE LA INSCRIPCIÓN", 20, 90);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(grisTexto[0], grisTexto[1], grisTexto[2]);
+        doc.text(`Código: ${formState.codigoInscripcion}`, 20, 98);
+        doc.text(`Fecha: ${fechaFormateada}`, 120, 98);
+        
+        // Información del participante principal
+        doc.setFontSize(12);
+        doc.setTextColor(azulOscuro[0], azulOscuro[1], azulOscuro[2]);
+        doc.setFont("helvetica", "bold");
+        doc.text("PARTICIPANTE PRINCIPAL", 15, 115);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(grisTexto[0], grisTexto[1], grisTexto[2]);
+        
+        doc.text(`Nombre: ${formState.participantePrincipal.nombres} ${formState.participantePrincipal.apellidos}`, 20, 123);
+        doc.text(`Documento: ${obtenerTipoDocumentoTexto(formState.participantePrincipal.tipoDocumento)} ${formState.participantePrincipal.documento}`, 20, 130);
+        doc.text(`Correo: ${formState.participantePrincipal.correo || "No especificado"}`, 20, 137);
+        
+        // Participantes adicionales
+        let yPos = 150;
+        
+        if (formState.participantesAdicionales.length > 0) {
+            doc.setFontSize(12);
+            doc.setTextColor(azulOscuro[0], azulOscuro[1], azulOscuro[2]);
+            doc.setFont("helvetica", "bold");
+            doc.text("PARTICIPANTES ADICIONALES", 15, yPos);
+            
+            yPos += 8;
+            
+            formState.participantesAdicionales.forEach((participante, index) => {
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(11);
+                doc.setTextColor(grisTexto[0], grisTexto[1], grisTexto[2]);
+                
+                doc.text(`${index + 1}. ${participante.nombres} ${participante.apellidos}`, 20, yPos);
+                yPos += 7;
+                
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+            });
+            
+            yPos += 5;
+        }
+        
+        // Resumen de costos
+        const costoInscripciones = (1 + formState.participantesAdicionales.length) * formState.costos.precioEvento;
+        
+        doc.setFillColor(240, 240, 245);
+        doc.rect(15, yPos, 180, 35, 'F');
+        
+        doc.setFontSize(12);
+        doc.setTextColor(azulOscuro[0], azulOscuro[1], azulOscuro[2]);
+        doc.setFont("helvetica", "bold");
+        doc.text("RESUMEN DE PAGO", 20, yPos + 10);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(grisTexto[0], grisTexto[1], grisTexto[2]);
+        
+        doc.text(`Subtotal Inscripciones:`, 20, yPos + 20);
+        doc.text(`$${formatNumber(costoInscripciones)}`, 150, yPos + 20, { align: "right" });
+        
+        doc.text(`Hospedaje adicional:`, 20, yPos + 27);
+        doc.text(`$${formatNumber(formState.costos.totalHospedaje)}`, 150, yPos + 27, { align: "right" });
+        
+        doc.setFont("helvetica", "bold");
+        doc.text(`TOTAL:`, 20, yPos + 34);
+        doc.setTextColor(azulMedio[0], azulMedio[1], azulMedio[2]);
+        doc.text(`$${formatNumber(formState.costos.total)}`, 150, yPos + 34, { align: "right" });
+        
+        // Método de pago
+        yPos += 45;
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(grisTexto[0], grisTexto[1], grisTexto[2]);
+        doc.text(`Método de pago:`, 20, yPos);
+        
+        let metodoPagoTexto = '';
+        switch (formState.metodoPago) {
+            case 'tarjeta': metodoPagoTexto = 'Tarjeta de Crédito/Débito'; break;
+            case 'pse': metodoPagoTexto = 'PSE - Pagos en línea'; break;
+            case 'transferencia': metodoPagoTexto = 'Transferencia Bancaria'; break;
+            default: metodoPagoTexto = 'No especificado';
+        }
+        
+        doc.setFont("helvetica", "normal");
+        doc.text(metodoPagoTexto, 70, yPos);
+        
+        // Estado del pago
+        doc.setFont("helvetica", "bold");
+        doc.text(`Estado:`, 20, yPos + 7);
+        
+        doc.setTextColor(0, 150, 0); // Color verde para "Aprobado"
+        doc.setFont("helvetica", "normal");
+        doc.text("APROBADO", 70, yPos + 7);
+        
+        // Footer
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text("Este documento es un comprobante de inscripción. Por favor, preséntelo el día del evento.", 105, 280, { align: "center" });
+        doc.text("Seminario Bautista de Colombia - www.seminariobautista.edu.co", 105, 287, { align: "center" });
+        
+        // Guardar PDF
+        const nombreArchivo = `Comprobante_${formState.codigoInscripcion}.pdf`;
+        doc.save(nombreArchivo);
+        
+        // Redirigir a la página de eventos
+        setTimeout(() => {
+            window.location.href = 'eventos.html';
+        }, 500);
+    }
+    
+    function obtenerTipoDocumentoTexto(tipo) {
+        switch (tipo) {
+            case 'cc': return 'Cédula de Ciudadanía';
+            case 'ce': return 'Cédula de Extranjería';
+            case 'pasaporte': return 'Pasaporte';
+            default: return 'Documento';
+        }
     }
     
     // Iniciar la página

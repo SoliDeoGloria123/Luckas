@@ -11,6 +11,8 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/inscripcion.css') }}">
 </head>
@@ -438,7 +440,10 @@
                 <!-- Resumen de la inscripción -->
                 <div class="summary-section">
                     <h4>Detalles de su Inscripción</h4>
-
+                    <div class="summary-item">
+                        <div class="summary-label">Código de inscripción:</div>
+                        <div class="summary-value" id="resumen-codigo">SBC-123456-7890</div>
+                    </div>
                     <div class="summary-item">
                         <div class="summary-label">Evento:</div>
                         <div class="summary-value" id="resumen-evento">Conferencia de Teología</div>
@@ -472,7 +477,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="eventos.html" class="btn btn-outline">Volver a Eventos</a>
+                    <a href="{{ url_for('eventos') }}" class="btn btn-outline">Volver a Eventos</a>
                     <a href="#" class="btn btn-primary" id="btn-descargar-comprobante">Descargar Comprobante</a>
                 </div>
             </div>
@@ -512,7 +517,7 @@
                     // También actualizar los campos del resumen
                     document.getElementById("resumen-evento").textContent = evento.title;
                     document.getElementById("resumen-fecha").textContent = evento.date;
-                    
+
                     // Actualizar subtotal y total según número de participantes
                     const precioBase = evento.price.replace('$', '').replace('.', '').trim();
                     const subtotal = parseInt(precioBase) * numParticipantes;
@@ -525,7 +530,7 @@
                     document.getElementById("otra-persona-si").checked = true;
                     const personasAdicionalesContainer = document.getElementById("personas-adicionales");
                     personasAdicionalesContainer.classList.remove("hidden");
-                    
+
                     // Generar formularios para participantes adicionales
                     for (let i = 2; i <= numParticipantes; i++) {
                         const personaHtml = `
@@ -555,10 +560,10 @@
                         `;
                         personasAdicionalesContainer.innerHTML += personaHtml;
                     }
-                    
+
                     // Configurar los botones de eliminar
                     document.querySelectorAll('.remove-person').forEach(button => {
-                        button.addEventListener('click', function() {
+                        button.addEventListener('click', function () {
                             const personId = this.getAttribute('data-person-id');
                             const personElement = document.querySelector(`.additional-person[data-person-id="${personId}"]`);
                             personElement.remove();
@@ -576,14 +581,14 @@
             }
 
             // Configurar botón para añadir más personas
-            document.getElementById('otra-persona-si').addEventListener('change', function() {
+            document.getElementById('otra-persona-si').addEventListener('change', function () {
                 if (this.checked) {
                     document.getElementById('personas-adicionales').classList.remove('hidden');
                     document.getElementById('agregar-persona').classList.remove('hidden');
                 }
             });
 
-            document.getElementById('otra-persona-no').addEventListener('change', function() {
+            document.getElementById('otra-persona-no').addEventListener('change', function () {
                 if (this.checked) {
                     document.getElementById('personas-adicionales').classList.add('hidden');
                     document.getElementById('agregar-persona').classList.add('hidden');
@@ -591,11 +596,11 @@
             });
 
             // Configurar botón para agregar más personas
-            document.getElementById('agregar-persona').addEventListener('click', function() {
+            document.getElementById('agregar-persona').addEventListener('click', function () {
                 const personasAdicionalesContainer = document.getElementById('personas-adicionales');
                 const numActual = personasAdicionalesContainer.querySelectorAll('.additional-person').length + 1;
                 const newPersonId = numActual + 1;
-                
+
                 const personaHtml = `
                     <div class="additional-person" data-person-id="${newPersonId}">
                         <h4>Participante ${newPersonId} <button type="button" class="remove-person" data-person-id="${newPersonId}">&times;</button></h4>
@@ -621,18 +626,18 @@
                         </div>
                     </div>
                 `;
-                
+
                 personasAdicionalesContainer.innerHTML += personaHtml;
-                
+
                 // Configurar el nuevo botón de eliminar
                 const removeBtn = personasAdicionalesContainer.querySelector(`.additional-person[data-person-id="${newPersonId}"] .remove-person`);
-                removeBtn.addEventListener('click', function() {
+                removeBtn.addEventListener('click', function () {
                     const personElement = document.querySelector(`.additional-person[data-person-id="${newPersonId}"]`);
                     personElement.remove();
                     // Actualizar el formulario y recalcular los costos
                     actualizarCostos();
                 });
-                
+
                 // Actualizar costos
                 actualizarCostos();
             });
