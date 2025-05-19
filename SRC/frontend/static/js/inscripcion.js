@@ -979,11 +979,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Guardar PDF
         const nombreArchivo = `Comprobante_${formState.codigoInscripcion}.pdf`;
         doc.save(nombreArchivo);
-        
-        // Redirigir a la página de eventos
-        setTimeout(() => {
-            window.location.href = 'eventos.html';
-        }, 500);
     }
     
     function obtenerTipoDocumentoTexto(tipo) {

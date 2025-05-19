@@ -1554,204 +1554,148 @@
             if (savedTheme === 'light') {
                 document.documentElement.classList.add('theme-light');
             }
+
+            // Añadir evento de clic al botón de notificaciones
+            const notificationButton = document.querySelector('.header-icon-button.notifications');
+            if (notificationButton) {
+                notificationButton.addEventListener('click', function() {
+                    window.location.href = '/notificaciones';
+                });
+            }
         });
 
         // Función para cargar inscripciones en el dashboard
         function cargarInscripciones() {
-            const actividadRecienteContainer = document.querySelector('.recent-activity');
-
-            if (actividadRecienteContainer) {
-                const inscripciones = JSON.parse(localStorage.getItem('inscripciones') || '[]');
-
-                // Limpiar el contenedor si ya tiene datos
-                const listItems = actividadRecienteContainer.querySelectorAll('.activity-item');
-                if (listItems.length > 0) {
-                    // Conservar solo el primer elemento (título) si existe
-                    const firstItem = listItems[0];
-                    if (firstItem.querySelector('h3')) {
-                        actividadRecienteContainer.innerHTML = '';
-                        actividadRecienteContainer.appendChild(firstItem);
-                    } else {
-                        actividadRecienteContainer.innerHTML = '<h3>Actividad Reciente</h3>';
-                    }
-                } else {
-                    actividadRecienteContainer.innerHTML = '<h3>Actividad Reciente</h3>';
-                }
-
+            const actividadRecienteContainer = document.querySelector('.timeline');
+            
+            if (!actividadRecienteContainer) return;
+            
+            // Limpiar el contenedor
+            actividadRecienteContainer.innerHTML = '';
+            
+            // Obtener inscripciones del localStorage
+            const inscripciones = JSON.parse(localStorage.getItem('inscripciones') || '[]');
+            
+            if (inscripciones.length === 0) {
                 // Mostrar mensaje si no hay inscripciones
-                if (inscripciones.length === 0) {
-                    const noActivityItem = document.createElement('div');
-                    noActivityItem.className = 'activity-item';
-                    noActivityItem.innerHTML = `
-                <div class="activity-icon">
-                    <i class="fas fa-info-circle"></i>
-                </div>
-                <div class="activity-content">
-                    <div class="activity-message">No hay actividad reciente para mostrar.</div>
-                </div>
-            `;
-                    actividadRecienteContainer.appendChild(noActivityItem);
-                    return;
-                }
-
-                // Mostrar las inscripciones más recientes
-                inscripciones.slice(0, 5).forEach(inscripcion => {
-                    const fechaFormateada = new Date(inscripcion.fecha).toLocaleDateString('es-CO', {
-                        day: '2-digit',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-
-                    const activityItem = document.createElement('div');
-                    activityItem.className = 'activity-item';
-
-                    let iconClass = 'fa-calendar-check';
-                    let colorClass = '';
-
-                    switch (inscripcion.estado) {
-                        case 'pendiente':
-                            iconClass = 'fa-clock';
-                            colorClass = 'warning';
-                            break;
-                        case 'aprobado':
-                            iconClass = 'fa-check-circle';
-                            colorClass = 'success';
-                            break;
-                        case 'rechazado':
-                            iconClass = 'fa-times-circle';
-                            colorClass = 'danger';
-                            break;
-                    }
-
-                    activityItem.innerHTML = `
-                <div class="activity-icon ${colorClass}">
-                    <i class="fas ${iconClass}"></i>
-                </div>
-                <div class="activity-content">
-                    <div class="activity-title">
-                        <span>Inscripción a evento</span>
-                        <span class="activity-time">${fechaFormateada}</span>
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'timeline-item';
+                emptyItem.innerHTML = `
+                    <div class="timeline-icon">
+                        <i class="fas fa-info-circle"></i>
                     </div>
-                    <div class="activity-message">Te has inscrito al evento: <strong>${inscripcion.eventoTitulo}</strong></div>
-                </div>
-            `;
-
-                    actividadRecienteContainer.appendChild(activityItem);
-                });
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <h3>No hay actividad reciente</h3>
+                            <span class="time">Ahora</span>
+                        </div>
+                        <p>No se ha registrado actividad reciente en tu cuenta.</p>
+                    </div>
+                `;
+                actividadRecienteContainer.appendChild(emptyItem);
+                return;
             }
+            
+            // Mostrar las inscripciones más recientes (máximo 3)
+            inscripciones.slice(0, 3).forEach(inscripcion => {
+                const fechaFormateada = new Date(inscripcion.fechaInscripcion || new Date()).toLocaleDateString('es-CO', {
+                    day: '2-digit',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                
+                let iconClass = 'confirmation';
+                let iconName = 'fa-check';
+                
+                timelineItem.innerHTML = `
+                    <div class="timeline-icon ${iconClass}">
+                        <i class="fas ${iconName}"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <h3>Inscripción confirmada</h3>
+                            <span class="time">${fechaFormateada}</span>
+                        </div>
+                        <p>Tu inscripción al evento "${inscripcion.evento?.titulo || 'Evento'}" ha sido confirmada exitosamente.</p>
+                        <a href="/eventos?inscripcion=${inscripcion.codigoInscripcion}" class="timeline-link">Ver detalles</a>
+                    </div>
+                `;
+                
+                actividadRecienteContainer.appendChild(timelineItem);
+            });
         }
 
         // Función para actualizar las notificaciones en el header
         function actualizarNotificaciones() {
-            const notificacionesCount = parseInt(localStorage.getItem('contadorNotificaciones') || '0');
-            const badgeElements = document.querySelectorAll('.notifications .badge');
-
+            // Obtener las notificaciones del localStorage o crear un array vacío si no hay
+            const notificaciones = JSON.parse(localStorage.getItem('notificaciones') || '[]');
+            
+            // Calcular el número de notificaciones no leídas
+            const noLeidasCount = notificaciones.filter(n => !n.leida).length;
+            
+            // Guardar el contador en localStorage para consistencia entre páginas
+            localStorage.setItem('contadorNotificaciones', noLeidasCount);
+            
+            // Actualizar todos los badges en la página
+            const badgeElements = document.querySelectorAll('.notifications .badge, .nav-section a .badge');
+            
             badgeElements.forEach(badge => {
-                badge.textContent = notificacionesCount;
-
+                badge.textContent = noLeidasCount;
+                
                 // Mostrar u ocultar según haya notificaciones
-                if (notificacionesCount > 0) {
+                if (noLeidasCount > 0) {
                     badge.style.display = 'flex';
                 } else {
                     badge.style.display = 'none';
                 }
             });
+        }
 
-            // Si estamos en la página de notificaciones, cargar la lista
-            const notificacionesContainer = document.querySelector('.notifications-list');
-            if (notificacionesContainer) {
-                const notificaciones = JSON.parse(localStorage.getItem('notificaciones') || '[]');
-
-                if (notificaciones.length === 0) {
-                    notificacionesContainer.innerHTML = `
-                <div class="notification-item empty-state">
-                    <div class="empty-icon"><i class="fas fa-bell-slash"></i></div>
-                    <p>No tienes notificaciones pendientes</p>
-                </div>
-            `;
-                    return;
-                }
-
-                notificacionesContainer.innerHTML = '';
-
-                notificaciones.forEach(notificacion => {
-                    const fechaFormateada = new Date(notificacion.fecha).toLocaleDateString('es-CO', {
-                        day: '2-digit',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-
-                    let iconClass = 'fa-bell';
-                    let colorClass = '';
-
-                    switch (notificacion.tipo) {
-                        case 'inscripcion':
-                            iconClass = 'fa-user-check';
-                            colorClass = 'success';
-                            break;
-                        case 'pago':
-                            iconClass = 'fa-money-check-alt';
-                            colorClass = 'primary';
-                            break;
-                        case 'alerta':
-                            iconClass = 'fa-exclamation-triangle';
-                            colorClass = 'warning';
-                            break;
+        // Función para inicializar datos de prueba si no existen
+        function inicializarDatosDePrueba() {
+            // Verificar si ya hay notificaciones
+            const notificacionesExistentes = localStorage.getItem('notificaciones');
+            
+            // Si no hay notificaciones, crear algunas de ejemplo
+            if (!notificacionesExistentes) {
+                const notificacionesEjemplo = [
+                    {
+                        id: 1,
+                        tipo: 'evento',
+                        mensaje: 'Recordatorio: El evento "Conferencia de Teología" comienza en 3 días.',
+                        fecha: new Date().toISOString(),
+                        leida: false
+                    },
+                    {
+                        id: 2,
+                        tipo: 'inscripcion',
+                        mensaje: 'Tu inscripción al Taller de Liderazgo ha sido confirmada.',
+                        fecha: new Date(Date.now() - 86400000).toISOString(), // 1 día atrás
+                        leida: false
+                    },
+                    {
+                        id: 3,
+                        tipo: 'sistema',
+                        mensaje: 'El sistema Luckas ha sido actualizado a la versión 2.1.0',
+                        fecha: new Date(Date.now() - 172800000).toISOString(), // 2 días atrás
+                        leida: true
                     }
-
-                    const notificationItem = document.createElement('div');
-                    notificationItem.className = `notification-item ${notificacion.leida ? 'read' : ''}`;
-                    notificationItem.dataset.id = notificacion.id;
-
-                    notificationItem.innerHTML = `
-                <div class="notification-icon ${colorClass}">
-                    <i class="fas ${iconClass}"></i>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-message">${notificacion.mensaje}</div>
-                    <div class="notification-time">${fechaFormateada}</div>
-                </div>
-                <div class="notification-actions">
-                    <button class="notification-action mark-read" title="Marcar como leída">
-                        <i class="fas fa-check"></i>
-                    </button>
-                </div>
-            `;
-
-                    notificacionesContainer.appendChild(notificationItem);
-                });
-
-                // Añadir manejadores de eventos para marcar como leídas
-                document.querySelectorAll('.notification-action.mark-read').forEach(btn => {
-                    btn.addEventListener('click', function () {
-                        const notificationItem = this.closest('.notification-item');
-                        const notificationId = parseInt(notificationItem.dataset.id);
-
-                        marcarNotificacionComoLeida(notificationId);
-                        notificationItem.classList.add('read');
-                    });
-                });
+                ];
+                
+                localStorage.setItem('notificaciones', JSON.stringify(notificacionesEjemplo));
+                localStorage.setItem('contadorNotificaciones', '2'); // 2 no leídas
             }
+            
+            // Actualizar los contadores y visualización
+            actualizarNotificaciones();
         }
 
-        // Función para marcar una notificación como leída
-        function marcarNotificacionComoLeida(id) {
-            const notificaciones = JSON.parse(localStorage.getItem('notificaciones') || '[]');
-
-            const notificacionIndex = notificaciones.findIndex(n => n.id === id);
-            if (notificacionIndex !== -1) {
-                notificaciones[notificacionIndex].leida = true;
-                localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
-
-                // Actualizar contador
-                const noLeidasCount = notificaciones.filter(n => !n.leida).length;
-                localStorage.setItem('contadorNotificaciones', noLeidasCount);
-
-                actualizarNotificaciones();
-            }
-        }
+        // Llamar a la función de inicialización
+        inicializarDatosDePrueba();
     </script>
 </body>
 

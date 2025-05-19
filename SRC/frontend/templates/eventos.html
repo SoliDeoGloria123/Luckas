@@ -1671,17 +1671,16 @@
         
         // Actualizar el enlace de inscripción
         const ticketCount = document.getElementById('ticket-count').textContent;
-        const inscripcionBase = "{{ url_for('inscripcion') }}";
-        const inscripcionUrl = `${inscripcionBase}?evento=${eventId}&participantes=${ticketCount}`;
+        const inscripcionUrl = `/inscripcion?evento=${eventId}&participantes=${ticketCount}`;
 
-        // Si existe el elemento register-btn, actualizar su href
-        const registerBtn = document.getElementById('register-btn');
-        if (registerBtn) {
-            registerBtn.href = inscripcionUrl;
-        }
+// Si existe el elemento register-btn, actualizar su href
+const registerBtn = document.getElementById('register-btn');
+if (registerBtn) {
+    registerBtn.href = inscripcionUrl;
+}
 
-        // Actualizar el botón de inscripción en el footer modal
-        document.querySelector('.modal-footer .btn-primary').href = inscripcionUrl;
+// Actualizar el botón de inscripción en el footer modal
+document.querySelector('.modal-footer .btn-primary').href = inscripcionUrl;
         
         // Mostrar modal
         document.getElementById('event-details-modal').classList.add('show');

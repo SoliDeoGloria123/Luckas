@@ -493,91 +493,209 @@
             const eventoId = urlParams.get('evento');
             const numParticipantes = parseInt(urlParams.get('participantes')) || 1;
 
+            console.log("Evento ID:", eventoId, "Participantes:", numParticipantes);
+
             if (eventoId) {
-                // Datos de los eventos
+                // Aquí obtén datos del evento según el ID (puedes usar un objeto con datos predefinidos o una petición)
                 const eventosData = {
                     evento1: {
                         title: "Conferencia de Teología",
                         date: "16 de mayo, 2025",
                         time: "9:00 AM - 5:00 PM",
                         location: "Auditorio Principal",
-                        price: "$150.000"
+                        price: "150000"
                     },
-                    // ...otros eventos...
+                    evento2: {
+                        title: "Taller de Liderazgo",
+                        date: "20 de mayo, 2025",
+                        time: "14:00 - 18:00",
+                        location: "Sala 203",
+                        price: "80000"
+                    },
+                    // Añade más eventos según necesites
                 };
 
-                // Si existe el evento, actualizar la información en el formulario
                 if (eventosData[eventoId]) {
                     const evento = eventosData[eventoId];
-                    document.getElementById("event-title").textContent = evento.title;
-                    document.getElementById("event-date").textContent = evento.date;
-                    document.getElementById("event-time").textContent = evento.time;
-                    document.getElementById("event-location").textContent = evento.location;
-                    document.getElementById("event-price").textContent = evento.price;
-                    // También actualizar los campos del resumen
-                    document.getElementById("resumen-evento").textContent = evento.title;
-                    document.getElementById("resumen-fecha").textContent = evento.date;
+                    document.getElementById('event-title').textContent = evento.title;
+                    document.getElementById('event-date').textContent = evento.date;
+                    document.getElementById('event-time').textContent = evento.time;
+                    document.getElementById('event-location').textContent = evento.location;
 
-                    // Actualizar subtotal y total según número de participantes
-                    const precioBase = evento.price.replace('$', '').replace('.', '').trim();
-                    const subtotal = parseInt(precioBase) * numParticipantes;
-                    document.getElementById("subtotal-inscripciones").textContent = `$${subtotal.toLocaleString()}`;
-                    document.getElementById("total-pagar").textContent = `$${subtotal.toLocaleString()}`;
-                }
+                    // Convertir precio a formato con separador de miles
+                    const precioNum = parseInt(evento.price);
+                    document.getElementById('event-price').textContent = `$${precioNum.toLocaleString('es-CO')}`;
 
-                // Si hay más de 1 participante, mostrar los formularios adicionales
-                if (numParticipantes > 1) {
-                    document.getElementById("otra-persona-si").checked = true;
-                    const personasAdicionalesContainer = document.getElementById("personas-adicionales");
-                    personasAdicionalesContainer.classList.remove("hidden");
+                    // Si hay más de 1 participante, marcar opción "Sí" para añadir personas
+                    if (numParticipantes > 1) {
+                        document.getElementById('otra-persona-si').checked = true;
+                        document.getElementById('personas-adicionales').classList.remove('hidden');
+                        document.getElementById('agregar-persona').classList.remove('hidden');
 
-                    // Generar formularios para participantes adicionales
-                    for (let i = 2; i <= numParticipantes; i++) {
-                        const personaHtml = `
-                            <div class="additional-person" data-person-id="${i}">
-                                <h4>Participante ${i} <button type="button" class="remove-person" data-person-id="${i}">&times;</button></h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="nombres-${i}">Nombres</label>
-                                        <input type="text" id="nombres-${i}" class="form-control" required>
+                        // Crear formularios para participantes adicionales
+                        const personasAdicionalesContainer = document.getElementById('personas-adicionales');
+
+                        for (let i = 2; i <= numParticipantes; i++) {
+                            const newPersonId = i;
+                            const personaHtml = `
+                                <div class="additional-person" data-person-id="${newPersonId}">
+                                    <h4>Participante ${newPersonId} <button type="button" class="remove-person" data-person-id="${newPersonId}">&times;</button></h4>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="nombres-${newPersonId}">Nombres</label>
+                                            <input type="text" id="nombres-${newPersonId}" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="apellidos-${newPersonId}">Apellidos</label>
+                                            <input type="text" id="apellidos-${newPersonId}" class="form-control" required>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="apellidos-${i}">Apellidos</label>
-                                        <input type="text" id="apellidos-${i}" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="documento-${i}">Número de Documento</label>
-                                        <input type="text" id="documento-${i}" class="form-control" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="edad-${i}">Edad</label>
-                                        <input type="number" id="edad-${i}" class="form-control" min="18" max="100" required>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="documento-${newPersonId}">Número de Documento</label>
+                                            <input type="text" id="documento-${newPersonId}" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edad-${newPersonId}">Edad</label>
+                                            <input type="number" id="edad-${newPersonId}" class="form-control" min="18" max="100" required>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        `;
-                        personasAdicionalesContainer.innerHTML += personaHtml;
-                    }
+                            `;
+                            personasAdicionalesContainer.innerHTML += personaHtml;
+                        }
 
-                    // Configurar los botones de eliminar
-                    document.querySelectorAll('.remove-person').forEach(button => {
-                        button.addEventListener('click', function () {
-                            const personId = this.getAttribute('data-person-id');
-                            const personElement = document.querySelector(`.additional-person[data-person-id="${personId}"]`);
-                            personElement.remove();
-                            // Actualizar el formulario y recalcular los costos
-                            actualizarCostos();
+                        // Configurar los botones de eliminar
+                        document.querySelectorAll('.remove-person').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const personId = this.getAttribute('data-person-id');
+                                const personElement = document.querySelector(`.additional-person[data-person-id="${personId}"]`);
+                                personElement.remove();
+                                actualizarCostos();
+                            });
                         });
-                    });
+
+                        // Actualizar costos
+                        actualizarCostos();
+                    }
                 }
             }
 
             // Función para actualizar costos al cambiar opciones
             function actualizarCostos() {
-                // Implementa la lógica para recalcular los costos
-                // basado en el número actual de participantes y otras opciones
+                // Obtener precio base del evento
+                const precioTexto = document.getElementById('event-price').textContent;
+                const precioBase = parseInt(precioTexto.replace(/[^\d]/g, ''));
+
+                // Calcular número de participantes (1 principal + adicionales)
+                const participantesAdicionales = document.querySelectorAll('.additional-person');
+                const numParticipantes = 1 + participantesAdicionales.length;
+
+                // Calcular subtotal de inscripciones
+                const subtotalInscripciones = precioBase * numParticipantes;
+
+                // Calcular costo de hospedaje adicional
+                let costoHospedaje = 0;
+                if (document.getElementById('hospedaje-anterior-si')?.checked) {
+                    costoHospedaje += 14000; // Hospedaje para participante principal
+                }
+
+                // Verificar hospedaje para participantes adicionales
+                participantesAdicionales.forEach(participante => {
+                    const personId = participante.getAttribute('data-person-id');
+                    const hospedajeRadio = document.querySelector(`input[name="${personId}-hospedaje"][value="si"]`);
+                    if (hospedajeRadio?.checked) {
+                        costoHospedaje += 14000;
+                    }
+                });
+
+                // Calcular total
+                const costoTotal = subtotalInscripciones + costoHospedaje;
+
+                // Actualizar elementos UI
+                const subtotalElement = document.getElementById('subtotal-inscripciones');
+                const hospedajeElement = document.getElementById('costo-hospedaje');
+                const totalElement = document.getElementById('total-pagar');
+
+                if (subtotalElement) subtotalElement.textContent = `$${subtotalInscripciones.toLocaleString('es-CO')}`;
+                if (hospedajeElement) hospedajeElement.textContent = `$${costoHospedaje.toLocaleString('es-CO')}`;
+                if (totalElement) totalElement.textContent = `$${costoTotal.toLocaleString('es-CO')}`;
+
+                // Actualizar también resumen de inscripción
+                actualizarResumenInscripcion(subtotalInscripciones, costoHospedaje, costoTotal);
+            }
+
+            // Función para actualizar el resumen de inscripción en paso 2
+            function actualizarResumenInscripcion(subtotal, hospedaje, total) {
+                const resumenInscripcion = document.getElementById('resumen-inscripcion');
+                if (!resumenInscripcion) return;
+
+                let html = '';
+
+                // Participante principal
+                const nombrePrincipal = document.getElementById('nombres')?.value || '';
+                const apellidoPrincipal = document.getElementById('apellidos')?.value || '';
+
+                if (nombrePrincipal || apellidoPrincipal) {
+                    html += `
+                        <div class="summary-item">
+                            <div class="summary-label">Participante principal:</div>
+                            <div class="summary-value">${nombrePrincipal} ${apellidoPrincipal}</div>
+                        </div>
+                    `;
+                }
+
+                // Participantes adicionales
+                const participantes = document.querySelectorAll('.additional-person');
+                participantes.forEach((participante, index) => {
+                    const personId = participante.getAttribute('data-person-id');
+                    const nombre = document.getElementById(`nombres-${personId}`)?.value || '';
+                    const apellido = document.getElementById(`apellidos-${personId}`)?.value || '';
+
+                    if (nombre || apellido) {
+                        html += `
+                            <div class="summary-item">
+                                <div class="summary-label">Participante adicional ${index + 1}:</div>
+                                <div class="summary-value">${nombre} ${apellido}</div>
+                            </div>
+                        `;
+                    }
+                });
+
+                resumenInscripcion.innerHTML = html;
+
+                // Actualizar también el resumen en paso 3 si existe
+                const resumenParticipante = document.getElementById('resumen-participante');
+                const resumenAdicionales = document.getElementById('resumen-adicionales');
+
+                if (resumenParticipante && (nombrePrincipal || apellidoPrincipal)) {
+                    resumenParticipante.textContent = `${nombrePrincipal} ${apellidoPrincipal}`;
+                }
+
+                if (resumenAdicionales) {
+                    let htmlAdicionales = '';
+                    participantes.forEach((participante, index) => {
+                        const personId = participante.getAttribute('data-person-id');
+                        const nombre = document.getElementById(`nombres-${personId}`)?.value || '';
+                        const apellido = document.getElementById(`apellidos-${personId}`)?.value || '';
+
+                        if (nombre || apellido) {
+                            htmlAdicionales += `
+                                <div class="summary-item">
+                                    <div class="summary-label">Participante adicional ${index + 1}:</div>
+                                    <div class="summary-value">${nombre} ${apellido}</div>
+                                </div>
+                            `;
+                        }
+                    });
+                    resumenAdicionales.innerHTML = htmlAdicionales;
+                }
+
+                // Actualizar totales en el resumen final
+                const resumenTotal = document.getElementById('resumen-total');
+                if (resumenTotal) {
+                    resumenTotal.textContent = `$${total.toLocaleString('es-CO')}`;
+                }
             }
 
             // Configurar botón para añadir más personas
@@ -641,6 +759,41 @@
                 // Actualizar costos
                 actualizarCostos();
             });
+
+            // Event listeners para cambios en formulario principal
+            document.getElementById('nombres')?.addEventListener('input', actualizarCostos);
+            document.getElementById('apellidos')?.addEventListener('input', actualizarCostos);
+            document.getElementById('hospedaje-anterior-si')?.addEventListener('change', actualizarCostos);
+            document.getElementById('hospedaje-anterior-no')?.addEventListener('change', actualizarCostos);
+
+            // Event listeners para botones de navegación
+            document.getElementById('btn-siguiente-paso1')?.addEventListener('click', function() {
+                // Aquí iría tu función para validar el paso 1
+                // Si es válido, actualizar la UI y mostrar el paso 2
+                actualizarCostos(); // Asegurarse que los costos están actualizados
+            });
+
+            // Observar cambios en el DOM para capturar nuevos campos
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length) {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === 1 && node.matches('.additional-person')) {
+                                // Si es un nuevo formulario de persona, agregar event listeners
+                                const personId = node.getAttribute('data-person-id');
+                                document.getElementById(`nombres-${personId}`)?.addEventListener('input', actualizarCostos);
+                                document.getElementById(`apellidos-${personId}`)?.addEventListener('input', actualizarCostos);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Iniciar observación en el contenedor de personas adicionales
+            const personasContainer = document.getElementById('personas-adicionales');
+            if (personasContainer) {
+                observer.observe(personasContainer, { childList: true, subtree: true });
+            }
         });
     </script>
 </body>
