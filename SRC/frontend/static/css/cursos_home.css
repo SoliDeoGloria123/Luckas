@@ -408,12 +408,10 @@ main {
 
 .curso-card {
     background: rgba(30, 30, 30, 0.9);
-    border-radius: 20px;
+    border-radius: 15px;
     padding: 2rem;
-    text-align: center;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(79, 195, 247, 0.2);
-    transition: all 0.4s ease;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(106, 133, 182, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -422,112 +420,133 @@ main {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
+    left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(79, 195, 247, 0.1), transparent);
-    transition: left 0.6s ease;
+    background: linear-gradient(135deg, rgba(106, 133, 182, 0.1), rgba(30, 58, 138, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .curso-card:hover::before {
-    left: 100%;
+    opacity: 1;
 }
 
 .curso-card:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--card-hover-shadow);
-    border-color: rgba(79, 195, 247, 0.5);
-}
-
-.curso-imagen {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(45deg, var(--curso-accent), var(--blue-light));
-    border-radius: 50%;
-    margin: 0 auto 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 20px rgba(79, 195, 247, 0.3);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border-color: #6a85b6;
 }
 
 .curso-card h3 {
-    font-size: 1.5rem;
+    color: #6a85b6;
     margin-bottom: 1rem;
-    color: var(--curso-accent);
-}
-
-.curso-info {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin: 1.5rem 0;
-    flex-wrap: wrap;
-}
-
-.curso-info span {
-    background: rgba(79, 195, 247, 0.2);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-/* Cards mejoradas */
-.neo-card {
-    background: rgba(30, 30, 30, 0.9);
-    border-radius: 20px;
-    padding: 2rem;
-    text-align: center;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(79, 195, 247, 0.2);
-    transition: all 0.4s ease;
+    font-size: 1.5rem;
     position: relative;
-    overflow: hidden;
-    margin: 1rem 0;
+    z-index: 2;
 }
 
-.neo-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(79, 195, 247, 0.1), transparent);
-    transition: left 0.6s ease;
+.curso-card p {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 2;
 }
 
-.neo-card:hover::before {
-    left: 100%;
-}
-
-.neo-card:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--card-hover-shadow);
-    border-color: rgba(79, 195, 247, 0.5);
-}
-
-/* Botones */
-.neo-button {
-    background: linear-gradient(45deg, var(--curso-accent), var(--blue-light));
-    border: none;
-    margin-top: 1rem;
-    transition: all 0.3s ease;
+.curso-card .neo-button {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(145deg, #1e3a8a, #6a85b6);
+    color: white;
     padding: 0.8rem 1.5rem;
     border-radius: 25px;
-    color: white;
     text-decoration: none;
+    transition: all 0.3s ease;
     display: inline-block;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(79, 195, 247, 0.3);
 }
 
-.neo-button:hover {
-    background: linear-gradient(45deg, var(--blue-light), white);
-    color: var(--blue-dark);
+.curso-card .neo-button:hover {
+    background: linear-gradient(145deg, #3f51b5, #5c6bc0);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(79, 195, 247, 0.5);
+    box-shadow: 0 8px 20px rgba(106, 133, 182, 0.4);
+}
+
+/* Sección de filtros de cursos */
+.curso-filters {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem auto;
+    border: 1px solid rgba(106, 133, 182, 0.2);
+}
+
+.curso-filters h2 {
+    color: #6a85b6;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.filter-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.filter-group {
+    background: rgba(30, 30, 30, 0.8);
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 1px solid rgba(106, 133, 182, 0.3);
+}
+
+.filter-group h3 {
+    color: #d4e0f7;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid rgba(106, 133, 182, 0.4);
+    background: rgba(18, 18, 18, 0.9);
+    color: white;
+    font-size: 1rem;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: #6a85b6;
+    box-shadow: 0 0 10px rgba(106, 133, 182, 0.3);
+}
+
+/* Lista de cursos mejorada */
+.cursos-lista {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    margin: 2rem auto;
+    border: 1px solid rgba(106, 133, 182, 0.2);
+}
+
+.cursos-lista h2 {
+    color: #6a85b6;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(106, 133, 182, 0.5);
+}
+
+.curso-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
 }
 
 /* Footer mejorado */
@@ -696,6 +715,40 @@ footer {
     background: rgba(2, 119, 189, 0.1);
     color: #0277bd !important;
     font-weight: 600;
+}
+
+/* Tema claro para cursos */
+.theme-light .curso-filters {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #333333 !important;
+}
+
+.theme-light .curso-filters h2 {
+    color: #1e3a8a !important;
+}
+
+.theme-light .filter-group {
+    background: rgba(248, 250, 252, 0.9) !important;
+    color: #333333 !important;
+}
+
+.theme-light .filter-group h3 {
+    color: #1e3a8a !important;
+}
+
+.theme-light .filter-group select {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #333333 !important;
+    border-color: rgba(30, 58, 138, 0.4) !important;
+}
+
+.theme-light .cursos-lista {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #333333 !important;
+}
+
+.theme-light .cursos-lista h2 {
+    color: #1e3a8a !important;
 }
 
 /* Responsive Design */
@@ -898,7 +951,7 @@ footer {
 }
 
 .theme-light .section-color {
-    background: linear-gradient(135deg, rgba(240, 249, 255, 0.95), rgba(224, 242, 254, 0.95));
+    background: linear-gradient(135deg, rgba(240, 249, 255, 0.95), rgba(224, 244, 255, 0.95));
 }
 
 .theme-light .section-color .neo-container {
