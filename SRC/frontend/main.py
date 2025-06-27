@@ -22,6 +22,7 @@ import re
 from dotenv import load_dotenv
 import os
 from typing import List
+from jinja2 import FileSystemLoader
 #from SRC.backend.ofertas import data_analist_products
 
 # Mapeo de categorías a términos de búsqueda
@@ -51,7 +52,7 @@ users_collection = db["users"]
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
 
-# Configurar clave secreta, el cual, sirve para firmar cookies y datos, y firmar significa que se puede verificar su autenticidad.
+# Configurar clave secreta
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
     raise ValueError("SECRET_KEY no está configurada en el archivo .env")
@@ -158,7 +159,16 @@ app.mount("/flask", WSGIMiddleware(flask_app))
 # Configurar templates y archivos estáticos
 BASE_DIR = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+app.mount("/images", StaticFiles(directory=BASE_DIR / "static" / "img"), name="images")
+
+# Configuración personalizada de plantillas para usar ambas carpetas
+loader = FileSystemLoader([
+    BASE_DIR / "templates",
+    BASE_DIR / "public"
+])
+
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
+templates.env.loader = loader
 
 # Filtro personalizado para codificar en Base64
 def b64encode_filter(data):
@@ -196,22 +206,13 @@ async def require_login(request: Request):
     print(">>> DEBUG: SI hay sesión, PERMITIENDO acceso <<<")
     return user_session_data
 
-# Rutas de la aplicación FastAPI para manejar la autenticación y el acceso a las páginas del sitio LuckasEnt
-@app.get("/")
-async def home(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
-
-@app.get("/login_principal", name="login_principal")
-async def login(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
+# Dependencia para rutas API
 async def require_api_login(request: Request):
     """
     Dependencia para rutas API. Verifica login y devuelve 401 si no está autenticado.
     """
     user_session_data = get_current_user(request)
     if not user_session_data:
-        # Para APIs, es estándar devolver 401 Unauthorized, no redirigir.
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No autenticado",
@@ -219,19 +220,33 @@ async def require_api_login(request: Request):
         )
     return user_session_data
 
+# Rutas de la aplicación FastAPI
+@app.get("/")
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/home", name="home")
+async def home_route(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/login", name="login")
+async def login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.get("/login_principal", name="login_principal")
+async def login_principal(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
 @app.post("/login", name="login_post")
 async def login_post(request: Request, response: Response, email: str = Form(...), password: str = Form(...)):
     print(f"--- DEBUG: Serializer en login_post: {serializer} ---")
-    # Verifica si los campos están vacíos
     if not email or not password:
         error = "Todos los campos son obligatorios"
         return templates.TemplateResponse(
             "login.html", {"request": request, "error": error}
         )
 
-    # Verifica si el usuario existe en la base de datos
     usuario = users_collection.find_one({"correo": email})
-
     if usuario and bcrypt.check_password_hash(usuario["password"], password):
         session_data = {"email": email}
         session_cookie = serializer.dumps(session_data)
@@ -239,11 +254,22 @@ async def login_post(request: Request, response: Response, email: str = Form(...
         response.set_cookie(key="session", value=session_cookie, httponly=True)
         return response
     else:
-        # Si no existe o la contraseña no coincide, muestra un mensaje de error
         error = "Correo o contraseña incorrectos"
         return templates.TemplateResponse(
             "login.html", {"request": request, "error": error}
         )
+
+@app.get("/logout", name="logout")
+async def logout(response: Response):
+    response = RedirectResponse(url="/login", status_code=303)
+    response.delete_cookie("session")
+    return response
+
+@app.get("/clear_cookies")
+async def clear_cookies(response: Response):
+    response = RedirectResponse(url="/login", status_code=303)
+    response.delete_cookie("session")
+    return response
 
 @app.get("/registro", name="registro")
 async def registro(request: Request):
@@ -259,14 +285,12 @@ async def register_post(
     password: str = Form(...),
     confirm_password: str = Form(...),
 ):
-    # Verifica si las contraseñas coinciden
     if password != confirm_password:
         error = "Las contraseñas no coinciden"
         return templates.TemplateResponse(
             "registro.html", {"request": request, "error": error}
         )
 
-    # Verifica si el correo ya está registrado
     usuario_existente = users_collection.find_one({"correo": correo})
     if usuario_existente:
         error = "El correo ya está registrado"
@@ -274,61 +298,49 @@ async def register_post(
             "registro.html", {"request": request, "error": error}
         )
 
-    # Encriptar la contraseña antes de guardarla
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-
-    # Inserta el nuevo usuario en la base de datos
     nuevo_usuario = {
         "nombre": nombre,
         "apellido": apellido,
         "correo": correo,
         "telefono": telefono,
-        "password": hashed_password,  # Guardar la contraseña encriptada
+        "password": hashed_password,
     }
     users_collection.insert_one(nuevo_usuario)
-
-    # Redirige al usuario a la página de inicio de sesión
     return RedirectResponse(url="/login", status_code=303)
 
 @app.get("/olvidar", name="olvidar")
-async def olvidar(request: Request):  # ✔️ Nombre correcto de la función
+async def olvidar(request: Request):
     return templates.TemplateResponse("olvidar_contraseña.html", {"request": request})
 
 @app.post("/olvidar", name="olvidar_post")
 async def olvidar_post(request: Request, email: str = Form(...)):
     usuario = users_collection.find_one({"correo": email})
     if not usuario:
-        # Mensaje genérico por seguridad
         return templates.TemplateResponse(
             "olvidar_contraseña.html", {"request": request, "error": "Si este correo está registrado, recibirás instrucciones para restablecer tu contraseña."}
         )
 
-    # --- Lógica de Token ---
     token = secrets.token_urlsafe(32)
-    expiry_time = datetime.utcnow() + datetime.timedelta(hours=1) # Token válido por 1 hora
+    expiry_time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
 
     users_collection.update_one(
         {"correo": email},
         {"$set": {"reset_token": token, "reset_token_expiry": expiry_time}}
     )
 
-    # Construir la URL de restablecimiento usando url_for
     try:
-        # Asegúrate que el nombre 'mostrar_reset_form' coincida con el name= en la ruta GET /restablecer_pass
         reset_url = request.url_for('mostrar_reset_form', token=token)
     except Exception as e:
         print(f"Error generando URL con url_for: {e}. Construyendo manualmente.")
-        # Fallback: Construcción manual (ajusta si tu app no corre en la raíz)
         base_url = str(request.base_url).rstrip('/')
         reset_url = f"{base_url}/restablecer_pass?token={token}"
 
     print(f"--- DEBUG: Reset URL generada: {reset_url} ---")
 
-    # --- Configurar y enviar correo ---
     sender_email = SENDER_EMAIL
     sender_password = SENDER_PASSWORD
     subject = "Restablece tu contraseña - LuckasEnt"
-    # **** ESTE ES EL NUEVO BODY DEL CORREO ****
     body = f"""Hola {usuario.get('nombre', 'Usuario')},
 
 Hemos recibido una solicitud para restablecer tu contraseña en LuckasEnt.
@@ -352,66 +364,36 @@ El equipo de LuckasEnt"""
             server.starttls()
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, email, message.as_string())
-        # Mensaje genérico de éxito
         return templates.TemplateResponse(
             "olvidar_contraseña.html", {"request": request, "success": "Si este correo está registrado, recibirás instrucciones para restablecer tu contraseña."}
         )
     except Exception as e:
         print(f"Error al enviar correo de restablecimiento: {e}")
         return templates.TemplateResponse(
-            "olvidar_contraseña.html", {"request": request, "error": "No se pudo enviar el correo de restablecimiento. Inténtalo más tarde."})
-# --- FIN: RUTA MODIFICADA ---
+            "olvidar_contraseña.html", {"request": request, "error": "No se pudo enviar el correo de restablecimiento. Inténtalo más tarde."}
+        )
 
-
-
-# --- INICIO: NUEVAS RUTAS PARA RESTABLECER ---
-@app.get("/restablecer_pass", name="mostrar_reset_form") # Ruta para MOSTRAR el formulario
+@app.get("/restablecer_pass", name="mostrar_reset_form")
 async def mostrar_reset_form(request: Request, token: str = Query(...)):
-    # Buscar usuario por token y verificar expiración
-    now = datetime.utcnow()
+    now = datetime.datetime.utcnow()
     usuario = users_collection.find_one({
         "reset_token": token,
-        "reset_token_expiry": {"$gt": now} # Token no expirado
+        "reset_token_expiry": {"$gt": now}
     })
 
     if not usuario:
-        # Token inválido o expirado
         return templates.TemplateResponse(
-            "error.html", # O una plantilla específica
+            "error.html",
             {"request": request, "status_code": 400, "detail": "El enlace de restablecimiento no es válido o ha expirado. Por favor, solicita uno nuevo."},
             status_code=400
         )
 
-    # Token válido, mostrar el formulario (restablecer_form.html)
     return templates.TemplateResponse(
-        "restablecer_form.html", # Usa el nombre de archivo renombrado
-        {"request": request, "token": token} # Pasa el token al formulario
+        "restablecer_form.html",
+        {"request": request, "token": token}
     )
 
-@app.get("/restablecer_pass", name="mostrar_reset_form") # Ruta para MOSTRAR el formulario
-async def mostrar_reset_form(request: Request, token: str = Query(...)):  # noqa: F811
-    # Buscar usuario por token y verificar expiración
-    now = datetime.utcnow()
-    usuario = users_collection.find_one({
-        "reset_token": token,
-        "reset_token_expiry": {"$gt": now} # Token no expirado
-    })
-
-    if not usuario:
-        # Token inválido o expirado
-        return templates.TemplateResponse(
-            "error.html", # O una plantilla específica
-            {"request": request, "status_code": 400, "detail": "El enlace de restablecimiento no es válido o ha expirado. Por favor, solicita uno nuevo."},
-            status_code=400
-        )
-
-    # Token válido, mostrar el formulario (restablecer_form.html)
-    return templates.TemplateResponse(
-        "restablecer_form.html", # Usa el nombre de archivo renombrado
-        {"request": request, "token": token} # Pasa el token al formulario
-    )
-
-@app.post("/restablecer_pass", name="procesar_reset_form") # Ruta para PROCESAR el formulario
+@app.post("/restablecer_pass", name="procesar_reset_form")
 async def procesar_reset_form(
     request: Request,
     token: str = Form(...),
@@ -419,14 +401,12 @@ async def procesar_reset_form(
     confirm_password: str = Form(...)
 ):
     if new_password != confirm_password:
-        # Contraseñas no coinciden, volver a mostrar el formulario con error
         return templates.TemplateResponse(
-            "restablecer_form.html", # Usa el nombre de archivo renombrado
+            "restablecer_form.html",
             {"request": request, "token": token, "error": "Las contraseñas no coinciden."}
         )
 
-    # Volver a verificar el token por seguridad
-    now = datetime.utcnow()
+    now = datetime.datetime.utcnow()
     usuario = users_collection.find_one({
         "reset_token": token,
         "reset_token_expiry": {"$gt": now}
@@ -439,76 +419,33 @@ async def procesar_reset_form(
             status_code=400
         )
 
-    # Hashear la NUEVA contraseña
     hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
-
-    # Actualizar la contraseña en la BD e invalidar el token
     users_collection.update_one(
         {"_id": usuario["_id"]},
         {
             "$set": {"password": hashed_password},
-            "$unset": {"reset_token": "", "reset_token_expiry": ""} # Elimina los campos del token
+            "$unset": {"reset_token": "", "reset_token_expiry": ""}
         }
     )
 
-    # Redirigir al login con mensaje de éxito (usando query param)
     login_url = request.url_for('login')
     response = RedirectResponse(url=f"{login_url}?reset_success=true", status_code=status.HTTP_303_SEE_OTHER)
     return response
 
-@app.get("/cuenta", name="cuenta")
-async def cuenta(request: Request, current_user: dict = Depends(require_login)):
-    usuario = users_collection.find_one({"correo": current_user["email"]})
-    print(f"--- DEBUG: Usuario obtenido para /cuenta: {usuario} ---")  # Depuración
-    if not usuario:
-        return RedirectResponse(url=request.url_for('login'), status_code=status.HTTP_303_SEE_OTHER)
-    return templates.TemplateResponse("Mi_Cuenta.html", {"request": request, "usuario": usuario})
-
-@app.get("/index", name="index")
-async def index(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
-
-@app.get("/cursos", name="cursos")
-async def cursos(request: Request):
-    return templates.TemplateResponse("cursos.html", {"request": request})
-
-@app.get("/inscripcion", name="inscripcion")
-async def inscripcion(request: Request, evento: str = None):
-    # Devolver la plantilla con el parámetro evento si existe
-    return templates.TemplateResponse("inscripcion.html", {"request": request, "evento": evento})
-
-@app.get("/programa", name="programa")
-async def program_inscripcion(request: Request):
-    return templates.TemplateResponse("programa-servicio-cristiano.html", {"request": request})
-
-@app.get("/notificaciones", name="notificaciones")
-async def nosotros(request: Request):
-    return templates.TemplateResponse("notificaciones.html", {"request": request})
-
-@app.get("/login", name="login")
-async def login(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
-@app.get("/logout", name="logout")
-async def logout(response: Response):
-    response = RedirectResponse(url="/login", status_code=303)
-    response.delete_cookie("session")
-    return response
-
-@app.get("/clear_cookies")
-async def clear_cookies(response: Response):
-    response = RedirectResponse(url="/login", status_code=303)
-    response.delete_cookie("session")
-    return response
+@app.get("/dashboard", name="dashboard")
+async def dashboard(request: Request):
+    return templates.TemplateResponse("dashboard.html", {"request": request})
 
 @app.get("/perfil", name="perfil")
-async def perfil(request: Request, current_user: dict = Depends(require_login)):
+async def perfil(request: Request, current_user = Depends(require_login)):
+    if isinstance(current_user, RedirectResponse):
+        return current_user
+
     usuario = users_collection.find_one({"correo": current_user["email"]})
-    print(f"--- DEBUG: Usuario obtenido para /perfil: {usuario} ---")  # Depuración
+    print(f"--- DEBUG: Usuario obtenido para /perfil: {usuario} ---")
     if not usuario:
         return RedirectResponse(url=request.url_for('login'), status_code=status.HTTP_303_SEE_OTHER)
     return templates.TemplateResponse("perfil.html", {"request": request, "usuario": usuario})
-
 
 @app.post("/perfil", name="actualizar_perfil")
 async def actualizar_perfil(
@@ -519,85 +456,144 @@ async def actualizar_perfil(
     telefono: str = Form(...),
     password: str = Form(...),
     foto: UploadFile = File(None),
-    current_user: dict = Depends(require_login)
+    current_user = Depends(require_login)
 ):
-        # Validar que el email del formulario coincide con el de la sesión
+    if isinstance(current_user, RedirectResponse):
+        return current_user
+        
     if email != current_user["email"]:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permiso para actualizar este perfil")
      
-    # Actualiza los datos del usuario en la base de datos
     update_data = {
         "nombre": nombre,
         "apellido": apellido,
         "telefono": telefono,
-        "foto": foto,
         "correo": email,
         "password": password,
     }
-   # Lee los bytes de la foto si se subió una
-    if foto and foto.filename: # Verifica que se subió un archivo y tiene nombre
-        contenido_foto = await foto.read() # Lee el contenido del archivo como bytes
-        update_data["foto"] = contenido_foto # Añade los bytes al diccionario de actualización
+    
+    if foto and foto.filename:
+        contenido_foto = await foto.read()
+        update_data["foto"] = contenido_foto
 
-    # Actualiza los datos del usuario en la base de datos
     result = users_collection.update_one(
-        {"correo": email}, # Usa el email correcto para encontrar al usuario
+        {"correo": email},
         {"$set": update_data},
     )
-    # Verifica si la actualización fue exitosa (opcional pero recomendado)
-    if result.modified_count == 0 and not (foto and foto.filename):
-         pass
     return RedirectResponse(url=request.url_for('cuenta'), status_code=303)
 
+@app.get("/cuenta", name="cuenta")
+async def cuenta(request: Request, current_user = Depends(require_login)):
+    if isinstance(current_user, RedirectResponse):
+        return current_user
 
-
-
+    usuario = users_collection.find_one({"correo": current_user["email"]})
+    print(f"--- DEBUG: Usuario obtenido para /cuenta: {usuario} ---")
+    if not usuario:
+        return RedirectResponse(url=request.url_for('login'), status_code=status.HTTP_303_SEE_OTHER)
+    return templates.TemplateResponse("Mi_Cuenta.html", {"request": request, "usuario": usuario})
 
 @app.post("/eliminar_cuenta", name="eliminar_cuenta")
 async def eliminar_cuenta(request: Request, email: str = Form(...)):
-    # Elimina el usuario de la base de datos
     result = users_collection.delete_one({"correo": email})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return RedirectResponse(url="/registro", status_code=303)
 
+@app.get("/inscripcion_home", name="inscripcion_home")
+async def inscripcion_home(request: Request, evento: str = None):
+    return templates.TemplateResponse("inscripcion_home.html", {"request": request, "evento": evento})
+
+@app.get("/inscripcion", name="inscripcion")
+async def inscripcion(request: Request, evento: str = None, current_user = Depends(require_login)):
+    if isinstance(current_user, RedirectResponse):
+        return current_user
+        
+    usuario = users_collection.find_one({"correo": current_user["email"]})
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    return templates.TemplateResponse("inscripcion.html", {"request": request, "evento": evento, "usuario": usuario})
+
+@app.get("/programa", name="programa")
+async def program_inscripcion(request: Request):
+    return templates.TemplateResponse("programa-servicio-cristiano.html", {"request": request})
+
+@app.get("/programas-academicos", name="programas-academicos")
+async def programa_academicos(request: Request):
+    return templates.TemplateResponse("programa-servicio-cristiano.html", {"request": request})
+
+@app.get("/programa-servicio-cristiano", name="programa_servicio_cristiano")
+async def programa_servicio_cristiano(request: Request):
+    return templates.TemplateResponse("programa-servicio-cristiano.html", {"request": request})
+
+@app.get("/programa-teologia-pastoral", name="programa_teologia_pastoral")
+async def programa_teologia_pastoral(request: Request):
+    return templates.TemplateResponse("programa-servicio-cristiano.html", {"request": request})
+
+@app.get("/eventos", name="eventos")
+async def eventos(request: Request):
+    return templates.TemplateResponse("eventos.html", {"request": request})
+
+@app.get("/cursos_home", name="cursos_home")
+async def cursos_home(request: Request):
+    return templates.TemplateResponse("cursos_home.html", {"request": request})
+
+@app.get("/cursos", name="cursos")
+async def cursos(request: Request):
+    return templates.TemplateResponse("cursos_home.html", {"request": request})
+
+@app.get("/cursos-intensivos", name="cursos_intensivos")
+async def cursos_intensivos(request: Request):
+    return templates.TemplateResponse("cursos_home.html", {"request": request})
+
+@app.get("/tienda", name="tienda")
+async def tienda(request: Request, current_user = Depends(require_login)): 
+    if isinstance(current_user, RedirectResponse):
+        return current_user
+        
+    print(f"### DEBUG: tienda - Usuario en /tienda: {current_user.get('email')} ###")
+    usuario = users_collection.find_one({"correo": current_user["email"]})
+
+    if not usuario:
+        return RedirectResponse(url=request.url_for('logout'), status_code=status.HTTP_303_SEE_OTHER)
+
+    return templates.TemplateResponse("tienda.html", {"request": request, "usuario": usuario})
+
+@app.get("/productlista", name="productlista")
+async def productlista(request: Request):
+    return templates.TemplateResponse("categorias.html", {"request": request})
 
 @app.get("/tulista", name="tulista")
-async def tulista(request: Request, current_user: dict = Depends(require_login)):
-    
+async def tulista(request: Request, current_user = Depends(require_login)):
     if isinstance(current_user, RedirectResponse):
-        print("### DEBUG: categoria - current_user es RedirectResponse, retornando... ###")
         return current_user
+        
     print(f"### DEBUG: categoria - Usuario en /categoria: {current_user.get('email')} ###")
     
     user_email = current_user["email"]
-
-    # 2. Buscar la lista del usuario en 'listas_usuarios'
     lista_doc = listas_collection.find_one({"user_email": user_email})
-    productos_lista_completa = [] # Lista paand los datos completand
+    productos_lista_completa = []
+    
     if lista_doc and "productos_ids" in lista_doc: 
-        lista_ids = lista_doc.get("productos_ids", []) # Obtiene el array de ObjectIds
+        lista_ids = lista_doc.get("productos_ids", [])
         if lista_ids:
-            # 3. Buscar los productos completos en la colección 'productos' usando los IDs
             productos_lista_completa = list(collection.find({"_id": {"$in": lista_ids}}))
 
-    # 4. (Opcional pero necesario para la foto de perfil en cardgrid.html) Obtener datos del usuario
     usuario_info = users_collection.find_one({"correo": user_email})
     if not usuario_info:
-         # Si por alguna razón no se encuentra, usa un default para evitar errores
-         usuario_info = {'foto': None, 'nombre': 'Usuario', 'apellido': ''}
+        usuario_info = {'foto': None, 'nombre': 'Usuario', 'apellido': ''}
 
-    # 5. Renderizar cardgrid.html pasando la lista de productos y la info del usuario
     return templates.TemplateResponse(
         "cardgrid.html",
         {
             "request": request,
-            "productos_lista": productos_lista_completa, # La lista de productos encontrados
-            "usuario": usuario_info # Para la foto de perfil en la barra de navegación
+            "productos_lista": productos_lista_completa,
+            "usuario": usuario_info
         }
     )
 
-@app.post("/eliminar_de_lista/{product_id}", name="eliminar_de_lista") # Puedes usar POST o DELETE
+@app.post("/eliminar_de_lista/{product_id}", name="eliminar_de_lista")
 async def eliminar_de_lista(request: Request, product_id: str):
     user_session_data = get_current_user(request)
     if not user_session_data:
@@ -610,7 +606,6 @@ async def eliminar_de_lista(request: Request, product_id: str):
     except Exception:
         raise HTTPException(status_code=400, detail="ID de producto inválido")
 
-    # Elimina el ObjectId del producto del array 'productos_ids' usando $pull
     result = listas_collection.update_one(
         {"user_email": user_email},
         {"$pull": {"productos_ids": obj_product_id}}
@@ -619,75 +614,38 @@ async def eliminar_de_lista(request: Request, product_id: str):
     if result.modified_count > 0:
         return {"status": "success", "message": "Producto eliminado de la lista"}
     elif result.matched_count == 0:
-         raise HTTPException(status_code=404, detail="Lista de usuario no encontrada")
+        raise HTTPException(status_code=404, detail="Lista de usuario no encontrada")
     else:
-         # No se modificó (quizás el producto ya no estaba en la lista)
-         return {"status": "info", "message": "Producto no encontrado en la lista"}
-
-
-@app.get("/termino", name="termino")
-async def termino(request: Request):  # ✔️ Nombre correcto de la función
-    return templates.TemplateResponse("Termino_uso.html", {"request": request})
-
-
-@app.get("/home", name="home")
-async def home(request: Request):  # ✔️ Nombre correcto de la función  # noqa: F811
-    return templates.TemplateResponse("home.html", {"request": request})
-
-
-@app.get("/tienda", name="tienda")
-async def tienda(request: Request, current_user = Depends(require_login)): 
-    if isinstance(current_user, RedirectResponse):
-        print("### DEBUG: tienda - current_user es RedirectResponse, retornando... ###")
-        return current_user
-    # Si no es una redirección, entonces es el diccionario del usuario.
-    # Ahora podemos usar ["email"] de forma segura.
-    print(f"### DEBUG: tienda - Usuario en /tienda: {current_user.get('email')} ###")
-    # Busca los datos completos del usuario usando el email de la sesión
-    usuario = users_collection.find_one({"correo": current_user["email"]})
-
-    # Manejar el caso (raro) de que el usuario exista en la sesión pero no en la BD
-    if not usuario:
-        # Redirigir a logout es una opción segura para limpiar la cookie
-        return RedirectResponse(url=request.url_for('logout'), status_code=status.HTTP_303_SEE_OTHER)
-
-    # Pasa los datos completos del usuario al template
-    return templates.TemplateResponse("tienda.html", {"request": request, "usuario": usuario})
-
-
-@app.get("/productlista", name="productlista")
-async def productlista(request: Request):  # ✔️ Nombre correcto de la función
-    return templates.TemplateResponse("categorias.html", {"request": request})
+        return {"status": "info", "message": "Producto no encontrado en la lista"}
 
 @app.get("/nosotros", name="nosotros")
-async def nosotros(request: Request):  # ✔️ Nombre correcto de la función
+async def nosotros(request: Request):
     return templates.TemplateResponse("nosotros.html", {"request": request})
 
-@app.get("/cursos", name="cursos")
-async def cursos(request: Request):
-    return templates.TemplateResponse("cursos.html", {"request": request})
-
-@app.get("/inscripcion", name="inscripcion")
-async def inscripcion(request: Request, evento: str = None):
-    # Devolver la plantilla con el parámetro evento si existe
-    return templates.TemplateResponse("inscripcion.html", {"request": request, "evento": evento})
-
-@app.get("/programa-servicio-cristiano", name="programa_servicio_cristiano")
-async def programa_servicio_cristiano(request: Request):
-    return templates.TemplateResponse("programa-servicio-cristiano.html", {"request": request})
+@app.get("/termino", name="termino")
+async def termino(request: Request):
+    return templates.TemplateResponse("Termino_uso.html", {"request": request})
 
 @app.get("/index", name="index")
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/dashboard", name="dashboard")
-async def dashboard(request: Request):
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+@app.get("/notificaciones", name="notificaciones")
+async def notificaciones(request: Request, current_user = Depends(require_login)):
+    if isinstance(current_user, RedirectResponse):
+        return current_user
+    
+    usuario = users_collection.find_one({"correo": current_user["email"]})
+    if not usuario:
+        return RedirectResponse(url=request.url_for('login'), status_code=status.HTTP_303_SEE_OTHER)
+    
+    return templates.TemplateResponse("notificaciones.html", {"request": request, "usuario": usuario})
 
-@app.get("/eventos", name="eventos")
-async def dashboard(request: Request):
-    return templates.TemplateResponse("eventos.html", {"request": request})
+@app.get("/contacto", name="contacto")
+async def contacto(request: Request):
+    return templates.TemplateResponse("contacto.html", {"request": request})
 
+# Manejadores de excepciones
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     return templates.TemplateResponse(
@@ -711,5 +669,3 @@ async def general_exception_handler(request: Request, exc: Exception):
         {"request": request, "status_code": 500, "detail": "Error interno del servidor"},
         status_code=500,
     )
-
-

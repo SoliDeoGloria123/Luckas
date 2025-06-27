@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html lang="es" class="dark-theme">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luckas</title>
-    <!-- Google Font - Bebas Neue -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/animations.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/theme-switcher.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/home.css') }}">
 </head>
 
 <body>
@@ -20,33 +21,34 @@
     <div class="animated-bg"></div>
 
     <!-- Header transparente al principio -->
-    <header class="neo-header header-transparent">
-        <div class="logo-container">
-            <img src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt de Kent.png') }}" alt="Logo del Seminario"
-                class="logo">
-            <h1 class="seminary-title">Luckas</h1>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="#" class="active">Inicio</a></li>
-                <li><a href="{{ url_for('cursos') }}" >Cursos</a></li>
-                <li><a href="{{ url_for('inscripcion') }}">Inscripción</a></li>
-            </ul>
-            <a href="{{ url_for('login_principal') }}" class="neo-button login-button">Iniciar Sesión</a>
-        </nav>
-        <div class="menu-toggle">
-            <i class="fas fa-bars"></i>
+    <header class="neo-header">
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', path='img/lOGO PROYECTO LuckasEnt de Kent.png') }}" alt="Logo del Seminario" class="logo">
+                <h1 class="seminary-title">Luckas</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('home') }}" class="active">Inicio</a></li>
+                    <li><a href="{{ url_for('cursos_home') }}">Cursos</a></li>
+                    <li><a href="{{ url_for('inscripcion_home') }}">Inscripción</a></li>
+                </ul>
+                <a href="{{ url_for('login') }}" class="neo-button login-button">Iniciar Sesión</a>
+            </nav>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
     </header>
 
     <!-- Hero animado con pantalla completa -->
-    <div class="hero-animated">
-        <div class="hero-content-animated neo-container">
+    <div class="hero-section">
+        <div class="hero-content">
             <h2>Bienvenido a Luckas</h2>
             <p>Formando líderes con fundamento bíblico para servir a Dios y a la comunidad</p>
             <div class="cta-buttons">
-                <a href="{{ url_for('cursos') }}" class="neo-button">Ver Cursos</a>
-                <a href="{{ url_for('inscripcion') }}" class="neo-button">Inscríbete Ahora</a>
+                <a href="{{ url_for('cursos_home') }}" class="neo-button">Ver Cursos</a>
+                <a href="{{ url_for('inscripcion_home') }}" class="neo-button">Inscríbete Ahora</a>
             </div>
         </div>
 
@@ -76,7 +78,7 @@
                         <span><i class="fas fa-calendar"></i> 3 meses</span>
                         <span><i class="fas fa-clock"></i> 60 horas</span>
                     </div>
-                    <a href="cursos.html#fundamentos" class="neo-button">Ver Detalles</a>
+                    <a href="{{ url_for('cursos_home') }}" class="neo-button">Ver Detalles</a>
                 </div>
                 <div class="neo-card curso-card">
                     <div class="curso-imagen"></div>
@@ -86,7 +88,7 @@
                         <span><i class="fas fa-calendar"></i> 4 meses</span>
                         <span><i class="fas fa-clock"></i> 80 horas</span>
                     </div>
-                    <a href="cursos.html#teologia" class="neo-button">Ver Detalles</a>
+                    <a href="{{ url_for('cursos_home') }}" class="neo-button">Ver Detalles</a>
                 </div>
                 <div class="neo-card curso-card">
                     <div class="curso-imagen"></div>
@@ -96,11 +98,11 @@
                         <span><i class="fas fa-calendar"></i> 3 meses</span>
                         <span><i class="fas fa-clock"></i> 60 horas</span>
                     </div>
-                    <a href="cursos.html#liderazgo" class="neo-button">Ver Detalles</a>
+                    <a href="{{ url_for('cursos_home') }}" class="neo-button">Ver Detalles</a>
                 </div>
             </div>
             <div class="center-button">
-                <a href="cursos.html" class="neo-button">Ver Todos los Cursos</a>
+                <a href="{{ url_for('cursos_home') }}" class="neo-button">Ver Todos los Cursos</a>
             </div>
         </section>
 
@@ -125,7 +127,7 @@
         <section class="inscripcion-cta neo-container fade-in">
             <h2>¿Listo para comenzar tu formación?</h2>
             <p>Inscríbete ahora en nuestro seminario y da el primer paso hacia tu crecimiento ministerial.</p>
-            <a href="inscripcion.html" class="neo-button">Inscríbete Ahora</a>
+            <a href="{{ url_for('inscripcion_home') }}" class="neo-button">Inscríbete Ahora</a>
         </section>
     </main>
 
@@ -144,17 +146,17 @@
             <div class="footer-column">
                 <h3>Enlaces Rápidos</h3>
                 <ul>
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="cursos.html">Cursos</a></li>
-                    <li><a href="inscripcion.html">Inscripción</a></li>
-                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                    <li><a href="{{ url_for('cursos_home') }}">Cursos</a></li>
+                    <li><a href="{{ url_for('inscripcion_home') }}">Inscripción</a></li>
+                    <li><a href="{{ url_for('contacto') }}">Contacto</a></li>
                 </ul>
             </div>
             <div class="footer-column">
                 <h3>Contacto</h3>
                 <ul class="contact-info">
-                    <li><i class="fas fa-map-marker-alt"></i> Av. Principal 123, Ciudad</li>
-                    <li><i class="fas fa-phone"></i> +1 (234) 567-8900</li>
+                    <li><i class="fas fa-map-marker-alt"></i> SBC Berea, Tenjo, Cundinamarca</li>
+                    <li><i class="fas fa-phone"></i> +57 (601) 123-4567</li>
                     <li><i class="fas fa-envelope"></i> info@luckas.org</li>
                 </ul>
             </div>
@@ -164,10 +166,155 @@
         </div>
     </footer>
 
+    <!-- Selector de tema (dark/light mode) -->
+    <div class="theme-switcher">
+        <button class="theme-toggle">
+            <i class="fas fa-sun"></i>
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
     <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
-    <script src="{{ url_for('static', path='js/cursos.js') }}"></script>
     <script src="{{ url_for('static', path='js/animations.js') }}"></script>
-    <script src="{{ url_for('static', path='js/theme-switcher.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle para el menú en dispositivos móviles
+            const menuToggle = document.querySelector('.menu-toggle');
+            const header = document.querySelector('.neo-header');
+            
+            if (menuToggle && header) {
+                menuToggle.addEventListener('click', function() {
+                    header.classList.toggle('mobile-open');
+                });
+            }
+
+            // Cambio de tema (dark/light mode)
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    document.documentElement.classList.toggle('theme-light');
+                    document.body.classList.toggle('theme-light');
+                    
+                    const currentTheme = document.documentElement.classList.contains('theme-light') ? 'light' : 'dark';
+                    localStorage.setItem('theme', currentTheme);
+                    
+                    // Forzar repintado para asegurar que los estilos se apliquen
+                    document.body.style.display = 'none';
+                    document.body.offsetHeight; // trigger reflow
+                    document.body.style.display = '';
+                });
+            }
+
+            // Aplicar tema guardado previamente
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('theme-light');
+                document.body.classList.add('theme-light');
+            }
+
+            // Animaciones de entrada con Intersection Observer
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            // Observar elementos que deben animarse
+            const elementsToAnimate = document.querySelectorAll('.neo-container, .neo-card');
+            elementsToAnimate.forEach(el => {
+                observer.observe(el);
+            });
+
+            // Smooth scroll para los enlaces internos
+            const internalLinks = document.querySelectorAll('a[href^="#"]');
+            internalLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        // Calcular la posición teniendo en cuenta el header sticky
+                        const headerHeight = document.querySelector('.neo-header')?.offsetHeight || 90;
+                        const targetPosition = targetElement.offsetTop - headerHeight - 20; // 20px de espaciado extra
+                        
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Cerrar menú móvil al hacer clic en un enlace
+            const navLinks = document.querySelectorAll('.neo-header nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    header.classList.remove('mobile-open');
+                });
+            });
+
+            // Parallax effect para el hero y manejo específico del scroll indicator
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            if (scrollIndicator) {
+                scrollIndicator.addEventListener('click', function() {
+                    const mainContent = document.querySelector('main .neo-container');
+                    if (mainContent) {
+                        const headerHeight = document.querySelector('.neo-header')?.offsetHeight || 90;
+                        const targetPosition = mainContent.offsetTop - headerHeight - 20;
+                        
+                        window.scrollTo({ 
+                            top: targetPosition, 
+                            behavior: 'smooth' 
+                        });
+                    }
+                });
+            }
+            
+            // Cambiar header según scroll
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const heroContent = document.querySelector('.hero-content');
+                const waves = document.querySelectorAll('.wave');
+                const scrollIndicator = document.querySelector('.scroll-indicator');
+                
+                if (heroContent) {
+                    heroContent.style.transform = `translateY(${scrolled * 0.5}px)`;
+                }
+                
+                waves.forEach((wave, index) => {
+                    wave.style.transform = `translateX(-50%) rotate(${scrolled * (0.1 + index * 0.05)}deg)`;
+                });
+                
+                // Ocultar scroll indicator cuando se hace scroll
+                if (scrollIndicator) {
+                    if (scrolled > 100) {
+                        scrollIndicator.classList.add('hidden');
+                    } else {
+                        scrollIndicator.classList.remove('hidden');
+                    }
+                }
+                
+                // Cambiar estilo del header al hacer scroll
+                const header = document.querySelector('.neo-header');
+                if (header) {
+                    if (scrolled > 100) {
+                        header.classList.add('scrolled');
+                    } else {
+                        header.classList.remove('scrolled');
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

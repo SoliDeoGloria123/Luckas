@@ -6,7 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Scroll a la primera sección después del hero
             const mainContent = document.querySelector('main .neo-container');
             if (mainContent) {
-                mainContent.scrollIntoView({ behavior: 'smooth' });
+                // Calcular la posición teniendo en cuenta el header sticky
+                const headerHeight = document.querySelector('.neo-header')?.offsetHeight || 90;
+                const targetPosition = mainContent.offsetTop - headerHeight - 20; // 20px de espaciado extra
+                
+                window.scrollTo({ 
+                    top: targetPosition, 
+                    behavior: 'smooth' 
+                });
             }
         });
     }

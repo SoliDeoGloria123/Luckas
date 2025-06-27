@@ -638,11 +638,11 @@
 
                 if (nombrePrincipal || apellidoPrincipal) {
                     html += `
-                        <div class="summary-item">
-                            <div class="summary-label">Participante principal:</div>
-                            <div class="summary-value">${nombrePrincipal} ${apellidoPrincipal}</div>
-                        </div>
-                    `;
+            <div class="summary-item">
+                <div class="summary-label">Participante principal:</div>
+                <div class="summary-value">${nombrePrincipal} ${apellidoPrincipal}</div>
+            </div>
+        `;
                 }
 
                 // Participantes adicionales
@@ -654,11 +654,11 @@
 
                     if (nombre || apellido) {
                         html += `
-                            <div class="summary-item">
-                                <div class="summary-label">Participante adicional ${index + 1}:</div>
-                                <div class="summary-value">${nombre} ${apellido}</div>
-                            </div>
-                        `;
+                <div class="summary-item">
+                    <div class="summary-label">Participante ${index + 2}:</div>
+                    <div class="summary-value">${nombre} ${apellido}</div>
+                </div>
+            `;
                     }
                 });
 
@@ -681,11 +681,11 @@
 
                         if (nombre || apellido) {
                             htmlAdicionales += `
-                                <div class="summary-item">
-                                    <div class="summary-label">Participante adicional ${index + 1}:</div>
-                                    <div class="summary-value">${nombre} ${apellido}</div>
-                                </div>
-                            `;
+                    <div class="summary-item">
+                        <div class="summary-label">Participante adicional ${index + 1}:</div>
+                        <div class="summary-value">${nombre} ${apellido}</div>
+                    </div>
+                `;
                         }
                     });
                     resumenAdicionales.innerHTML = htmlAdicionales;
@@ -698,6 +698,23 @@
                 }
             }
 
+            // Asegúrate de que los campos de los participantes adicionales actualicen el resumen
+            document.addEventListener('DOMContentLoaded', function () {
+                // Event listeners para los participantes adicionales que se creen
+                document.getElementById('agregar-persona').addEventListener('click', function () {
+                    // Añadir event listeners a los nuevos campos después de que se añadan
+                    setTimeout(() => {
+                        document.querySelectorAll('.additional-person').forEach(persona => {
+                            const personId = persona.getAttribute('data-person-id');
+                            const nombreInput = document.getElementById(`nombres-${personId}`);
+                            const apellidoInput = document.getElementById(`apellidos-${personId}`);
+
+                            if (nombreInput) nombreInput.addEventListener('input', actualizarCostos);
+                            if (apellidoInput) apellidoInput.addEventListener('input', actualizarCostos);
+                        });
+                    }, 100);
+                });
+            });
             // Configurar botón para añadir más personas
             document.getElementById('otra-persona-si').addEventListener('change', function () {
                 if (this.checked) {
@@ -767,33 +784,99 @@
             document.getElementById('hospedaje-anterior-no')?.addEventListener('change', actualizarCostos);
 
             // Event listeners para botones de navegación
-            document.getElementById('btn-siguiente-paso1')?.addEventListener('click', function() {
+            document.getElementById('btn-siguiente-paso1')?.addEventListener('click', function () {
                 // Aquí iría tu función para validar el paso 1
                 // Si es válido, actualizar la UI y mostrar el paso 2
                 actualizarCostos(); // Asegurarse que los costos están actualizados
             });
 
-            // Observar cambios en el DOM para capturar nuevos campos
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.addedNodes.length) {
-                        mutation.addedNodes.forEach(function(node) {
-                            if (node.nodeType === 1 && node.matches('.additional-person')) {
-                                // Si es un nuevo formulario de persona, agregar event listeners
-                                const personId = node.getAttribute('data-person-id');
-                                document.getElementById(`nombres-${personId}`)?.addEventListener('input', actualizarCostos);
-                                document.getElementById(`apellidos-${personId}`)?.addEventListener('input', actualizarCostos);
-                            }
-                        });
-                    }
-                });
+            // Añade este código para manejar la navegación entre pasos
+            document.addEventListener('DOMContentLoaded', function() {
+                // Botones de navegación
+                const btnSiguientePaso1 = document.getElementById('btn-siguiente-paso1');
+                const btnRegresarPaso2 = document.getElementById('btn-regresar-paso2');
+                const btnSiguientePaso2 = document.getElementById('btn-siguiente-paso2');
+                
+                // Secciones del formulario
+                const step1 = document.getElementById('step1');
+                const step2 = document.getElementById('step2');
+                const step3 = document.getElementById('step3');
+                
+                // Navegación de pasos
+                const stepsNav = document.querySelectorAll('.step');
+                
+                // Ir al paso 2
+                if (btnSiguientePaso1) {
+                    btnSiguientePaso1.addEventListener('click', function() {
+                        // Simple validación básica
+                        const nombres = document.getElementById('nombres').value;
+                        const apellidos = document.getElementById('apellidos').value;
+                        const documento = document.getElementById('documento').value;
+                        
+                        if (!nombres || !apellidos || !documento) {
+                            alert('Por favor complete los campos obligatorios');
+                            return;
+                        }
+                        
+                        // Actualizar UI
+                        step1.classList.remove('active');
+                        step2.classList.add('active');
+                        
+                        stepsNav[0].classList.remove('active');
+                        stepsNav[0].classList.add('completed');
+                        stepsNav[1].classList.add('active');
+                        
+                        // Actualizar costos
+                        actualizarCostos();
+                        
+                        // Scroll al inicio
+                        window.scrollTo(0, 0);
+                    });
+                }
+                
+                // Volver al paso 1
+                if (btnRegresarPaso2) {
+                    btnRegresarPaso2.addEventListener('click', function() {
+                        step2.classList.remove('active');
+                        step1.classList.add('active');
+                        
+                        stepsNav[1].classList.remove('active');
+                        stepsNav[0].classList.remove('completed');
+                        stepsNav[0].classList.add('active');
+                        
+                        window.scrollTo(0, 0);
+                    });
+                }
+                
+                // Ir al paso 3
+                if (btnSiguientePaso2) {
+                    btnSiguientePaso2.addEventListener('click', function() {
+                        // Validación del paso 2
+                        const metodoPago = document.getElementById('metodo-pago').value;
+                        
+                        if (!metodoPago) {
+                            alert('Por favor seleccione un método de pago');
+                            return;
+                        }
+                        
+                        // Actualizar UI
+                        step2.classList.remove('active');
+                        step3.classList.add('active');
+                        
+                        stepsNav[1].classList.remove('active');
+                        stepsNav[1].classList.add('completed');
+                        stepsNav[2].classList.add('active');
+                        
+                        window.scrollTo(0, 0);
+                        
+                        // Simular confirmación después de 3 segundos (solo demo)
+                        setTimeout(() => {
+                            document.getElementById('estado-pendiente').classList.add('hidden');
+                            document.getElementById('estado-aprobado').classList.remove('hidden');
+                        }, 3000);
+                    });
+                }
             });
-
-            // Iniciar observación en el contenedor de personas adicionales
-            const personasContainer = document.getElementById('personas-adicionales');
-            if (personasContainer) {
-                observer.observe(personasContainer, { childList: true, subtree: true });
-            }
         });
     </script>
 </body>
