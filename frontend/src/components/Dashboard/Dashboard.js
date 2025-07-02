@@ -1452,6 +1452,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
         setNuevaCabana={setNuevaCabana}
         onClose={() => setMostrarModal(false)}
         onSubmit={modoEdicionCabana ? actualizarCabana : crearCabana}
+        categorias={categorias}
       />
 
       <ReservasModal

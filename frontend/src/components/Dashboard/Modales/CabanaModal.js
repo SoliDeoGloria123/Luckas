@@ -10,7 +10,8 @@ const CabanaModal = ({
     nuevaCabana,
     setNuevaCabana,
     onClose,
-    onSubmit
+    onSubmit,
+    categorias
 }) => {
   if (!mostrar) return null;
 
@@ -67,7 +68,7 @@ const CabanaModal = ({
           </div>
           <div className="form-grupo">
             <label>Categoría:</label>
-            <input
+            <select
               type="text"
               value={modoEdicion ? cabanaSeleccionada?.categoria : nuevaCabana.categoria}
               onChange={e =>
@@ -76,8 +77,28 @@ const CabanaModal = ({
                   : setNuevaCabana({ ...nuevaCabana, categoria: e.target.value })
               }
               placeholder="Categoría"
+            >
+              <option value="">Seleccione...</option>
+              {categorias && categorias.map(cat => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+          {!modoEdicion && (
+          <div className="form-grupo">
+            <label>Ubicacion:</label>
+            <input
+              type="text"
+              value={ nuevaCabana.ubicacion}
+              onChange={e =>
+               setNuevaCabana({ ...nuevaCabana, ubicacion: e.target.value })
+              }
+              placeholder="Ubicación"
             />
           </div>
+          )}
           <div className="form-grupo">
             <label>Estado:</label>
             <select
@@ -93,6 +114,19 @@ const CabanaModal = ({
               <option value="ocupada">Ocupada</option>
               <option value="mantenimiento">Mantenimiento</option>
             </select>
+          </div>
+           <div className="form-grupo">
+            <label>Imagen De La Cabaña:</label>
+            <input
+              type="file"
+              value={modoEdicion ? cabanaSeleccionada?.imagen : nuevaCabana.imagen}
+              onChange={e =>
+                modoEdicion
+                  ? setCabanaSeleccionada({ ...cabanaSeleccionada, imagen: e.target.value })
+                  : setNuevaCabana({ ...nuevaCabana, imagen: e.target.value })
+              }
+    
+            />
           </div>
         </div>
         <div className="modal-footer">

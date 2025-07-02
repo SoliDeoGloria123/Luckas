@@ -28,7 +28,9 @@ exports.crearCabana = async (req, res) => {
 
 exports.obtenerCabanas = async (req, res) => {
   try {
-    const cabanas = await Cabana.find();
+    const cabanas = await Cabana.find()
+      .populate('categoria', 'nombre')
+      .populate('creadoPor', 'nombre email');
     res.json({ success: true, data: cabanas });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -37,7 +39,9 @@ exports.obtenerCabanas = async (req, res) => {
 
 exports.obtenerCabanaPorId = async (req, res) => {
   try {
-    const cabana = await Cabana.findById(req.params.id);
+    const cabana = await Cabana.findById(req.params.id)
+      .populate('categoria', 'nombre')
+      .populate('creadoPor', 'nombre email');
     if (!cabana) {
       return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
     }
@@ -49,7 +53,9 @@ exports.obtenerCabanaPorId = async (req, res) => {
 
 exports.actualizarCabana = async (req, res) => {
   try {
-    const cabana = await Cabana.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const cabana = await Cabana.findByIdAndUpdate(req.params.id, req.body, { new: true })
+      .populate('categoria', 'nombre')
+      .populate('creadoPor', 'nombre email');
     if (!cabana) return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
     res.json({ success: true, data: cabana });
   } catch (error) {
@@ -75,7 +81,9 @@ exports.categorizarCabana = async (req, res) => {
       req.params.id,
       { categoria },
       { new: true }
-    );
+    )
+    .populate('categoria', 'nombre')
+    .populate('creadoPor', 'nombre email');
     if (!cabana) {
       return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
     }

@@ -31,7 +31,7 @@ const CabanaTabla = ({cabanas, onEditar, onEliminar }) => (
               <td>{cabana.capacidad}</td>
               <td>{cabana.categoria?.nombre || cabana.categoria || "N/A"}</td>
               <td>{cabana.estado}</td>
-              <td>{cabana.creadoPor}</td>
+              <td>{cabana.creadoPor?.nombre || cabana.creadoPor || "N/A"}</td>
               <td>{cabana.imagen || "N/A" }</td>
               <td>
                 <button className="btn-editar" onClick={() => onEditar(cabana)}>

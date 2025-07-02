@@ -9,51 +9,57 @@ const ReservasModal = ({
   setNuevaReserva,
   usuarios,
   cabanas,
-  categorias,
+  solicitudes,
   onClose,
   onSubmit
 }) => {
   if (!mostrar) return null;
+
+  const reservaActual = modoEdicion ? reservaSeleccionada : nuevaReserva;
+  const setReserva = modoEdicion ? setReservaSeleccionada : setNuevaReserva;
+
+  const handleChange = (e) => {
+    const {name,value} = e.target;
+    setReserva({...reservaActual, [name]: value});
+
+  };
 
   return (
     <div className="modal-overlay">
       <div className="modal">
         <div className="modal-header">
           <h3>{modoEdicion ? "Editar Reserva" : "Crear Nueva Reserva"}</h3>
-          <button className="modal-cerrar" onClick={onClose}>
-            ✕
-          </button>
+          <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
+
         <div className="modal-body">
           {/* Usuario */}
           <div className="form-grupo">
-            <label>Usuario:</label>
-            <select
-              value={modoEdicion ? reservaSeleccionada?.usuario : nuevaReserva.usuario}
-              onChange={e =>
+            <label>Usuario ID:</label>
+  
+             <input
+                type="text"
+                value={modoEdicion ? reservaSeleccionada?.usuario : nuevaReserva.usuario}
+                onChange={e =>
                 modoEdicion
                   ? setReservaSeleccionada({ ...reservaSeleccionada, usuario: e.target.value })
                   : setNuevaReserva({ ...nuevaReserva, usuario: e.target.value })
-              }
-              required
-            >
-              <option value="">Seleccione...</option>
-              {usuarios && usuarios.map(user => (
-                <option key={user._id} value={user._id}>
-                  {user.username} ({user.email})
-                </option>
-              ))}
-            </select>
+                }
+                placeholder="ID del solicitante"
+                required
+              />
+            
           </div>
+
           {/* Cabaña */}
           <div className="form-grupo">
             <label>Cabaña:</label>
             <select
-              value={modoEdicion ? reservaSeleccionada?.recurso : nuevaReserva.recurso}
+              value={modoEdicion ? reservaSeleccionada?.cabana : nuevaReserva.cabana}
               onChange={e =>
                 modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, recurso: e.target.value })
-                  : setNuevaReserva({ ...nuevaReserva, recurso: e.target.value })
+                  ? setReservaSeleccionada({ ...reservaSeleccionada, cabana: e.target.value })
+                  : setNuevaReserva({ ...nuevaReserva, cabana: e.target.value })
               }
               required
             >
@@ -65,12 +71,17 @@ const ReservasModal = ({
               ))}
             </select>
           </div>
-          {/* Fechas */}
+
+          {/* Fecha Inicio */}
           <div className="form-grupo">
             <label>Fecha Inicio:</label>
             <input
               type="date"
-              value={modoEdicion ? reservaSeleccionada?.fechaInicio?.substring(0,10) : nuevaReserva.fechaInicio}
+              value={
+                modoEdicion
+                  ? reservaSeleccionada?.fechaInicio?.substring(0, 10)
+                  : nuevaReserva.fechaInicio
+              }
               onChange={e =>
                 modoEdicion
                   ? setReservaSeleccionada({ ...reservaSeleccionada, fechaInicio: e.target.value })
@@ -79,11 +90,17 @@ const ReservasModal = ({
               required
             />
           </div>
+
+          {/* Fecha Fin */}
           <div className="form-grupo">
             <label>Fecha Fin:</label>
             <input
               type="date"
-              value={modoEdicion ? reservaSeleccionada?.fechaFin?.substring(0,10) : nuevaReserva.fechaFin}
+              value={
+                modoEdicion
+                  ? reservaSeleccionada?.fechaFin?.substring(0, 10)
+                  : nuevaReserva.fechaFin
+              }
               onChange={e =>
                 modoEdicion
                   ? setReservaSeleccionada({ ...reservaSeleccionada, fechaFin: e.target.value })
@@ -92,26 +109,26 @@ const ReservasModal = ({
               required
             />
           </div>
-          {/* Categoría */}
+
+          {/* Estado */}
           <div className="form-grupo">
-            <label>Categoría:</label>
+            <label>Estado:</label>
             <select
-              value={modoEdicion ? reservaSeleccionada?.categoria : nuevaReserva.categoria}
+              value={modoEdicion ? reservaSeleccionada?.estado : nuevaReserva.estado || "Pendiente"}
               onChange={e =>
                 modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, categoria: e.target.value })
-                  : setNuevaReserva({ ...nuevaReserva, categoria: e.target.value })
+                  ? setReservaSeleccionada({ ...reservaSeleccionada, estado: e.target.value })
+                  : setNuevaReserva({ ...nuevaReserva, estado: e.target.value })
               }
               required
             >
-              <option value="">Seleccione...</option>
-              {categorias && categorias.map(cat => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.nombre}
-                </option>
-              ))}
+              <option value="Pendiente">Pendiente</option>
+              <option value="Confirmada">Confirmada</option>
+              <option value="Cancelada">Cancelada</option>
+              <option value="finalizada">Finalizada</option>
             </select>
           </div>
+
           {/* Observaciones */}
           <div className="form-grupo">
             <label>Observaciones:</label>
@@ -126,11 +143,12 @@ const ReservasModal = ({
               placeholder="Observaciones"
             />
           </div>
+
+      
         </div>
+
         <div className="modal-footer">
-          <button className="btn-secondary" onClick={onClose}>
-            Cancelar
-          </button>
+          <button className="btn-secondary" onClick={onClose}>Cancelar</button>
           <button className="btn-primary" onClick={onSubmit}>
             {modoEdicion ? "Guardar Cambios" : "Crear Reserva"}
           </button>
