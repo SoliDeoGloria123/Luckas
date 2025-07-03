@@ -25,6 +25,7 @@ import TablaTareas from "./Tablas/TareaTabla";
 import TablaCabana from './Tablas/CabanaTabla';
 import TablaReservas from './Tablas/ReservaTabla';
 import Reportes from "../Reportes/Reportes";
+import useBusqueda from "./Busqueda/useBusqueda";
 import "./Dashboard.css";
 
 
@@ -82,81 +83,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
     role: "externo",
     estado: "activo"
   });
-  //---------------------------------------------------------------------------------------------------------------
-  const [solicitudes, setSolicitudes] = useState([]);
-  const [nuevaSolicitud, setNuevaSolicitud] = useState({
-    solicitante: "",
-    correo: "",
-    telefono: "",
-    tipoSolicitud: "",
-    categoria: "",
-    descripcion: "",
-    estado: "Nuevo",
-    prioridad: "Media",
-    responsable: "",
-    observaciones: ""
-  });
-  const [modoEdicionSolicitud, setModoEdicionSolicitud] = useState(false);
-  const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
-  /*------------------------------------------------------------------------------------------------*/
-  const [mostrarModalInscripcion, setMostrarModalInscripcion] = useState(false);
-  const [modoEdicionInscripcion, setModoEdicionInscripcion] = useState(false);
-  const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
-  const [nuevaInscripcion, setNuevaInscripcion] = useState({
-    usuario: "",
-    nombre: "",
-    apellido: "",
-    tipoDocumento: "",
-    numeroDocumento: "",
-    correo: "",
-    telefono: "",
-    edad: "",
-    evento: "",
-    categoria: "",
-    estado: "pendiente",
-    observaciones: "",
-    solicitud: ""
-  });
-  //----------------------------------------------------------------------------------------------------------
-  // Estados para eventos
-  const [eventos, setEventos] = useState([]);
-  const [nuevoEvento, setNuevoEvento] = useState({
-    nombre: "",
-    descripcion: "",
-    imagen: "",
-    precio: 0,
-    categoria: "",
-    etiquetas: [],
-    fechaEvento: "",
-    horaInicio: "",
-    horaFin: "",
-    lugar: "",
-    direccion: "",
-    duracionDias: 1,
-    cuposTotales: 0,
-    cuposDisponibles: 0,
-    programa: [],
-    prioridad: "Normal",
-    observaciones: "",
-    active: true
-  });
-  const [modoEdicionEvento, setModoEdicionEvento] = useState(false);
-  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
-  //----------------------------------------------------------------------------------------------------------
-  // Estados para tareas
-  const [tareas, setTareas] = useState([]);
-  const [nuevaTarea, setNuevaTarea] = useState({
-    titulo: "",
-    descripcion: "",
-    estado: "pendiente",
-    prioridad: "media",
-    asignadoA: "",
-    asignadoPor: "",
-    fechaLimite: "",
-    comentarios: []
-  });
-  const [modoEdicionTarea, setModoEdicionTarea] = useState(false);
-  const [tareaSeleccionada, setTareaSeleccionada] = useState(null);
+
   //----------------------------------------------------------------------------------------------------------
   // Obtener usuarios
   const obtenerUsuarios = async () => {
@@ -282,6 +209,32 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
     )
     : [];
   /*-----------------------------------------------------------------------------------------------------------*/
+    const [solicitudes, setSolicitudes] = useState([]);  
+    const { busqueda: busquedaSolicitudes, setBusqueda: setBusquedaSolicitudes, datosFiltrados: solicitudesFiltradas } =
+    useBusqueda(solicitudes, [
+      "solicitante.nombre",
+      "correo",
+      "tipoSolicitud",
+      "categoria.nombre",
+      "categoria"
+    ]);
+
+  const [nuevaSolicitud, setNuevaSolicitud] = useState({
+    solicitante: "",
+    correo: "",
+    telefono: "",
+    tipoSolicitud: "",
+    categoria: "",
+    descripcion: "",
+    estado: "Nuevo",
+    prioridad: "Media",
+    responsable: "",
+    observaciones: ""
+  });
+  const [modoEdicionSolicitud, setModoEdicionSolicitud] = useState(false);
+  const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
+  
+
   // Obtener solicitudes
   const obtenerSolicitudes = async () => {
     try {
@@ -376,7 +329,24 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
 
 
   //-----------------------------------------------------------------------------------------------------------
-
+  const [mostrarModalInscripcion, setMostrarModalInscripcion] = useState(false);
+  const [modoEdicionInscripcion, setModoEdicionInscripcion] = useState(false);
+  const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
+  const [nuevaInscripcion, setNuevaInscripcion] = useState({
+    usuario: "",
+    nombre: "",
+    apellido: "",
+    tipoDocumento: "",
+    numeroDocumento: "",
+    correo: "",
+    telefono: "",
+    edad: "",
+    evento: "",
+    categoria: "",
+    estado: "pendiente",
+    observaciones: "",
+    solicitud: ""
+  })
   // Obtener inscripciones
   const obtenerInscripciones = async () => {
     try {
@@ -498,11 +468,19 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
     setMostrarModalInscripcion(true); // <-- Cambia esto
   };
   const [inscripciones, setInscripciones] = useState([]);
-  // Función para crear o actualizar inscripción (ajusta según tu lógica)
-  const crearOActualizarInscripcion = () => {
-    // Aquí va tu lógica para crear o actualizar la inscripción
-    setMostrarModalInscripcion(false);
-  };
+
+  // Luego usas el hook
+  const { busqueda: busquedaInscripciones, setBusqueda: setBusquedaInscripciones, datosFiltrados: inscripcionesFiltradas } =
+    useBusqueda(inscripciones, [
+      "nombre",
+      "apellido",
+      "correo",
+      "telefono",
+      "evento.nombre",
+      "categoria.nombre",
+      "estado"
+    ]);
+
   useEffect(() => {
     if (seccionActiva === "inscripciones") {
       obtenerInscripciones();
@@ -511,7 +489,39 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
 
   //-----------------------------------------------------------------------------------------------------------
   // FUNCIONES PARA GESTIÓN DE EVENTOS
+  // Estados para eventos
+  const [nuevoEvento, setNuevoEvento] = useState({
+    nombre: "",
+    descripcion: "",
+    imagen: "",
+    precio: 0,
+    categoria: "",
+    etiquetas: [],
+    fechaEvento: "",
+    horaInicio: "",
+    horaFin: "",
+    lugar: "",
+    direccion: "",
+    duracionDias: 1,
+    cuposTotales: 0,
+    cuposDisponibles: 0,
+    programa: [],
+    prioridad: "Normal",
+    observaciones: "",
+    active: true
+  });
+  const [modoEdicionEvento, setModoEdicionEvento] = useState(false);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
 
+  const [eventos, setEventos] = useState([]);
+  const { busqueda: busquedaEventos, setBusqueda: setBusquedaEventos, datosFiltrados: eventosFiltrados } =
+    useBusqueda(eventos, [
+      "nombre",
+      "descripcion",
+      "categoria.nombre",
+      "lugar",
+      "direccion"
+    ]);
   // Obtener todos los eventos
   const obtenerEventos = async () => {
     try {
@@ -633,7 +643,30 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
 
   //-----------------------------------------------------------------------------------------------------------
   // FUNCIONES PARA GESTIÓN DE TAREAS
+ // Estados para tareas
+  const [nuevaTarea, setNuevaTarea] = useState({
+    titulo: "",
+    descripcion: "",
+    estado: "pendiente",
+    prioridad: "media",
+    asignadoA: "",
+    asignadoPor: "",
+    fechaLimite: "",
+    comentarios: []
+  });
+  const [modoEdicionTarea, setModoEdicionTarea] = useState(false);
+  const [tareaSeleccionada, setTareaSeleccionada] = useState(null);
 
+  const [tareas, setTareas] = useState([]);
+  const { busqueda: busquedaTareas, setBusqueda: setBusquedaTareas, datosFiltrados: tareasFiltradas } =
+    useBusqueda(tareas, [
+      "titulo",
+      "descripcion",
+      "estado",
+      "prioridad",
+      "asignadoA",
+      "asignadoPor"
+    ]);
   // Obtener todas las tareas
   const obtenerTareas = async () => {
     try {
@@ -742,8 +775,8 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
 
   const [nuevaCategoria, setNuevaCategoria] = useState({
     nombre: "",
-    codigo: "",
-    descripcion: ""
+    codigo: ""
+
   });
   const [modoEdicionCategoria, setModoEdicionCategoria] = useState(false);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
@@ -751,7 +784,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
     try {
       await categorizacionService.create(nuevaCategoria);
       alert("Categoría creada exitosamente");
-      setNuevaCategoria({ nombre: "", codigo: "", descripcion: "" });
+      setNuevaCategoria({ nombre: "", codigo: "" });
       setMostrarModal(false);
       obtenerCategorias();
     } catch (error) {
@@ -797,7 +830,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
 
   const abrirModalCrearCategoria = () => {
     setModoEdicionCategoria(false);
-    setNuevaCategoria({ nombre: "", codigo: "", descripcion: "" });
+    setNuevaCategoria({ nombre: "", codigo: "" });
     setMostrarModal(true);
   };
 
@@ -807,9 +840,21 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
     setMostrarModal(true);
   };
   //----------------------------------------------------------------------------------------------------------------
-
+  const { busqueda: busquedaCategorias, setBusqueda: setBusquedaCategorias, datosFiltrados: categoriasFiltradas } =
+    useBusqueda(categorias, ["nombre", "codigo", "estado"]);
   // Estados para cabañas
   const [cabanas, setCabanas] = useState([]);
+ // Cabañas
+const { busqueda: busquedaCabanas, setBusqueda: setBusquedaCabanas, datosFiltrados: cabanasFiltradas } =
+  useBusqueda(cabanas, [
+    "nombre",
+    "descripcion",
+    "capacidad",
+    "categoria",
+    "estado"
+  ]);
+
+
   const [nuevaCabana, setNuevaCabana] = useState({
     nombre: "",
     descripcion: "",
@@ -892,6 +937,16 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
   //-----------------------------------------------------------------------------------------------------------
   // Estados para reservas
   const [reservas, setReservas] = useState([]);
+  // Reservas
+const { busqueda: busquedaReservas, setBusqueda: setBusquedaReservas, datosFiltrados: reservasFiltradas } =
+  useBusqueda(reservas, [
+    "usuario.nombre",
+    "usuario.apellido",
+    "usuario.correo",
+    "recurso.nombre",
+    "categoria",
+    "estado"
+  ]);
   const [nuevaReserva, setNuevaReserva] = useState({
     usuario: "",
     recurso: "",
@@ -1235,7 +1290,18 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
                 onEditar={readOnly ? null : abrirModalEditar}
                 onEliminar={(modoTesorero || readOnly) ? null : eliminarUsuario}
               />
+              <UsuarioModal
+                mostrar={mostrarModal && seccionActiva === "usuarios"}
+                modoEdicion={modoEdicion}
+                usuarioSeleccionado={usuarioSeleccionado}
+                setUsuarioSeleccionado={setUsuarioSeleccionado}
+                nuevoUsuario={nuevoUsuario}
+                setNuevoUsuario={setNuevoUsuario}
+                onClose={() => setMostrarModal(false)}
+                onSubmit={modoEdicion ? actualizarUsuario : crearUsuario}
+              />
             </div>
+
           )}
           {seccionActiva === "configuracion" && (
             <div className="seccion-configuracion">
@@ -1253,10 +1319,30 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
                   </button>
                 )}
               </div>
+              <div className="busqueda-contenedor">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar Solicitud..."
+                  value={busquedaSolicitudes}
+                  onChange={e => setBusquedaSolicitudes(e.target.value)}
+                  className="input-busqueda"
+                />
+              </div>
               <TablaUnificadaSolicitudes
-                datosUnificados={{ solicitudes, inscripciones: [], reservas: [] }}
+                datosUnificados={{ solicitudes: solicitudesFiltradas, inscripciones: [], reservas: [] }}
                 abrirModalEditarSolicitud={(canEdit && !readOnly) ? abrirModalEditarSolicitud : null}
                 eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
+              />
+              <SolicitudModal
+                mostrar={mostrarModal && seccionActiva === "solicitudes"}
+                modoEdicion={modoEdicionSolicitud}
+                solicitudSeleccionada={solicitudSeleccionada}
+                setSolicitudSeleccionada={setSolicitudSeleccionada}
+                nuevaSolicitud={nuevaSolicitud}
+                setNuevaSolicitud={setNuevaSolicitud}
+                onClose={() => setMostrarModal(false)}
+                onSubmit={modoEdicionSolicitud ? actualizarSolicitud : crearSolicitud}
+                categorias={categorias}
               />
             </div>
           )}
@@ -1271,10 +1357,31 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
                   </button>
                 )}
               </div>
+              <div className="busqueda-contenedor">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar Inscripción..."
+                  value={busquedaInscripciones}
+                  onChange={e => setBusquedaInscripciones(e.target.value)}
+                  className="input-busqueda"
+                />
+              </div>
               <TablaInscripciones
-                inscripciones={inscripciones}
+                inscripciones={inscripcionesFiltradas}
                 onEditar={(canEdit && !readOnly) ? abrirModalEditarInscripcion : null}
                 onEliminar={(canDelete && !modoTesorero && !readOnly) ? eliminarInscripcion : null}
+              />
+              <InscripcionModal
+                mostrar={mostrarModalInscripcion}
+                modoEdicion={modoEdicionInscripcion}
+                inscripcionSeleccionada={inscripcionSeleccionada}
+                setInscripcionSeleccionada={setInscripcionSeleccionada}
+                nuevaInscripcion={nuevaInscripcion}
+                setNuevaInscripcion={setNuevaInscripcion}
+                eventos={eventos}
+                categorias={categorias}
+                onClose={() => setMostrarModalInscripcion(false)}
+                onSubmit={modoEdicionInscripcion ? actualizarInscripcion : CrearInscripcion}
               />
             </div>
           )}
@@ -1289,11 +1396,32 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
                   </button>
                 )}
               </div>
+              <div className="busqueda-contenedor">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar Evento..."
+                  value={busquedaEventos}
+                  onChange={e => setBusquedaEventos(e.target.value)}
+                  className="input-busqueda"
+                />
+              </div>
               <TablaEventos
-                eventos={eventos}
+                eventos={eventosFiltrados}
                 onEditar={readOnly ? null : abrirModalEditarEvento}
                 onEliminar={(modoTesorero || readOnly) ? null : eliminarEvento}
                 onDeshabilitar={readOnly ? null : deshabilitarEvento}
+              />
+
+              <EventoModal
+                mostrar={mostrarModal && seccionActiva === "eventos"}
+                modoEdicion={modoEdicionEvento}
+                eventoSeleccionado={eventoSeleccionado}
+                setEventoSeleccionado={setEventoSeleccionado}
+                nuevoEvento={nuevoEvento}
+                setNuevoEvento={setNuevoEvento}
+                categorias={categorias}
+                onClose={() => setMostrarModal(false)}
+                onSubmit={modoEdicionEvento ? actualizarEvento : crearEvento}
               />
             </div>
           )}
@@ -1307,10 +1435,29 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
                   </button>
                 )}
               </div>
+              <div className="busqueda-contenedor">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar Categoría..."
+                  value={busquedaCategorias}
+                  onChange={e => setBusquedaCategorias(e.target.value)}
+                  className="input-busqueda"
+                />
+              </div>
               <TablaCategorias
-                categorias={categorias}
+                categorias={categoriasFiltradas}
                 onEditar={readOnly ? null : abrirModalEditarCategoria}
                 onEliminar={(modoTesorero || readOnly) ? null : eliminarCategoria}
+              />
+              <CategorizacionModal
+                mostrar={mostrarModal && seccionActiva === "categorizacion"}
+                modoEdicion={modoEdicionCategoria}
+                categoriaSeleccionada={categoriaSeleccionada}
+                setCategoriaSeleccionada={setCategoriaSeleccionada}
+                nuevaCategoria={nuevaCategoria}
+                setNuevaCategoria={setNuevaCategoria}
+                onClose={() => setMostrarModal(false)}
+                onSubmit={modoEdicionCategoria ? actualizarCategoria : crearCategoria}
               />
             </div>
           )}
@@ -1324,11 +1471,31 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
                   </button>
                 )}
               </div>
+              <div className="busqueda-contenedor">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar Tarea..."
+                  value={busquedaTareas}
+                  onChange={e => setBusquedaTareas(e.target.value)}
+                  className="input-busqueda"
+                />
+              </div>
               <TablaTareas
-                tareas={tareas}
+                tareas={tareasFiltradas}
                 onEditar={readOnly ? null : abrirModalEditarTarea}
                 onEliminar={(modoTesorero || readOnly) ? null : eliminarTarea}
                 onCambiarEstado={readOnly ? null : cambiarEstadoTarea}
+              />
+              <TareaModal
+                mostrar={mostrarModal && seccionActiva === "tareas"}
+                modoEdicion={modoEdicionTarea}
+                tareaSeleccionada={tareaSeleccionada}
+                setTareaSeleccionada={setTareaSeleccionada}
+                nuevaTarea={nuevaTarea}
+                setNuevaTarea={setNuevaTarea}
+                onClose={() => setMostrarModal(false)}
+                onSubmit={modoEdicionTarea ? actualizarTarea : crearTarea}
+                usuarios={usuarios} // <-- agrega esto
               />
             </div>
           )}
@@ -1342,10 +1509,30 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
                   </button>
                 )}
               </div>
+              <div className="busqueda-contenedor">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar Cabaña..."
+                  value={busquedaCabanas}
+                  onChange={e => setBusquedaCabanas(e.target.value)}
+                  className="input-busqueda"
+                />
+              </div>
               <TablaCabana
-                cabanas={cabanas}
+                cabanas={cabanasFiltradas}
                 onEditar={readOnly ? null : abrirModalEditarCabana}
                 onEliminar={(modoTesorero || readOnly) ? null : eliminarCabana}
+              />
+              <CabanaModal
+                mostrar={mostrarModal && seccionActiva === "cabanas"}
+                modoEdicion={modoEdicionCabana}
+                cabanaSeleccionada={cabanaSeleccionada}
+                setCabanaSeleccionada={setCabanaSeleccionada}
+                nuevaCabana={nuevaCabana}
+                setNuevaCabana={setNuevaCabana}
+                onClose={() => setMostrarModal(false)}
+                onSubmit={modoEdicionCabana ? actualizarCabana : crearCabana}
+                categorias={categorias}
               />
             </div>
           )}
@@ -1359,10 +1546,32 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
                   </button>
                 )}
               </div>
+              <div className="busqueda-contenedor">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar Reserva..."
+                  value={busquedaReservas}
+                  onChange={e => setBusquedaReservas(e.target.value)}
+                  className="input-busqueda"
+                />
+              </div>
               <TablaReservas
-                reservas={reservas}
+                reservas={reservasFiltradas}
                 onEditar={(canEdit && !readOnly) ? abrirModalEditarReserva : null}
                 onEliminar={(canDelete && !modoTesorero && !readOnly) ? eliminarReserva : null}
+              />
+              <ReservasModal
+                mostrar={mostrarModal && seccionActiva === "reservas"}
+                modoEdicion={modoEdicionReserva}
+                reservaSeleccionada={reservaSeleccionada}
+                setReservaSeleccionada={setReservaSeleccionada}
+                nuevaReserva={nuevaReserva}
+                setNuevaReserva={setNuevaReserva}
+                usuarios={usuarios}
+                cabanas={cabanas}
+                categorias={categorias}
+                onClose={() => setMostrarModal(false)}
+                onSubmit={modoEdicionReserva ? actualizarReserva : crearReserva}
               />
             </div>
           )}
@@ -1375,99 +1584,6 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
 
         </main>
       </div>
-      <CategorizacionModal
-        mostrar={mostrarModal && seccionActiva === "categorizacion"}
-        modoEdicion={modoEdicionCategoria}
-        categoriaSeleccionada={categoriaSeleccionada}
-        setCategoriaSeleccionada={setCategoriaSeleccionada}
-        nuevaCategoria={nuevaCategoria}
-        setNuevaCategoria={setNuevaCategoria}
-        onClose={() => setMostrarModal(false)}
-
-        onSubmit={modoEdicionCategoria ? actualizarCategoria : crearCategoria}
-      />
-      <UsuarioModal
-        mostrar={mostrarModal && seccionActiva === "usuarios"}
-        modoEdicion={modoEdicion}
-        usuarioSeleccionado={usuarioSeleccionado}
-        setUsuarioSeleccionado={setUsuarioSeleccionado}
-        nuevoUsuario={nuevoUsuario}
-        setNuevoUsuario={setNuevoUsuario}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicion ? actualizarUsuario : crearUsuario}
-      />
-      <SolicitudModal
-        mostrar={mostrarModal && seccionActiva === "solicitudes"}
-        modoEdicion={modoEdicionSolicitud}
-        solicitudSeleccionada={solicitudSeleccionada}
-        setSolicitudSeleccionada={setSolicitudSeleccionada}
-        nuevaSolicitud={nuevaSolicitud}
-        setNuevaSolicitud={setNuevaSolicitud}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicionSolicitud ? actualizarSolicitud : crearSolicitud}
-        categorias={categorias}
-      />
-      <EventoModal
-        mostrar={mostrarModal && seccionActiva === "eventos"}
-        modoEdicion={modoEdicionEvento}
-        eventoSeleccionado={eventoSeleccionado}
-        setEventoSeleccionado={setEventoSeleccionado}
-        nuevoEvento={nuevoEvento}
-        setNuevoEvento={setNuevoEvento}
-        categorias={categorias}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicionEvento ? actualizarEvento : crearEvento}
-      />
-
-      <TareaModal
-        mostrar={mostrarModal && seccionActiva === "tareas"}
-        modoEdicion={modoEdicionTarea}
-        tareaSeleccionada={tareaSeleccionada}
-        setTareaSeleccionada={setTareaSeleccionada}
-        nuevaTarea={nuevaTarea}
-        setNuevaTarea={setNuevaTarea}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicionTarea ? actualizarTarea : crearTarea}
-        usuarios={usuarios} // <-- agrega esto
-      />
-      <InscripcionModal
-        mostrar={mostrarModalInscripcion}
-        modoEdicion={modoEdicionInscripcion}
-        inscripcionSeleccionada={inscripcionSeleccionada}
-        setInscripcionSeleccionada={setInscripcionSeleccionada}
-        nuevaInscripcion={nuevaInscripcion}
-        setNuevaInscripcion={setNuevaInscripcion}
-        eventos={eventos}
-        categorias={categorias}
-        onClose={() => setMostrarModalInscripcion(false)}
-        onSubmit={modoEdicionInscripcion ? actualizarInscripcion : CrearInscripcion}
-      />
-
-      <CabanaModal
-        mostrar={mostrarModal && seccionActiva === "cabanas"}
-        modoEdicion={modoEdicionCabana}
-        cabanaSeleccionada={cabanaSeleccionada}
-        setCabanaSeleccionada={setCabanaSeleccionada}
-        nuevaCabana={nuevaCabana}
-        setNuevaCabana={setNuevaCabana}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicionCabana ? actualizarCabana : crearCabana}
-        categorias={categorias}
-      />
-
-      <ReservasModal
-        mostrar={mostrarModal && seccionActiva === "reservas"}
-        modoEdicion={modoEdicionReserva}
-        reservaSeleccionada={reservaSeleccionada}
-        setReservaSeleccionada={setReservaSeleccionada}
-        nuevaReserva={nuevaReserva}
-        setNuevaReserva={setNuevaReserva}
-        usuarios={usuarios}
-        cabanas={cabanas}
-        categorias={categorias}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicionReserva ? actualizarReserva : crearReserva}
-      />
     </div>
   )
 }

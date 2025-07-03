@@ -15,10 +15,6 @@ const categorizacionSchema = new mongoose.Schema({
     uppercase: true,
     trim: true
   },
-  descripcion: {
-    type: String,
-    trim: true
-  },
   activo: {
     type: Boolean,
     default: true

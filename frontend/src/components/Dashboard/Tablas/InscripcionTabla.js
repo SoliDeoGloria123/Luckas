@@ -38,7 +38,11 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
               <td>{ins.evento?.nombre || "N/A"}</td>
               <td>{ins.observaciones || "N/A"}</td>
               <td>{ins.fechaInscripcion || "N/A"}</td>
-              <td>{ins.estado || "N/A"}</td>
+              <td>
+                <span className={`badge-estado estado-${(ins.estado || "pendiente").toLowerCase()}`}>
+                  {ins.estado || "Pendiente"}
+                </span>
+              </td>
               <td>{ins.solicitud?._id || ins.solicitud || ""}</td>
               <td>
                 <button className="btn-editar" onClick={() => onEditar(ins)}>✏️</button>

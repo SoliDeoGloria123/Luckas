@@ -1,7 +1,9 @@
 import React from "react";
 
 const TablaUsuarios = ({ usuarios, onEditar, onEliminar }) => (
+  
   <div className="tabla-contenedor">
+    
     <table className="tabla-usuarios">
       <thead>
         <tr>

@@ -40,7 +40,10 @@ const TablaEventos = ({ eventos, onEditar, onEliminar, onDeshabilitar }) => (
               <td>{evento.lugar}</td>
               <td>{evento.cuposTotales}</td>
               <td>{evento.cuposDisponibles}</td>
-              <td>{evento.prioridad}</td>
+              <td><span className={`prioridad-${(evento.prioridad || "media").toLowerCase()}}`}>
+                {evento.prioridad || "Media"}
+                </span>
+              </td>
               <td>
                 <span className={`badge-estado estado-${evento.active ? "activo" : "inactivo"}`}>
                   {evento.active ? "Activo" : "Inactivo"}

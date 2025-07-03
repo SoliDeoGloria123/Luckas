@@ -6,7 +6,7 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar }) => (
         <tr>
           <th>ID</th>
           <th>Nombre</th>
-          <th>Descripción</th>
+          <th>Codigo</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
@@ -21,7 +21,7 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar }) => (
             <tr key={cat._id}>
               <td>{cat._id}</td>
               <td>{cat.nombre}</td>
-              <td>{cat.descripcion}</td>
+              <td>{cat.codigo}</td>
               <td>
                 <span className={`badge-estado estado-${cat.estado || "activo"}`}>
                   {cat.estado || "activo"}

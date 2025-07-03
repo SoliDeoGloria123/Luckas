@@ -41,7 +41,7 @@ const Login = () => {
       <div className="container">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
         <div className="logo">
-          <span className="luckas">Luckas</span><span className="ent">ent</span>
+          <span className="luckas1">Luckas</span><span className="ent1">ent</span>
         </div>
         <div className="login-box">
           <h2>Iniciar Sesión</h2>

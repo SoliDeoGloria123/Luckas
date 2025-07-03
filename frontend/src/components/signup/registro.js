@@ -58,7 +58,7 @@ const Registro = () => {
       <div className="registro-wrapper">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
         <div className="logo">
-          <span className="luckas">Luckas</span><span className="ent">ent</span>
+          <span className="luckas2">Luckas</span><span className="ent2">ent</span>
         </div>
         <div className="registro-contenedor">
           <div className="registro-caja">

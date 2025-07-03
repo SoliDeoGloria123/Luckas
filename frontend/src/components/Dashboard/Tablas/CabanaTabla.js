@@ -1,8 +1,8 @@
-import React from   "react";
+import React from "react";
 
 
-const CabanaTabla = ({cabanas, onEditar, onEliminar }) => (
-    <div className="tabla-contenedor">
+const CabanaTabla = ({ cabanas, onEditar, onEliminar }) => (
+  <div className="tabla-contenedor">
     <table className="tabla-usuarios">
       <thead>
         <tr>
@@ -30,9 +30,13 @@ const CabanaTabla = ({cabanas, onEditar, onEliminar }) => (
               <td>{cabana.descripcion}</td>
               <td>{cabana.capacidad}</td>
               <td>{cabana.categoria?.nombre || cabana.categoria || "N/A"}</td>
-              <td>{cabana.estado}</td>
+              <td>
+                <span className={`badge-estado estado-${(cabana.estado || "pendiente").toLowerCase()}`}>
+                  {cabana.estado || "Pendiente"}
+                </span>
+              </td>
               <td>{cabana.creadoPor?.nombre || cabana.creadoPor || "N/A"}</td>
-              <td>{cabana.imagen || "N/A" }</td>
+              <td>{cabana.imagen || "N/A"}</td>
               <td>
                 <button className="btn-editar" onClick={() => onEditar(cabana)}>
                   ✏️

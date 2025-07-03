@@ -30,9 +30,13 @@ const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => 
               <td>{tarea._id}</td>
               <td>{tarea.titulo}</td>
               <td>{tarea.descripcion?.substring(0, 100)}...</td>
-               <td>{tarea.estado}</td>
               <td>
-                <span className={`badge-prioridad prioridad-${tarea.prioridad}`}>
+                <span className={`badge-estado estado-${(tarea.estado || "pendiente").toLowerCase()}`}>
+                  {tarea.estado || "Pendiente"}
+                </span>
+              </td>
+              <td>
+                <span className={`prioridad-${tarea.prioridad}`}>
                   {tarea.prioridad?.charAt(0).toUpperCase() + tarea.prioridad?.slice(1)}
                 </span>
               </td>

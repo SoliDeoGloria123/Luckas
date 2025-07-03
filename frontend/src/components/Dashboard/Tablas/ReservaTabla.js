@@ -11,6 +11,7 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
           <th>Fecha Inicio</th>
           <th>Fecha Fin</th>
           <th>Estado</th>
+          <th>Categoría</th>
           <th>Observaciones</th>
           <th>Solicitud</th>
           <th>Acciones</th>
@@ -30,14 +31,19 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
                   ? reserva.usuario?.username || reserva.usuario?.nombre || reserva.usuario?.correo || reserva.usuario?._id || "N/A"
                   : reserva.usuario || "N/A"}
               </td>
-             <td>
+              <td>
                 {typeof reserva.cabana === "object"
                   ? reserva.cabana?.nombre || reserva.cabana?._id || "N/A"
                   : reserva.cabana || "N/A"}
               </td>
               <td>{reserva.fechaInicio ? new Date(reserva.fechaInicio).toLocaleDateString() : ""}</td>
               <td>{reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : ""}</td>
-             <td>
+              <td>
+                <span className={`badge-estado estado-${(reserva.estado || "pendiente").toLowerCase()}`}>
+                  {reserva.estado || "Pendiente"}
+                </span>
+              </td>
+              <td>
                 {typeof reserva.categoria === "object"
                   ? reserva.categoria?.nombre || reserva.categoria?._id || "N/A"
                   : reserva.categoria || "N/A"}

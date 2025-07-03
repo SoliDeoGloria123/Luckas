@@ -51,18 +51,19 @@ const CategorizacionModal = ({
             />
           </div>
           <div className="form-grupo">
-            <label>Descripción:</label>
-            <input
-              type="text"
-              value={modoEdicion ? categoriaSeleccionada?.descripcion : nuevaCategoria.descripcion}
+            <label>Activo:</label>
+            <select
+              value={modoEdicion ? categoriaSeleccionada?.activo : nuevaCategoria.activo}
               onChange={e =>
                 modoEdicion
-                  ? setCategoriaSeleccionada({ ...categoriaSeleccionada, descripcion: e.target.value })
-                  : setNuevaCategoria({ ...nuevaCategoria, descripcion: e.target.value })
+                  ? setCategoriaSeleccionada({ ...categoriaSeleccionada, activo: e.target.value === "true" })
+                  : setNuevaCategoria({ ...nuevaCategoria, activo: e.target.value === "true" })
               }
-              placeholder="Descripción"
-            />
-          </div>
+            >
+              <option value="true">Activo</option>
+              <option value="false">Desactivado</option>
+            </select>
+        </div>
         </div>
         <div className="modal-footer">
           <button className="btn-secondary" onClick={onClose}>

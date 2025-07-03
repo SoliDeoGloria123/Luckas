@@ -124,7 +124,7 @@ body {
     position: relative;
     height: 14px;
     margin: -2px 0 0 90px;
-    color: #0a0a0a;
+    color: #ffffff;
     font-family: Bebas Neue, var(--default-font-family);
     font-size: 12px;
     font-weight: 400;
@@ -1157,7 +1157,7 @@ body {
 .estado-revision { color: #ffc107; font-weight: bold; }
 .estado-aprobada { color: #28a745; font-weight: bold; }
 .estado-rechazada { color: #dc3545; font-weight: bold; }
-.estado-completada { color: #6c757d; font-weight: bold; }
+.estado-pendiente { color: #6c757d; font-weight: bold; }
 
 .prioridad-alta { color: #dc3545; font-weight: bold; }
 .prioridad-media { color: #ffc107; font-weight: bold; }

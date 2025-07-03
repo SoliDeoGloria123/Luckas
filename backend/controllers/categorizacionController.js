@@ -5,7 +5,7 @@ const Solicitud = require('../models/Solicitud');
 // CREAR nueva categoría
 const crearCategoria = async (req, res) => {
   try {
-    const { nombre, codigo, descripcion } = req.body;
+    const { nombre, codigo } = req.body;
     
     // Verificar si el código ya existe
     const categoriaExistente = await Categorizacion.findOne({ codigo: codigo.toUpperCase() });
@@ -28,7 +28,6 @@ const crearCategoria = async (req, res) => {
     const nuevaCategoria = new Categorizacion({
       nombre,
       codigo: codigo.toUpperCase(),
-      descripcion,
       creadoPor: req.userId
     });
 
@@ -109,7 +108,7 @@ const obtenerCategoriaPorId = async (req, res) => {
 // ACTUALIZAR categoría
 const actualizarCategoria = async (req, res) => {
   try {
-    const { nombre, descripcion, codigo, activo } = req.body;
+    const { nombre, codigo, activo } = req.body;
 
     // Si se está cambiando el código, verificar que no exista
     if (codigo) {
@@ -141,7 +140,7 @@ const actualizarCategoria = async (req, res) => {
       }
     }
 
-    const datosActualizacion = { nombre, descripcion, activo };
+    const datosActualizacion = { nombre,  activo };
     if (codigo) {
       datosActualizacion.codigo = codigo.toUpperCase();
     }
