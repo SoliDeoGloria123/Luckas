@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="es" class="theme-dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripción a Evento - Seminario Bautista de Colombia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/inscripcion.css') }}">
+</head>
+
+<body>
+    <!-- Fondo de ondas animadas -->
+    <div class="wave-background">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar elegante -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/logo-white.png" alt="Logo SBC" class="logo">
+                <h1>Luckas</h1>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-image-container">
+                    <img src="images/profile.jpg" alt="Perfil de usuario" class="user-image">
+                </div>
+                <div class="user-info">
+                    <h3>Juan Pérez</h3>
+                    <p>Estudiante</p>
+                </div>
+            </div>
+
+            <nav class="main-nav">
+                <div class="nav-section">
+                    <h4>Principal</h4>
+                    <ul>
+                        <li>
+                            <a href="dashboard.html">
+                                <i class="fas fa-th-large"></i>
+                                <span>Panel Principal</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="perfil.html">
+                                <i class="fas fa-user"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="notificaciones.html">
+                                <i class="fas fa-bell"></i>
+                                <span>Notificaciones</span>
+                                <span class="badge">3</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h4>Gestión</h4>
+                    <ul>
+                        <li class="active">
+                            <a href="eventos.html">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Eventos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="programas-academicos.html">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Programas Académicos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="cabanas.html">
+                                <i class="fas fa-home"></i>
+                                <span>Reservas de Cabañas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h4>Cuenta</h4>
+                    <ul>
+                        <li>
+                            <a href="configuracion.html">
+                                <i class="fas fa-cog"></i>
+                                <span>Configuración</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="ayuda.html">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Ayuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html" class="logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Cerrar Sesión</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>Seminario Bautista de Colombia</p>
+                <p class="version">Luckas v2.1.0</p>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Inscripción a Evento</h1>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle header-icon-button">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Navegación por pasos -->
+            <div class="steps-navigation">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Datos de Inscripción</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Pago</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Confirmación</div>
+                </div>
+            </div>
+
+            <!-- Resumen del evento -->
+            <div class="event-summary">
+                <div class="event-image">
+                    <img src="images/events/conference.jpg" alt="Conferencia de Teología" id="event-image">
+                </div>
+                <div class="event-info">
+                    <div>
+                        <h2 id="event-title">Conferencia de Teología</h2>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span id="event-date">16 de mayo, 2025</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-clock"></i>
+                                <span id="event-time">9:00 AM - 5:00 PM</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="event-location">Auditorio Principal</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-price">
+                        <div class="price" id="event-price">$150.000</div>
+                        <div class="per-person">por persona</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 1: Formulario de Inscripción -->
+            <div class="form-section active" id="step1">
+                <h3>Información del Participante Principal</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombres">Nombres</label>
+                        <input type="text" id="nombres" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellidos">Apellidos</label>
+                        <input type="text" id="apellidos" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo-documento">Tipo de Documento</label>
+                        <select id="tipo-documento" class="form-control" required>
+                            <option value="">Seleccione</option>
+                            <option value="cc">Cédula de Ciudadanía</option>
+                            <option value="ce">Cédula de Extranjería</option>
+                            <option value="pasaporte">Pasaporte</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="documento">Número de Documento</label>
+                        <input type="text" id="documento" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="correo">Correo Electrónico</label>
+                        <input type="email" id="correo" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edad">Edad</label>
+                        <input type="number" id="edad" class="form-control" min="18" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="iglesia">Iglesia a la que pertenece</label>
+                        <select id="iglesia" class="form-control" required>
+                            <option value="">Seleccione</option>
+                            <option value="iglesia1">Primera Iglesia Bautista de Bogotá</option>
+                            <option value="iglesia2">Iglesia Bautista Central de Medellín</option>
+                            <option value="iglesia3">Iglesia Bautista El Redil</option>
+                            <option value="iglesia4">Iglesia Bautista Esperanza Viva</option>
+                            <option value="iglesia5">Otra</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Necesita hospedaje la noche anterior al evento?</label>
+                    <div class="form-check">
+                        <input type="radio" name="hospedaje-anterior" id="hospedaje-anterior-si" value="si">
+                        <label for="hospedaje-anterior-si">Sí, deseo reservar ($14.000 por noche)</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="hospedaje-anterior" id="hospedaje-anterior-no" value="no" checked>
+                        <label for="hospedaje-anterior-no">No</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Desea inscribir a otra persona?</label>
+                    <div class="form-check">
+                        <input type="radio" name="otra-persona" id="otra-persona-si" value="si">
+                        <label for="otra-persona-si">Sí</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="otra-persona" id="otra-persona-no" value="no" checked>
+                        <label for="otra-persona-no">No</label>
+                    </div>
+                </div>
+
+                <!-- Formulario para personas adicionales (oculto inicialmente) -->
+                <div id="personas-adicionales" class="hidden">
+                    <!-- Será llenado dinámicamente con JavaScript -->
+                </div>
+
+                <!-- Botón para añadir más personas -->
+                <button type="button" id="agregar-persona" class="btn btn-outline add-person hidden">
+                    <i class="fas fa-user-plus"></i> Añadir otra persona
+                </button>
+
+                <div class="form-actions">
+                    <a href="eventos.html" class="btn btn-outline">Cancelar</a>
+                    <button type="button" class="btn btn-primary" id="btn-siguiente-paso1">Continuar al Pago</button>
+                </div>
+            </div>
+
+            <!-- Paso 2: Método de Pago -->
+            <div class="form-section" id="step2">
+                <h3>Método de Pago</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="metodo-pago">Seleccione un método de pago</label>
+                        <select id="metodo-pago" class="form-control" required>
+                            <option value="">Seleccione</option>
+                            <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                            <option value="pse">PSE - Pagos en línea</option>
+                            <option value="transferencia">Transferencia Bancaria</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Detalles del pago seleccionado -->
+                <div id="detalles-pago" class="hidden">
+                    <!-- Tarjeta de crédito/débito -->
+                    <div id="pago-tarjeta" class="hidden">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="numero-tarjeta">Número de Tarjeta</label>
+                                <input type="text" id="numero-tarjeta" class="form-control"
+                                    placeholder="1234 5678 9012 3456">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre-tarjeta">Nombre en la Tarjeta</label>
+                                <input type="text" id="nombre-tarjeta" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiracion">Fecha de Expiración</label>
+                                <input type="text" id="expiracion" class="form-control" placeholder="MM/AA">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" class="form-control" maxlength="4">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PSE -->
+                    <div id="pago-pse" class="hidden">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="banco">Seleccione su Banco</label>
+                                <select id="banco" class="form-control">
+                                    <option value="">Seleccione</option>
+                                    <option value="bancolombia">Bancolombia</option>
+                                    <option value="davivienda">Davivienda</option>
+                                    <option value="bbva">BBVA</option>
+                                    <option value="popular">Banco Popular</option>
+                                    <option value="bogota">Banco de Bogotá</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tipo-cuenta">Tipo de Cuenta</label>
+                                <select id="tipo-cuenta" class="form-control">
+                                    <option value="">Seleccione</option>
+                                    <option value="ahorros">Ahorros</option>
+                                    <option value="corriente">Corriente</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transferencia Bancaria -->
+                    <div id="pago-transferencia" class="hidden">
+                        <div class="info-text">
+                            <p>Realice una transferencia a la siguiente cuenta bancaria:</p>
+                            <p><strong>Banco:</strong> Bancolombia</p>
+                            <p><strong>Tipo de Cuenta:</strong> Ahorros</p>
+                            <p><strong>Número de Cuenta:</strong> 123-456789-00</p>
+                            <p><strong>Titular:</strong> Seminario Bautista de Colombia</p>
+                            <p><strong>NIT:</strong> 900.123.456-7</p>
+                            <p>Una vez realizada la transferencia, por favor cargue el comprobante de pago:</p>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="comprobante">Comprobante de Pago</label>
+                                <input type="file" id="comprobante" class="form-control" accept="image/*,.pdf">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen de costos -->
+                <div class="summary-section">
+                    <h4>Resumen de su Inscripción</h4>
+
+                    <div id="resumen-inscripcion">
+                        <!-- Será llenado dinámicamente con JavaScript -->
+                    </div>
+
+                    <div class="summary-costs">
+                        <div class="cost-item">
+                            <div class="cost-label">Subtotal Inscripciones:</div>
+                            <div class="cost-value" id="subtotal-inscripciones">$150.000</div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-label">Hospedaje adicional:</div>
+                            <div class="cost-value" id="costo-hospedaje">$0</div>
+                        </div>
+                        <div class="cost-item total">
+                            <div class="cost-label">Total a pagar:</div>
+                            <div class="cost-value" id="total-pagar">$150.000</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="btn-regresar-paso2">Regresar</button>
+                    <button type="button" class="btn btn-primary" id="btn-siguiente-paso2">Confirmar Pago</button>
+                </div>
+            </div>
+
+            <!-- Paso 3: Confirmación -->
+            <div class="form-section" id="step3">
+                <h3>Estado de su Inscripción</h3>
+
+                <div class="confirmation-status" id="estado-pendiente">
+                    <div class="status-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h4>Inscripción en Proceso</h4>
+                    <p>Estamos verificando su pago. Este proceso puede tomar hasta 24 horas hábiles.</p>
+                </div>
+
+                <div class="confirmation-status hidden" id="estado-aprobado">
+                    <div class="status-icon approved">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h4>¡Inscripción Confirmada!</h4>
+                    <p>Su pago ha sido confirmado. Se ha enviado la información a su correo electrónico.</p>
+                </div>
+
+                <div class="confirmation-status hidden" id="estado-rechazado">
+                    <div class="status-icon rejected">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <h4>Inscripción Rechazada</h4>
+                    <p>Ha ocurrido un problema con su pago. Por favor contacte a soporte para obtener asistencia.</p>
+                </div>
+
+                <!-- Resumen de la inscripción -->
+                <div class="summary-section">
+                    <h4>Detalles de su Inscripción</h4>
+                    <div class="summary-item">
+                        <div class="summary-label">Código de inscripción:</div>
+                        <div class="summary-value" id="resumen-codigo">SBC-123456-7890</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Evento:</div>
+                        <div class="summary-value" id="resumen-evento">Conferencia de Teología</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Fecha:</div>
+                        <div class="summary-value" id="resumen-fecha">16 de mayo, 2025</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Participante principal:</div>
+                        <div class="summary-value" id="resumen-participante">Juan Pérez</div>
+                    </div>
+
+                    <div id="resumen-adicionales">
+                        <!-- Será llenado dinámicamente con JavaScript si hay participantes adicionales -->
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Método de pago:</div>
+                        <div class="summary-value" id="resumen-pago">Transferencia Bancaria</div>
+                    </div>
+
+                    <div class="summary-costs">
+                        <div class="cost-item total">
+                            <div class="cost-label">Total pagado:</div>
+                            <div class="cost-value" id="resumen-total">$150.000</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('eventos') }}" class="btn btn-outline">Volver a Eventos</a>
+                    <a href="#" class="btn btn-primary" id="btn-descargar-comprobante">Descargar Comprobante</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script para la lógica de la página -->
+    <script src="{{ url_for('static', path='js/inscripcion.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Obtener los parámetros de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventoId = urlParams.get('evento');
+            const numParticipantes = parseInt(urlParams.get('participantes')) || 1;
+
+            console.log("Evento ID:", eventoId, "Participantes:", numParticipantes);
+
+            if (eventoId) {
+                // Aquí obtén datos del evento según el ID (puedes usar un objeto con datos predefinidos o una petición)
+                const eventosData = {
+                    evento1: {
+                        title: "Conferencia de Teología",
+                        date: "16 de mayo, 2025",
+                        time: "9:00 AM - 5:00 PM",
+                        location: "Auditorio Principal",
+                        price: "150000"
+                    },
+                    evento2: {
+                        title: "Taller de Liderazgo",
+                        date: "20 de mayo, 2025",
+                        time: "14:00 - 18:00",
+                        location: "Sala 203",
+                        price: "80000"
+                    },
+                    // Añade más eventos según necesites
+                };
+
+                if (eventosData[eventoId]) {
+                    const evento = eventosData[eventoId];
+                    document.getElementById('event-title').textContent = evento.title;
+                    document.getElementById('event-date').textContent = evento.date;
+                    document.getElementById('event-time').textContent = evento.time;
+                    document.getElementById('event-location').textContent = evento.location;
+
+                    // Convertir precio a formato con separador de miles
+                    const precioNum = parseInt(evento.price);
+                    document.getElementById('event-price').textContent = `$${precioNum.toLocaleString('es-CO')}`;
+
+                    // Si hay más de 1 participante, marcar opción "Sí" para añadir personas
+                    if (numParticipantes > 1) {
+                        document.getElementById('otra-persona-si').checked = true;
+                        document.getElementById('personas-adicionales').classList.remove('hidden');
+                        document.getElementById('agregar-persona').classList.remove('hidden');
+
+                        // Crear formularios para participantes adicionales
+                        const personasAdicionalesContainer = document.getElementById('personas-adicionales');
+
+                        for (let i = 2; i <= numParticipantes; i++) {
+                            const newPersonId = i;
+                            const personaHtml = `
+                                <div class="additional-person" data-person-id="${newPersonId}">
+                                    <h4>Participante ${newPersonId} <button type="button" class="remove-person" data-person-id="${newPersonId}">&times;</button></h4>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="nombres-${newPersonId}">Nombres</label>
+                                            <input type="text" id="nombres-${newPersonId}" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="apellidos-${newPersonId}">Apellidos</label>
+                                            <input type="text" id="apellidos-${newPersonId}" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="documento-${newPersonId}">Número de Documento</label>
+                                            <input type="text" id="documento-${newPersonId}" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edad-${newPersonId}">Edad</label>
+                                            <input type="number" id="edad-${newPersonId}" class="form-control" min="18" max="100" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            personasAdicionalesContainer.innerHTML += personaHtml;
+                        }
+
+                        // Configurar los botones de eliminar
+                        document.querySelectorAll('.remove-person').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const personId = this.getAttribute('data-person-id');
+                                const personElement = document.querySelector(`.additional-person[data-person-id="${personId}"]`);
+                                personElement.remove();
+                                actualizarCostos();
+                            });
+                        });
+
+                        // Actualizar costos
+                        actualizarCostos();
+                    }
+                }
+            }
+
+            // Función para actualizar costos al cambiar opciones
+            function actualizarCostos() {
+                // Obtener precio base del evento
+                const precioTexto = document.getElementById('event-price').textContent;
+                const precioBase = parseInt(precioTexto.replace(/[^\d]/g, ''));
+
+                // Calcular número de participantes (1 principal + adicionales)
+                const participantesAdicionales = document.querySelectorAll('.additional-person');
+                const numParticipantes = 1 + participantesAdicionales.length;
+
+                // Calcular subtotal de inscripciones
+                const subtotalInscripciones = precioBase * numParticipantes;
+
+                // Calcular costo de hospedaje adicional
+                let costoHospedaje = 0;
+                if (document.getElementById('hospedaje-anterior-si')?.checked) {
+                    costoHospedaje += 14000; // Hospedaje para participante principal
+                }
+
+                // Verificar hospedaje para participantes adicionales
+                participantesAdicionales.forEach(participante => {
+                    const personId = participante.getAttribute('data-person-id');
+                    const hospedajeRadio = document.querySelector(`input[name="${personId}-hospedaje"][value="si"]`);
+                    if (hospedajeRadio?.checked) {
+                        costoHospedaje += 14000;
+                    }
+                });
+
+                // Calcular total
+                const costoTotal = subtotalInscripciones + costoHospedaje;
+
+                // Actualizar elementos UI
+                const subtotalElement = document.getElementById('subtotal-inscripciones');
+                const hospedajeElement = document.getElementById('costo-hospedaje');
+                const totalElement = document.getElementById('total-pagar');
+
+                if (subtotalElement) subtotalElement.textContent = `$${subtotalInscripciones.toLocaleString('es-CO')}`;
+                if (hospedajeElement) hospedajeElement.textContent = `$${costoHospedaje.toLocaleString('es-CO')}`;
+                if (totalElement) totalElement.textContent = `$${costoTotal.toLocaleString('es-CO')}`;
+
+                // Actualizar también resumen de inscripción
+                actualizarResumenInscripcion(subtotalInscripciones, costoHospedaje, costoTotal);
+            }
+
+            // Función para actualizar el resumen de inscripción en paso 2
+            function actualizarResumenInscripcion(subtotal, hospedaje, total) {
+                const resumenInscripcion = document.getElementById('resumen-inscripcion');
+                if (!resumenInscripcion) return;
+
+                let html = '';
+
+                // Participante principal
+                const nombrePrincipal = document.getElementById('nombres')?.value || '';
+                const apellidoPrincipal = document.getElementById('apellidos')?.value || '';
+
+                if (nombrePrincipal || apellidoPrincipal) {
+                    html += `
+            <div class="summary-item">
+                <div class="summary-label">Participante principal:</div>
+                <div class="summary-value">${nombrePrincipal} ${apellidoPrincipal}</div>
+            </div>
+        `;
+                }
+
+                // Participantes adicionales
+                const participantes = document.querySelectorAll('.additional-person');
+                participantes.forEach((participante, index) => {
+                    const personId = participante.getAttribute('data-person-id');
+                    const nombre = document.getElementById(`nombres-${personId}`)?.value || '';
+                    const apellido = document.getElementById(`apellidos-${personId}`)?.value || '';
+
+                    if (nombre || apellido) {
+                        html += `
+                <div class="summary-item">
+                    <div class="summary-label">Participante ${index + 2}:</div>
+                    <div class="summary-value">${nombre} ${apellido}</div>
+                </div>
+            `;
+                    }
+                });
+
+                resumenInscripcion.innerHTML = html;
+
+                // Actualizar también el resumen en paso 3 si existe
+                const resumenParticipante = document.getElementById('resumen-participante');
+                const resumenAdicionales = document.getElementById('resumen-adicionales');
+
+                if (resumenParticipante && (nombrePrincipal || apellidoPrincipal)) {
+                    resumenParticipante.textContent = `${nombrePrincipal} ${apellidoPrincipal}`;
+                }
+
+                if (resumenAdicionales) {
+                    let htmlAdicionales = '';
+                    participantes.forEach((participante, index) => {
+                        const personId = participante.getAttribute('data-person-id');
+                        const nombre = document.getElementById(`nombres-${personId}`)?.value || '';
+                        const apellido = document.getElementById(`apellidos-${personId}`)?.value || '';
+
+                        if (nombre || apellido) {
+                            htmlAdicionales += `
+                    <div class="summary-item">
+                        <div class="summary-label">Participante adicional ${index + 1}:</div>
+                        <div class="summary-value">${nombre} ${apellido}</div>
+                    </div>
+                `;
+                        }
+                    });
+                    resumenAdicionales.innerHTML = htmlAdicionales;
+                }
+
+                // Actualizar totales en el resumen final
+                const resumenTotal = document.getElementById('resumen-total');
+                if (resumenTotal) {
+                    resumenTotal.textContent = `$${total.toLocaleString('es-CO')}`;
+                }
+            }
+
+            // Asegúrate de que los campos de los participantes adicionales actualicen el resumen
+            document.addEventListener('DOMContentLoaded', function () {
+                // Event listeners para los participantes adicionales que se creen
+                document.getElementById('agregar-persona').addEventListener('click', function () {
+                    // Añadir event listeners a los nuevos campos después de que se añadan
+                    setTimeout(() => {
+                        document.querySelectorAll('.additional-person').forEach(persona => {
+                            const personId = persona.getAttribute('data-person-id');
+                            const nombreInput = document.getElementById(`nombres-${personId}`);
+                            const apellidoInput = document.getElementById(`apellidos-${personId}`);
+
+                            if (nombreInput) nombreInput.addEventListener('input', actualizarCostos);
+                            if (apellidoInput) apellidoInput.addEventListener('input', actualizarCostos);
+                        });
+                    }, 100);
+                });
+            });
+            // Configurar botón para añadir más personas
+            document.getElementById('otra-persona-si').addEventListener('change', function () {
+                if (this.checked) {
+                    document.getElementById('personas-adicionales').classList.remove('hidden');
+                    document.getElementById('agregar-persona').classList.remove('hidden');
+                }
+            });
+
+            document.getElementById('otra-persona-no').addEventListener('change', function () {
+                if (this.checked) {
+                    document.getElementById('personas-adicionales').classList.add('hidden');
+                    document.getElementById('agregar-persona').classList.add('hidden');
+                }
+            });
+
+            // Configurar botón para agregar más personas
+            document.getElementById('agregar-persona').addEventListener('click', function () {
+                const personasAdicionalesContainer = document.getElementById('personas-adicionales');
+                const numActual = personasAdicionalesContainer.querySelectorAll('.additional-person').length + 1;
+                const newPersonId = numActual + 1;
+
+                const personaHtml = `
+                    <div class="additional-person" data-person-id="${newPersonId}">
+                        <h4>Participante ${newPersonId} <button type="button" class="remove-person" data-person-id="${newPersonId}">&times;</button></h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombres-${newPersonId}">Nombres</label>
+                                <input type="text" id="nombres-${newPersonId}" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="apellidos-${newPersonId}">Apellidos</label>
+                                <input type="text" id="apellidos-${newPersonId}" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="documento-${newPersonId}">Número de Documento</label>
+                                <input type="text" id="documento-${newPersonId}" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edad-${newPersonId}">Edad</label>
+                                <input type="number" id="edad-${newPersonId}" class="form-control" min="18" max="100" required>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                personasAdicionalesContainer.innerHTML += personaHtml;
+
+                // Configurar el nuevo botón de eliminar
+                const removeBtn = personasAdicionalesContainer.querySelector(`.additional-person[data-person-id="${newPersonId}"] .remove-person`);
+                removeBtn.addEventListener('click', function () {
+                    const personElement = document.querySelector(`.additional-person[data-person-id="${newPersonId}"]`);
+                    personElement.remove();
+                    // Actualizar el formulario y recalcular los costos
+                    actualizarCostos();
+                });
+
+                // Actualizar costos
+                actualizarCostos();
+            });
+
+            // Event listeners para cambios en formulario principal
+            document.getElementById('nombres')?.addEventListener('input', actualizarCostos);
+            document.getElementById('apellidos')?.addEventListener('input', actualizarCostos);
+            document.getElementById('hospedaje-anterior-si')?.addEventListener('change', actualizarCostos);
+            document.getElementById('hospedaje-anterior-no')?.addEventListener('change', actualizarCostos);
+
+            // Event listeners para botones de navegación
+            document.getElementById('btn-siguiente-paso1')?.addEventListener('click', function () {
+                // Aquí iría tu función para validar el paso 1
+                // Si es válido, actualizar la UI y mostrar el paso 2
+                actualizarCostos(); // Asegurarse que los costos están actualizados
+            });
+
+            // Añade este código para manejar la navegación entre pasos
+            document.addEventListener('DOMContentLoaded', function() {
+                // Botones de navegación
+                const btnSiguientePaso1 = document.getElementById('btn-siguiente-paso1');
+                const btnRegresarPaso2 = document.getElementById('btn-regresar-paso2');
+                const btnSiguientePaso2 = document.getElementById('btn-siguiente-paso2');
+                
+                // Secciones del formulario
+                const step1 = document.getElementById('step1');
+                const step2 = document.getElementById('step2');
+                const step3 = document.getElementById('step3');
+                
+                // Navegación de pasos
+                const stepsNav = document.querySelectorAll('.step');
+                
+                // Ir al paso 2
+                if (btnSiguientePaso1) {
+                    btnSiguientePaso1.addEventListener('click', function() {
+                        // Simple validación básica
+                        const nombres = document.getElementById('nombres').value;
+                        const apellidos = document.getElementById('apellidos').value;
+                        const documento = document.getElementById('documento').value;
+                        
+                        if (!nombres || !apellidos || !documento) {
+                            alert('Por favor complete los campos obligatorios');
+                            return;
+                        }
+                        
+                        // Actualizar UI
+                        step1.classList.remove('active');
+                        step2.classList.add('active');
+                        
+                        stepsNav[0].classList.remove('active');
+                        stepsNav[0].classList.add('completed');
+                        stepsNav[1].classList.add('active');
+                        
+                        // Actualizar costos
+                        actualizarCostos();
+                        
+                        // Scroll al inicio
+                        window.scrollTo(0, 0);
+                    });
+                }
+                
+                // Volver al paso 1
+                if (btnRegresarPaso2) {
+                    btnRegresarPaso2.addEventListener('click', function() {
+                        step2.classList.remove('active');
+                        step1.classList.add('active');
+                        
+                        stepsNav[1].classList.remove('active');
+                        stepsNav[0].classList.remove('completed');
+                        stepsNav[0].classList.add('active');
+                        
+                        window.scrollTo(0, 0);
+                    });
+                }
+                
+                // Ir al paso 3
+                if (btnSiguientePaso2) {
+                    btnSiguientePaso2.addEventListener('click', function() {
+                        // Validación del paso 2
+                        const metodoPago = document.getElementById('metodo-pago').value;
+                        
+                        if (!metodoPago) {
+                            alert('Por favor seleccione un método de pago');
+                            return;
+                        }
+                        
+                        // Actualizar UI
+                        step2.classList.remove('active');
+                        step3.classList.add('active');
+                        
+                        stepsNav[1].classList.remove('active');
+                        stepsNav[1].classList.add('completed');
+                        stepsNav[2].classList.add('active');
+                        
+                        window.scrollTo(0, 0);
+                        
+                        // Simular confirmación después de 3 segundos (solo demo)
+                        setTimeout(() => {
+                            document.getElementById('estado-pendiente').classList.add('hidden');
+                            document.getElementById('estado-aprobado').classList.remove('hidden');
+                        }, 3000);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

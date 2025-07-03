@@ -1426,7 +1426,7 @@ const { busqueda: busquedaReservas, setBusqueda: setBusquedaReservas, datosFiltr
             </div>
           )}
           {seccionActiva === "categorizacion" && (
-            <div className="seccion-categorias">
+            <div className="seccion-usuarios">
               <div className="seccion-header">
                 <h2>Categorización</h2>
                 {!readOnly && (

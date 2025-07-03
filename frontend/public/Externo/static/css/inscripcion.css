@@ -1,0 +1,412 @@
+/* Estilos específicos para la página de inscripción a eventos */
+
+/* Navegación por pasos */
+.steps-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.steps-navigation::before {
+    content: "";
+    position: absolute;
+    top: 24px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--border);
+    z-index: 0;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    width: 33.33%;
+}
+
+.step-number {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--surface);
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    border: 2px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background-color: var(--blue-medium);
+    color: white;
+    border-color: var(--blue-medium);
+    box-shadow: 0 0 0 4px rgba(106, 133, 182, 0.3);
+}
+
+.step.completed .step-number {
+    background-color: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+.step-label {
+    font-size: 0.9rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.step.active .step-label {
+    color: var(--blue-light);
+    font-weight: 500;
+}
+
+.step.completed .step-label {
+    color: var(--success);
+}
+
+/* Resumen del evento */
+.event-summary {
+    display: flex;
+    background-color: rgba(18, 18, 18, 0.8);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.event-image {
+    width: 200px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.event-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-info {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.event-info h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.event-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.event-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.event-detail i {
+    color: var(--blue-medium);
+}
+
+.event-price {
+    display: flex;
+    align-items: baseline;
+    margin-top: auto;
+}
+
+.event-price .price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--blue-light);
+}
+
+.event-price .per-person {
+    margin-left: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Formularios */
+.form-section {
+    background-color: rgba(18, 18, 18, 0.8);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    display: none;
+}
+
+.form-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.form-section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.8rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.form-control {
+    width: 100%;
+    background-color: rgba(30, 30, 40, 0.5);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.9rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--blue-medium);
+    box-shadow: 0 0 0 2px rgba(106, 133, 182, 0.2);
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.form-check input[type="radio"],
+.form-check input[type="checkbox"] {
+    margin-right: 0.5rem;
+    cursor: pointer;
+    accent-color: var(--blue-medium);
+}
+
+.form-check label {
+    cursor: pointer;
+    margin-bottom: 0;
+    color: var(--text);
+}
+
+.info-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1rem;
+}
+
+/* Estilos para personas adicionales */
+.additional-person {
+    background-color: rgba(30, 30, 40, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+}
+
+.additional-person h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-person {
+    background: none;
+    border: none;
+    color: var(--error);
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.add-person {
+    margin-top: 0.5rem;
+    align-self: flex-start;
+}
+
+/* Resumen y costos */
+.summary-section {
+    background-color: rgba(30, 30, 40, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.summary-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: var(--blue-light);
+}
+
+.summary-item {
+    display: flex;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.summary-label {
+    flex: 1;
+    color: var(--text-secondary);
+}
+
+.summary-value {
+    flex: 2;
+}
+
+.summary-costs {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.cost-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+}
+
+.cost-item.total {
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding-top: 0.8rem;
+    margin-top: 0.8rem;
+    border-top: 1px solid var(--border);
+}
+
+.cost-item.total .cost-value {
+    color: var(--blue-light);
+    font-size: 1.3rem;
+}
+
+/* Estados de confirmación */
+.confirmation-status {
+    text-align: center;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    background-color: rgba(30, 30, 40, 0.3);
+}
+
+.status-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2.5rem;
+}
+
+.status-icon.pending {
+    background-color: rgba(249, 168, 37, 0.2);
+    color: var(--warning);
+}
+
+.status-icon.approved {
+    background-color: rgba(67, 160, 71, 0.2);
+    color: var(--success);
+}
+
+.status-icon.rejected {
+    background-color: rgba(193, 67, 67, 0.2);
+    color: var(--error);
+}
+
+.confirmation-status h4 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.confirmation-status p {
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Responsividad */
+@media (max-width: 992px) {
+    .event-summary {
+        flex-direction: column;
+    }
+    
+    .event-image {
+        width: 100%;
+        height: 180px;
+    }
+}
+
+@media (max-width: 768px) {
+    .steps-navigation {
+        flex-direction: column;
+        gap: 1rem;
+        border-left: 2px solid var(--border);
+        padding-left: 1rem;
+        margin-left: 1rem;
+    }
+    
+    .steps-navigation::before {
+        display: none;
+    }
+    
+    .step {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 1rem;
+    }
+    
+    .step-number {
+        margin-bottom: 0;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
