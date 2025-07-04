@@ -7,6 +7,9 @@ const Categorizacion = require('./categorizacion');
 const Tarea = require('./Tarea');
 const Cabanas = require('./Cabana');
 const Inscripcion = require('./Inscripciones');
+const ProgramaAcademico = require('./ProgramaAcademico');
+const Curso = require('./Curso');
+const ProgramaTecnico = require('./ProgramaTecnico');
 
 
 // Exportar todos los modelos para que puedan ser utilizados en otras partes de la aplicación
@@ -19,5 +22,8 @@ module.exports= {
     Evento,
     Categorizacion,
     Tarea,
-    Cabanas
+    Cabanas,
+    ProgramaAcademico,
+    Curso,
+    ProgramaTecnico
 };

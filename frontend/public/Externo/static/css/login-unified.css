@@ -1,0 +1,367 @@
+/* Login Unificado - Seminario Bautista de Colombia */
+:root {
+    --primary-blue: #1e3a8a;
+    --secondary-blue: #3b5998;
+    --light-blue: #6a85b6;
+    --accent-blue: #d4e0f7;
+    --dark-blue: #0a1128;
+    --white: #ffffff;
+    --light-gray: #f5f5f5;
+    --medium-gray: #333333;
+    --dark-gray: #121212;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.background-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+    z-index: -1;
+}
+
+.background-animation::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(1deg); }
+}
+
+.login-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    animation: slideUp 0.8s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.5rem;
+}
+
+.luckas1 {
+    color: var(--primary-blue);
+}
+
+.ent1 {
+    color: var(--secondary-blue);
+}
+
+.login-box h2 {
+    color: var(--dark-gray);
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 1.8rem;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--medium-gray);
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--light-blue);
+    font-size: 1.1rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px 15px 15px 50px;
+    border: 2px solid var(--accent-blue);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--white);
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+}
+
+.toggle-password {
+    left: auto !important;
+    right: 15px;
+    cursor: pointer;
+    color: var(--medium-gray) !important;
+    transition: color 0.3s ease;
+}
+
+.toggle-password:hover {
+    color: var(--primary-blue) !important;
+}
+
+.btn-login {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: var(--white);
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(30, 58, 138, 0.3);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.btn-login.loading {
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent-blue);
+}
+
+.divider span {
+    background: var(--white);
+    padding: 0 15px;
+    color: var(--medium-gray);
+    position: relative;
+}
+
+.btn-google {
+    width: 100%;
+    background: var(--white);
+    color: var(--medium-gray);
+    border: 2px solid var(--accent-blue);
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.btn-google:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 5px 15px rgba(30, 58, 138, 0.1);
+}
+
+.form-footer {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-footer a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.form-footer a:hover {
+    color: var(--secondary-blue);
+}
+
+.register-link {
+    margin-top: 15px;
+    color: var(--medium-gray);
+}
+
+.role-info {
+    border-top: 1px solid var(--accent-blue);
+    padding-top: 20px;
+}
+
+.role-info h4 {
+    color: var(--dark-gray);
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.roles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.role-item {
+    text-align: center;
+    padding: 15px 10px;
+    background: var(--light-gray);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.role-item:hover {
+    background: var(--accent-blue);
+    transform: translateY(-2px);
+}
+
+.role-item i {
+    font-size: 1.5rem;
+    color: var(--primary-blue);
+    margin-bottom: 5px;
+}
+
+.role-item span {
+    display: block;
+    font-weight: 600;
+    color: var(--dark-gray);
+    margin-bottom: 3px;
+}
+
+.role-item small {
+    color: var(--medium-gray);
+    font-size: 0.8rem;
+}
+
+/* Alerts */
+.alert {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--success);
+    color: var(--success);
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--error);
+    color: var(--error);
+}
+
+.alert-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid var(--warning);
+    color: var(--warning);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+    
+    .logo {
+        font-size: 2rem;
+    }
+    
+    .roles-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .role-item {
+        padding: 12px 8px;
+    }
+}

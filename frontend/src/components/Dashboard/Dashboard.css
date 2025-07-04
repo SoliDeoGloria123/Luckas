@@ -753,7 +753,32 @@ body {
   border-color: var(--color-primary);
 }
 
+/* Estilos para submenu */
+.sidebar-nav .submenu {
+  margin-left: 20px;
+  margin-top: 5px;
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+}
 
+.sidebar-nav .submenu li {
+  margin-left: 10px;
+}
+
+.sidebar-nav .submenu a {
+  padding: 8px 12px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.sidebar-nav .submenu a:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-nav .submenu .activo a {
+  background-color: rgba(255, 255, 255, 0.15);
+  opacity: 1;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

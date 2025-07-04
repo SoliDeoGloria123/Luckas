@@ -1602,14 +1602,19 @@
                 });
             });
             
-            // Cargar nombre y rol dinámicamente
-            const userName = localStorage.getItem('userName') || 'Juan Pérez';
-            const userRole = localStorage.getItem('userRole') || 'Estudiante';
-            const userNameElem = document.getElementById('user-name');
-            const userRoleElem = document.getElementById('user-role');
-            if (userNameElem) userNameElem.textContent = userName;
-            if (userRoleElem) userRoleElem.textContent = userRole;
+            // Cargar datos del usuario autenticado
+            const user = AuthUtils.getUser();
+            if (user) {
+                const userNameElem = document.getElementById('user-name');
+                const userRoleElem = document.getElementById('user-role');
+                if (userNameElem) userNameElem.textContent = `${user.nombre} ${user.apellido}`;
+                if (userRoleElem) userRoleElem.textContent = 'Usuario Externo';
+            }
         });
     </script>
+    
+    <!-- Scripts necesarios -->
+    <script src="../static/js/login-unified.js"></script>
+    <script src="../static/js/dashboard-external.js"></script>
 </body>
 </html>

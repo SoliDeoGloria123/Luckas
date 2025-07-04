@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es" class="theme-dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programas Académicos - Seminario Bautista de Colombia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/external/static/css/dashboard.css">
+    <link rel="stylesheet" href="../static/css/programas-academicos-external.css">
+</head>
+
+<body>
+    <!-- Fondo animado de ondas -->
+    <div class="wave-background">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar elegante -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="/external/static/img/lOGO%20PROYECTO%20LuckasEnt.png" alt="Logo LuckasEnt" class="logo">
+                <h1>Luckas</h1>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-image-container">
+                    <img src="/external/static/img/meme.jpg" alt="Perfil de usuario" class="user-image">
+                </div>
+                <div class="user-info">
+                    <h3 id="user-name">Cargando...</h3>
+                    <p id="user-role">Usuario Externo</p>
+                </div>
+            </div>
+
+            <nav class="main-nav">
+                <div class="nav-section">
+                    <h4>Principal</h4>
+                    <ul>
+                        <li>
+                            <a href="dashboard.html">
+                                <i class="fas fa-th-large"></i>
+                                <span>Panel Principal</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="perfil.html">
+                                <i class="fas fa-user"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="notificaciones.html">
+                                <i class="fas fa-bell"></i>
+                                <span>Notificaciones</span>
+                                <span class="badge">3</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h4>Gestión</h4>
+                    <ul>
+                        <li>
+                            <a href="eventos.html">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Eventos</span>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="programas-academicos-external.html">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Programas Académicos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="cabanas.html">
+                                <i class="fas fa-home"></i>
+                                <span>Reservas de Cabañas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h4>Cuenta</h4>
+                    <ul>
+                        <li>
+                            <a href="configuracion.html">
+                                <i class="fas fa-cog"></i>
+                                <span>Configuración</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="ayuda.html">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Ayuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Cerrar Sesión</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>Seminario Bautista de Colombia</p>
+                <p class="version">Luckas v2.1.0</p>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>
+                    <i class="fas fa-graduation-cap"></i>
+                    Programas Académicos
+                </h1>
+                <p>Descubre nuestros cursos, programas técnicos y especializaciones</p>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters-section">
+                <div class="filters-group">
+                    <div class="filter-item">
+                        <label for="tipo-programa">Tipo de Programa</label>
+                        <select id="tipo-programa">
+                            <option value="">Todos los programas</option>
+                            <option value="curso">Cursos</option>
+                            <option value="tecnico">Programas Técnicos</option>
+                            <option value="especializacion">Especializaciones</option>
+                            <option value="diplomado">Diplomados</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="modalidad">Modalidad</label>
+                        <select id="modalidad">
+                            <option value="">Todas las modalidades</option>
+                            <option value="presencial">Presencial</option>
+                            <option value="virtual">Virtual</option>
+                            <option value="mixta">Mixta</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="duracion">Duración</label>
+                        <select id="duracion">
+                            <option value="">Cualquier duración</option>
+                            <option value="corto">Menos de 3 meses</option>
+                            <option value="medio">3-6 meses</option>
+                            <option value="largo">Más de 6 meses</option>
+                        </select>
+                    </div>
+                    <button class="btn-filter" onclick="aplicarFiltros()">
+                        <i class="fas fa-search"></i>
+                        Filtrar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading-container">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando programas académicos...</p>
+                </div>
+            </div>
+
+            <!-- Grid de programas -->
+            <div id="programas-container" class="programas-grid">
+                <!-- Los programas se cargarán dinámicamente aquí -->
+            </div>
+
+            <!-- Mensaje cuando no hay programas -->
+            <div id="no-programas" class="no-results" style="display: none;">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>No se encontraron programas</h3>
+                <p>No hay programas académicos que coincidan con los filtros seleccionados.</p>
+                <button class="btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de inscripción -->
+    <div id="modal-inscripcion" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Inscripción a Programa Académico</h2>
+                <button class="modal-close" onclick="cerrarModalInscripcion()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="programa-seleccionado" class="programa-summary">
+                    <!-- Información del programa seleccionado -->
+                </div>
+                
+                <form id="form-inscripcion">
+                    <div class="form-section">
+                        <h3>Información Personal</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nombres">Nombres completos</label>
+                                <input type="text" id="nombres" name="nombres" required readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="apellidos">Apellidos completos</label>
+                                <input type="text" id="apellidos" name="apellidos" required readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="documento">Documento de identidad</label>
+                                <input type="text" id="documento" name="documento" required readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono">Teléfono de contacto</label>
+                                <input type="tel" id="telefono" name="telefono" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="correo">Correo electrónico</label>
+                                <input type="email" id="correo" name="correo" required readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Información Académica</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nivel-educativo">Nivel educativo actual</label>
+                                <select id="nivel-educativo" name="nivelEducativo" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="bachiller">Bachiller</option>
+                                    <option value="tecnico">Técnico</option>
+                                    <option value="tecnologo">Tecnólogo</option>
+                                    <option value="universitario">Universitario</option>
+                                    <option value="especialista">Especialista</option>
+                                    <option value="magister">Magíster</option>
+                                    <option value="doctor">Doctor</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="experiencia">Experiencia relacionada (opcional)</label>
+                                <textarea id="experiencia" name="experiencia" rows="3" placeholder="Describe tu experiencia en el área..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Método de Pago</h3>
+                        <div class="payment-options">
+                            <div class="payment-option">
+                                <input type="radio" id="pago-total" name="metodoPago" value="total" checked>
+                                <label for="pago-total">
+                                    <div class="payment-info">
+                                        <h4>Pago Total</h4>
+                                        <p>Paga el valor completo ahora</p>
+                                        <span class="payment-price" id="precio-total">$0</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="payment-option">
+                                <input type="radio" id="pago-cuotas" name="metodoPago" value="cuotas">
+                                <label for="pago-cuotas">
+                                    <div class="payment-info">
+                                        <h4>Pago en Cuotas</h4>
+                                        <p>Divide el pago en 3 cuotas</p>
+                                        <span class="payment-price" id="precio-cuotas">$0</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="cerrarModalInscripcion()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-credit-card"></i>
+                            Proceder al Pago
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de detalles del programa -->
+    <div id="modal-detalles" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="modal-titulo">Detalles del Programa</h2>
+                <button class="modal-close" onclick="cerrarModalDetalles()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="detalles-content">
+                    <!-- El contenido se cargará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../static/js/login-unified.js"></script>
+    <script src="../static/js/dashboard-external.js"></script>
+    <script src="../static/js/programas-academicos-external.js"></script>
+</body>
+
+</html>

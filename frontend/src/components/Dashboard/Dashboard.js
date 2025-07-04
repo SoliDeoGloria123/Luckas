@@ -25,6 +25,9 @@ import TablaTareas from "./Tablas/TareaTabla";
 import TablaCabana from './Tablas/CabanaTabla';
 import TablaReservas from './Tablas/ReservaTabla';
 import Reportes from "../Reportes/Reportes";
+import ProgramasAcademicos from "./ProgramasAcademicos";
+import Cursos from "./Cursos";
+import ProgramasTecnicos from "./ProgramasTecnicos";
 import useBusqueda from "./Busqueda/useBusqueda";
 import "./Dashboard.css";
 
@@ -1116,7 +1119,7 @@ const { busqueda: busquedaReservas, setBusqueda: setBusquedaReservas, datosFiltr
           </div>
 
           <div className="nav-seccion">
-            <div className="nav-titulo">GESTIÓN</div>
+            <div className="nav-titulo">GESTIÓN ACADÉMICA</div>
             <ul>
               <li>
                 <a href="#" onClick={() => setSeccionActiva("categorizacion")}>
@@ -1124,23 +1127,49 @@ const { busqueda: busquedaReservas, setBusqueda: setBusquedaReservas, datosFiltr
                   <span className="nav-texto">Categorizacion</span>
                 </a>
               </li>
-              <li>
-                <a href="#" onClick={() => setSeccionActiva("solicitudes")}>
-                  <span className="nav-icon">📨</span>
-                  <span className="nav-texto">Solicitudes</span>
+              <li className={seccionActiva === "programas-academicos" ? "activo" : ""}>
+                <a href="#" onClick={() => setSeccionActiva("programas-academicos")}>
+                  <span className="nav-icon">🎓</span>
+                  <span className="nav-texto">Programas Académicos</span>
                 </a>
-              </li>
-
-              <li>
-                <a href="#" onClick={() => setSeccionActiva("inscripciones")}>
-                  <span className="nav-icon">📝</span>
-                  <span className="nav-texto">Inscripciones</span>
-                </a>
+                {/* Submenu para programas académicos */}
+                <ul className="submenu">
+                  <li className={seccionActiva === "cursos" ? "activo" : ""}>
+                    <a href="#" onClick={() => setSeccionActiva("cursos")}>
+                      <span className="nav-icon">📚</span>
+                      <span className="nav-texto">Cursos</span>
+                    </a>
+                  </li>
+                  <li className={seccionActiva === "programas-tecnicos" ? "activo" : ""}>
+                    <a href="#" onClick={() => setSeccionActiva("programas-tecnicos")}>
+                      <span className="nav-icon">🔧</span>
+                      <span className="nav-texto">Prog. Técnicos</span>
+                    </a>
+                  </li>
+                </ul>
               </li>
               <li>
                 <a href="#" onClick={() => setSeccionActiva("eventos")}>
-                  <span className="nav-icon">📅</span>
+                  <span className="nav-icon">�</span>
                   <span className="nav-texto">Eventos</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="nav-seccion">
+            <div className="nav-titulo">ADMINISTRACIÓN</div>
+            <ul>
+              <li>
+                <a href="#" onClick={() => setSeccionActiva("solicitudes")}>
+                  <span className="nav-icon">�</span>
+                  <span className="nav-texto">Solicitudes</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" onClick={() => setSeccionActiva("inscripciones")}>
+                  <span className="nav-icon">�</span>
+                  <span className="nav-texto">Inscripciones</span>
                 </a>
               </li>
               <li>
@@ -1149,7 +1178,12 @@ const { busqueda: busquedaReservas, setBusqueda: setBusquedaReservas, datosFiltr
                   <span className="nav-texto">Tareas</span>
                 </a>
               </li>
+            </ul>
+          </div>
 
+          <div className="nav-seccion">
+            <div className="nav-titulo">SERVICIOS</div>
+            <ul>
               <li>
                 <a href="#" onClick={() => setSeccionActiva("cabanas")}>
                   <span className="nav-icon">🛖</span>
@@ -1573,6 +1607,24 @@ const { busqueda: busquedaReservas, setBusqueda: setBusquedaReservas, datosFiltr
                 onClose={() => setMostrarModal(false)}
                 onSubmit={modoEdicionReserva ? actualizarReserva : crearReserva}
               />
+            </div>
+          )}
+
+          {seccionActiva === "programas-academicos" && (
+            <div className="seccion-programas-academicos">
+              <ProgramasAcademicos />
+            </div>
+          )}
+
+          {seccionActiva === "cursos" && (
+            <div className="seccion-cursos">
+              <Cursos />
+            </div>
+          )}
+
+          {seccionActiva === "programas-tecnicos" && (
+            <div className="seccion-programas-tecnicos">
+              <ProgramasTecnicos />
             </div>
           )}
 
