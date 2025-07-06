@@ -1,0 +1,12 @@
+/* Import all component styles first */
+@import './variables.css';
+@import './components.css';
+@import './animations.css';
+
+/* Reset and Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}

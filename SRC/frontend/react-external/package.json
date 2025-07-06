@@ -1,0 +1,22 @@
+{
+  "name": "react-external",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["react", "seminary", "external"],
+  "author": "Seminario Bautista de Colombia",
+  "license": "ISC",
+  "description": "React application for External role - Seminario Bautista de Colombia",
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.6.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.3",
+    "vite": "^7.0.2"
+  }
+}
