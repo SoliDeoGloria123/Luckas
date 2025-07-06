@@ -19,7 +19,20 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
       },
+      '/login': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/logout': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/static': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
     },
   },
-  base: '/static/react-build/',
+  // Use relative base for production builds to work with any server path
+  base: './',
 })

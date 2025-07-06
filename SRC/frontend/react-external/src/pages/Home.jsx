@@ -116,11 +116,11 @@ const Home = () => {
           </div>
           <nav>
             <ul>
-              <li><Link to="/" className="active">Inicio</Link></li>
-              <li><Link to="/cursos">Cursos</Link></li>
-              <li><Link to="/inscripcion-info">Inscripción</Link></li>
+              <li><Link to="/app/" className="active">Inicio</Link></li>
+              <li><Link to="/app/cursos">Cursos</Link></li>
+              <li><Link to="/app/inscripcion-info">Inscripción</Link></li>
             </ul>
-            <Link to="/login" className="neo-button login-button">Iniciar Sesión</Link>
+            <Link to="/app/login" className="neo-button login-button">Iniciar Sesión</Link>
           </nav>
           <div className="menu-toggle">
             <i className="fas fa-bars"></i>

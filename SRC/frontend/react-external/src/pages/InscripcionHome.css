@@ -1,0 +1,1565 @@
+/* Estilos específicos para la página de inscripción */
+
+/* Variables para la página de inscripción */
+:root {
+    --hero-bg: linear-gradient(135deg, #0a1128 0%, #1e3a8a 50%, #3b5998 100%);
+    --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    --text-glow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Variables específicas para el tema claro */
+.theme-light {
+    --hero-bg: linear-gradient(135deg, #ffffff 0%, #f0f8ff 50%, #e6f3ff 100%);
+    --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    --text-glow: none;
+}
+
+/* Fondo animado específico para inscripción */
+.animated-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--hero-bg);
+    z-index: -3;
+}
+
+.animated-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(59, 89, 152, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(106, 133, 182, 0.2) 0%, transparent 50%);
+    animation: backgroundShift 20s ease-in-out infinite;
+}
+
+@keyframes backgroundShift {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Header mejorado */
+.neo-header {
+    background: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(106, 133, 182, 0.2);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.neo-header.scrolled {
+    background: rgba(10, 10, 10, 0.98);
+    backdrop-filter: blur(25px);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.theme-light .neo-header.scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    position: relative;
+}
+
+.neo-header .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.neo-header .logo {
+    width: 50px;
+    height: auto;
+    border-radius: 8px;
+    filter: drop-shadow(0 0 10px rgba(106, 133, 182, 0.3));
+}
+
+.neo-header .seminary-title {
+    font-size: 2rem;
+    background: linear-gradient(45deg, #6a85b6, #d4e0f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(106, 133, 182, 0.3);
+}
+
+.neo-header nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    flex: 1;
+    margin: 0 2rem;
+}
+
+.neo-header nav ul {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    margin: 0;
+}
+
+.neo-header nav ul li a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.neo-header nav ul li a:hover,
+.neo-header nav ul li a.active {
+    color: var(--blue-light);
+    background: rgba(106, 133, 182, 0.15);
+    text-shadow: var(--text-glow);
+}
+
+.login-button {
+    padding: 0.7rem 1.8rem !important;
+    font-size: 0.95rem !important;
+    background: linear-gradient(45deg, var(--blue-medium), var(--blue-light)) !important;
+    color: white !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(106, 133, 182, 0.3) !important;
+    flex-shrink: 0;
+}
+
+.login-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(106, 133, 182, 0.5) !important;
+}
+
+.menu-toggle {
+    display: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text);
+    flex-shrink: 0;
+}
+
+/* Hero Section mejorada */
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    padding: 2rem;
+    overflow: hidden;
+}
+
+.hero-content {
+    max-width: 800px;
+    z-index: 2;
+    position: relative;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 3rem 2.5rem;
+    border: 1px solid rgba(106, 133, 182, 0.2);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.hero-content h2 {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(45deg, #ffffff, #d4e0f7, #6a85b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    line-height: 1.2;
+}
+
+.hero-content p {
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-buttons .neo-button {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    background: linear-gradient(145deg, rgba(30, 58, 138, 0.8), rgba(106, 133, 182, 0.8));
+    color: white;
+    text-decoration: none;
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(106, 133, 182, 0.3);
+}
+
+.cta-buttons .neo-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 12px 30px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    background: linear-gradient(145deg, rgba(30, 58, 138, 1), rgba(106, 133, 182, 1));
+}
+
+/* Indicador de scroll */
+.scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    animation: pulse 2s infinite;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    opacity: 1;
+}
+
+.scroll-indicator.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(10px);
+}
+
+.scroll-indicator:hover {
+    color: rgba(255, 255, 255, 1);
+    transform: translateX(-50%) translateY(-5px);
+}
+
+.scroll-indicator p {
+    margin: 0.5rem 0;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.scroll-arrow {
+    width: 30px;
+    height: 30px;
+    border: 2px solid currentColor;
+    border-top: none;
+    border-right: none;
+    transform: rotate(-45deg);
+    margin: 1rem auto;
+    animation: bounce 2s infinite;
+    transition: all 0.3s ease;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(-45deg); }
+    40% { transform: translateY(-10px) rotate(-45deg); }
+    60% { transform: translateY(-5px) rotate(-45deg); }
+}
+
+/* Ondas animadas en el hero */
+.wave-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: rgba(106, 133, 182, 0.1);
+    border-radius: 50%;
+}
+
+.wave-1 {
+    animation: wave 10s linear infinite;
+}
+
+.wave-2 {
+    animation: wave 15s linear infinite reverse;
+    background: rgba(30, 58, 138, 0.08);
+    height: 120%;
+}
+
+.wave-3 {
+    animation: wave 20s linear infinite;
+    background: rgba(59, 89, 152, 0.06);
+    height: 140%;
+}
+
+@keyframes wave {
+    0% { transform: translateX(-50%) rotate(0deg); }
+    100% { transform: translateX(-50%) rotate(360deg); }
+}
+
+/* Secciones principales */
+main {
+    position: relative;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    scroll-margin-top: 90px; /* Compensar el header sticky */
+    margin-top: 0;
+}
+
+.neo-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    scroll-margin-top: 100px; /* Compensar header */
+}
+
+.section-color {
+    background: linear-gradient(135deg, rgba(13, 26, 53, 0.9), rgba(22, 36, 71, 0.9));
+    margin: 0;
+    padding: 5rem 0; /* Más espaciado para evitar solapamiento */
+    scroll-margin-top: 90px; /* Compensar header */
+}
+
+.section-color + .section-color {
+    margin-top: 2rem;
+}
+
+.section-color .neo-container {
+    scroll-margin-top: 100px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, #ffffff, #d4e0f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-description {
+    text-align: center;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Grid de programas mejorado */
+.programas-section {
+    padding: 5rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.programas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.programa-card {
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(106, 133, 182, 0.2);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.programa-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(106, 133, 182, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.programa-card:hover::before {
+    left: 100%;
+}
+
+.programa-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--card-hover-shadow);
+    border-color: rgba(106, 133, 182, 0.5);
+}
+
+.programa-imagen {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(45deg, var(--blue-medium), var(--blue-light));
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(106, 133, 182, 0.3);
+}
+
+.programa-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--blue-light);
+}
+
+.programa-info {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+}
+
+.programa-info span {
+    background: rgba(106, 133, 182, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Proceso de inscripción */
+.proceso-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.proceso-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 1px solid rgba(106, 133, 182, 0.2);
+    transition: all 0.3s ease;
+}
+
+.proceso-step:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-3px);
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(45deg, var(--blue-medium), var(--blue-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+}
+
+.step-content h3 {
+    color: var(--blue-light);
+    margin-bottom: 0.5rem;
+}
+
+.proceso-cta {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.proceso-cta .neo-button {
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    background: linear-gradient(45deg, var(--blue-medium), var(--blue-light));
+    box-shadow: 0 8px 25px rgba(106, 133, 182, 0.3);
+}
+
+/* Requisitos */
+.requisitos-section {
+    padding: 4rem 2rem;
+    margin-bottom: 4rem;
+}
+
+.requisitos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.requisito-card {
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 15px;
+    padding: 2rem;
+    border: 1px solid rgba(106, 133, 182, 0.2);
+    transition: all 0.3s ease;
+}
+
+.requisito-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(106, 133, 182, 0.4);
+}
+
+.requisito-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, var(--blue-medium), var(--blue-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.requisito-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.requisito-card li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.requisito-card li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--blue-light);
+    font-weight: bold;
+}
+
+/* FAQ Section */
+.faq-grid {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(106, 133, 182, 0.2);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-question {
+    padding: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(106, 133, 182, 0.1);
+}
+
+.faq-question:hover {
+    background: rgba(106, 133, 182, 0.15);
+}
+
+.faq-question h3 {
+    color: white;
+    margin: 0;
+}
+
+.faq-icon {
+    color: var(--blue-light);
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+.faq-icon .fa-plus {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.faq-icon .fa-minus {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: opacity 0.3s ease;
+}
+
+.faq-item.open .faq-icon .fa-plus {
+    opacity: 0;
+}
+
+.faq-item.open .faq-icon .fa-minus {
+    opacity: 1;
+}
+
+.faq-answer {
+    padding: 0 1.5rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-item.open .faq-answer {
+    max-height: 200px;
+    padding: 1.5rem;
+}
+
+/* Testimonios */
+.testimonio {
+    padding: 4rem 2rem;
+    margin: 3rem auto;
+}
+
+.testimonio h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    background: linear-gradient(45deg, #ffffff, #d4e0f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.testimonio-card {
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(106, 133, 182, 0.2);
+    max-width: 600px;
+    margin: 0 auto;
+    border-radius: 15px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.testimonio-autor {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(106, 133, 182, 0.2);
+}
+
+.testimonio-autor img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--blue-light);
+}
+
+.testimonio-autor .autor-info h4 {
+    color: var(--blue-light);
+    margin: 0;
+    font-size: 1rem;
+}
+
+.testimonio-autor .autor-info p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* CTA Final */
+.inscripcion-cta {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, rgba(10, 17, 40, 0.9), rgba(30, 58, 138, 0.8));
+    border-radius: 20px;
+    margin: 2rem auto;
+    max-width: 800px;
+    border: 1px solid rgba(106, 133, 182, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.inscripcion-cta h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, #ffffff, #d4e0f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.inscripcion-cta p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.inscripcion-cta .neo-button {
+    padding: 1.2rem 3rem;
+    font-size: 1.2rem;
+    background: linear-gradient(45deg, var(--blue-light), white);
+    color: var(--blue-dark);
+    font-weight: 700;
+    box-shadow: 0 8px 25px rgba(212, 224, 247, 0.3);
+    transition: all 0.3s ease;
+}
+
+.inscripcion-cta .neo-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(212, 224, 247, 0.5);
+}
+
+/* Correcciones específicas para botones con texto visible */
+.theme-light .programa-card a.neo-button,
+.theme-light .requisito-card a.neo-button,
+.theme-light .inscripcion-cta a.neo-button,
+.theme-light .proceso-cta a.neo-button {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    border: 1px solid rgba(30, 58, 138, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2) !important;
+}
+
+.theme-light .programa-card a.neo-button:hover,
+.theme-light .requisito-card a.neo-button:hover,
+.theme-light .inscripcion-cta a.neo-button:hover,
+.theme-light .proceso-cta a.neo-button:hover {
+    background: linear-gradient(45deg, #3f51b5, #5c6bc0) !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.3) !important;
+}
+
+/* Override general para todos los botones en tema claro */
+.theme-light a.neo-button {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    border: 1px solid rgba(30, 58, 138, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2) !important;
+    padding: 0.8rem 1.5rem !important;
+    border-radius: 25px !important;
+    display: inline-block !important;
+    transition: all 0.3s ease !important;
+}
+
+.theme-light a.neo-button:hover {
+    background: linear-gradient(45deg, #3f51b5, #5c6bc0) !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.3) !important;
+    text-decoration: none !important;
+}
+
+/* Asegurar que el texto sea siempre visible */
+.theme-light .neo-button,
+.theme-light .neo-button:visited,
+.theme-light .neo-button:link,
+.theme-light .neo-button:active {
+    color: white !important;
+    text-shadow: none !important;
+}
+
+/* Footer mejorado */
+footer {
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(106, 133, 182, 0.2);
+    padding: 3rem 0 1rem;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.footer-column h3 {
+    color: var(--blue-light);
+    margin-bottom: 1rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.neo-social {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, var(--blue-medium), var(--blue-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.neo-social:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(106, 133, 182, 0.4);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid rgba(106, 133, 182, 0.2);
+    margin-top: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-content h2 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-content p {
+        font-size: 1.1rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .programas-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .proceso-steps {
+        grid-template-columns: 1fr;
+    }
+    
+    .requisitos-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    /* Header responsive */
+    .header-container {
+        flex-wrap: wrap;
+        position: relative;
+    }
+    
+    .menu-toggle {
+        display: block;
+        order: 3;
+    }
+    
+    .neo-header nav {
+        order: 4;
+        width: 100%;
+        flex-direction: column;
+        gap: 1rem;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        background: rgba(18, 18, 18, 0.98);
+        margin-top: 1rem;
+        border-radius: 10px;
+    }
+    
+    .neo-header.mobile-open nav {
+        max-height: 300px;
+        padding: 1rem;
+    }
+    
+    .neo-header nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+    
+    .neo-header nav ul li a {
+        display: block;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .login-button {
+        text-align: center;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content h2 {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .neo-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+}
+
+/* Animaciones de entrada */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efectos adicionales */
+.programa-card .neo-button,
+.requisito-card .neo-button {
+    background: linear-gradient(45deg, var(--blue-medium), var(--blue-light));
+    border: none;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.programa-card .neo-button:hover,
+.requisito-card .neo-button:hover {
+    background: linear-gradient(45deg, var(--blue-light), white);
+    color: var(--blue-dark);
+    transform: translateY(-2px);
+}
+
+/* Mejoras específicas para el theme switcher en inscripción */
+.theme-switcher {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+}
+
+.theme-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--blue-medium), var(--blue-light));
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+.theme-toggle i {
+    font-size: 1.5rem;
+    color: white;
+    transition: all 0.3s ease;
+    position: absolute;
+}
+
+.theme-toggle .fa-sun {
+    opacity: 0;
+    transform: rotate(180deg);
+}
+
+.theme-toggle .fa-moon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+/* Tema claro */
+.theme-light .theme-toggle .fa-sun {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+.theme-light .theme-toggle .fa-moon {
+    opacity: 0;
+    transform: rotate(-180deg);
+}
+
+/* Ajustes del tema claro para inscripción */
+.theme-light {
+    --text: #1a1a1a;
+    --text-secondary: rgba(26, 26, 26, 0.8);
+    --text-muted: rgba(26, 26, 26, 0.6);
+    --background: #f8f9fa;
+    --surface: #ffffff;
+    --border: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.15);
+}
+
+.theme-light .animated-bg {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 50%, #e6f3ff 100%);
+}
+
+.theme-light .animated-bg::before {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(59, 89, 152, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(106, 133, 182, 0.05) 0%, transparent 50%);
+}
+
+.theme-light .neo-header {
+    background: rgba(255, 255, 255, 0.98);
+    border-bottom: 1px solid rgba(106, 133, 182, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .neo-header nav ul li a {
+    color: #333333;
+}
+
+.theme-light .neo-header nav ul li a:hover,
+.theme-light .neo-header nav ul li a.active {
+    color: #1e3a8a;
+    background: rgba(30, 58, 138, 0.1);
+}
+
+.theme-light .hero-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(106, 133, 182, 0.3);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.theme-light .hero-content h2 {
+    background: linear-gradient(45deg, #1a237e, #3f51b5, #5c6bc0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+}
+
+.theme-light .hero-content p {
+    color: #333333 !important;
+    font-weight: 500;
+}
+
+.theme-light main {
+    background: rgba(248, 249, 250, 0.95);
+}
+
+.theme-light .neo-container {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(106, 133, 182, 0.2);
+    color: #1a1a1a;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .section-color {
+    background: linear-gradient(135deg, rgba(240, 248, 255, 0.95), rgba(230, 243, 255, 0.95));
+}
+
+.theme-light .section-color .neo-container {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(106, 133, 182, 0.25);
+}
+
+.theme-light .section-title {
+    background: linear-gradient(45deg, #1a237e, #3f51b5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.theme-light .section-description {
+    color: #333333;
+    font-weight: 500;
+}
+
+.theme-light .programa-card,
+.theme-light .requisito-card,
+.theme-light .testimonio h2 {
+    background: linear-gradient(45deg, #1a237e, #3f51b5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.theme-light .testimonio-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(106, 133, 182, 0.2);
+    color: #1a1a1a;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .testimonio-card p {
+    color: #333333;
+    font-weight: 500;
+}
+
+.theme-light .testimonio-autor .autor-info h4 {
+    color: #1e3a8a;
+}
+
+.theme-light .testimonio-autor .autor-info p {
+    color: #666666;
+}
+
+.theme-light .programa-card:hover,
+.theme-light .requisito-card:hover,
+.theme-light .testimonio-card:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    border-color: rgba(106, 133, 182, 0.4);
+}
+
+.theme-light .programa-card h3,
+.theme-light .requisito-card h3 {
+    color: #1e3a8a !important;
+}
+
+.theme-light .programa-card p,
+.theme-light .requisito-card p,
+.theme-light .requisito-card li {
+    color: #333333 !important;
+}
+
+/* Correcciones específicas para todas las secciones principales en tema claro */
+.theme-light .programas-section,
+.theme-light .proceso-section,
+.theme-light .requisitos-section,
+.theme-light .testimonio,
+.theme-light .faq-section,
+.theme-light .inscripcion-cta {
+    color: #1a1a1a !important;
+}
+
+.theme-light .programas-section h2,
+.theme-light .proceso-section h2,
+.theme-light .requisitos-section h2,
+.theme-light .testimonio h2,
+.theme-light .faq-section h2,
+.theme-light .inscripcion-cta h2 {
+    color: #1e3a8a !important;
+}
+
+.theme-light .programas-section p,
+.theme-light .proceso-section p,
+.theme-light .requisitos-section p,
+.theme-light .testimonio p,
+.theme-light .faq-section p,
+.theme-light .inscripcion-cta p {
+    color: #333333 !important;
+}
+
+.theme-light .programa-card,
+.theme-light .requisito-card,
+.theme-light .testimonio-card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(106, 133, 182, 0.3) !important;
+    color: #1a1a1a !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.theme-light .programa-card h3,
+.theme-light .requisito-card h3,
+.theme-light .testimonio-card h4 {
+    color: #1e3a8a !important;
+}
+
+.theme-light .programa-card p,
+.theme-light .programa-card li,
+.theme-light .requisito-card p,
+.theme-light .requisito-card ul,
+.theme-light .requisito-card li,
+.theme-light .testimonio-card p {
+    color: #333333 !important;
+}
+
+.theme-light .requisito-icon {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5) !important;
+    color: white !important;
+}
+
+.theme-light .requisito-card li::before {
+    color: #1e3a8a !important;
+}
+
+.theme-light .programa-info span {
+    background: rgba(30, 58, 138, 0.1);
+    color: #1e3a8a;
+    font-weight: 600;
+}
+
+.theme-light .proceso-step {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(106, 133, 182, 0.2);
+    color: #1a1a1a;
+}
+
+.theme-light .proceso-step:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.theme-light .step-content h3 {
+    color: #1e3a8a;
+}
+
+.theme-light .step-content p {
+    color: #333333;
+}
+
+.theme-light .faq-item {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(106, 133, 182, 0.2);
+}
+
+.theme-light .faq-question {
+    background: rgba(240, 248, 255, 0.8);
+}
+
+.theme-light .faq-question:hover {
+    background: rgba(230, 243, 255, 0.9);
+}
+
+.theme-light .faq-question h3 {
+    color: #1a1a1a;
+}
+
+.theme-light .faq-answer {
+    color: #333333;
+}
+
+.theme-light .faq-icon {
+    color: #1e3a8a;
+}
+
+.theme-light .inscripcion-cta {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.9), rgba(59, 89, 152, 0.8));
+    border: 1px solid rgba(30, 58, 138, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .inscripcion-cta h2 {
+    background: linear-gradient(45deg, #ffffff, #f0f8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.theme-light .inscripcion-cta p {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.theme-light footer {
+    background: rgba(248, 249, 250, 0.98);
+    border-top: 1px solid rgba(106, 133, 182, 0.2);
+}
+
+.theme-light .footer-column h3 {
+    color: #1e3a8a;
+}
+
+.theme-light .footer-column,
+.theme-light .footer-column ul li,
+.theme-light .footer-column ul li a,
+.theme-light .footer-bottom {
+    color: #333333;
+}
+
+.theme-light .footer-column ul li a:hover {
+    color: #1e3a8a;
+}
+
+.theme-light .scroll-indicator {
+    color: #333333;
+}
+
+.theme-light .scroll-indicator:hover {
+    color: #1e3a8a;
+}
+
+.theme-light .scroll-indicator p {
+    color: #333333;
+    font-weight: 600;
+}
+
+.theme-light .scroll-arrow {
+    border-color: #333333;
+}
+
+.theme-light .faq-icon {
+    color: #1e3a8a;
+}
+
+/* Mejores contrastes para botones en tema claro */
+.theme-light .neo-button {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5) !important;
+    color: white !important;
+    border: 1px solid rgba(30, 58, 138, 0.3);
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2);
+    text-decoration: none !important;
+}
+
+.theme-light .neo-button:hover {
+    background: linear-gradient(45deg, #3f51b5, #5c6bc0) !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.3);
+}
+
+.theme-light .programa-card .neo-button,
+.theme-light .requisito-card .neo-button {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5) !important;
+    color: white !important;
+    border: 1px solid rgba(30, 58, 138, 0.3);
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2);
+}
+
+.theme-light .programa-card .neo-button:hover,
+.theme-light .requisito-card .neo-button:hover {
+    background: linear-gradient(45deg, #3f51b5, #5c6bc0) !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.3);
+}
+
+.theme-light .cta-buttons .neo-button {
+    background: linear-gradient(145deg, rgba(30, 58, 138, 0.9), rgba(63, 81, 181, 0.9)) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(30, 58, 138, 0.4);
+}
+
+.theme-light .cta-buttons .neo-button:hover {
+    background: linear-gradient(145deg, rgba(30, 58, 138, 1), rgba(63, 81, 181, 1)) !important;
+}
+
+.theme-light .login-button {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5) !important;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2) !important;
+}
+
+.theme-light .login-button:hover {
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.3) !important;
+}
+
+/* Mejoras para iconos y elementos decorativos */
+.theme-light .programa-imagen,
+.theme-light .requisito-icon {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5);
+    box-shadow: 0 0 20px rgba(30, 58, 138, 0.2);
+}
+
+.theme-light .step-number {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5);
+}
+
+.theme-light .requisito-card li::before {
+    color: #1e3a8a;
+}
+
+.theme-light .neo-social {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5);
+}
+
+.theme-light .neo-social:hover {
+    box-shadow: 0 5px 15px rgba(30, 58, 138, 0.3);
+}
+
+/* Correcciones adicionales para el tema claro */
+.theme-light h1,
+.theme-light h2,
+.theme-light h3,
+.theme-light h4,
+.theme-light h5,
+.theme-light h6 {
+    color: #1a1a1a !important;
+}
+
+.theme-light p,
+.theme-light span,
+.theme-light div {
+    color: #333333 !important;
+}
+
+.theme-light .neo-header .seminary-title {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+.theme-light .menu-toggle {
+    color: #1a1a1a !important;
+}
+
+/* Correcciones específicas para elementos de texto */
+.theme-light .neo-container h1,
+.theme-light .neo-container h2,
+.theme-light .neo-container h3,
+.theme-light .neo-container h4 {
+    color: #1e3a8a !important;
+}
+
+.theme-light .neo-container p,
+.theme-light .neo-container li,
+.theme-light .neo-container span {
+    color: #333333 !important;
+}
+
+.theme-light .cta-buttons .neo-button,
+.theme-light .cta-buttons .neo-button:visited,
+.theme-light .cta-buttons .neo-button:link {
+    color: white !important;
+    text-decoration: none !important;
+}
+
+.theme-light .programa-card h3,
+.theme-light .requisito-card h3,
+.theme-light .step-content h3 {
+    color: #1e3a8a !important;
+}
+
+.theme-light .programa-card p,
+.theme-light .requisito-card p,
+.theme-light .step-content p,
+.theme-light .requisito-card li {
+    color: #333333 !important;
+}
+
+.theme-light .faq-question h3,
+.theme-light .faq-answer p {
+    color: #1a1a1a !important;
+}
+
+.theme-light .testimonio-card h4 {
+    color: #1e3a8a !important;
+}
+
+.theme-light .testimonio-card p {
+    color: #333333 !important;
+}
+
+.theme-light .footer-column h3 {
+    color: #1e3a8a !important;
+}
+
+.theme-light .footer-column p,
+.theme-light .footer-column li,
+.theme-light .footer-column a,
+.theme-light .footer-bottom {
+    color: #333333 !important;
+}
+
+.theme-light .footer-column a:hover {
+    color: #1e3a8a !important;
+}
+
+/* Asegurar que los enlaces en general sean visibles */
+.theme-light a {
+    color: #1e3a8a !important;
+}
+
+.theme-light a:hover {
+    color: #3f51b5 !important;
+}
+
+/* Botones específicos con mejor contraste */
+.theme-light button,
+.theme-light .button,
+.theme-light input[type="submit"],
+.theme-light input[type="button"] {
+    background: linear-gradient(45deg, #1e3a8a, #3f51b5) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.theme-light button:hover,
+.theme-light .button:hover,
+.theme-light input[type="submit"]:hover,
+.theme-light input[type="button"]:hover {
+    background: linear-gradient(45deg, #3f51b5, #5c6bc0) !important;
+    color: white !important;
+}
+
+/* Mejoras adicionales de espaciado */
+.neo-container + .neo-container {
+    margin-top: 4rem;
+}
+
+.section-color + .neo-container {
+    margin-top: 5rem;
+}
+
+.neo-container + .section-color {
+    margin-top: 5rem;
+}
+
+/* Asegurar que todas las secciones tengan buen espaciado */
+.programas-section,
+.requisitos-section,
+.testimonio {
+    margin-bottom: 4rem;
+}
+
+.faq-section {
+    margin-top: 5rem;
+    margin-bottom: 4rem;
+}
+
+.inscripcion-cta {
+    margin-top: 5rem;
+    margin-bottom: 3rem;
+}

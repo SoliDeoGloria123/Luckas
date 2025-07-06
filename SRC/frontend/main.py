@@ -228,15 +228,38 @@ async def auth_status(request: Request):
     """
     user_session_data = get_current_user(request)
     if user_session_data:
+        # Get full user data from database
+        try:
+            from bson import ObjectId
+            user_id = user_session_data.get("id")
+            if user_id:
+                user = users_collection.find_one({"_id": ObjectId(user_id)})
+                if user:
+                    # Remove sensitive data
+                    user.pop('password', None)
+                    user['_id'] = str(user['_id'])
+                    return {"authenticated": True, "user": user}
+        except Exception as e:
+            print(f"Error getting user data: {e}")
+        
         return {"authenticated": True, "user": user_session_data}
     else:
         return {"authenticated": False, "user": None}
 
-# Serve React app for external role
-@app.get("/react{path:path}")
+# Routes for React app - serve the React SPA for external users
+@app.get("/react/{path:path}")
 async def serve_react_app(request: Request, path: str = ""):
     """
     Serve the React application for external role users
+    This handles all React routes and serves index.html for client-side routing
+    """
+    return FileResponse(str(BASE_DIR / "static" / "react-build" / "index.html"))
+
+# Alternative routes for React app without /react prefix (for cleaner URLs)
+@app.get("/app/{path:path}")
+async def serve_react_app_clean(request: Request, path: str = ""):
+    """
+    Clean URL version for React app
     """
     return FileResponse(str(BASE_DIR / "static" / "react-build" / "index.html"))
 
