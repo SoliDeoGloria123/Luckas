@@ -7,6 +7,9 @@ const NavBar = () => {
   return (
     <nav className="navbar-luckasent">
       <ul>
+        <li className={location.pathname.includes('inicio') ? 'active' : ''}>
+          <Link to="/seminarista">Inicio</Link>
+        </li>
         <li className={location.pathname.includes('eventos') ? 'active' : ''}>
           <Link to="/dashboard/seminarista/eventos">Eventos</Link>
         </li>

@@ -5,8 +5,12 @@ import NavBar from './NavBar';
 import './estilosDashboard.css';
 import { Link } from 'react-router-dom';
 import EditarReservaModal from './EditarReservaModal';
+import { useAuthCheck } from '../hooks/useAuthCheck';
+import Header from '../Shared/Header';
+
 
 const MisReservas = () => {
+  const { user } = useAuthCheck('seminarista');
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,6 +50,11 @@ const MisReservas = () => {
 
   return (
     <div className="app-background">
+     <Header 
+        userRole="seminarista" 
+        userName={user?.nombre} 
+        breadcrumbPath={['Dashboard', 'Nueva Solicitud']}
+    />
       <NavBar />
       <div className="section-container">
         <Link to="/seminarista/dashboard" className="card-btn" style={{marginBottom:'1.5rem',display:'inline-block'}}>← Volver al Dashboard</Link>

@@ -134,7 +134,7 @@ const GestionEventos = () => {
 
   return (
     <div className="seccion-usuarios">
-      <div className="seccion-header">
+      <div className="page-header-Academicos">
         <h2>Gestión de Eventos</h2>
         <button className="btn-primary" onClick={abrirModalCrear}>
           + Nuevo Evento

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { cursosService } from '../../services/cursosService';
-import './Cursos.css';
+import CursoModal from './Modales/CursoModal';
+import CursoTabla from './Tablas/CursoTabla';
+
 
 const Cursos = () => {
   const [cursos, setCursos] = useState([]);
@@ -210,9 +212,9 @@ const Cursos = () => {
 
   return (
     <div className="cursos-container">
-      <div className="cursos-header">
+      <div className="page-header-Academicos">
         <h2>Gestión de Cursos</h2>
-        <button className="btn-crear" onClick={() => abrirModal()}>
+        <button className="btn-primary" onClick={() => abrirModal()}>
           Crear Nuevo Curso
         </button>
       </div>
@@ -287,252 +289,24 @@ const Cursos = () => {
       </div>
 
       {/* Tabla de cursos */}
-      <div className="tabla-container">
-        <table className="cursos-tabla">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Categoría</th>
-              <th>Nivel</th>
-              <th>Modalidad</th>
-              <th>Instructor</th>
-              <th>Cupos</th>
-              <th>Fecha Inicio</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cursos.map(curso => (
-              <tr key={curso._id}>
-                <td>{curso.nombre}</td>
-                <td>{curso.categoria}</td>
-                <td>{curso.nivel}</td>
-                <td>{curso.modalidad}</td>
-                <td>{curso.instructor}</td>
-                <td>{curso.cuposOcupados}/{curso.cuposDisponibles}</td>
-                <td>{new Date(curso.fechaInicio).toLocaleDateString()}</td>
-                <td>
-                  <span className={`estado ${curso.estado}`}>
-                    {curso.estado}
-                  </span>
-                </td>
-                <td className="acciones">
-                  <button 
-                    className="btn-editar" 
-                    onClick={() => abrirModal(curso)}
-                  >
-                    Editar
-                  </button>
-                  <button 
-                    className="btn-eliminar" 
-                    onClick={() => eliminarCurso(curso._id)}
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <CursoTabla
+        cursos={cursos}
+        abrirModal={abrirModal}
+        eliminarCurso={eliminarCurso}
+      />
 
       {/* Modal */}
-      {console.log('Estado mostrarModal:', mostrarModal)}
-      {mostrarModal && (
-        <div className="modal-overlay">
-          <div className="modal-contenido">
-            <div className="modal-header">
-              <h3>{modoEdicion ? 'Editar Curso' : 'Crear Nuevo Curso'}</h3>
-              <button className="btn-cerrar" onClick={cerrarModal}>×</button>
-            </div>
-
-            {mensajeError && <div className="mensaje-error">{mensajeError}</div>}
-            {mensajeExito && <div className="mensaje-exito">{mensajeExito}</div>}
-
-            <form onSubmit={manejarEnvio} className="curso-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Nombre del Curso</label>
-                  <input
-                    type="text"
-                    value={nuevoCurso.nombre}
-                    onChange={(e) => manejarCambio('nombre', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Instructor</label>
-                  <input
-                    type="text"
-                    value={nuevoCurso.instructor}
-                    onChange={(e) => manejarCambio('instructor', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Descripción</label>
-                <textarea
-                  value={nuevoCurso.descripcion}
-                  onChange={(e) => manejarCambio('descripcion', e.target.value)}
-                  rows={3}
-                  required
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Categoría</label>
-                  <select
-                    value={nuevoCurso.categoria}
-                    onChange={(e) => manejarCambio('categoria', e.target.value)}
-                    required
-                  >
-                    <option value="biblico">Bíblico</option>
-                    <option value="ministerial">Ministerial</option>
-                    <option value="liderazgo">Liderazgo</option>
-                    <option value="evangelismo">Evangelismo</option>
-                    <option value="pastoral">Pastoral</option>
-                    <option value="otros">Otros</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Nivel</label>
-                  <select
-                    value={nuevoCurso.nivel}
-                    onChange={(e) => manejarCambio('nivel', e.target.value)}
-                    required
-                  >
-                    <option value="basico">Básico</option>
-                    <option value="intermedio">Intermedio</option>
-                    <option value="avanzado">Avanzado</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Modalidad</label>
-                  <select
-                    value={nuevoCurso.modalidad}
-                    onChange={(e) => manejarCambio('modalidad', e.target.value)}
-                    required
-                  >
-                    <option value="presencial">Presencial</option>
-                    <option value="virtual">Virtual</option>
-                    <option value="semipresencial">Semipresencial</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Horas de Duración</label>
-                  <input
-                    type="number"
-                    value={nuevoCurso.duracion.horas}
-                    onChange={(e) => manejarCambio('duracion.horas', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Semanas</label>
-                  <input
-                    type="number"
-                    value={nuevoCurso.duracion.semanas}
-                    onChange={(e) => manejarCambio('duracion.semanas', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Cupos Disponibles</label>
-                  <input
-                    type="number"
-                    value={nuevoCurso.cuposDisponibles}
-                    onChange={(e) => manejarCambio('cuposDisponibles', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Costo</label>
-                  <input
-                    type="number"
-                    value={nuevoCurso.costo}
-                    onChange={(e) => manejarCambio('costo', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Fecha de Inicio</label>
-                  <input
-                    type="date"
-                    value={nuevoCurso.fechaInicio}
-                    onChange={(e) => manejarCambio('fechaInicio', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Fecha de Fin</label>
-                  <input
-                    type="date"
-                    value={nuevoCurso.fechaFin}
-                    onChange={(e) => manejarCambio('fechaFin', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Hora de Inicio</label>
-                  <input
-                    type="time"
-                    value={nuevoCurso.horario.horaInicio}
-                    onChange={(e) => manejarCambio('horario.horaInicio', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Hora de Fin</label>
-                  <input
-                    type="time"
-                    value={nuevoCurso.horario.horaFin}
-                    onChange={(e) => manejarCambio('horario.horaFin', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Días de la Semana</label>
-                <div className="dias-checkbox">
-                  {['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'].map(dia => (
-                    <label key={dia} className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={nuevoCurso.horario.dias.includes(dia)}
-                        onChange={() => manejarCambioDias(dia)}
-                      />
-                      {dia.charAt(0).toUpperCase() + dia.slice(1)}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn-cancelar" onClick={cerrarModal}>
-                  Cancelar
-                </button>
-                <button type="submit" className="btn-guardar">
-                  {modoEdicion ? 'Actualizar' : 'Crear'} Curso
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CursoModal
+        mostrarModal={mostrarModal}
+        modoEdicion={modoEdicion}
+        cerrarModal={cerrarModal}
+        mensajeError={mensajeError}
+        mensajeExito={mensajeExito}
+        manejarEnvio={manejarEnvio}
+        nuevoCurso={nuevoCurso}
+        manejarCambio={manejarCambio}
+        manejarCambioDias={manejarCambioDias}
+      />
     </div>
   );
 };

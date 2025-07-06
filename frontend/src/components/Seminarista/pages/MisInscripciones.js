@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { inscripcionService } from '../../../services/inscripcionService';
+import { useAuthCheck } from '../hooks/useAuthCheck';
 import './MisInscripciones.css';
 import NavBar from './NavBar';
 import './estilosDashboard.css';
 import EditarInscripcionModal from './EditarInscripcionModal';
+import Header from '../Shared/Header';
 
 const MisInscripciones = () => {
+  const { user } = useAuthCheck('seminarista');
   const [inscripciones, setInscripciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,6 +39,11 @@ const MisInscripciones = () => {
 
   return (
     <div className="app-background">
+        <Header 
+        userRole="seminarista" 
+        userName={user?.nombre} 
+        breadcrumbPath={['Dashboard', 'Nueva Solicitud']}
+        />
       <NavBar />
       <div className="section-container">
         <Link to="/seminarista/dashboard" className="card-btn" style={{marginBottom:'1.5rem',display:'inline-block'}}>← Volver al Dashboard</Link>

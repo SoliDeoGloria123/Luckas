@@ -152,7 +152,7 @@ const GestionIscripcion = () => {
 
   return (
     <div className="seccion-usuarios">
-      <div className="seccion-header">
+      <div className="page-header-Academicos">
         <h2>Gestión de Inscripciones</h2>
         <button className="btn-primary" onClick={abrirModalCrear}>
           ➕ Nueva Inscripción

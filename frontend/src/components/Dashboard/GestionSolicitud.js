@@ -138,7 +138,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
 
   return (
     <div className="seccion-usuarios"> {/* Aplica el mismo contenedor que Dashboard */}
-      <div className="seccion-header">
+      <div className="page-header-Academicos">
         <h2>Gestión de Solicitudes</h2>
         <button className="btn-primary" onClick={abrirModalCrearSolicitud}>
           ➕ Nuevo Solicitud

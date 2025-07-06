@@ -465,7 +465,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
 
           {seccionActiva === "usuarios" && (
             <div className="seccion-usuarios">
-              <div className="seccion-header">
+              <div className="page-header-Academicos">  
                 <h2>Gestión de Usuarios</h2>
                 {!readOnly && (
                   <button className="btn-primary" onClick={abrirModalCrear}>

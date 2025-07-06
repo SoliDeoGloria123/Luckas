@@ -1,6 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { programasTecnicosService } from '../../services/programasTecnicosService';
-import './ProgramasTecnicos.css';
+import TecnicoModal from './Modales/TecnicoModal';
+import TecnicoTabla from './Tablas/TecnicoTabla';
+
 
 const ProgramasTecnicos = () => {
   const [programas, setProgramas] = useState([]);
@@ -250,9 +253,9 @@ const ProgramasTecnicos = () => {
 
   return (
     <div className="programas-tecnicos-container">
-      <div className="programas-header">
+      <div className="page-header-Academicos">
         <h2>Gestión de Programas Técnicos</h2>
-        <button className="btn-crear" onClick={() => abrirModal()}>
+        <button className="btn-primary" onClick={() => abrirModal()}>
           Crear Nuevo Programa Técnico
         </button>
       </div>
@@ -327,237 +330,24 @@ const ProgramasTecnicos = () => {
         </select>
       </div>
 
-      {/* Tabla de programas */}
-      <div className="tabla-container">
-        <table className="programas-tabla">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Área</th>
-              <th>Nivel</th>
-              <th>Modalidad</th>
-              <th>Coordinador</th>
-              <th>Duración</th>
-              <th>Cupos</th>
-              <th>Fecha Inicio</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {programas.map(programa => (
-              <tr key={programa._id}>
-                <td>{programa.nombre}</td>
-                <td>{programa.area}</td>
-                <td>{programa.nivel.replace('_', ' ')}</td>
-                <td>{programa.modalidad}</td>
-                <td>{programa.coordinador}</td>
-                <td>{programa.duracion.meses} meses</td>
-                <td>{programa.cuposOcupados}/{programa.cuposDisponibles}</td>
-                <td>{new Date(programa.fechaInicio).toLocaleDateString()}</td>
-                <td>
-                  <span className={`estado ${programa.estado}`}>
-                    {programa.estado.replace('_', ' ')}
-                  </span>
-                </td>
-                <td className="acciones">
-                  <button 
-                    className="btn-editar" 
-                    onClick={() => abrirModal(programa)}
-                  >
-                    Editar
-                  </button>
-                  <button 
-                    className="btn-eliminar" 
-                    onClick={() => eliminarPrograma(programa._id)}
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Tabla de programas técnicos modularizada */}
+      <TecnicoTabla 
+        programas={programas}
+        abrirModal={abrirModal}
+        eliminarPrograma={eliminarPrograma}
+      />
 
-      {/* Modal */}
-      {mostrarModal && (
-        <div className="modal-overlay">
-          <div className="modal-contenido">
-            <div className="modal-header">
-              <h3>{modoEdicion ? 'Editar Programa Técnico' : 'Crear Nuevo Programa Técnico'}</h3>
-              <button className="btn-cerrar" onClick={cerrarModal}>×</button>
-            </div>
-
-            {mensajeError && <div className="mensaje-error">{mensajeError}</div>}
-            {mensajeExito && <div className="mensaje-exito">{mensajeExito}</div>}
-
-            <form onSubmit={manejarEnvio} className="programa-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Nombre del Programa</label>
-                  <input
-                    type="text"
-                    value={nuevoPrograma.nombre}
-                    onChange={(e) => manejarCambio('nombre', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Coordinador</label>
-                  <input
-                    type="text"
-                    value={nuevoPrograma.coordinador}
-                    onChange={(e) => manejarCambio('coordinador', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Descripción</label>
-                <textarea
-                  value={nuevoPrograma.descripcion}
-                  onChange={(e) => manejarCambio('descripcion', e.target.value)}
-                  rows={3}
-                  required
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Área</label>
-                  <select
-                    value={nuevoPrograma.area}
-                    onChange={(e) => manejarCambio('area', e.target.value)}
-                    required
-                  >
-                    <option value="tecnologia">Tecnología</option>
-                    <option value="administracion">Administración</option>
-                    <option value="oficios">Oficios</option>
-                    <option value="arte_diseno">Arte y Diseño</option>
-                    <option value="salud">Salud</option>
-                    <option value="otros">Otros</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Nivel</label>
-                  <select
-                    value={nuevoPrograma.nivel}
-                    onChange={(e) => manejarCambio('nivel', e.target.value)}
-                    required
-                  >
-                    <option value="tecnico_laboral">Técnico Laboral</option>
-                    <option value="tecnico_profesional">Técnico Profesional</option>
-                    <option value="especializacion_tecnica">Especialización Técnica</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Modalidad</label>
-                  <select
-                    value={nuevoPrograma.modalidad}
-                    onChange={(e) => manejarCambio('modalidad', e.target.value)}
-                    required
-                  >
-                    <option value="presencial">Presencial</option>
-                    <option value="virtual">Virtual</option>
-                    <option value="semipresencial">Semipresencial</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Duración (Meses)</label>
-                  <input
-                    type="number"
-                    value={nuevoPrograma.duracion.meses}
-                    onChange={(e) => manejarCambio('duracion.meses', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Duración (Horas)</label>
-                  <input
-                    type="number"
-                    value={nuevoPrograma.duracion.horas}
-                    onChange={(e) => manejarCambio('duracion.horas', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Cupos Disponibles</label>
-                  <input
-                    type="number"
-                    value={nuevoPrograma.cuposDisponibles}
-                    onChange={(e) => manejarCambio('cuposDisponibles', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Fecha de Inicio</label>
-                  <input
-                    type="date"
-                    value={nuevoPrograma.fechaInicio}
-                    onChange={(e) => manejarCambio('fechaInicio', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Fecha de Fin</label>
-                  <input
-                    type="date"
-                    value={nuevoPrograma.fechaFin}
-                    onChange={(e) => manejarCambio('fechaFin', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Costo Matrícula</label>
-                  <input
-                    type="number"
-                    value={nuevoPrograma.costo.matricula}
-                    onChange={(e) => manejarCambio('costo.matricula', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Costo Mensualidad</label>
-                  <input
-                    type="number"
-                    value={nuevoPrograma.costo.mensualidad}
-                    onChange={(e) => manejarCambio('costo.mensualidad', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Costo Certificación</label>
-                  <input
-                    type="number"
-                    value={nuevoPrograma.costo.certificacion}
-                    onChange={(e) => manejarCambio('costo.certificacion', e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn-cancelar" onClick={cerrarModal}>
-                  Cancelar
-                </button>
-                <button type="submit" className="btn-guardar">
-                  {modoEdicion ? 'Actualizar' : 'Crear'} Programa Técnico
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Modal modularizado */}
+      <TecnicoModal
+        mostrarModal={mostrarModal}
+        modoEdicion={modoEdicion}
+        cerrarModal={cerrarModal}
+        mensajeError={mensajeError}
+        mensajeExito={mensajeExito}
+        manejarEnvio={manejarEnvio}
+        nuevoPrograma={nuevoPrograma}
+        manejarCambio={manejarCambio}
+      />
     </div>
   );
 };

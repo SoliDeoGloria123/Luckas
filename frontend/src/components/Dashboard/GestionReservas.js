@@ -128,7 +128,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
 
   return (
     <div className="seccion-usuarios">
-      <div className="seccion-header">
+      <div className="page-header-Academicos">
         <h2>Gestión de Reservas</h2>
         {canCreate && !readOnly && (
           <button className="btn-primary" onClick={abrirModalCrear}>

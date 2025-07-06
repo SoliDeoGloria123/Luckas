@@ -8,6 +8,7 @@ import './NuevaSolicitud.css';
 import NavBar from './NavBar';
 import './estilosDashboard.css';
 import { Link } from 'react-router-dom';
+import Header from '../Shared/Header';
 
 const NuevaSolicitud = () => {
   const { user } = useAuthCheck('seminarista');
@@ -102,6 +103,11 @@ const NuevaSolicitud = () => {
 
   return (
     <div className="app-background">
+      <Header 
+        userRole="seminarista" 
+        userName={user?.nombre} 
+        breadcrumbPath={['Dashboard', 'Nueva Solicitud']}/>
+
       <NavBar />
       <div className="section-container">
         <Link to="/seminarista/dashboard" className="card-btn" style={{marginBottom:'1.5rem',display:'inline-block'}}>← Volver al Dashboard</Link>

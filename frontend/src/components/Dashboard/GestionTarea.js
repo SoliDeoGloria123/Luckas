@@ -132,7 +132,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
 
   return (
     <div className="seccion-usuarios">
-      <div className="seccion-header">
+      <div className="page-header-Academicos">
         <h2>Gestión de Tareas</h2>
         {canCreate && !readOnly && (
           <button className="btn-primary" onClick={abrirModalCrear}>

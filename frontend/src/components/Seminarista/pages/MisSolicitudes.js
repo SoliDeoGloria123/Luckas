@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { solicitudService } from '../../../services/solicirudService';
+import { useAuthCheck } from '../hooks/useAuthCheck';
 import './MisSolicitudes.css';
 import './estilosDashboard.css';
+import Header from '../Shared/Header';
 import NavBar from './NavBar';
 import { Link } from 'react-router-dom';
 import EditarSolicitudModal from './EditarSolicitudModal';
 
 const MisSolicitudes = () => {
+  const { user } = useAuthCheck('seminarista'); // <-- Aquí está user
+
   const [solicitudes, setSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +27,6 @@ const MisSolicitudes = () => {
         }
         const data = await solicitudService.getMisSolicitudes();
         let solicitudesArray = [];
-        // Compatibilidad con backend: buscar en data.data
         if (Array.isArray(data)) {
           solicitudesArray = data;
         } else if (data && Array.isArray(data.data)) {
@@ -31,7 +34,6 @@ const MisSolicitudes = () => {
         } else if (data && Array.isArray(data.solicitudes)) {
           solicitudesArray = data.solicitudes;
         }
-        // Si no hay solicitudes, mostrar vacío
         setSolicitudes(solicitudesArray || []);
       } catch (err) {
         if (err && err.message && err.message.includes('401')) {
@@ -48,9 +50,16 @@ const MisSolicitudes = () => {
 
   return (
     <div className="app-background">
+      <Header 
+        userRole="seminarista" 
+        userName={user?.nombre}
+        breadcrumbPath={['Dashboard', 'Solicitudes']}
+      />
       <NavBar />
       <div className="section-container">
-        <Link to="/seminarista/dashboard" className="card-btn" style={{marginBottom:'1.5rem',display:'inline-block'}}>← Volver al Dashboard</Link>
+        <Link to="/seminarista" className="card-btn" style={{marginBottom:'1.5rem',display:'inline-block'}}>
+          ← Volver al Dashboard
+        </Link>
         <h2 style={{fontWeight:800, fontSize:'2rem', color:'#a5b4fc'}}>Mis Solicitudes</h2>
         {loading && <p>Cargando solicitudes...</p>}
         {error && <p style={{color:'#f472b6'}}>{error}</p>}
@@ -61,14 +70,11 @@ const MisSolicitudes = () => {
             ) : (
               solicitudes
                 .filter(sol => {
-                  // Mostrar solo solicitudes donde el solicitante es el usuario autenticado
-                  const usuario = JSON.parse(localStorage.getItem('usuario'));
-                  if (!usuario || !usuario._id) return false;
-                  // sol.solicitante puede ser objeto o string
+                  if (!user?._id) return false;
                   if (typeof sol.solicitante === 'object') {
-                    return sol.solicitante._id === usuario._id;
+                    return sol.solicitante._id === user._id;
                   }
-                  return sol.solicitante === usuario._id;
+                  return sol.solicitante === user._id;
                 })
                 .map(sol => (
                   <div key={sol._id} className="card">
@@ -99,7 +105,6 @@ const MisSolicitudes = () => {
               try {
                 await solicitudService.update(editando._id, { ...editando, ...form });
                 setEditando(null);
-                // Refrescar solicitudes
                 const data = await solicitudService.getMisSolicitudes();
                 let solicitudesArray = [];
                 if (Array.isArray(data)) {
