@@ -13,3 +13,17 @@ Ent/
 .env
 *.pyc
 __pycache__/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+
+# React build artifacts
+**/react-build/
+
+# IDE
+.vscode/
+.idea/

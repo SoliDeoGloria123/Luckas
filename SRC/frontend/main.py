@@ -1,7 +1,7 @@
 import datetime
 from fastapi import FastAPI, File, HTTPException, Query, Request, Form, Response, UploadFile, Depends, status
 from fastapi.middleware.wsgi import WSGIMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
@@ -219,6 +219,26 @@ async def require_api_login(request: Request):
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user_session_data
+
+# API endpoint for React app to check authentication status
+@app.get("/api/auth/status")
+async def auth_status(request: Request):
+    """
+    API endpoint for React app to check authentication status
+    """
+    user_session_data = get_current_user(request)
+    if user_session_data:
+        return {"authenticated": True, "user": user_session_data}
+    else:
+        return {"authenticated": False, "user": None}
+
+# Serve React app for external role
+@app.get("/react{path:path}")
+async def serve_react_app(request: Request, path: str = ""):
+    """
+    Serve the React application for external role users
+    """
+    return FileResponse(str(BASE_DIR / "static" / "react-build" / "index.html"))
 
 # Rutas de la aplicación FastAPI
 @app.get("/")
