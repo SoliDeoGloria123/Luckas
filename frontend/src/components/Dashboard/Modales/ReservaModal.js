@@ -35,20 +35,23 @@ const ReservasModal = ({
         <div className="modal-body">
           {/* Usuario */}
           <div className="form-grupo">
-            <label>Usuario ID:</label>
-  
-             <input
-                type="text"
-                value={modoEdicion ? reservaSeleccionada?.usuario : nuevaReserva.usuario}
-                onChange={e =>
+            <label>Usuario:</label>
+            <select
+              value={modoEdicion ? reservaSeleccionada?.usuario : nuevaReserva.usuario}
+              onChange={e =>
                 modoEdicion
                   ? setReservaSeleccionada({ ...reservaSeleccionada, usuario: e.target.value })
                   : setNuevaReserva({ ...nuevaReserva, usuario: e.target.value })
-                }
-                placeholder="ID del solicitante"
-                required
-              />
-            
+              }
+              required
+            >
+              <option value="">Seleccione...</option>
+              {usuarios && usuarios.map(user => (
+                <option key={user._id} value={user._id}>
+                  {user.nombre || user.username || user.correo} ({user.role})
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Cabaña */}

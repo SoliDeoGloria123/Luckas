@@ -26,7 +26,7 @@ const Login = () => {
       } else if (data.user.role === 'tesorero') {
         navigate('/tesorero/dashboard');
       } else if (data.user.role === 'seminarista') {
-        navigate('/seminarista/dashboard');
+        navigate('/seminarista');
       } else if (data.user.role === 'externo') {
         // Para usuarios externos, redirigir al dashboard HTML estático
         window.location.href = '/Externo/templates/dashboard.html';

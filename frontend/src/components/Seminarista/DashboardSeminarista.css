@@ -1,0 +1,345 @@
+/* Fondo general con gradiente y puntos sutiles tipo crypto */
+.dashboard-seminarista-contenedo {
+  background: radial-gradient(ellipse at 60% 40%, #23243a 60%, #18181b 100%);
+  min-height: 100vh;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.dashboard-seminarista-contenedo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="1" cy="1" r="1" fill="%233b3b4f"/></svg>');
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.header {
+  width: 100vw;
+  left: 0;
+  right: 0;
+  top: 0;
+  position: sticky;
+  z-index: 100;
+  min-width: 100vw;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  background: linear-gradient(90deg, #23243a 0%, #3b1c5c 100%);
+  border-bottom: 1.5px solid #312e81;
+}
+
+.header-content {
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
+
+.breadcrumb {
+  min-height: 32px;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.main-content {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+  position: relative;
+  z-index: 1;
+  min-height: 400px;
+  display: block;
+  flex: 1 1 auto;
+}
+
+/* Bienvenida centrada, con gradiente y sombra */
+.seccion-bienvenida {
+  background: linear-gradient(90deg, rgba(139,92,246,0.18) 0%, rgba(59,130,246,0.13) 100%);
+  border-radius: 22px;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.18);
+  padding: 2.5rem 2rem 2rem 2rem;
+  margin-bottom: 2.5rem;
+  animation: fadeIn 0.7s;
+  color: #fff;
+  text-align: center;
+}
+.bienvenida-header h1 {
+  font-size: 2.5rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.text-accent {
+  background: linear-gradient(90deg, #5eead4 0%, #818cf8 50%, #f472b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+.bienvenida-subtitle {
+  color: #a1a1aa;
+  font-size: 1.15rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+/* Status cards arriba, en fila, con fondo translúcido y gradiente */
+.status-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  justify-content: flex-start;
+}
+.status-card {
+  background: linear-gradient(120deg, rgba(59,130,246,0.13) 0%, rgba(139,92,246,0.13) 100%);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(59,130,246,0.13);
+  flex: 1 1 220px;
+  min-width: 220px;
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  padding: 1.2rem 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  color: #fff;
+  border: 1.5px solid rgba(129,140,248,0.18);
+  backdrop-filter: blur(2px);
+}
+.status-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 32px rgba(59,130,246,0.18);
+}
+.status-icon {
+  font-size: 2.2rem;
+  margin-right: 1.2rem;
+  color: #ffe066;
+}
+.status-info h3 {
+  margin: 0 0 0.2rem 0;
+  color: #a5b4fc;
+  font-size: 1.1rem;
+}
+.status-indicator {
+  color: #5eead4;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Cards principales en grid, con gradiente y sombra */
+.acciones-rapidas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.2rem;
+  justify-content: center;
+}
+.accion-card {
+  background: linear-gradient(120deg, #23243a 60%, #3b1c5c 100%);
+  border-radius: 18px;
+  box-shadow: 0 2px 32px 0 rgba(59,130,246,0.18);
+  min-width: 260px;
+  max-width: 400px;
+  padding: 2.2rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+  position: relative;
+  color: #fff;
+  overflow: hidden;
+  border: 1.5px solid rgba(129,140,248,0.13);
+}
+.accion-card:hover {
+  box-shadow: 0 12px 48px 0 rgba(139,92,246,0.22);
+  transform: translateY(-8px) scale(1.04);
+  background: linear-gradient(120deg, #3b1c5c 60%, #23243a 100%);
+}
+.accion-icon {
+  font-size: 2.7rem;
+  margin-bottom: 0.9rem;
+  background: linear-gradient(90deg, #5eead4 0%, #818cf8 100%);
+  border-radius: 50%;
+  padding: 0.5rem;
+  box-shadow: 0 2px 12px rgba(59,130,246,0.13);
+}
+.accion-titulo {
+  color: #fff;
+  font-size: 1.3rem;
+  margin-bottom: 0.3rem;
+  font-weight: 700;
+}
+.accion-descripcion {
+  color: #a1a1aa;
+  font-size: 1.05rem;
+  margin-bottom: 1.1rem;
+  text-align: left;
+  font-weight: 500;
+}
+.accion-button {
+  background: linear-gradient(90deg, #5eead4 0%, #818cf8 100%);
+  color: #23243a;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  margin-top: auto;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.13);
+}
+.accion-button:hover {
+  background: linear-gradient(90deg, #818cf8 0%, #5eead4 100%);
+  color: #fff;
+}
+
+/* Estilos para el menú desplegable de usuario */
+.usuario-menu {
+  background: linear-gradient(120deg, #23243a 60%, #3b1c5c 100%);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(59,130,246,0.18);
+  border: 1.5px solid rgba(129,140,248,0.18);
+  color: #fff;
+  min-width: 240px;
+  padding: 1.5rem 1.3rem 1.3rem 1.3rem;
+  margin-top: 0.7rem;
+  font-size: 1rem;
+  position: absolute;
+  right: 0;
+  z-index: 200;
+  animation: fadeIn 0.3s;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.usuario-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+.usuario-avatar {
+  background: linear-gradient(90deg, #5eead4 0%, #818cf8 100%);
+  color: #23243a;
+  border-radius: 50%;
+  width: 2.4rem;
+  height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-right: 0.7rem;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.13);
+}
+.usuario-menu-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.usuario-menu-info strong, .usuario-menu-info b {
+  color: #a5b4fc;
+  font-weight: 700;
+  font-size: 1.08rem;
+}
+.usuario-menu-info .usuario-rol {
+  color: #5eead4;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+.usuario-menu-info .usuario-email {
+  color: #cbd5e1;
+  font-size: 0.97rem;
+  font-weight: 400;
+}
+.usuario-menu hr {
+  border: none;
+  border-top: 1px solid #312e81;
+  margin: 0.7rem 0 0.5rem 0;
+}
+.usuario-menu .usuario-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.45rem 0.2rem 0.45rem 0.2rem;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  font-size: 1.01rem;
+}
+.usuario-menu .usuario-menu-item:hover {
+  background: linear-gradient(90deg, #818cf8 0%, #5eead4 100%);
+  color: #23243a;
+}
+.usuario-menu .usuario-menu-item svg {
+  font-size: 1.15rem;
+  color: #5eead4;
+}
+.usuario-menu .cerrar-sesion-btn {
+  margin-top: 0.7rem;
+  width: 100%;
+  background: linear-gradient(90deg, #f472b6 0%, #818cf8 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.13);
+  transition: background 0.18s, color 0.18s, transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+}
+.usuario-menu .cerrar-sesion-btn:hover {
+  background: linear-gradient(90deg, #818cf8 0%, #f472b6 100%);
+  color: #23243a;
+  transform: translateY(-2px) scale(1.03);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.7s;
+}
+.slide-up {
+  animation: fadeIn 0.7s;
+}
+
+@media (max-width: 900px) {
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+  .header {
+    padding: 0.5rem 0;
+  }
+  .main-content {
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+  }
+  .seccion-bienvenida {
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+  }
+}

@@ -87,19 +87,21 @@ const Registro = () => {
                 </div>
               </div>
               <div className="grupo-input-doble">
-                <label htmlFor="tipoDocumento">Tipo de Documento</label>
-                <select
-                  name="tipoDocumento"
-                  required
-                  onChange={handleChange}
-                  defaultValue=""
-                >
-                  <option value="" disabled>Seleccione un tipo</option>
-                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
-                  <option value="Cédula de extranjería">Cédula de extranjería</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-                </select>
+                <div className="campo-input">
+                  <label htmlFor="tipoDocumento">Tipo de Documento</label>
+                  <select
+                    name="tipoDocumento"
+                    required
+                    onChange={handleChange}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Seleccione un tipo</option>
+                    <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
+                    <option value="Cédula de extranjería">Cédula de extranjería</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                    <option value="Tarjeta de identidad">Tarjeta de identidad</option>
+                  </select>
+                </div>
                 <div className="campo-input">
                   <label htmlFor="numeroDocumento">Numero De Documento </label>
                   <input type="text" name="numeroDocumento" placeholder="Ingrese su Documneto " required onChange={handleChange} />

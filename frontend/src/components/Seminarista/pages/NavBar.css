@@ -1,0 +1,28 @@
+.navbar-luckasent {
+  background: #232946;
+  padding: 0.5rem 0;
+  display: flex;
+  justify-content: center;
+  box-shadow: 0 2px 8px #0002;
+}
+.navbar-luckasent ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+.navbar-luckasent li {
+  font-size: 1.1rem;
+}
+.navbar-luckasent a {
+  color: #eebbc3;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.navbar-luckasent .active a, .navbar-luckasent a:hover {
+  background: #eebbc3;
+  color: #232946;
+}

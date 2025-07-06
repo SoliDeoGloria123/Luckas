@@ -1,0 +1,108 @@
+/* Estilo moderno y oscuro para la sección de solicitudes */
+.seccion-solicitudes {
+  background: linear-gradient(120deg, #23243a 60%, #3b1c5c 100%);
+  border-radius: 22px;
+  box-shadow: 0 6px 32px rgba(59,130,246,0.18);
+  padding: 2.5rem 2rem 2rem 2rem;
+  margin: 2.5rem auto;
+  color: #fff;
+  max-width: 700px;
+  min-width: 320px;
+  animation: fadeIn 0.7s;
+  position: relative;
+  z-index: 1;
+}
+.seccion-solicitudes h2 {
+  font-size: 2.1rem;
+  color: #a5b4fc;
+  font-weight: 800;
+  margin-bottom: 1.1rem;
+  letter-spacing: 1px;
+}
+.seccion-solicitudes p {
+  color: #a1a1aa;
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+@media (max-width: 700px) {
+  .seccion-solicitudes {
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+    min-width: unset;
+  }
+  .seccion-solicitudes h2 {
+    font-size: 1.4rem;
+  }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos para la lista de solicitudes como cards visuales */
+.lista-solicitudes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.solicitud-item {
+  background: linear-gradient(120deg, #23243a 60%, #3b1c5c 100%);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(59,130,246,0.13);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  gap: 1rem;
+  border: 1.5px solid rgba(129,140,248,0.13);
+  transition: transform 0.15s, box-shadow 0.15s;
+  min-height: 220px;
+}
+.solicitud-item:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 8px 32px #5eead4aa;
+}
+.solicitud-imgbox {
+  width: 100%;
+  max-width: 220px;
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #181926;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.7rem;
+}
+.solicitud-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #23243a;
+}
+.solicitud-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  align-items: center;
+}
+.solicitud-tipo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #5eead4;
+}
+.solicitud-estado {
+  font-size: 1.08rem;
+  color: #fbbf24;
+  font-weight: 700;
+}
+.solicitud-fecha, .solicitud-detalle {
+  font-size: 1.01rem;
+  color: #a1a1aa;
+  margin-bottom: 0.2rem;
+  display: block;
+}

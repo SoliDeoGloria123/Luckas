@@ -260,14 +260,13 @@ const ProgramasAcademicos = () => {
 
     return (
         <div className="programas-academicos-container">
-            <div className="page-header">
+            <div className="page-header-Academicos">
                 <h1>
                     <i className="fas fa-graduation-cap"></i>
                     Gestión de Programas Académicos
                 </h1>
                 <button className="btn-primary" onClick={abrirModalCrear}>
-                    <i className="fas fa-plus"></i>
-                    Nuevo Programa
+                     ➕ Nuevo Programa
                 </button>
             </div>
 
@@ -279,9 +278,9 @@ const ProgramasAcademicos = () => {
             )}
 
             {/* Filtros */}
-            <div className="filtros-container">
-                <div className="filtros-group">
-                    <div className="filtro-item">
+            <div className="filtros-Academicos">
+                <div className="filtros-group-Academicos">
+                    <div className="filtro-item-Academicos">
                         <label>Tipo de Programa</label>
                         <select 
                             value={filtros.tipo} 
@@ -294,7 +293,7 @@ const ProgramasAcademicos = () => {
                             <option value="diplomado">Diplomados</option>
                         </select>
                     </div>
-                    <div className="filtro-item">
+                    <div className="filtro-item-Academicos">
                         <label>Modalidad</label>
                         <select 
                             value={filtros.modalidad} 
@@ -306,7 +305,7 @@ const ProgramasAcademicos = () => {
                             <option value="mixta">Mixta</option>
                         </select>
                     </div>
-                    <div className="filtro-item">
+                    <div className="filtro-item-Academicos">
                         <label>Buscar</label>
                         <input
                             type="text"
@@ -319,8 +318,8 @@ const ProgramasAcademicos = () => {
             </div>
 
             {/* Tabla de programas */}
-            <div className="table-container">
-                <table className="programas-table">
+            <div className="table-container-Academicos">
+                <table className="programas-table-Academicos">
                     <thead>
                         <tr>
                             <th>Programa</th>
@@ -398,8 +397,8 @@ const ProgramasAcademicos = () => {
             {/* Modal Crear/Editar */}
             {(modalCrear || modalEditar) && (
                 <div className="modal-overlay">
-                    <div className="modal modal-large">
-                        <div className="modal-header">
+                    <div className="modal">
+                        <div className="modal-header-Academicos">
                             <h2>
                                 {modalEditar ? 'Editar Programa Académico' : 'Crear Programa Académico'}
                             </h2>
@@ -407,13 +406,13 @@ const ProgramasAcademicos = () => {
                                 <i className="fas fa-times"></i>
                             </button>
                         </div>
-                        <div className="modal-body">
+                        <div className="modal-body-Academicos">
                             <form onSubmit={handleSubmit}>
                                 {/* Información básica */}
                                 <div className="form-section">
                                     <h3>Información Básica</h3>
-                                    <div className="form-grid">
-                                        <div className="form-group">
+                                    <div className="form-grid-Academicos">
+                                        <div className="form-group-Academicos">
                                             <label>Título del Programa *</label>
                                             <input
                                                 type="text"
@@ -422,7 +421,7 @@ const ProgramasAcademicos = () => {
                                                 required
                                             />
                                         </div>
-                                        <div className="form-group">
+                                        <div className="form-group-Academicos">
                                             <label>Tipo *</label>
                                             <select
                                                 value={formData.tipo}
@@ -435,7 +434,7 @@ const ProgramasAcademicos = () => {
                                                 <option value="diplomado">Diplomado</option>
                                             </select>
                                         </div>
-                                        <div className="form-group">
+                                        <div className="form-group-Academicos">
                                             <label>Modalidad *</label>
                                             <select
                                                 value={formData.modalidad}
@@ -447,7 +446,7 @@ const ProgramasAcademicos = () => {
                                                 <option value="mixta">Mixta</option>
                                             </select>
                                         </div>
-                                        <div className="form-group">
+                                        <div className="form-group-Academicos">
                                             <label>Duración *</label>
                                             <input
                                                 type="text"
@@ -457,7 +456,7 @@ const ProgramasAcademicos = () => {
                                                 required
                                             />
                                         </div>
-                                        <div className="form-group">
+                                        <div className="form-group-Academicos">
                                             <label>Precio (COP) *</label>
                                             <input
                                                 type="number"
@@ -467,7 +466,7 @@ const ProgramasAcademicos = () => {
                                                 required
                                             />
                                         </div>
-                                        <div className="form-group">
+                                        <div className="form-group-Academicos">
                                             <label>Cupos Disponibles *</label>
                                             <input
                                                 type="number"
@@ -477,7 +476,7 @@ const ProgramasAcademicos = () => {
                                                 required
                                             />
                                         </div>
-                                        <div className="form-group">
+                                        <div className="form-group-Academicos">
                                             <label>Fecha de Inicio *</label>
                                             <input
                                                 type="date"
@@ -486,7 +485,7 @@ const ProgramasAcademicos = () => {
                                                 required
                                             />
                                         </div>
-                                        <div className="form-group">
+                                        <div className="form-group-Academicos">
                                             <label>Fecha de Fin</label>
                                             <input
                                                 type="date"
@@ -495,7 +494,7 @@ const ProgramasAcademicos = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="form-group">
+                                    <div className="form-group-Academicos">
                                         <label>Descripción *</label>
                                         <textarea
                                             rows="3"
@@ -504,7 +503,7 @@ const ProgramasAcademicos = () => {
                                             required
                                         />
                                     </div>
-                                    <div className="form-group">
+                                    <div className="form-group-Academicos">
                                         <label>
                                             <input
                                                 type="checkbox"
@@ -519,7 +518,7 @@ const ProgramasAcademicos = () => {
                                 {/* Información del profesor */}
                                 <div className="form-section">
                                     <h3>Profesor</h3>
-                                    <div className="form-group">
+                                    <div className="form-group-Academicos">
                                         <label>Nombre del Profesor *</label>
                                         <input
                                             type="text"
@@ -528,7 +527,7 @@ const ProgramasAcademicos = () => {
                                             required
                                         />
                                     </div>
-                                    <div className="form-group">
+                                    <div className="form-group-Academicos">
                                         <label>Biografía del Profesor</label>
                                         <textarea
                                             rows="3"
@@ -574,8 +573,8 @@ const ProgramasAcademicos = () => {
                                     <h3>Plan de Estudios</h3>
                                     {formData.pensum.map((modulo, index) => (
                                         <div key={index} className="pensum-item">
-                                            <div className="form-grid">
-                                                <div className="form-group">
+                                            <div className="form-grid-Academicos">
+                                                <div className="form-group-Academicos">
                                                     <input
                                                         type="text"
                                                         placeholder="Nombre del módulo"
@@ -583,7 +582,7 @@ const ProgramasAcademicos = () => {
                                                         onChange={(e) => actualizarModuloPensum(index, 'modulo', e.target.value)}
                                                     />
                                                 </div>
-                                                <div className="form-group">
+                                                <div className="form-group-Academicos">
                                                     <input
                                                         type="number"
                                                         placeholder="Horas"

@@ -196,7 +196,7 @@ body {
 }
 
 /* Header */
-.header {
+.admin-header {
   height: var(--header-height);
   background: white;
   border-bottom: 1px solid #e9ecef;
@@ -209,7 +209,7 @@ body {
   z-index: 100;
 }
 
-.header-izquierda {
+.admin-header-izquierda {
   display: flex;
   align-items: center;
   gap: 20px;
@@ -237,13 +237,13 @@ body {
   font-size: 14px;
 }
 
-.header-derecha {
+.admin-header-derecha {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-.notificaciones {
+.admin-notificaciones {
   position: relative;
   cursor: pointer;
 }
@@ -273,7 +273,7 @@ body {
   gap: 10px;
 }
 
-.usuario-avatar {
+usuario-avatar {
   width: 35px;
   height: 35px;
   border-radius: 50%;
@@ -286,11 +286,11 @@ body {
   font-size: 12px;
 }
 
-.usuario-nombre {
+.admin-nombre {
   font-weight: 500;
 }
 
-.btn-logout {
+.admin-btn-logout {
   background: none;
   border: none;
   font-size: 16px;
@@ -300,8 +300,8 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.btn-logout:hover {
-  background-color: #f8f9fa;
+.admin-btn-logout:hover {
+  background-color: #faf8f8;
 }
 
 /* Contenido */
@@ -601,7 +601,7 @@ body {
   gap: 12px;
 }
 
-.usuario-avatar-mini {
+.admi-avatar {
   width: 35px;
   height: 35px;
   border-radius: 50%;
@@ -810,8 +810,8 @@ body {
     align-items: stretch;
   }
 
-  .header-izquierda,
-  .header-derecha {
+  .admin-header-izquierda,
+  .admin-header-derecha {
     gap: 10px;
   }
 

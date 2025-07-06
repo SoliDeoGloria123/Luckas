@@ -40,8 +40,8 @@ exports.obtenerSolicitudes = async (req, res) => {
       // Ejecutar consulta
       const solicitudes = await Solicitud.find(filtros)
         .populate('solicitante', 'username nombre correo telefono role')
-        .populate('categoria', 'nombre descripcion codigo')
-        .populate('responsable', 'username nombre email')
+        .populate('categoria', 'nombre  codigo')
+        .populate('responsable', 'nombre apellido')
         .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit))
