@@ -1,11 +1,12 @@
-const ProgramaTecnico = require('../models/ProgramaTecnico');
+// Importa SIEMPRE el modelo User ANTES del modelo que lo referencia
 const User = require('../models/User');
+const ProgramaTecnico = require('../models/ProgramaTecnico');
 
 // Obtener todos los programas técnicos
 exports.obtenerProgramasTecnicos = async (req, res) => {
   try {
     const { area, estado, modalidad, nivel, page = 1, limit = 10 } = req.query;
-    
+
     // Construir filtro
     const filtro = {};
     if (area) filtro.area = area;
@@ -14,7 +15,7 @@ exports.obtenerProgramasTecnicos = async (req, res) => {
     if (nivel) filtro.nivel = nivel;
 
     const skip = (page - 1) * limit;
-    
+
     const programas = await ProgramaTecnico.find(filtro)
       .populate('inscripciones.usuario', 'nombre apellido correo')
       .sort({ fechaInicio: -1 })
@@ -47,7 +48,7 @@ exports.obtenerProgramasTecnicos = async (req, res) => {
 exports.obtenerProgramaTecnicoPorId = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const programa = await ProgramaTecnico.findById(id)
       .populate('inscripciones.usuario', 'nombre apellido correo telefono');
 
@@ -95,7 +96,7 @@ exports.crearProgramaTecnico = async (req, res) => {
     });
   } catch (error) {
     console.error('Error al crear programa técnico:', error);
-    
+
     if (error.name === 'ValidationError') {
       const errores = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -149,7 +150,7 @@ exports.actualizarProgramaTecnico = async (req, res) => {
     });
   } catch (error) {
     console.error('Error al actualizar programa técnico:', error);
-    
+
     if (error.name === 'ValidationError') {
       const errores = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -173,7 +174,7 @@ exports.eliminarProgramaTecnico = async (req, res) => {
     const { id } = req.params;
 
     const programa = await ProgramaTecnico.findById(id);
-    
+
     if (!programa) {
       return res.status(404).json({
         success: false,
@@ -305,7 +306,7 @@ exports.obtenerEstadisticas = async (req, res) => {
     const programasActivos = await ProgramaTecnico.countDocuments({ estado: 'activo' });
     const programasEnProceso = await ProgramaTecnico.countDocuments({ estado: 'en_proceso' });
     const programasFinalizados = await ProgramaTecnico.countDocuments({ estado: 'finalizado' });
-    
+
     const inscripcionesTotales = await ProgramaTecnico.aggregate([
       { $unwind: '$inscripciones' },
       { $count: 'total' }

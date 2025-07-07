@@ -24,27 +24,27 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
-    match: /^[0-9]{7,15}$/  // solo dígitos, mínimo 7 y máximo 15 caracteres
+    match: /^[0-9]{7,15}$/
   },
   tipoDocumento: {
     type: String,
     enum: ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad'],
     required: true
-   },
-   numeroDocumento: {
+  },
+  numeroDocumento: {
     type: String,
     required: true,
     unique: true,
     trim: true,
-   },
+  },
   password: {
     type: String,
     required: true,
-    select: false // No devolver el password en las consultas
+    select: false
   },
   role: {
     type: String,
-     enum: ['admin', 'tesorero', 'seminarista', 'externo'],
+    enum: ['admin', 'tesorero', 'seminarista', 'externo'],
     default: 'externo'
   },
   estado: {
@@ -54,10 +54,9 @@ const userSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Middleware para hashear la contraseña antes de guardar
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
-  
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -67,9 +66,8 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// Método para comparar contraseñas
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('usuarios', userSchema);
+module.exports = mongoose.model('User', userSchema);
