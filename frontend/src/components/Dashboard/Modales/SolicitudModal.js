@@ -93,7 +93,7 @@ const SolicitudModal = ({
             <select
               value={nuevaSolicitud.tipoSolicitud}
               onChange={e =>
-               setNuevaSolicitud({ ...nuevaSolicitud, tipoSolicitud: e.target.value })
+               setNuevaSolicitud({ ...nuevaSolicitud, tipoSolicitud: e.target.value, modeloReferencia: '' })
               }
               required
             >
@@ -107,6 +107,40 @@ const SolicitudModal = ({
               <option value="Otra">Otra</option>
             </select>
           </div>
+          )}
+          {/* Select de modeloReferencia dinámico */}
+          {!modoEdicion && nuevaSolicitud.tipoSolicitud && (
+            <div className="form-grupo">
+              <label>Modelo Referencia:</label>
+              <select
+                value={nuevaSolicitud.modeloReferencia || ''}
+                onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, modeloReferencia: e.target.value })}
+                required
+              >
+                <option value="">Seleccione...</option>
+                {nuevaSolicitud.tipoSolicitud === 'Inscripción' && (
+                  <option value="Eventos">Eventos</option>
+                )}
+                {nuevaSolicitud.tipoSolicitud === 'Hospedaje' && (
+                  <option value="Cabana">Cabaña</option>
+                )}
+                {nuevaSolicitud.tipoSolicitud === 'Alimentación' && (
+                  <option value="Comedor">Comedor</option>
+                )}
+                {nuevaSolicitud.tipoSolicitud === 'Transporte' && (
+                  <option value="Bus">Bus</option>
+                  )}
+                {nuevaSolicitud.tipoSolicitud === 'Certificados' && (
+                  <option value="Certificado">Certificado</option>
+                )}
+                {nuevaSolicitud.tipoSolicitud === 'Administrativa' && (
+                  <option value="Administrativo">Administrativo</option>
+                )}
+                {nuevaSolicitud.tipoSolicitud === 'Otra' && (
+                  <option value="Otro">Otro</option>
+                )}
+              </select>
+            </div>
           )}
           {!modoEdicion && (
           <div className="form-grupo">
@@ -179,7 +213,11 @@ const SolicitudModal = ({
             <label>Responsable:</label>
             <input
               type="text"
-              value={modoEdicion ? solicitudSeleccionada?.responsable : nuevaSolicitud.responsable}
+              value={modoEdicion
+                ? (typeof solicitudSeleccionada?.responsable === 'object'
+                    ? (solicitudSeleccionada.responsable?.nombre || solicitudSeleccionada.responsable?.username || solicitudSeleccionada.responsable?.correo || solicitudSeleccionada.responsable?._id || '')
+                    : (solicitudSeleccionada?.responsable || ''))
+                : nuevaSolicitud.responsable}
               onChange={e =>
                 modoEdicion
                   ? setSolicitudSeleccionada({ ...solicitudSeleccionada, responsable: e.target.value })

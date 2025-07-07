@@ -24,20 +24,17 @@ exports.getDashboardReport = async (req, res) => {
       eventosProximos
     ] = await Promise.all([
       Usuario.countDocuments(),
-      Reserva.countDocuments(),
+      Reserva.countDocuments({}), // Total de reservas sin filtro de fecha
       Inscripcion.countDocuments(),
       Evento.countDocuments({ active: true }),
       Cabana.countDocuments(),
       Solicitud.countDocuments(),
       Tarea.countDocuments(),
       Solicitud.countDocuments({ estado: { $in: ['Nueva', 'En Revisión', 'Pendiente Info'] } }),
-      Reserva.countDocuments({ 
-        fechaInicio: { $lte: new Date() },
-        fechaFin: { $gte: new Date() }
-      }),
-      Evento.countDocuments({ 
-        fecha: { $gte: new Date() },
-        active: true 
+      Reserva.countDocuments({ estado: { $in: ['Pendiente', 'Confirmada'] }, $or: [{ activo: true }, { activo: "true" }] }),// Activas por estado y activo
+      Evento.countDocuments({
+        fechaEvento: { $gte: new Date() },
+        active: true
       })
     ]);
 
@@ -59,6 +56,7 @@ exports.getDashboardReport = async (req, res) => {
 
     res.json({ success: true, data: dashboard });
   } catch (error) {
+      console.error('Error en getDashboardReport:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -67,7 +65,7 @@ exports.getDashboardReport = async (req, res) => {
 exports.getReservasReport = async (req, res) => {
   try {
     const { fechaInicio, fechaFin, estado, cabana } = req.query;
-    
+
     let filtros = {};
     if (fechaInicio && fechaFin) {
       filtros.fechaInicio = { $gte: new Date(fechaInicio) };
@@ -75,15 +73,24 @@ exports.getReservasReport = async (req, res) => {
     }
     if (cabana) filtros.cabana = cabana;
 
-    const reservas = await Reserva.find(filtros)
+
+    let reservas = await Reserva.find(filtros)
       .populate('usuario', 'username email phone')
       .populate('cabana', 'nombre descripcion capacidad categoria estado')
       .populate('solicitud', 'estado prioridad fechaSolicitud')
       .sort({ fechaInicio: -1 });
 
+    // Forzar el campo activo a booleano en cada reserva (por si hay datos antiguos o inconsistentes)
+    reservas = reservas.map(r => {
+      r.activo = typeof r.activo === 'string' ? r.activo === 'true' : Boolean(r.activo);
+      return r;
+    });
+
     // Estadísticas
     const estadisticas = {
       total: reservas.length,
+      activos: reservas.filter(r => r.activo).length,
+      inactivos: reservas.filter(r => !r.activo).length,
       porEstado: await Reserva.aggregate([
         { $match: filtros },
         { $group: { _id: '$estado', count: { $sum: 1 } } }
@@ -102,13 +109,13 @@ exports.getReservasReport = async (req, res) => {
       ])
     };
 
-    res.json({ 
-      success: true, 
-      data: { 
-        reservas, 
+    res.json({
+      success: true,
+      data: {
+        reservas,
         estadisticas,
         fechaGeneracion: new Date()
-      } 
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -119,10 +126,10 @@ exports.getReservasReport = async (req, res) => {
 exports.getInscripcionesReport = async (req, res) => {
   try {
     const { fechaInicio, fechaFin, evento, categoria } = req.query;
-    
+
     let filtros = {};
     if (fechaInicio && fechaFin) {
-      filtros.createdAt = { 
+      filtros.createdAt = {
         $gte: new Date(fechaInicio),
         $lte: new Date(fechaFin)
       };
@@ -160,13 +167,13 @@ exports.getInscripcionesReport = async (req, res) => {
       ])
     };
 
-    res.json({ 
-      success: true, 
-      data: { 
-        inscripciones, 
+    res.json({
+      success: true,
+      data: {
+        inscripciones,
         estadisticas,
         fechaGeneracion: new Date()
-      } 
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -177,10 +184,10 @@ exports.getInscripcionesReport = async (req, res) => {
 exports.getSolicitudesReport = async (req, res) => {
   try {
     const { fechaInicio, fechaFin, estado, tipoSolicitud, prioridad } = req.query;
-    
+
     let filtros = {};
     if (fechaInicio && fechaFin) {
-      filtros.fechaSolicitud = { 
+      filtros.fechaSolicitud = {
         $gte: new Date(fechaInicio),
         $lte: new Date(fechaFin)
       };
@@ -211,12 +218,12 @@ exports.getSolicitudesReport = async (req, res) => {
         { $group: { _id: '$prioridad', count: { $sum: 1 } } }
       ]),
       tiempoPromedioProcesamiento: await Solicitud.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
             ...filtros,
             fechaRespuesta: { $exists: true },
             estado: { $in: ['Aprobada', 'Rechazada', 'Completada'] }
-          } 
+          }
         },
         {
           $project: {
@@ -237,13 +244,13 @@ exports.getSolicitudesReport = async (req, res) => {
       ])
     };
 
-    res.json({ 
-      success: true, 
-      data: { 
-        solicitudes, 
+    res.json({
+      success: true,
+      data: {
+        solicitudes,
         estadisticas,
         fechaGeneracion: new Date()
-      } 
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -254,10 +261,10 @@ exports.getSolicitudesReport = async (req, res) => {
 exports.getUsuariosReport = async (req, res) => {
   try {
     const { fechaInicio, fechaFin, rol, activo } = req.query;
-    
+
     let filtros = {};
     if (fechaInicio && fechaFin) {
-      filtros.createdAt = { 
+      filtros.createdAt = {
         $gte: new Date(fechaInicio),
         $lte: new Date(fechaFin)
       };
@@ -294,13 +301,13 @@ exports.getUsuariosReport = async (req, res) => {
       ])
     };
 
-    res.json({ 
-      success: true, 
-      data: { 
-        usuarios, 
+    res.json({
+      success: true,
+      data: {
+        usuarios,
         estadisticas,
         fechaGeneracion: new Date()
-      } 
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -311,20 +318,23 @@ exports.getUsuariosReport = async (req, res) => {
 exports.getEventosReport = async (req, res) => {
   try {
     const { fechaInicio, fechaFin, categoria, activo } = req.query;
-    
+
+
     let filtros = {};
+    // Usar el campo correcto: fechaEvento
     if (fechaInicio && fechaFin) {
-      filtros.fecha = { 
+      filtros.fechaEvento = {
         $gte: new Date(fechaInicio),
         $lte: new Date(fechaFin)
       };
     }
     if (categoria) filtros.categoria = categoria;
-    if (activo !== undefined) filtros.active = activo === 'true';
+    if (activo !== undefined) filtros.active = (activo === 'true' || activo === true);
+
 
     const eventos = await Evento.find(filtros)
       .populate('categoria', 'nombre descripcion codigo')
-      .sort({ fecha: -1 });
+      .sort({ fechaEvento: -1 });
 
     // Obtener inscripciones por evento
     const eventosConInscripciones = await Promise.all(
@@ -350,17 +360,17 @@ exports.getEventosReport = async (req, res) => {
       ]),
       ingresosPotenciales: await Evento.aggregate([
         { $match: filtros },
-        { $group: { _id: null, total: { $sum: '$price' } } }
+        { $group: { _id: null, total: { $sum: '$precio' } } }
       ])
     };
 
-    res.json({ 
-      success: true, 
-      data: { 
-        eventos: eventosConInscripciones, 
+    res.json({
+      success: true,
+      data: {
+        eventos: eventosConInscripciones,
         estadisticas,
         fechaGeneracion: new Date()
-      } 
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -371,11 +381,11 @@ exports.getEventosReport = async (req, res) => {
 exports.getReporteFinanciero = async (req, res) => {
   try {
     const { fechaInicio, fechaFin } = req.query;
-    
+
     let filtrosFecha = {};
     if (fechaInicio && fechaFin) {
       filtrosFecha = {
-        createdAt: { 
+        createdAt: {
           $gte: new Date(fechaInicio),
           $lte: new Date(fechaFin)
         }
@@ -416,9 +426,9 @@ exports.getReporteFinanciero = async (req, res) => {
       cabanas: ingresosCabanas[0] || { totalReservas: 0, ingresoTotal: 0, promedioPorReserva: 0 },
       eventos: ingresosEventos[0] || { totalInscripciones: 0, ingresoTotal: 0, promedioPorInscripcion: 0 },
       resumen: {
-        ingresoTotalConsolidado: 
+        ingresoTotalConsolidado:
           (ingresosCabanas[0]?.ingresoTotal || 0) + (ingresosEventos[0]?.ingresoTotal || 0),
-        transaccionesTotales: 
+        transaccionesTotales:
           (ingresosCabanas[0]?.totalReservas || 0) + (ingresosEventos[0]?.totalInscripciones || 0)
       },
       fechaGeneracion: new Date()
@@ -434,11 +444,11 @@ exports.getReporteFinanciero = async (req, res) => {
 exports.getActividadUsuarios = async (req, res) => {
   try {
     const { usuarioId, fechaInicio, fechaFin } = req.query;
-    
+
     let filtros = {};
     if (usuarioId) filtros.usuario = usuarioId;
     if (fechaInicio && fechaFin) {
-      filtros.createdAt = { 
+      filtros.createdAt = {
         $gte: new Date(fechaInicio),
         $lte: new Date(fechaFin)
       };

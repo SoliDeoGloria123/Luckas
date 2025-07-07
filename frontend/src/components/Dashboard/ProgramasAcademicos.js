@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ProgramasModal from './Modales/ProgramasModal';
 import ProgramasTabla from './Tablas/ProgramasTabla';
 
 const ProgramasAcademicos = () => {
@@ -12,7 +11,6 @@ const ProgramasAcademicos = () => {
         modalidad: '',
         busqueda: ''
     });
-    const [modalCrear, setModalCrear] = useState(false);
     const [modalEditar, setModalEditar] = useState(false);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
     const [formData, setFormData] = useState({
@@ -100,8 +98,6 @@ const ProgramasAcademicos = () => {
                     }
                 });
             }
-
-            cerrarModales();
             cargarProgramas();
             mostrarMensaje('Programa guardado exitosamente', 'success');
         } catch (error) {
@@ -126,62 +122,6 @@ const ProgramasAcademicos = () => {
         }
     };
 
-    const abrirModalCrear = () => {
-        setFormData({
-            titulo: '',
-            descripcion: '',
-            tipo: 'curso',
-            modalidad: 'presencial',
-            duracion: '',
-            precio: '',
-            fechaInicio: '',
-            fechaFin: '',
-            cupos: '',
-            profesor: '',
-            profesorBio: '',
-            requisitos: [''],
-            pensum: [{ modulo: '', descripcion: '', horas: '' }],
-            objetivos: [''],
-            metodologia: '',
-            evaluacion: '',
-            certificacion: '',
-            imagen: '',
-            destacado: false
-        });
-        setModalCrear(true);
-    };
-
-    const abrirModalEditar = (programa) => {
-        setProgramaSeleccionado(programa);
-        setFormData({
-            titulo: programa.titulo || '',
-            descripcion: programa.descripcion || '',
-            tipo: programa.tipo || 'curso',
-            modalidad: programa.modalidad || 'presencial',
-            duracion: programa.duracion || '',
-            precio: programa.precio?.toString() || '',
-            fechaInicio: programa.fechaInicio ? new Date(programa.fechaInicio).toISOString().split('T')[0] : '',
-            fechaFin: programa.fechaFin ? new Date(programa.fechaFin).toISOString().split('T')[0] : '',
-            cupos: programa.cupos?.toString() || '',
-            profesor: programa.profesor || '',
-            profesorBio: programa.profesorBio || '',
-            requisitos: programa.requisitos?.length ? programa.requisitos : [''],
-            pensum: programa.pensum?.length ? programa.pensum : [{ modulo: '', descripcion: '', horas: '' }],
-            objetivos: programa.objetivos?.length ? programa.objetivos : [''],
-            metodologia: programa.metodologia || '',
-            evaluacion: programa.evaluacion || '',
-            certificacion: programa.certificacion || '',
-            imagen: programa.imagen || '',
-            destacado: programa.destacado || false
-        });
-        setModalEditar(true);
-    };
-
-    const cerrarModales = () => {
-        setModalCrear(false);
-        setModalEditar(false);
-        setProgramaSeleccionado(null);
-    };
 
     const mostrarMensaje = (mensaje, tipo) => {
         // Implementar sistema de notificaciones
@@ -266,9 +206,7 @@ const ProgramasAcademicos = () => {
                     <i className="fas fa-graduation-cap"></i>
                     Gestión de Programas Académicos
                 </h1>
-                <button className="btn-primary" onClick={abrirModalCrear}>
-                     ➕ Nuevo Programa
-                </button>
+             
             </div>
 
             {error && (
@@ -322,28 +260,13 @@ const ProgramasAcademicos = () => {
             {/* Tabla de programas */}
             <ProgramasTabla
                 programas={programas}
-                abrirModalEditar={abrirModalEditar}
                 eliminarPrograma={eliminarPrograma}
                 formatearPrecio={formatearPrecio}
                 formatearFecha={formatearFecha}
             />
 
-            {/* Modal Crear/Editar */}
-            {(modalCrear || modalEditar) && (
-                <ProgramasModal
-                    modalEditar={modalEditar}
-                    cerrarModales={cerrarModales}
-                    handleSubmit={handleSubmit}
-                    formData={formData}
-                    setFormData={setFormData}
-                    actualizarRequisito={actualizarRequisito}
-                    removerRequisito={removerRequisito}
-                    agregarRequisito={agregarRequisito}
-                    actualizarModuloPensum={actualizarModuloPensum}
-                    removerModuloPensum={removerModuloPensum}
-                    agregarModuloPensum={agregarModuloPensum}
-                />
-            )}
+            
+            
         </div>
     );
 };

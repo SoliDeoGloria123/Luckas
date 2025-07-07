@@ -34,6 +34,18 @@ body {
   min-height: 100vh;
   background-color: #f4f6f9;
 }
+.usuario-avatar-admin {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+}
 
 .spinner {
   width: 50px;

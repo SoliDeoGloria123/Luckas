@@ -19,8 +19,8 @@ const ReservasModal = ({
   const setReserva = modoEdicion ? setReservaSeleccionada : setNuevaReserva;
 
   const handleChange = (e) => {
-    const {name,value} = e.target;
-    setReserva({...reservaActual, [name]: value});
+    const { name, value } = e.target;
+    setReserva({ ...reservaActual, [name]: value });
 
   };
 
@@ -112,6 +112,20 @@ const ReservasModal = ({
               required
             />
           </div>
+          <div className="form-grupo">
+            <label>Precio:</label>
+            <input
+              type="number" // <-- debe ser number, no numbre
+              value={modoEdicion ? reservaSeleccionada?.precio : nuevaReserva.precio}
+              onChange={e =>
+                modoEdicion
+                  ? setReservaSeleccionada({ ...reservaSeleccionada, precio: e.target.value })
+                  : setNuevaReserva({ ...nuevaReserva, precio: e.target.value })
+              }
+              required
+            />
+          </div>
+
 
           {/* Estado */}
           <div className="form-grupo">
@@ -131,6 +145,22 @@ const ReservasModal = ({
               <option value="finalizada">Finalizada</option>
             </select>
           </div>
+          {/* Activo */}
+          <div className="form-grupo">
+            <label>Activo:</label>
+            <select
+              value={modoEdicion ? (reservaSeleccionada?.activo ? 'true' : 'false') : (nuevaReserva.activo !== undefined ? (nuevaReserva.activo ? 'true' : 'false') : 'true')}
+              onChange={e =>
+                modoEdicion
+                  ? setReservaSeleccionada({ ...reservaSeleccionada, activo: e.target.value === 'true' })
+                  : setNuevaReserva({ ...nuevaReserva, activo: e.target.value === 'true' })
+              }
+              required
+            >
+              <option value="true">Sí</option>
+              <option value="false">No</option>
+            </select>
+          </div>
 
           {/* Observaciones */}
           <div className="form-grupo">
@@ -147,7 +177,7 @@ const ReservasModal = ({
             />
           </div>
 
-      
+
         </div>
 
         <div className="modal-footer">

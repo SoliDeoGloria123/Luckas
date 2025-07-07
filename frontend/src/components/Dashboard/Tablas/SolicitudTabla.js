@@ -58,6 +58,23 @@ const TablaUnificadaSolicitudes = ({
                 ? sol.categoria?.nombre || sol.categoria?._id || "N/A"
                 : sol.categoria || "N/A"}
             </td>
+            {/* Origen: mostrar nombre legible según modeloReferencia */}
+            <td>
+              {(() => {
+                const origen = sol.modeloReferencia;
+                if (!origen) return "N/A";
+                switch (origen) {
+                  case "Cabana": return "Reserva";
+                  case "Eventos": return "Evento";
+                  case "Comedor": return "Alimentación";
+                  case "Bus": return "Transporte";
+                  case "Certificado": return "Certificado";
+                  case "Administrativo": return "Administrativa";
+                  case "Otro": return "Otra";
+                  default: return origen;
+                }
+              })()}
+            </td>
             <td>
               <span className={` estado-${(sol.estado || "activo").toLowerCase()}`}>
                 {sol.estado || "Activo"}

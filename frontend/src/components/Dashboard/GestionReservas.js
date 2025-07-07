@@ -18,6 +18,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
     cabana: "",
     fechaInicio: "",
     fechaFin: "",
+    precio: "14000",
     estado: "Pendiente",
     observaciones: ""
   });
@@ -62,15 +63,24 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   // CRUD
   const crearReserva = async () => {
     try {
-      await reservaService.create(nuevaReserva);
+      // Forzar activo a booleano
+      const reservaData = { ...nuevaReserva };
+      if (typeof reservaData.activo === 'string') {
+        reservaData.activo = reservaData.activo === 'true';
+      } else if (typeof reservaData.activo !== 'boolean') {
+        reservaData.activo = true;
+      }
+      await reservaService.create(reservaData);
       setMostrarModal(false);
       setNuevaReserva({
         usuario: "",
         cabana: "",
         fechaInicio: "",
         fechaFin: "",
+        precio: "14000",
         estado: "Pendiente",
-        observaciones: ""
+        observaciones: "",
+        activo: true
       });
       obtenerReservas();
     } catch (err) {
@@ -80,7 +90,14 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
 
   const actualizarReserva = async () => {
     try {
-      await reservaService.update(reservaSeleccionada._id, reservaSeleccionada);
+      // Forzar activo a booleano
+      const reservaData = { ...reservaSeleccionada };
+      if (typeof reservaData.activo === 'string') {
+        reservaData.activo = reservaData.activo === 'true';
+      } else if (typeof reservaData.activo !== 'boolean') {
+        reservaData.activo = true;
+      }
+      await reservaService.update(reservaSeleccionada._id, reservaData);
       setMostrarModal(false);
       setReservaSeleccionada(null);
       setModoEdicion(false);
@@ -108,6 +125,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
       cabana: "",
       fechaInicio: "",
       fechaFin: "",
+      precio: "14000",
       estado: "Pendiente",
       observaciones: ""
     });

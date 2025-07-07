@@ -59,14 +59,23 @@ exports.crearReserva = async (req, res) => {
 
     console.log('Validaciones pasadas, creando reserva...');
 
+    // Forzar el campo activo a booleano
+    let activo = req.body.activo;
+    if (typeof activo === 'string') {
+      activo = activo === 'true';
+    } else if (typeof activo !== 'boolean') {
+      activo = true; // valor por defecto
+    }
     // Crear reserva
     const reserva = new Reserva({
-        usuario: req.body.usuario,
-        cabana: req.body.cabana,
-        fechaInicio: req.body.fechaInicio,
-        fechaFin: req.body.fechaFin,
-        estado: req.body.estado || 'Pendiente',
-        observaciones: req.body.observaciones
+      usuario: req.body.usuario,
+      cabana: req.body.cabana,
+      fechaInicio: req.body.fechaInicio,
+      fechaFin: req.body.fechaFin,
+      precio: req.body.precio ? Number(req.body.precio) : 14000, // Asegura que sea número
+      estado: req.body.estado || 'Pendiente',
+      observaciones: req.body.observaciones,
+      activo
     });
     await reserva.save();
     console.log('Reserva creada:', reserva._id);
@@ -118,7 +127,7 @@ exports.obtenerDatosParaReserva = async (req, res) => {
   try {
     const usuarios = await Usuario.find({}, 'nombre apellido correo _id').limit(10);
     const cabanas = await Cabana.find({}, 'nombre descripcion capacidad categoria estado _id').limit(10);
-    
+
     res.json({
       success: true,
       data: {
@@ -127,6 +136,7 @@ exports.obtenerDatosParaReserva = async (req, res) => {
         ejemplo: {
           usuario: usuarios[0]?._id || 'ID_DEL_USUARIO',
           cabana: cabanas[0]?._id || 'ID_DE_LA_CABANA',
+          precio: 14000,
           fechaInicio: '2025-08-01',
           fechaFin: '2025-08-05',
           estado: 'Pendiente',
@@ -155,6 +165,14 @@ exports.obtenerReservaPorId = async (req, res) => {
 // Actualizar reserva
 exports.actualizarReserva = async (req, res) => {
   try {
+    // Forzar el campo activo a booleano
+    let activo = req.body.activo;
+    if (typeof activo === 'string') {
+      activo = activo === 'true';
+    } else if (typeof activo !== 'boolean') {
+      activo = true;
+    }
+    req.body.activo = activo;
     const reserva = await Reserva.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!reserva) return res.status(404).json({ success: false, message: 'Reserva no encontrada' });
     res.json({ success: true, data: reserva });

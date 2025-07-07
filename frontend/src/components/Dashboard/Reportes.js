@@ -132,12 +132,33 @@ const Reportes = () => {
       </div>
     );
   };
+  const handleGuardarReporte = async () => {
+  try {
+    await reporteService.guardarReporte({
+      nombre: 'Reporte  Julio',
+      descripcion: 'Reporte generado desde el sistema',
+      tipo: tipoReporte, // o el tipo que corresponda
+      filtros,           // los filtros usados
+      datos: datosReporte // el JSON del reporte mostrado
+    });
+    alert('¡Reporte guardado correctamente!');
+  } catch (err) {
+    alert('Error al guardar el reporte: ' + err.message);
+  }
+};
 
   const renderTablaReporte = () => {
     if (!datosReporte) return null;
 
     switch (tipoReporte) {
       case 'reservas':
+        // Calcular reservas activas (estados: 'Pendiente', 'Confirmada', 'Activa')
+        let reservasActivas = 0;
+        if (Array.isArray(datosReporte.estadisticas.porEstado)) {
+          reservasActivas = datosReporte.estadisticas.porEstado
+            .filter(e => ['Pendiente', 'Confirmada', 'Activa'].includes(e._id))
+            .reduce((acc, curr) => acc + curr.count, 0);
+        }
         return (
           <div>
             <h3>Estadísticas de Reservas</h3>
@@ -145,6 +166,10 @@ const Reportes = () => {
               <div className="stat-card">
                 <h4>Total de Reservas</h4>
                 <p>{datosReporte.estadisticas.total}</p>
+              </div>
+              <div className="stat-card">
+                <h4>Reservas Activas</h4>
+                <p>{reservasActivas}</p>
               </div>
             </div>
             <table className="reporte-table">
@@ -292,6 +317,7 @@ const Reportes = () => {
           <button onClick={exportarExcel} className="btn-export">
             Exportar Excel
           </button>
+          <button onClick={handleGuardarReporte} className='btn-export'>Guardar Reporte</button>
         </div>
       </div>
 

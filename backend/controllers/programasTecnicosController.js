@@ -1,28 +1,28 @@
-const ProgramaTecnico = require('../models/ProgramaTecnico');
 const User = require('../models/User');
-
+const ProgramaTecnico = require('../models/ProgramaTecnico');
+ 
 // Obtener todos los programas técnicos
 exports.obtenerProgramasTecnicos = async (req, res) => {
   try {
     const { area, estado, modalidad, nivel, page = 1, limit = 10 } = req.query;
-    
+ 
     // Construir filtro
     const filtro = {};
     if (area) filtro.area = area;
     if (estado) filtro.estado = estado;
     if (modalidad) filtro.modalidad = modalidad;
     if (nivel) filtro.nivel = nivel;
-
+ 
     const skip = (page - 1) * limit;
-    
+ 
     const programas = await ProgramaTecnico.find(filtro)
       .populate('inscripciones.usuario', 'nombre apellido correo')
       .sort({ fechaInicio: -1 })
       .skip(skip)
       .limit(parseInt(limit));
-
+ 
     const total = await ProgramaTecnico.countDocuments(filtro);
-
+ 
     res.status(200).json({
       success: true,
       data: programas,
@@ -42,22 +42,22 @@ exports.obtenerProgramasTecnicos = async (req, res) => {
     });
   }
 };
-
+ 
 // Obtener un programa técnico por ID
 exports.obtenerProgramaTecnicoPorId = async (req, res) => {
   try {
     const { id } = req.params;
-    
+ 
     const programa = await ProgramaTecnico.findById(id)
       .populate('inscripciones.usuario', 'nombre apellido correo telefono');
-
+ 
     if (!programa) {
       return res.status(404).json({
         success: false,
         message: 'Programa técnico no encontrado'
       });
     }
-
+ 
     res.status(200).json({
       success: true,
       data: programa
@@ -71,12 +71,12 @@ exports.obtenerProgramaTecnicoPorId = async (req, res) => {
     });
   }
 };
-
+ 
 // Crear un nuevo programa técnico
 exports.crearProgramaTecnico = async (req, res) => {
   try {
     const programaDatos = req.body;
-
+ 
     // Validar fechas
     if (new Date(programaDatos.fechaFin) <= new Date(programaDatos.fechaInicio)) {
       return res.status(400).json({
@@ -84,10 +84,10 @@ exports.crearProgramaTecnico = async (req, res) => {
         message: 'La fecha de fin debe ser posterior a la fecha de inicio'
       });
     }
-
+ 
     const nuevoPrograma = new ProgramaTecnico(programaDatos);
     await nuevoPrograma.save();
-
+ 
     res.status(201).json({
       success: true,
       message: 'Programa técnico creado exitosamente',
@@ -95,7 +95,7 @@ exports.crearProgramaTecnico = async (req, res) => {
     });
   } catch (error) {
     console.error('Error al crear programa técnico:', error);
-    
+ 
     if (error.name === 'ValidationError') {
       const errores = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -104,7 +104,7 @@ exports.crearProgramaTecnico = async (req, res) => {
         errores
       });
     }
-
+ 
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor',
@@ -112,13 +112,13 @@ exports.crearProgramaTecnico = async (req, res) => {
     });
   }
 };
-
+ 
 // Actualizar un programa técnico
 exports.actualizarProgramaTecnico = async (req, res) => {
   try {
     const { id } = req.params;
     const actualizaciones = req.body;
-
+ 
     // Validar fechas si se están actualizando
     if (actualizaciones.fechaInicio && actualizaciones.fechaFin) {
       if (new Date(actualizaciones.fechaFin) <= new Date(actualizaciones.fechaInicio)) {
@@ -128,20 +128,20 @@ exports.actualizarProgramaTecnico = async (req, res) => {
         });
       }
     }
-
+ 
     const programa = await ProgramaTecnico.findByIdAndUpdate(
       id,
       actualizaciones,
       { new: true, runValidators: true }
     ).populate('inscripciones.usuario', 'nombre apellido correo');
-
+ 
     if (!programa) {
       return res.status(404).json({
         success: false,
         message: 'Programa técnico no encontrado'
       });
     }
-
+ 
     res.status(200).json({
       success: true,
       message: 'Programa técnico actualizado exitosamente',
@@ -149,7 +149,7 @@ exports.actualizarProgramaTecnico = async (req, res) => {
     });
   } catch (error) {
     console.error('Error al actualizar programa técnico:', error);
-    
+ 
     if (error.name === 'ValidationError') {
       const errores = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -158,7 +158,7 @@ exports.actualizarProgramaTecnico = async (req, res) => {
         errores
       });
     }
-
+ 
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor',
@@ -166,26 +166,26 @@ exports.actualizarProgramaTecnico = async (req, res) => {
     });
   }
 };
-
+ 
 // Eliminar un programa técnico
 exports.eliminarProgramaTecnico = async (req, res) => {
   try {
     const { id } = req.params;
-
+ 
     const programa = await ProgramaTecnico.findById(id);
-    
+ 
     if (!programa) {
       return res.status(404).json({
         success: false,
         message: 'Programa técnico no encontrado'
       });
     }
-
+ 
     // Verificar si hay inscripciones activas
     const inscripcionesActivas = programa.inscripciones.filter(
       ins => ['inscrito', 'matriculado', 'en_curso'].includes(ins.estado)
     );
-
+ 
     if (inscripcionesActivas.length > 0) {
       return res.status(400).json({
         success: false,
@@ -193,9 +193,9 @@ exports.eliminarProgramaTecnico = async (req, res) => {
         inscripcionesActivas: inscripcionesActivas.length
       });
     }
-
+ 
     await ProgramaTecnico.findByIdAndDelete(id);
-
+ 
     res.status(200).json({
       success: true,
       message: 'Programa técnico eliminado exitosamente'
@@ -209,13 +209,13 @@ exports.eliminarProgramaTecnico = async (req, res) => {
     });
   }
 };
-
+ 
 // Inscribir usuario en un programa técnico
 exports.inscribirUsuario = async (req, res) => {
   try {
     const { id } = req.params; // ID del programa
     const { usuarioId } = req.body;
-
+ 
     const programa = await ProgramaTecnico.findById(id);
     if (!programa) {
       return res.status(404).json({
@@ -223,7 +223,7 @@ exports.inscribirUsuario = async (req, res) => {
         message: 'Programa técnico no encontrado'
       });
     }
-
+ 
     const usuario = await User.findById(usuarioId);
     if (!usuario) {
       return res.status(404).json({
@@ -231,9 +231,9 @@ exports.inscribirUsuario = async (req, res) => {
         message: 'Usuario no encontrado'
       });
     }
-
+ 
     await programa.inscribirUsuario(usuarioId);
-
+ 
     res.status(200).json({
       success: true,
       message: 'Usuario inscrito exitosamente en el programa técnico',
@@ -251,12 +251,12 @@ exports.inscribirUsuario = async (req, res) => {
     });
   }
 };
-
+ 
 // Obtener progreso de un estudiante
 exports.obtenerProgresoEstudiante = async (req, res) => {
   try {
     const { id, usuarioId } = req.params;
-
+ 
     const programa = await ProgramaTecnico.findById(id);
     if (!programa) {
       return res.status(404).json({
@@ -264,20 +264,20 @@ exports.obtenerProgresoEstudiante = async (req, res) => {
         message: 'Programa técnico no encontrado'
       });
     }
-
+ 
     const inscripcion = programa.inscripciones.find(
       ins => ins.usuario.toString() === usuarioId
     );
-
+ 
     if (!inscripcion) {
       return res.status(404).json({
         success: false,
         message: 'Usuario no inscrito en este programa'
       });
     }
-
+ 
     const porcentajeProgreso = programa.calcularProgreso(usuarioId);
-
+ 
     res.status(200).json({
       success: true,
       data: {
@@ -297,7 +297,7 @@ exports.obtenerProgresoEstudiante = async (req, res) => {
     });
   }
 };
-
+ 
 // Obtener estadísticas de programas técnicos
 exports.obtenerEstadisticas = async (req, res) => {
   try {
@@ -305,24 +305,24 @@ exports.obtenerEstadisticas = async (req, res) => {
     const programasActivos = await ProgramaTecnico.countDocuments({ estado: 'activo' });
     const programasEnProceso = await ProgramaTecnico.countDocuments({ estado: 'en_proceso' });
     const programasFinalizados = await ProgramaTecnico.countDocuments({ estado: 'finalizado' });
-    
+ 
     const inscripcionesTotales = await ProgramaTecnico.aggregate([
       { $unwind: '$inscripciones' },
       { $count: 'total' }
     ]);
-
+ 
     const programasPorArea = await ProgramaTecnico.aggregate([
       { $group: { _id: '$area', count: { $sum: 1 } } }
     ]);
-
+ 
     const programasPorNivel = await ProgramaTecnico.aggregate([
       { $group: { _id: '$nivel', count: { $sum: 1 } } }
     ]);
-
+ 
     const programasPorModalidad = await ProgramaTecnico.aggregate([
       { $group: { _id: '$modalidad', count: { $sum: 1 } } }
     ]);
-
+ 
     res.status(200).json({
       success: true,
       data: {

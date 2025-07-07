@@ -139,6 +139,22 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
       setMostrarModal(false);
       setUsuarioSeleccionado(null);
       setModoEdicion(false);
+      // Si el usuario editado es el usuario actual, actualiza el estado y el localStorage
+      if (usuarioActual && usuarioSeleccionado._id === usuarioActual._id) {
+        const nuevoUsuarioActual = {
+          ...usuarioActual,
+          nombre: usuarioSeleccionado.nombre,
+          apellido: usuarioSeleccionado.apellido,
+          correo: usuarioSeleccionado.correo,
+          telefono: usuarioSeleccionado.telefono,
+          tipoDocumento: usuarioSeleccionado.tipoDocumento,
+          numeroDocumento: usuarioSeleccionado.numeroDocumento,
+          role: usuarioSeleccionado.role,
+          estado: usuarioSeleccionado.estado,
+        };
+        setUsuarioActual(nuevoUsuarioActual);
+        localStorage.setItem('usuario', JSON.stringify(nuevoUsuarioActual));
+      }
       obtenerUsuarios();
     } catch (error) {
       alert(`Error: ${error.message}`);

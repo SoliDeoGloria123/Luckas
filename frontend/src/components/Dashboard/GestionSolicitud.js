@@ -12,8 +12,11 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicionSolicitud, setModoEdicionSolicitud] = useState(false);
   const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
-   const [busquedaSolicitudes, setBusquedaSolicitudes] = useState("");
-  const { datosFiltrados: solicitudesFiltradas } = useBusqueda(
+  const {
+    busqueda: busquedaSolicitudes,
+    setBusqueda: setBusquedaSolicitudes,
+    datosFiltrados: solicitudesFiltradas
+  } = useBusqueda(
     solicitudes,
     [
       "solicitante.nombre",

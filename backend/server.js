@@ -20,6 +20,7 @@ const ReportesRoutes= require ('./routes/reportesRoutes')// Asegúrate de que es
 const programasAcademicosRoutes = require('./routes/programasAcademicosRoutes');
 const cursosRoutes = require('./routes/cursosRoutes');
 const programasTecnicosRoutes = require('./routes/programasTecnicosRoutes');
+const reporteguardarRoutes = require('./routes/reporteRoutes');
 // Primero declaramos app
 const app = express();
 
@@ -59,6 +60,7 @@ app.use('/api/reportes', ReportesRoutes);
 app.use('/api/programas-academicos', programasAcademicosRoutes);
 app.use('/api/cursos', cursosRoutes);
 app.use('/api/programas-tecnicos', programasTecnicosRoutes);
+app.use('/api/reporte', reporteguardarRoutes);
 
 // Rutas para páginas externas/públicas
 app.get('/', (req, res) => {

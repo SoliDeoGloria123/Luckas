@@ -12,8 +12,8 @@ router.get('/datos-para-crear', reservasController.obtenerDatosParaReserva); // 
 router.get('/:id', reservasController.obtenerReservaPorId);
 
 // Rutas de creación y modificación (admin, tesorero y seminarista)
-router.post('/', role.checkRole('admin', 'tesorero', 'seminarista'), reservasController.crearReserva);
-router.put('/:id', role.checkRole('admin', 'tesorero', 'seminarista'), reservasController.actualizarReserva);
+router.post('/', role.checkRole('admin', 'tesorero', 'seminarista','externo'), reservasController.crearReserva);
+router.put('/:id', role.checkRole('admin', 'tesorero', 'seminarista','externo'), reservasController.actualizarReserva);
 
 // Rutas de eliminación (solo admin)
 router.delete('/:id', role.isAdmin, reservasController.eliminarReserva);

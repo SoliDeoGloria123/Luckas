@@ -109,14 +109,15 @@ const obtenerCategoriaPorId = async (req, res) => {
 const actualizarCategoria = async (req, res) => {
   try {
     const { nombre, codigo, activo } = req.body;
+    const id = mongoose.Types.ObjectId(req.params.id); // Conversión segura
 
-    // Si se está cambiando el código, verificar que no exista
+    // Validar si el código ya existe en otra categoría
     if (codigo) {
       const categoriaExistente = await Categorizacion.findOne({
         codigo: codigo.toUpperCase(),
-        _id: { $ne: req.params.id }
+        _id: { $ne: id } // Excluir el mismo ID que estamos editando
       });
-      
+
       if (categoriaExistente) {
         return res.status(400).json({
           success: false,
@@ -125,13 +126,13 @@ const actualizarCategoria = async (req, res) => {
       }
     }
 
-    // Si se está cambiando el nombre, verificar que no exista
+    // Validar si el nombre ya existe en otra categoría
     if (nombre) {
       const nombreExistente = await Categorizacion.findOne({
         nombre,
-        _id: { $ne: req.params.id }
+        _id: { $ne: id }
       });
-      
+
       if (nombreExistente) {
         return res.status(400).json({
           success: false,
@@ -140,13 +141,13 @@ const actualizarCategoria = async (req, res) => {
       }
     }
 
-    const datosActualizacion = { nombre,  activo };
+    const datosActualizacion = { nombre, activo };
     if (codigo) {
       datosActualizacion.codigo = codigo.toUpperCase();
     }
 
     const categoriaActualizada = await Categorizacion.findByIdAndUpdate(
-      req.params.id,
+      id,
       datosActualizacion,
       { new: true, runValidators: true }
     );

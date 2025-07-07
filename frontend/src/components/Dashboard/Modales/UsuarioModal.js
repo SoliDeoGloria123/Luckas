@@ -110,20 +110,20 @@ const UsuarioModal = ({
               required
             />
           </div>
+          {!modoEdicion && (
           <div className="form-grupo">
             <label>Contraseña:</label>
             <input
               type="password"
-              value={modoEdicion ? usuarioSeleccionado?.password : nuevoUsuario.password}
+              value={ nuevoUsuario.password}
               onChange={e =>
-                modoEdicion
-                  ? setUsuarioSeleccionado({ ...usuarioSeleccionado, password: e.target.value })
-                  : setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })
+                 setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })
               }
               placeholder="Contraseña"
               required={!modoEdicion}
             />
           </div>
+          )}
           <div className="form-grupo">
             <label>Rol:</label>
             <select

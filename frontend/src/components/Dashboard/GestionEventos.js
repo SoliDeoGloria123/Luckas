@@ -60,16 +60,16 @@ const GestionEventos = () => {
       setNuevoEvento({
         nombre: "",
         descripcion: "",
-        precio: 0,
         categoria: "",
         fechaEvento: "",
         horaInicio: "",
         horaFin: "",
         lugar: "",
-        cuposTotales: 0,
-        cuposDisponibles: 0,
         prioridad: "Media",
-        active: true,
+        precio: Number(nuevoEvento.precio),
+        cuposTotales: Number(nuevoEvento.cuposTotales),
+        cuposDisponibles: Number(nuevoEvento.cuposDisponibles),
+        active: nuevoEvento.active === "true" || nuevoEvento.active === true,
         imagen: ""
       });
       obtenerEventos();

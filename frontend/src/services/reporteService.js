@@ -182,5 +182,18 @@ export const reporteService = {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-  }
+  },
+
+  guardarReporte: async (reporte) => {
+  const res = await fetch('http://localhost:3000/api/reporte/guardar', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify(reporte),
+  });
+  if (!res.ok) throw new Error('Error al guardar el reporte');
+  return await res.json();
+}
 };
