@@ -56,3 +56,4 @@ console.log('[AuthJWT] Middleware verifyTokenFn es una funcion: ', typeof verify
 module.exports = {
     verifyToken: verifyTokenFn
 };
+
