@@ -5,7 +5,7 @@ export const cabanaService = {
     const res = await fetch(API_URL, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener cabañas");
@@ -16,7 +16,7 @@ export const cabanaService = {
     const res = await fetch(`${API_URL}/${id}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener la cabaña");
@@ -28,7 +28,7 @@ export const cabanaService = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
       body: JSON.stringify(cabana),
     });
@@ -41,7 +41,7 @@ export const cabanaService = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
       body: JSON.stringify(cabana),
     });
@@ -54,7 +54,7 @@ export const cabanaService = {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al eliminar cabaña");

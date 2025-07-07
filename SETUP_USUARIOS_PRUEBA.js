@@ -16,11 +16,11 @@ mongoose.connect(MONGODB_URI)
 // Esquema de Usuario
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
+  correo: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'seminarista', 'externo', 'tesorero'], default: 'externo' },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
+  nombre: { type: String, required: true },
+  apellido: { type: String, required: true },
   telefono: String,
   isActive: { type: Boolean, default: true },
   fechaRegistro: { type: Date, default: Date.now }
@@ -32,38 +32,38 @@ const User = mongoose.model('User', userSchema);
 const usuariosPrueba = [
   {
     username: 'admin',
-    email: 'admin@luckas.com',
+    correo: 'admin@luckas.com',
     password: 'admin123',
     role: 'admin',
-    firstName: 'Administrador',
-    lastName: 'Sistema',
+    nombre: 'Administrador',
+    apellido: 'Sistema',
     telefono: '123456789'
   },
   {
     username: 'seminarista',
-    email: 'seminarista@luckas.com',
+    correo: 'seminarista@luckas.com',
     password: 'seminarista123',
     role: 'seminarista',
-    firstName: 'Juan',
-    lastName: 'Seminarista',
+    nombre: 'Juan',
+    apellido: 'Seminarista',
     telefono: '987654321'
   },
   {
     username: 'externo',
-    email: 'externo@luckas.com',
+    correo: 'externo@luckas.com',
     password: 'externo123',
     role: 'externo',
-    firstName: 'María',
-    lastName: 'Externa',
+    nombre: 'María',
+    apellido: 'Externa',
     telefono: '555666777'
   },
   {
     username: 'tesorero',
-    email: 'tesorero@luckas.com',
+    correo: 'tesorero@luckas.com',
     password: 'tesorero123',
     role: 'tesorero',
-    firstName: 'Carlos',
-    lastName: 'Tesorero',
+    nombre: 'Carlos',
+    apellido: 'Tesorero',
     telefono: '111222333'
   }
 ];

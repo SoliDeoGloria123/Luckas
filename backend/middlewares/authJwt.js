@@ -7,53 +7,66 @@ console.log('[AuthJWT ]Configuracion cargada: ', config.secret ? '***' + config.
 // Definicion del middleware 
 const verifyTokenFn = (req, res, next) => {
     console.log('\n [AuthJWT] Middleware ejecutandose para ', req.originalUrl);
+    console.log('[AuthJWT] Method:', req.method);
+    console.log('[AuthJWT] Headers recibidos:', {
+        'x-access-token': req.headers['x-access-token'] ? '***' + req.headers['x-access-token'].slice(-8) : 'NO PRESENTE',
+        'authorization': req.headers.authorization ? '***' + req.headers.authorization.slice(-10) : 'NO PRESENTE'
+    });
 
     try {
-        const token = req.headers['x-access-token'] || req.headers.authorization?.split(' ')[1];
-        console.log('[AuthJWT] Token recibido:', token ? '***' + token.slice(-8) : 'NO PROVISTO');
+        // Soporta tanto x-access-token como Authorization: Bearer
+        let token = req.headers['x-access-token'];
+        
+        if (!token && req.headers.authorization) {
+            const authHeader = req.headers.authorization;
+            if (authHeader.startsWith('Bearer ')) {
+                token = authHeader.substring(7); // Remover 'Bearer ' prefix
+                console.log('[AuthJWT] Token extraído de Authorization header');
+            }
+        }
+        
+        console.log('[AuthJWT] Token final recibido:', token ? '***' + token.slice(-8) : 'NO PROVISTO');
+        
         if (!token) {
-            console.log('[AuthJWT] Error: token np proporcionado');
+            console.log('[AuthJWT] ❌ Error: token no proporcionado');
             return res.status(403).json({
                 success: false,
                 message: 'Token no proporcionado'
             });
         }
 
+        // Verifica el JWT
+        console.log('[AuthJWT] Verificando token con secret:', config.secret ? '***' + config.secret.slice(-5) : 'NO CONFIG');
         const decoded = jwt.verify(token, config.secret);
+
+        // Asigna los datos del usuario decodificado
         req.userId = decoded.id;
         req.userRole = decoded.role;
-        console.log('[AudhJWT] Token valido para usuario ID:', decoded.id, 'Role:', decoded.role);
+        req.userEmail = decoded.email || 'no-email';
+        
+        // CLAVE: agrega el objeto user para que los controllers lo encuentren
+        req.user = {
+            id: decoded.id,
+            role: decoded.role,
+            email: decoded.email || 'no-email'
+        };
+
+        console.log('[AuthJWT] ✅ Token valido para usuario ID:', decoded.id, 'Role:', decoded.role);
         next();
     } catch (error) {
-        console.error('[AuthJWT] Error :', error.name, '_', error.message);
+        console.error('[AuthJWT] ❌ Error :', error.name, '_', error.message);
+        console.error('[AuthJWT] Stack:', error.stack);
         return res.status(401).json({
             success: false,
-            message: 'Token invalido ',
-            error: error.name
+            message: 'Token invalido',
+            error: error.name,
+            details: error.message
         });
     }
 };
 
-const AuthJWT = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-        return res.status(401).json({
-            message: 'Token no porporcionado '
-        });
-    }
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Corregir veryfy, teken y JWT_SCREET
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({
-            message: 'Token invalido'
-        });
-    }
-};
-
-//Validacion antes de exportar
-if (typeof verifyTokenFn !== 'function') { // Corregir funtion a function
+// Validacion antes de exportar
+if (typeof verifyTokenFn !== 'function') {
     console.error('[AuthJWT] ERROR: verifyTokenFn no es una funcion!');
     throw new Error('verifyTokenfn debe ser una funcion');
 }
@@ -63,4 +76,3 @@ console.log('[AuthJWT] Middleware verifyTokenFn es una funcion: ', typeof verify
 module.exports = {
     verifyToken: verifyTokenFn
 };
-

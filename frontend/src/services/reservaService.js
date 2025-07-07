@@ -5,7 +5,7 @@ export const reservaService = {
     const res = await fetch(API_URL, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener reservas");
@@ -16,7 +16,7 @@ export const reservaService = {
     const res = await fetch(`${API_URL}/${id}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener la reserva");
@@ -28,7 +28,7 @@ export const reservaService = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
       body: JSON.stringify(reserva),
     });
@@ -41,7 +41,7 @@ export const reservaService = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
       body: JSON.stringify(reserva),
     });
@@ -54,7 +54,7 @@ export const reservaService = {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al eliminar reserva");

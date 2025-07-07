@@ -21,7 +21,7 @@ const categorizacionSchema = new mongoose.Schema({
   },
   creadoPor: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'usuarios'
+    ref: 'User'
   }
 }, {
   timestamps: true // Crea automáticamente createdAt y updatedAt

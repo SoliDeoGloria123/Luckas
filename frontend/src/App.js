@@ -12,6 +12,9 @@ import MisReservas from "./components/Seminarista/pages/MisReservas";
 import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
 
+// Importar utilidades de token
+import './utils/tokenUtils';
+
 // Componente para usuarios externos
 const ExternalHome = () => {
   return (

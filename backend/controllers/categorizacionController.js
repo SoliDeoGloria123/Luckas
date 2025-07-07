@@ -5,7 +5,17 @@ const Solicitud = require('../models/Solicitud');
 // CREAR nueva categoría
 const crearCategoria = async (req, res) => {
   try {
+    console.log('[CATEGORIA] Datos recibidos:', req.body);
     const { nombre, codigo } = req.body;
+    
+    // Validar que se envíen los campos requeridos
+    if (!nombre || !codigo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nombre y código son requeridos',
+        datos: { nombre, codigo }
+      });
+    }
     
     // Verificar si el código ya existe
     const categoriaExistente = await Categorizacion.findOne({ codigo: codigo.toUpperCase() });
@@ -32,6 +42,7 @@ const crearCategoria = async (req, res) => {
     });
 
     await nuevaCategoria.save();
+    console.log('[CATEGORIA] Creada exitosamente:', nuevaCategoria);
 
     res.status(201).json({
       success: true,
@@ -52,6 +63,7 @@ const crearCategoria = async (req, res) => {
 // OBTENER todas las categorías
 const obtenerCategorias = async (req, res) => {
   try {
+    console.log('[CATEGORIA] Obteniendo categorías...');
     const { activo } = req.query;
     
     let filtro = {};
@@ -59,10 +71,12 @@ const obtenerCategorias = async (req, res) => {
       filtro.activo = activo === 'true';
     }
 
+    console.log('[CATEGORIA] Filtro aplicado:', filtro);
     const categorias = await Categorizacion.find(filtro)
-      .populate('creadoPor', 'nombre email')
+      .populate('creadoPor', 'nombre apellido correo')
       .sort({ nombre: 1 });
 
+    console.log('[CATEGORIA] Categorías encontradas:', categorias.length);
     res.json({
       success: true,
       data: categorias,
@@ -70,6 +84,7 @@ const obtenerCategorias = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('[CATEGORIA] Error al obtener categorías:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener las categorías',
@@ -82,7 +97,7 @@ const obtenerCategorias = async (req, res) => {
 const obtenerCategoriaPorId = async (req, res) => {
   try {
     const categoria = await Categorizacion.findById(req.params.id)
-      .populate('creadoPor', 'nombre email');
+      .populate('creadoPor', 'nombre apellido correo');
 
     if (!categoria) {
       return res.status(404).json({

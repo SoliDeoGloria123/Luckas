@@ -59,9 +59,18 @@ const ProgramasTecnicos = () => {
   const cargarProgramas = async () => {
     try {
       setCargando(true);
+      console.log('🔍 Cargando programas técnicos...');
+      console.log('📊 Filtros aplicados:', filtros);
+      
       const response = await programasTecnicosService.obtenerProgramasTecnicos(filtros);
+      console.log('📥 Respuesta del servidor:', response);
+      console.log('📦 Datos recibidos:', response.data);
+      console.log('📊 Cantidad de programas:', response.data?.length || 0);
+      
       setProgramas(response.data);
+      setMensajeError('');
     } catch (error) {
+      console.error('❌ Error al cargar programas técnicos:', error);
       setMensajeError('Error al cargar programas técnicos: ' + error.message);
     } finally {
       setCargando(false);

@@ -2,14 +2,14 @@ const API_URL = "http://localhost:3000/api/eventos";
 
 const getHeaders = () => ({
   "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("token")}`
+  "x-access-token": localStorage.getItem("token")
 });
 
 export const eventService = {
   // Obtener todos los eventos
   getAllEvents: async () => {
     const res = await fetch(API_URL, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     if (!res.ok) throw new Error("Error al obtener eventos");
     return await res.json();
@@ -18,7 +18,7 @@ export const eventService = {
   // Obtener evento por ID
   getEventById: async (id) => {
     const res = await fetch(`${API_URL}/${id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     if (!res.ok) throw new Error("Error al obtener evento");
     return await res.json();
@@ -50,7 +50,7 @@ export const eventService = {
   deleteEvent: async (id) => {
     const res = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     if (!res.ok) throw new Error("Error al eliminar evento");
     return await res.json();
@@ -81,7 +81,7 @@ export const eventService = {
   getEventosPorCategoria: async (categoria) => {
     const url = categoria ? `${API_URL}?categoria=${categoria}` : API_URL;
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     if (!res.ok) throw new Error("Error al obtener eventos por categoría");
     return await res.json();

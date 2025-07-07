@@ -16,10 +16,16 @@ export const programasTecnicosService = {
   obtenerProgramasTecnicos: async (filtros = {}) => {
     try {
       const params = new URLSearchParams(filtros).toString();
-      const response = await axios.get(`${API_URL}${params ? `?${params}` : ''}`);
+      const url = `${API_URL}${params ? `?${params}` : ''}`;
+      console.log('🌐 URL de petición:', url);
+      console.log('🔑 Token en localStorage:', localStorage.getItem('token') ? 'Existe' : 'No existe');
+      
+      const response = await axios.get(url);
+      console.log('✅ Respuesta exitosa del servicio:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener programas técnicos:', error);
+      console.error('❌ Error en el servicio:', error);
+      console.error('📄 Respuesta del error:', error.response?.data);
       throw error.response?.data || error;
     }
   },

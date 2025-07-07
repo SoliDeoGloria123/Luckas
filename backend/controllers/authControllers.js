@@ -101,49 +101,74 @@ exports.signup = async (req, res) => {
 };
 
 exports.signin = async (req, res) => {
+  console.log('[SIGNIN] Iniciando proceso de signin...');
+  console.log('[SIGNIN] Body recibido:', req.body);
+  
   try {
     const { correo, password } = req.body;
+    console.log('[SIGNIN] Credenciales extraídas:', { correo, password: password ? '***' : 'VACÍO' });
 
     // 1. Validación básica
     if (!correo || !password) {
+      console.log('[SIGNIN] ❌ Validación falló - campos vacíos');
       return res.status(400).json({
         success: false,
         message: "Email y contraseña son requeridos"
       });
     }
 
+    console.log('[SIGNIN] ✅ Validación básica pasada');
+
     // 2. Buscar usuario incluyendo el password (que normalmente está oculto)
+    console.log('[SIGNIN] 🔍 Buscando usuario con email:', correo);
     const user = await User.findOne({ correo }).select('+password');
 
     if (!user) {
+      console.log('[SIGNIN] ❌ Usuario no encontrado');
       return res.status(404).json({
         success: false,
         message: "Usuario no encontrado"
       });
     }
 
+    console.log('[SIGNIN] ✅ Usuario encontrado:', user.nombre, user.apellido);
+
     // 3. Comparar contraseñas
+    console.log('[SIGNIN] 🔐 Comparando contraseñas...');
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
+      console.log('[SIGNIN] ❌ Contraseña incorrecta');
       return res.status(401).json({
         success: false,
         message: "Credenciales inválidas"
       });
     }
 
+    console.log('[SIGNIN] ✅ Contraseña correcta');
+
     // 4. Generar token JWT
+    console.log('[SIGNIN] 🎫 Generando token...');
+    console.log('[SIGNIN] Configuración JWT:', { 
+      secret: config.secret ? '***' + config.secret.slice(-5) : 'NO CONFIG',
+      expiration: config.jwtExpiration 
+    });
+    
     const token = jwt.sign(
       { id: user._id, role: user.role },
       config.secret,
       { expiresIn: config.jwtExpiration }
     );
 
+    console.log('[SIGNIN] ✅ Token generado con expiración:', config.jwtExpiration);
+
     // 5. Preparar respuesta sin datos sensibles
     const userData = user.toObject();
     delete userData.password;
 
-    res.status(200).json({
+    console.log('[SIGNIN] 🎉 Login exitoso para:', userData.correo);
+    
+    return res.status(200).json({
       success: true,
       message: "Autenticación exitosa",
       token,
@@ -151,8 +176,8 @@ exports.signin = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[AuthController] Error en login:', error);
-    res.status(500).json({
+    console.error('[SIGNIN] ❌ Error en login:', error);
+    return res.status(500).json({
       success: false,
       message: "Error en el servidor",
       error: error.message

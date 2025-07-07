@@ -38,6 +38,12 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+// Middleware de debugging global
+app.use((req, res, next) => {
+    console.log(`[SERVER] ${req.method} ${req.originalUrl} - IP: ${req.ip}`);
+    next();
+});
+
 // Servir archivos estáticos del frontend
 app.use('/Externo', express.static(path.join(__dirname, '../frontend/public/Externo')));
 app.use(express.static(path.join(__dirname, '../frontend/public')));
@@ -47,7 +53,9 @@ mongoose.connect(process.env.MONGODB_URI).then(()=> console.log('Ok MonfoDB cone
 .catch(error => console.error('X Error de MongoDB', error.message));
 
 //Rutas de API
+console.log('[SERVER] Registrando rutas de API...');
 app.use('/api/auth', authRoutes);
+console.log('[SERVER] ✅ Ruta /api/auth registrada');
 app.use('/api/users', userRoutes);
 app.use('/api/solicitudes',solicitudRoutes);
 app.use('/api/eventos', eventosRoutes);

@@ -3,7 +3,7 @@ const API_URL = "http://localhost:3000/api/solicitudes";
 export const solicitudService = {
   getAll: async () => {
     const res = await fetch(API_URL, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     if (!res.ok) throw new Error("Error al obtener solicitudes en services");
     return await res.json();
@@ -13,7 +13,7 @@ export const solicitudService = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
+        "x-access-token": localStorage.getItem("token")
       },
       body: JSON.stringify(solicitud)
     });
@@ -24,7 +24,7 @@ export const solicitudService = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
+        "x-access-token": localStorage.getItem("token")
       },
       body: JSON.stringify(solicitud)
     });
@@ -33,7 +33,7 @@ export const solicitudService = {
   delete: async (id) => {
     const res = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     return await res.json();
   }

@@ -2,14 +2,14 @@ const API_URL = "http://localhost:3000/api/tareas";
 
 const getHeaders = () => ({
   "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("token")}`
+  "x-access-token": localStorage.getItem("token")
 });
 
 export const tareaService = {
   // Obtener todas las tareas
   getAll: async () => {
     const res = await fetch(API_URL, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     if (!res.ok) throw new Error("Error al obtener tareas");
     return await res.json();
@@ -18,7 +18,7 @@ export const tareaService = {
   // Obtener tarea por ID
   getById: async (id) => {
     const res = await fetch(`${API_URL}/${id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     if (!res.ok) throw new Error("Error al obtener tarea");
     return await res.json();
@@ -50,7 +50,7 @@ export const tareaService = {
   delete: async (id) => {
     const res = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     if (!res.ok) throw new Error("Error al eliminar tarea");
     return await res.json();
@@ -59,7 +59,7 @@ export const tareaService = {
   // Obtener tareas asignadas a un usuario
   getByUsuario: async (usuarioId) => {
     const res = await fetch(`${API_URL}/usuario/${usuarioId}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { "x-access-token": localStorage.getItem("token") }
     });
     if (!res.ok) throw new Error("Error al obtener tareas del usuario");
     return await res.json();

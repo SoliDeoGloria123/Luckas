@@ -6,7 +6,7 @@ export const reporteService = {
     const res = await fetch(`${API_URL}/dashboard`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener reporte del dashboard");
@@ -23,7 +23,7 @@ export const reporteService = {
     const res = await fetch(`${API_URL}/reservas?${params}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener reporte de reservas");
@@ -40,7 +40,7 @@ export const reporteService = {
     const res = await fetch(`${API_URL}/inscripciones?${params}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener reporte de inscripciones");
@@ -57,7 +57,7 @@ export const reporteService = {
     const res = await fetch(`${API_URL}/solicitudes?${params}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener reporte de solicitudes");
@@ -74,7 +74,7 @@ export const reporteService = {
     const res = await fetch(`${API_URL}/usuarios?${params}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener reporte de usuarios");
@@ -91,7 +91,7 @@ export const reporteService = {
     const res = await fetch(`${API_URL}/eventos?${params}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener reporte de eventos");
@@ -108,7 +108,7 @@ export const reporteService = {
     const res = await fetch(`${API_URL}/financiero?${params}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener reporte financiero");
@@ -125,7 +125,7 @@ export const reporteService = {
     const res = await fetch(`${API_URL}/actividad-usuarios?${params}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al obtener actividad de usuarios");
@@ -142,7 +142,7 @@ export const reporteService = {
     
     const res = await fetch(`${API_URL}/${tipoReporte}?${params}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al exportar reporte");
@@ -168,7 +168,7 @@ export const reporteService = {
     
     const res = await fetch(`${API_URL}/${tipoReporte}?${params}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "x-access-token": localStorage.getItem("token"),
       },
     });
     if (!res.ok) throw new Error("Error al exportar reporte");

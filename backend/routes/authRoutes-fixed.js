@@ -25,39 +25,23 @@ router.use((req, res, next) => {
 
 // Rutas principales
 if (authController) {
-    router.post('/signin', async (req, res) => {
+    router.post('/signin', (req, res) => {
         console.log('[AUTH-ROUTES] 🔐 Ejecutando signin...');
-        console.log('[AUTH-ROUTES] Datos recibidos:', req.body);
-        
         try {
-            // Llamada directa al controlador
-            await authController.signin(req, res);
-            console.log('[AUTH-ROUTES] ✅ Signin ejecutado sin errores');
+            return authController.signin(req, res);
         } catch (error) {
-            console.error('[AUTH-ROUTES] ❌ Error en signin:', error);
-            if (!res.headersSent) {
-                return res.status(500).json({ 
-                    success: false, 
-                    message: 'Error interno en signin',
-                    error: error.message 
-                });
-            }
+            console.error('[AUTH-ROUTES] Error en signin:', error);
+            return res.status(500).json({ success: false, message: 'Error interno en signin' });
         }
     });
 
-    router.post('/signup', async (req, res) => {
+    router.post('/signup', (req, res) => {
         console.log('[AUTH-ROUTES] 📝 Ejecutando signup...');
         try {
-            await authController.signup(req, res);
+            return authController.signup(req, res);
         } catch (error) {
-            console.error('[AUTH-ROUTES] ❌ Error en signup:', error);
-            if (!res.headersSent) {
-                return res.status(500).json({ 
-                    success: false, 
-                    message: 'Error interno en signup',
-                    error: error.message 
-                });
-            }
+            console.error('[AUTH-ROUTES] Error en signup:', error);
+            return res.status(500).json({ success: false, message: 'Error interno en signup' });
         }
     });
 } else {
