@@ -33,3 +33,4 @@ router.put('/:id', [authJwt.verifyToken, role.isAdmin], programasTecnicosControl
 router.delete('/:id', [authJwt.verifyToken, role.isAdmin], programasTecnicosController.eliminarProgramaTecnico);
 
 module.exports = router;
+
