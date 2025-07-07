@@ -26,7 +26,7 @@ const reporteSchema = new mongoose.Schema({
   },
   creadoPor: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'usuarios',
+    ref: 'User',
     required: false
   },
   fechaGeneracion: {

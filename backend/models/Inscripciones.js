@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const inscripcionSchema = new mongoose.Schema({
     usuario: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'usuarios', // Debe coincidir con User.js
+        ref: 'User', // Debe coincidir con User.js
         required: true,
     },
     nombre:{

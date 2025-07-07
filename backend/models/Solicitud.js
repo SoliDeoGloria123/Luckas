@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const solicitudSchema = new mongoose.Schema({
   solicitante: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'usuarios',
+    ref: 'User',
     required: true
   },
   correo: {
@@ -69,16 +69,16 @@ const solicitudSchema = new mongoose.Schema({
   },
   responsable: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'usuarios',
+    ref: 'User',
     required: true
   },
   creadoPor: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'usuarios'
+    ref: 'User'
   },
   modificadoPor: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'usuarios'
+    ref: 'User'
   }
 }, {
   timestamps: true

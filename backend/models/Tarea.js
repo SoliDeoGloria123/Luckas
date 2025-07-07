@@ -21,12 +21,12 @@ const tareaSchema = new mongoose.Schema({
     },
     asignadoA: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'usuarios',
+        ref: 'User',
         required: [true, 'Debe asignar la tarea a un usuario']
     },
     asignadoPor: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'usuarios',
+        ref: 'User',
         required: [true, 'Debe especificar quién asigna la tarea']
     },
     fechaLimite: { 
@@ -37,7 +37,7 @@ const tareaSchema = new mongoose.Schema({
         texto: String,
         autor: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'usuarios'
+            ref: 'User'
         },
         fecha: {
             type: Date,

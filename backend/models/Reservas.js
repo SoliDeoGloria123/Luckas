@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const reservaSchema = new mongoose.Schema({
     usuario: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'usuarios',
+        ref: 'User',
         required: [true, 'El usuario es obligatorio']
     },
     cabana: { // <-- Cambia de categoria a cabana

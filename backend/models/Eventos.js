@@ -77,7 +77,7 @@ const eventoSchema = new mongoose.Schema({
   },
   categorizadoPor: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Usuarios'
+    ref: 'User'
   },
   fechaCategorizacion: {
     type: Date

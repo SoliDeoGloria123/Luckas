@@ -11,7 +11,7 @@ const cabanaSchema = new mongoose.Schema({
   },
   ubicacion: { type: String, trim: true },
   estado: { type: String, enum: ['disponible', 'ocupada', 'mantenimiento'], default: 'disponible' },
-  creadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'usuarios' },
+  creadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   ubicacion: { type: String, trim: true },
   imagen: {
   type: String // URL de imagen o nombre del archivo

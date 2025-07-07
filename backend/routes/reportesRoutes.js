@@ -7,6 +7,23 @@ const { authJwt, role } = require('../middlewares');
 router.use(authJwt.verifyToken);
 
 // Rutas de reportes (solo admin y tesorero pueden ver reportes)
+router.get('/', role.checkRole('admin', 'tesorero'), (req, res) => {
+    res.json({
+        success: true,
+        message: 'API de reportes funcionando',
+        availableReports: [
+            '/dashboard',
+            '/reservas', 
+            '/inscripciones',
+            '/solicitudes',
+            '/usuarios',
+            '/eventos',
+            '/financiero',
+            '/actividad-usuarios'
+        ]
+    });
+});
+
 router.get('/dashboard', role.checkRole('admin', 'tesorero'), reportesController.getDashboardReport);
 router.get('/reservas', role.checkRole('admin', 'tesorero'), reportesController.getReservasReport);
 router.get('/inscripciones', role.checkRole('admin', 'tesorero'), reportesController.getInscripcionesReport);
