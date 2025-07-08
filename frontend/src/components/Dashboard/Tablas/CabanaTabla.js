@@ -11,6 +11,7 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar }) => (
           <th>Descripción</th>
           <th>Capacidad</th>
           <th>Categoría</th>
+          <th>Precio</th>
           <th>Estado</th>
           <th>Creado por</th>
           <th>imagen</th>
@@ -30,6 +31,7 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar }) => (
               <td>{cabana.descripcion}</td>
               <td>{cabana.capacidad}</td>
               <td>{cabana.categoria?.nombre || cabana.categoria || "N/A"}</td>
+               <td>{cabana.precio}</td>
               <td>
                 <span className={`badge-estado estado-${(cabana.estado || "pendiente").toLowerCase()}`}>
                   {cabana.estado || "Pendiente"}

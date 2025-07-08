@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const usuarios = require('../models/User');
 const ProgramaTecnico = require('../models/ProgramaTecnico');
  
 // Obtener todos los programas técnicos
@@ -224,7 +224,7 @@ exports.inscribirUsuario = async (req, res) => {
       });
     }
  
-    const usuario = await User.findById(usuarioId);
+    const usuario = await usuarios.findById(usuarioId);
     if (!usuario) {
       return res.status(404).json({
         success: false,

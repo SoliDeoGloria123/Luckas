@@ -1,13 +1,21 @@
-// controllers/categorizacionController.js
+const mongoose = require('mongoose'); // 👈 IMPORTANTE
 const Categorizacion = require('../models/categorizacion');
 const Solicitud = require('../models/Solicitud');
 
 // CREAR nueva categoría
 const crearCategoria = async (req, res) => {
   try {
+    console.log('[CATEGORIA] Datos recibidos:', req.body);
     const { nombre, codigo } = req.body;
-    
-    // Verificar si el código ya existe
+
+    if (!nombre || !codigo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nombre y código son requeridos',
+        datos: { nombre, codigo }
+      });
+    }
+
     const categoriaExistente = await Categorizacion.findOne({ codigo: codigo.toUpperCase() });
     if (categoriaExistente) {
       return res.status(400).json({
@@ -16,7 +24,6 @@ const crearCategoria = async (req, res) => {
       });
     }
 
-    // Verificar si el nombre ya existe
     const nombreExistente = await Categorizacion.findOne({ nombre });
     if (nombreExistente) {
       return res.status(400).json({
@@ -40,7 +47,7 @@ const crearCategoria = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error al crear categoría:', error);
+    console.error('[CATEGORIA] Error al crear:', error);
     res.status(500).json({
       success: false,
       message: 'Error al crear la categoría',
@@ -53,14 +60,14 @@ const crearCategoria = async (req, res) => {
 const obtenerCategorias = async (req, res) => {
   try {
     const { activo } = req.query;
-    
     let filtro = {};
+
     if (activo !== undefined) {
       filtro.activo = activo === 'true';
     }
 
     const categorias = await Categorizacion.find(filtro)
-      .populate('creadoPor', 'nombre email')
+      .populate('creadoPor', 'nombre apellido correo')
       .sort({ nombre: 1 });
 
     res.json({
@@ -70,6 +77,7 @@ const obtenerCategorias = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('[CATEGORIA] Error al obtener:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener las categorías',
@@ -82,7 +90,7 @@ const obtenerCategorias = async (req, res) => {
 const obtenerCategoriaPorId = async (req, res) => {
   try {
     const categoria = await Categorizacion.findById(req.params.id)
-      .populate('creadoPor', 'nombre email');
+      .populate('creadoPor', 'nombre apellido correo');
 
     if (!categoria) {
       return res.status(404).json({
@@ -97,6 +105,7 @@ const obtenerCategoriaPorId = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('[CATEGORIA] Error al buscar por ID:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener la categoría',
@@ -109,13 +118,21 @@ const obtenerCategoriaPorId = async (req, res) => {
 const actualizarCategoria = async (req, res) => {
   try {
     const { nombre, codigo, activo } = req.body;
-    const id = mongoose.Types.ObjectId(req.params.id); // Conversión segura
+    const id = req.params.id;
 
-    // Validar si el código ya existe en otra categoría
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID inválido'
+      });
+    }
+
+    const objectId = new mongoose.Types.ObjectId(id);
+
     if (codigo) {
       const categoriaExistente = await Categorizacion.findOne({
         codigo: codigo.toUpperCase(),
-        _id: { $ne: id } // Excluir el mismo ID que estamos editando
+        _id: { $ne: objectId }
       });
 
       if (categoriaExistente) {
@@ -126,11 +143,10 @@ const actualizarCategoria = async (req, res) => {
       }
     }
 
-    // Validar si el nombre ya existe en otra categoría
     if (nombre) {
       const nombreExistente = await Categorizacion.findOne({
         nombre,
-        _id: { $ne: id }
+        _id: { $ne: objectId }
       });
 
       if (nombreExistente) {
@@ -141,13 +157,13 @@ const actualizarCategoria = async (req, res) => {
       }
     }
 
-    const datosActualizacion = { nombre, activo };
-    if (codigo) {
-      datosActualizacion.codigo = codigo.toUpperCase();
-    }
+    const datosActualizacion = {};
+    if (nombre) datosActualizacion.nombre = nombre;
+    if (typeof activo === 'boolean') datosActualizacion.activo = activo;
+    if (codigo) datosActualizacion.codigo = codigo.toUpperCase();
 
     const categoriaActualizada = await Categorizacion.findByIdAndUpdate(
-      id,
+      objectId,
       datosActualizacion,
       { new: true, runValidators: true }
     );
@@ -166,6 +182,7 @@ const actualizarCategoria = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('[CATEGORIA] Error al actualizar:', error);
     res.status(500).json({
       success: false,
       message: 'Error al actualizar la categoría',
@@ -177,7 +194,6 @@ const actualizarCategoria = async (req, res) => {
 // ELIMINAR categoría
 const eliminarCategoria = async (req, res) => {
   try {
-    // Verificar si hay solicitudes usando esta categoría
     const solicitudesConCategoria = await Solicitud.countDocuments({
       'categoria.id': req.params.id
     });
@@ -204,6 +220,7 @@ const eliminarCategoria = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('[CATEGORIA] Error al eliminar:', error);
     res.status(500).json({
       success: false,
       message: 'Error al eliminar la categoría',
@@ -211,13 +228,13 @@ const eliminarCategoria = async (req, res) => {
     });
   }
 };
-// CATEGORIZAR una solicitud
+
+// CATEGORIZAR solicitud
 const categorizarSolicitud = async (req, res) => {
   try {
     const { categoriaId } = req.body;
     const solicitudId = req.params.id;
 
-    // Verificar que la categoría existe
     const categoria = await Categorizacion.findById(categoriaId);
     if (!categoria) {
       return res.status(404).json({
@@ -226,7 +243,6 @@ const categorizarSolicitud = async (req, res) => {
       });
     }
 
-    // Verificar que la solicitud existe
     const solicitud = await Solicitud.findById(solicitudId);
     if (!solicitud) {
       return res.status(404).json({
@@ -235,7 +251,6 @@ const categorizarSolicitud = async (req, res) => {
       });
     }
 
-    // Actualizar la solicitud con la categoría
     const solicitudActualizada = await Solicitud.findByIdAndUpdate(
       solicitudId,
       {
@@ -258,6 +273,7 @@ const categorizarSolicitud = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('[CATEGORIA] Error al categorizar solicitud:', error);
     res.status(500).json({
       success: false,
       message: 'Error al categorizar la solicitud',

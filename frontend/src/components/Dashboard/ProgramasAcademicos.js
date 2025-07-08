@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProgramasTabla from './Tablas/ProgramasTabla';
+import { cursosService } from '../../services/cursosService';
+import { programasTecnicosService } from '../../services/programasTecnicosService';
 
 const ProgramasAcademicos = () => {
     const [programas, setProgramas] = useState([]);
@@ -35,37 +37,62 @@ const ProgramasAcademicos = () => {
         destacado: false
     });
 
+
     useEffect(() => {
         cargarProgramas();
-    }, [filtros]);
+    }, []); // Solo cargar una vez, no depende de filtros
 
     const cargarProgramas = async () => {
         try {
-            setLoading(true);
-            const token = localStorage.getItem('token');
-            const params = new URLSearchParams();
-            
-            if (filtros.tipo) params.append('tipo', filtros.tipo);
-            if (filtros.modalidad) params.append('modalidad', filtros.modalidad);
-            if (filtros.busqueda) params.append('busqueda', filtros.busqueda);
-            
-            const response = await axios.get(`/api/programas-academicos?${params}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.data.success) {
-                setProgramas(response.data.data);
-            } else {
-                setError('Error al cargar los programas');
-            }
-        } catch (error) {
-            setError('Error de conexión');
-            console.error('Error:', error);
-        } finally {
-            setLoading(false);
+        setLoading(true);
+        setError('');
+        // Traer cursos
+        const cursosRes = await cursosService.obtenerCursos({});
+        // Traer programas técnicos
+        const tecnicosRes = await programasTecnicosService.obtenerProgramasTecnicos({});
+        // Normalizar y unificar
+        const cursos = (cursosRes.data || []).map(curso => ({
+            ...curso,
+            tipo: 'curso',
+            titulo: curso.nombre,
+            profesor: curso.instructor,
+            precio: curso.costo,
+            fechaInicio: curso.fechaInicio,
+            cupos: curso.cuposDisponibles,
+            activo: curso.estado === 'activo'
+        }));
+        const tecnicos = (tecnicosRes.data || []).map(prog => ({
+            ...prog,
+            tipo: 'tecnico',
+            titulo: prog.nombre,
+            profesor: prog.instructor,
+            precio: prog.costo,
+            fechaInicio: prog.fechaInicio,
+            cupos: prog.cuposDisponibles,
+            activo: prog.estado === 'activo'
+        }));
+        // Filtrar por tipo y modalidad si el usuario selecciona filtros
+        let resultado = [...cursos, ...tecnicos];
+        if (filtros.tipo) {
+            resultado = resultado.filter(p => p.tipo === filtros.tipo);
         }
+        if (filtros.modalidad) {
+            resultado = resultado.filter(p => p.modalidad === filtros.modalidad);
+        }
+        if (filtros.busqueda) {
+            const texto = filtros.busqueda.toLowerCase();
+            resultado = resultado.filter(p =>
+                (p.titulo && p.titulo.toLowerCase().includes(texto)) ||
+                (p.profesor && p.profesor.toLowerCase().includes(texto))
+            );
+        }
+        setProgramas(resultado);
+    } catch (error) {
+        setError('Error de conexión');
+        console.error('Error:', error);
+    } finally {
+        setLoading(false);
+    }
     };
 
     const handleSubmit = async (e) => {

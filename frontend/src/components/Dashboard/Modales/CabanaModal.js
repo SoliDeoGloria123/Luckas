@@ -86,6 +86,20 @@ const CabanaModal = ({
               ))}
             </select>
           </div>
+          <div className="form-grupo">
+            <label>Precio:</label>
+            <input
+              type="number"
+              value={modoEdicion ? cabanaSeleccionada?.precio : nuevaCabana.precio}
+              onChange={e =>
+                modoEdicion
+                  ? setCabanaSeleccionada({ ...cabanaSeleccionada, precio: e.target.value })
+                  : setNuevaCabana({ ...nuevaCabana, precio: e.target.value })
+              }
+              placeholder="Precio por noche"
+              required
+            />
+          </div>
           {!modoEdicion && (
           <div className="form-grupo">
             <label>Ubicacion:</label>

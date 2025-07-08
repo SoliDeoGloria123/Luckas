@@ -21,7 +21,6 @@ const reservaSchema = new mongoose.Schema({
     },
     precio: {
         type: Number,
-        default: 14000,
         required: true
     },
     estado: {

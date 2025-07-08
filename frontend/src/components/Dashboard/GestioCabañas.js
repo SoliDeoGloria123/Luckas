@@ -16,6 +16,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     descripcion: "",
     capacidad: "",
     categoria: "",
+    precio: "",
     estado: "disponible",
     imagen: "",
     ubicacion: ""
@@ -59,6 +60,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
         descripcion: "",
         capacidad: "",
         categoria: "",
+        precio: "",
         estado: "disponible",
         imagen: "",
         ubicacion: ""
@@ -99,6 +101,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       descripcion: "",
       capacidad: "",
       categoria: "",
+      precio: "",
       estado: "disponible",
       imagen: "",
       ubicacion: ""

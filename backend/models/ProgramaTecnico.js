@@ -109,7 +109,7 @@ const programaTecnicoSchema = new mongoose.Schema({
   inscripciones: [{
     usuario: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'usuarios'
     },
     fechaInscripcion: {
       type: Date,

@@ -18,7 +18,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
     cabana: "",
     fechaInicio: "",
     fechaFin: "",
-    precio: "14000",
+    precio: "",
     estado: "Pendiente",
     observaciones: ""
   });
@@ -77,7 +77,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
         cabana: "",
         fechaInicio: "",
         fechaFin: "",
-        precio: "14000",
+        precio: "",
         estado: "Pendiente",
         observaciones: "",
         activo: true
@@ -125,7 +125,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
       cabana: "",
       fechaInicio: "",
       fechaFin: "",
-      precio: "14000",
+      precio: "",
       estado: "Pendiente",
       observaciones: ""
     });

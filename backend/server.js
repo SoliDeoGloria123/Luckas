@@ -17,7 +17,6 @@ const reservasRoutes = require('./routes/reservasRoutes');
 const cabanasRoutes = require('./routes/cabanasRoutes'); // Asegúrate de que esta ruta exista
 const inscripcionesRoutes = require('./routes/inscripcionRoutes');
 const ReportesRoutes= require ('./routes/reportesRoutes')// Asegúrate de que esta ruta exista
-const programasAcademicosRoutes = require('./routes/programasAcademicosRoutes');
 const cursosRoutes = require('./routes/cursosRoutes');
 const programasTecnicosRoutes = require('./routes/programasTecnicosRoutes');
 const reporteguardarRoutes = require('./routes/reporteRoutes');
@@ -57,7 +56,6 @@ app.use('/api/categorizacion', categotizacionRoutes);
 app.use('/api/reservas', reservasRoutes); // Asegúrate de que esta ruta exista
 app.use('/api/inscripciones', inscripcionesRoutes); // Asegúrate de que esta ruta exista
 app.use('/api/reportes', ReportesRoutes);
-app.use('/api/programas-academicos', programasAcademicosRoutes);
 app.use('/api/cursos', cursosRoutes);
 app.use('/api/programas-tecnicos', programasTecnicosRoutes);
 app.use('/api/reporte', reporteguardarRoutes);

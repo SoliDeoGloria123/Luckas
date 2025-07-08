@@ -9,6 +9,7 @@ const cabanaSchema = new mongoose.Schema({
     ref: 'Categorizacion', // Relación correcta
     required: true
   },
+  precio:{type: Number, required: true, min: 0},
   ubicacion: { type: String, trim: true },
   estado: { type: String, enum: ['disponible', 'ocupada', 'mantenimiento'], default: 'disponible' },
   creadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'usuarios' },

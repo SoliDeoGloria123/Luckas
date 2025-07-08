@@ -101,9 +101,6 @@ const SolicitudModal = ({
               <option value="Inscripción">Inscripción</option>
               <option value="Hospedaje">Hospedaje</option>
               <option value="Alimentación">Alimentación</option>
-              <option value="Transporte">Transporte</option>
-              <option value="Certificados">Certificados</option>
-              <option value="Administrativa">Administrativa</option>
               <option value="Otra">Otra</option>
             </select>
           </div>
@@ -121,24 +118,22 @@ const SolicitudModal = ({
                 {nuevaSolicitud.tipoSolicitud === 'Inscripción' && (
                   <option value="Eventos">Eventos</option>
                 )}
+                {nuevaSolicitud.tipoSolicitud === 'Inscripción' && (
+                  <option value="Curso">Curso</option>
+                )}
+                {nuevaSolicitud.tipoSolicitud === 'Inscripción' && (
+                  <option value="ProgramaTecnico">Programa Tecnico </option>
+                )}
                 {nuevaSolicitud.tipoSolicitud === 'Hospedaje' && (
                   <option value="Cabana">Cabaña</option>
+                )}
+                {nuevaSolicitud.tipoSolicitud === 'Hospedaje' && (
+                  <option value="Reserva">Rervas</option>
                 )}
                 {nuevaSolicitud.tipoSolicitud === 'Alimentación' && (
                   <option value="Comedor">Comedor</option>
                 )}
-                {nuevaSolicitud.tipoSolicitud === 'Transporte' && (
-                  <option value="Bus">Bus</option>
-                  )}
-                {nuevaSolicitud.tipoSolicitud === 'Certificados' && (
-                  <option value="Certificado">Certificado</option>
-                )}
-                {nuevaSolicitud.tipoSolicitud === 'Administrativa' && (
-                  <option value="Administrativo">Administrativo</option>
-                )}
-                {nuevaSolicitud.tipoSolicitud === 'Otra' && (
-                  <option value="Otro">Otro</option>
-                )}
+             
               </select>
             </div>
           )}

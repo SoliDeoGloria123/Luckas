@@ -90,14 +90,14 @@ router.get('/unificado', async (req, res) => {
 });
 
 // Rutas de consulta - Solo admin y tesorero
-router.get('/', role.checkRole('admin', 'tesorero','seminarista','externo'), solicitudController.obtenerSolicitudes);
-router.get('/:id', role.checkRole('admin', 'tesorero','seminarista'), validarId, solicitudController.obtenerSolicitudPorId);
+router.get('/',solicitudController.obtenerSolicitudes);
+router.get('/:id', validarId, solicitudController.obtenerSolicitudPorId);
 
 // Rutas de creación - Admin, tesorero, seminarista y externo pueden crear solicitudes
-router.post('/', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), solicitudController.crearSolicitud);
+router.post('/', solicitudController.crearSolicitud);
 
 // Rutas de modificación - Solo admin y tesorero
-router.put('/:id', role.checkRole('admin', 'tesorero', 'seminarista','externo'), validarId, solicitudController.actualizarSolicitud);
+router.put('/:id', validarId, solicitudController.actualizarSolicitud);
 
 // Rutas de eliminación - Solo admin
 router.delete('/:id', role.isAdmin, validarId, solicitudController.eliminarSolicitud);

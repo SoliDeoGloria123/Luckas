@@ -13,13 +13,14 @@ const ProgramasTabla = ({
         <thead>
           <tr>
             <th>Programa</th>
+            <th>Profesor</th>
             <th>Tipo</th>
             <th>Modalidad</th>
             <th>Precio</th>
             <th>Fecha Inicio</th>
             <th>Cupos</th>
             <th>Estado</th>
-            <th>Acciones</th>
+
           </tr>
         </thead>
         <tbody>
@@ -28,12 +29,13 @@ const ProgramasTabla = ({
               <td>
                 <div className="programa-info">
                   <h4>{programa.titulo}</h4>
-                  <p>{programa.profesor}</p>
+                 
                   {programa.destacado && (
                     <span className="badge-destacado">Destacado</span>
                   )}
                 </div>
               </td>
+              <td> <p>{programa.profesor}</p></td>
               <td>
                 <span className={`badge badge-${programa.tipo}`}>
                   {programa.tipo.charAt(0).toUpperCase() + programa.tipo.slice(1)}
@@ -53,22 +55,7 @@ const ProgramasTabla = ({
                 </span>
               </td>
               <td>
-                <div className="actions-group">
-                  <button
-                    className="btn-icon btn-edit"
-                    onClick={() => abrirModalEditar(programa)}
-                    title="Editar"
-                  >
-                    <i className="fas fa-edit"></i>
-                  </button>
-                  <button
-                    className="btn-icon btn-delete"
-                    onClick={() => eliminarPrograma(programa._id)}
-                    title="Eliminar"
-                  >
-                    <i className="fas fa-trash"></i>
-                  </button>
-                </div>
+               
               </td>
             </tr>
           ))}

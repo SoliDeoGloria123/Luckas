@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+// Actualizar el precio automáticamente al seleccionar una cabaña
 
 const ReservasModal = ({
   mostrar,
@@ -13,6 +14,19 @@ const ReservasModal = ({
   onClose,
   onSubmit
 }) => {
+  // Actualizar el precio automáticamente al seleccionar una cabaña
+  useEffect(() => {
+    const reservaActual = modoEdicion ? reservaSeleccionada : nuevaReserva;
+    const setReserva = modoEdicion ? setReservaSeleccionada : setNuevaReserva;
+    if (reservaActual.cabana && cabanas && cabanas.length > 0) {
+      const cabanaSeleccionada = cabanas.find(c => c._id === reservaActual.cabana);
+      if (cabanaSeleccionada && cabanaSeleccionada.precio && reservaActual.precio !== cabanaSeleccionada.precio) {
+        setReserva({ ...reservaActual, precio: cabanaSeleccionada.precio });
+      }
+    }
+    // eslint-disable-next-line
+  }, [modoEdicion, reservaSeleccionada?.cabana, nuevaReserva.cabana, cabanas]);
+
   if (!mostrar) return null;
 
   const reservaActual = modoEdicion ? reservaSeleccionada : nuevaReserva;
@@ -59,22 +73,44 @@ const ReservasModal = ({
             <label>Cabaña:</label>
             <select
               value={modoEdicion ? reservaSeleccionada?.cabana : nuevaReserva.cabana}
-              onChange={e =>
-                modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, cabana: e.target.value })
-                  : setNuevaReserva({ ...nuevaReserva, cabana: e.target.value })
-              }
+              onChange={e => {
+                const cabanaId = e.target.value;
+                const cabanaSeleccionada = cabanas.find(c => c._id === cabanaId);
+                const nuevoPrecio = cabanaSeleccionada ? cabanaSeleccionada.precio : "";
+
+                if (modoEdicion) {
+                  setReservaSeleccionada({
+                    ...reservaSeleccionada,
+                    cabana: cabanaId,
+                    precio: nuevoPrecio
+                  });
+                } else {
+                  setNuevaReserva({
+                    ...nuevaReserva,
+                    cabana: cabanaId,
+                    precio: nuevoPrecio
+                  });
+                }
+              }}
               required
             >
               <option value="">Seleccione...</option>
               {cabanas && cabanas.map(cab => (
                 <option key={cab._id} value={cab._id}>
-                  {cab.nombre}
+                  {cab.nombre} {cab.precio ? `- $${cab.precio}` : ''}
                 </option>
               ))}
             </select>
           </div>
-
+          <div className="form-grupo">
+            <label>Precio:</label>
+            <input
+              type="number"
+              value={modoEdicion ? reservaSeleccionada?.precio : nuevaReserva.precio}
+              readOnly
+              required
+            />
+          </div>
           {/* Fecha Inicio */}
           <div className="form-grupo">
             <label>Fecha Inicio:</label>
@@ -112,19 +148,7 @@ const ReservasModal = ({
               required
             />
           </div>
-          <div className="form-grupo">
-            <label>Precio:</label>
-            <input
-              type="number" // <-- debe ser number, no numbre
-              value={modoEdicion ? reservaSeleccionada?.precio : nuevaReserva.precio}
-              onChange={e =>
-                modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, precio: e.target.value })
-                  : setNuevaReserva({ ...nuevaReserva, precio: e.target.value })
-              }
-              required
-            />
-          </div>
+
 
 
           {/* Estado */}
