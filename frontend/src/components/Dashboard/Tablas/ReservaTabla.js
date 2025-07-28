@@ -45,7 +45,7 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
                   {reserva.estado || "Pendiente"}
                 </span>
               </td>
-             
+
               <td>{reserva.observaciones}</td>
               <td>
                 {typeof reserva.solicitud === "object"
@@ -56,14 +56,16 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
                 {reserva.activo === undefined ? 'N/A' : reserva.activo ? 'Sí' : 'No'}
               </td>
               <td>
-                <button className="btn-editar" onClick={() => onEditar(reserva)}>
-                  ✏️
-                </button>
-                {onEliminar && (
-                  <button className="btn-eliminar" onClick={() => onEliminar(reserva._id)}>
-                    🗑️
+                <div className="acciones-usuario">
+                  <button className="btn-editar" onClick={() => onEditar(reserva)}>
+                    ✏️
                   </button>
-                )}
+                  {onEliminar && (
+                    <button className="btn-eliminar" onClick={() => onEliminar(reserva._id)}>
+                      🗑️
+                    </button>
+                  )}
+                </div>
               </td>
             </tr>
           ))

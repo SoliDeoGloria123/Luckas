@@ -4,6 +4,7 @@ import { userService } from "../../services/userService";
 import { cabanaService } from "../../services/cabanaService";
 import TablaReservas from "./Tablas/ReservaTabla";
 import ReservasModal from "./Modales/ReservaModal";
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
 const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [reservas, setReservas] = useState([]);
@@ -71,6 +72,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
         reservaData.activo = true;
       }
       await reservaService.create(reservaData);
+      mostrarAlerta("¡Éxito!", "Reserva creada exitosamente");
       setMostrarModal(false);
       setNuevaReserva({
         usuario: "",
@@ -84,7 +86,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
       });
       obtenerReservas();
     } catch (err) {
-      setError("Error al crear la reserva: " + err.message);
+      mostrarAlerta("Error", "Error al crear la reserva: " + err.message);
     }
   };
 
@@ -98,22 +100,29 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
         reservaData.activo = true;
       }
       await reservaService.update(reservaSeleccionada._id, reservaData);
+      mostrarAlerta("¡Éxito!", "Reserva actualizada exitosamente");
       setMostrarModal(false);
       setReservaSeleccionada(null);
       setModoEdicion(false);
       obtenerReservas();
     } catch (err) {
-      setError("Error al actualizar reserva: " + err.message);
+      mostrarAlerta("Error", "Error al actualizar reserva: " + err.message);
     }
   };
 
   const eliminarReserva = async (id) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar esta reserva?")) return;
+    const confirmado = await mostrarConfirmacion(
+      "¿Estás seguro?",
+      "Esta acción eliminará el usuario de forma permanente."
+    );
+
+    if (!confirmado) return;
     try {
       await reservaService.delete(id);
+      mostrarAlerta("¡Éxito!", "Reserva eliminada exitosamente");
       obtenerReservas();
     } catch (err) {
-      setError("Error al eliminar reserva: " + err.message);
+      mostrarAlerta("Error","Error al eliminar reserva: " + err.message);
     }
   };
 
@@ -147,28 +156,48 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   return (
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
-        <h2>Gestión de Reservas</h2>
+        <h1 className="titulo-admin" >Gestión de Reservas</h1>
         {canCreate && !readOnly && (
-          <button className="btn-primary" onClick={abrirModalCrear}>
+          <button className="btn-admin" onClick={abrirModalCrear}>
             ➕ Nueva Reserva
           </button>
         )}
       </div>
-      <div className="busqueda-contenedor">
-        <input
-          type="text"
-          placeholder="🔍 Buscar Reserva..."
-          value={busqueda}
-          onChange={e => setBusqueda(e.target.value)}
-          className="input-busqueda"
+      <section className="filtros-section-admin">
+        <div className="busqueda-contenedor">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Buscar Reserva..."
+            value={busqueda}
+            onChange={e => setBusqueda(e.target.value)}
+            className="input-busqueda"
+          />
+        </div>
+        <div class="filtro-grupo-admin">
+          <select className="filtro-dropdown">
+            <option>Todos los Roles</option>
+            <option>Administrador</option>
+            <option>Seminarista</option>
+            <option>Tesorero</option>
+            <option>Usuario Externo</option>
+          </select>
+          <select className="filtro-dropdown">
+            <option>Todos los Estados</option>
+            <option>Activo</option>
+            <option>Inactivo</option>
+            <option>Pendiente</option>
+          </select>
+        </div>
+
+
+        {error && <div className="error-message">{error}</div>}
+        <TablaReservas
+          reservas={reservasFiltradas}
+          onEditar={canEdit && !readOnly ? abrirModalEditar : null}
+          onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarReserva : null}
         />
-      </div>
-      {error && <div className="error-message">{error}</div>}
-      <TablaReservas
-        reservas={reservasFiltradas}
-        onEditar={canEdit && !readOnly ? abrirModalEditar : null}
-        onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarReserva : null}
-      />
+      </section>
       <ReservasModal
         mostrar={mostrarModal}
         modoEdicion={modoEdicion}

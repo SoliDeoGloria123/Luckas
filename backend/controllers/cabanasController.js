@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Cabana = require('../models/Cabana');
 const Categorizacion = require('../models/categorizacion');
+const fs = require('fs');
+const path = require('path');
 
 // CRUD básico
 exports.crearCabana = async (req, res) => {
@@ -17,8 +19,8 @@ exports.crearCabana = async (req, res) => {
     if (!categoriaExiste) {
       return res.status(404).json({ success: false, message: 'Categoría no encontrada' });
     }
-
-    const cabana = new Cabana({ ...req.body, creadoPor: req.userId });
+    const imagen = req.files?.map(file => file.filename) || [];
+    const cabana = new Cabana({ ...req.body, imagen, creadoPor: req.userId });
     await cabana.save();
     res.status(201).json({ success: true, data: cabana });
   } catch (error) {
@@ -53,10 +55,29 @@ exports.obtenerCabanaPorId = async (req, res) => {
 
 exports.actualizarCabana = async (req, res) => {
   try {
-    const cabana = await Cabana.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    let cabana = await Cabana.findById(req.params.id);
+    if (!cabana) {
+      return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
+    }
+    if (req.files && req.files.length > 0) {
+      // Elimina todas las imágenes anteriores
+      if (Array.isArray(cabana.imagen)) {
+        cabana.imagen.forEach(nombreImagen => {
+          const rutaImagen = path.join(__dirname, '../public/uploads/cabanas', nombreImagen);
+          if (fs.existsSync(rutaImagen)) {
+            fs.unlinkSync(rutaImagen);
+          }
+        });
+      }
+
+      // Guarda los nombres de las nuevas imágenes
+      req.body.imagen = req.files.map(file => file.filename);
+    }
+
+    cabana = await Cabana.findByIdAndUpdate(req.params.id, req.body, { new: true })
       .populate('categoria', 'nombre')
       .populate('creadoPor', 'nombre email');
-    if (!cabana) return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
+
     res.json({ success: true, data: cabana });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -66,7 +87,24 @@ exports.actualizarCabana = async (req, res) => {
 exports.eliminarCabana = async (req, res) => {
   try {
     const cabana = await Cabana.findByIdAndDelete(req.params.id);
-    if (!cabana) return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
+    if (!cabana) {
+      return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
+    }
+    // Elimina la imagen del sistema de archivos si existe
+    if (Array.isArray(cabana.imagen)) {
+      cabana.imagen.forEach((nombreImagen) => {
+        const rutaImagen = path.join(__dirname, '../public/uploads/cabanas', nombreImagen);
+        if (fs.existsSync(rutaImagen)) {
+          fs.unlinkSync(rutaImagen);
+        }
+      });
+    } else if (typeof cabana.imagen === 'string') {
+
+      const rutaImagen = path.join(__dirname, '../public/uploads/cabanas', cabana.imagen);
+      if (fs.existsSync(rutaImagen)) {
+        fs.unlinkSync(rutaImagen);
+      }
+    }
     res.json({ success: true, message: 'Cabaña eliminada' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -82,8 +120,8 @@ exports.categorizarCabana = async (req, res) => {
       { categoria },
       { new: true }
     )
-    .populate('categoria', 'nombre')
-    .populate('creadoPor', 'nombre email');
+      .populate('categoria', 'nombre')
+      .populate('creadoPor', 'nombre email');
     if (!cabana) {
       return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
     }

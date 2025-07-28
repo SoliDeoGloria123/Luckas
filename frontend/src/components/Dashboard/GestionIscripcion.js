@@ -4,6 +4,7 @@ import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaInscripciones from "./Tablas/InscripcionTabla";
 import InscripcionModal from "./Modales/InscripsionModal";
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
 const GestionIscripcion = () => {
   const [inscripciones, setInscripciones] = useState([]);
@@ -73,7 +74,7 @@ const GestionIscripcion = () => {
         delete insc.solicitud;
       }
       await inscripcionService.create(insc);
-      alert("Inscripción creada exitosamente");
+      mostrarAlerta("¡Éxito!","Inscripción creada exitosamente");
       setMostrarModal(false);
       setNuevaInscripcion({
         usuario: "",
@@ -92,7 +93,7 @@ const GestionIscripcion = () => {
       });
       obtenerInscripciones();
     } catch (error) {
-      alert(`Error al crear la inscripción: ${error.message}`);
+      mostrarAlerta("Error",`Error al crear la inscripción: ${error.message}`);
     }
   };
 
@@ -100,25 +101,30 @@ const GestionIscripcion = () => {
   const actualizarInscripcion = async () => {
     try {
       await inscripcionService.update(inscripcionSeleccionada._id, inscripcionSeleccionada);
-      alert("Inscripción actualizada exitosamente");
+      mostrarAlerta("¡Éxito!","Inscripción actualizada exitosamente");
       setMostrarModal(false);
       setInscripcionSeleccionada(null);
       setModoEdicion(false);
       obtenerInscripciones();
     } catch (error) {
-      alert(`Error al actualizar la inscripción: ${error.message}`);
+      mostrarAlerta("Error", `Error al actualizar la inscripción: ${error.message}`);
     }
   };
 
   // Eliminar inscripción
   const eliminarInscripcion = async (id) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar esta inscripción?")) return;
+   const confirmado = await mostrarConfirmacion(
+    "¿Estás seguro?",
+    "Esta acción eliminará el usuario de forma permanente."
+  );
+
+    if (!confirmado) return;
     try {
       await inscripcionService.delete(id);
-      alert("Inscripción eliminada exitosamente");
+      mostrarAlerta("¡Éxito!","Inscripción eliminada exitosamente");
       obtenerInscripciones();
     } catch (error) {
-      alert(`Error al eliminar la inscripción: ${error.message}`);
+      mostrarAlerta("Error",`Error al eliminar la inscripción: ${error.message}`);
     }
   };
 
@@ -153,16 +159,45 @@ const GestionIscripcion = () => {
   return (
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
-        <h2>Gestión de Inscripciones</h2>
-        <button className="btn-primary" onClick={abrirModalCrear}>
+        <h1 className="titulo-admin" >Gestión de Inscripciones</h1>
+        <button className="btn-admin" onClick={abrirModalCrear}>
           ➕ Nueva Inscripción
         </button>
       </div>
+
+      <section className="filtros-section-admin">
+        <div className="busqueda-contenedor">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Buscar Incripcion..."
+            // value={busqueda}
+            //onChange={(e) => setBusqueda(e.target.value)}
+            className="input-busqueda"
+          />
+        </div>
+        <div className="filtro-grupo-admin">
+          <select className="filtro-dropdown">
+            <option>Todos los Roles</option>
+            <option>Administrador</option>
+            <option>Seminarista</option>
+            <option>Tesorero</option>
+            <option>Usuario Externo</option>
+          </select>
+          <select className="filtro-dropdown">
+            <option>Todos los Estados</option>
+            <option>Activo</option>
+            <option>Inactivo</option>
+            <option>Pendiente</option>
+          </select>
+        </div>
+
       <TablaInscripciones
         inscripciones={inscripciones}
         onEditar={abrirModalEditar}
         onEliminar={eliminarInscripcion}
       />
+      </section>
       <InscripcionModal
         mostrar={mostrarModal}
         modoEdicion={modoEdicion}

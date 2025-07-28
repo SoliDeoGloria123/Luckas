@@ -76,7 +76,7 @@ const TablaUnificadaSolicitudes = ({
               })()}
             </td>
             <td>
-              <span className={` estado-${(sol.estado || "activo").toLowerCase()}`}>
+              <span className={`estado-${(sol.estado || "activo").toLowerCase()}`}>
                 {sol.estado || "Activo"}
               </span>
             </td>
@@ -92,12 +92,13 @@ const TablaUnificadaSolicitudes = ({
                 ? sol.responsable?.nombre || sol.responsable?.username || sol.responsable?.email || sol.responsable?._id || "N/A"
                 : sol.responsable || "N/A"}
             </td>
-
             <td>
-              <button className="btn-editar" onClick={() => abrirModalEditarSolicitud(sol)}>✏️</button>
-              {eliminarSolicitud && (
-                <button className="btn-eliminar" onClick={() => eliminarSolicitud(sol._id)}>🗑️</button>
-              )}
+              <div className="acciones-botones">
+                <button className="btn-editar" onClick={() => abrirModalEditarSolicitud(sol)}>✏️</button>
+                {eliminarSolicitud && (
+                  <button className="btn-eliminar" onClick={() => eliminarSolicitud(sol._id)}>🗑️</button>
+                )}
+              </div>
             </td>
           </tr>
         ))}

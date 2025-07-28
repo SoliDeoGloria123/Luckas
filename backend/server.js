@@ -59,35 +59,8 @@ app.use('/api/reportes', ReportesRoutes);
 app.use('/api/cursos', cursosRoutes);
 app.use('/api/programas-tecnicos', programasTecnicosRoutes);
 app.use('/api/reporte', reporteguardarRoutes);
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
-// Rutas para páginas externas/públicas
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/home.html'));
-});
-
-app.get('/external', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/home.html'));
-});
-
-app.get('/home', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/home.html'));
-});
-
-app.get('/eventos', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/eventos.html'));
-});
-
-app.get('/cursos', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/cursos_home.html'));
-});
-
-app.get('/programas-academicos', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/programas-academicos-external.html'));
-});
-
-app.get('/inscripcion', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/inscripcion.html'));
-});
 
 // Ruta para el login/admin - redirigir al frontend React
 app.get('/admin', (req, res) => {
@@ -107,6 +80,7 @@ app.get('*', (req, res) => {
         res.status(404).json({ message: 'Ruta de API no encontrada' });
     }
 });
+
 
 //Inicio del servidor
 const PORT = process.env.PORT || 3000;

@@ -17,15 +17,15 @@ const CabanaModal = ({
 
   return (
    <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal-header">
+      <div className="modal-admin">
+        <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Cabaña" : "Crear Nueva Cabaña"}</h3>
           <button className="modal-cerrar" onClick={onClose}>
             ✕
           </button>
         </div>
-        <div className="modal-body">
-          <div className="form-grupo">
+        <div className="modal-body-admin">
+          <div className="form-grupo-admin">
             <label>Nombre:</label>
             <input
               type="text"
@@ -39,7 +39,7 @@ const CabanaModal = ({
               required
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Descripción:</label>
             <input
               type="text"
@@ -52,7 +52,7 @@ const CabanaModal = ({
               placeholder="Descripción"
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Capacidad:</label>
             <input
               type="number"
@@ -66,7 +66,7 @@ const CabanaModal = ({
               required
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Categoría:</label>
             <select
               type="text"
@@ -86,7 +86,7 @@ const CabanaModal = ({
               ))}
             </select>
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Precio:</label>
             <input
               type="number"
@@ -101,7 +101,7 @@ const CabanaModal = ({
             />
           </div>
           {!modoEdicion && (
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Ubicacion:</label>
             <input
               type="text"
@@ -113,7 +113,7 @@ const CabanaModal = ({
             />
           </div>
           )}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Estado:</label>
             <select
               value={modoEdicion ? cabanaSeleccionada?.estado : nuevaCabana.estado}
@@ -129,18 +129,26 @@ const CabanaModal = ({
               <option value="mantenimiento">Mantenimiento</option>
             </select>
           </div>
-           <div className="form-grupo">
-            <label>Imagen De La Cabaña:</label>
+          <div className="form-grupo-admin">
+            <label>Imagenes De La Cabaña:</label>
             <input
               type="file"
-              value={modoEdicion ? cabanaSeleccionada?.imagen : nuevaCabana.imagen}
-              onChange={e =>
-                modoEdicion
-                  ? setCabanaSeleccionada({ ...cabanaSeleccionada, imagen: e.target.value })
-                  : setNuevaCabana({ ...nuevaCabana, imagen: e.target.value })
-              }
-    
+              name="imagen"
+              multiple
+              accept="image/*"
+              className="input-imagen-multiple"
+              onChange={e => {
+                const files = Array.from(e.target.files);
+                if (modoEdicion) {
+                  setCabanaSeleccionada({ ...cabanaSeleccionada, imagenes: files });
+                } else {
+                  setNuevaCabana({ ...nuevaCabana, imagenes: files });
+                }
+              }}
             />
+            <samll style={{color: "#555", marginTop: "5px"}}>
+             Puedes seleccionar varias imágenes manteniendo presionada la tecla Ctrl o Shift
+             </samll>
           </div>
         </div>
         <div className="modal-footer">

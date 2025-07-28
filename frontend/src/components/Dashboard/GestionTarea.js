@@ -3,6 +3,7 @@ import { tareaService } from "../../services/tareaService";
 import { userService } from "../../services/userService";
 import TablaTareas from "./Tablas/TareaTabla";
 import TareaModal from "./Modales/TareaModal";
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
 const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [tareas, setTareas] = useState([]);
@@ -51,6 +52,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
   const crearTarea = async () => {
     try {
       await tareaService.create(nuevaTarea);
+      mostrarAlerta("¡Éxito!", "Tarea creada exitosamente");
       setMostrarModal(false);
       setNuevaTarea({
         titulo: "",
@@ -64,29 +66,36 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
       });
       obtenerTareas();
     } catch (err) {
-      setError("Error al crear la tarea: " + err.message);
+      mostrarAlerta("Error", "Error al crear la tarea: " + err.message);
     }
   };
 
   const actualizarTarea = async () => {
     try {
       await tareaService.update(tareaSeleccionada._id, tareaSeleccionada);
+      mostrarAlerta("¡Éxito!", "Tarea actualizada exitosamente");
       setMostrarModal(false);
       setTareaSeleccionada(null);
       setModoEdicion(false);
       obtenerTareas();
     } catch (err) {
-      setError("Error al actualizar tarea: " + err.message);
+      mostrarAlerta("Error", "Error al actualizar tarea: " + err.message);
     }
   };
 
   const eliminarTarea = async (id) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar esta tarea?")) return;
+    const confirmado = await mostrarConfirmacion(
+      "¿Estás seguro?",
+      "Esta acción eliminará el usuario de forma permanente."
+    );
+
+    if (!confirmado) return;
     try {
       await tareaService.delete(id);
+      mostrarAlerta("¡Éxito!", "Tarea eliminada exitosamente");
       obtenerTareas();
     } catch (err) {
-      setError("Error al eliminar tarea: " + err.message);
+      mostrarAlerta("Error","Error al eliminar tarea: " + err.message);
     }
   };
 
@@ -133,29 +142,50 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
   return (
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
-        <h2>Gestión de Tareas</h2>
+        <h1 className="titulo-admin" >Gestión de Tareas</h1>
         {canCreate && !readOnly && (
-          <button className="btn-primary" onClick={abrirModalCrear}>
+          <button className="btn-admin" onClick={abrirModalCrear}>
             ➕ Nueva Tarea
           </button>
         )}
       </div>
-      <div className="busqueda-contenedor">
-        <input
-          type="text"
-          placeholder="🔍 Buscar Tarea..."
-          value={busqueda}
-          onChange={e => setBusqueda(e.target.value)}
-          className="input-busqueda"
+      <section className="filtros-section-admin">
+        <div className="busqueda-contenedor">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Buscar Tarea..."
+            value={busqueda}
+            onChange={e => setBusqueda(e.target.value)}
+            className="input-busqueda"
+          />
+        </div>
+
+
+        <div className="filtro-grupo-admin">
+          <select className="filtro-dropdown">
+            <option>Todos los Roles</option>
+            <option>Administrador</option>
+            <option>Seminarista</option>
+            <option>Tesorero</option>
+            <option>Usuario Externo</option>
+          </select>
+          <select className="filtro-dropdown">
+            <option>Todos los Estados</option>
+            <option>Activo</option>
+            <option>Inactivo</option>
+            <option>Pendiente</option>
+          </select>
+        </div>
+
+        {error && <div className="error-message">{error}</div>}
+        <TablaTareas
+          tareas={tareasFiltradas}
+          onEditar={canEdit && !readOnly ? abrirModalEditar : null}
+          onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarTarea : null}
+          onCambiarEstado={canEdit && !readOnly ? cambiarEstadoTarea : null}
         />
-      </div>
-      {error && <div className="error-message">{error}</div>}
-      <TablaTareas
-        tareas={tareasFiltradas}
-        onEditar={canEdit && !readOnly ? abrirModalEditar : null}
-        onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarTarea : null}
-        onCambiarEstado={canEdit && !readOnly ? cambiarEstadoTarea : null}
-      />
+      </section>
       <TareaModal
         mostrar={mostrarModal}
         modoEdicion={modoEdicion}

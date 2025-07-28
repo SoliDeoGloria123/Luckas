@@ -254,8 +254,8 @@ const ProgramasTecnicos = () => {
   return (
     <div className="programas-tecnicos-container">
       <div className="page-header-Academicos">
-        <h2>Gestión de Programas Técnicos</h2>
-        <button className="btn-primary" onClick={() => abrirModal()}>
+        <h1 className="titulo-admin">Gestión de Programas Técnicos</h1>
+        <button className="btn-admin" onClick={() => abrirModal()}>
           Crear Nuevo Programa Técnico
         </button>
       </div>

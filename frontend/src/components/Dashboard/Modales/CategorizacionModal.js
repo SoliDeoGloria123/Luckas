@@ -14,15 +14,15 @@ const CategorizacionModal = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal-header">
+      <div className="modal-admin">
+        <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Categoría" : "Crear Nueva Categoría"}</h3>
           <button className="modal-cerrar" onClick={onClose}>
             ✕
           </button>
         </div>
-        <div className="modal-body">
-          <div className="form-grupo">
+        <div className="modal-body-admin">
+          <div className="form-grupo-admin">
             <label>Nombre:</label>
             <input
               type="text"
@@ -36,7 +36,7 @@ const CategorizacionModal = ({
               required
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Código:</label>
             <input
               type="text"
@@ -50,7 +50,7 @@ const CategorizacionModal = ({
               required
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Activo:</label>
             <select
               value={modoEdicion ? categoriaSeleccionada?.activo : nuevaCategoria.activo}
@@ -65,7 +65,7 @@ const CategorizacionModal = ({
             </select>
         </div>
         </div>
-        <div className="modal-footer">
+        <div className="modal-footer-admin">
           <button className="btn-secondary" onClick={onClose}>
             Cancelar
           </button>

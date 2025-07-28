@@ -42,16 +42,16 @@ const SolicitudModal = ({
   if (!mostrar) return null;
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal-header">
+      <div className="modal-admin">
+        <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Solicitud" : "Crear Nueva Solicitud"}</h3>
           <button className="modal-cerrar" onClick={onClose}>
             ✕
           </button>
         </div>
-        <div className="modal-body">
+        <div className="modal-body-admin">
           {!modoEdicion && (
-            <div className="form-grupo">
+            <div className="form-grupo-admin">
               <label>Solicitante (ID):</label>
               <input
                 type="text"
@@ -63,7 +63,7 @@ const SolicitudModal = ({
             </div>
           )}
           {!modoEdicion && (
-            <div className="form-grupo">
+            <div className="form-grupo-admin">
               <label>Correo:</label>
               <input
                 type="correo"
@@ -75,7 +75,7 @@ const SolicitudModal = ({
             </div>
           )}
           {!modoEdicion && (
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Teléfono:</label>
             <input
               type="text"
@@ -88,7 +88,7 @@ const SolicitudModal = ({
           </div>
           )}
           {!modoEdicion && (
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Tipo de Solicitud:</label>
             <select
               value={nuevaSolicitud.tipoSolicitud}
@@ -107,7 +107,7 @@ const SolicitudModal = ({
           )}
           {/* Select de modeloReferencia dinámico */}
           {!modoEdicion && nuevaSolicitud.tipoSolicitud && (
-            <div className="form-grupo">
+            <div className="form-grupo-admin">
               <label>Modelo Referencia:</label>
               <select
                 value={nuevaSolicitud.modeloReferencia || ''}
@@ -138,7 +138,7 @@ const SolicitudModal = ({
             </div>
           )}
           {!modoEdicion && (
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Categoría:</label>
             <select
               value={ nuevaSolicitud.categoria}
@@ -157,7 +157,7 @@ const SolicitudModal = ({
           </div>
           )}
           {!modoEdicion && (
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Descripción:</label>
             <input
               type="text"
@@ -171,7 +171,7 @@ const SolicitudModal = ({
             />
           </div>
           )}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Estado:</label>
             <select
               value={modoEdicion ? solicitudSeleccionada?.estado : nuevaSolicitud.estado}
@@ -189,7 +189,7 @@ const SolicitudModal = ({
               <option value="Pendiente Info">Pendiente</option>
             </select>
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Prioridad:</label>
             <select
               value={modoEdicion ? solicitudSeleccionada?.prioridad : nuevaSolicitud.prioridad}
@@ -204,7 +204,7 @@ const SolicitudModal = ({
               <option value="Baja">Baja</option>
             </select>
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Responsable:</label>
             <input
               type="text"
@@ -221,7 +221,7 @@ const SolicitudModal = ({
               placeholder="Responsable"
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Observaciones:</label>
             <input
               type="text"
@@ -235,7 +235,7 @@ const SolicitudModal = ({
             />
           </div>
         </div>
-        <div className="modal-footer">
+        <div className="modal-footer-admin">
           <button className="btn-secondary" onClick={onClose}>
             Cancelar
           </button>

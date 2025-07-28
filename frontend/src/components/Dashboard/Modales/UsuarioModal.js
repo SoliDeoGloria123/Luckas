@@ -14,15 +14,15 @@ const UsuarioModal = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal-header">
+      <div className="modal-admin">
+        <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Usuario" : "Crear Nuevo Usuario"}</h3>
           <button className="modal-cerrar" onClick={onClose}>
             ✕
           </button>
         </div>
-        <div className="modal-body">
-          <div className="form-grupo">
+        <form className="modal-body-admin">
+          <div className="form-grupo-admin">
             <label>Nombre:</label>
             <input
               type="text"
@@ -36,7 +36,7 @@ const UsuarioModal = ({
               required
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Apellido:</label>
             <input
               type="text"
@@ -50,7 +50,7 @@ const UsuarioModal = ({
               required
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Correo:</label>
             <input
               type="email"
@@ -64,7 +64,7 @@ const UsuarioModal = ({
               required
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Teléfono:</label>
             <input
               type="text"
@@ -78,7 +78,7 @@ const UsuarioModal = ({
               required
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Tipo de Documento:</label>
             <select
               value={modoEdicion ? usuarioSeleccionado?.tipoDocumento : nuevoUsuario.tipoDocumento}
@@ -96,7 +96,7 @@ const UsuarioModal = ({
               <option value="Tarjeta de identidad">Tarjeta de identidad</option>
             </select>
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Número de Documento:</label>
             <input
               type="text"
@@ -111,7 +111,7 @@ const UsuarioModal = ({
             />
           </div>
           {!modoEdicion && (
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Contraseña:</label>
             <input
               type="password"
@@ -124,7 +124,7 @@ const UsuarioModal = ({
             />
           </div>
           )}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Rol:</label>
             <select
               value={modoEdicion ? usuarioSeleccionado?.role : nuevoUsuario.role}
@@ -141,7 +141,7 @@ const UsuarioModal = ({
               <option value="externo">Externo</option>
             </select>
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Estado:</label>
             <select
               value={modoEdicion ? usuarioSeleccionado?.estado : nuevoUsuario.estado}
@@ -156,8 +156,8 @@ const UsuarioModal = ({
               <option value="inactivo">Inactivo</option>
             </select>
           </div>
-        </div>
-        <div className="modal-footer">
+        
+        <div className="modal-footer-admin">
           <button className="btn-secondary" onClick={onClose}>
             Cancelar
           </button>
@@ -165,6 +165,7 @@ const UsuarioModal = ({
             {modoEdicion ? "Guardar Cambios" : "Crear Usuario"}
           </button>
         </div>
+        </form>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaEventos from "./Tablas/EventoTabla";
 import EventoModal from "./Modales/EventoModal";
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
 const GestionEventos = () => {
   const [eventos, setEventos] = useState([]);
@@ -55,7 +56,7 @@ const GestionEventos = () => {
   const crearEvento = async () => {
     try {
       await eventService.createEvent(nuevoEvento);
-      alert("Evento creado exitosamente");
+      mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
       setMostrarModal(false);
       setNuevoEvento({
         nombre: "",
@@ -74,7 +75,7 @@ const GestionEventos = () => {
       });
       obtenerEventos();
     } catch (error) {
-      alert(`Error al crear el evento: ${error.message}`);
+      mostrarAlerta("Error", `Error al crear el evento: ${error.message}`);
     }
   };
 
@@ -82,25 +83,30 @@ const GestionEventos = () => {
   const actualizarEvento = async () => {
     try {
       await eventService.updateEvent(eventoSeleccionado._id, eventoSeleccionado);
-      alert("Evento actualizado exitosamente");
+      mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
       setMostrarModal(false);
       setEventoSeleccionado(null);
       setModoEdicion(false);
       obtenerEventos();
     } catch (error) {
-      alert(`Error al actualizar el evento: ${error.message}`);
+      mostrarAlerta("Error"`Error al actualizar el evento: ${error.message}`);
     }
   };
 
   // Eliminar evento
   const eliminarEvento = async (id) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar este evento?")) return;
+    const confirmado = await mostrarConfirmacion(
+      "¿Estás seguro?",
+      "Esta acción eliminará el usuario de forma permanente."
+    );
+
+    if (!confirmado) return;
     try {
       await eventService.deleteEvent(id);
-      alert("Evento eliminado exitosamente");
+      mostrarAlerta("¡Éxito!", "Evento eliminado exitosamente");
       obtenerEventos();
     } catch (error) {
-      alert(`Error al eliminar el evento: ${error.message}`);
+      mostrarAlerta("Error"`Error al eliminar el evento: ${error.message}`);
     }
   };
 
@@ -125,6 +131,31 @@ const GestionEventos = () => {
     setMostrarModal(true);
   };
 
+  const [modalImagen, setModalImagen] = useState({ abierto: false, imagenes: [], actual: 0 });
+
+  const handleVerImagenes = (imagenes) => {
+    if (Array.isArray(imagenes) && imagenes.length > 0) {
+      setModalImagen({ abierto: true, imagenes, actual: 0 });
+    }
+  };
+  const handleNext = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual + 1) % prev.imagenes.length
+    }));
+  };
+
+  const handlePrev = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual - 1 + prev.imagenes.length) % prev.imagenes.length
+    }));
+  };
+
+  const cerrarModalImagen = () => {
+    setModalImagen({ abierto: false, imagenes: [], actual: 0 });
+  };
+
   // Abrir modal para editar
   const abrirModalEditar = (evento) => {
     setModoEdicion(true);
@@ -135,16 +166,59 @@ const GestionEventos = () => {
   return (
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
-        <h2>Gestión de Eventos</h2>
-        <button className="btn-primary" onClick={abrirModalCrear}>
+        <h1 className="titulo-admin" >Gestión de Eventos</h1>
+        <button className="btn-admin" onClick={abrirModalCrear}>
           + Nuevo Evento
         </button>
       </div>
-      <TablaEventos
-        eventos={eventos}
-        onEditar={abrirModalEditar}
-        onEliminar={eliminarEvento}
-      />
+      <section className="filtros-section-admin">
+        <div className="busqueda-contenedor">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Buscar Eventos..."
+            // value={busqueda}
+            //onChange={(e) => setBusqueda(e.target.value)}
+            className="input-busqueda"
+          />
+        </div>
+        <div className="filtro-grupo-admin">
+          <select className="filtro-dropdown">
+            <option>Todos los Roles</option>
+            <option>Administrador</option>
+            <option>Seminarista</option>
+            <option>Tesorero</option>
+            <option>Usuario Externo</option>
+          </select>
+          <select className="filtro-dropdown">
+            <option>Todos los Estados</option>
+            <option>Activo</option>
+            <option>Inactivo</option>
+            <option>Pendiente</option>
+          </select>
+        </div>
+
+        <TablaEventos
+          eventos={eventos}
+          onEditar={abrirModalEditar}
+          onEliminar={eliminarEvento}
+          onVerImagen={handleVerImagenes}
+        />
+        {modalImagen.abierto && (
+          <div className="modal-overlay" onClick={cerrarModalImagen}>
+            <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
+              <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
+              <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
+              <img
+                src={`http://localhost:3000/uploads/eventos/${modalImagen.imagenes[modalImagen.actual]}`}
+                alt="Imagen del evento"
+                className="imagen-modal"
+              />
+              <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+            </div>
+          </div>
+        )}
+      </section>
       <EventoModal
         mostrar={mostrarModal}
         modoEdicion={modoEdicion}

@@ -31,7 +31,7 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar }) => (
               <td>{user._id}</td>
               <td>
                 <div className="usuario-celda">
-                  <div className="usuario-avatar-admin">{user.nombre?.substring(0, 2).toUpperCase()}</div>
+                  <div className="user-avatar">{user.nombre?.substring(0, 2).toUpperCase()}</div>
                   <span>{user.nombre}</span>
                 </div>
               </td>

@@ -79,16 +79,16 @@ const InscripcionModal = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal-header">
+      <div className="modal-admin">
+        <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Inscripción" : "Nueva Inscripción"}</h3>
           <button className="modal-cerrar" onClick={onClose}>
             ✕
           </button>
         </div>
-        <div className="modal-body">
+        <div className="modal-body-admin">
           {!modoEdicion && (
-            <div className="form-grupo">
+            <div className="form-grupo-admin">
               <label>Usuario:</label>
               <input
                 type="text"
@@ -99,7 +99,7 @@ const InscripcionModal = ({
               />
             </div>
           )}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Nombre:</label>
             <input
               type="text"
@@ -112,7 +112,7 @@ const InscripcionModal = ({
             />
           </div>
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Apellido:</label>
             <input
               type="text"
@@ -126,7 +126,7 @@ const InscripcionModal = ({
           </div>
 
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Tipo de Documento:</label>
             <select
               value={modoEdicion ? inscripcionSeleccionada?.tipoDocumento : nuevaInscripcion.tipoDocumento}
@@ -146,7 +146,7 @@ const InscripcionModal = ({
           </div>
 
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Número de Documento:</label>
             <input
               type="text"
@@ -161,7 +161,7 @@ const InscripcionModal = ({
           </div>
 
            {!modoEdicion && (  
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Correo:</label>
             <input
               type="email"
@@ -173,7 +173,7 @@ const InscripcionModal = ({
           </div>
           )}
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Teléfono:</label>
             <input
               type="text"
@@ -188,7 +188,7 @@ const InscripcionModal = ({
           </div>
 
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Edad:</label>
             <input
               type="number"
@@ -203,7 +203,7 @@ const InscripcionModal = ({
           </div>
 
               
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Evento:</label>
             <select
               value={modoEdicion ? inscripcionSeleccionada?.evento : nuevaInscripcion.evento}
@@ -224,7 +224,7 @@ const InscripcionModal = ({
           </div>
 
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Categoría:</label>
             <select
               value={modoEdicion ? inscripcionSeleccionada?.categoria : nuevaInscripcion.categoria}
@@ -245,7 +245,7 @@ const InscripcionModal = ({
           </div>
 
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Estado:</label>
             <select
               value={modoEdicion ? inscripcionSeleccionada?.estado : nuevaInscripcion.estado}
@@ -263,7 +263,7 @@ const InscripcionModal = ({
           </div>
 
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Observaciones:</label>
             <input
               type="text"
@@ -277,7 +277,7 @@ const InscripcionModal = ({
             />
           </div>
         </div>
-        <div className="modal-footer">
+        <div className="modal-footer-admin">
           <button className="btn-secondary" onClick={onClose}>
             Cancelar
           </button>

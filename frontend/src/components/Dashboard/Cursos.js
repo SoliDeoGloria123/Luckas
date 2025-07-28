@@ -213,8 +213,8 @@ const Cursos = () => {
   return (
     <div className="cursos-container">
       <div className="page-header-Academicos">
-        <h2>Gestión de Cursos</h2>
-        <button className="btn-primary" onClick={() => abrirModal()}>
+        <h1 className="titulo-admin">Gestión de Cursos</h1>
+        <button className="btn-admin" onClick={() => abrirModal()}>
           Crear Nuevo Curso
         </button>
       </div>

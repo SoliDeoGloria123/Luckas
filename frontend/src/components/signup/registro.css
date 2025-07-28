@@ -1,30 +1,10 @@
-:root {
-    --default-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFang SC",
-        "Hiragino Sans GB", "Microsoft Yahei UI", "Microsoft Yahei",
-        "Source Han Sans CN", sans-serif;
-}
-
-
-.logo {
-
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 167px;
-    height: auto;
-    font-size: 0px;
-    z-index: 10;
-   
-}
-
-.luckas2 {
+.luckas-registro{
 
     display: block;
     position: relative;
-    height: 52px;
+    height: 45px;
     margin: 0 0 0 0;
-    color: #050505;
+    color: #2563eb;
     font-family: Bebas Neue, var(--default-font-family);
     font-size: 56px;
     font-weight: 400;
@@ -33,238 +13,747 @@
     white-space: nowrap;
     z-index: 6;
 }
-
-.ent2 {
-    display: block;
-    position: relative;
-    height: 14px;
-    margin: -2px 0 0 90px;
-    color: #0a0a0a;
-    font-family: Bebas Neue, var(--default-font-family);
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 14px;
-    text-align: left;
-    white-space: nowrap;
-    letter-spacing: 0.96px;
-    z-index: 7;
-}
-
-.secundario {
-    display: block;
-    position: relative;
-    height: 14px;
-    margin: -2px 0 0 90px;
-    color: #0a0a0a;
-    font-family: Bebas Neue, var(--default-font-family);
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 14px;
-    text-align: left;
-    white-space: nowrap;
-    letter-spacing: 0.96px;
-    z-index: 7;
-}
-
-.container{
-  font-family: var(--default-font-family);
-  background-color: #f5f5f5;
-  margin: 0;
-  padding: 15px;
-  box-sizing: border-box;
+/* Contenedor principal */
+.register-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  flex-direction: column;
 }
 
-
-.registro-wrapper {
-  width: 100%;
-  max-width: 500px;
-  padding: 20px;
-  background-color: white;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+/* Header */
+.register-header {
   text-align: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.registro-logo {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  font-size: 0;
-  z-index: 10;
-}
-
-.logo-principal {
-  display: block;
-  color: #050505;
-  font-family: 'Bebas Neue', var(--default-font-family);
-  font-size: 56px;
-  line-height: 52px;
-}
-
-.logo-secundario {
-  display: block;
-  margin-left: 90px;
-  color: #0a0a0a;
-  font-family: 'Bebas Neue', var(--default-font-family);
-  font-size: 12px;
-  letter-spacing: 0.96px;
-}
-
-.registro-caja {
+.logo-registro {
   display: flex;
-  flex-direction: column;
-  gap: 32px;
-  align-items: center;
-  position: relative;
-}
-
-.registro-titulo {
-  color: #202020;
-  font-family: "Roboto-Bold", sans-serif;
-  font-size: 37px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.registro-texto {
-  color: #414141;
-  font-family: "Roboto-Regular", sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  margin: 0;
-}
-
-.formulario {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  align-items: center;
-  width: 100%;
-}
-
-
-.grupo-input-doble {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  width: 100%;
-}
-
-/* Estilo personalizado para el select de tipo de documento */
-select[name="tipoDocumento"] {
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-family: "Roboto-Regular", sans-serif;
- 
-  outline: none;
-  width: 100%;
-  height: 41px;
-  background: #f8f9fa;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23414141" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7.293 7.293a1 1 0 011.414 0L10 8.586l1.293-1.293a1 1 0 111.414 1.414l-2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  background-size: 20px 20px;
-}
-
-select[name="tipoDocumento"]:focus {
-  border-color: #0033ff;
-  box-shadow: 0 0 0 2px rgba(0, 51, 255, 0.1);
-}
-
-.campo-input {
-   display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: calc(50% - 6px);
-}
-.campo-input2{
-     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: 100%;
-    
-}
-
-
-
-.campo-input
-.campo-input2 input {
-  border-radius: 8px;
-  border: 1px solid #000000;
-  padding: 9px 16px;
-  font-size: 14px;
-  font-family: "Roboto-Regular", sans-serif;
-  color: #414141;
-  outline: none;
-  width: 100%;
-  height: 48px;
-}
-
-
-.registro-botones {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  width: 100%;
-  align-items: center;
-}
-
-.btn-principal {
-  background: #0033ff;
-  border-radius: 8px;
-  padding: 14px 24px;
-  color: white;
-  font-size: 16px;
-  font-family: "Inter-SemiBold", sans-serif;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-}
-
-.btn-google {
-  border-radius: 8px;
-  border: 1px solid #414141;
-  background-color: white;
-  padding: 12px 24px;
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.logo-registro-icon {
+  font-size: 2rem;
+  color: #f59e0b;
+}
+
+.logo-registro h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.register-header p {
+  color: #64748b;
+  font-size: 1rem;
+}
+
+/* Contenido principal */
+.registro-contenedor {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.form-contanedor {
   width: 100%;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.icono-google {
-  width: 24px;
-  height: 24px;
+.form-header-registro {
+  text-align: center;
+  padding: 2rem 2rem 1rem;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
 }
 
-.enlace {
-  color: #335CFF;
-  font-family: "Roboto-Regular", sans-serif;
-  font-size: 16px;
+.form-header-registro h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.form-header-registro p {
+  color: #bfdbfe;
+  font-size: 1rem;
+}
+
+/* Formulario */
+.registro-form {
+  padding: 2rem;
+}
+
+/* Pasos del formulario */
+.form-step {
+  display: none;
+}
+
+.form-step.active {
+  display: block;
+  animation: fadeIn 0.5s ease-out;
+}
+
+tep-header-registro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.step-header h3 {
+  color: #1e293b;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step-icon-registro {
+  color: #2563eb;
+}
+
+.step-indicator-registro {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  
+}
+
+/* Grupos de formulario */
+.form-row-registro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group-registro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-group-registro label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.input-group-registro {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: #9ca3af;
+  z-index: 1;
+}
+
+.input-group-registro input,
+.input-group-registro select {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 2.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f9fafb;
+  font-family: inherit;
+}
+
+.input-group-registro input:focus,
+.input-group-registro select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.toggle-password {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: color 0.3s ease;
+  z-index: 2;
+}
+
+.toggle-password:hover {
+  color: #2563eb;
+}
+
+/* Hint de contraseña */
+.password-hint {
+  color: #6b7280;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* Checkboxes */
+.checkbox-group {
+  margin: 1.5rem 0;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.checkbox-container input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-radius: 0.25rem;
+  position: relative;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: #1d4ed8;
   text-decoration: underline;
 }
 
-.registro-footer {
-  position: absolute;
-  bottom: 10px;
-  right: 16px;
-  font-size: 12px;
-  color: #666;
+/* Navegación del formulario */
+.form-navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.btn-primary-registro,
+.btn-secondary-registro {
+  padding: 0.875rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.btn-primary-registro {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary-registro:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 15px -3px rgba(37, 99, 235, 0.4);
+}
+
+.btn-secondary-registro {
+  background: white;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+}
+
+.btn-secondary-registro:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+/* Barra de progreso */
+.progress-container {
+  padding: 1.5rem 2rem;
+  background: #f8fafc;
+  border-top: 1px solid #e5e7eb;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-step {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.progress-step.active {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+}
+
+/* Footer */
+.register-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.register-footer p {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.footer-note {
+  font-size: 0.8rem !important;
+  color: #9ca3af !important;
+  font-style: italic;
+}
+
+/* Mensaje de éxito */
+.success-message-container {
+  text-align: center;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: #059669;
+  margin-bottom: 1.5rem;
+  animation: bounceIn 0.8s ease-out;
+}
+
+.success-icon svg {
+  width: 1em;
+  height: 1em;
+}
+
+.success-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.success-text {
+  font-size: 1.1rem;
+  color: #475569;
+  margin-bottom: 2rem;
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+/* ------------------ RESPONSIVE DESIGN ------------------ */
+
+/* Variables para breakpoints */
+:root {
+  --breakpoint-mobile: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-laptop: 992px;
+  --breakpoint-desktop: 1200px;
+}
+
+/* Estilos base (mobile first) - Ya incluidos en tu CSS */
+
+/* Pequeños móviles (≤480px) */
+@media (max-width: 480px) {
+  .register-container {
+    padding: 0.5rem;
+    min-height: calc(100vh - 1rem);
+  }
+
+  .register-header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .logo-registro {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .logo-registro h1 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .logo-registro-icon {
+    font-size: 1.8rem;
+  }
+
+  .luckas-registro {
+    font-size: 2.5rem;
+    height: auto;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .form-header-registro {
+    padding: 1rem;
+  }
+
+  .form-header-registro h2 {
+    font-size: 1.4rem;
+  }
+
+  .form-header-registro p {
+    font-size: 0.875rem;
+  }
+
+  .registro-form {
+    padding: 1rem;
+  }
+
+  .form-row-registro {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .input-group-registro input,
+  .input-group-registro select {
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .step-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .step-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .step-indicator-registro {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .form-navigation {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+
+  .btn-primary-registro,
+  .btn-secondary-registro {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .progress-container {
+    padding: 1rem;
+  }
+
+  .progress-step {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
+  .register-footer {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .success-message-container {
+    padding: 2rem 1rem;
+  }
+
+  .success-title {
+    font-size: 1.5rem;
+  }
+
+  .success-text {
+    font-size: 1rem;
+  }
+}
+
+/* Tabletas (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .register-container {
+    padding: 1rem;
+  }
+
+  .register-header {
+    padding: 1.5rem;
+  }
+
+  .logo-registro h1 {
+    font-size: 1.75rem;
+  }
+
+  .luckas-registro {
+    font-size: 3rem;
+  }
+
+  .form-header-registro {
+    padding: 1.5rem;
+  }
+
+  .form-header-registro h2 {
+    font-size: 1.6rem;
+  }
+
+  .registro-form {
+    padding: 1.5rem;
+  }
+
+  .form-row-registro {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .step-header {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .form-navigation {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .btn-primary-registro,
+  .btn-secondary-registro {
+    min-width: auto;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+/* Tabletas grandes (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .register-container {
+    max-width: 700px;
+    padding: 1.5rem;
+  }
+
+  .form-row-registro {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-group-registro.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .registro-form {
+    padding: 2rem;
+  }
+
+  .progress-container {
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* Laptops (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .register-container {
+    max-width: 800px;
+    padding: 2rem;
+  }
+
+  .form-contanedor {
+    max-width: 800px;
+  }
+}
+
+/* Escritorios grandes (≥1200px) */
+@media (min-width: 1200px) {
+  .register-container {
+    max-width: 900px;
+    padding: 3rem;
+  }
+
+  .form-contanedor {
+    max-width: 900px;
+  }
+}
+
+/* Ajustes para pantallas muy altas */
+@media (min-height: 900px) {
+  .register-container {
+    justify-content: center;
+  }
+}
+
+/* Orientación horizontal en móviles */
+@media (max-width: 991px) and (orientation: landscape) {
+  .register-container {
+    padding: 1rem;
+    min-height: auto;
+  }
+
+  .registro-contenedor {
+    align-items: flex-start;
+    padding-bottom: 2rem;
+  }
+
+  .form-row-registro {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Ajustes para pantallas pequeñas en altura */
+@media (max-height: 600px) and (min-width: 768px) {
+  .register-container {
+    padding: 1rem;
+  }
+
+  .register-header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-header-registro {
+    padding: 1rem;
+  }
+
+  .registro-form {
+    padding: 1rem;
+  }
+
+  .form-navigation {
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+}
+
+/* Ajustes específicos para el formulario de varios pasos */
+@media (max-width: 767px) {
+  .form-step .form-row-registro {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

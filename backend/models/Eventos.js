@@ -14,7 +14,8 @@ const eventoSchema = new mongoose.Schema({
     trim: true
   },
   imagen: {
-    type: String // URL o nombre del archivo
+    type: [String],
+    trim: true // URL o nombre del archivo
   },
   precio: {
     type: Number,
@@ -69,8 +70,8 @@ const eventoSchema = new mongoose.Schema({
   }],
   prioridad: {
     type: String,
-    enum: ['Alta', 'Normal', 'Baja'],
-    default: 'Normal'
+    enum: ['Alta', 'Media', 'Baja'],
+    default: 'Media'
   },
   observaciones: {
     type: String

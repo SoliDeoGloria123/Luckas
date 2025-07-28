@@ -15,16 +15,16 @@ const TareaModal = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal-header">
+      <div className="modal-admin">
+        <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Tarea" : "Crear Nueva Tarea"}</h3>
           <button className="modal-cerrar" onClick={onClose}>
             ✕
           </button>
         </div>
-        <div className="modal-body">
+        <div className="modal-body-admin">
           {/* Título */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Título:</label>
             <input
               type="text"
@@ -40,7 +40,7 @@ const TareaModal = ({
           </div>
 
           {/* Descripción */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Descripción:</label>
             <textarea
               value={modoEdicion ? tareaSeleccionada?.descripcion : nuevaTarea.descripcion}
@@ -55,7 +55,7 @@ const TareaModal = ({
           </div>
 
           {/* Fecha Límite */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Fecha Límite:</label>
             <input
               type="date"
@@ -70,7 +70,7 @@ const TareaModal = ({
           </div>
 
           {/* Asignado A */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Asignado a:</label>
             <select
               value={modoEdicion ? tareaSeleccionada?.asignadoA : nuevaTarea.asignadoA}
@@ -91,7 +91,7 @@ const TareaModal = ({
           </div>
 
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Asignado por:</label>
             <select
               value={modoEdicion ? tareaSeleccionada?.asignadoPor : nuevaTarea.asignadoPor}
@@ -112,7 +112,7 @@ const TareaModal = ({
           </div>
 
           {/* Prioridad */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Prioridad:</label>
             <select
               value={modoEdicion ? tareaSeleccionada?.prioridad : nuevaTarea.prioridad}
@@ -130,7 +130,7 @@ const TareaModal = ({
           </div>
 
           {/* Estado */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Estado:</label>
             <select
               value={modoEdicion ? tareaSeleccionada?.estado : nuevaTarea.estado}
@@ -149,7 +149,7 @@ const TareaModal = ({
           </div>
         </div>
 
-        <div className="modal-footer">
+        <div className="modal-footer-admin">
           <button className="btn-secondary" onClick={onClose}>
             Cancelar
           </button>

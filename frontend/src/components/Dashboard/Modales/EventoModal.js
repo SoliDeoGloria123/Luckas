@@ -15,15 +15,15 @@ const EventoModal = ({
   if (!mostrar) return null;
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal-header">
+      <div className="modal-admin">
+        <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Evento" : "Nueva Evento"}</h3>
           <button className="modal-cerrar" onClick={onClose}>
             ✕
           </button>
         </div>
-        <div className="modal-body">
-          <div className="form-grupo">
+        <div className="modal-body-admin">
+          <div className="form-grupo-admin">
             <label>Nombre Evento:</label>
             <input
               type="text"
@@ -38,7 +38,7 @@ const EventoModal = ({
           </div>
 
           {!modoEdicion && (
-            <div className="form-grupo">
+            <div className="form-grupo-admin">
               <label>Descripcion Evento:</label>
               <input
                 type="text"
@@ -49,7 +49,7 @@ const EventoModal = ({
               />
             </div>
           )}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Precio Evento:</label>
             <input
               type="number"
@@ -62,7 +62,7 @@ const EventoModal = ({
               placeholder="Nombre del Evento"
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Categoría:</label>
             <select
               value={modoEdicion ? eventoSeleccionado?.categoria : nuevoEvento.categoria}
@@ -82,7 +82,7 @@ const EventoModal = ({
             </select>
           </div>
           {!modoEdicion && (
-            <div className="form-grupo">
+            <div className="form-grupo-admin">
               <label>Etiquetas Evento:</label>
               <input
                 type="text"
@@ -94,7 +94,7 @@ const EventoModal = ({
               />
             </div>
           )}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Fecha del Evento:</label>
             <input
               type="date"
@@ -106,7 +106,7 @@ const EventoModal = ({
               }
             />
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Hora de Inicio:</label>
             <input
               type="time"
@@ -119,7 +119,7 @@ const EventoModal = ({
             />
           </div>
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Hora de Fin:</label>
             <input
               type="time"
@@ -132,7 +132,7 @@ const EventoModal = ({
             />
           </div>
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Lugar:</label>
             <input
               type="text"
@@ -146,7 +146,7 @@ const EventoModal = ({
             />
           </div>
           {!modoEdicion && (
-            <div className="form-grupo">
+            <div className="form-grupo-admin">
               <label>Dirección:</label>
               <input
                 type="text"
@@ -158,7 +158,7 @@ const EventoModal = ({
               />
             </div>
           )}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Cupos Totales:</label>
             <input
               type="number"
@@ -171,7 +171,7 @@ const EventoModal = ({
             />
           </div>
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Cupos Disponibles:</label>
             <input
               type="number"
@@ -184,7 +184,7 @@ const EventoModal = ({
             />
           </div>
 
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Prioridad:</label>
             <select
               value={modoEdicion ? eventoSeleccionado?.prioridad : nuevoEvento.prioridad}
@@ -196,12 +196,12 @@ const EventoModal = ({
             >
               <option value="">Seleccione...</option>
               <option value="Alta">Alta</option>
-              <option value="Normal">Normal</option>
+              <option value="Media">Media</option>
               <option value="Baja">Baja</option>
             </select>
           </div>
           {!modoEdicion && (
-            <div className="form-grupo">
+            <div className="form-grupo-admin">
               <label>Observaciones:</label>
               <input
                 type="text"
@@ -213,7 +213,7 @@ const EventoModal = ({
               />
             </div>
           )}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Estado:</label>
             <select
               value={modoEdicion ? eventoSeleccionado?.active : nuevoEvento.active}
@@ -230,7 +230,7 @@ const EventoModal = ({
           </div>
 
                 {!modoEdicion && (
-            <div className="form-grupo">
+            <div className="form-grupo-admin">
               <label>Imagen:</label>
               <input
                 type="file"
@@ -246,7 +246,7 @@ const EventoModal = ({
 
 
 
-        <div className="modal-footer">
+        <div className="modal-footer-admin">
           <button className="btn-secondary" onClick={onClose}>
             Cancelar
           </button>

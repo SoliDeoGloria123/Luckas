@@ -1,7 +1,8 @@
 import React from "react";
+import { FaEye } from "react-icons/fa";
 
 
-const CabanaTabla = ({ cabanas, onEditar, onEliminar }) => (
+const CabanaTabla = ({ cabanas, onEditar, onEliminar, onVerImagen }) => (
   <div className="tabla-contenedor">
     <table className="tabla-usuarios">
       <thead>
@@ -31,23 +32,35 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar }) => (
               <td>{cabana.descripcion}</td>
               <td>{cabana.capacidad}</td>
               <td>{cabana.categoria?.nombre || cabana.categoria || "N/A"}</td>
-               <td>{cabana.precio}</td>
+              <td>{cabana.precio}</td>
               <td>
                 <span className={`badge-estado estado-${(cabana.estado || "pendiente").toLowerCase()}`}>
                   {cabana.estado || "Pendiente"}
                 </span>
               </td>
               <td>{cabana.creadoPor?.nombre || cabana.creadoPor || "N/A"}</td>
-              <td>{cabana.imagen || "N/A"}</td>
               <td>
-                <button className="btn-editar" onClick={() => onEditar(cabana)}>
-                  ✏️
-                </button>
-                {onEliminar && (
-                  <button className="btn-eliminar" onClick={() => onEliminar(cabana._id)}>
-                    🗑️
+                {Array.isArray(cabana.imagen) && cabana.imagen.length > 0 ? (
+                  <button onClick={() => onVerImagen(cabana.imagen)} className="btn-ver-imagen">
+                    <FaEye />
                   </button>
+                ) : (
+                  "Sin imagen"
                 )}
+              </td>
+
+              <td>
+                <div className="acciones-botones">
+                  <button className="btn-editar" onClick={() => onEditar(cabana)}>
+                    ✏️
+                  </button>
+                  {onEliminar && (
+                    <button className="btn-eliminar" onClick={() => onEliminar(cabana._id)}>
+                      🗑️
+                    </button>
+
+                  )}
+                </div>
               </td>
             </tr>
           ))

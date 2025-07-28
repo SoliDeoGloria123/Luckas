@@ -3,6 +3,7 @@ import { cabanaService } from "../../services/cabanaService";
 import { categorizacionService } from "../../services/categorizacionService";
 import CabanaTabla from "./Tablas/CabanaTabla";
 import CabanaModal from "./Modales/CabanaModal";
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
 const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [cabanas, setCabanas] = useState([]);
@@ -46,14 +47,28 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       let cats = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
       setCategorias(cats);
     } catch (err) {
-      setError("Error al obtener categorías: " + err.message);
+      setError("Error","Error al obtener categorías: " + err.message);
     }
   };
-
   // CRUD
   const crearCabana = async () => {
     try {
-      await cabanaService.create(nuevaCabana);
+      const formData = new FormData();
+      formData.append("nombre", nuevaCabana.nombre);
+      formData.append("descripcion", nuevaCabana.descripcion);
+      formData.append("capacidad", nuevaCabana.capacidad);
+      formData.append("categoria", nuevaCabana.categoria);
+      formData.append("precio", nuevaCabana.precio);
+      formData.append("estado", nuevaCabana.estado);
+      formData.append("ubicacion", nuevaCabana.ubicacion);
+
+      if (Array.isArray(nuevaCabana.imagen)) {
+        nuevaCabana.imagen.forEach(imagen => {
+          formData.append("imagen",imagen);
+        });
+      }
+      await cabanaService.create(formData);
+      mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente");
       setMostrarModal(false);
       setNuevaCabana({
         nombre: "",
@@ -62,34 +77,41 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
         categoria: "",
         precio: "",
         estado: "disponible",
-        imagen: "",
+        imagen: [],
         ubicacion: ""
       });
       obtenerCabanas();
-    } catch (err) {
-      setError("Error al crear la cabaña: " + err.message);
+    } catch (error) {
+      mostrarAlerta("Error", "Error al crear la cabaña: " + error.message, "error");
     }
   };
 
   const actualizarCabana = async () => {
     try {
       await cabanaService.update(cabanaSeleccionada._id, cabanaSeleccionada);
+      mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente");
       setMostrarModal(false);
       setCabanaSeleccionada(null);
       setModoEdicion(false);
       obtenerCabanas();
     } catch (err) {
-      setError("Error al actualizar cabaña: " + err.message);
+      mostrarAlerta("Error", "Error al actualizar cabaña: " + err.message);
     }
   };
 
   const eliminarCabana = async (id) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar esta cabaña?")) return;
+    const confirmado = await mostrarConfirmacion(
+      "¿Estás seguro?",
+      "Esta acción eliminará el usuario de forma permanente."
+    );
+
+    if (!confirmado) return;
     try {
       await cabanaService.delete(id);
+      mostrarAlerta("¡Éxito!", "Cabaña eliminada exitosamente");
       obtenerCabanas();
     } catch (err) {
-      setError("Error al eliminar cabaña: " + err.message);
+      mostrarAlerta("Error", "Error al eliminar cabaña: " + err.message);
     }
   };
 
@@ -121,31 +143,91 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     return texto.includes(busqueda.toLowerCase());
   });
 
+  const [modalImagen, setModalImagen] = useState({ abierto: false, imagenes: [], actual: 0 });
+
+  const handleVerImagenes = (imagenes) => {
+    if (Array.isArray(imagenes) && imagenes.length > 0) {
+      setModalImagen({ abierto: true, imagenes, actual: 0 });
+    }
+  };
+
+  const handleNext = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual + 1) % prev.imagenes.length
+    }));
+  };
+
+  const handlePrev = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual - 1 + prev.imagenes.length) % prev.imagenes.length
+    }));
+  };
+
+  const cerrarModalImagen = () => {
+    setModalImagen({ abierto: false, imagenes: [], actual: 0 });
+  };
   return (
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
-        <h2>Gestión de Cabañas</h2>
+        <h1 className="titulo-admin">Gestión de Cabañas</h1>
         {canCreate && !readOnly && (
-          <button className="btn-primary" onClick={abrirModalCrear}>
+          <button className="btn-admin" onClick={abrirModalCrear}>
             ➕ Nueva Cabaña
           </button>
         )}
       </div>
-      <div className="busqueda-contenedor">
-        <input
-          type="text"
-          placeholder="🔍 Buscar Cabaña..."
-          value={busqueda}
-          onChange={e => setBusqueda(e.target.value)}
-          className="input-busqueda"
+      <section className="filtros-section-admin">
+        <div className="busqueda-contenedor">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Buscar Cabaña..."
+            value={busqueda}
+            onChange={e => setBusqueda(e.target.value)}
+            className="input-busqueda"
+          />
+        </div>
+        <div className="filtro-grupo-admin">
+          <select className="filtro-dropdown">
+            <option>Todos los Roles</option>
+            <option>Administrador</option>
+            <option>Seminarista</option>
+            <option>Tesorero</option>
+            <option>Usuario Externo</option>
+          </select>
+          <select className="filtro-dropdown">
+            <option>Todos los Estados</option>
+            <option>Activo</option>
+            <option>Inactivo</option>
+            <option>Pendiente</option>
+          </select>
+        </div>
+
+
+        {error && <div className="error-message">{error}</div>}
+        <CabanaTabla
+          cabanas={cabanasFiltradas}
+          onEditar={canEdit && !readOnly ? abrirModalEditar : null}
+          onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarCabana : null}
+          onVerImagen={handleVerImagenes}
         />
-      </div>
-      {error && <div className="error-message">{error}</div>}
-      <CabanaTabla
-        cabanas={cabanasFiltradas}
-        onEditar={canEdit && !readOnly ? abrirModalEditar : null}
-        onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarCabana : null}
-      />
+        {modalImagen.abierto && (
+          <div className="modal-overlay" onClick={cerrarModalImagen}>
+            <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
+              <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
+              <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
+              <img
+                src={`http://localhost:3000/uploads/cabanas/${modalImagen.imagenes[modalImagen.actual]}`}
+                alt="Imagen de la cabaña"
+                className="imagen-modal"
+              />
+              <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+            </div>
+          </div>
+        )}
+      </section>
       <CabanaModal
         mostrar={mostrarModal}
         modoEdicion={modoEdicion}

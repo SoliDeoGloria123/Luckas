@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaCategorias from "./Tablas/CategorizacionTabla";
 import CategorizacionModal from "./Modales/CategorizacionModal";
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
 const GestionCategorizacion = () => {
     const [categorias, setCategorias] = useState([]);
@@ -28,12 +29,12 @@ const GestionCategorizacion = () => {
     const crearCategoria = async () => {
         try {
             await categorizacionService.create(nuevaCategoria);
-            alert("Categoría creada exitosamente");
+            mostrarAlerta("¡EXITO!", "Categoría creada exitosamente");
             setNuevaCategoria({ nombre: "", codigo: "", estado: "activo" });
             setMostrarModal(false);
             obtenerCategorias();
         } catch (error) {
-            alert(`Error al crear la categoría: ${error.message}`);
+            mostrarAlerta("ERROR", `Error al crear la categoría: ${error.message}`);
         }
     };
 
@@ -41,25 +42,29 @@ const GestionCategorizacion = () => {
     const actualizarCategoria = async () => {
         try {
             await categorizacionService.update(categoriaSeleccionada._id, categoriaSeleccionada);
-            alert("Categoría actualizada exitosamente");
+            mostrarAlerta("¡EXITO!", "Categoría actualizada exitosamente");
             setCategoriaSeleccionada(null);
             setModoEdicion(false);
             setMostrarModal(false);
             obtenerCategorias();
         } catch (error) {
-            alert(`Error al actualizar la categoría: ${error.message}`);
+            mostrarAlerta("ERROR", `Error al actualizar la categoría: ${error.message}`);
         }
     };
 
     // Eliminar categoría
     const eliminarCategoria = async (id) => {
-        if (!window.confirm("¿Estás seguro de que quieres eliminar esta categoría?")) return;
+        const confirmado = await mostrarConfirmacion(
+            "¿Estás seguro?",
+            "Esta acción eliminará el usuario de forma permanente."
+        );
+        if (!confirmado) return;
         try {
             await categorizacionService.delete(id);
-            alert("Categoría eliminada exitosamente");
+            mostrarAlerta("¡Éxito!", "Categoría eliminada exitosamente");
             obtenerCategorias();
         } catch (error) {
-            alert(`Error al eliminar la categoría: ${error.message}`);
+            mostrarAlerta(`Error al eliminar la categoría: ${error.message}`);
         }
     };
 
@@ -80,16 +85,44 @@ const GestionCategorizacion = () => {
     return (
         <div className="seccion-usuarios">
             <div className="page-header-Academicos">
-                <h2>Categorización</h2>
-                <button className="btn-primary" onClick={abrirModalCrear}>
+                <h1 className="titulo-admin">Categorización</h1>
+                <button className="btn-admin" onClick={abrirModalCrear}>
                     + Nueva Categoría
                 </button>
             </div>
-            <TablaCategorias
-                categorias={categorias}
-                onEditar={abrirModalEditar}
-                onEliminar={eliminarCategoria}
-            />
+            <section className="filtros-section-admin">
+                <div className="busqueda-contenedor">
+                    <i class="fas fa-search"></i>
+                    <input
+                        type="text"
+                        placeholder="Buscar Categorizacion..."
+                        //value={busqueda}
+                        //onChange={(e) => setBusqueda(e.target.value)}
+                        className="input-busqueda"
+                    />
+                </div>
+                <div className="filtro-grupo-admin">
+                    <select className="filtro-dropdown">
+                        <option>Todos los Roles</option>
+                        <option>Administrador</option>
+                        <option>Seminarista</option>
+                        <option>Tesorero</option>
+                        <option>Usuario Externo</option>
+                    </select>
+                    <select className="filtro-dropdown">
+                        <option>Todos los Estados</option>
+                        <option>Activo</option>
+                        <option>Inactivo</option>
+                        <option>Pendiente</option>
+                    </select>
+                </div>
+
+                <TablaCategorias
+                    categorias={categorias}
+                    onEditar={abrirModalEditar}
+                    onEliminar={eliminarCategoria}
+                />
+            </section>
             <CategorizacionModal
                 mostrar={mostrarModal}
                 modoEdicion={modoEdicion}

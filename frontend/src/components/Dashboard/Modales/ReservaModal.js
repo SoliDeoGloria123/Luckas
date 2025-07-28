@@ -40,15 +40,15 @@ const ReservasModal = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal-header">
+      <div className="modal-admin">
+        <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Reserva" : "Crear Nueva Reserva"}</h3>
           <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
 
-        <div className="modal-body">
+        <div className="modal-body-admin">
           {/* Usuario */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Usuario:</label>
             <select
               value={modoEdicion ? reservaSeleccionada?.usuario : nuevaReserva.usuario}
@@ -69,7 +69,7 @@ const ReservasModal = ({
           </div>
 
           {/* Cabaña */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Cabaña:</label>
             <select
               value={modoEdicion ? reservaSeleccionada?.cabana : nuevaReserva.cabana}
@@ -102,7 +102,7 @@ const ReservasModal = ({
               ))}
             </select>
           </div>
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Precio:</label>
             <input
               type="number"
@@ -112,7 +112,7 @@ const ReservasModal = ({
             />
           </div>
           {/* Fecha Inicio */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Fecha Inicio:</label>
             <input
               type="date"
@@ -131,7 +131,7 @@ const ReservasModal = ({
           </div>
 
           {/* Fecha Fin */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Fecha Fin:</label>
             <input
               type="date"
@@ -152,7 +152,7 @@ const ReservasModal = ({
 
 
           {/* Estado */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Estado:</label>
             <select
               value={modoEdicion ? reservaSeleccionada?.estado : nuevaReserva.estado || "Pendiente"}
@@ -170,7 +170,7 @@ const ReservasModal = ({
             </select>
           </div>
           {/* Activo */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Activo:</label>
             <select
               value={modoEdicion ? (reservaSeleccionada?.activo ? 'true' : 'false') : (nuevaReserva.activo !== undefined ? (nuevaReserva.activo ? 'true' : 'false') : 'true')}
@@ -187,7 +187,7 @@ const ReservasModal = ({
           </div>
 
           {/* Observaciones */}
-          <div className="form-grupo">
+          <div className="form-grupo-admin">
             <label>Observaciones:</label>
             <input
               type="text"
@@ -204,7 +204,7 @@ const ReservasModal = ({
 
         </div>
 
-        <div className="modal-footer">
+        <div className="modal-footer-admin">
           <button className="btn-secondary" onClick={onClose}>Cancelar</button>
           <button className="btn-primary" onClick={onSubmit}>
             {modoEdicion ? "Guardar Cambios" : "Crear Reserva"}

@@ -3,7 +3,8 @@ import { solicitudService } from "../../services/solicirudService";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaUnificadaSolicitudes from "./Tablas/SolicitudTabla";
 import SolicitudModal from "./Modales/SolicitudModal";
-import useBusqueda from "./Busqueda/useBusqueda"; 
+import useBusqueda from "./Busqueda/useBusqueda";
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
 
 
@@ -46,7 +47,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       const data = await solicitudService.getAll();
       setSolicitudes(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
-      alert("Error al obtener solicitudes");
+      mostrarAlerta("Error","Error al obtener solicitudes");
     }
   };
 
@@ -69,7 +70,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
   const crearSolicitud = async () => {
     try {
       await solicitudService.create(nuevaSolicitud);
-      alert("Solicitud creada exitosamente");
+      mostrarAlerta("¡Éxito!","Solicitud creada exitosamente");
       setMostrarModal(false);
       setNuevaSolicitud({
         solicitante: "",
@@ -85,7 +86,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       });
       obtenerSolicitudes();
     } catch (error) {
-      alert(`Error al crear la solicitud: ${error.message}`);
+      mostrarAlerta("Error",`Error al crear la solicitud: ${error.message}`);
     }
   };
 
@@ -93,25 +94,30 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
   const actualizarSolicitud = async () => {
     try {
       await solicitudService.update(solicitudSeleccionada._id, solicitudSeleccionada);
-      alert("Solicitud actualizada exitosamente");
+      mostrarAlerta("¡Éxito!","Solicitud actualizada exitosamente");
       setMostrarModal(false);
       setSolicitudSeleccionada(null);
       setModoEdicionSolicitud(false);
       obtenerSolicitudes();
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      mostrarAlerta("Error",`Error: ${error.message}`);
     }
   };
 
   // Eliminar solicitud
   const eliminarSolicitud = async (id) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar esta solicitud?")) return;
+      const confirmado = await mostrarConfirmacion(
+    "¿Estás seguro?",
+    "Esta acción eliminará el usuario de forma permanente."
+  );
+
+    if (!confirmado) return;
     try {
       await solicitudService.delete(id);
-      alert("Solicitud eliminada exitosamente");
+      mostrarAlerta("¡Éxito!","Solicitud eliminada exitosamente");
       obtenerSolicitudes();
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      mostrarAlerta("Error",`Error: ${error.message}`);
     }
   };
 
@@ -143,25 +149,44 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
     <div className="seccion-usuarios"> {/* Aplica el mismo contenedor que Dashboard */}
       <div className="page-header-Academicos">
         <h2>Gestión de Solicitudes</h2>
-        <button className="btn-primary" onClick={abrirModalCrearSolicitud}>
+        <button className="btn-admin" onClick={abrirModalCrearSolicitud}>
           ➕ Nuevo Solicitud
         </button>
       </div>
-         <div className="busqueda-contenedor">
+      <section className="filtros-section-admin">
+        <div className="busqueda-contenedor">
+          <i class="fas fa-search"></i>
           <input
-          type="text"
-          placeholder="🔍 Buscar Solicitud..."
-          value={busquedaSolicitudes}
-          onChange={e => setBusquedaSolicitudes(e.target.value)}
-          className="input-busqueda"
-          style={{ marginLeft: 10, width: 300 }}
-        />
-         </div>
+            type="text"
+            placeholder="Buscar Solicitud..."
+            value={busquedaSolicitudes}
+            onChange={e => setBusquedaSolicitudes(e.target.value)}
+            className="input-busqueda"
+            style={{ marginLeft: 10, width: 300 }}
+          />
+        </div>
+        <div className="filtro-grupo-admin">
+          <select className="filtro-dropdown">
+            <option>Todos los Roles</option>
+            <option>Administrador</option>
+            <option>Seminarista</option>
+            <option>Tesorero</option>
+            <option>Usuario Externo</option>
+          </select>
+          <select className="filtro-dropdown">
+            <option>Todos los Estados</option>
+            <option>Activo</option>
+            <option>Inactivo</option>
+            <option>Pendiente</option>
+          </select>
+        </div>
+     
       <TablaUnificadaSolicitudes
         datosUnificados={{ solicitudes: solicitudesFiltradas, inscripciones: [], reservas: [] }}
         abrirModalEditarSolicitud={(canEdit && !readOnly) ? abrirModalEditarSolicitud : null}
         eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
       />
+       </section>
       <SolicitudModal
         mostrar={mostrarModal}
         modoEdicion={modoEdicionSolicitud}
