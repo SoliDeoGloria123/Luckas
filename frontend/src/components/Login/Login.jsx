@@ -2,6 +2,7 @@
 import { useState } from "react"
 import { authService } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import "./Login.css"
 
 const Login = () => {
@@ -22,7 +23,7 @@ const Login = () => {
       if (data.user.role === 'admin') {
         navigate('/admin/users');
       } else if (data.user.role === 'tesorero') {
-        navigate('/tesorero/dashboard');
+        navigate('/tesorero');
       } else if (data.user.role === 'seminarista') {
         navigate('/seminarista');
       } else if (data.user.role === 'externo') {
@@ -33,6 +34,7 @@ const Login = () => {
       }
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión');
+      mostrarAlerta('Error', 'Credenciales incorrectas, por favor verifica tus datos.', 'error');
     }
   };
 

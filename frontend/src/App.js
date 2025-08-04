@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login/Login';
 import Registro from './components/signup/registro';
 import DashboardAdmin from "./components/Dashboard/DashboardAdmin";
-import DashboardTesorero from "./components/Dashboard/DashboardTesorero";
+import DashboardTesorero from "./components/Tesorero/DashboardTesorero";
 import DashboardSeminarista from "./components/Seminarista/DashboardSeminarista";
 import EventosNavegables from "./components/Seminarista/pages/EventosNavegables";
 import CabanasNavegables from "./components/Seminarista/pages/CabanasNavegables";
@@ -11,6 +11,7 @@ import MisInscripciones from "./components/Seminarista/pages/MisInscripciones";
 import MisReservas from "./components/Seminarista/pages/MisReservas";
 import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
+
 
 // Componente para usuarios externos
 const ExternalHome = () => {
@@ -35,9 +36,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup/registro" element={<Registro />} />
         <Route path="/admin/users" element={<DashboardAdmin />} />
-        <Route path="/tesorero/dashboard" element={<DashboardTesorero />} />
+        <Route path="/tesorero" element={<DashboardTesorero />} />
         <Route path="/seminarista" element={<DashboardSeminarista />} />
-         {/* Rutas para las secciones del dashboard seminarista */}
         <Route path="/dashboard/seminarista/eventos" element={<EventosNavegables />} />
         <Route path="/dashboard/seminarista/cabanas" element={<CabanasNavegables />} />
         <Route path="/dashboard/seminarista/mis-inscripciones" element={<MisInscripciones />} />

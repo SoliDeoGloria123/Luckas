@@ -20,8 +20,20 @@ import "./Dashboard.css";
 
 const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, modoTesorero = false, userRole, readOnly = false, canCreate = true, canEdit = true, canDelete = true }) => {
 
-
-
+const [usuarios, setUsuarios] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [busqueda, setBusqueda] = useState("");
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [sidebarAbierto, setSidebarAbierto] = useState(true);
+  const [seccionActiva, setSeccionActiva] = useState("dashboard");
+  const [estadisticas, setEstadisticas] = useState({
+    totalUsuarios: 0,
+    usuariosActivos: 0,
+    administradores: 0,
+    nuevosHoy: 0,
+  });
   const [usuarioActual, setUsuarioActual] = useState(usuarioProp);
 
   // Si no se pasa usuario como prop, obtenerlo desde localStorage
@@ -38,26 +50,13 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
     if (onCerrarSesionProp) {
       onCerrarSesionProp();
     } else {
-      localStorage.removeItem('token');
+      localStorage.removeItem('token'); 
       localStorage.removeItem('usuario');
       window.location.href = '/login';
     }
   };
 
-  const [usuarios, setUsuarios] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [busqueda, setBusqueda] = useState("");
-  const [mostrarModal, setMostrarModal] = useState(false);
-  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
-  const [modoEdicion, setModoEdicion] = useState(false);
-  const [sidebarAbierto, setSidebarAbierto] = useState(true);
-  const [seccionActiva, setSeccionActiva] = useState("dashboard");
-  const [estadisticas, setEstadisticas] = useState({
-    totalUsuarios: 0,
-    usuariosActivos: 0,
-    administradores: 0,
-    nuevosHoy: 0,
-  });
+  
   const [nuevoUsuario, setNuevoUsuario] = useState({
     nombre: "",
     apellido: "",
@@ -104,8 +103,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
   const crearUsuario = async () => {
     try {
       await userService.createUser(nuevoUsuario);
-
-      mostrarAlerta("¡Éxito!","Usuario creado exitosamente");
+      mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
       setMostrarModal(false);
       setNuevoUsuario({
         nombre: "",
@@ -137,7 +135,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
         role: usuarioSeleccionado.role,
         estado: usuarioSeleccionado.estado,
       });
-       mostrarAlerta("¡Éxito!", "Usuario actualizado exitosamente");
+      mostrarAlerta("¡Éxito!", "Usuario actualizado exitosamente");
       setMostrarModal(false);
       setUsuarioSeleccionado(null);
       setModoEdicion(false);
@@ -159,25 +157,25 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
       }
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error",`Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`);
     }
   };
 
   // Eliminar usuario
   const eliminarUsuario = async (userId) => {
     const confirmado = await mostrarConfirmacion(
-    "¿Estás seguro?",
-    "Esta acción eliminará el usuario de forma permanente."
-  );
+      "¿Estás seguro?",
+      "Esta acción eliminará el usuario de forma permanente."
+    );
 
     if (!confirmado) return;
-    
+
     try {
       await userService.deleteUser(userId);
-       mostrarAlerta("¡Éxito!" ,"Usuario eliminado exitosamente");
+      mostrarAlerta("¡Éxito!", "Usuario eliminado exitosamente");
       obtenerUsuarios();
     } catch (error) {
-       mostrarAlerta("Error", `No se pudo eliminar el usuario: ${error.message}`);
+      mostrarAlerta("Error", `No se pudo eliminar el usuario: ${error.message}`);
     }
   };
   //para cerrar la sesion 
