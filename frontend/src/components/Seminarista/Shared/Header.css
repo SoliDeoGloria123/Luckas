@@ -1,122 +1,264 @@
-/* Header estilo dark y gradiente para Dashboard tipo crypto */
-.seminarista-header {
-  background: linear-gradient(90deg, #23243a 0%, #3b1c5c 100%);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.13);
-  padding: 1.5rem 0;
+:root {
+  --default-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft Yahei UI", "Microsoft Yahei",
+    "Source Han Sans CN", sans-serif;
+
+  --color-blue-primary: #2563eb;
+  --color-blue-dark: #1d4ed8;
+  --color-purple: #8b5cf6;
+  --color-green: #059669;
+  --color-gray-dark: #334155;
+  --color-gray-light: #f1f5f9;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  
+  /* Colores adicionales para gradientes y efectos */
+  --color-blue-light: #3b82f6;
+  --color-purple-light: #a78bfa;
+  --color-green-light: #10b981;
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Espaciado */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* Bordes */
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-2xl: 24px;
+}
+/* Header */
+.header-seminario {
+  background: linear-gradient(135deg, var(--color-gray-dark) 0%, var(--color-gray-800) 100%);
+  color: var(--color-white);
+  padding: var(--spacing-md) 0;
+  box-shadow: var(--shadow-lg);
   position: sticky;
   top: 0;
-  z-index: 100;
-  width: 100vw;
-  left: 0;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  min-width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
+  z-index: 1000;
 }
-.seminarista-header-content {
-  width: 100vw;
-  max-width: 100vw;
-  margin: 0;
+
+.header-container-seminario {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
-  box-sizing: border-box;
-}
-.seminarista-header-left {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-.logo-section-seminarista {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
 }
 
-.titulo-gradiente {
-  background: linear-gradient(90deg, #5eead4 0%, #818cf8 50%, #f472b6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.header-left-seminario {
+  display: flex;
+  align-items: center;
 }
-.badge-seminarista {
-  background: #18181b;
-  color: #a5b4fc;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  padding: 0.2rem 0.7rem;
-  margin-left: 9.7rem;
+
+.logo-seminario {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.luckas-seminario {
+  display: block;
+  position: relative;
+  height: 52px;
+  margin: 0 0 0 0;
+  color: #ffffff;
+  font-family: Bebas Neue, var(--default-font-family);
+  font-size: 63px;
+  font-weight: 400;
+  line-height: 52px;
+  text-align: left;
+  white-space: nowrap;
+  z-index: 6;
+}
+.role-badge-seminario {
+  background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-purple-light) 100%);
+  color: var(--color-white);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-lg);
+  font-size: 0.875rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
-}
-:root {
-    --default-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFang SC",
-        "Hiragino Sans GB", "Microsoft Yahei UI", "Microsoft Yahei",
-        "Source Han Sans CN", sans-serif;
+  box-shadow: var(--shadow-sm);
 }
 
-
-.logo-seminarista {
-
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 167px;
-    height: auto;
-    font-size: 0px;
-    z-index: 10;
-   
-}
-
-.luckas-seminarista {
-
-    display: block;
-    position: relative;
-    height: 52px;
-    margin: 0 0 0 0;
-    color: #ffffff;
-    font-family: Bebas Neue, var(--default-font-family);
-    font-size: 60px;
-    font-weight: 400;
-    line-height: 52px;
-    text-align: left;
-    white-space: nowrap;
-    z-index: 6;
-}
-
-.ent-seminarista {
-    display: block;
-    position: relative;
-    height: 14px;
-    margin: -2px 0 0 90px;
-    color: #ffffff;
-    font-family: Bebas Neue, var(--default-font-family);
-    font-size: 17px;
-    font-weight: 400;
-    line-height: 14px;
-    text-align: left;
-    white-space: nowrap;
-    letter-spacing: 0.96px;
-    z-index: 7;
-}
-.seminarista-header-right {
+.header-nav-seminario {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: var(--spacing-sm);
 }
 
-@media (max-width: 900px) {
-  .seminarista-header-content {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 0 0.5rem;
-  }
-  .seminarista-header {
-    padding: 0.5rem 0;
-  }
+.nav-item-seminario {
+  color: var(--color-gray-300);
+  text-decoration: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-item-seminario:hover {
+  color: var(--color-white);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item-seminario.active {
+  color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-blue-primary) 0%, var(--color-blue-light) 100%);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-right-seminario {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.header-icons-seminario {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.icon-btn-seminario {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--color-white);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.icon-btn-seminario:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.notification-dot-seminario {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: var(--color-purple);
+  border-radius: 50%;
+  border: 2px solid var(--color-white);
+}
+
+.user-profile-seminario {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.user-avatar-seminario {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--color-blue-primary) 0%, var(--color-blue-light) 100%);
+  color: var(--color-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/*.user-name-seminario {
+  font-weight: 500;
+  color: var(--color-white);
+}*/
+
+.user-menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.user-menu-button {
+  background: #2563eb;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.user-menu-button:hover {
+  background: #1e40af;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-5px);
+  transition: all 0.2s ease-in-out;
+  z-index: 100;
+}
+
+.user-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  gap: 0.5rem;
+  color: #374151;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #0156ff;
+}
+
+.dropdown-divider {
+  border: none;
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0.3rem 0;
 }

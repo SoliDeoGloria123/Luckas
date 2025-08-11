@@ -1,0 +1,619 @@
+import React, { useEffect, useState } from 'react';
+import { useAuthCheck } from '../hooks/useAuthCheck';
+import { eventService } from '../../../services/eventService';
+import { inscripcionService } from '../../../services/inscripcionService';
+import './EventosSeminario.css';
+import Header from '../Shared/Header';
+import Footer from '../../footer/Footer'
+import formualrioIncripcion from '../pages/FormularioInscripcion';
+import FormularioInscripcion from '../pages/FormularioInscripcion';
+
+const EventosSeminario = () => {
+  const { user } = useAuthCheck('seminarista');
+  const [eventos, setEventos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
+  const [inscripcionMsg, setInscripcionMsg] = useState(null);
+  const [inscripcionLoading, setInscripcionLoading] = useState(false);
+  const [misInscripciones, setMisInscripciones] = useState([]);
+
+  useEffect(() => {
+    const fetchEventosEInscripciones = async () => {
+      try {
+
+        // Cambia getMisInscripciones por getAll (no existe getMisInscripciones en el service)
+        const [eventosData, inscripcionesData] = await Promise.all([
+          eventService.getAllEvents(),
+          inscripcionService.getAll()
+        ]);
+
+
+        let eventosArray = [];
+        if (eventosData && Array.isArray(eventosData.data)) {
+          eventosArray = eventosData.data;
+        } else if (Array.isArray(eventosData)) {
+          eventosArray = eventosData;
+        } else if (eventosData && Array.isArray(eventosData.eventos)) {
+          eventosArray = eventosData.eventos;
+        }
+
+        let inscripcionesArray = [];
+        if (Array.isArray(inscripcionesData)) {
+          inscripcionesArray = inscripcionesData;
+        } else if (inscripcionesData && Array.isArray(inscripcionesData.data)) {
+          inscripcionesArray = inscripcionesData.data;
+        }
+
+        setEventos(eventosArray);
+        setMisInscripciones(inscripcionesArray);
+      } catch (err) {
+        setError('No se pudieron cargar los eventos.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEventosEInscripciones();
+  }, []);
+
+  const estaInscrito = (eventoId) => {
+    return misInscripciones.some(insc => insc.evento === eventoId || insc.evento?._id === eventoId);
+  };
+
+  const handleInscribir = (evento) => {
+    if (estaInscrito(evento._id)) {
+      setInscripcionMsg('Ya estás inscrito en este evento.');
+      return;
+    }
+    setEventoSeleccionado(evento);
+  };
+
+  const handleSubmitInscripcion = async (e) => {
+    e.preventDefault();
+    setInscripcionMsg(null);
+    setInscripcionLoading(true);
+    const form = e.target;
+
+    try {
+      const nuevaInscripcion = {
+        usuario: user._id,
+        evento: eventoSeleccionado._id,
+        categoria: form.categoria.value || eventoSeleccionado.categoria,
+        nombre: form.nombre.value,
+        apellido: form.apellido.value,
+        tipoDocumento: form.tipoDocumento.value,
+        numeroDocumento: form.numeroDocumento.value,
+        correo: form.correo.value,
+        telefono: form.telefono.value,
+        edad: parseInt(form.edad.value),
+        observaciones: form.observaciones.value || undefined
+      };
+
+      const response = await inscripcionService.create(nuevaInscripcion);
+
+      // Actualizar la lista de inscripciones
+      setMisInscripciones(prev => [...prev, response.data || response]);
+
+      setInscripcionMsg('¡Inscripción exitosa!');
+      setTimeout(() => {
+        setEventoSeleccionado(null);
+        setInscripcionMsg(null);
+      }, 1800);
+    } catch (err) {
+      console.error('Error al inscribirse:', err);
+      setInscripcionMsg('Error al inscribirse. Intenta de nuevo.');
+    } finally {
+      setInscripcionLoading(false);
+    }
+
+  };
+ // 4. Cerrar el formulario
+  const handleCloseFormulario = () => {
+    setEventoSeleccionado(null);
+    setInscripcionMsg(null);
+  };
+  return (
+    <div className="eventos-seminario">
+      <Header></Header>
+      <main className="main-content-seminarista">
+        <div className="breadcrumb-seminarista">
+          <button className="back-btn-seminarista">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 12H5" />
+              <path d="M12 19l-7-7 7-7" />
+            </svg>
+            Volver al Dashboard
+          </button>
+        </div>
+
+        <div className="page-header-seminarista">
+          <div className="page-title-seminarista">
+            <h1>Eventos del Seminario</h1>
+            <p>Descubre y participa en los eventos más importantes de nuestra comunidad</p>
+          </div>
+          <div className="page-stats-seminarista">
+            <div className="stat-item-seminarista">
+              <span className="stat-number-seminarista">24</span>
+              <span className="stat-label-seminarista">Eventos Activos</span>
+            </div>
+            <div className="stat-item-seminarista">
+              <span className="stat-number-seminarista">156</span>
+              <span className="stat-label-seminarista">Participantes</span>
+            </div>
+            <div className="stat-item-seminarista">
+              <span className="stat-number-seminarista">8</span>
+              <span className="stat-label-seminarista">Este Mes</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="filters-section-seminarista">
+          <div className="search-bar-seminarista">
+            <svg className="search-icon-seminarista" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input type="text" placeholder="Buscar eventos..." id="searchInput" />
+          </div>
+
+          <div className="filter-buttons">
+            <button className="filter-btn active" data-category="todos">Todos</button>
+            <button className="filter-btn" data-category="espiritual">Espiritual</button>
+            <button className="filter-btn" data-category="academico">Académico</button>
+            <button className="filter-btn" data-category="social">Social</button>
+            <button className="filter-btn" data-category="deportivo">Deportivo</button>
+          </div>
+
+          <div className="sort-dropdown">
+            <select id="sortSelect">
+              <option value="fecha">Ordenar por fecha</option>
+              <option value="precio">Ordenar por precio</option>
+              <option value="popularidad">Ordenar por popularidad</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="events-grid" id="eventsGrid">
+          {eventos.length === 0 ? (
+            <p>No hay eventos disponibles en este momento.</p>
+          ) : (
+            eventos.map(ev => {
+              const inscrito = estaInscrito(ev._id);
+              return (
+                <div className="event-card" data-category="academico" key={ev._id}>
+                  <div className="event-image">
+                    {Array.isArray(ev.imagen) && ev.imagen.length > 0 ? (
+                      <img
+                        src={`http://localhost:3000/uploads/eventos/${ev.imagen[0]}`}
+                        alt="Imagen del evento"
+                      />
+                    ) : (
+                      <p>Sin imagen</p>
+                    )}
+                    <div className="event-badge priority-high">Prioridad {ev.prioridad} </div>
+                    <div className="event-date">
+                      <span className="day">15</span>
+                      <span className="month">Mar</span>
+                    </div>
+                  </div>
+                  <div className="event-content">
+                    <div className="event-category">Académico</div>
+                    <h3 className="event-title">{ev.nombre || '-'}</h3>
+                    <p className="event-description">{ev.descripcion}</p>
+
+                    <div className="event-details">
+                      <div className="detail-item--seminarista">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                          <line x1="16" y1="2" x2="16" y2="6" />
+                          <line x1="8" y1="2" x2="8" y2="6" />
+                          <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                        <span>{ev.fechaEvento}</span>
+                      </div>
+                      <div className="detail-item--seminarista">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="12,6 12,12 16,14" />
+                        </svg>
+                        <span>{ev.horaInicio}- {ev.horaFin}</span>
+                      </div>
+                      <div className="detail-item--seminarista">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                          <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        <span>{ev.lugar}</span>
+                      </div>
+                    </div>
+
+                    <div className="event-footer">
+                      <div className="event-price">
+                        <span className="price">${ev.precio}</span>
+                        <span className="price-label">COP</span>
+                      </div>
+                      <div className="event-participants">
+                        <div className="participants-avatars">
+                          <div className="avatar">J</div>
+                          <div className="avatar">M</div>
+                          <div className="avatar">C</div>
+                          <div className="avatar-count">+12</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button className="evento-btn" onClick={() => handleInscribir(ev)} disabled={inscrito}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 12l2 2 4-4" />
+                      </svg>
+                        {inscrito ? "Ya inscrito" : "Inscribirme"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          {eventoSeleccionado && (
+            <FormularioInscripcion
+            evento={eventoSeleccionado}
+            usuario={user}
+            loading={inscripcionLoading}
+            mesage={inscripcionMsg}
+            onsubmit={handleSubmitInscripcion}
+            onClose={handleCloseFormulario}
+            />
+          )}
+
+
+          {/* Evento 2 */}
+          <div className="event-card" data-category="espiritual">
+            <div className="event-image">
+              <img src="/placeholder.svg?height=200&width=300" alt="Retiro Espiritual" />
+              <div className="event-badge priority-medium">Media Prioridad</div>
+              <div className="event-date">
+                <span className="day">22</span>
+                <span className="month">Mar</span>
+              </div>
+            </div>
+            <div className="event-content">
+              <div className="event-category">Espiritual</div>
+              <h3 className="event-title">Retiro Espiritual</h3>
+              <p className="event-description">Tres días de reflexión y crecimiento espiritual en la montaña</p>
+
+              <div className="event-details">
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  <span>22-24 de Marzo, 2024</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12,6 12,12 16,14" />
+                  </svg>
+                  <span>Todo el día</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <span>Casa de Retiros</span>
+                </div>
+              </div>
+
+              <div className="event-footer">
+                <div className="event-price">
+                  <span className="price">$200,000</span>
+                  <span className="price-label">COP</span>
+                </div>
+                <div className="event-participants">
+                  <div className="participants-avatars">
+                    <div className="avatar">A</div>
+                    <div className="avatar">L</div>
+                    <div className="avatar">P</div>
+                    <div className="avatar-count">+8</div>
+                  </div>
+                </div>
+              </div>
+
+              <button className="event-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4" />
+                </svg>
+                Inscribirme
+              </button>
+            </div>
+          </div>
+
+          {/* Evento 3 */}
+          <div className="event-card" data-category="social">
+            <div className="event-image">
+              <img src="/placeholder.svg?height=200&width=300" alt="Cena de Gala" />
+              <div className="event-badge priority-high">Alta Prioridad</div>
+              <div className="event-date">
+                <span className="day">30</span>
+                <span className="month">Mar</span>
+              </div>
+            </div>
+            <div className="event-content">
+              <div className="event-category">Social</div>
+              <h3 className="event-title">Cena de Gala Anual</h3>
+              <p className="event-description">Celebración anual con la comunidad seminarial</p>
+
+              <div className="event-details">
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  <span>30 de Marzo, 2024</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12,6 12,12 16,14" />
+                  </svg>
+                  <span>7:00 PM - 11:00 PM</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <span>Salón de Eventos</span>
+                </div>
+              </div>
+
+              <div className="event-footer">
+                <div className="event-price">
+                  <span className="price">$150,000</span>
+                  <span className="price-label">COP</span>
+                </div>
+                <div className="event-participants">
+                  <div className="participants-avatars">
+                    <div className="avatar">R</div>
+                    <div className="avatar">S</div>
+                    <div className="avatar">T</div>
+                    <div className="avatar-count">+25</div>
+                  </div>
+                </div>
+              </div>
+
+              <button className="event-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4" />
+                </svg>
+                Inscribirme
+              </button>
+            </div>
+          </div>
+
+          {/* Evento 4 */}
+          <div className="event-card" data-category="deportivo">
+            <div className="event-image">
+              <img src="/placeholder.svg?height=200&width=300" alt="Torneo de Fútbol" />
+              <div className="event-badge priority-low">Baja Prioridad</div>
+              <div className="event-date">
+                <span className="day">05</span>
+                <span className="month">Abr</span>
+              </div>
+            </div>
+            <div className="event-content">
+              <div className="event-category">Deportivo</div>
+              <h3 className="event-title">Torneo de Fútbol</h3>
+              <p className="event-description">Competencia deportiva entre los diferentes grupos del seminario</p>
+
+              <div className="event-details">
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  <span>5 de Abril, 2024</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12,6 12,12 16,14" />
+                  </svg>
+                  <span>8:00 AM - 6:00 PM</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <span>Campo Deportivo</span>
+                </div>
+              </div>
+
+              <div className="event-footer">
+                <div className="event-price">
+                  <span className="price">Gratis</span>
+                  <span className="price-label"></span>
+                </div>
+                <div className="event-participants">
+                  <div className="participants-avatars">
+                    <div className="avatar">D</div>
+                    <div className="avatar">F</div>
+                    <div className="avatar">G</div>
+                    <div className="avatar-count">+18</div>
+                  </div>
+                </div>
+              </div>
+
+              <button className="event-btn" >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4" />
+                </svg>
+                Inscribirme
+              </button>
+            </div>
+          </div>
+
+          {/* Evento 5 */}
+          <div className="event-card" data-category="academico">
+            <div className="event-image">
+              <img src="/placeholder.svg?height=200&width=300" alt="Seminario de Teología" />
+              <div className="event-badge priority-high">Alta Prioridad</div>
+              <div className="event-date">
+                <span className="day">12</span>
+                <span className="month">Abr</span>
+              </div>
+            </div>
+            <div className="event-content">
+              <div className="event-category">Académico</div>
+              <h3 className="event-title">Seminario de Teología</h3>
+              <p className="event-description">Profundización en temas teológicos contemporáneos</p>
+
+              <div className="event-details">
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  <span>12 de Abril, 2024</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12,6 12,12 16,14" />
+                  </svg>
+                  <span>2:00 PM - 6:00 PM</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <span>Aula Magna</span>
+                </div>
+              </div>
+
+              <div className="event-footer">
+                <div className="event-price">
+                  <span className="price">$100,000</span>
+                  <span className="price-label">COP</span>
+                </div>
+                <div className="event-participants">
+                  <div className="participants-avatars">
+                    <div className="avatar">H</div>
+                    <div className="avatar">I</div>
+                    <div className="avatar">K</div>
+                    <div className="avatar-count">+15</div>
+                  </div>
+                </div>
+              </div>
+
+              <button className="event-btn" >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4" />
+                </svg>
+                Inscribirme
+              </button>
+            </div>
+          </div>
+
+          {/* Evento 6 */}
+          <div className="event-card" data-category="espiritual">
+            <div className="event-image">
+              <img src="/placeholder.svg?height=200&width=300" alt="Jornada de Oración" />
+              <div className="event-badge priority-medium">Media Prioridad</div>
+              <div className="event-date">
+                <span className="day">20</span>
+                <span className="month">Abr</span>
+              </div>
+            </div>
+            <div className="event-content">
+              <div className="event-category">Espiritual</div>
+              <h3 className="event-title">Jornada de Oración</h3>
+              <p className="event-description">Día dedicado a la oración y meditación comunitaria</p>
+
+              <div className="event-details">
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  <span>20 de Abril, 2024</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12,6 12,12 16,14" />
+                  </svg>
+                  <span>6:00 AM - 8:00 PM</span>
+                </div>
+                <div className="detail-item--seminarista">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <span>Capilla Principal</span>
+                </div>
+              </div>
+
+              <div className="event-footer">
+                <div className="event-price">
+                  <span className="price">Gratis</span>
+                  <span className="price-label"></span>
+                </div>
+                <div className="event-participants">
+                  <div className="participants-avatars">
+                    <div className="avatar">N</div>
+                    <div className="avatar">O</div>
+                    <div className="avatar">Q</div>
+                    <div className="avatar-count">+30</div>
+                  </div>
+                </div>
+              </div>
+
+              <button className="event-btn" >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4" />
+                </svg>
+                Inscribirme
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="load-more-section">
+          <button className="load-more-btn" >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+            Cargar más eventos
+          </button>
+        </div>
+      </main>
+
+      <div id="notification" className="notification">
+        <div className="notification-content">
+          <svg className="notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+          <span className="notification-message"></span>
+        </div>
+      </div>
+      <Footer></Footer>
+    </div>
+  );
+};
+
+export default EventosSeminario;

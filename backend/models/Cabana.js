@@ -36,10 +36,6 @@ const cabanaSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
      ref: 'usuarios' 
     },
-  ubicacion: { 
-    type: String, 
-    trim: true 
-  },
   imagen: {
     type: [String], // URL de imagen o nombre del archivo
     required: true

@@ -11,6 +11,7 @@ import MisInscripciones from "./components/Seminarista/pages/MisInscripciones";
 import MisReservas from "./components/Seminarista/pages/MisReservas";
 import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
+import Perfil from './components/Seminarista/Shared/MiPerfil';
 
 
 // Componente para usuarios externos
@@ -44,6 +45,7 @@ function App() {
         <Route path="/dashboard/seminarista/mis-reservas" element={<MisReservas />} />
         <Route path="/dashboard/seminarista/mis-solicitudes" element={<MisSolicitudes />} />
         <Route path="/dashboard/seminarista/nueva-solicitud" element={<NuevaSolicitud />} />
+        <Route path="/dashboard/seminarista/Mi-Perfil" element={<Perfil />} />
       </Routes>
     </Router>
   );
