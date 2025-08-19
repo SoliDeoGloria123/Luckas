@@ -95,21 +95,19 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
           <div className="user-profile-seminario">
             <div className="user-avatar-seminario">S</div>
             <button className="user-menu-button" onClick={toggleDropdown} >
-              Semianrio   ▾
+              Semianrio
+               <i class="fas fa-chevron-down"></i>
             </button>
             {/* <span className="user-name-seminario">Seminarista</span>*/}
-            <div className={`user-dropdown ${showUserDropdown ? "show" : ""}`}>
-              <a href="/dashboard/seminarista/Mi-Perfil" className="dropdown-item">
-        
+            <div className={`user-dropdown-header ${showUserDropdown ? "show" : ""}`}>
+              <a href="/dashboard/seminarista/Mi-Perfil" className="dropdown-item">    
                 <span>Mi Perfil</span>
               </a>
-              <a href="#" className="dropdown-item">
-             
+              <a href="/dashboard/seminarista/Configuracion" className="dropdown-item">
                 <span>Configuración</span>
               </a>
               <hr className="dropdown-divider" />
-              <a href="#" className="dropdown-item">
-            
+              <a href="" className="dropdown-item" onClick={handleLogout}>
                 <span>Cerrar Sesión</span>
               </a>
             </div>

@@ -15,6 +15,7 @@ import GestionTarea from "./GestionTarea";
 import GestioCabañas from "./GestioCabañas";
 import GestionReservas from "./GestionReservas";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import Footer from '../footer/Footer';
 import "./Dashboard.css";
 
 
@@ -281,6 +282,7 @@ const [usuarios, setUsuarios] = useState([]);
   }
 
   return (
+
     <div className="dashboard-contenedor">
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarAbierto ? "abierto" : "cerrado"}`}>
@@ -624,6 +626,7 @@ const [usuarios, setUsuarios] = useState([]);
         </main>
       </div>
     </div>
+  
   )
 }
 export default Dashboard

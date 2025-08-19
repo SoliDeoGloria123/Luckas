@@ -13,7 +13,7 @@
 
 
 /* Modal Overlay */
-.modal-overlay-reservation {
+.modal-overlay-seminarista-reserva {
     display: none;
     position: fixed;
     top: 0;
@@ -26,14 +26,14 @@
     padding: 20px;
 }
 
-.modal-overlay-reservation.active {
+.modal-overlay-seminarista-reserva.active {
     display: flex;
     align-items: flex-start;
     justify-content: center;
 }
 
 /* Modal Container */
-.modal-container {
+.modal-container-seminarista-reserva {
     background-color: var(--white);
     border-radius: 12px;
     max-width: 900px;
@@ -44,7 +44,7 @@
 }
 
 /* Header de la Cabaña */
-.cabin-header {
+.cabin-header-seminarista-reserva {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -291,7 +291,7 @@
 }
 
 /* Botones */
-.continue-button {
+.continue-button-seminarista-reserva {
     width: 100%;
     background-color: var(--primary-blue);
     color: var(--white);
@@ -305,7 +305,7 @@
     margin-top: 8px;
 }
 
-.continue-button:hover {
+.continue-button-seminarista-reserva:hover {
     background-color: #1d4ed8;
 }
 

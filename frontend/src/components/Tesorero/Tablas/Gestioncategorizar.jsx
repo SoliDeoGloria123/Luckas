@@ -55,98 +55,115 @@ const Gestioncategorizacion = () => {
   };
 
   return (
-    <div className="user-management-tesorero">
-      <div className="header-section">
-        <h2>Gestión de Categorizacion</h2>
-        <button className="add-user-btn" onClick={handleCreate}>
-          + Nuevo Categorizacion
+    <main className="main-content-tesorero">
+      <div className="page-header-tesorero">
+        <div className="dashboard-header-tesorero">
+          <button className="back-btn-tesorero">
+            <i className="fas fa-arrow-left"></i>
+          </button>
+          <div className="page-title-tesorero">
+            <h1>Gestión de Categorías</h1>
+            <p>Administra y organiza las categorías del sistema</p>
+          </div>
+        </div>
+
+        <button className="btn-primary-tesorero" onClick={handleCreate}>
+          <i className="fas fa-plus"></i>
+          Nueva Categoría
         </button>
       </div>
+      <div className="stats-grid-usuarios">
+        <div className="stat-card-usuarios">
+          <div className="stat-icon-usuarios blue">
+            <i class="fas fa-tags"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number-usuarios">4</div>
+            <div className="stat-label-usuarios">Total Categorías</div>
+          </div>
+        </div>
 
-      <div className="filters-section">
-        <input
-          type="text"
-          placeholder="Buscar usuario..."
-          className="search-input"
-        />
-        <select className="filter-select">
-          <option>Todos los Roles</option>
-          <option>Administrador</option>
-          <option>Tesorero</option>
-        </select>
-        <select className="filter-select">
-          <option>Todos los Estados</option>
-          <option>Activo</option>
-          <option>Inactivo</option>
-        </select>
+        <div className="stat-card-usuarios">
+          <div className="stat-icon-usuarios green">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number-usuarios">1</div>
+            <div className="stat-label-usuarios">Activas</div>
+          </div>
+          
+        </div>
+
+        <div className="stat-card-usuarios">
+          <div className="stat-icon-usuarios purple">
+            <i class="fas fa-star"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number-usuarios">1</div>
+            <div className="stat-label-usuarios">Principales</div>
+          </div>
+        
+        </div>
+
+        <div className="stat-card-usuarios">
+           <div className="stat-icon-usuarios orange">
+           <i className="fas fa-user-plus"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number-usuarios">2</div>
+            <div className="stat-label-usuarios">Nuevas Este Mes</div>
+          </div>
+        </div>
       </div>
 
-      <div className="users-table-container">
-        <table className="users-table">
+      <div className="filters-section-tesorero">
+        <div className="search-filters-tesorero">
+          <div className="search-input-container-tesorero">
+            <i className="fas fa-search"></i>
+            <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+          </div>
+          <select className="filter-select">
+            <option value="">Todos los roles</option>
+            <option value="administrador">Administrador</option>
+            <option value="tesorero">Tesorero</option>
+            <option value="seminarista">Seminarista</option>
+          </select>
+          <select id="statusFilter" className="filter-select">
+            <option value="">Todos los estados</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div className="export-actions">
+          <button className="btn-outline-tesorero" id="exportBtn">
+            <i className="fas fa-download"></i>
+          </button>
+          <button className="btn-outline-tesorero" id="importBtn">
+            <i className="fas fa-upload"></i>
+          </button>
+        </div>
+      </div>
+
+
+      <div className="table-container-tesorero">
+        <table className="users-table-tesorero">
           <thead>
             <tr>
+              <th>
+                <input type="checkbox" id="selectAll"></input>
+              </th>
               <th>USUARIO</th>
-              <th>EMAIL</th>
-              <th>TELÉFONO</th>
-              <th>DOCUMENTO</th>
               <th>ROL</th>
               <th>ESTADO</th>
-              <th>FECHA</th>
+              <th>ÚLTIMA ACTIVIDAD</th>
               <th>ACCIONES</th>
             </tr>
           </thead>
-          <tbody>
-            {users.map((user, index) => (
-              <tr key={user.id} className={index % 2 === 0 ? 'even-row' : 'odd-row'}>
-                <td>
-                  <div className="user-avatar">
-                    {user.username.charAt(0).toUpperCase()}
-                  </div>
-                  {user.username}
-                </td>
-                <td>{user.email}</td>
-                <td>{user.phone}</td>
-                <td>
-                  <div className="doc-info">
-                    <span className="doc-type">{user.docType}</span>
-                    <span className="doc-number">{user.docNumber}</span>
-                  </div>
-                </td>
-                <td>
-                  <span className={`role-badge ${user.role.includes("Admin") ? "admin" : "tesorero"
-                    }`}>
-                    {user.role}
-                  </span>
-                </td>
-                <td>
-                  <span className={`status-badge ${user.status === "ACTIVO" ? "active" : "inactive"
-                    }`}>
-                    {user.status}
-                  </span>
-                </td>
-                <td>{user.date}</td>
-                <td>
-                  <div className="actions">
-                    <button className="action-btn edit">
-                      ✏️
-                    </button>
-                    <button className="action-btn view" onClick={handleEdit}>
-                      👁️
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+          <tbody id="usersTableBody">
+
           </tbody>
         </table>
       </div>
-
-      <div className="pagination-controls">
-        <button className="pagination-btn">← Anterior</button>
-        <span>Página 1 de 5</span>
-        <button className="pagination-btn">Siguiente →</button>
-      </div>
-
       {showModal && (
         <CategorizacionModal
           mode={modalMode}
@@ -155,7 +172,7 @@ const Gestioncategorizacion = () => {
           onSubmit={handleSubmit}
         />
       )}
-    </div>
+    </main>
   );
 };
 

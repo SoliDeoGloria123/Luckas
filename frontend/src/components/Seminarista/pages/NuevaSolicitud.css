@@ -7,36 +7,36 @@
 
 
 /* Main Content */
-.main-content {
+.main-content-nuevasolicitud {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1rem;
 }
 
-.container {
+.container-nuevasolicitud {
     max-width: 800px;
     margin: 0 auto;
 }
 
-.page-header {
+.page-header-nuevasolicitud {
     text-align: center;
     margin-bottom: 2rem;
 }
 
-.page-header h1 {
+.page-header-nuevasolicitud h1 {
     font-size: 2rem;
     font-weight: bold;
     color: #1e293b;
     margin-bottom: 0.5rem;
 }
 
-.page-header p {
+.page-header-nuevasolicitud p {
     color: #64748b;
     font-size: 1rem;
 }
 
 /* Progress Steps */
-.progress-steps {
+.progress-steps-nuevasolicitud {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -44,7 +44,7 @@
     position: relative;
 }
 
-.progress-steps::before {
+.progress-steps-nuevasolicitud::before {
     content: '';
     position: absolute;
     top: 20px;
@@ -56,7 +56,7 @@
     z-index: 1;
 }
 
-.step {
+.step-nuevasolicitud {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -67,7 +67,7 @@
     padding: 0 1rem;
 }
 
-.step-number {
+.step-number-nuevasolicitud {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -80,7 +80,7 @@
     transition: all 0.3s;
 }
 
-.step-label {
+.step-label-nuevasolicitud {
     font-size: 0.875rem;
     color: #64748b;
     font-weight: 500;
@@ -106,30 +106,30 @@
 }
 
 /* Form Container */
-.form-container {
+.form-container-nuevasolicitud {
     background: white;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
-.step-content {
+.step-content-nuevasolicitud {
     padding: 2rem;
 }
 
-.step-header {
+.step-header-nuevasolicitud {
     margin-bottom: 2rem;
     position: relative;
 }
 
-.step-header h2 {
+.step-header-nuevasolicitud h2 {
     font-size: 1.5rem;
     font-weight: bold;
     color: #1e293b;
     margin-bottom: 0.5rem;
 }
 
-.step-header p {
+.step-header-nuevasolicitud p {
     color: #64748b;
 }
 

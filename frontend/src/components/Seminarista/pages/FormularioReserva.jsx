@@ -135,9 +135,9 @@ const closeReservationModal = () => {
       {/* Botón de prueba para abrir el modal */}
 
       {/* Modal */}
-      <div id="reservationModal" className="modal-overlay-reservation active">
-        <div className="modal-container">
-          <div className="cabin-header">
+      <div id="reservationModal" className="modal-overlay-seminarista-reserva active">
+        <div className="modal-container-seminarista-reserva">
+          <div className="cabin-header-seminarista-reserva">
             <div className="cabin-info">
               <h2 className="cabin-title">Cabaña del Bosque</h2>
               <p className="cabin-description">
@@ -348,7 +348,7 @@ const closeReservationModal = () => {
                   ></textarea>
                 </div>
 
-                <button type="submit" className="continue-button">
+                <button type="submit" className="continue-button-seminarista-reserva">
                   Continuar con la Reserva
                 </button>
               </form>
@@ -424,7 +424,7 @@ const closeReservationModal = () => {
                 <button type="button" className="back-button" onClick={() => goToStep(1)}>
                   Volver a Editar
                 </button>
-                <button type="button" className="continue-button" onClick={() => goToStep(3)}>
+                <button type="button" className="continue-button-seminarista-reserva" onClick={() => goToStep(3)}>
                   Confirmar y Proceder al Pago
                 </button>
               </div>

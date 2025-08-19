@@ -1,36 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import UsuarioModal from '../modal/UsuarioModal';
+import { userService } from '../../../services/userService'
 
 
 const Gestionusuarios = () => {
   // Datos de ejemplo
-  const users = [
-    {
-      id: "GSI0405100d800b0f9b2c5656",
-      username: "pedrasa",
-      email: "admin@gmail.com",
-      phone: "3115524272",
-      docType: "Cédula de ciudadanía",
-      docNumber: "117200207",
-      role: "(Administrador)",
-      status: "ACTIVO",
-      date: "2/8/2025"
-    },
-    {
-      id: "GSI0405100d800b0f9b2c5667",
-      username: "perera",
-      email: "sabat@mail.com",
-      phone: "1311354354",
-      docType: "Cédula de ciudadanía",
-      docNumber: "12135434354",
-      role: "(Tesorero)",
-      status: "ACTIVO",
-      date: "2/8/2025"
-    },
-    // Más usuarios...
-  ];
-
-
+  const [usuarios, setUsuarios] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
@@ -41,11 +16,6 @@ const Gestionusuarios = () => {
     setShowModal(true);
   };
 
-  const handleEdit = (item) => {
-    setModalMode('edit');
-    setCurrentItem(item);
-    setShowModal(true);
-  };
 
   const handleSubmit = (data) => {
     if (modalMode === 'create') {
@@ -55,98 +25,201 @@ const Gestionusuarios = () => {
     }
   };
 
+  //------------------------------------------------------------------------------------------------------------------------------------
+  //obtener usuarios
+  useEffect(() => {
+    obtenerUsuarios();
+  }, []);
+
+  const obtenerUsuarios = async () => {
+    try {
+      const data = await userService.getAllUsers();
+      const usuariosData = Array.isArray(data.data) ? data.data : [];
+      setUsuarios(usuariosData);
+    } catch (error) {
+      console.error("Error al obtener los usuarios de la base de datos", error.mensage);
+    }
+  };
+
+
+  /*const handleCerrarSesion = () => {
+    if (onCerrarSesionProp) {
+      onCerrarSesionProp();
+    } else {
+      localStorage.removeItem('token'); 
+      localStorage.removeItem('usuario');
+      window.location.href = '/login';
+    }
+  };*/
+
+
+
+
+
+  // Calcular estadísticas
+  /*const calcularEstadisticas = (usuariosData) => {
+    const hoy = new Date().toDateString();
+    setEstadisticas({
+      totalUsuarios: usuariosData.length,
+      usuariosActivos: usuariosData.filter((user) => user.status === "active").length,
+      administradores: usuariosData.filter((user) => user.role === "admin").length,
+      nuevosHoy: usuariosData.filter((user) => new Date(user.createdAt).toDateString() === hoy).length,
+    });
+  };*/
+
+
+  // Filtrar usuarios
+  /*const usuariosFiltrados = Array.isArray(usuarios)
+    ? usuarios.filter(
+      (user) =>
+        user.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        user.correo?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        user.role?.toLowerCase().includes(busqueda.toLowerCase())
+    )
+    : [];*/
+  /*-----------------------------------------------------------------------------------------------------------*/
+  /* const [datosUnificados, setDatosUnificados] = useState({
+     solicitudes: [],
+     inscripciones: [],
+     reservas: []
+   });*/
+
+
+
+
 
   return (
-    <div className="user-management-tesorero">
-      <div className="header-section">
-        <h2>Gestión de Usuarios</h2>
-        <button className="add-user-btn" onClick={handleCreate}>
-          + Nuevo Usuario
+    <main className="main-content-tesorero">
+      <div className="page-header-tesorero">
+        <div className="card-header-tesorero">
+          <button className="back-btn-tesorero">
+            <i className="fas fa-arrow-left"></i>
+          </button>
+          <div className="page-title-tesorero">
+            <h1>Gestión de Usuarios</h1>
+            <p>Administr a las cuentas de usuario del sistema</p>
+          </div>
+        </div>
+
+        <button className="btn-primary-tesorero" onClick={handleCreate}>
+          <i className="fas fa-plus"></i>
+          Nuevo Usuario
         </button>
       </div>
-
-      <div className="filters-section">
-        <input
-          type="text"
-          placeholder="Buscar usuario..."
-          className="search-input"
-        />
-        <select className="filter-select">
-          <option>Todos los Roles</option>
-          <option>Administrador</option>
-          <option>Tesorero</option>
-        </select>
-        <select className="filter-select">
-          <option>Todos los Estados</option>
-          <option>Activo</option>
-          <option>Inactivo</option>
-        </select>
+      <div className="stats-grid-usuarios">
+        <div className="stat-card-usuarios">
+          <div className="stat-icon-usuarios blue">
+            <i className="fas fa-users"></i>
+          </div>fGestionusuarios
+          <div className="stat-content">
+            <div className="stat-number-usuarios" id="totalUsers">5</div>
+            <div className="stat-label-usuarios">Total Usuarios</div>
+          </div>
+        </div>
+        <div className="stat-card-usuarios">
+          <div className="stat-icon-usuarios green">
+            <i className="fas fa-user-check"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number-usuarios" id="activeUsers">4</div>
+            <div className="stat-label-usuarios">Usuarios Activos</div>
+          </div>
+        </div>
+        <div className="stat-card-usuarios">
+          <div className="stat-icon-usuarios purple">
+            <i className="fas fa-user-shield"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number-usuarios" id="adminUsers">1</div>
+            <div className="stat-label-usuarios">Administradores</div>
+          </div>
+        </div>
+        <div className="stat-card-usuarios">
+          <div className="stat-icon-usuarios orange">
+            <i className="fas fa-user-plus"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number-usuarios" id="newUsers">12</div>
+            <div className="stat-label-usuarios">Nuevos Este Mes</div>
+          </div>
+        </div>
       </div>
 
-      <div className="users-table-container">
-        <table className="users-table">
+      <div className="filters-section-tesorero">
+        <div className="search-filters-tesorero">
+          <div className="search-input-container-tesorero">
+            <i className="fas fa-search"></i>
+            <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+          </div>
+          <select className="filter-select">
+            <option value="">Todos los roles</option>
+            <option value="administrador">Administrador</option>
+            <option value="tesorero">Tesorero</option>
+            <option value="seminarista">Seminarista</option>
+          </select>
+          <select id="statusFilter" className="filter-select">
+            <option value="">Todos los estados</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div className="export-actions">
+          <button className="btn-outline-tesorero" >
+            <i className="fas fa-download"></i>
+          </button>
+          <button className="btn-outline-tesorero" >
+            <i class="fas fa-share"></i>
+          </button>
+        </div>
+      </div>
+
+
+      <div className="table-container-tesorero">
+        <table className="users-table-tesorero">
           <thead>
             <tr>
-              <th>USUARIO</th>
-              <th>EMAIL</th>
-              <th>TELÉFONO</th>
-              <th>DOCUMENTO</th>
+              <th>
+                <input type="checkbox" id="selectAll"></input>
+              </th>
+              <th>ID</th>
+              <th>NOMBRE</th>
+              <th>APELLIDO</th>
+              <th>TIPO DE DOCUEMENTO</th>
+              <th>NUMERO DE DOCUMENTO </th>
+              <th>CORREO</th>
+              <th>TELEFONO</th>
               <th>ROL</th>
               <th>ESTADO</th>
-              <th>FECHA</th>
-              <th>ACCIONES</th>
+              <th>ACCINES</th>
             </tr>
           </thead>
-          <tbody>
-            {users.map((user, index) => (
-              <tr key={user.id} className={index % 2 === 0 ? 'even-row' : 'odd-row'}>
-                <td>
-                  <div className="user-avatar">
-                    {user.username.charAt(0).toUpperCase()}
-                  </div>
-                  {user.username}
-                </td>
-                <td>{user.email}</td>
-                <td>{user.phone}</td>
-                <td>
-                  <div className="doc-info">
-                    <span className="doc-type">{user.docType}</span>
-                    <span className="doc-number">{user.docNumber}</span>
-                  </div>
-                </td>
-                <td>
-                  <span className={`role-badge ${user.role.includes("Admin") ? "admin" : "tesorero"
-                    }`}>
-                    {user.role}
-                  </span>
-                </td>
-                <td>
-                  <span className={`status-badge ${user.status === "ACTIVO" ? "active" : "inactive"
-                    }`}>
-                    {user.status}
-                  </span>
-                </td>
-                <td>{user.date}</td>
-                <td>
-                  <div className="actions">
-                    <button className="action-btn edit">
-                      ✏️
-                    </button>
-                    <button className="action-btn view">
-                      👁️
-                    </button>
-                  </div>
-                </td>
+          <tbody id="usersTableBody">
+            {usuarios.length === 0 ? (
+              <tr>
+                <td colSpan={9}>No hay usuarios para mostrar</td>
               </tr>
-            ))}
+            ) : (
+              usuarios.map((user) => (
+                <tr hey={user._id}>
+                  <td>
+                    <input type="checkbox" />
+                  </td>
+                  <td>{user._id}</td>
+                  <td>{user.nombre}</td>
+                  <td>{user.apellido}</td>
+                  <td>{user.tipoDocumento}</td>
+                  <td>{user.numeroDocumento}</td>
+                  <td>{user.correo}</td>
+                  <td>{user.telefono}</td>
+                  <td>{user.role}</td>
+                  <td>{user.estado}</td>
+                </tr>
+
+              ))
+            )}
+
           </tbody>
         </table>
-      </div>
-
-      <div className="pagination-controls">
-        <button className="pagination-btn">← Anterior</button>
-        <span>Página 1 de 5</span>
-        <button className="pagination-btn">Siguiente →</button>
       </div>
 
       {showModal && (
@@ -157,8 +230,7 @@ const Gestionusuarios = () => {
           onSubmit={handleSubmit}
         />
       )}
-
-    </div>
+    </main>
 
   );
 };

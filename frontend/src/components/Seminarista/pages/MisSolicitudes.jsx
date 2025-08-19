@@ -163,19 +163,19 @@ const MisSolicitudes = () => {
       {/* Header */}
       <Header/>
       {/* Main Content */}
-      <main className="main-content">
-        <div className="container">
+      <main className="main-content-misolicitudes">
+        <div className="container-misolicitudes">
           {/* Page Header */}
-          <div className="page-header">
-            <h1 className="page-title">Mis Solicitudes</h1>
-            <p className="page-subtitle">Gestiona y revisa el estado de todas tus solicitudes</p>
+          <div className="page-header-misolicitudes">
+            <h1 className="page-title-misolicitudes">Mis Solicitudes</h1>
+            <p className="page-subtitle-misolicitudes">Gestiona y revisa el estado de todas tus solicitudes</p>
           </div>
 
           {/* Statistics Cards */}
-          <div className="stats-grid">
-            <div className="stat-card approved">
+          <div className="stats-grid-misolicitudes">
+            <div className="stat-card-misolicitudes approved">
               <div className="stat-icon">
-                <FaCheckCircle />
+                <FaCheckCircle />   
               </div>
               <div className="stat-content">
                 <div className="stat-number">{stats.approved}</div>

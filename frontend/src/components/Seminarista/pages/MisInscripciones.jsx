@@ -116,8 +116,8 @@ const MisInscripciones = () => {
         </div>
 
         {/* Tarjetas de estadísticas */}
-        <div className="stats-grid">
-          <div className="stat-card">
+        <div className="stats-grid-inscripciones-semianrista">
+          <div className="stat-card-inscripciones-semianrista">
             <div className="stat-icon confirmed">
               <FontAwesomeIcon icon={faCheckCircle} />
             </div>
@@ -127,7 +127,7 @@ const MisInscripciones = () => {
             </div>
           </div>
 
-          <div className="stat-card">
+          <div className="stat-card-inscripciones-semianrista">
             <div className="stat-icon pending">
               <FontAwesomeIcon icon={faExclamationTriangle} />
             </div>
@@ -137,7 +137,7 @@ const MisInscripciones = () => {
             </div>
           </div>
 
-          <div className="stat-card">
+          <div className="stat-card-inscripciones-semianrista">
             <div className="stat-icon cancelled">
               <FontAwesomeIcon icon={faTimesCircle} />
             </div>
@@ -147,7 +147,7 @@ const MisInscripciones = () => {
             </div>
           </div>
 
-          <div className="stat-card">
+          <div className="stat-card-inscripciones-semianrista">
             <div className="stat-icon total">
               <FontAwesomeIcon icon={faCalendar} />
             </div>
@@ -159,7 +159,7 @@ const MisInscripciones = () => {
         </div>
 
         {/* Filtros */}
-        <div className="filters-card">
+        <div className="filters-card-inscripciones-semianrista">
           <div className="filters-content">
             <span className="filter-label">Filtrar por estado:</span>
             <div className="filter-buttons">
@@ -194,7 +194,7 @@ const MisInscripciones = () => {
         {/* Lista de inscripciones */}
         {filteredInscripciones.map((inscripcion) => (
         <div class="inscripciones-container-seminario-inscripciones">
-          <div className="inscripcion-card-semianrio-inscripciones" key={inscripcion.id}>
+          <div className="inscripcion-card-inscripciones-semianrista-semianrio-inscripciones" key={inscripcion.id}>
             <div className="inscripcion-content-seminario-inscripciones">
               <img src="https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg"  class="inscripcion-image"></img>
               <div className="inscripcion-body-seminario-inscripciones">

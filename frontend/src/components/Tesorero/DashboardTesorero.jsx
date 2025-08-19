@@ -7,8 +7,11 @@ import Gestionevento from './Tablas/Gestionevento';
 import Gestioninscripcion from './Tablas/Gestioninscripcion';
 import Gestiontarea from './Tablas/Gestiontareas';
 import Gestioncabana from './Tablas/Gestioncabana';
-import Gestionreserva from './Tablas/Gestionreserva'
-import "./DashboardTesorero.css"
+import Gestionreserva from './Tablas/Gestionreserva';
+import Gestionreporte from './Tablas/Gestioreportes';
+import "./DashboardTesorero.css";
+import Header from './Header-tesorero';
+import Footer from '../footer/Footer';
 
 const DashboardTesorero = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,122 +19,7 @@ const DashboardTesorero = () => {
   const navigate = useNavigate();
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
 
-  // Datos para gráficos (simulados)
-  const [financialData, setFinancialData] = useState({
-    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-    income: [4500, 5200, 4800, 5500, 6000, 5800],
-    expenses: [3200, 3800, 3500, 4200, 4500, 4300]
-  });
 
-  // Datos de métricas financieras
-  const financialMetrics = [
-    {
-      title: "Ingresos Totales",
-      value: "$45,231",
-      change: "+15%",
-      trend: "up",
-      icon: "💰",
-      color: "green"
-    },
-    {
-      title: "Gastos Operativos",
-      value: "$28,450",
-      change: "+8%",
-      trend: "down",
-      icon: "💸",
-      color: "purple"
-    },
-    {
-      title: "Balance Neto",
-      value: "$16,781",
-      change: "+22%",
-      trend: "up",
-      icon: "📊",
-      color: "blue"
-    },
-    {
-      title: "Donaciones",
-      value: "$5,200",
-      change: "+5%",
-      trend: "up",
-      icon: "❤️",
-      color: "pink"
-    }
-  ];
-
-  // Transacciones recientes
-  const recentTransactions = [
-    {
-      id: 1,
-      type: "ingreso",
-      description: "Donación mensual",
-      amount: "$1,200",
-      date: "Hoy, 10:45 AM",
-      icon: "⬆️"
-    },
-    {
-      id: 2,
-      type: "gasto",
-      description: "Mantenimiento cabañas",
-      amount: "$850",
-      date: "Ayer, 3:30 PM",
-      icon: "⬇️"
-    },
-    {
-      id: 3,
-      type: "ingreso",
-      description: "Inscripción curso",
-      amount: "$350",
-      date: "Ayer, 11:20 AM",
-      icon: "⬆️"
-    },
-    {
-      id: 4,
-      type: "gasto",
-      description: "Materiales seminario",
-      amount: "$1,450",
-      date: "Lun, 9:15 AM",
-      icon: "⬇️"
-    }
-  ];
-
-  // Resumen de categorías
-  const categoriesSummary = [
-    {
-      name: "Cursos",
-      amount: "$12,450",
-      percentage: 35,
-      color: "blue"
-    },
-    {
-      name: "Eventos",
-      amount: "$8,750",
-      percentage: 25,
-      color: "purple"
-    },
-    {
-      name: "Donaciones",
-      amount: "$5,200",
-      percentage: 15,
-      color: "pink"
-    },
-    {
-      name: "Otros",
-      amount: "$8,831",
-      percentage: 25,
-      color: "green"
-    }
-  ];
-
-  // Proyección financiera
-  const financialProjection = [
-    { month: 'Jul', amount: 6200 },
-    { month: 'Ago', amount: 6500 },
-    { month: 'Sep', amount: 6800 },
-    { month: 'Oct', amount: 7100 },
-    { month: 'Nov', amount: 7400 },
-    { month: 'Dic', amount: 8000 }
-  ];
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -167,317 +55,366 @@ const DashboardTesorero = () => {
 
   return (
     <div className="dashboard-tesorero">
-     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
-      <aside className={`sidebar-tesorero ${isOpen ? "open" : ""}`}>
-        <div className="sidebar-header-tesorero">
-          <div className="logo-container-tesorero">
-            <div className="logo-icon-tesorero">💰</div>
-            <div className="logo-text-tesorero">
-                <span className="luckas-tesorero">Luckas</span>
-      
-            </div>
-          </div>
-        </div>
-
-        <nav className="sidebar-nav-tesorero">
-          <div className="nav-section-tesorero">
-            <h3 className="section-title-tesorero">Finanzas</h3>
-            <ul>
-              <li className="active"><span>📊</span> Dashboard</li>
-              <li><span>💵</span> Ingresos</li>
-              <li><span>📋</span> Presupuesto</li>
-              <li><span>🧾</span> Facturas</li>
-            </ul>
-          </div>
-
-          <div className="nav-section-tesorero">
-            <h3 className="section-title-tesorero">Gestión</h3>
-            <ul>
-              <li className={seccionActiva === "usuarios" ? "activo" : ""}>
-                <button onClick={() => setSeccionActiva("usuarios")} style={{ all: 'unset', cursor: 'pointer' }}>
-                  <span>👥</span>
-                  Usuarios
-                </button>
-              </li>
-              <li className={seccionActiva === "categorizacion" ? "activo" : ""}>
-                <button onClick={() => setSeccionActiva("categorizacion")} style={{ all: 'unset', cursor: 'pointer' }}>
-                  <span>🏷️</span>
-                  Categorizacion
-                </button>
-              </li>
-              <li className={seccionActiva === "solicitud" ? "activo" : ""}>
-                <button onClick={() => setSeccionActiva("solicitud")} style={{ all: 'unset', cursor: 'pointer' }}>
-                  <span>📋</span>
-                  Solicitud
-                </button>
-              </li>
-              <li className={seccionActiva === "cabana" ? "activo" : ""} >
-                <button onClick={() => setSeccionActiva("cabana")} style={{ all: 'unset', cursor: 'pointer' }}>
-                  <span>🏠</span>
-                  Cabañas
-                </button>
-              </li>
-              <li><span>📚</span> Cursos</li>
-              <li className={seccionActiva === "evento" ? "activo" : ""} >
-                <button onClick={() => setSeccionActiva("evento")} style={{ all: 'unset', cursor: 'pointer' }}>
-                  <span>🎉</span>
-                  Eventos
-                </button>
-              </li>
-              <li className={seccionActiva === "inscripcion" ? "activo" : ""} >
-                <button onClick={() => setSeccionActiva("inscripcion")} style={{ all: 'unset', cursor: 'pointer' }}>
-                  <span>✏️</span>
-                  Inscripcion
-                </button>
-              </li>
-              <li className={seccionActiva === "tarea" ? "activo" : ""} >
-                <button onClick={() => setSeccionActiva("tarea")} style={{ all: 'unset', cursor: 'pointer' }}>
-                  <span></span>
-                  <span>✅</span>
-                  Tareas
-                </button>
-              </li>
-              <li className={seccionActiva === "reserva" ? "activo" : ""} >
-                <button onClick={() => setSeccionActiva("reserva")} style={{ all: 'unset', cursor: 'pointer' }}>
-                  <span>🔖</span>
-                  Reserva
-                </button>
-              </li>
-            </ul>
-          </div>
-        </nav>
-
-        <div className="sidebar-footer-tesorero">
-          <div className="user-profile-tesorero">
-            <div className="avatar-tesorero">TE</div>
-            <div className="user-info-tesorero">
-              <p className="name-tesorero">Tesorero</p>
-              <p className="email-tesorero">tesorero@seminario.com</p>
-            </div>
-          </div>
-          <button className="logout-btn-tesorero" onClick={handleLogout}>
-            Cerrar sesión
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
+      <Header />
       <main className="main-content-tesorero">
-        {/* Header */}
-        <header className="dashboard-header-tesorero">
-          <div className="header-left-tesorero">
-            <button className="menu-toggle-tesorero" onClick={toggleSidebar}>
-              ☰
-            </button>
-
-
-            <h1>
-              {seccionActiva === "dashboard" && "Dashboard Principal"}
-              {seccionActiva === "usuarios" && "Dashboard Principal   "}
-              {seccionActiva === "categorizacion" && "Dashboard Principal"}
-              {seccionActiva === "solicitud" && "Dashboard Principal"}
-              {seccionActiva === "evento" && "Dashboard Principal"}
-              {seccionActiva === "inscripcion" && "Dashboard Principal"}
-              {seccionActiva === "tarea" && "Dashboard Principal"}
-              {seccionActiva === "cabana" && "Dashboard Principal"}
-              {seccionActiva === "reserva" && "Dashboard Principal"}
-            </h1>
-          </div>
-          <div className="header-right-tesorero">
-            <div className="search-box-tesorero ">
-              <input type="text" placeholder="Buscar..." />
-              <span>🔍</span>
+        {seccionActiva === "dashboard" && (
+          <>
+            <div className="dashboard-header-tesorero">
+              <div className="dashboard-title-tesorero">
+                <h1>Dashboard Principal</h1>
+                <p>Gestiona recursos y administra el sistema eficientemente</p>
+              </div>
+              <button className="quick-action-btn-tesorero">
+                <i className="fas fa-plus"></i>
+                Acción Rápida
+              </button>
             </div>
-            <div className="notifications">
-              <span>🔔</span>
-              <div className="notification-badge">3</div>
-            </div>
-          </div>
-        </header>
-
-        {/* Dashboard Content */}
-        <div className="dashboard-content">
-          {seccionActiva === "dashboard" && (
-            <>
-              {/* Financial Overview */}
-              <section className="financial-overview">
-                <div className="section-header">
-                  <h2>Resumen Financiero</h2>
-                  <div className="time-filter">
-                    <select>
-                      <option>Este mes</option>
-                      <option>Trimestre</option>
-                      <option>Año</option>
-                      <option>Personalizado</option>
-                    </select>
+            <div className="dashboard-content">
+              <section className="financial-metrics-tesorero">
+                <div className="metric-card-tesorero income">
+                  <div className="metric-icon-tesorero">
+                    <i className="fas fa-dollar-sign"></i>
+                  </div>
+                  <div className="metric-content-tesorero">
+                    <div className="metric-value-tesorero">$45,231</div>
+                    <div className="metric-label-tesorero">Ingresos Totales</div>
+                    <div className="metric-trend-tesorero positive">
+                      <i className="fas fa-arrow-up"></i>
+                      +15%
+                    </div>
                   </div>
                 </div>
 
-                <div className="metrics-grid">
-                  {financialMetrics.map((metric, index) => (
-                    <div key={index} className={`metric-card ${metric.color}`}>
-                      <div className="metric-icon">{metric.icon}</div>
-                      <div className="metric-info">
-                        <h3>{metric.title}</h3>
-                        <p className="value">{metric.value}</p>
-                        <p className={`change ${metric.trend}`}>
-                          {metric.change} <span>vs mes anterior</span>
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="financial-chart">
-                  <div className="chart-header">
-                    <h3>Tendencia Financiera</h3>
-                    <div className="chart-legend">
-                      <div className="legend-item">
-                        <span className="income-dot"></span> Ingresos
-                      </div>
-                      <div className="legend-item">
-                        <span className="expense-dot"></span> Gastos
-                      </div>
+                <div className="metric-card-tesorero expenses">
+                  <div className="metric-icon-tesorero">
+                    <i className="fas fa-chart-line"></i>
+                  </div>
+                  <div className="metric-content-tesorero">
+                    <div className="metric-value-tesorero">$28,450</div>
+                    <div className="metric-label-tesorero">Gastos Operativos</div>
+                    <div className="metric-trend-tesorero positive">
+                      <i className="fas fa-arrow-up"></i>
+                      +8%
                     </div>
                   </div>
-                  <div className="chart-placeholder">
-                    {/* Aquí iría un gráfico real con una librería como Chart.js */}
-                    <div className="chart-lines">
-                      {financialData.labels.map((month, i) => (
-                        <div key={i} className="chart-column">
-                          <div
-                            className="income-bar"
-                            style={{ height: `${financialData.income[i] / 100}px` }}
-                          ></div>
-                          <div
-                            className="expense-bar"
-                            style={{ height: `${financialData.expenses[i] / 100}px` }}
-                          ></div>
-                          <span className="month-label">{month}</span>
-                        </div>
-                      ))}
+                </div>
+
+                <div className="metric-card-tesorero balance">
+                  <div className="metric-icon-tesorero">
+                    <i className="fas fa-balance-scale"></i>
+                  </div>
+                  <div className="metric-content-tesorero">
+                    <div className="metric-value-tesorero">$16,781</div>
+                    <div className="metric-label-tesorero">Balance Neto</div>
+                    <div className="metric-trend-tesorero positive">
+                      <i className="fas fa-arrow-up"></i>
+                      +22%
                     </div>
                   </div>
                 </div>
               </section>
 
-              {/* Bottom Section */}
-              <div className="bottom-section">
-                {/* Recent Transactions */}
-                <section className="recent-transactions">
-                  <div className="section-header">
-                    <h2>Transacciones Recientes</h2>
-                    <button className="view-all">Ver todas</button>
-                  </div>
-
-                  <div className="transactions-list">
-                    {recentTransactions.map(transaction => (
-                      <div key={transaction.id} className="transaction-item">
-                        <div className="transaction-icon">{transaction.icon}</div>
-                        <div className="transaction-details">
-                          <h4>{transaction.description}</h4>
-                          <p className="date">{transaction.date}</p>
-                        </div>
-                        <div className={`amount ${transaction.type}`}>
-                          {transaction.amount}
-                        </div>
+              <section className="admin-functions">
+                <h2>Funciones Administrativas</h2>
+                <div className="functions-grid">
+                  <div className={ seccionActiva === "usuarios-tesorero" ? "activo" : "function-card"} data-function="usuarios-tesorero">
+                    <div className="function-icon">
+                      <i className="fas fa-users"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">156</span>
+                        <span className="stat-label">usuarios</span>
+                        <span className="stat-detail">+12 este mes</span>
                       </div>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Financial Summary */}
-                <section className="financial-summary">
-                  <div className="summary-card income-distribution">
-                    <h3>Distribución de Ingresos</h3>
-                    <div className="distribution-chart">
-                      {categoriesSummary.map((category, index) => (
-                        <div
-                          key={index}
-                          className="distribution-slice"
-                          style={{
-                            backgroundColor: `var(--color-${category.color})`,
-                            width: `${category.percentage}%`
-                          }}
-                          title={`${category.name}: ${category.amount} (${category.percentage}%)`}
-                        ></div>
-                      ))}
+                      <div className="function-info">
+                        <h3>Gestionar Usuarios</h3>
+                        <p>Administrar cuentas de usuarios del sistema</p>
+                      </div>
+                      <button className="function-action" onClick={() => setSeccionActiva("usuarios-tesorero")} >
+                        Gestionar →
+                      </button>
                     </div>
-                    <div className="distribution-legend">
-                      {categoriesSummary.map((category, index) => (
-                        <div key={index} className="legend-item">
-                          <span className={`dot ${category.color}`}></span>
-                          {category.name} - {category.amount}
-                        </div>
-                      ))}
+                  </div>
+                  <div className={ seccionActiva === "categorias-tesorero" ? "activo" : "function-card"} data-function="categorias-tesorero">
+                    <div className="function-icon">
+                      <i className="fas fa-users"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">156</span>
+                        <span className="stat-label">usuarios</span>
+                        <span className="stat-detail">+12 este mes</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Categorias</h3>
+                        <p>Administrar Categorias del sistema</p>
+                      </div>
+                      <button className="function-action" onClick={() => setSeccionActiva("categorias-tesorero")} >
+                        Gestionar →
+                      </button>
                     </div>
                   </div>
 
-                  <div className="summary-card financial-projection">
-                    <h3>Proyección Financiera</h3>
-                    <div className="projection-chart">
-                      {financialProjection.map((item, index) => (
-                        <div key={index} className="projection-item">
-                          <div className="month">{item.month}</div>
-                          <div className="projection-bar">
-                            <div
-                              className="bar-fill"
-                              style={{ width: `${(item.amount / 8000) * 100}%` }}
-                            ></div>
-                            <span className="amount">${item.amount}</span>
-                          </div>
-                        </div>
-                      ))}
+                  <div className= { seccionActiva === "solicitud-tesorero" ? "activo" : "function-card"} data-function="solicitud-tesorero">
+                    <div className="function-icon">
+                      <i className="fas fa-file-alt"></i>
                     </div>
-
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">23</span>
+                        <span className="stat-label">pendientes</span>
+                        <span className="stat-detail">5 nuevas hoy</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Solicitudes</h3>
+                        <p>Revisar y categorizar solicitudes</p>
+                      </div>
+                      <button className="function-action " onClick={()=> setSeccionActiva('solicitud-tesorero')}>
+                        Gestionar →
+                      </button>
+                    </div>
                   </div>
-                </section>
-              </div>
-            </>
-          )}
-          {seccionActiva === "usuarios" && (
-            <div className="seccion-usuarios">
-              <Gestionusuarios />
-            </div>
-          )}
-          {seccionActiva === "categorizacion" && (
-            <div className="seccion-categorizacion">
-              <Gestioncategorizacion />
-            </div>
-          )}
-          {seccionActiva === "solicitud" && (
-            <div className="seccion-solicitud">
-              <Gestionsolicitud />
-            </div>
-          )}
-          {seccionActiva === "evento" && (
-            <div className="seccion-solicitud">
-              <Gestionevento />
-            </div>
-          )}
-          {seccionActiva === "inscripcion" && (
-            <div className="seccion-solicitud">
-              <Gestioninscripcion />
-            </div>
-          )}
-          {seccionActiva === "tarea" && (
-            <div className="seccion-solicitud">
-              <Gestiontarea />
-            </div>
-          )}
-          {seccionActiva === "cabana" && (
-            <div className="seccion-solicitud">
-              <Gestioncabana />
-            </div>
-          )}
-          {seccionActiva === "reserva" && (
-            <div className="seccion-solicitud">
-              <Gestionreserva />
-            </div>
-          )}
-        </div>
 
+                  <div className={ seccionActiva === "evento-tesorero" ? "activo" : "function-card"} data-function="evento-tesorero" >
+                    <div className="function-icon">
+                      <i className="fas fa-calendar"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">8</span>
+                        <span className="stat-label">próximos</span>
+                        <span className="stat-detail">2 esta semana</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Eventos</h3>
+                        <p>Organizar y categorizar eventos</p>
+                      </div>
+                      <button className="function-action" onClick={()=> setSeccionActiva('evento-tesorero')}>
+                        Gestionar →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={ seccionActiva === "cabana-tesorero" ? "activo" : "function-card"} data-function="cabana-tesorero">
+                    <div className="function-icon">
+                      <i className="fas fa-home"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">12</span>
+                        <span className="stat-label">disponibles</span>
+                        <span className="stat-detail">85% ocupación</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Cabañas</h3>
+                        <p>Administrar las cabañas</p>
+                      </div>
+                      <button className="function-action" onClick={()=> setSeccionActiva('cabana-tesorero')}>
+                        Gestionar →
+                      </button>
+                    </div>
+                  </div>
+                  <div className={ seccionActiva === "reserva-tesorero" ? "activo" : "function-card"} data-function="reserva-tesorero">
+                    <div className="function-icon">
+                      <i className="fas fa-home"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">12</span>
+                        <span className="stat-label">disponibles</span>
+                        <span className="stat-detail">85% ocupación</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Reservas</h3>
+                        <p>Administrar reservas de cabañas</p>
+                      </div>
+                      <button className="function-action" onClick={()=> setSeccionActiva('reserva-tesorero')}>
+                        Gestionar →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={ seccionActiva === "curso-tesorero" ? "activo" : "function-card"} data-function="curso-tesorero">
+                    <div className="function-icon">
+                      <i className="fas fa-book"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">15</span>
+                        <span className="stat-label">activos</span>
+                        <span className="stat-detail">245 inscritos</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Cursos</h3>
+                        <p>Administrar programas académicos</p>
+                      </div>
+                      <button className="function-action" onClick={()=> setSeccionActiva('curso-tesorero')}>
+                        Gestionar →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div  className={ seccionActiva === "tarea-tesorero" ? "activo" : "function-card"} data-function="tarea-tesorero">
+                    <div className="function-icon">
+                      <i className="fas fa-tasks"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">34</span>
+                        <span className="stat-label">activas</span>
+                        <span className="stat-detail">12 completadas</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Tareas</h3>
+                        <p>Asignar y supervisar tareas</p>
+                      </div>
+                      <button className="function-action" onClick={()=> setSeccionActiva('tarea-tesorero')}>
+                        Gestionar →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={ seccionActiva === "inscripcion-tesorero" ? "activo" : "function-card"} data-function="inscripcion-tesorero">
+                    <div className="function-icon">
+                      <i className="fas fa-user-plus"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">67</span>
+                        <span className="stat-label">nuevas</span>
+                        <span className="stat-detail">+18 esta semana</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Inscripciones</h3>
+                        <p>Procesar inscripciones y categorizar</p>
+                      </div>
+                      <button className="function-action" onClick={()=> setSeccionActiva('inscripcion-tesorero')}>
+                        Gestionar →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div  className={ seccionActiva === "reportes-tesorero" ? "activo" : "function-card"} data-function="reportes-tesorero">
+                    <div className="function-icon">
+                      <i className="fas fa-chart-bar"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">25</span>
+                        <span className="stat-label">reportes</span>
+                        <span className="stat-detail">Actualizado hoy</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Reportes</h3>
+                        <p>Generar informes del sistema</p>
+                      </div>
+                      <button className="function-action" onClick={()=> setSeccionActiva('reportes-tesorero')}>
+                        Gestionar →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="bottom-section">
+                <div className="recent-activity">
+                  <div className="section-header">
+                    <h3>Actividad Reciente</h3>
+                    <button className="view-all-btn">Ver todas</button>
+                  </div>
+                  <div className="activity-list">
+                    <div className="activity-item">
+                      <div className="activity-indicator pending"></div>
+                      <div className="activity-content">
+                        <div className="activity-title">Nueva solicitud de permiso</div>
+                        <div className="activity-subtitle">Juan Mendoza • Hace 2 horas</div>
+                      </div>
+                      <div className="activity-status pending">Pendiente</div>
+                    </div>
+                    <div className="activity-item">
+                      <div className="activity-indicator completed"></div>
+                      <div className="activity-content">
+                        <div className="activity-title">Usuario registrado</div>
+                        <div className="activity-subtitle">María García • Hace 4 horas</div>
+                      </div>
+                      <div className="activity-status completed">Completado</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="system-stats">
+                  <h3>Estadísticas del Sistema</h3>
+                  <div className="stats-list">
+                    <div className="stat-item">
+                      <span className="stat-label">Usuarios Activos</span>
+                      <span className="stat-value">142</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Solicitudes Pendientes</span>
+                      <span className="stat-value">23</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Eventos Este Mes</span>
+                      <span className="stat-value">8</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Ocupación Cabañas</span>
+                      <span className="stat-value highlight">85%</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </>
+        )}
+        {seccionActiva === "usuarios-tesorero" && (
+          <div className="seccion-usuarios">
+            <Gestionusuarios />
+          </div>
+        )}
+        {seccionActiva === "categorias-tesorero" && (
+          <div className="seccion-categorizacion">
+            <Gestioncategorizacion />
+          </div>
+        )}
+        {seccionActiva === "solicitud-tesorero" && (
+          <div className="seccion-solicitud">
+            <Gestionsolicitud />
+          </div>
+        )}
+        {seccionActiva === "evento-tesorero" && (
+          <div className="seccion-solicitud">
+            <Gestionevento />
+          </div>
+        )}
+        {seccionActiva === "inscripcion-tesorero" && (
+          <div className="seccion-solicitud">
+            <Gestioninscripcion />
+          </div>
+        )}
+        {seccionActiva === "tarea-tesorero" && (
+          <div className="seccion-solicitud">
+            <Gestiontarea />
+          </div>
+        )}
+        {seccionActiva === "cabana-tesorero" && (
+          <div className="seccion-solicitud">
+            <Gestioncabana />
+          </div>
+        )}
+        {seccionActiva === "reserva-tesorero" && (
+          <div className="seccion-solicitud">
+            <Gestionreserva />
+          </div>
+        )}
+        {seccionActiva === "reportes-tesorero" && (
+          <div className="seccion-solicitud">
+            <Gestionreporte />
+          </div>
+        )}
       </main>
+      <Footer />
     </div>
   );
 };

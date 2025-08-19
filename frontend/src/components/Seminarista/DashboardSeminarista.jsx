@@ -100,10 +100,10 @@ const DashboardSeminarista = () => {
     setMensajeTipo('info');
   };
 
-  const renderContent = () => {
+
     return (
       <div className="dashboard-seminarista-contenedo">
-
+        <Header/>
         <main className="main-content">
           {/* Hero Section */}
           <section className="hero-section">
@@ -326,49 +326,7 @@ const DashboardSeminarista = () => {
         <Footer></Footer>
       </div>
     );
-  };
-
-  if (mostrarModificarPerfil) {
-    return (
-      <div className="dashboard-seminarista-contenedo">
-        <Header
-          userRole="seminarista"
-          userName={user?.nombre}
-          breadcrumbPath={breadcrumbPath}
-        />
-
-
-        <main className="main-content">
-          <ModificarPerfil
-            onClose={() => setMostrarModificarPerfil(false)}
-            onSuccess={handleSuccess}
-          />
-        </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="dashboard-seminarista-contenedo">
-      <Header
-        userRole="seminarista"
-        userName={user?.nombre}
-        breadcrumbPath={breadcrumbPath}
-      />
-
-      {mensaje && (
-        <NotificationBanner
-          message={mensaje}
-          type={mensajeTipo}
-          onClose={closeMensaje}
-        />
-      )}
-
-      <main className="main-content">
-        {renderContent()}
-      </main>
-    </div>
-  );
+  
 };
 
 export default DashboardSeminarista;

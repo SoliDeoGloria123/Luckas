@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
-  FaHome, FaCalendarAlt, FaUserCheck, FaBookmark, FaFileAlt, FaPlus, FaBell, 
-  FaUser, FaChevronDown, FaBars, FaTimes, FaDoorOpen, FaGraduationCap, 
+   FaCalendarAlt,  FaTimes, FaDoorOpen, FaGraduationCap, 
   FaTools, FaHeart, FaEllipsisH, FaArrowLeft, FaArrowRight, FaPaperPlane,
   FaCheckCircle, FaExclamationCircle, FaExclamationTriangle, FaInfoCircle,
-  FaCloudUploadAlt, FaFile, FaClipboardList
+  FaCloudUploadAlt, FaFile, 
 } from 'react-icons/fa';
 import './NuevaSolicitud.css';
 import Header from '../Shared/Header';
@@ -342,35 +341,35 @@ const NuevaSolicitud = () => {
       <Header/>
   
       {/* Main Content */}
-      <main className="main-content">
-        <div className="container">
+      <main className="main-content-nuevasolicitud">
+        <div className="container-nuevasolicitud">
           {/* Page Header */}
-          <div className="page-header">
+          <div className="page-header-nuevasolicitud">
             <h1>Nueva Solicitud</h1>
             <p>Crea una nueva solicitud siguiendo los pasos a continuación</p>
           </div>
 
           {/* Progress Steps */}
-          <div className="progress-steps">
-            <div className={`step ${currentStep > 1 ? 'completed' : ''} ${currentStep === 1 ? 'active' : ''}`}>
-              <div className="step-number">1</div>
-              <div className="step-label">Tipo de Solicitud</div>
+          <div className="progress-steps-nuevasolicitud">
+            <div className={`step-nuevasolicitud ${currentStep > 1 ? 'completed' : ''} ${currentStep === 1 ? 'active' : ''}`}>
+              <div className="step-number-nuevasolicitud">1</div>
+              <div className="step-label-nuevasolicitud">Tipo de Solicitud</div>
             </div>
-            <div className={`step ${currentStep > 2 ? 'completed' : ''} ${currentStep === 2 ? 'active' : ''}`}>
-              <div className="step-number">2</div>
+            <div className={`step-nuevasolicitud ${currentStep > 2 ? 'completed' : ''} ${currentStep === 2 ? 'active' : ''}`}>
+              <div className="step-number-nuevasolicitud">2</div>
               <div className="step-label">Detalles</div>
             </div>
             <div className={`step ${currentStep === 3 ? 'active' : ''}`}>
-              <div className="step-number">3</div>
+              <div className="step-number-nuevasolicitud">3</div>
               <div className="step-label">Confirmación</div>
             </div>
           </div>
 
           {/* Form Container */}
-          <div className="form-container">
+          <div className="form-container-nuevasolicitud">
             {/* Step 1: Tipo de Solicitud */}
-            <div className="step-content" style={{ display: currentStep === 1 ? 'block' : 'none' }}>
-              <div className="step-header">
+            <div className="step-content-nuevasolicitud" style={{ display: currentStep === 1 ? 'block' : 'none' }}>
+              <div className="step-header-nuevasolicitud">
                 <h2>Paso 1: Selecciona el Tipo de Solicitud</h2>
                 <p>Elige la categoría que mejor describa tu solicitud</p>
               </div>

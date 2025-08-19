@@ -10,6 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [showPassword, setShowPassword]=useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -137,7 +138,7 @@ const Login = () => {
                     <i className="fas fa-lock"></i>
                   </span>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     id="password"
                     className="form-control"
                     value={password}
@@ -145,8 +146,10 @@ const Login = () => {
                     placeholder="Ingrese su contraseña"
                     required
                   />
-                  <button type="button" className="btn btn-outline-secondary password-toggle" >
-                     <i class="fas fa-eye" id="toggleIcon"></i>
+                  <button type="button" 
+                  className="btn btn-outline-secondary password-toggle"
+                  onClick={()=> setShowPassword(!showPassword)} >
+                    <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
                   </button>
                 </div>
               </div>

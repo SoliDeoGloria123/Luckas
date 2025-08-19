@@ -4,6 +4,7 @@ import Login from './components/Login/Login';
 import Registro from './components/signup/registro';
 import DashboardAdmin from "./components/Dashboard/DashboardAdmin";
 import DashboardTesorero from "./components/Tesorero/DashboardTesorero";
+import GestionTesorero from './components/Tesorero/Gestion';
 import DashboardSeminarista from "./components/Seminarista/DashboardSeminarista";
 import EventosNavegables from "./components/Seminarista/pages/EventosNavegables";
 import CabanasNavegables from "./components/Seminarista/pages/CabanasNavegables";
@@ -12,6 +13,7 @@ import MisReservas from "./components/Seminarista/pages/MisReservas";
 import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
 import Perfil from './components/Seminarista/Shared/MiPerfil';
+import Configuracion from './components/Seminarista/pages/configuracion';
 
 
 // Componente para usuarios externos
@@ -38,6 +40,7 @@ function App() {
         <Route path="/signup/registro" element={<Registro />} />
         <Route path="/admin/users" element={<DashboardAdmin />} />
         <Route path="/tesorero" element={<DashboardTesorero />} />
+        <Route path='/tesorero-Gestiones' element={<GestionTesorero/>}/>
         <Route path="/seminarista" element={<DashboardSeminarista />} />
         <Route path="/dashboard/seminarista/eventos" element={<EventosNavegables />} />
         <Route path="/dashboard/seminarista/cabanas" element={<CabanasNavegables />} />
@@ -46,6 +49,7 @@ function App() {
         <Route path="/dashboard/seminarista/mis-solicitudes" element={<MisSolicitudes />} />
         <Route path="/dashboard/seminarista/nueva-solicitud" element={<NuevaSolicitud />} />
         <Route path="/dashboard/seminarista/Mi-Perfil" element={<Perfil />} />
+        <Route path="/dashboard/seminarista/Configuracion" element={<Configuracion />} />
       </Routes>
     </Router>
   );
