@@ -158,7 +158,7 @@ const SolicitudModal = ({
           )}
           {!modoEdicion && (
           <div className="form-grupo-admin">
-            <label>Descripción:</label>
+            <label>Categoría:</label>
             <input
               type="text"
               value={ nuevaSolicitud.descripcion}

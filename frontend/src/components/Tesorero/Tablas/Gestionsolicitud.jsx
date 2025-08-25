@@ -1,36 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SolicitudModal from '../modal/SolicitudModal';
+import { solicitudService } from '../../../services/solicirudService';
+import { mostrarAlerta } from '../../utils/alertas'
 const Gestionsolicitud = () => {
-  // Datos de ejemplo
-  const users = [
-    {
-      id: "GSI0405100d800b0f9b2c5656",
-      username: "pedrasa",
-      email: "admin@gmail.com",
-      phone: "3115524272",
-      docType: "Cédula de ciudadanía",
-      docNumber: "117200207",
-      role: "(Administrador)",
-      status: "ACTIVO",
-      date: "2/8/2025"
-    },
-    {
-      id: "GSI0405100d800b0f9b2c5667",
-      username: "perera",
-      email: "sabat@mail.com",
-      phone: "1311354354",
-      docType: "Cédula de ciudadanía",
-      docNumber: "12135434354",
-      role: "(Tesorero)",
-      status: "ACTIVO",
-      date: "2/8/2025"
-    },
-    // Más usuarios...
-  ];
-
+  
+  const [solicitudes, setSolicitudes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
+
+
+  // Obtener solicitudes
+  const obtenerSolicitudes = async () => {
+    try {
+      const data = await solicitudService.getAll();
+      setSolicitudes(Array.isArray(data.data) ? data.data : []);
+    } catch (error) {
+      mostrarAlerta("Error", "Error al obtener solicitudes");
+    }
+  };
+  useEffect(() => {
+    obtenerSolicitudes();
+  }, []);
 
   const handleCreate = () => {
     setModalMode('create');
@@ -51,10 +42,8 @@ const Gestionsolicitud = () => {
       // Lógica para editar
     }
   };
-
-
   return (
-    <main className="main--solicitudes-tesorero">
+    <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
           <button className="back-btn-tesorero">
@@ -150,14 +139,51 @@ const Gestionsolicitud = () => {
               <th>
                 <input type="checkbox" id="selectAll"></input>
               </th>
-              <th>USUARIO</th>
+              <th>ID</th>
+              <th>NOMBRE </th>
+              <th>CORREO</th>
+              <th>TELEFONO</th>
               <th>ROL</th>
+              <th>TIPO SOLICITUD</th>
+              <th>CATEGORIA</th>
+              <th>ORIGEN</th>
               <th>ESTADO</th>
-              <th>ÚLTIMA ACTIVIDAD</th>
+              <th>PRIORIDAD</th>
+              <th>FECHA SOLICITUD</th>
+              <th>RESPONSABLE</th>
               <th>ACCIONES</th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
+            {(solicitudes || []).map((soli) => (
+              <tr key={soli._id}>
+                <td>
+                  <input type="checkbox" className="select-row"></input>
+                </td>
+                <td>{soli._id}</td>
+                <td>{soli.solicitante?.username || soli.solicitante?.nombre || soli.solicitante?.correo || soli.solicitante?._id || "N/A"}</td>
+                <td>{soli.solicitante?.correo || soli.correo || "N/A"}</td>
+                <td>{soli.solicitante?.telefono || soli.telefono || "N/A"}</td>
+                <td>{soli.solicitante?.role || "N/A"}</td>
+                <td>{soli.tipoSolicitud || "N/A"}</td>
+                <td>{soli.categoria?.nombre || soli.categoria?._id || "N/A"}</td>
+                <td>{soli.modeloReferencia || "N/A"}</td>
+                <td>
+                  <span className={`status-badge ${soli.estado === "activo" ? "status-activo" : "status-inactivo"}`}>
+                 <span className="status-dot"></span>
+                 {soli.estado}
+                  </span>
+                </td>
+                <td>{soli.prioridad || "N/A"}</td>
+                <td>{new Date(soli.fechaSolicitud).toLocaleDateString()}</td>
+                <td>{soli.responsable?.username || "N/A"}</td>
+                <td className="actions-cell">
+                  <button className="action-btn edit" onClick={() => handleEdit(soli)}>
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </td>
+              </tr>
+            ))}
 
           </tbody>
         </table>

@@ -1,27 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 
 const CategorizacionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    nombre: initialData.nombre || '',
-    apellido: initialData.apellido || '',
-    email: initialData.email || '',
-    telefono: initialData.telefono || '',
-    tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
-    numeroDocumento: initialData.numeroDocumento || '',
-    rol: initialData.rol || 'Tesorero',
-    estado: initialData.estado || 'Activo'
+
+const [formData, setFormData] = useState({
+    nombre: '',
+    codigo: '',
+    activo: 'Activo'
   });
+
+  useEffect(() => {
+    setFormData({
+      nombre: initialData.nombre || '',
+      codigo: initialData.codigo || '',
+      activo: initialData.activo || 'Activo'
+    });
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
-    onClose();
   };
 
   return (
@@ -31,7 +37,6 @@ const CategorizacionModal = ({ mode = 'create', initialData = {}, onClose, onSub
           <h2>{mode === 'create' ? 'Crear Nuevo Categorizacion' : 'Editar Categorizacion'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
-        
         <div className="modal-body-tesorero">
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
@@ -48,87 +53,24 @@ const CategorizacionModal = ({ mode = 'create', initialData = {}, onClose, onSub
               </div>
               
               <div className="form-group-tesorero">
-                <label>Apellido</label>
+                <label>Codigo</label>
                 <input
                   type="text"
-                  name="apellido"
-                  value={formData.apellido}
+                  name="codigo"
+                  value={formData.codigo}
                   onChange={handleChange}
                   placeholder="Apellido"
                   required
                 />
               </div>
               
-              <div className="form-group-tesorero">
-                <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="correo@ejemplo.com"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Teléfono</label>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  placeholder="Teléfono"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Tipo de Documento</label>
-                <select
-                  name="tipoDocumento"
-                  value={formData.tipoDocumento}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
-                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                  <option value="Cédula extranjería">Cédula extranjería</option>
-                </select>
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Número de Documento</label>
-                <input
-                  type="text"
-                  name="numeroDocumento"
-                  value={formData.numeroDocumento}
-                  onChange={handleChange}
-                  placeholder="Número de documento"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Rol</label>
-                <select
-                  name="rol"
-                  value={formData.rol}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="Tesorero">Tesorero</option>
-                  <option value="Administrador">Administrador</option>
-                  <option value="Usuario">Usuario</option>
-                </select>
-              </div>
+      
               
               <div className="form-group-tesorero">
                 <label>Estado</label>
                 <select
-                  name="estado"
-                  value={formData.estado}
+                  name="activo"
+                  value={formData.activo}
                   onChange={handleChange}
                   required
                 >

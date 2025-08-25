@@ -1,36 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import UsuarioModal from '../modal/UsuarioModal';
 import { userService } from '../../../services/userService'
+import { mostrarAlerta } from '../../utils/alertas';
+
 
 
 const Gestionusuarios = () => {
   // Datos de ejemplo
   const [usuarios, setUsuarios] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModalUsuario] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
 
   const handleCreate = () => {
     setModalMode('create');
     setCurrentItem(null);
-    setShowModal(true);
-  };
-
-
-  const handleSubmit = (data) => {
-    if (modalMode === 'create') {
-      // Lógica para crear
-    } else {
-      // Lógica para editar
-    }
+    setShowModalUsuario(true);
   };
 
   //------------------------------------------------------------------------------------------------------------------------------------
   //obtener usuarios
-  useEffect(() => {
-    obtenerUsuarios();
-  }, []);
-
   const obtenerUsuarios = async () => {
     try {
       const data = await userService.getAllUsers();
@@ -40,53 +29,27 @@ const Gestionusuarios = () => {
       console.error("Error al obtener los usuarios de la base de datos", error.mensage);
     }
   };
+  useEffect(() => {
+    obtenerUsuarios();
+  }, []);
 
+  const handleSubmit = async (Usuariodata) => {
+    try {
+      if (modalMode === 'create') {
+        await userService.createUser(Usuariodata)
+        mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
 
-  /*const handleCerrarSesion = () => {
-    if (onCerrarSesionProp) {
-      onCerrarSesionProp();
-    } else {
-      localStorage.removeItem('token'); 
-      localStorage.removeItem('usuario');
-      window.location.href = '/login';
-    }
-  };*/
-
-
-
-
-
-  // Calcular estadísticas
-  /*const calcularEstadisticas = (usuariosData) => {
-    const hoy = new Date().toDateString();
-    setEstadisticas({
-      totalUsuarios: usuariosData.length,
-      usuariosActivos: usuariosData.filter((user) => user.status === "active").length,
-      administradores: usuariosData.filter((user) => user.role === "admin").length,
-      nuevosHoy: usuariosData.filter((user) => new Date(user.createdAt).toDateString() === hoy).length,
-    });
-  };*/
-
-
-  // Filtrar usuarios
-  /*const usuariosFiltrados = Array.isArray(usuarios)
-    ? usuarios.filter(
-      (user) =>
-        user.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        user.correo?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        user.role?.toLowerCase().includes(busqueda.toLowerCase())
-    )
-    : [];*/
-  /*-----------------------------------------------------------------------------------------------------------*/
-  /* const [datosUnificados, setDatosUnificados] = useState({
-     solicitudes: [],
-     inscripciones: [],
-     reservas: []
-   });*/
-
-
-
-
+      } else {
+        await userService.updateUser(currentItem._id, Usuariodata);
+        mostrarAlerta("¡Éxito!", "Usuario actualizado exitosamente");
+        obtenerUsuarios();
+      }
+      setShowModalUsuario(false);
+      obtenerUsuarios();
+    } catch (error) {
+      mostrarAlerta("Error", `Error al procesar el usuario: ${error.message}`);
+    };
+  };
 
   return (
     <main className="main-content-tesorero">
@@ -110,7 +73,7 @@ const Gestionusuarios = () => {
         <div className="stat-card-usuarios">
           <div className="stat-icon-usuarios blue">
             <i className="fas fa-users"></i>
-          </div>fGestionusuarios
+          </div>
           <div className="stat-content">
             <div className="stat-number-usuarios" id="totalUsers">5</div>
             <div className="stat-label-usuarios">Total Usuarios</div>
@@ -173,7 +136,6 @@ const Gestionusuarios = () => {
         </div>
       </div>
 
-
       <div className="table-container-tesorero">
         <table className="users-table-tesorero">
           <thead>
@@ -211,8 +173,37 @@ const Gestionusuarios = () => {
                   <td>{user.numeroDocumento}</td>
                   <td>{user.correo}</td>
                   <td>{user.telefono}</td>
-                  <td>{user.role}</td>
-                  <td>{user.estado}</td>
+                  <td>
+                    <span
+                      className={`role-badge ${user.role === "admin"
+                        ? "role-administrador"
+                        : user.role === "tesorero"
+                          ? "role-tesorero"
+                          : "role-seminarista"
+                        }`}
+                    >
+                      {user.role}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className={`status-badge ${user.estado === "activo" ? "status-activo" : "status-inactivo"
+                        }`}
+                    >
+                      <span className="status-dot"></span>
+                      {user.estado}
+                    </span>
+                  </td>
+                  <td className='actions-cell'>
+                    <button className='action-btn edit'
+                      onClick={() => {
+                        setModalMode('edit');
+                        setCurrentItem(user);
+                        setShowModalUsuario(true);
+                      }}>
+                      <i class="fas fa-edit"></i>
+                    </button>
+                  </td>
                 </tr>
 
               ))
@@ -226,7 +217,7 @@ const Gestionusuarios = () => {
         <UsuarioModal
           mode={modalMode}
           initialData={currentItem || {}}
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowModalUsuario(false)}
           onSubmit={handleSubmit}
         />
       )}

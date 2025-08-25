@@ -53,7 +53,7 @@ body {
 
 /* Main Content */
 .main-content-tesorero {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 2rem;
 }
@@ -413,11 +413,7 @@ body {
 
 /*Estilo de la tabla de usuarios*/
 
-.main-content-tesorero {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
-}
+
 
 .page-header-tesorero {
     background: white;
@@ -445,13 +441,13 @@ body {
 }
 
 .back-btn-tesorero:hover {
-  background: #e2e8f0;
+    background: #e2e8f0;
 }
 
-.card-header-tesorero{
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.card-header-tesorero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 
@@ -460,12 +456,11 @@ body {
     font-weight: 700;
     color: var(--color-gray-dark);
     margin-bottom: 0.5rem
-
 }
 
 .page-title-tesorero p {
     color: #64748b;
-     font-size: 14px;
+    font-size: 14px;
 }
 
 .btn-primary-tesorero {
@@ -577,11 +572,14 @@ body {
 
 /* Table Styles */
 .table-container-tesorero {
-    background: var(--color-white);
+    background: white;
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 2rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .users-table-tesorero {
@@ -590,14 +588,14 @@ body {
 }
 
 .users-table-tesorero th {
-    background: var(--light-gray);
+    background: #f8fafc;
     padding: 1rem;
     text-align: left;
     font-weight: 600;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--color-gray-dark);
+    color: var(--gris-oscuro);
     border-bottom: 1px solid #e2e8f0;
 }
 
@@ -730,9 +728,6 @@ body {
     color: var(--primary-blue);
 }
 
-.action-btn.delete:hover {
-    color: var(--error);
-}
 
 /* Statistics Grid usuarios */
 .stats-grid-usuarios {
@@ -798,20 +793,20 @@ body {
 
 /* Statistics Grid Solicitud */
 .stats-grid-solicitudes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
 }
 
 .stat-card-solicitudes {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card-solicitudes:hover {
@@ -819,46 +814,46 @@ body {
 }
 
 .stat-number-solicitudes {
-  font-size: 32px;
-  font-weight: 700;
-  color: #334155;
-  margin-bottom: 4px;
+    font-size: 32px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 4px;
 }
 
 .stat-label-solicitudes {
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 500;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .stat-icon-solicitudes {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
 }
 
 .stat-icon-solicitudes.purple {
-  background: rgba(139, 92, 246, 0.1);
-  color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
 }
 
 .stat-icon-solicitudes.orange {
-  background: rgba(251, 146, 60, 0.1);
-  color: #fb923c;
+    background: rgba(251, 146, 60, 0.1);
+    color: #fb923c;
 }
 
 .stat-icon-solicitudes.green {
-  background: rgba(5, 150, 105, 0.1);
-  color: #059669;
+    background: rgba(5, 150, 105, 0.1);
+    color: #059669;
 }
 
 .stat-icon-solicitudes.red {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
 }
 
 
@@ -879,60 +874,66 @@ body {
 }
 
 .tesorero-modal {
-    background-color: var(--color-white);
-    border-radius: 12px;
+    background: var(--color-white);
+    border-radius: 16px;
     width: 90%;
-    max-width: 700px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    max-height: 90vh;
     overflow: hidden;
-    animation: modalAppear 0.3s ease-out;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
 }
 
-@keyframes modalAppear {
+@keyframes modalSlideIn {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-50px) scale(0.95);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
+
 .modal-header-tesorero {
-    background: linear-gradient(135deg, var(--color-purple), var(--color-blue));
-    color: white;
-    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
+    color: var(--color-white);
+    padding: 20px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
 }
 
 .modal-header-tesorero h2 {
-    margin: 0;
-    font-size: 1.5rem;
+    font-size: 20px;
     font-weight: 600;
+    margin: 0;
 }
 
 .close-btn {
     background: none;
     border: none;
-    color: white;
-    font-size: 1.8rem;
+    color: var(--color-white);
+    font-size: 24px;
     cursor: pointer;
-    transition: transform 0.2s;
-    padding: 0 0.5rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
 }
 
 .close-btn:hover {
-    transform: scale(1.2);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .modal-body-tesorero {
-    padding: 1.5rem;
-    max-height: 70vh;
+    padding: 24px;
+    max-height: calc(90vh - 80px);
     overflow-y: auto;
 }
 
@@ -943,32 +944,33 @@ body {
 }
 
 .form-group-tesorero {
-    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .form-group-tesorero label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 14px;
     color: var(--color-gray-dark);
 }
 
 .form-group-tesorero input,
 .form-group-tesorero select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--color-gray-light);
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.2s;
-    background-color: var(--color-gray-very-light);
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background-color: var(--color-white);
+    color: var(--color-gray-dark);
 }
 
 .form-group-tesorero input:focus,
 .form-group-tesorero select:focus {
     outline: none;
-    border-color: var(--color-purple);
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .modal-footer-tesorero {
@@ -1006,83 +1008,191 @@ body {
 }
 
 .submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(5, 150, 105, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .form-grid {
+/* ================= RESPONSIVE ================= */
+/* Pantallas grandes (1200px+) */
+
+
+/* Tablets y pantallas medianas (992px - 1199px) */
+@media (max-width: 1199px) {
+    .main-content-tesorero {
+        padding: 1.5rem;
+    }
+    
+    .bottom-section {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .financial-metrics-tesorero,
+    .functions-grid,
+    .stats-grid-usuarios,
+    .stats-grid-solicitudes {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+/* Tablets pequeñas (768px - 991px) */
+@media (max-width: 991px) {
+    .dashboard-header-tesorero,
+    .page-header-tesorero,
+    .filters-section-tesorero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .search-filters-tesorero {
+        width: 100%;
+    }
+    
+    #userSearch {
+        width: 100%;
+    }
+    
+    .users-table-tesorero {
+        font-size: 0.85rem;
+    }
+    
+    .users-table-tesorero th,
+    .users-table-tesorero td {
+        padding: 0.75rem;
+    }
+    
+    .form-grid-tesorero {
         grid-template-columns: 1fr;
     }
+    
+    .metric-card-tesorero {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .stat-card-usuarios,
+    .stat-card-solicitudes {
+        flex-direction: column;
+        text-align: center;
+    }
+}
 
-    .modal-footer {
+/* Móviles grandes (576px - 767px) */
+@media (max-width: 767px) {
+    .main-content-tesorero {
+        padding: 1rem;
+    }
+    
+    .dashboard-title-tesorero h1,
+    .page-title-tesorero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .financial-metrics-tesorero,
+    .functions-grid,
+    .stats-grid-usuarios,
+    .stats-grid-solicitudes {
+        grid-template-columns: 1fr;
+    }
+    
+    .metric-value-tesorero {
+        font-size: 1.5rem;
+    }
+    
+    .stat-number-usuarios,
+    .stat-number-solicitudes {
+        font-size: 1.75rem;
+    }
+    
+    .page-header-tesorero,
+    .filters-section-tesorero {
+        padding: 1rem;
+    }
+    
+    .btn-primary-tesorero,
+    .btn-outline-tesorero,
+    .btn-danger-tesorero,
+    .quick-action-btn-tesorero {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .modal-body-tesorero {
+        padding: 1rem;
+    }
+    
+    .modal-footer-tesorero {
         flex-direction: column;
     }
-
+    
     .cancel-btn,
     .submit-btn {
         width: 100%;
     }
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
-    .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
+/* Móviles pequeños (575px y menos) */
+@media (max-width: 575px) {
+    .main-content-tesorero {
+        padding: 0.5rem;
     }
-
-    .bottom-section {
-        grid-template-columns: 1fr;
+    
+    .dashboard-title-tesorero h1,
+    .page-title-tesorero h1 {
+        font-size: 1.25rem;
     }
-}
-
-@media (max-width: 992px) {
-    .sidebar {
-        transform: translateX(-100%);
-        position: fixed;
+    
+    .metric-card-tesorero,
+    .function-card,
+    .recent-activity,
+    .system-stats {
+        padding: 1rem;
     }
-
-    .sidebar.open {
-        transform: translateX(0);
+    
+    .table-container-tesorero {
+        border-radius: 8px;
+        margin-bottom: 1rem;
     }
-
-    .main-content {
-        margin-left: 0;
+    
+    .users-table-tesorero {
+        min-width: 600px;
+        font-size: 0.75rem;
     }
-
-    .menu-toggle {
-        display: block;
+    
+    .users-table-tesorero th,
+    .users-table-tesorero td {
+        padding: 0.5rem;
     }
-}
-
-@media (max-width: 768px) {
-    .metrics-grid {
-        grid-template-columns: 1fr;
+    
+    .users-table-tesorero th {
+        font-size: 0.7rem;
     }
-
-    .header-right {
-        gap: var(--spacing-md);
+    
+    .user-cell {
+        gap: 0.5rem;
     }
-
-    .search-box input {
-        width: 150px;
+    
+    .user-avatar-table {
+        width: 32px;
+        height: 32px;
+        font-size: 0.7rem;
     }
-}
-
-@media (max-width: 576px) {
-    .dashboard-header {
+    
+    .actions-cell {
         flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-md);
+        gap: 0.25rem;
     }
-
-    .header-right {
-        width: 100%;
-        justify-content: space-between;
+    
+    .tesorero-modal {
+        width: 95%;
+        margin: 0.5rem;
     }
-
-    .search-box input {
-        width: 100%;
+    
+    .modal-header-tesorero {
+        padding: 1rem 1.5rem;
+    }
+    
+    .modal-header-tesorero h2 {
+        font-size: 1.125rem;
     }
 }

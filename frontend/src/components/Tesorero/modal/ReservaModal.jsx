@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
 
-const  ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
+const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usuarios, cabanas }) => {
   const [formData, setFormData] = useState({
-    nombre: initialData.nombre || '',
-    apellido: initialData.apellido || '',
-    email: initialData.email || '',
-    telefono: initialData.telefono || '',
-    tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
-    numeroDocumento: initialData.numeroDocumento || '',
-    rol: initialData.rol || 'Tesorero',
-    estado: initialData.estado || 'Activo'
+    usuario: initialData.usuario || '',
+    cabana: initialData.cabana || '',
+    fechaInicio: initialData.fechaInicio || '',
+    fechaFin: initialData.fechaFin || '',
+    precio: initialData.precio || '',
+    estado: initialData.estado || '',
+    observaciones: initialData.observaciones || '',
+    activo: initialData.activo || 'Activo'
   });
 
   const handleChange = (e) => {
@@ -31,99 +31,78 @@ const  ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit })
           <h2>{mode === 'create' ? 'Crear Nuevo Reserva' : 'Editar Reserva'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
-        
+
         <div className="modal-body-tesorero">
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Nombre</label>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleChange}
-                  placeholder="Nombre"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Apellido</label>
-                <input
-                  type="text"
-                  name="apellido"
-                  value={formData.apellido}
-                  onChange={handleChange}
-                  placeholder="Apellido"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="correo@ejemplo.com"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Teléfono</label>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  placeholder="Teléfono"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Tipo de Documento</label>
+                <label>Usuarios</label>
                 <select
-                  name="tipoDocumento"
-                  value={formData.tipoDocumento}
+                  name="usuario"
+                  value={formData.usuario}
                   onChange={handleChange}
-                  required
+             
                 >
-                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
-                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                  <option value="Cédula extranjería">Cédula extranjería</option>
+                  <option value="">Seleccione...</option>
+                  {usuarios && usuarios.map(user => (
+                    <option key={user._id} value={user._id}>
+                      {user.nombre || user.username || user.correo} ({user.role})
+                    </option>
+                  ))}
                 </select>
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Número de Documento</label>
-                <input
-                  type="text"
-                  name="numeroDocumento"
-                  value={formData.numeroDocumento}
+                <label>Cabañas</label>
+                <select
+                  name="cabaña"
+                  value={formData.cabana}
                   onChange={handleChange}
-                  placeholder="Número de documento"
+           
+                >
+                  <option value="">Seleccione...</option>
+                  {cabanas && cabanas.map(cab => (
+                    <option key={cab._id} value={cab._id}>
+                      {cab.nombre} {cab.precio ? `- $${cab.precio}` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group-tesorero">
+                <label>Precio</label>
+                <input
+                  type="number"
+                  name="precio"
+                  value={formData.precio}
+                  onChange={handleChange}
+                  placeholder="Precion de la reserva"
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Rol</label>
-                <select
-                  name="rol"
-                  value={formData.rol}
+                <label>Fecha Inicio:</label>
+                <input
+                  type="date"
+                  name="fechaInicio"
+                  value={formData.fechaInicio}
                   onChange={handleChange}
-                  required
-                >
-                  <option value="Tesorero">Tesorero</option>
-                  <option value="Administrador">Administrador</option>
-                  <option value="Usuario">Usuario</option>
-                </select>
+                
+                />
               </div>
-              
+
+              <div className="form-group-tesorero">
+                <label>Fecha Fin:</label>
+                <input
+                  type="date"
+                  name="fechaFin"
+                  value={formData.fechaFin}
+                  onChange={handleChange}
+          
+                />
+              </div>
+
               <div className="form-group-tesorero">
                 <label>Estado</label>
                 <select
@@ -132,13 +111,40 @@ const  ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit })
                   onChange={handleChange}
                   required
                 >
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
+                  <option value="">Seleccione...</option>
                   <option value="Pendiente">Pendiente</option>
+                  <option value="Confirmada">Confirmada</option>
+                  <option value="Cancelada">Cancelada</option>
+                  <option value="finalizada">Finalizada</option>
                 </select>
               </div>
+
+              <div className="form-group-tesorero">
+                <label>Activo</label>
+                <select
+                  name="activo"
+                  value={formData.activo}
+                  onChange={handleChange}
+                  required
+                >
+                  <option>Seleccione...</option>
+                  <option value="true">Sí</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+
+              <div className="form-group-tesorero">
+                <label>Observaciones</label>
+                <input
+                 type='text'
+                  name="observaciones"
+                  value={formData.observaciones}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
-            
+
             <div className="modal-footer-tesorero">
               <button type="button" className="cancel-btn" onClick={onClose}>
                 Cancelar
@@ -149,8 +155,8 @@ const  ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit })
             </div>
           </form>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

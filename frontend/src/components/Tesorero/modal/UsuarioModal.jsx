@@ -5,12 +5,13 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
   const [formData, setFormData] = useState({
     nombre: initialData.nombre || '',
     apellido: initialData.apellido || '',
-    email: initialData.email || '',
+    correo: initialData.correo || '',
     telefono: initialData.telefono || '',
     tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
     numeroDocumento: initialData.numeroDocumento || '',
-    rol: initialData.rol || 'Tesorero',
-    estado: initialData.estado || 'Activo'
+    role: initialData.role || '',
+    estado: initialData.estado || 'Activo',
+    password: initialData.password || ''
   });
 
   const handleChange = (e) => {
@@ -31,7 +32,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
           <h2>{mode === 'create' ? 'Crear Nuevo Usuario' : 'Editar Usuario'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
-        
+
         <div className="modal-body-tesorero">
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
@@ -46,7 +47,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
                 <label>Apellido</label>
                 <input
@@ -58,18 +59,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                   required
                 />
               </div>
-              
-              <div className="form-group-tesorero">
-                <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="correo@ejemplo.com"
-                  required
-                />
-              </div>
+
               
               <div className="form-group-tesorero">
                 <label>Teléfono</label>
@@ -82,7 +72,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
                 <label>Tipo de Documento</label>
                 <select
@@ -92,12 +82,12 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                   required
                 >
                   <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
-                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
+                  <option value="Cédula de extranjería">Cédula extranjería</option>
                   <option value="Pasaporte">Pasaporte</option>
-                  <option value="Cédula extranjería">Cédula extranjería</option>
+                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
                 </select>
               </div>
-              
+
               <div className="form-group-tesorero">
                 <label>Número de Documento</label>
                 <input
@@ -109,21 +99,45 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                   required
                 />
               </div>
-              
+              <div className="form-group-tesorero">
+                <label>Correo</label>
+                <input
+                  type="email"
+                  name="correo"
+                  value={formData.correo}
+                  onChange={handleChange}
+                  placeholder="correo@ejemplo.com"
+                  required
+                />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Contraseña</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Contraseña"
+                  required
+                />
+              </div>
+
+
               <div className="form-group-tesorero">
                 <label>Rol</label>
                 <select
                   name="rol"
-                  value={formData.rol}
+                  value={formData.role}
                   onChange={handleChange}
                   required
                 >
-                  <option value="Tesorero">Tesorero</option>
-                  <option value="Administrador">Administrador</option>
-                  <option value="Usuario">Usuario</option>
+                  <option value="admin">Administrador</option>
+                  <option value="tesorero">Tesorero</option>
+                  <option value="seminarista">Seminarista</option>
+                  <option value="externo">Externo</option>
                 </select>
               </div>
-              
+
               <div className="form-group-tesorero">
                 <label>Estado</label>
                 <select
@@ -138,13 +152,13 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                 </select>
               </div>
             </div>
-            
+
             <div className="modal-footer-tesorero">
               <button type="button" className="cancel-btn" onClick={onClose}>
                 Cancelar
               </button>
               <button type="submit" className="submit-btn">
-                {mode === 'create' ? 'Crear Categorización' : 'Guardar Cambios'}
+                {mode === 'create' ? 'Crear Usuario' : 'Guardar Cambios'}
               </button>
             </div>
           </form>

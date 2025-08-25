@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 
 
-const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
+const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, categorias}) => {
   const [formData, setFormData] = useState({
     nombre: initialData.nombre || '',
-    apellido: initialData.apellido || '',
-    email: initialData.email || '',
-    telefono: initialData.telefono || '',
-    tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
-    numeroDocumento: initialData.numeroDocumento || '',
-    rol: initialData.rol || 'Tesorero',
-    estado: initialData.estado || 'Activo'
+    descripcion: initialData.descripcion || '',
+    capacidad: initialData.capacidad || '',
+    categoria: initialData.categoria || '',
+    precio: initialData.precio || '',
+    ubicacion: initialData.ubicacion || '',
+    estado: initialData.estado || '',
+    imagen: initialData.imagen || ''
   });
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -31,7 +30,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) =
           <h2>{mode === 'create' ? 'Crear Nuevo Cabaña' : 'Editar Cabaña'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
-        
+
         <div className="modal-body-tesorero">
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
@@ -46,99 +45,90 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) =
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Apellido</label>
+                <label>Descripción</label>
                 <input
                   type="text"
-                  name="apellido"
-                  value={formData.apellido}
+                  name="descripcion"
+                  value={formData.descripcion}
                   onChange={handleChange}
-                  placeholder="Apellido"
+                  placeholder="Descripción"
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Email</label>
+                <label>Capacidad</label>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="number"
+                  name="capacidad"
+                  value={formData.capacidad}
                   onChange={handleChange}
-                  placeholder="correo@ejemplo.com"
+                  placeholder="Capacidad"
                   required
                 />
               </div>
-              
               <div className="form-group-tesorero">
-                <label>Teléfono</label>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  placeholder="Teléfono"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Tipo de Documento</label>
+                <label>Categoría</label>
                 <select
-                  name="tipoDocumento"
-                  value={formData.tipoDocumento}
+                  name="categoria"
+                  value={formData.categoria}
                   onChange={handleChange}
                   required
                 >
-                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
-                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                  <option value="Cédula extranjería">Cédula extranjería</option>
+                  <option value="">Seleccione...</option>
+                  {categorias && categorias.map(cat => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.nombre}
+                    </option>
+                  ))}
                 </select>
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Número de Documento</label>
+                <label>Precio</label>
                 <input
-                  type="text"
-                  name="numeroDocumento"
-                  value={formData.numeroDocumento}
+                  type="number"
+                  name="precio"
+                  value={formData.precio}
                   onChange={handleChange}
-                  placeholder="Número de documento"
+                  placeholder="precio"
                   required
                 />
               </div>
-              
               <div className="form-group-tesorero">
-                <label>Rol</label>
-                <select
-                  name="rol"
-                  value={formData.rol}
+                <label>Ubicacion</label>
+                <input
+                  type="text"
+                  name="ubicacion"
+                  value={formData.ubicacion}
                   onChange={handleChange}
+                  placeholder="Ubicacion"
                   required
-                >
-                  <option value="Tesorero">Tesorero</option>
-                  <option value="Administrador">Administrador</option>
-                  <option value="Usuario">Usuario</option>
-                </select>
+                />
               </div>
-              
               <div className="form-group-tesorero">
-                <label>Estado</label>
+                <label> Estado</label>
                 <select
                   name="estado"
                   value={formData.estado}
                   onChange={handleChange}
                   required
                 >
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
-                  <option value="Pendiente">Pendiente</option>
+              <option value="disponible">Disponible</option>
+              <option value="ocupada">Ocupada</option>
+              <option value="mantenimiento">Mantenimiento</option>
                 </select>
               </div>
+              <div className="form-group-tesorero">
+                <label>Imagenes De La Cabaña</label>
+                <input type="file" />
+              </div>
+
+
             </div>
-            
+
             <div className="modal-footer-tesorero">
               <button type="button" className="cancel-btn" onClick={onClose}>
                 Cancelar

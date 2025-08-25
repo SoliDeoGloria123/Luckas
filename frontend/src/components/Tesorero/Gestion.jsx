@@ -1,11 +1,24 @@
-import React from "react";
-import HeaderTesorero from "./Header-tesorero";
+import React, {useState} from "react";
+import HeaderTesorero from "./Header/Header-tesorero";
 import Footer from '../footer/Footer';
 import './Gestion.css';
+// Importa los componentes de gestión
+import Gestionusuarios from './Tablas/Gestionusuarios';
+import Gestionsolicitud from './Tablas/Gestionsolicitud';
+import Gestionevento from './Tablas/Gestionevento';
+import Gestioncabana from './Tablas/Gestioncabana';
+import Gestioninscripcion from './Tablas/Gestioninscripcion';
+import Gestiontarea from './Tablas/Gestiontareas';
+import Gestioncategorizacion from './Tablas/Gestioncategorizar';
+import Gestionreporte from './Tablas/Gestioreportes';
 
 const Gestion = ({ }) => {
+     const [seccionActiva, setSeccionActiva] = useState("gestion");
 
-
+    // Función para cambiar la sección activa
+    const handleGestionar = (seccion) => {
+        setSeccionActiva(seccion);
+    };
 
     return (
         <>
@@ -29,13 +42,11 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Usuarios</h3>
                             <p className="card-description">Administrar cuentas de usuarios del sistema</p>
-                            <a href="seminarista-gestion-usuarios.html" className="card-action">
+                            <a href="" className="card-action"onClick={() => handleGestionar("usuarios")} >
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
                     </div>
-
-
                     <div className="management-card" data-module="solicitudes">
                         <div className="card-icon requests">
                             <i className="fas fa-file-alt"></i>
@@ -167,6 +178,15 @@ const Gestion = ({ }) => {
                         </div>
                     </div>
                 </div>
+                 {seccionActiva === "usuarios" && <Gestionusuarios />}
+                {seccionActiva === "solicitudes" && <Gestionsolicitud />}
+                {seccionActiva === "eventos" && <Gestionevento />}
+                {seccionActiva === "cabanas" && <Gestioncabana />}
+                {seccionActiva === "cursos" && <Gestioninscripcion />}
+                {seccionActiva === "tareas" && <Gestiontarea />}
+                {seccionActiva === "inscripciones" && <Gestioninscripcion />}
+                {seccionActiva === "categorias" && <Gestioncategorizacion />}
+                {seccionActiva === "reportes" && <Gestionreporte />}
             </main>
              <Footer/>
         </>

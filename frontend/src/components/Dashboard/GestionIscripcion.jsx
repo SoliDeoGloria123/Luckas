@@ -7,6 +7,8 @@ import InscripcionModal from "./Modales/InscripsionModal";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
 const GestionIscripcion = () => {
+  const [eventos, setEventos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [inscripciones, setInscripciones] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -26,8 +28,7 @@ const GestionIscripcion = () => {
     observaciones: "",
     solicitud: ""
   });
-  const [eventos, setEventos] = useState([]);
-  const [categorias, setCategorias] = useState([]);
+
 
   // Obtener inscripciones
   const obtenerInscripciones = async () => {

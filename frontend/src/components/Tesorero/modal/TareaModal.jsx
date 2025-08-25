@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
 
-const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
+const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usuarios }) => {
   const [formData, setFormData] = useState({
-    nombre: initialData.nombre || '',
-    apellido: initialData.apellido || '',
-    email: initialData.email || '',
-    telefono: initialData.telefono || '',
-    tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
-    numeroDocumento: initialData.numeroDocumento || '',
-    rol: initialData.rol || 'Tesorero',
-    estado: initialData.estado || 'Activo'
+    titulo: initialData.titulo || '',
+    descripcion: initialData.descripcion || '',
+    estado: initialData.estado || '',
+    prioridad: initialData.prioridad || '',
+    asignadoA: initialData.asignadoA || '',
+    asignadoPor: initialData.asignadoPor || '',
+    fechaLimite: initialData.fechaLimite || '',
+    comentarios: initialData.comentarios || ''
   });
 
   const handleChange = (e) => {
@@ -31,99 +31,94 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) =>
           <h2>{mode === 'create' ? 'Crear Nuevo Tarea' : 'Editar Tarea'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
-        
         <div className="modal-body-tesorero">
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Nombre</label>
+                <label>Título</label>
                 <input
                   type="text"
-                  name="nombre"
-                  value={formData.nombre}
+                  name="titulo"
+                  value={formData.titulo}
                   onChange={handleChange}
                   placeholder="Nombre"
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Apellido</label>
+                <label>Descripción</label>
                 <input
                   type="text"
-                  name="apellido"
-                  value={formData.apellido}
+                  name="descripcion"
+                  value={formData.descripcion}
                   onChange={handleChange}
                   placeholder="Apellido"
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Email</label>
+                <label>Fecha Límite</label>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="date"
+                  name="fechaLimite"
+                  value={formData.fechaLimite}
                   onChange={handleChange}
                   placeholder="correo@ejemplo.com"
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Teléfono</label>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  placeholder="Teléfono"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Tipo de Documento</label>
+                <label>Asignado a</label>
                 <select
-                  name="tipoDocumento"
-                  value={formData.tipoDocumento}
+                  name="asignadoA"
+                  value={formData.asignadoA}
+                  onChange={handleChange}
+                >
+                  <option value="">Seleccione...</option>
+                  {usuarios && usuarios.map(user => (
+                    <option key={user._id} value={user._id}>
+                      {user.nombre} ({user.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group-tesorero">
+                <label>Asignado por</label>
+                <select
+                  name="asignadoPor"
+                  value={formData.asignadoPor}
                   onChange={handleChange}
                   required
                 >
-                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
-                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                  <option value="Cédula extranjería">Cédula extranjería</option>
+                  <option value="">Seleccione...</option>
+                  {usuarios && usuarios.map(user => (
+                    <option key={user._id} value={user._id}>
+                      {user.nombre} ({user.role})
+                    </option>
+                  ))}
                 </select>
               </div>
-              
+
+
               <div className="form-group-tesorero">
-                <label>Número de Documento</label>
-                <input
-                  type="text"
-                  name="numeroDocumento"
-                  value={formData.numeroDocumento}
-                  onChange={handleChange}
-                  placeholder="Número de documento"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Rol</label>
+                <label>Prioridad</label>
                 <select
-                  name="rol"
-                  value={formData.rol}
+                  name="prioridad"
+                  value={formData.prioridad}
                   onChange={handleChange}
                   required
                 >
-                  <option value="Tesorero">Tesorero</option>
-                  <option value="Administrador">Administrador</option>
-                  <option value="Usuario">Usuario</option>
+                  <option>Seleccione...</option>
+                  <option value="media">Media</option>
+                  <option value="alta">Alta</option>
+                  <option value="baja">Baja</option>
                 </select>
               </div>
-              
+
               <div className="form-group-tesorero">
                 <label>Estado</label>
                 <select
@@ -132,13 +127,15 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) =>
                   onChange={handleChange}
                   required
                 >
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
-                  <option value="Pendiente">Pendiente</option>
+                  <option>Seleccione...</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="en progreso">En Progreso</option>
+                  <option value="completada">Completada</option>
+                  <option value="cancelada">Cancelada</option>
                 </select>
               </div>
             </div>
-            
+
             <div className="modal-footer-tesorero">
               <button type="button" className="cancel-btn" onClick={onClose}>
                 Cancelar

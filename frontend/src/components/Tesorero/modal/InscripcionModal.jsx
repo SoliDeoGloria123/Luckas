@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import { userService } from '../../../services/userService';
 
 
 const InscripcionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
+    usuario: initialData.usuario || '',
     nombre: initialData.nombre || '',
     apellido: initialData.apellido || '',
-    email: initialData.email || '',
-    telefono: initialData.telefono || '',
-    tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
+    tipoDocumento: initialData.tipoDocumento || '',
     numeroDocumento: initialData.numeroDocumento || '',
-    rol: initialData.rol || 'Tesorero',
-    estado: initialData.estado || 'Activo'
+    correo: initialData.correo || '',
+    telefono: initialData.telefono || '',
+    edad: initialData.edad || '',
+    categoria: initialData.categoria || '',
+    estado: initialData.estado || '',
+    observaciones: initialData.observaciones || '',
   });
 
   const handleChange = (e) => {
@@ -23,6 +27,46 @@ const InscripcionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit
     onSubmit(formData);
     onClose();
   };
+  
+  // 🔹 Buscar datos cuando cambia la cédula
+  useEffect(() => {
+    const cargarDatosUsuario = async () => {
+      if (formData.numeroDocumento && formData.numeroDocumento.length > 5) {
+        try {
+          // aquí cambias por tu método real: getByDocumento o getById
+          const user = await userService.getByDocumento(formData.numeroDocumento);
+
+          if (user) {
+            setFormData((prev) => ({
+              ...prev,
+              nombre: user.nombre || "",
+              apellido: user.apellido || "",
+              correo: user.correo || "",
+              telefono: user.telefono || "",
+              tipoDocumento: user.tipoDocumento || "",
+              role: user.role || "",
+              estado: user.estado || ""
+            }));
+          }
+        } catch (error) {
+          console.error("No se encontró usuario:", error);
+          // 🔹 Limpia si no existe
+          setFormData((prev) => ({
+            ...prev,
+            nombre: "",
+            apellido: "",
+            correo: "",
+            telefono: "",
+            tipoDocumento: "",
+            role: "",
+            estado: ""
+          }));
+        }
+      }
+    };
+
+    cargarDatosUsuario();
+  }, [formData.numeroDocumento]); // 👈 depende del número de documento
 
   return (
     <div className="modal-overlay-tesorero">
@@ -36,19 +80,19 @@ const InscripcionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Nombre</label>
+                <label>Cedula Usuario</label>
                 <input
                   type="text"
-                  name="nombre"
-                  value={formData.nombre}
+                  name="numeroDocumento"
+                  value={formData.numeroDocumento}
                   onChange={handleChange}
-                  placeholder="Nombre"
+                  placeholder="Número de documento"
                   required
                 />
               </div>
-              
+  
               <div className="form-group-tesorero">
-                <label>Apellido</label>
+                <label>Nombre</label>
                 <input
                   type="text"
                   name="apellido"
@@ -60,11 +104,11 @@ const InscripcionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit
               </div>
               
               <div className="form-group-tesorero">
-                <label>Email</label>
+                <label>Apellido</label>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  name="apellido"
+                  value={formData.apellido}
                   onChange={handleChange}
                   placeholder="correo@ejemplo.com"
                   required
@@ -72,11 +116,11 @@ const InscripcionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit
               </div>
               
               <div className="form-group-tesorero">
-                <label>Teléfono</label>
+                <label>Tipo de Documento</label>
                 <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
+                  type="text"
+                  name="tipoDocumento"
+                  value={formData.tipoDocumento}
                   onChange={handleChange}
                   placeholder="Teléfono"
                   required
@@ -84,26 +128,22 @@ const InscripcionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit
               </div>
               
               <div className="form-group-tesorero">
-                <label>Tipo de Documento</label>
-                <select
-                  name="tipoDocumento"
-                  value={formData.tipoDocumento}
+                <label>Número de Documento</label>
+                <input
+                type='text'
+                  name="numeroDocumento"
+                  value={formData.numeroDocumento}
                   onChange={handleChange}
                   required
-                >
-                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
-                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                  <option value="Cédula extranjería">Cédula extranjería</option>
-                </select>
+                />
               </div>
               
               <div className="form-group-tesorero">
-                <label>Número de Documento</label>
+                <label>Correo</label>
                 <input
-                  type="text"
-                  name="numeroDocumento"
-                  value={formData.numeroDocumento}
+                  type="email"
+                  name="correo"
+                  value={formData.correo}
                   onChange={handleChange}
                   placeholder="Número de documento"
                   required
@@ -111,19 +151,42 @@ const InscripcionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit
               </div>
               
               <div className="form-group-tesorero">
-                <label>Rol</label>
+                <label>Teléfono</label>
+                <input
+                type='text'
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  required
+                />
+      
+              </div>
+              
+              <div className="form-group-tesorero">
+                <label>Edad</label>
+                <input
+                type='number'
+                  name="edad"
+                  value={formData.edad}
+                  onChange={handleChange}
+                  required
+                />
+     
+              </div>
+              
+              <div className="form-group-tesorero">
+                <label>Categoría</label>
                 <select
-                  name="rol"
-                  value={formData.rol}
+                  name="categoria"
+                  value={formData.categoria}
                   onChange={handleChange}
                   required
                 >
-                  <option value="Tesorero">Tesorero</option>
-                  <option value="Administrador">Administrador</option>
-                  <option value="Usuario">Usuario</option>
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                  <option value="Pendiente">Pendiente</option>
                 </select>
               </div>
-              
               <div className="form-group-tesorero">
                 <label>Estado</label>
                 <select
@@ -136,6 +199,17 @@ const InscripcionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit
                   <option value="Inactivo">Inactivo</option>
                   <option value="Pendiente">Pendiente</option>
                 </select>
+              </div>
+                 <div className="form-group-tesorero">
+                <label>Observaciones</label>
+                <input
+                  type="text"
+                  name="observaciones"
+                  value={formData.observaciones}
+                  onChange={handleChange}
+                  placeholder="Número de documento"
+                  required
+                />
               </div>
             </div>
             

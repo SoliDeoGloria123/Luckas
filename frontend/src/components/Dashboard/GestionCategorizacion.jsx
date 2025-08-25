@@ -7,7 +7,7 @@ import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 const GestionCategorizacion = () => {
     const [categorias, setCategorias] = useState([]);
     const [mostrarModal, setMostrarModal] = useState(false);
-    const [modoEdicion, setModoEdicion] = useState(false);
+    const [modoEdicion, setModoEdicion ] = useState(false);
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
     const [nuevaCategoria, setNuevaCategoria] = useState({ nombre: "", codigo: "", estado: "activo" });
 
@@ -20,7 +20,6 @@ const GestionCategorizacion = () => {
             setCategorias([]);
         }
     };
-
     useEffect(() => {
         obtenerCategorias();
     }, []);

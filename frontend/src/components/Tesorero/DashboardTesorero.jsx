@@ -10,7 +10,7 @@ import Gestioncabana from './Tablas/Gestioncabana';
 import Gestionreserva from './Tablas/Gestionreserva';
 import Gestionreporte from './Tablas/Gestioreportes';
 import "./DashboardTesorero.css";
-import Header from './Header-tesorero';
+import Header from './Header/Header-tesorero';
 import Footer from '../footer/Footer';
 
 const DashboardTesorero = () => {
@@ -25,11 +25,7 @@ const DashboardTesorero = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-    window.location.href = "/login";
-  };
+ 
 
   useEffect(() => {
     const usuarioStorage = localStorage.getItem('usuario');
