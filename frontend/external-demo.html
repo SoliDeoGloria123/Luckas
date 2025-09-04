@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luckas - Dashboard External</title>
+    <style>
+        /* Aquí copiarías todo el CSS del archivo ExternalDashboard.css */
+        @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&display=swap');
+        
+        /* El resto del CSS aquí... */
+        :root {
+          --black: #000000;
+          --white: #ffffff;
+          --blue-accent: #1b62fc;
+          --transition: 200ms ease;
+        }
+        
+        /* ... resto de estilos ... */
+    </style>
+</head>
+<body>
+    <div id="external-dashboard">
+        <!-- El contenido del dashboard se cargaría aquí con React -->
+        <div class="dashboard dark">
+            <div class="animated-background">
+                <div class="shader-overlay"></div>
+            </div>
+            
+            <!-- Header -->
+            <header class="header-translucent">
+                <div class="header-content">
+                    <div class="logo">
+                        <span class="logo-text">Luckas</span>
+                    </div>
+                    <nav class="navigation">
+                        <a href="#courses">Cursos</a>
+                        <a href="#events">Eventos</a>
+                        <a href="#seminarista">Ser Seminarista</a>
+                    </nav>
+                    <div class="header-actions">
+                        <button class="theme-toggle">🌙</button>
+                        <button class="cta-button">Perfil</button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <div class="announcement-badge">
+                        <span>✨ Nuevos cursos disponibles para 2024</span>
+                    </div>
+                    
+                    <h1 class="hero-title">
+                        <span class="title-sans">Bienvenido al</span>
+                        <span class="title-serif">Seminario</span>
+                        <span class="title-sans">Bautista de Colombia</span>
+                    </h1>
+                    
+                    <p class="hero-description">
+                        Inscríbete a nuestros cursos, eventos y forma parte de nuestra 
+                        comunidad educativa. Proceso de inscripción 100% digital.
+                    </p>
+                    
+                    <div class="hero-actions">
+                        <button class="btn-transparent">Ver Cursos</button>
+                        <button class="btn-solid">Ver Eventos</button>
+                    </div>
+                </div>
+                
+                <div class="decorative-circle">
+                    <div class="rotating-text">
+                        <span>SEMINARIO • BAUTISTA • COLOMBIA • </span>
+                    </div>
+                    <div class="circle-pulse"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
