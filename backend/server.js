@@ -61,6 +61,15 @@ app.use('/api/programas-tecnicos', programasTecnicosRoutes);
 app.use('/api/reporte', reporteguardarRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
+// Ruta de salud para verificar el estado del servidor
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'OK', 
+        message: 'Servidor funcionando correctamente',
+        timestamp: new Date().toISOString()
+    });
+});
+
 
 // Ruta para el login/admin - redirigir al frontend React
 app.get('/admin', (req, res) => {

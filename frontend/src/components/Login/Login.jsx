@@ -28,8 +28,7 @@ const Login = () => {
       } else if (data.user.role === 'seminarista') {
         navigate('/seminarista');
       } else if (data.user.role === 'externo') {
-        // Para usuarios externos, redirigir al dashboard HTML estático
-        window.location.href = '/Externo/templates/dashboard.html';
+        navigate('/external');
       } else {
         navigate('/admin/users'); // Por defecto para otros roles
       }

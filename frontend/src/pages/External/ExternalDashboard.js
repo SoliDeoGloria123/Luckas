@@ -1,7 +1,10 @@
 // frontend/src/pages/External/ExternalDashboard.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ExternalDashboard.css';
 import SeminaristaForm from '../../components/External/SeminaristaForm';
+import externalService from '../../services/externalService';
+import PaymentModal from '../../components/External/PaymentModal';
 
 const ExternalDashboard = () => {
     const [darkMode, setDarkMode] = useState(true);
@@ -9,66 +12,137 @@ const ExternalDashboard = () => {
     const [availableEvents, setAvailableEvents] = useState([]);
     const [inscriptions, setInscriptions] = useState([]);
     const [showSeminaristaForm, setShowSeminaristaForm] = useState(false);
-
-    // Datos simulados (tus compañeros conectarán con el backend real)
-    const mockCourses = [
-        {
-            _id: '1',
-            name: 'Teología Bíblica',
-            description: 'Curso completo de teología bíblica fundamental',
-            duration: '6 meses',
-            price: 150000,
-            image: '/images/teologia.jpg'
-        },
-        {
-            _id: '2',
-            name: 'Homilética',
-            description: 'Arte de la predicación cristiana',
-            duration: '4 meses',
-            price: 120000,
-            image: '/images/homiletica.jpg'
-        }
-    ];
-
-    const mockEvents = [
-        {
-            _id: '1',
-            name: 'Campamento de Jóvenes 2024',
-            description: 'Campamento anual para jóvenes cristianos',
-            date: '2024-07-15',
-            location: 'Seminario Bautista',
-            capacity: 100,
-            price: 80000
-        },
-        {
-            _id: '2',
-            name: 'Conferencia Pastoral',
-            description: 'Conferencia para pastores y líderes',
-            date: '2024-08-20',
-            location: 'Auditorio Principal',
-            capacity: 50,
-            price: 60000
-        }
-    ];
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [paymentData, setPaymentData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Simular carga de datos
-        setAvailableCourses(mockCourses);
-        setAvailableEvents(mockEvents);
-    }, []);
+        // Verificar autenticación
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('usuario');
+        
+        if (!token || !userData) {
+            navigate('/login');
+            return;
+        }
 
-    const handleCourseInscription = (courseId) => {
-        alert(`Inscribirse al curso ${courseId} - Aquí se integrará el sistema de pagos`);
+        const user = JSON.parse(userData);
+        if (user.role !== 'externo') {
+            // Redirigir según el rol
+            switch(user.role) {
+                case 'admin':
+                    navigate('/admin/users');
+                    break;
+                case 'tesorero':
+                    navigate('/tesorero');
+                    break;
+                case 'seminarista':
+                    navigate('/seminarista');
+                    break;
+                default:
+                    navigate('/login');
+            }
+            return;
+        }
+
+        setUser(user);
+        loadData();
+    }, [navigate]);
+
+    const loadData = async () => {
+        try {
+            setLoading(true);
+            
+            // Cargar cursos y eventos en paralelo
+            const [cursosResponse, eventosResponse] = await Promise.all([
+                externalService.getCursos(),
+                externalService.getEventos()
+            ]);
+
+            if (cursosResponse.success) {
+                setAvailableCourses(cursosResponse.data || []);
+            }
+
+            if (eventosResponse.success) {
+                setAvailableEvents(eventosResponse.data || []);
+            }
+
+        } catch (error) {
+            console.error('Error al cargar datos:', error);
+            // Si hay error de autenticación, redirigir al login
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                navigate('/login');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCourseInscription = (course) => {
+        setPaymentData({
+            type: 'course',
+            id: course._id,
+            name: course.nombre,
+            price: course.precio,
+            description: course.descripcion
+        });
+        setShowPaymentModal(true);
     };
     
+    const handleEventInscription = (event) => {
+        setPaymentData({
+            type: 'event',
+            id: event._id,
+            name: event.nombre,
+            price: event.precio,
+            description: event.descripcion
+        });
+        setShowPaymentModal(true);
+    };
 
-    const handleEventInscription = (eventId) => {
-        alert(`Inscribirse al evento ${eventId} - Aquí se integrará el sistema de pagos`);
+    const handlePaymentSuccess = async (paymentInfo) => {
+        try {
+            // Procesar la inscripción según el tipo
+            if (paymentData.type === 'course') {
+                await externalService.inscribirCurso(paymentData.id, user._id);
+            } else if (paymentData.type === 'event') {
+                await externalService.inscribirEvento(paymentData.id, user._id);
+            }
+            
+            alert('¡Inscripción exitosa! Has sido inscrito correctamente.');
+            setShowPaymentModal(false);
+            setPaymentData(null);
+            
+            // Recargar datos para actualizar inscripciones
+            loadData();
+        } catch (error) {
+            console.error('Error al procesar inscripción:', error);
+            alert('Error al procesar la inscripción. Inténtalo de nuevo.');
+        }
     };
 
     const handleSeminaristaApplication = () => {
         setShowSeminaristaForm(true);
     };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        navigate('/login');
+    };
+
+    if (loading) {
+        return (
+            <div className="loading-screen">
+                <div className="loading-spinner"></div>
+                <p>Cargando...</p>
+            </div>
+        );
+    }
 
     return (
         <div className={`dashboard ${darkMode ? 'dark' : 'light'}`}>
@@ -92,10 +166,13 @@ const ExternalDashboard = () => {
                     </nav>
 
                     <div className="header-actions">
+                        <span className="user-welcome">Hola, {user?.nombre}</span>
                         <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
                             {darkMode ? '☀️' : '🌙'}
                         </button>
-                        <button className="cta-button">Perfil</button>
+                        <button className="cta-button" onClick={handleLogout}>
+                            Cerrar Sesión
+                        </button>
                     </div>
                 </div>
             </header>
@@ -145,59 +222,71 @@ const ExternalDashboard = () => {
             {/* Courses Section */}
             <section id="courses" className="courses-section">
                 <h2 className="section-title">Cursos Disponibles</h2>
-                <div className="courses-grid">
-                    {availableCourses.map(course => (
-                        <div key={course._id} className="course-card">
-                            <div className="course-image">
-                                <img src={course.image || '/images/default-course.jpg'} alt={course.name} />
-                            </div>
-                            <div className="course-content">
-                                <h3>{course.name}</h3>
-                                <p>{course.description}</p>
-                                <div className="course-details">
-                                    <span className="duration">📅 {course.duration}</span>
-                                    <span className="price">💰 ${course.price?.toLocaleString()}</span>
+                {availableCourses.length === 0 ? (
+                    <div className="empty-state">
+                        <p>No hay cursos disponibles en este momento.</p>
+                    </div>
+                ) : (
+                    <div className="courses-grid">
+                        {availableCourses.map(course => (
+                            <div key={course._id} className="course-card">
+                                <div className="course-image">
+                                    <img src={course.imagen || '/images/default-course.jpg'} alt={course.nombre} />
                                 </div>
-                                <button 
-                                    className="inscribe-btn"
-                                    onClick={() => handleCourseInscription(course._id)}
-                                >
-                                    Inscribirse y Pagar
-                                </button>
+                                <div className="course-content">
+                                    <h3>{course.nombre}</h3>
+                                    <p>{course.descripcion}</p>
+                                    <div className="course-details">
+                                        <span className="duration">📅 {course.duracion}</span>
+                                        <span className="price">💰 ${course.precio?.toLocaleString()}</span>
+                                    </div>
+                                    <button 
+                                        className="inscribe-btn"
+                                        onClick={() => handleCourseInscription(course)}
+                                    >
+                                        Inscribirse y Pagar
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </section>
 
             {/* Events Section */}
             <section id="events" className="events-section">
                 <h2 className="section-title">Próximos Eventos</h2>
-                <div className="events-grid">
-                    {availableEvents.map(event => (
-                        <div key={event._id} className="event-card">
-                            <div className="event-date">
-                                <span className="day">{new Date(event.date).getDate()}</span>
-                                <span className="month">{new Date(event.date).toLocaleString('es', { month: 'short' })}</span>
-                            </div>
-                            <div className="event-content">
-                                <h3>{event.name}</h3>
-                                <p>{event.description}</p>
-                                <div className="event-details">
-                                    <span>📍 {event.location}</span>
-                                    <span>👥 {event.capacity} plazas</span>
-                                    <span>💰 ${event.price?.toLocaleString()}</span>
+                {availableEvents.length === 0 ? (
+                    <div className="empty-state">
+                        <p>No hay eventos programados en este momento.</p>
+                    </div>
+                ) : (
+                    <div className="events-grid">
+                        {availableEvents.map(event => (
+                            <div key={event._id} className="event-card">
+                                <div className="event-date">
+                                    <span className="day">{new Date(event.fechaEvento).getDate()}</span>
+                                    <span className="month">{new Date(event.fechaEvento).toLocaleString('es', { month: 'short' })}</span>
                                 </div>
-                                <button 
-                                    className="inscribe-btn"
-                                    onClick={() => handleEventInscription(event._id)}
-                                >
-                                    Inscribirse
-                                </button>
+                                <div className="event-content">
+                                    <h3>{event.nombre}</h3>
+                                    <p>{event.descripcion}</p>
+                                    <div className="event-details">
+                                        <span>📍 {event.lugar}</span>
+                                        <span>👥 {event.cuposDisponibles} plazas</span>
+                                        <span>💰 ${event.precio?.toLocaleString()}</span>
+                                    </div>
+                                    <button 
+                                        className="inscribe-btn"
+                                        onClick={() => handleEventInscription(event)}
+                                    >
+                                        Inscribirse
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </section>
 
             {/* Seminarista Application Section */}
@@ -233,6 +322,15 @@ const ExternalDashboard = () => {
             {/* Mostrar el formulario de Seminarista si corresponde */}
             {showSeminaristaForm && (
                 <SeminaristaForm onClose={() => setShowSeminaristaForm(false)} />
+            )}
+
+            {/* Modal de pagos */}
+            {showPaymentModal && (
+                <PaymentModal
+                    data={paymentData}
+                    onClose={() => setShowPaymentModal(false)}
+                    onSuccess={handlePaymentSuccess}
+                />
             )}
         </div>
     );

@@ -543,3 +543,48 @@
   z-index: 2;
   box-shadow: 0 20px 40px rgba(27, 98, 252, 0.2);
 }
+
+/* Loading Screen */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--black);
+  color: var(--white);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(27, 98, 252, 0.3);
+  border-top: 3px solid var(--blue-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  opacity: 0.6;
+}
+
+.empty-state p {
+  font-size: 18px;
+  margin: 0;
+}
+
+/* User Welcome */
+.user-welcome {
+  color: var(--white);
+  font-weight: 500;
+  opacity: 0.9;
+}
