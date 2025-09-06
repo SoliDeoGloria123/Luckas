@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { userService } from '../../services/userService';
 import { 
   Users, 
@@ -24,21 +24,26 @@ import {
   Calendar as CalendarIcon
 } from 'lucide-react';
 
-// Componentes de gestión
+// Componentes críticos (no lazy)
 import UsuarioModal from "./Modales/UsuarioModal";
 import TablaUsuarios from "./Tablas/UserTabla";
-import GestionSolicitud from "./GestionSolicitud";
-import Reportes from "./Reportes";
-import ProgramasAcademicos from "./ProgramasAcademicos";
-import Cursos from "./Cursos";
-import ProgramasTecnicos from "./ProgramasTecnicos";
-import GestionCategorizacion from "./GestionCategorizacion";
-import GestionIscripcion from "./GestionIscripcion";
-import GestionEventos from "./GestionEventos";
-import GestionTarea from "./GestionTarea";
-import GestioCabañas from "./GestioCabañas";
-import GestionReservas from "./GestionReservas";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+
+// Lazy imports para mejor rendimiento
+import {
+  GestionSolicitudLazy,
+  ReportesLazy,
+  ProgramasAcademicosLazy,
+  CursosLazy,
+  ProgramasTecnicosLazy,
+  GestionCategorizacionLazy,
+  GestionIscripcionLazy,
+  GestionEventosLazy,
+  GestionTareaLazy,
+  GestioCabañasLazy,
+  GestionReservasLazy,
+  PremiumLoader
+} from './LazyComponents';
 
 const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp }) => {
   // Estados principales
@@ -596,7 +601,7 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
             </div>
           )}
 
-          {/* Otros módulos */}
+          {/* Otros módulos con Lazy Loading */}
           {seccionActiva === "configuracion" && (
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-lg">
               <h2 className="text-2xl font-bold text-slate-800 mb-4">Configuración del Sistema</h2>
@@ -604,17 +609,19 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
             </div>
           )}
 
-          {seccionActiva === "solicitudes" && <GestionSolicitud />}
-          {seccionActiva === "inscripciones" && <GestionIscripcion />}
-          {seccionActiva === "eventos" && <GestionEventos />}
-          {seccionActiva === "categorizacion" && <GestionCategorizacion />}
-          {seccionActiva === "tareas" && <GestionTarea />}
-          {seccionActiva === "cabanas" && <GestioCabañas />}
-          {seccionActiva === "reservas" && <GestionReservas />}
-          {seccionActiva === "programas-academicos" && <ProgramasAcademicos />}
-          {seccionActiva === "cursos" && <Cursos />}
-          {seccionActiva === "programas-tecnicos" && <ProgramasTecnicos />}
-          {seccionActiva === "reportes" && <Reportes />}
+          <Suspense fallback={<PremiumLoader />}>
+            {seccionActiva === "solicitudes" && <GestionSolicitudLazy />}
+            {seccionActiva === "inscripciones" && <GestionIscripcionLazy />}
+            {seccionActiva === "eventos" && <GestionEventosLazy />}
+            {seccionActiva === "categorizacion" && <GestionCategorizacionLazy />}
+            {seccionActiva === "tareas" && <GestionTareaLazy />}
+            {seccionActiva === "cabanas" && <GestioCabañasLazy />}
+            {seccionActiva === "reservas" && <GestionReservasLazy />}
+            {seccionActiva === "programas-academicos" && <ProgramasAcademicosLazy />}
+            {seccionActiva === "cursos" && <CursosLazy />}
+            {seccionActiva === "programas-tecnicos" && <ProgramasTecnicosLazy />}
+            {seccionActiva === "reportes" && <ReportesLazy />}
+          </Suspense>
         </main>
       </div>
     </div>

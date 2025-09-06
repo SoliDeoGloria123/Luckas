@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import PremiumDashboardAdmin from './PremiumDashboardAdmin';
+import OptimizedPremiumDashboard from './OptimizedPremiumDashboard';
 import { useNavigate } from 'react-router-dom';
 
 /**
- * Componente Dashboard Premium específico para el rol de Admin
- * Utiliza el nuevo PremiumDashboardAdmin con diseño sofisticado
+ * Componente Dashboard Premium Optimizado específico para el rol de Admin
+ * Utiliza hooks personalizados y lazy loading para máximo rendimiento
  */
 const DashboardAdmin = () => {
   const [usuario, setUsuario] = useState(null);
@@ -56,7 +56,7 @@ const DashboardAdmin = () => {
   }
 
   return (
-    <PremiumDashboardAdmin 
+    <OptimizedPremiumDashboard 
       usuario={usuario}
       onCerrarSesion={handleCerrarSesion}
     />
