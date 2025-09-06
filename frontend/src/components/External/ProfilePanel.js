@@ -17,6 +17,11 @@ const ProfilePanel = ({ isOpen, onClose, currentUser, onUserUpdate }) => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    text: 'Muy débil',
+    color: '#ef4444'
+  });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [activeTab, setActiveTab] = useState('profile');
@@ -48,6 +53,44 @@ const ProfilePanel = ({ isOpen, onClose, currentUser, onUserUpdate }) => {
       ...prev,
       [name]: value
     }));
+
+    // Calcular fuerza de contraseña para newPassword
+    if (name === 'newPassword') {
+      const strength = calculatePasswordStrength(value);
+      setPasswordStrength(strength);
+    }
+  };
+
+  const calculatePasswordStrength = (password) => {
+    let score = 0;
+    let text = 'Muy débil';
+    let color = '#ef4444';
+
+    if (password.length >= 6) score += 1;
+    if (password.length >= 10) score += 1;
+    if (/[a-z]/.test(password)) score += 1;
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^a-zA-Z0-9]/.test(password)) score += 1;
+
+    if (score <= 2) {
+      text = 'Muy débil';
+      color = '#ef4444';
+    } else if (score <= 3) {
+      text = 'Débil';
+      color = '#f59e0b';
+    } else if (score <= 4) {
+      text = 'Moderada';
+      color = '#eab308';
+    } else if (score <= 5) {
+      text = 'Fuerte';
+      color = '#22c55e';
+    } else {
+      text = 'Muy fuerte';
+      color = '#16a34a';
+    }
+
+    return { score, text, color };
   };
 
   const handleFileChange = (e) => {
@@ -284,6 +327,22 @@ const ProfilePanel = ({ isOpen, onClose, currentUser, onUserUpdate }) => {
                   required
                   minLength="6"
                 />
+                {passwordData.newPassword && (
+                  <div className="password-strength">
+                    <div className="strength-bar">
+                      <div 
+                        className="strength-fill" 
+                        style={{ 
+                          width: `${(passwordStrength.score / 6) * 100}%`,
+                          backgroundColor: passwordStrength.color 
+                        }}
+                      ></div>
+                    </div>
+                    <span className="strength-text" style={{ color: passwordStrength.color }}>
+                      {passwordStrength.text}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="form-group">

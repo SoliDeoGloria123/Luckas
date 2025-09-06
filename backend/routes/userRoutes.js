@@ -25,6 +25,7 @@ router.put('/profile', (req, res, next) => {
     next();
 }, uploadProfile, userController.updateProfile);
 router.put('/change-password', userController.changePassword);
+router.get('/inscripciones', userController.getMyInscripciones);
 
 // Rutas de consulta (admin y tesorero)
 router.get('/', role.checkRole('admin', 'tesorero'), userController.getAllUsers);

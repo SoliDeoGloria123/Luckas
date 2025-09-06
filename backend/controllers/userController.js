@@ -184,6 +184,8 @@ exports.deleteUser = async(req, res)=>{
 exports.updateProfile = async (req, res) => {
     try {
         console.log('[CONTROLLER] Actualizando perfil para usuario:', req.userId);
+        console.log('[CONTROLLER] Datos recibidos:', req.body);
+        console.log('[CONTROLLER] Archivo recibido:', req.file ? req.file.filename : 'No hay archivo');
         
         const { nombre, apellido, correo, telefono, direccion } = req.body;
         
@@ -305,6 +307,53 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Error al cambiar contraseña'
+        });
+    }
+};
+
+// Obtener inscripciones del usuario autenticado
+exports.getMyInscripciones = async (req, res) => {
+    try {
+        console.log('[CONTROLLER] Obteniendo inscripciones para usuario:', req.userId);
+        
+        const Curso = require('../models/Curso');
+        const Eventos = require('../models/Eventos');
+        
+        // Buscar cursos donde el usuario está inscrito
+        const cursos = await Curso.find({
+            'inscripciones.usuario': req.userId
+        }).populate('inscripciones.usuario', 'nombre apellido correo');
+        
+        const inscripciones = [];
+        
+        // Agregar cursos
+        cursos.forEach(curso => {
+            const inscripcion = curso.inscripciones.find(ins => 
+                ins.usuario._id.toString() === req.userId
+            );
+            if (inscripcion) {
+                inscripciones.push({
+                    tipo: 'curso',
+                    cursoId: curso._id,
+                    eventoId: null,
+                    nombre: curso.nombre,
+                    descripcion: curso.descripcion,
+                    fechaInscripcion: inscripcion.fechaInscripcion,
+                    estado: inscripcion.estado
+                });
+            }
+        });
+        
+        res.json({
+            success: true,
+            data: inscripciones
+        });
+        
+    } catch (error) {
+        console.error('[CONTROLLER] Error al obtener inscripciones:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor'
         });
     }
 };

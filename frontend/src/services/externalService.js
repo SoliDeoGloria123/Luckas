@@ -1,7 +1,7 @@
 // frontend/src/services/externalService.js
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3000/api"; // Usar URL completa temporalmente
+const API_BASE_URL = "http://localhost:3001/api"; // Usar URL completa temporalmente
 
 // Configurar axios con el token
 const api = axios.create({
@@ -22,34 +22,33 @@ const externalService = {
   getCursos: async () => {
     try {
       console.log('Making request to /cursos/publicos...');
-      const response = await api.get('/cursos/publicos');
-      console.log('Full API response:', response);
-      console.log('Response data:', response.data);
-      console.log('Response data.data:', response.data.data);
-      
-      // La API devuelve {success: true, data: [...]}
-      if (response.data && response.data.success && response.data.data) {
-        console.log('Returning courses:', response.data.data);
-        return response.data.data;
+      // Usar fetch sin headers de autorización para endpoint público
+      const response = await fetch('http://localhost:3001/api/cursos/publicos');
+      const data = await response.json();
+      if (data && data.success && data.data) {
+        console.log('Returning courses:', data.data);
+        return data.data;
       } else {
         console.log('No data found in response, returning empty array');
         return [];
       }
     } catch (error) {
       console.error('Error al obtener cursos:', error);
-      return []; // Retornar array vacío en lugar de lanzar error
+      return [];
     }
   },
 
   // Obtener eventos disponibles
   getEventos: async () => {
     try {
-      const response = await api.get('/eventos');
-      console.log('Eventos API response:', response.data);
-      return response.data.data || response.data; // Retornar solo los datos
+      // Usar fetch sin headers de autorización para endpoint público
+      const response = await fetch('http://localhost:3001/api/eventos/publicos');
+      const data = await response.json();
+      console.log('Eventos API response:', data);
+      return data.data || [];
     } catch (error) {
       console.error('Error al obtener eventos:', error);
-      throw error;
+      return [];
     }
   },
 
@@ -117,11 +116,11 @@ const externalService = {
   // Obtener mis inscripciones (alias para compatibilidad)
   getMisInscripciones: async (userId) => {
     try {
-      const response = await api.get(`/users/${userId}/inscripciones`);
+      const response = await api.get('/users/inscripciones');
       return response.data;
     } catch (error) {
       console.error('Error al obtener inscripciones:', error);
-      throw error;
+      return { success: true, data: [] };
     }
   },
 

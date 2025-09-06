@@ -19,6 +19,7 @@ const inscripcionesRoutes = require('./routes/inscripcionRoutes');
 const ReportesRoutes= require ('./routes/reportesRoutes')// Asegúrate de que esta ruta exista
 const cursosRoutes = require('./routes/cursosRoutes');
 const programasTecnicosRoutes = require('./routes/programasTecnicosRoutes');
+const pagosRoutes = require('./routes/pagosRoutes');
 const reporteguardarRoutes = require('./routes/reporteRoutes');
 // Primero declaramos app
 const app = express();
@@ -58,6 +59,7 @@ app.use('/api/inscripciones', inscripcionesRoutes); // Asegúrate de que esta ru
 app.use('/api/reportes', ReportesRoutes);
 app.use('/api/cursos', cursosRoutes);
 app.use('/api/programas-tecnicos', programasTecnicosRoutes);
+app.use('/api/pagos', pagosRoutes);
 app.use('/api/reporte', reporteguardarRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
@@ -92,7 +94,7 @@ app.get('*', (req, res) => {
 
 
 //Inicio del servidor
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT,()=>{
     console.log(`Servidor en http://localhost:${PORT}`);
 });
