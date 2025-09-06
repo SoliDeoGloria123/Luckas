@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { userService } from '../../services/userService';
-import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import { userService } from '../../../services/userService';
+import { mostrarAlerta, mostrarConfirmacion } from '../../utils/alertas.jsx';
 
 // Hook para manejo de operaciones CRUD de usuarios
 export const useUsuariosAdmin = (obtenerUsuarios, usuarioActual, setUsuarioActual) => {

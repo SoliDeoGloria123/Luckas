@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { userService } from '../../services/userService';
+import { userService } from '../../../services/userService';
 
 // Hook personalizado para el manejo optimizado del dashboard admin
 export const useDashboardAdmin = (usuarioProp, onCerrarSesion) => {
