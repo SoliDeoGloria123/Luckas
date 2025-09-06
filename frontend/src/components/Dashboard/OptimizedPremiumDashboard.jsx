@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, Suspense } from 'react';
 import { 
   Users, 
   Settings, 
@@ -20,20 +20,28 @@ import {
   Shield,
   BookOpen,
   Layers,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  Sun,
+  Moon
 } from 'lucide-react';
+
+// Estilos
+import './PremiumAnimations.css';
 
 // Hooks optimizados
 import { useDashboardAdmin } from './hooks/useDashboardAdmin';
 import { useUsuariosAdmin } from './hooks/useUsuariosAdmin';
+import { useTheme } from '../../hooks/useTheme';
 
 // Componentes
 import UsuarioModal from "./Modales/UsuarioModal";
 import TablaUsuarios from "./Tablas/UserTabla";
 import { PremiumLoader } from './LazyComponents';
 
-// Estilos
-import './PremiumAnimations.css';
+// Lazy loading de los nuevos componentes de gestión
+const GestionProgramasAcademicosAdmin = React.lazy(() => import('./GestionProgramasAcademicosAdmin'));
+const GestionEventosAdmin = React.lazy(() => import('./GestionEventosAdmin'));
+const GestionCabanasAdmin = React.lazy(() => import('./GestionCabanasAdmin'));
 
 const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp }) => {
   // Estados locales
@@ -43,6 +51,9 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
   const [mostrarMenu, setMostrarMenu] = useState(false);
   
   const menuRef = useRef(null);
+
+  // Hook para tema
+  const { toggleTema, esTemaOscuro } = useTheme();
 
   // Hook principal del dashboard
   const {
@@ -129,21 +140,21 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+    <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
       {/* Sidebar Premium con animaciones */}
-      <div className={`fixed left-0 top-0 h-full glass-card border-r border-white/20 shadow-2xl transition-all duration-300 z-30 ${
+      <div className={`fixed left-0 top-0 h-full glass-card border-r shadow-2xl transition-all duration-300 z-30 ${
         sidebarAbierto ? 'w-72' : 'w-20'
       }`}>
         {/* Logo con efecto shimmer */}
-        <div className="p-6 border-b border-slate-200/50">
+        <div className="p-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shimmer">
               <BookOpen className="w-6 h-6 text-white icon-bounce" />
             </div>
             {sidebarAbierto && (
               <div className="fade-in-up">
-                <h1 className="text-xl font-bold text-slate-800">Luckas</h1>
-                <p className="text-sm text-slate-500">Admin Panel</p>
+                <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Luckas</h1>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Admin Panel</p>
               </div>
             )}
           </div>
@@ -154,7 +165,7 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
           {menuItems.map((section, sectionIndex) => (
             <div key={sectionIndex} className="fade-in-up" style={{ animationDelay: `${sectionIndex * 0.1}s` }}>
               {sidebarAbierto && (
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
                   {section.section}
                 </h3>
               )}
@@ -169,8 +180,11 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
                         className={`sidebar-item w-full flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200 group ${
                           isActive 
                             ? 'active text-white shadow-lg' 
-                            : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'
+                            : 'hover:bg-slate-100/80 dark:hover:bg-slate-700/80'
                         }`}
+                        style={{ 
+                          color: isActive ? 'white' : 'var(--text-secondary)'
+                        }}
                       >
                         <Icon className={`w-5 h-5 icon-bounce ${isActive ? 'text-white' : item.color}`} />
                         {sidebarAbierto && (
@@ -192,16 +206,20 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
       {/* Main Content */}
       <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
         {/* Header Premium */}
-        <header className="glass-card border-b border-slate-200/50 px-6 py-4 sticky top-0 z-20">
+        <header className="glass-card border-b px-6 py-4 sticky top-0 z-20" style={{ borderColor: 'var(--border-color)' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setSidebarAbierto(!sidebarAbierto)}
-                className="p-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 transition-all duration-300 icon-bounce"
+                className="p-2 rounded-xl transition-all duration-300 icon-bounce"
+                style={{ 
+                  background: 'var(--bg-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <div className="text-sm text-slate-500 fade-in-up">
+              <div className="text-sm fade-in-up" style={{ color: 'var(--text-muted)' }}>
                 Dashboard / {seccionActiva.charAt(0).toUpperCase() + seccionActiva.slice(1)}
               </div>
             </div>
@@ -209,16 +227,31 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
             <div className="flex items-center space-x-4">
               {/* Search con efectos */}
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                 <input
                   type="text"
                   placeholder="Buscar..."
                   className="pl-10 pr-4 py-2 glass-card border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  style={{ color: 'var(--text-primary)' }}
                 />
               </div>
 
+              {/* Toggle de tema */}
+              <button
+                onClick={toggleTema}
+                className="p-2 rounded-xl glass-card transition-all duration-300 icon-bounce"
+                style={{ color: 'var(--text-secondary)' }}
+                title={`Cambiar a modo ${esTemaOscuro ? 'claro' : 'oscuro'}`}
+              >
+                {esTemaOscuro ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
+
               {/* Notifications con pulse */}
-              <button className="relative p-2 rounded-xl glass-card text-slate-600 transition-all duration-300 icon-bounce">
+              <button className="relative p-2 rounded-xl glass-card transition-all duration-300 icon-bounce" style={{ color: 'var(--text-secondary)' }}>
                 <Bell className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full pulse-notification"></span>
               </button>
@@ -431,12 +464,38 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
 
           {/* Placeholder para otras secciones */}
           {seccionActiva !== "dashboard" && seccionActiva !== "usuarios" && (
-            <div className="glass-card rounded-2xl p-8 border border-white/20 shadow-lg fade-in-up">
-              <h2 className="text-2xl font-bold text-slate-800 mb-4">
-                {seccionActiva.charAt(0).toUpperCase() + seccionActiva.slice(1).replace('-', ' ')}
-              </h2>
-              <p className="text-slate-600">Esta sección está disponible con lazy loading para mejor rendimiento.</p>
-            </div>
+            <>
+              {/* Programas Académicos */}
+              {seccionActiva === "programas-academicos" && (
+                <Suspense fallback={<PremiumLoader />}>
+                  <GestionProgramasAcademicosAdmin />
+                </Suspense>
+              )}
+
+              {/* Eventos */}
+              {seccionActiva === "eventos" && (
+                <Suspense fallback={<PremiumLoader />}>
+                  <GestionEventosAdmin />
+                </Suspense>
+              )}
+
+              {/* Cabañas */}
+              {seccionActiva === "cabanas" && (
+                <Suspense fallback={<PremiumLoader />}>
+                  <GestionCabanasAdmin />
+                </Suspense>
+              )}
+
+              {/* Secciones no implementadas aún */}
+              {!["programas-academicos", "eventos", "cabanas"].includes(seccionActiva) && (
+                <div className="glass-card rounded-2xl p-8 border border-white/20 shadow-lg fade-in-up">
+                  <h2 className="text-2xl font-bold text-slate-800 mb-4">
+                    {seccionActiva.charAt(0).toUpperCase() + seccionActiva.slice(1).replace('-', ' ')}
+                  </h2>
+                  <p className="text-slate-600">Esta sección está disponible con lazy loading para mejor rendimiento.</p>
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>

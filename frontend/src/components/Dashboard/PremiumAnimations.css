@@ -1,32 +1,95 @@
-/* Premium Dashboard Animations */
+/* Premium Dashboard Animations - Luckas System */
+
+/* Variables CSS para temas */
+:root {
+  /* Colores modo claro */
+  --bg-primary: #f8fafc;
+  --bg-secondary: rgba(255, 255, 255, 0.8);
+  --bg-glass: rgba(255, 255, 255, 0.25);
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: rgba(226, 232, 240, 0.5);
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-heavy: rgba(0, 0, 0, 0.25);
+  
+  /* Gradientes */
+  --gradient-primary: linear-gradient(135deg, #2563eb, #8b5cf6);
+  --gradient-secondary: linear-gradient(135deg, #06b6d4, #3b82f6);
+  --gradient-accent: linear-gradient(135deg, #10b981, #06b6d4);
+  --gradient-danger: linear-gradient(135deg, #ef4444, #f97316);
+  --gradient-bg: linear-gradient(to bottom right, #f8fafc, rgba(59, 130, 246, 0.05));
+}
+
+/* Modo oscuro */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-secondary: rgba(30, 41, 59, 0.8);
+  --bg-glass: rgba(30, 41, 59, 0.4);
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-color: rgba(51, 65, 85, 0.5);
+  --shadow-light: rgba(0, 0, 0, 0.3);
+  --shadow-medium: rgba(0, 0, 0, 0.4);
+  --shadow-heavy: rgba(0, 0, 0, 0.6);
+  --gradient-bg: linear-gradient(to bottom right, #0f172a, rgba(30, 41, 59, 0.3));
+}
+
+/* Estilos base responsivos */
+* {
+  box-sizing: border-box;
+}
 
 /* Transiciones suaves para glassmorphism */
 .glass-card {
+  background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  color: var(--text-primary);
 }
 
 .glass-card:hover {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   transform: translateY(-2px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px var(--shadow-heavy);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive breakpoints */
+@media (max-width: 640px) {
+  .glass-card {
+    margin: 0.5rem;
+    padding: 1rem !important;
+  }
 }
 
 /* Animaciones para estadísticas */
 .stat-card {
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .stat-card:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px -8px var(--shadow-medium);
+}
+
+@media (max-width: 768px) {
+  .stat-card:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
 }
 
 .stat-number {
   display: inline-block;
   animation: countUp 1.5s ease-out;
+  color: var(--text-primary);
 }
 
 @keyframes countUp {
@@ -40,11 +103,12 @@
   }
 }
 
-/* Animaciones para sidebar */
+/* Animaciones para sidebar responsivo */
 .sidebar-item {
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  color: var(--text-secondary);
 }
 
 .sidebar-item::before {
@@ -63,8 +127,41 @@
 }
 
 .sidebar-item.active {
-  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  background: var(--gradient-primary);
+  color: white;
   box-shadow: 0 8px 32px rgba(37, 99, 235, 0.3);
+}
+
+/* Responsive sidebar */
+@media (max-width: 768px) {
+  .sidebar-mobile {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    z-index: 50;
+    transition: left 0.3s ease-in-out;
+  }
+  
+  .sidebar-mobile.open {
+    left: 0;
+  }
+  
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .sidebar-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 /* Animación de entrada suave */
@@ -83,9 +180,38 @@
   }
 }
 
-/* Animación de carga de skeleton */
+/* Responsive grid layouts */
+.responsive-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Animación de carga de skeleton con soporte dark mode */
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-glass) 50%,
+    var(--bg-secondary) 75%
+  );
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
 }
@@ -103,8 +229,10 @@
 .btn-premium {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  background: var(--gradient-primary);
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  color: white;
+  border: none;
 }
 
 .btn-premium::before {
@@ -125,6 +253,14 @@
 .btn-premium:hover {
   transform: translateY(-2px);
   box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+}
+
+/* Responsive button sizing */
+@media (max-width: 640px) {
+  .btn-premium {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
 }
 
 /* Animaciones para iconos */
@@ -156,6 +292,36 @@
   100% {
     background-position: 20px 20px;
   }
+}
+
+/* Dark mode toggle button */
+.theme-toggle {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  background: var(--bg-glass);
+  border-radius: 15px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px var(--shadow-light);
+}
+
+[data-theme="dark"] .theme-toggle::before {
+  transform: translateX(28px);
+  background: var(--gradient-accent);
 }
 
 /* Transición suave para cambio de secciones */
@@ -191,17 +357,20 @@
 /* Hover effect para tarjetas de usuario */
 .user-card {
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .user-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px var(--shadow-medium);
 }
 
 /* Animación de loading para el spinner premium */
 .spinner-premium {
   animation: spin 1s linear infinite;
   filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.5));
+  color: var(--text-primary);
 }
 
 @keyframes spin {
@@ -211,4 +380,154 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Modal responsive */
+@media (max-width: 640px) {
+  .modal-container {
+    margin: 0.5rem;
+    width: calc(100% - 1rem);
+    max-height: calc(100vh - 1rem);
+  }
+}
+
+/* Table responsive */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .table-container table {
+    font-size: 0.875rem;
+  }
+  
+  .table-container th,
+  .table-container td {
+    padding: 0.5rem;
+  }
+}
+
+/* Form responsive */
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .form-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .form-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Card grid responsivo */
+.card-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles mejorados */
+.focus-visible:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Scrollbar personalizado para dark mode */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Transiciones suaves para el cambio de tema */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Utilidades de texto responsive */
+@media (max-width: 640px) {
+  .text-responsive-sm {
+    font-size: 0.875rem;
+  }
+  
+  .text-responsive-base {
+    font-size: 1rem;
+  }
+  
+  .text-responsive-lg {
+    font-size: 1.125rem;
+  }
+  
+  .text-responsive-xl {
+    font-size: 1.25rem;
+  }
+  
+  .text-responsive-2xl {
+    font-size: 1.5rem;
+  }
+}
+
+/* Estados de loading mejorados */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-glass) 25%,
+    var(--bg-secondary) 50%,
+    var(--bg-glass) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Mejoras de contraste para dark mode */
+[data-theme="dark"] .glass-card {
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+[data-theme="dark"] .btn-premium {
+  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="dark"] .sidebar-item.active {
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
 }
