@@ -167,7 +167,7 @@ const ExternalDashboard = () => {
     <div className={`external-dashboard ${darkMode ? 'dark-mode' : ''}`}>
       {/* Header translúcido con backdrop-blur */}
       <header className="hero-header">
-        <button className="hero-logo" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>Luckas</button>
+        <a href="#" className="hero-logo">Luckas</a>
         <nav className="hero-nav">
           <a href="#cursos">Cursos</a>
           <a href="#eventos">Eventos</a>
@@ -209,7 +209,7 @@ const ExternalDashboard = () => {
               )}
             </div>
           )}
-          <button className="hero-cta" onClick={handleLogout}>Cerrar Sesión</button>
+          <button className="hero-cta">Comenzar</button>
         </div>
       </header>
 

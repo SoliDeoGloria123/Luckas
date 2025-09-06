@@ -178,4 +178,133 @@ exports.deleteUser = async(req, res)=>{
             message: 'Error al eliminar usuario'
         });
     }
+}
+
+// Actualizar perfil del usuario autenticado
+exports.updateProfile = async (req, res) => {
+    try {
+        console.log('[CONTROLLER] Actualizando perfil para usuario:', req.userId);
+        
+        const { nombre, apellido, correo, telefono, direccion } = req.body;
+        
+        // Verificar si el correo ya existe en otro usuario
+        if (correo) {
+            const existingUser = await User.findOne({ 
+                correo, 
+                _id: { $ne: req.userId } 
+            });
+            
+            if (existingUser) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'El correo electrónico ya está en uso'
+                });
+            }
+        }
+
+        const updateData = {};
+        if (nombre) updateData.nombre = nombre;
+        if (apellido) updateData.apellido = apellido;
+        if (correo) updateData.correo = correo;
+        if (telefono) updateData.telefono = telefono;
+        if (direccion) updateData.direccion = direccion;
+
+        // Si hay archivo de imagen (foto de perfil)
+        if (req.file) {
+            updateData.fotoPerfil = `/uploads/perfiles/${req.file.filename}`;
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.userId,
+            updateData,
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        console.log('[CONTROLLER] Perfil actualizado exitosamente');
+        res.status(200).json({
+            success: true,
+            message: 'Perfil actualizado exitosamente',
+            data: updatedUser
+        });
+
+    } catch (error) {
+        console.error('[CONTROLLER] Error al actualizar perfil:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al actualizar perfil'
+        });
+    }
+}
+
+// Cambiar contraseña del usuario autenticado
+exports.changePassword = async (req, res) => {
+    try {
+        console.log('[CONTROLLER] Cambiando contraseña para usuario:', req.userId);
+        
+        const { currentPassword, newPassword } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Se requiere la contraseña actual y la nueva contraseña'
+            });
+        }
+
+        // Buscar el usuario
+        const user = await User.findById(req.userId);
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        // Verificar la contraseña actual
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        
+        if (!isCurrentPasswordValid) {
+            return res.status(400).json({
+                success: false,
+                message: 'La contraseña actual es incorrecta'
+            });
+        }
+
+        // Validar nueva contraseña
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'La nueva contraseña debe tener al menos 6 caracteres'
+            });
+        }
+
+        // Hashear la nueva contraseña
+        const saltRounds = 12;
+        const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        // Actualizar la contraseña
+        await User.findByIdAndUpdate(req.userId, {
+            password: hashedNewPassword
+        });
+
+        console.log('[CONTROLLER] Contraseña actualizada exitosamente');
+        res.status(200).json({
+            success: true,
+            message: 'Contraseña actualizada exitosamente'
+        });
+
+    } catch (error) {
+        console.error('[CONTROLLER] Error al cambiar contraseña:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al cambiar contraseña'
+        });
+    }
 };

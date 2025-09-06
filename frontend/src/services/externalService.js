@@ -1,7 +1,7 @@
 // frontend/src/services/externalService.js
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = "http://localhost:3000/api"; // Usar URL completa temporalmente
 
 // Configurar axios con el token
 const api = axios.create({
@@ -18,14 +18,26 @@ api.interceptors.request.use((config) => {
 });
 
 const externalService = {
-  // Obtener cursos disponibles
+  // Obtener cursos disponibles (usar ruta pública)
   getCursos: async () => {
     try {
-      const response = await api.get('/cursos');
-      return response.data;
+      console.log('Making request to /cursos/publicos...');
+      const response = await api.get('/cursos/publicos');
+      console.log('Full API response:', response);
+      console.log('Response data:', response.data);
+      console.log('Response data.data:', response.data.data);
+      
+      // La API devuelve {success: true, data: [...]}
+      if (response.data && response.data.success && response.data.data) {
+        console.log('Returning courses:', response.data.data);
+        return response.data.data;
+      } else {
+        console.log('No data found in response, returning empty array');
+        return [];
+      }
     } catch (error) {
       console.error('Error al obtener cursos:', error);
-      throw error;
+      return []; // Retornar array vacío en lugar de lanzar error
     }
   },
 
@@ -33,7 +45,8 @@ const externalService = {
   getEventos: async () => {
     try {
       const response = await api.get('/eventos');
-      return response.data;
+      console.log('Eventos API response:', response.data);
+      return response.data.data || response.data; // Retornar solo los datos
     } catch (error) {
       console.error('Error al obtener eventos:', error);
       throw error;
@@ -89,12 +102,51 @@ const externalService = {
   },
 
   // Obtener mis inscripciones
+  getInscripciones: async (userId) => {
+    try {
+      const response = await api.get(`/users/${userId}/inscripciones`);
+      console.log('Inscripciones API response:', response.data);
+      return response.data.data || response.data;
+    } catch (error) {
+      console.error('Error al obtener inscripciones:', error);
+      // En caso de error, retornar array vacío para no romper la UI
+      return [];
+    }
+  },
+
+  // Obtener mis inscripciones (alias para compatibilidad)
   getMisInscripciones: async (userId) => {
     try {
       const response = await api.get(`/users/${userId}/inscripciones`);
       return response.data;
     } catch (error) {
       console.error('Error al obtener inscripciones:', error);
+      throw error;
+    }
+  },
+
+  // Actualizar perfil de usuario
+  updateProfile: async (formData) => {
+    try {
+      const response = await api.put('/users/profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error al actualizar perfil:', error);
+      throw error;
+    }
+  },
+
+  // Cambiar contraseña
+  changePassword: async (passwordData) => {
+    try {
+      const response = await api.put('/users/change-password', passwordData);
+      return response.data;
+    } catch (error) {
+      console.error('Error al cambiar contraseña:', error);
       throw error;
     }
   }

@@ -19,4 +19,21 @@ export const authService = {
     });
     return response.data;
   },
+
+  // Solicitar recuperación de contraseña
+  forgotPassword: async (correo) => {
+    const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, {
+      correo,
+    });
+    return response.data;
+  },
+
+  // Resetear contraseña con token
+  resetPassword: async (token, newPassword) => {
+    const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, {
+      token,
+      newPassword,
+    });
+    return response.data;
+  },
 };
