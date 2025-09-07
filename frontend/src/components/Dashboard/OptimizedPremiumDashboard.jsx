@@ -176,7 +176,10 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
                   return (
                     <li key={item.id} style={{ animationDelay: `${(sectionIndex * 4 + itemIndex) * 0.05}s` }}>
                       <button
-                        onClick={() => setSeccionActiva(item.id)}
+                        onClick={() => {
+                          console.log(`Cambiando a sección: ${item.id}`);
+                          setSeccionActiva(item.id);
+                        }}
                         className={`sidebar-item w-full flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200 group ${
                           isActive 
                             ? 'active text-white shadow-lg' 
@@ -465,25 +468,45 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
           {/* Placeholder para otras secciones */}
           {seccionActiva !== "dashboard" && seccionActiva !== "usuarios" && (
             <>
+              {/* Debug - mostrar la sección activa */}
+              <div className="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded">
+                <small>Debug: Sección activa = "{seccionActiva}"</small>
+              </div>
+
               {/* Programas Académicos */}
               {seccionActiva === "programas-academicos" && (
-                <Suspense fallback={<PremiumLoader />}>
-                  <GestionProgramasAcademicosAdmin />
-                </Suspense>
+                <div>
+                  <div className="mb-4 p-2 bg-green-100 border border-green-300 rounded">
+                    <small>✅ Cargando componente GestionProgramasAcademicosAdmin</small>
+                  </div>
+                  <Suspense fallback={<PremiumLoader />}>
+                    <GestionProgramasAcademicosAdmin />
+                  </Suspense>
+                </div>
               )}
 
               {/* Eventos */}
               {seccionActiva === "eventos" && (
-                <Suspense fallback={<PremiumLoader />}>
-                  <GestionEventosAdmin />
-                </Suspense>
+                <div>
+                  <div className="mb-4 p-2 bg-green-100 border border-green-300 rounded">
+                    <small>✅ Cargando componente GestionEventosAdmin</small>
+                  </div>
+                  <Suspense fallback={<PremiumLoader />}>
+                    <GestionEventosAdmin />
+                  </Suspense>
+                </div>
               )}
 
               {/* Cabañas */}
               {seccionActiva === "cabanas" && (
-                <Suspense fallback={<PremiumLoader />}>
-                  <GestionCabanasAdmin />
-                </Suspense>
+                <div>
+                  <div className="mb-4 p-2 bg-green-100 border border-green-300 rounded">
+                    <small>✅ Cargando componente GestionCabanasAdmin</small>
+                  </div>
+                  <Suspense fallback={<PremiumLoader />}>
+                    <GestionCabanasAdmin />
+                  </Suspense>
+                </div>
               )}
 
               {/* Secciones no implementadas aún */}
@@ -493,6 +516,9 @@ const OptimizedPremiumDashboard = ({ usuario: usuarioProp, onCerrarSesion: onCer
                     {seccionActiva.charAt(0).toUpperCase() + seccionActiva.slice(1).replace('-', ' ')}
                   </h2>
                   <p className="text-slate-600">Esta sección está disponible con lazy loading para mejor rendimiento.</p>
+                  <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded">
+                    <small>Debug: Esta sección no está implementada aún. Sección: "{seccionActiva}"</small>
+                  </div>
                 </div>
               )}
             </>

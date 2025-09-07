@@ -348,7 +348,12 @@ const GestionProgramasAcademicosAdmin = () => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Clock className="w-4 h-4 text-purple-600" />
-                    <span className="text-slate-600">{programa.duracion || 'N/A'}</span>
+                    <span className="text-slate-600">
+                      {typeof programa.duracion === 'object' 
+                        ? `${programa.duracion?.horas || 0}h - ${programa.duracion?.semanas || 0} sem`
+                        : programa.duracion || 'N/A'
+                      }
+                    </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Calendar className="w-4 h-4 text-amber-600" />
