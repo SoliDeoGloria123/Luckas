@@ -166,10 +166,51 @@ const GestionEventos = () => {
   return (
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
-        <h1 className="titulo-admin" >Gestión de Eventos</h1>
-        <button className="btn-admin" onClick={abrirModalCrear}>
+        <div className="page-title-admin">
+          <h1>Gestión de Eventos</h1>
+          <p>Administra las cuentas de usuario del sistema</p>
+        </div>
+        <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
           + Nuevo Evento
         </button>
+      </div>
+      <div className="stats-grid-admin">
+        <div className="stat-card-admin">
+          <div className="stat-icon-admin users">
+            <i className="fas fa-users"></i>
+          </div>
+          <div className="stat-info-admin">
+            <h3>5</h3>
+            <p>Total Usuarios</p>
+          </div>
+        </div>
+        <div className="stat-card-admin">
+          <div className="stat-icon-admin active">
+            <i className="fas fa-user-check"></i>
+          </div>
+          <div className="stat-info-admin">
+            <h3>4</h3>
+            <p>Usuarios Activos</p>
+          </div>
+        </div>
+        <div className="stat-card-admin">
+          <div className="stat-icon-admin admins">
+            <i className="fas fa-user-shield"></i>
+          </div>
+          <div className="stat-info-admin">
+            <h3>1</h3>
+            <p>Administradores</p>
+          </div>
+        </div>
+        <div className="stat-card-admin">
+          <div className="stat-icon-admin new">
+            <i className="fas fa-user-plus"></i>
+          </div>
+          <div className="stat-info-admin">
+            <h3>12</h3>
+            <p>Nuevos Este Mes</p>
+          </div>
+        </div>
       </div>
       <section className="filtros-section-admin">
         <div className="busqueda-contenedor">
@@ -198,14 +239,9 @@ const GestionEventos = () => {
           </select>
         </div>
 
-        <TablaEventos
-          eventos={eventos}
-          onEditar={abrirModalEditar}
-          onEliminar={eliminarEvento}
-          onVerImagen={handleVerImagenes}
-        />
+
         {modalImagen.abierto && (
-          <div className="modal-overlay" onClick={cerrarModalImagen}>
+          <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
             <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
               <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
               <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
@@ -219,6 +255,12 @@ const GestionEventos = () => {
           </div>
         )}
       </section>
+      <TablaEventos
+        eventos={eventos}
+        onEditar={abrirModalEditar}
+        onEliminar={eliminarEvento}
+        onVerImagen={handleVerImagenes}
+      />
       <EventoModal
         mostrar={mostrarModal}
         modoEdicion={modoEdicion}

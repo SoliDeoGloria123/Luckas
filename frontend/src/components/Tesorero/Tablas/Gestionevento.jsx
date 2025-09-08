@@ -3,6 +3,9 @@ import { eventService } from "../../../services/eventService";
 import { categorizacionService } from "../../../services/categorizacionService";
 import { mostrarAlerta } from '../../utils/alertas';
 import EventosModal from '../modal/EventosModal'
+import { FaEye } from "react-icons/fa";
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
 
 
 const Gestionevento = () => {
@@ -11,7 +14,30 @@ const Gestionevento = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalEvento] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
+  const [modalImagen, setModalImagen] = useState({ abierto: false, imagenes: [], actual: 0 });
 
+  const handleVerImagenes = (imagenes) => {
+    if (Array.isArray(imagenes) && imagenes.length > 0) {
+      setModalImagen({ abierto: true, imagenes, actual: 0 });
+    }
+  };
+  const handleNext = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual + 1) % prev.imagenes.length
+    }));
+  };
+
+  const handlePrev = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual - 1 + prev.imagenes.length) % prev.imagenes.length
+    }));
+  };
+
+  const cerrarModalImagen = () => {
+    setModalImagen({ abierto: false, imagenes: [], actual: 0 });
+  };
   // Obtener eventos
   const obtenerEventos = async () => {
     try {
@@ -48,7 +74,7 @@ const Gestionevento = () => {
       }
     } else {
       try {
-        await eventService.updateEvent(setCurrentItem._id, data);
+        await eventService.updateEvent(currentItem._id, data);
         mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
         obtenerEventos();
       } catch (error) {
@@ -66,6 +92,8 @@ const Gestionevento = () => {
   };
 
   return (
+    <>
+    <Header/>
     <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
@@ -193,8 +221,8 @@ const Gestionevento = () => {
                 <td>{event.lugar}</td>
                 <td>{event.cuposTotales}</td>
                 <td>{event.cuposDisponibles}</td>
-                <td><span className={`prioridad-${(event.prioridad || "media").toLowerCase()}`}>
-                  {event.prioridad || "Media"}
+                <td><span className={`priority-tesorero priority-tesorero-${event.prioridad }`}>
+                  {event.prioridad }
                 </span>
                 </td>
                 <td>
@@ -203,10 +231,16 @@ const Gestionevento = () => {
                   </span>
                 </td>
                 <td>{event.createdAt ? new Date(event.createdAt).toLocaleDateString() : "N/A"}</td>
-                <td>{Array.isArray(event.imagen) && event.imagen.length > 0
-                  ? <img src={event.imagen[0]} alt="Evento" className="tabla-imagen" />
-                  : "Sin imagen"
-                }</td>
+
+                <td>
+                  {Array.isArray(event.imagen) && event.imagen.length > 0 ? (
+                    <button onClick={() => handleVerImagenes(event.imagen)} className="btn-image-tesorero ">
+                     <i class="fas fa-eye"></i>
+                    </button>
+                  ) : (
+                    <span class="no-image-tesorero">Sin imagen</span>
+                  )}
+                </td>
 
                 <td className='actions-cell'>
                   <button className='action-btn edit' onClick={() => {
@@ -226,7 +260,20 @@ const Gestionevento = () => {
           </tbody>
         </table>
       </div>
-
+      {modalImagen.abierto && (
+        <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
+          <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
+            <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
+            <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
+            <img
+              src={`http://localhost:3000/uploads/eventos/${modalImagen.imagenes[modalImagen.actual]}`}
+              alt="Imagen del evento"
+              className="imagen-modal"
+            />
+            <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+          </div>
+        </div>
+      )}
       {showModal && (
         <EventosModal
           mode={modalMode}
@@ -238,6 +285,8 @@ const Gestionevento = () => {
         />
       )}
     </main>
+    <Footer/>
+    </>
   );
 };
 

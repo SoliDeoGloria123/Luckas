@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import UsuarioModal from '../modal/UsuarioModal';
 import { userService } from '../../../services/userService'
 import { mostrarAlerta } from '../../utils/alertas';
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
 
 
 
@@ -36,6 +38,7 @@ const Gestionusuarios = () => {
   const handleSubmit = async (Usuariodata) => {
     try {
       if (modalMode === 'create') {
+          console.log("Datos enviados al backend:", Usuariodata); // <-- Verifica aquí
         await userService.createUser(Usuariodata)
         mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
 
@@ -47,11 +50,13 @@ const Gestionusuarios = () => {
       setShowModalUsuario(false);
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `Error al procesar el usuario: ${error.message}`);
+      mostrarAlerta( 'Error','Error al procesar el usuario','error' );
     };
   };
 
   return (
+    <> 
+    <Header />
     <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
@@ -186,13 +191,9 @@ const Gestionusuarios = () => {
                     </span>
                   </td>
                   <td>
-                    <span
-                      className={`status-badge ${user.estado === "activo" ? "status-activo" : "status-inactivo"
-                        }`}
-                    >
-                      <span className="status-dot"></span>
-                      {user.estado}
-                    </span>
+                      <span className={`badge-tesorero badge-tesorero-${user.estado}`}>
+                        {user.estado}
+                      </span>
                   </td>
                   <td className='actions-cell'>
                     <button className='action-btn edit'
@@ -222,6 +223,8 @@ const Gestionusuarios = () => {
         />
       )}
     </main>
+    <Footer />
+    </>
 
   );
 };

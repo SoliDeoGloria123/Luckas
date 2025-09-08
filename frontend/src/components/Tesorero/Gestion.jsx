@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import HeaderTesorero from "./Header/Header-tesorero";
 import Footer from '../footer/Footer';
 import './Gestion.css';
@@ -13,7 +13,7 @@ import Gestioncategorizacion from './Tablas/Gestioncategorizar';
 import Gestionreporte from './Tablas/Gestioreportes';
 
 const Gestion = ({ }) => {
-     const [seccionActiva, setSeccionActiva] = useState("gestion");
+    const [seccionActiva, setSeccionActiva] = useState("gestion");
 
     // Función para cambiar la sección activa
     const handleGestionar = (seccion) => {
@@ -22,7 +22,7 @@ const Gestion = ({ }) => {
 
     return (
         <>
-         <HeaderTesorero />
+            <HeaderTesorero/>
             <main className="main-content-gestion">
                 <div className="page-header-gestion">
                     <h1 className="page-title-gestion">Gestiones Administrativas</h1>
@@ -42,7 +42,7 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Usuarios</h3>
                             <p className="card-description">Administrar cuentas de usuarios del sistema</p>
-                            <a href="" className="card-action"onClick={() => handleGestionar("usuarios")} >
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionar("tesorero-usuarios"); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -178,7 +178,7 @@ const Gestion = ({ }) => {
                         </div>
                     </div>
                 </div>
-                 {seccionActiva === "usuarios" && <Gestionusuarios />}
+                {seccionActiva === "usuarios" && <Gestionusuarios />}
                 {seccionActiva === "solicitudes" && <Gestionsolicitud />}
                 {seccionActiva === "eventos" && <Gestionevento />}
                 {seccionActiva === "cabanas" && <Gestioncabana />}
@@ -188,7 +188,7 @@ const Gestion = ({ }) => {
                 {seccionActiva === "categorias" && <Gestioncategorizacion />}
                 {seccionActiva === "reportes" && <Gestionreporte />}
             </main>
-             <Footer/>
+            <Footer />
         </>
     );
 };

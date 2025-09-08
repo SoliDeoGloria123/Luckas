@@ -47,7 +47,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       let cats = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
       setCategorias(cats);
     } catch (err) {
-      setError("Error","Error al obtener categorías: " + err.message);
+      setError("Error", "Error al obtener categorías: " + err.message);
     }
   };
   // CRUD
@@ -64,7 +64,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
 
       if (Array.isArray(nuevaCabana.imagen)) {
         nuevaCabana.imagen.forEach(imagen => {
-          formData.append("imagen",imagen);
+          formData.append("imagen", imagen);
         });
       }
       await cabanaService.create(formData);
@@ -171,13 +171,54 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   return (
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
-        <h1 className="titulo-admin">Gestión de Cabañas</h1>
+        <div className="page-title-admin">
+          <h1>Gestión de Cabañas</h1>
+          <p>Administra las cuentas de usuario del sistema</p>
+        </div>
         {canCreate && !readOnly && (
-          <button className="btn-admin" onClick={abrirModalCrear}>
-            ➕ Nueva Cabaña
+          <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
+            + Nueva Cabaña
           </button>
         )}
       </div>
+       <div className="stats-grid-admin">
+                <div className="stat-card-admin">
+                  <div className="stat-icon-admin users">
+                    <i className="fas fa-users"></i>
+                  </div>
+                  <div className="stat-info-admin">
+                    <h3>5</h3>
+                    <p>Total Usuarios</p>
+                  </div>
+                </div>
+                <div className="stat-card-admin">
+                  <div className="stat-icon-admin active">
+                    <i className="fas fa-user-check"></i>
+                  </div>
+                  <div className="stat-info-admin">
+                    <h3>4</h3>
+                    <p>Usuarios Activos</p>
+                  </div>
+                </div>
+                <div className="stat-card-admin">
+                  <div className="stat-icon-admin admins">
+                    <i className="fas fa-user-shield"></i>
+                  </div>
+                  <div className="stat-info-admin">
+                    <h3>1</h3>
+                    <p>Administradores</p>
+                  </div>
+                </div>
+                <div className="stat-card-admin">
+                  <div className="stat-icon-admin new">
+                    <i className="fas fa-user-plus"></i>
+                  </div>
+                  <div className="stat-info-admin">
+                    <h3>12</h3>
+                    <p>Nuevos Este Mes</p>
+                  </div>
+                </div>
+              </div>
       <section className="filtros-section-admin">
         <div className="busqueda-contenedor">
           <i class="fas fa-search"></i>
@@ -204,17 +245,8 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
             <option>Pendiente</option>
           </select>
         </div>
-
-
-        {error && <div className="error-message">{error}</div>}
-        <CabanaTabla
-          cabanas={cabanasFiltradas}
-          onEditar={canEdit && !readOnly ? abrirModalEditar : null}
-          onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarCabana : null}
-          onVerImagen={handleVerImagenes}
-        />
         {modalImagen.abierto && (
-          <div className="modal-overlay" onClick={cerrarModalImagen}>
+          <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
             <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
               <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
               <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
@@ -228,6 +260,13 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
           </div>
         )}
       </section>
+      {error && <div className="error-message">{error}</div>}
+        <CabanaTabla
+          cabanas={cabanasFiltradas}
+          onEditar={canEdit && !readOnly ? abrirModalEditar : null}
+          onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarCabana : null}
+          onVerImagen={handleVerImagenes}
+        />
       <CabanaModal
         mostrar={mostrarModal}
         modoEdicion={modoEdicion}

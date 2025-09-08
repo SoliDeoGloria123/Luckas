@@ -4,6 +4,8 @@ import { userService } from "../../../services/userService";
 import { cabanaService } from "../../../services/cabanaService";
 import { mostrarAlerta } from '../../utils/alertas';
 import ReservaModal from '../modal/ReservaModal';
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
 
 
 const Gestionreserva = () => {
@@ -79,6 +81,8 @@ const Gestionreserva = () => {
   };
 
   return (
+    <>
+    <Header/>
     <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
@@ -206,15 +210,27 @@ const Gestionreserva = () => {
                   </td>
                   <td>{reser.fechaInicio ? new Date(reser.fechaInicio).toLocaleDateString() : ""}</td>
                   <td>{reser.fechaFin ? new Date(reser.fechaFin).toLocaleDateString() : ""}</td>
-                  <td>{reser.precio}</td>
-                  <td>{reser.estado}</td>
+                  <td>
+                    <span className='price-cell-tesorero'>
+                      ${reser.precio}
+                    </span>
+
+                  </td>
+                  <td>
+                    <span className={`badge-tesorero badge-tesorero-${reser.estado} `}>
+                      {reser.estado}
+                    </span>
+
+                  </td>
                   <td>{reser.observaciones}</td>
                   <td>
-                    {typeof reser.solicitud === "object"
-                      ? reser.solicitud?._id || "N/A"
-                      : reser.solicitud || "N/A"}
+                    {typeof reser.solicitud === "object" ? reser.solicitud?._id || "N/A" : reser.solicitud || "N/A"}
                   </td>
-                  <td>{reser.activo}</td>
+                  <td>
+                    <span className={`status-badge status-${reser.activo ? 'Activo' : 'Desactivado'}`}>
+                      {reser.activo ? 'Activo' : 'Desactivado'}
+                    </span>
+                  </td>
                   <td className='actions-cell'>
                     <button className='action-btn edit' in onClick={() => handleEdit(reser)}>
                       <i class="fas fa-edit"></i>
@@ -240,6 +256,8 @@ const Gestionreserva = () => {
         />
       )}
     </main>
+    <Footer/>
+    </>
   );
 };
 

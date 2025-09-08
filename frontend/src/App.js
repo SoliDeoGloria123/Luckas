@@ -3,8 +3,19 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Index from './components/Panel Principal/Panel'
 import Login from './components/Login/Login';
 import Registro from './components/signup/registro';
+import OlvidoPassw from './components/forget password/olvidarPassword';
 import DashboardAdmin from "./components/Dashboard/DashboardAdmin";
 import DashboardTesorero from "./components/Tesorero/DashboardTesorero";
+import GestionTusuarios from "./components/Tesorero/Tablas/Gestionusuarios";
+import GestionTcategorias from "./components/Tesorero/Tablas/Gestioncategorizar";
+import GestionTsolicitudes from "./components/Tesorero/Tablas/Gestionsolicitud";
+import GestionTeventos from "./components/Tesorero/Tablas/Gestionevento";
+import GestionTcabanas from "./components/Tesorero/Tablas/Gestioncabana";
+import GestionTreservas from "./components/Tesorero/Tablas/Gestionreserva";
+//import GestionTcursos from "./components/Tesorero/Tablas/Gestioncurso";
+import GestionTtarea from "./components/Tesorero/Tablas/Gestiontareas";
+import GestionTinscripcion from "./components/Tesorero/Tablas/Gestioninscripcion";
+import GestionTreportes from "./components/Tesorero/Tablas/Gestioreportes";
 import GestionTesorero from './components/Tesorero/Gestion';
 import DashboardSeminarista from "./components/Seminarista/DashboardSeminarista";
 import EventosNavegables from "./components/Seminarista/pages/EventosNavegables";
@@ -38,9 +49,20 @@ function App() {
         <Route path="/external" element={<ExternalHome />} />
         <Route path="/home" element={<div style={{width: '100%', height: '100vh'}}><iframe src="/Externo/templates/home.html" style={{width: '100%', height: '100%', border: 'none'}} /></div>} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup/registro" element={<Registro />} />
-        <Route path="/admin/users" element={<DashboardAdmin />} />
-        <Route path="/tesorero" element={<DashboardTesorero />} />
+        <Route path="/signup/registro" element={<Registro />}/>
+        <Route path="/Olvidar-Contraseña" element={<OlvidoPassw />}/>
+        <Route path="/admin/users" element={<DashboardAdmin />}/>
+        <Route path="/tesorero" element={<DashboardTesorero />}/>
+        <Route path="/tesorero/usuarios" element={<GestionTusuarios />}/>
+        <Route path="/tesorero/categorias" element={<GestionTcategorias />}/>
+        <Route path="/tesorero/solicitudes" element={<GestionTsolicitudes />}/>
+        <Route path="/tesorero/eventos" element={<GestionTeventos/>}/>
+        <Route path="/tesorero/cabañas" element={<GestionTcabanas/>}/>
+        <Route path="/tesorero/reservas" element={<GestionTreservas/>}/>
+        {/*<Route path="/tesorero/cursos" element={<GestionTcursos/>}/>*/}
+        <Route path="/tesorero/tarea" element={<GestionTtarea/>}/>
+        <Route path="/tesorero/inscripcion" element={<GestionTinscripcion/>}/>
+        <Route path="/tesorero/reportes" element={<GestionTreportes/>}/>
         <Route path='/tesorero-Gestiones' element={<GestionTesorero/>}/>
         <Route path="/seminarista" element={<DashboardSeminarista />} />
         <Route path="/dashboard/seminarista/eventos" element={<EventosNavegables />} />

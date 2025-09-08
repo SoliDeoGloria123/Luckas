@@ -41,7 +41,7 @@ const SolicitudModal = ({
   }, [nuevaSolicitud.solicitante, modoEdicion]);
   if (!mostrar) return null;
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay-admin">
       <div className="modal-admin">
         <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Solicitud" : "Crear Nueva Solicitud"}</h3>
@@ -49,7 +49,8 @@ const SolicitudModal = ({
             ✕
           </button>
         </div>
-        <div className="modal-body-admin">
+        <form className="modal-body-admin">
+           <div className="from-grid-admin">
           {!modoEdicion && (
             <div className="form-grupo-admin">
               <label>Solicitante (ID):</label>
@@ -74,6 +75,8 @@ const SolicitudModal = ({
               />
             </div>
           )}
+          </div>
+           <div className="from-grid-admin">
           {!modoEdicion && (
           <div className="form-grupo-admin">
             <label>Teléfono:</label>
@@ -105,6 +108,8 @@ const SolicitudModal = ({
             </select>
           </div>
           )}
+          </div>
+           <div className="from-grid-admin">
           {/* Select de modeloReferencia dinámico */}
           {!modoEdicion && nuevaSolicitud.tipoSolicitud && (
             <div className="form-grupo-admin">
@@ -156,6 +161,8 @@ const SolicitudModal = ({
             </select>
           </div>
           )}
+          </div>
+           <div className="from-grid-admin">
           {!modoEdicion && (
           <div className="form-grupo-admin">
             <label>Categoría:</label>
@@ -189,6 +196,8 @@ const SolicitudModal = ({
               <option value="Pendiente Info">Pendiente</option>
             </select>
           </div>
+          </div>
+           <div className="from-grid-admin">
           <div className="form-grupo-admin">
             <label>Prioridad:</label>
             <select
@@ -221,6 +230,7 @@ const SolicitudModal = ({
               placeholder="Responsable"
             />
           </div>
+          </div>
           <div className="form-grupo-admin">
             <label>Observaciones:</label>
             <input
@@ -234,15 +244,17 @@ const SolicitudModal = ({
               placeholder="Observaciones"
             />
           </div>
-        </div>
-        <div className="modal-footer-admin">
-          <button className="btn-secondary" onClick={onClose}>
+          <div className="modal-action-admin">
+          <button className="btn-admin secondary-admin" onClick={onClose}>
+             <i class="fas fa-times"></i>
             Cancelar
           </button>
-          <button className="btn-primary" onClick={onSubmit}>
+          <button className="btn-admin btn-primary" onClick={onSubmit}>
+              <i class="fas fa-save"></i>
             {modoEdicion ? "Guardar Cambios" : "Crear Solicitud"}
           </button>
         </div>
+        </form>
       </div>
     </div>
   );

@@ -131,48 +131,48 @@ const closeReservationModal = () => {
 
 
   return (
-    <div>
+    <>
       {/* Botón de prueba para abrir el modal */}
 
       {/* Modal */}
       <div id="reservationModal" className="modal-overlay-seminarista-reserva active">
         <div className="modal-container-seminarista-reserva">
           <div className="cabin-header-seminarista-reserva">
-            <div className="cabin-info">
-              <h2 className="cabin-title">Cabaña del Bosque</h2>
-              <p className="cabin-description">
+            <div className="cabin-info-seminario-reserva">
+              <h2 className="cabin-title-seminario-reserva">Cabaña del Bosque</h2>
+              <p className="cabin-description-seminario-reserva">
                 Hermosa cabaña rodeada de naturaleza, perfecta para familias que buscan tranquilidad y conexión espiritual.
               </p>
-              <div className="cabin-details">
-                <div className="detail-item">
+              <div className="cabin-details-seminario-reserva">
+                <div className="detail-item-seminario-reserva">
                   <i className="fas fa-users"></i>
                   <span>Hasta 6 personas</span>
                 </div>
-                <div className="detail-item">
+                <div className="detail-item-seminario-reserva">
                   <i className="fas fa-map-marker-alt"></i>
                   <span>Zona Norte</span>
                 </div>
-                <div className="price-tag">$180,000 COP/noche</div>
+                <div className="price-tag-seminario-reserva">$180,000 COP/noche</div>
               </div>
             </div>
-            <button className="close-button" onClick={onClose}>
+            <button className="close-button-seminario-reserva" onClick={onClose}>
               Cerrar
             </button>
           </div>
 
           {/* Sección de Progreso */}
-          <div className="progress-section">
-            <h3 className="progress-title">Progreso de Reserva</h3>
-            <div className="progress-bar">
+          <div className="progress-section-seminario-reserva">
+            <h3 className="progress-title-seminario-reserva">Progreso de Reserva</h3>
+            <div className="progress-bar-seminario-reserva">
               <div 
-                className="progress-fill" 
+                className="progress-fill-seminario-reserva" 
                 style={{ width: `${progressPercentage}%` }}
               ></div>
             </div>
-            <div className="steps-container">
+            <div className="steps-container-seminario-reserva">
               {/* Paso 1 */}
-              <div className={`step ${currentStep === 1 ? 'active' : currentStep > 1 ? 'completed' : ''}`} data-step="1">
-                <div className="step-icon">
+              <div className={`step-seminario-reserva ${currentStep === 1 ? 'active' : currentStep > 1 ? 'completed' : ''}`} data-step="1">
+                <div className="step-icon-seminario-reserva">
                   <i className="fas fa-file-text"></i>
                 </div>
                 <div className="step-content">
@@ -182,8 +182,8 @@ const closeReservationModal = () => {
               </div>
               
               {/* Paso 2 */}
-              <div className={`step ${currentStep === 2 ? 'active' : currentStep > 2 ? 'completed' : ''}`} data-step="2">
-                <div className="step-icon">
+              <div className={`step-seminario-reserva ${currentStep === 2 ? 'active' : currentStep > 2 ? 'completed' : ''}`} data-step="2">
+                <div className="step-icon-seminario-reserva">
                   <i className="fas fa-clock"></i>
                 </div>
                 <div className="step-content">
@@ -193,8 +193,8 @@ const closeReservationModal = () => {
               </div>
               
               {/* Paso 3 */}
-              <div className={`step ${currentStep === 3 ? 'active' : currentStep > 3 ? 'completed' : ''}`} data-step="3">
-                <div className="step-icon">
+              <div className={`step-seminario-reserva ${currentStep === 3 ? 'active' : currentStep > 3 ? 'completed' : ''}`} data-step="3">
+                <div className="step-icon-seminario-reserva">
                   <i className="fas fa-credit-card"></i>
                 </div>
                 <div className="step-content">
@@ -204,8 +204,8 @@ const closeReservationModal = () => {
               </div>
               
               {/* Paso 4 */}
-              <div className={`step ${currentStep === 4 ? 'active' : ''}`} data-step="4">
-                <div className="step-icon">
+              <div className={`step-seminario-reserva ${currentStep === 4 ? 'active' : ''}`} data-step="4">
+                <div className="step-icon-seminario-reserva">
                   <i className="fas fa-check-circle"></i>
                 </div>
                 <div className="step-content">
@@ -217,22 +217,22 @@ const closeReservationModal = () => {
           </div>
 
           {/* Contenido de los pasos */}
-          <div className="step-content-area">
+          <div className="step-content-area-seminario-reserva">
             {/* Paso 1: Detalles de Reserva */}
-            <div className={`step-form ${currentStep === 1 ? 'active' : ''}`} id="step1">
-              <div className="form-header">
-                <h3 className="form-title">Paso 1: Detalles de Reserva</h3>
-                <p className="form-subtitle">Selecciona las fechas de tu estadía y completa tus datos personales</p>
+            <div className={`step-form-seminario-reserva ${currentStep === 1 ? 'active' : ''}`} id="step1">
+              <div className="form-header-seminario-reserva">
+                <h3 className="form-title-seminario-reserva">Paso 1: Detalles de Reserva</h3>
+                <p className="form-subtitle-seminario-reserva">Selecciona las fechas de tu estadía y completa tus datos personales</p>
               </div>
               
-              <form className="reservation-form" onSubmit={handleSubmit}>
-                <div className="form-row-reservation">
-                  <div className="form-group-reservation">
-                    <label className="form-label">Fecha de Check-in *</label>
-                    <div className="date-input-container">
+              <form className="reservation-form-seminario-reserva" onSubmit={handleSubmit}>
+                <div className="form-row-reservation-seminario-reserva">
+                  <div className="form-group-reservation-seminario-reserva">
+                    <label className="form-label-reservation-seminario-reserva">Fecha de Check-in *</label>
+                    <div className="date-input-container-seminario-reserva">
                       <input 
                         type="date" 
-                        className="form-input-reservation" 
+                        className="form-input-reservation-seminario-reserva" 
                         id="checkInDate" 
                         min={checkInMinDate}
                         value={reservationData.checkInDate || ''}
@@ -242,12 +242,12 @@ const closeReservationModal = () => {
                       <i className="fas fa-calendar-alt date-icon"></i>
                     </div>
                   </div>
-                  <div className="form-group-reservation">
-                    <label className="form-label-reservation">Fecha de Check-out *</label>
-                    <div className="date-input-container">
+                  <div className="form-group-reservation-seminario-reserva">
+                    <label className="form-label-reservation-seminario-reserva">Fecha de Check-out *</label>
+                    <div className="date-input-container-seminario-reserva">
                       <input 
                         type="date" 
-                        className="form-input-reservation" 
+                        className="form-input-reservation-seminario-reserva" 
                         id="checkOutDate" 
                         min={reservationData.checkInDate || ''}
                         value={reservationData.checkOutDate || ''}
@@ -259,23 +259,23 @@ const closeReservationModal = () => {
                   </div>
                 </div>
 
-                <div className="form-row-reservation">
-                  <div className="form-group-reservation">
-                    <label className="form-label-reservation">Nombre Completo *</label>
+                <div className="form-row-reservation-seminario-reserva">
+                  <div className="form-group-reservation-seminario-reserva">
+                    <label className="form-label-reservation-seminario-reserva">Nombre Completo *</label>
                     <input 
                       type="text" 
-                      className="form-input-reservation" 
+                      className="form-input-reservation-seminario-reserva" 
                       id="fullName" 
                       value={reservationData.fullName || ''}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-                  <div className="form-group-reservation">
-                    <label className="form-label-reservation">Número de Documento *</label>
+                  <div className="form-group-reservation-seminario-reserva">
+                    <label className="form-label-reservation-seminario-reserva">Número de Documento *</label>
                     <input 
                       type="text" 
-                      className="form-input-reservation" 
+                      className="form-input-reservation-seminario-reserva" 
                       id="documentNumber" 
                       value={reservationData.documentNumber || ''}
                       onChange={handleInputChange}
@@ -284,23 +284,23 @@ const closeReservationModal = () => {
                   </div>
                 </div>
 
-                <div className="form-row-reservation">
-                  <div className="form-group-reservation">
-                    <label className="form-labe-reservationl">Correo Electrónico *</label>
+                <div className="form-row-reservation-seminario-reserva">
+                  <div className="form-group-reservation-seminario-reserva">
+                    <label className="form-label-reservation-seminario-reserva">Correo Electrónico *</label>
                     <input 
                       type="email" 
-                      className="form-input-reservation" 
+                      className="form-input-reservation-seminario-reserva" 
                       id="email" 
                       value={reservationData.email || ''}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-                  <div className="form-group-reservation">
-                    <label className="form-label-reservation">Teléfono *</label>
+                  <div className="form-group-reservation-seminario-reserva">
+                    <label className="form-label-reservation-seminario-reserva">Teléfono *</label>
                     <input 
                       type="tel" 
-                      className="form-input-reservation" 
+                      className="form-input-reservation-seminario-reserva" 
                       id="phone" 
                       value={reservationData.phone || ''}
                       onChange={handleInputChange}
@@ -309,12 +309,12 @@ const closeReservationModal = () => {
                   </div>
                 </div>
 
-                <div className="form-row-reservation">
-                  <div className="form-group-reservation">
-                    <label className="form-label-reservation">Número de Personas *</label>
+                <div className="form-row-reservation-seminario-reserva">
+                  <div className="form-group-reservation-seminario-reserva">
+                    <label className="form-label-reservation-seminario-reserva">Número de Personas *</label>
                     <input 
                       type="number" 
-                      className="form-input-reservation" 
+                      className="form-input-reservation-seminario-reserva" 
                       id="numberOfPeople" 
                       value={reservationData.numberOfPeople || 1}
                       min="1" 
@@ -323,11 +323,11 @@ const closeReservationModal = () => {
                       required
                     />
                   </div>
-                  <div className="form-group-reservation">
-                    <label className="form-label-reservation">Propósito de la Estadía</label>
+                  <div className="form-group-reservation-seminario-reserva">
+                    <label className="form-label-reservation-seminario-reserva">Propósito de la Estadía</label>
                     <input 
                       type="text" 
-                      className="form-input-reservation" 
+                      className="form-input-reservation-seminario-reserva" 
                       id="stayPurpose" 
                       value={reservationData.stayPurpose || ''}
                       onChange={handleInputChange}
@@ -336,10 +336,10 @@ const closeReservationModal = () => {
                   </div>
                 </div>
 
-                <div className="form-group-reservation full-width">
-                  <label className="form-label-reservation">Solicitudes Especiales</label>
+                <div className="form-group-reservation-seminario-reserva full-width">
+                  <label className="form-label-reservation-seminario-reserva">Solicitudes Especiales</label>
                   <textarea 
-                    className="form-textarea-reservation" 
+                    className="form-textarea-reservation-seminario-reserva" 
                     id="specialRequests" 
                     rows="4" 
                     value={reservationData.specialRequests || ''}
@@ -347,7 +347,6 @@ const closeReservationModal = () => {
                     placeholder="Alguna solicitud especial o necesidad particular..."
                   ></textarea>
                 </div>
-
                 <button type="submit" className="continue-button-seminarista-reserva">
                   Continuar con la Reserva
                 </button>
@@ -355,73 +354,73 @@ const closeReservationModal = () => {
             </div>
 
             {/* Paso 2: Revisión y Confirmación */}
-            <div className={`step-form ${currentStep === 2 ? 'active' : ''}`} id="step2">
-              <div className="form-header">
-                <h3 className="form-title">Paso 2: Revisión y Confirmación</h3>
-                <p className="form-subtitle">Verifica todos los detalles de tu reserva antes de proceder al pago</p>
+            <div className={`step-form-seminario-reserva ${currentStep === 2 ? 'active' : ''}`} id="step2">
+              <div className="form-header-seminario-reserva">
+                <h3 className="form-title-seminario-reserva">Paso 2: Revisión y Confirmación</h3>
+                <p className="form-subtitle-seminario-reserva">Verifica todos los detalles de tu reserva antes de proceder al pago</p>
               </div>
-              <div className="review-content">
-                <div className="review-section">
+              <div className="review-content-seminario-reserva">
+                <div className="review-section-seminario-reserva">
                   <h4>Detalles de la Reserva</h4>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Cabaña:</span>
                     <span>Cabaña del Bosque</span>
                   </div>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Check-in:</span>
                     <span>{formatDate(reservationData.checkInDate)}</span>
                   </div>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Check-out:</span>
                     <span>{formatDate(reservationData.checkOutDate)}</span>
                   </div>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Noches:</span>
                     <span>{calculateNights()}</span>
                   </div>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Huéspedes:</span>
                     <span>{reservationData.numberOfPeople || 1} personas</span>
                   </div>
                   
                   <h4 style={{ marginTop: '24px' }}>Datos del Huésped</h4>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Nombre:</span>
                     <span>{reservationData.fullName || '-'}</span>
                   </div>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Email:</span>
                     <span>{reservationData.email || '-'}</span>
                   </div>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Teléfono:</span>
                     <span>{reservationData.phone || '-'}</span>
                   </div>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Documento:</span>
                     <span>{reservationData.documentNumber || '-'}</span>
                   </div>
                 </div>
                 
-                <div className="review-section">
+                <div className="review-section-seminario-reserva">
                   <h4>Resumen de Costos</h4>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>$180,000 x {calculateNights()} noches</span>
                     <span>${(180000 * calculateNights()).toLocaleString()}</span>
                   </div>
-                  <div className="review-item">
+                  <div className="review-item-seminario-reserva">
                     <span>Tarifa de limpieza</span>
                     <span>$50,000</span>
                   </div>
                   <hr style={{ margin: '16px 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
-                  <div className="review-item" style={{ fontWeight: '600', fontSize: '16px' }}>
+                  <div className="review-item-seminario-reserva" style={{ fontWeight: '600', fontSize: '16px' }}>
                     <span>Total</span>
                     <span style={{ color: 'var(--orange)' }}>${calculateTotal().toLocaleString()}</span>
                   </div>
                 </div>
               </div>
-              <div className="form-actions">
-                <button type="button" className="back-button" onClick={() => goToStep(1)}>
+              <div className="form-actions-seminario-reserva">
+                <button type="button" className="back-button-seminario-reserva" onClick={() => goToStep(1)}>
                   Volver a Editar
                 </button>
                 <button type="button" className="continue-button-seminarista-reserva" onClick={() => goToStep(3)}>
@@ -431,34 +430,34 @@ const closeReservationModal = () => {
             </div>
 
             {/* Paso 3: Proceso de Pago */}
-            <div className={`step-form ${currentStep === 3 ? 'active' : ''}`} id="step3">
-              <div className="form-header">
-                <h3 className="form-title">Paso 3: Proceso de Pago</h3>
-                <p className="form-subtitle">Selecciona tu método de pago preferido para confirmar la reserva</p>
+            <div className={`step-form-seminario-reserva ${currentStep === 3 ? 'active' : ''}`} id="step3">
+              <div className="form-header-seminario-reserva">
+                <h3 className="form-title-seminario-reserva">Paso 3: Proceso de Pago</h3>
+                <p className="form-subtitle-seminario-reserva">Selecciona tu método de pago preferido para confirmar la reserva</p>
               </div>
-              <div className="payment-content">
-                <div className="payment-methods">
+              <div className="payment-content-seminario-reserva">
+                <div className="payment-methods-seminario-reserva">
                   <h4>Métodos de Pago Disponibles</h4>
-                  <div className="payment-options">
-                    <button className="payment-option" onClick={() => processPayment('tarjeta')}>
+                  <div className="payment-options-seminario-reserva">
+                    <button className="payment-option-seminario-reserva" onClick={() => processPayment('tarjeta')}>
                       <i className="fas fa-credit-card"></i>
                       <div className="payment-info">
-                        <div className="payment-title">Tarjeta de Crédito/Débito</div>
-                        <div className="payment-subtitle">Visa, Mastercard, American Express</div>
+                        <div className="payment-title-seminario-reserva">Tarjeta de Crédito/Débito</div>
+                        <div className="payment-subtitle-seminario-reserva">Visa, Mastercard, American Express</div>
                       </div>
                     </button>
-                    <button className="payment-option" onClick={() => processPayment('transferencia')}>
+                    <button className="payment-option-seminario-reserva" onClick={() => processPayment('transferencia')}>
                       <i className="fas fa-university"></i>
                       <div className="payment-info">
-                        <div className="payment-title">Transferencia Bancaria</div>
-                        <div className="payment-subtitle">Pago directo desde tu banco</div>
+                        <div className="payment-title-seminario-reserva">Transferencia Bancaria</div>
+                        <div className="payment-subtitle-seminario-reserva">Pago directo desde tu banco</div>
                       </div>
                     </button>
-                    <button className="payment-option" onClick={() => processPayment('pse')}>
+                    <button className="payment-option-seminario-reserva" onClick={() => processPayment('pse')}>
                       <i className="fas fa-money-check-alt"></i>
                       <div className="payment-info">
-                        <div className="payment-title">PSE</div>
-                        <div className="payment-subtitle">Débito desde cuenta corriente o ahorros</div>
+                        <div className="payment-title-seminario-reserva">PSE</div>
+                        <div className="payment-subtitle-seminario-reserva">Débito desde cuenta corriente o ahorros</div>
                       </div>
                     </button>
                   </div>
@@ -467,60 +466,60 @@ const closeReservationModal = () => {
             </div>
 
             {/* Paso 4: Reserva Confirmada */}
-            <div className={`step-form ${currentStep === 4 ? 'active' : ''}`} id="step4">
-              <div className="form-header">
-                <h3 className="form-title success-title">¡Reserva Confirmada!</h3>
-                <p className="form-subtitle">Tu reserva ha sido procesada exitosamente</p>
+            <div className={`step-form-seminario-reserva ${currentStep === 4 ? 'active' : ''}`} id="step4">
+              <div className="form-header-seminario-reserva">
+                <h3 className="form-title-seminario-reserva success-title-seminario-reserva">¡Reserva Confirmada!</h3>
+                <p className="form-subtitle-seminario-reserva">Tu reserva ha sido procesada exitosamente</p>
               </div>
-              <div className="success-content">
-                <div className="success-icon">
+              <div className="success-content-seminario-reserva">
+                <div className="success-icon-seminario-reserva">
                   <i className="fas fa-check-circle"></i>
                 </div>
-                <h4 className="success-message">¡Felicitaciones!</h4>
-                <p className="success-description">
+                <h4 className="success-message-seminario-reserva">¡Felicitaciones!</h4>
+                <p className="success-description-seminario-reserva">
                   Tu reserva en "Cabaña del Bosque" ha sido confirmada exitosamente.
                 </p>
                 
-                <div className="confirmation-details">
+                <div className="confirmation-details-seminario-reserva">
                   <h4>Detalles de tu Reserva</h4>
-                  <div className="confirmation-grid">
+                  <div className="confirmation-grid-seminario-reserva">
                     <div>
-                      <div className="confirmation-item">
+                      <div className="confirmation-item-seminario-reserva">
                         <strong>Número de Reserva:</strong> #RES-2025-{Math.floor(Math.random() * 1000).toString().padStart(3, '0')}
                       </div>
-                      <div className="confirmation-item">
+                      <div className="confirmation-item-seminario-reserva">
                         <strong>Huésped Principal:</strong> {reservationData.fullName || '-'}
                       </div>
-                      <div className="confirmation-item">
+                      <div className="confirmation-item-seminario-reserva">
                         <strong>Email:</strong> {reservationData.email || '-'}
                       </div>
-                      <div className="confirmation-item">
+                      <div className="confirmation-item-seminario-reserva">
                         <strong>Teléfono:</strong> {reservationData.phone || '-'}
                       </div>
                     </div>
                     <div>
-                      <div className="confirmation-item">
+                      <div className="confirmation-item-seminario-reserva">
                         <strong>Cabaña:</strong> Cabaña del Bosque
                       </div>
-                      <div className="confirmation-item">
+                      <div className="confirmation-item-seminario-reserva">
                         <strong>Check-in:</strong> {formatDate(reservationData.checkInDate)}
                       </div>
-                      <div className="confirmation-item">
+                      <div className="confirmation-item-seminario-reserva">
                         <strong>Check-out:</strong> {formatDate(reservationData.checkOutDate)}
                       </div>
-                      <div className="confirmation-item">
+                      <div className="confirmation-item-seminario-reserva">
                         <strong>Total Pagado:</strong> ${calculateTotal().toLocaleString()} COP
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="success-actions">
-                  <button className="download-button">
+                <div className="success-actions-seminario-reserva">
+                  <button className="download-button-seminario-reserva">
                     <i className="fas fa-download"></i>
                     Descargar Comprobante de Reserva
                   </button>
-                  <button className="back-to-cabins-button" onClick={closeReservationModal}>
+                  <button className="back-to-cabins-button-seminario-reserva" onClick={closeReservationModal}>
                     Volver a Cabañas
                   </button>
                 </div>
@@ -529,7 +528,7 @@ const closeReservationModal = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

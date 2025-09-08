@@ -2,14 +2,31 @@ import React, { useState } from 'react';
 
 
 const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usuarios }) => {
+ 
+  function normalizeFecha(fecha) {
+    if (!fecha) return '';
+    // Si ya está en formato YYYY-MM-DD, devolver tal cual
+    if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
+    // Si es un objeto Date o string con T, formatear
+    try {
+      const d = new Date(fecha);
+      if (!isNaN(d.getTime())) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+    } catch (e) {}
+    return '';
+  }
   const [formData, setFormData] = useState({
     titulo: initialData.titulo || '',
     descripcion: initialData.descripcion || '',
     estado: initialData.estado || '',
     prioridad: initialData.prioridad || '',
-    asignadoA: initialData.asignadoA || '',
+    asignadoA: initialData.asignadoA ? String(initialData.asignadoA) :'',
     asignadoPor: initialData.asignadoPor || '',
-    fechaLimite: initialData.fechaLimite || '',
+    fechaLimite: normalizeFecha (initialData.fechaLimite ),
     comentarios: initialData.comentarios || ''
   });
 
@@ -74,7 +91,7 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
                 <label>Asignado a</label>
                 <select
                   name="asignadoA"
-                  value={formData.asignadoA}
+                  value={formData.asignadoA ? String(formData.asignadoA): ''}
                   onChange={handleChange}
                 >
                   <option value="">Seleccione...</option>

@@ -1,18 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 import './header.css'
 
 
-const HeaderTesorero = ({ }) => {
-    const [openmenu,setOpenMenu]= useState(false);
+const HeaderTesorero = () => {
+    const [openmenu, setOpenMenu] = useState(false);
+    const [usuario, setUsuario] = useState({});
+    const [seccionActiva, setSeccionActiva] = useState("gestion");
 
-    const toogleMenuTesorero = () =>{
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            try {
+                const decoded = jwtDecode(token);
+                setUsuario(decoded);
+            } catch (e) {
+                setUsuario(null);
+            }
+        }
+    }, []);
+
+    const toogleMenuTesorero = () => {
         setOpenMenu(!openmenu)
     }
-     const handleLogout = () => {
+    const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("usuario");
         window.location.href = "/";
-      };
+    };
+    // Función para cambiar la sección activa
+    const handleGestionar = (seccion) => {
+        setSeccionActiva(seccion);
+    };
+
     return (
         <header className="header-tesorero-header">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
@@ -30,7 +50,7 @@ const HeaderTesorero = ({ }) => {
                     <a href="/tesorero" className="nav-item-tesorero">Dasbhoard</a>
                     <a href="/tesorero-Gestiones" className="nav-item-tesorero">Gestiones</a>
                     <a href="" className="nav-item-tesorero">Finanzas</a>
-                    <a href="" className="nav-item-tesorero">Reportes</a>
+                    <a href="" onClick={e => { e.preventDefault(); handleGestionar("reportes-tesorero"); }} className="nav-item-tesorero">Reportes</a>
                 </nav>
 
                 <div className="header-actions-tesorero">
@@ -43,8 +63,8 @@ const HeaderTesorero = ({ }) => {
                     </div>
                     <div className="user-profile-tesorero" onClick={toogleMenuTesorero}>
                         <div className="user-info-tesorero">
-                            <span className="user-name-tesorero">Steeven</span>
-                            <span className="user-role-tesorero">Tesorera</span>
+                            <span className="user-name-tesorero">{usuario?.nombre || "Usuario"}</span>
+                            <span className="user-role-tesorero">{usuario?.role || "Rol"}</span>
                         </div>
                         <i className="fas fa-chevron-down"></i>
 

@@ -3,6 +3,8 @@ import { tareaService } from "../../../services/tareaService";
 import { userService } from "../../../services/userService";
 import TareaModal from '../modal/TareaModal';
 import { mostrarAlerta } from '../../utils/alertas';
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
 
 
 const Gestiontarea = () => {
@@ -48,7 +50,7 @@ const Gestiontarea = () => {
       }
       setShowModalTarea(false);
       obtenerTareas();
-    }catch (error){
+    } catch (error) {
       mostrarAlerta("Error", "Error al procesar la tarea: " + error.message);
     }
   };
@@ -66,10 +68,9 @@ const Gestiontarea = () => {
   };
 
 
-
-
-
   return (
+    <>
+    <Header/>
     <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
@@ -191,8 +192,8 @@ const Gestiontarea = () => {
                   <td>{tarea.titulo}</td>
                   <td>{tarea.descripcion}</td>
                   <td>
-                    <span className={`badge-estado estado-${(tarea.estado || "pendiente").toLowerCase()}`}>
-                      {tarea.estado || "Pendiente"}
+                    <span className={`badge-tesorero badge-tesorero-${tarea.estado} `}>
+                      {tarea.estado}
                     </span>
                   </td>
                   <td>{tarea.prioridad}</td>
@@ -200,7 +201,7 @@ const Gestiontarea = () => {
                   <td>{tarea.asignadoA?.role || "N/A"}</td>
                   <td>{tarea.asignadoPor?.nombre || "N/A"}</td>
                   <td>{tarea.asignadoPor?.role || "N/A"}</td>
-                  <td>{tarea.fechaLimite  ? new Date(tarea.fechaLimite).toLocaleDateString() : "N/A"}</td>
+                  <td>{tarea.fechaLimite ? new Date(tarea.fechaLimite).toLocaleDateString() : "N/A"}</td>
                   <td>
                     {tarea.updatedAt ? new Date(tarea.updatedAt).toLocaleDateString() : "N/A"}
                   </td>
@@ -227,6 +228,8 @@ const Gestiontarea = () => {
         />
       )}
     </main>
+    <Footer/>
+    </>
   );
 };
 

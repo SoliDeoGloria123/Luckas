@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import SolicitudModal from '../modal/SolicitudModal';
 import { solicitudService } from '../../../services/solicirudService';
-import { mostrarAlerta } from '../../utils/alertas'
+import { mostrarAlerta } from '../../utils/alertas';
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
 const Gestionsolicitud = () => {
-  
+
   const [solicitudes, setSolicitudes] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
-  const [currentItem, setCurrentItem] = useState(null);
+  const [modalModeSolicitud, setModalMode] = useState('create');
+  const [currentItemSolicitud, setCurrentItem] = useState(null);
 
 
   // Obtener solicitudes
@@ -35,14 +37,25 @@ const Gestionsolicitud = () => {
     setShowModal(true);
   };
 
-  const handleSubmit = (data) => {
-    if (modalMode === 'create') {
-      // Lógica para crear
-    } else {
-      // Lógica para editar
+  const handleSubmit = async (dataSolicitud) => {
+    try {
+      if (modalModeSolicitud === 'create') {
+        await solicitudService.create(dataSolicitud);
+         mostrarAlerta("¡EXITO!", "Solciitud creada exitosamente");
+      } else {
+        await solicitudService.update(currentItemSolicitud._id, dataSolicitud);
+        mostrarAlerta("¡EXITO!", "Solicitud actualizada exitosamente");
+      }
+      setShowModal(false);
+      obtenerSolicitudes();
+    }catch (error){
+      mostrarAlerta("ERROR", `Error: ${error.message}`,'error');
     }
+   
   };
   return (
+    <>
+    <Header/>
     <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
@@ -107,7 +120,7 @@ const Gestionsolicitud = () => {
         <div className="search-filters-tesorero">
           <div className="search-input-container-tesorero">
             <i className="fas fa-search"></i>
-            <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+            <input type="text" placeholder="Buscar Solicitudes..." id="userSearch"></input>
           </div>
           <select className="filter-select">
             <option value="">Todos los roles</option>
@@ -140,10 +153,10 @@ const Gestionsolicitud = () => {
                 <input type="checkbox" id="selectAll"></input>
               </th>
               <th>ID</th>
-              <th>NOMBRE </th>
-              <th>CORREO</th>
-              <th>TELEFONO</th>
-              <th>ROL</th>
+              <th>NOMBRE SOLICITANTE </th>
+              <th>CORREO SOLICITANTE</th>
+              <th>TELEFONO SOLICITANTE</th>
+              <th>ROL SOLICITANTE</th>
               <th>TIPO SOLICITUD</th>
               <th>CATEGORIA</th>
               <th>ORIGEN</th>
@@ -164,19 +177,30 @@ const Gestionsolicitud = () => {
                 <td>{soli.solicitante?.username || soli.solicitante?.nombre || soli.solicitante?.correo || soli.solicitante?._id || "N/A"}</td>
                 <td>{soli.solicitante?.correo || soli.correo || "N/A"}</td>
                 <td>{soli.solicitante?.telefono || soli.telefono || "N/A"}</td>
-                <td>{soli.solicitante?.role || "N/A"}</td>
+                <td>
+                  <span className={`role-badge-tesorero role-tesorero-${soli.solicitante?.role}`}>
+                   {soli.solicitante?.role || "N/A"}
+                  </span>
+                 
+                  </td>
                 <td>{soli.tipoSolicitud || "N/A"}</td>
                 <td>{soli.categoria?.nombre || soli.categoria?._id || "N/A"}</td>
                 <td>{soli.modeloReferencia || "N/A"}</td>
                 <td>
-                  <span className={`status-badge ${soli.estado === "activo" ? "status-activo" : "status-inactivo"}`}>
-                 <span className="status-dot"></span>
-                 {soli.estado}
+                  <span className={`badge-tesorero badge-tesorero-${soli.estado}`}>
+                  
+                    {soli.estado || "N/A"}
                   </span>
                 </td>
-                <td>{soli.prioridad || "N/A"}</td>
+                <td>
+                  <span className={`priority-tesorero priority-tesorero-${soli.prioridad}`}>
+                    {soli.prioridad || "N/A"}
+                  </span>
+                 
+                  </td>
                 <td>{new Date(soli.fechaSolicitud).toLocaleDateString()}</td>
-                <td>{soli.responsable?.username || "N/A"}</td>
+                <td>{soli.responsable?.nombre || soli.responsable?.username || soli.responsable?.email || soli.responsable?._id || "N/A"
+                }</td>
                 <td className="actions-cell">
                   <button className="action-btn edit" onClick={() => handleEdit(soli)}>
                     <i class="fas fa-edit"></i>
@@ -191,14 +215,16 @@ const Gestionsolicitud = () => {
 
       {showModal && (
         <SolicitudModal
-          mode={modalMode}
-          initialData={currentItem || {}}
+          mode={modalModeSolicitud}
+          initialData={currentItemSolicitud || {}}
           onClose={() => setShowModal(false)}
           onSubmit={handleSubmit}
         />
 
       )}
     </main>
+    <Footer/>
+    </>
   );
 };
 

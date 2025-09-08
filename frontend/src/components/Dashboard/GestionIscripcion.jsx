@@ -75,7 +75,7 @@ const GestionIscripcion = () => {
         delete insc.solicitud;
       }
       await inscripcionService.create(insc);
-      mostrarAlerta("¡Éxito!","Inscripción creada exitosamente");
+      mostrarAlerta("¡Éxito!", "Inscripción creada exitosamente");
       setMostrarModal(false);
       setNuevaInscripcion({
         usuario: "",
@@ -94,7 +94,7 @@ const GestionIscripcion = () => {
       });
       obtenerInscripciones();
     } catch (error) {
-      mostrarAlerta("Error",`Error al crear la inscripción: ${error.message}`);
+      mostrarAlerta("Error", `Error al crear la inscripción: ${error.message}`);
     }
   };
 
@@ -102,7 +102,7 @@ const GestionIscripcion = () => {
   const actualizarInscripcion = async () => {
     try {
       await inscripcionService.update(inscripcionSeleccionada._id, inscripcionSeleccionada);
-      mostrarAlerta("¡Éxito!","Inscripción actualizada exitosamente");
+      mostrarAlerta("¡Éxito!", "Inscripción actualizada exitosamente");
       setMostrarModal(false);
       setInscripcionSeleccionada(null);
       setModoEdicion(false);
@@ -114,18 +114,18 @@ const GestionIscripcion = () => {
 
   // Eliminar inscripción
   const eliminarInscripcion = async (id) => {
-   const confirmado = await mostrarConfirmacion(
-    "¿Estás seguro?",
-    "Esta acción eliminará el usuario de forma permanente."
-  );
+    const confirmado = await mostrarConfirmacion(
+      "¿Estás seguro?",
+      "Esta acción eliminará el usuario de forma permanente."
+    );
 
     if (!confirmado) return;
     try {
       await inscripcionService.delete(id);
-      mostrarAlerta("¡Éxito!","Inscripción eliminada exitosamente");
+      mostrarAlerta("¡Éxito!", "Inscripción eliminada exitosamente");
       obtenerInscripciones();
     } catch (error) {
-      mostrarAlerta("Error",`Error al eliminar la inscripción: ${error.message}`);
+      mostrarAlerta("Error", `Error al eliminar la inscripción: ${error.message}`);
     }
   };
 
@@ -160,10 +160,52 @@ const GestionIscripcion = () => {
   return (
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
-        <h1 className="titulo-admin" >Gestión de Inscripciones</h1>
-        <button className="btn-admin" onClick={abrirModalCrear}>
-          ➕ Nueva Inscripción
+        <div className="page-title-admin">
+          <h1>Gestión de Inscripciones</h1>
+          <p>Administra las cuentas de usuario del sistema</p>
+        </div>
+        <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
+          + Nueva Inscripción
         </button>
+      </div>
+
+      <div className="stats-grid-admin">
+        <div className="stat-card-admin">
+          <div className="stat-icon-admin users">
+            <i className="fas fa-users"></i>
+          </div>
+          <div className="stat-info-admin">
+            <h3>5</h3>
+            <p>Total Usuarios</p>
+          </div>
+        </div>
+        <div className="stat-card-admin">
+          <div className="stat-icon-admin active">
+            <i className="fas fa-user-check"></i>
+          </div>
+          <div className="stat-info-admin">
+            <h3>4</h3>
+            <p>Usuarios Activos</p>
+          </div>
+        </div>
+        <div className="stat-card-admin">
+          <div className="stat-icon-admin admins">
+            <i className="fas fa-user-shield"></i>
+          </div>
+          <div className="stat-info-admin">
+            <h3>1</h3>
+            <p>Administradores</p>
+          </div>
+        </div>
+        <div className="stat-card-admin">
+          <div className="stat-icon-admin new">
+            <i className="fas fa-user-plus"></i>
+          </div>
+          <div className="stat-info-admin">
+            <h3>12</h3>
+            <p>Nuevos Este Mes</p>
+          </div>
+        </div>
       </div>
 
       <section className="filtros-section-admin">
@@ -193,12 +235,13 @@ const GestionIscripcion = () => {
           </select>
         </div>
 
-      <TablaInscripciones
-        inscripciones={inscripciones}
-        onEditar={abrirModalEditar}
-        onEliminar={eliminarInscripcion}
-      />
       </section>
+    
+        <TablaInscripciones
+          inscripciones={inscripciones}
+          onEditar={abrirModalEditar}
+          onEliminar={eliminarInscripcion}
+        />
       <InscripcionModal
         mostrar={mostrarModal}
         modoEdicion={modoEdicion}

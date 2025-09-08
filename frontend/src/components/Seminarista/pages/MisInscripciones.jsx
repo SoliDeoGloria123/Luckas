@@ -117,8 +117,8 @@ const MisInscripciones = () => {
 
         {/* Tarjetas de estadísticas */}
         <div className="stats-grid-inscripciones-semianrista">
-          <div className="stat-card-inscripciones-semianrista">
-            <div className="stat-icon confirmed">
+          <div className="stat-card-misolicitudes">
+            <div className="stat-icon-inscripciones-semianrista confirmed">
               <FontAwesomeIcon icon={faCheckCircle} />
             </div>
             <div className="stat-content">
@@ -127,8 +127,8 @@ const MisInscripciones = () => {
             </div>
           </div>
 
-          <div className="stat-card-inscripciones-semianrista">
-            <div className="stat-icon pending">
+          <div className="stat-card-misolicitudes">
+            <div className="stat-icon-inscripciones-semianrista pending">
               <FontAwesomeIcon icon={faExclamationTriangle} />
             </div>
             <div className="stat-content">
@@ -137,8 +137,8 @@ const MisInscripciones = () => {
             </div>
           </div>
 
-          <div className="stat-card-inscripciones-semianrista">
-            <div className="stat-icon cancelled">
+          <div className="stat-card-misolicitudes">
+            <div className="stat-icon-inscripciones-semianrista cancelled">
               <FontAwesomeIcon icon={faTimesCircle} />
             </div>
             <div className="stat-content">
@@ -147,8 +147,8 @@ const MisInscripciones = () => {
             </div>
           </div>
 
-          <div className="stat-card-inscripciones-semianrista">
-            <div className="stat-icon total">
+          <div className="stat-card-misolicitudes">
+            <div className="stat-icon-inscripciones-semianrista total">
               <FontAwesomeIcon icon={faCalendar} />
             </div>
             <div className="stat-content">
@@ -160,29 +160,29 @@ const MisInscripciones = () => {
 
         {/* Filtros */}
         <div className="filters-card-inscripciones-semianrista">
-          <div className="filters-content">
-            <span className="filter-label">Filtrar por estado:</span>
-            <div className="filter-buttons">
+          <div className="filters-content-inscripciones-semianrista">
+            <span className="filter-label-inscripciones-semianrista">Filtrar por estado:</span>
+            <div className="filter-buttons-inscripciones-semianrista">
               <button
-                className={`filter-btn ${activeFilter === 'Todas' ? 'active' : ''}`}
+                className={`filter-btn-inscripciones-semianrista ${activeFilter === 'Todas' ? 'active' : ''}`}
                 onClick={() => filterInscripciones('Todas')}
               >
                 Todas
               </button>
               <button
-                className={`filter-btn ${activeFilter === 'Confirmada' ? 'active' : ''}`}
+                className={`filter-btn-inscripciones-semianrista ${activeFilter === 'Confirmada' ? 'active' : ''}`}
                 onClick={() => filterInscripciones('Confirmada')}
               >
                 Confirmada
               </button>
               <button
-                className={`filter-btn ${activeFilter === 'Pendiente' ? 'active' : ''}`}
+                className={`filter-btn-inscripciones-semianrista ${activeFilter === 'Pendiente' ? 'active' : ''}`}
                 onClick={() => filterInscripciones('Pendiente')}
               >
                 Pendiente
               </button>
               <button
-                className={`filter-btn ${activeFilter === 'Cancelada' ? 'active' : ''}`}
+                className={`filter-btn-inscripciones-semianrista ${activeFilter === 'Cancelada' ? 'active' : ''}`}
                 onClick={() => filterInscripciones('Cancelada')}
               >
                 Cancelada
@@ -193,50 +193,50 @@ const MisInscripciones = () => {
 
         {/* Lista de inscripciones */}
         {filteredInscripciones.map((inscripcion) => (
-        <div class="inscripciones-container-seminario-inscripciones">
-          <div className="inscripcion-card-inscripciones-semianrista-semianrio-inscripciones" key={inscripcion.id}>
-            <div className="inscripcion-content-seminario-inscripciones">
-              <img src="https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg"  class="inscripcion-image"></img>
-              <div className="inscripcion-body-seminario-inscripciones">
-                <div className="header-seminario-inscripciones">
-                  <div className="inscripcion-title-section-seminario-inscripciones">
-                    <div className="inscripcion-title-row-seminario-inscripciones">
-                      <h3 className="inscripcion-title">{inscripcion.titulo}</h3>
-                      <span className={`status-badge ${inscripcion.estado.toLowerCase()}`}>{inscripcion.estado}</span>
+        <div className="inscripciones-container-misinscripciones">
+          <div className="inscripcion-card-misinscripciones" key={inscripcion.id}>
+            <div className="inscripcion-content-misinscripciones">
+              <img src="https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg"  className="inscripcion-image-misinscripciones"></img>
+              <div className="inscripcion-body-misinscripciones">
+                <div className="header-misinscripciones">
+                  <div className="inscripcion-title-section-misinscripciones">
+                    <div className="inscripcion-title-row-misinscripciones">
+                      <h3 className="inscripcion-title-misinscripciones">{inscripcion.titulo}</h3>
+                      <span className={`status-badge-misinscripciones ${inscripcion.estado.toLowerCase()}`}>{inscripcion.estado}</span>
                     </div>
                     {/* Si tienes categoría, puedes mostrarla aquí */}
                     {/* <span className={`categoria-badge ${inscripcion.categoria?.toLowerCase()}`}>{inscripcion.categoria}</span> */}
                   </div>
-                  <div className="inscripcion-price-section">
-                    <div className="inscripcion-price">{inscripcion.precio}</div>
-                    <div className="inscripcion-date">Inscrito: {inscripcion.fechaInscripcion}</div>
+                  <div className="inscripcion-price-section-misinscripciones">
+                    <div className="inscripcion-price-misinscripciones">{inscripcion.precio}</div>
+                    <div className="inscripcion-date-misinscripciones">Inscrito: {inscripcion.fechaInscripcion}</div>
                   </div>
                 </div>
-                <div className="inscripcion-details">
-                  <div className="detail-row">
+                <div className="inscripcion-details-misinscripciones">
+                  <div className="detail-row-misinscripciones">
                     <i className="fas fa-calendar"></i>
                     <span>{inscripcion.fecha}</span>
                   </div>
-                  <div className="detail-row">
+                  <div className="detail-row-misinscripciones">
                     <i className="fas fa-clock"></i>
                     <span>{inscripcion.horario}</span>
                   </div>
-                  <div className="detail-row">
+                  <div className="detail-row-misinscripciones">
                     <i className="fas fa-map-marker-alt"></i>
                     <span>{inscripcion.ubicacion}</span>
                   </div>
                 </div>
-                <div className="inscripcion-footer">
-                  <div className="status-info">
-                    <i className={`fas status-icon ${inscripcion.estado.toLowerCase()}`}></i>
-                    <span className="status-text">{inscripcion.estado}</span>
+                <div className="inscripcion-footer-misinscripciones">
+                  <div className="status-info-misinscripciones">
+                    <i className={`fas status-icon-misinscripciones ${inscripcion.estado.toLowerCase()}`}></i>
+                    <span className="status-text-misinscripciones">{inscripcion.estado}</span>
                   </div>
-                  <div className="inscripcion-actions">
-                    <button className="btn-outline" onClick={() => openModal(inscripcion)}>
+                  <div className="inscripcion-actions-misinscripciones">
+                    <button className="btn-outline-misinscripciones" onClick={() => openModal(inscripcion)}>
                       <i className="fas fa-eye"></i>
                       Ver Detalles
                     </button>
-                    <button className="btn-danger">Cancelar</button>
+                    <button className="btn-danger-misinscripciones">Cancelar</button>
                   </div>
                 </div>
               </div>
@@ -247,71 +247,71 @@ const MisInscripciones = () => {
         {/* Modal de Detalles */}
         {isModalOpen && currentInscripcion && (
           <div className="" id="modalOverlay" onClick={closeModal}>
-            <div className="modal-container" onClick={e => e.stopPropagation()}>
+            <div className="modal-container-misinscripciones" onClick={e => e.stopPropagation()}>
               <div className="modal-header">
                 <img
                   id="modalImage"
                   src={currentInscripcion.imagen}
                   alt=""
-                  className="modal-image"
+                  className="modal-image-misinscripciones"
                 />
-                <button className="modal-close" onClick={closeModal}>
+                <button className="modal-close-misinscripciones" onClick={closeModal}>
                   <FontAwesomeIcon icon={faTimes} />
                 </button>
               </div>
 
-              <div className="modal-content">
-                <div className="modal-status-price">
-                  <span id="modalStatus" className={`status-badge ${currentInscripcion.estado.toLowerCase()}`}>
+              <div className="modal-content-misinscripciones">
+                <div className="modal-status-price-misinscripciones">
+                  <span id="modalStatus" className={`status-badge-misinscripciones ${currentInscripcion.estado.toLowerCase()}`}>
                     {currentInscripcion.estado}
                   </span>
-                  <span id="modalPrice" className="modal-price">
+                  <span id="modalPrice" className="modal-price-misinscripciones">
                     {currentInscripcion.precio}
                   </span>
                 </div>
 
-                <h2 id="modalTitle" className="modal-title">{currentInscripcion.titulo}</h2>
+                <h2 id="modalTitle" className="modal-title-misinscripciones">{currentInscripcion.titulo}</h2>
 
-                <div className="modal-details-grid">
-                  <div className="modal-section">
-                    <h3 className="section-title">Detalles del Evento</h3>
-                    <div className="detail-item">
-                      <FontAwesomeIcon icon={faCalendar} className="detail-icon" />
+                <div className="modal-details-grid-misinscripciones">
+                  <div className="modal-section-misinscripciones">
+                    <h3 className="section-title-misinscripciones">Detalles del Evento</h3>
+                    <div className="detail-item-misinscripciones">
+                      <FontAwesomeIcon icon={faCalendar} className="detail-icon-misinscripciones" />
                       <span id="modalFecha">{currentInscripcion.fecha}</span>
                     </div>
-                    <div className="detail-item">
-                      <FontAwesomeIcon icon={faClock} className="detail-icon" />
+                    <div className="detail-item-misinscripciones">
+                      <FontAwesomeIcon icon={faClock} className="detail-icon-misinscripciones" />
                       <span id="modalHorario">{currentInscripcion.horario}</span>
                     </div>
-                    <div className="detail-item">
-                      <FontAwesomeIcon icon={faMapMarkerAlt} className="detail-icon" />
-                      <span id="modalUbicacion">{currentInscripcion.ubicacion}</span>
+                    <div className="detail-item-misinscripciones">
+                      <FontAwesomeIcon icon={faMapMarkerAlt} className="detail-icon-misinscripciones" />
+                      <span >{currentInscripcion.ubicacion}</span>
                     </div>
                   </div>
 
-                  <div className="modal-section">
-                    <h3 className="section-title">Información de Inscripción</h3>
-                    <div className="detail-item">
-                      <FontAwesomeIcon icon={faCheckCircle} className="detail-icon" />
+                  <div className="modal-section-misinscripciones">
+                    <h3 className="section-title-misinscripciones">Información de Inscripción</h3>
+                    <div className="detail-item-misinscripciones">
+                      <FontAwesomeIcon icon={faCheckCircle} className="detail-icon-misinscripciones" />
                       <span>Estado: <span id="modalEstadoText">{currentInscripcion.estado}</span></span>
                     </div>
-                    <div className="detail-item">
-                      <FontAwesomeIcon icon={faCalendar} className="detail-icon" />
+                    <div className="detail-item-misinscripciones">
+                      <FontAwesomeIcon icon={faCalendar} className="detail-icon-misinscripciones" />
                       <span>Inscrito: <span id="modalFechaInscripcion">{currentInscripcion.fechaInscripcion}</span></span>
                     </div>
-                    <div className="detail-item">
-                      <span className="detail-icon">💰</span>
+                    <div className="detail-item-misinscripciones">
+                      <span className="detail-icon-misinscripciones">💰</span>
                       <span>Precio: <span id="modalPrecioText">{currentInscripcion.precio}</span></span>
                     </div>
                   </div>
                 </div>
 
-                <div className="modal-actions">
-                  <button className="btn-secondary" onClick={closeModal}>Cerrar</button>
+                <div className="modal-actions-misinscripciones">
+                  <button className="btn-secondary-misinscripciones" onClick={closeModal}>Cerrar</button>
                   {currentInscripcion.estado === 'Confirmada' && (
                     <button
                       id="cancelarBtn"
-                      className="btn-danger"
+                      className="btn-danger-misinscripciones"
                       onClick={cancelarInscripcion}
                     >
                       Cancelar Inscripción

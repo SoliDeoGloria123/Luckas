@@ -4,6 +4,9 @@ import { categorizacionService } from '../../../services/categorizacionService';
 import { useNavigate } from "react-router-dom";
 import { mostrarAlerta } from '../../utils/alertas';
 import CabanaModal from '../modal/CabanaModal';
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
+
 
 
 const Gestioncabana = () => {
@@ -13,6 +16,32 @@ const Gestioncabana = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalCabana] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
+  const [modalImagen, setModalImagen] = useState({ abierto: false, imagenes: [], actual: 0 });
+
+  
+
+  const handleVerImagenes = (imagenes) => {
+    if (Array.isArray(imagenes) && imagenes.length > 0) {
+      setModalImagen({ abierto: true, imagenes, actual: 0 });
+    }
+  };
+  const handleNext = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual + 1) % prev.imagenes.length
+    }));
+  };
+
+  const handlePrev = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual - 1 + prev.imagenes.length) % prev.imagenes.length
+    }));
+  };
+
+  const cerrarModalImagen = () => {
+    setModalImagen({ abierto: false, imagenes: [], actual: 0 });
+  };
 
   const ataras = () => {
     navigate('/tesorero');
@@ -29,15 +58,15 @@ const Gestioncabana = () => {
     }
   };
   const obtenerCategorias = async () => {
-      try {
-        const data = await categorizacionService.getAll();
-        // Soporta respuesta tipo {data: [...]} o array directa
-        let cats = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
-        setCategorias(cats);
-      } catch (err) {
-        console.log("Error","Error al obtener categorías: " + err.message);
-      }
-    };
+    try {
+      const data = await categorizacionService.getAll();
+      // Soporta respuesta tipo {data: [...]} o array directa
+      let cats = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+      setCategorias(cats);
+    } catch (err) {
+      console.log("Error", "Error al obtener categorías: " + err.message);
+    }
+  };
   useEffect(() => {
     obtenerCabanas();
     obtenerCategorias();
@@ -46,20 +75,20 @@ const Gestioncabana = () => {
   const handleSubmit = async (data) => {
     if (modalMode === 'create') {
       try {
-            await cabanaService.create(data);
-            mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente")
-            obtenerCabanas();
-          } catch (error) {
-            mostrarAlerta("Error", "Error al crear la cabaña: " + error.message, "error");
-          }
+        await cabanaService.create(data);
+        mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente")
+        obtenerCabanas();
+      } catch (error) {
+        mostrarAlerta("Error", "Error al crear la cabaña: " + error.message, "error");
+      }
     } else {
       try {
-           await cabanaService.update(currentItem._id, data);
-           mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente");
-           obtenerCabanas();
-         } catch (err) {
-           mostrarAlerta("Error", "Error al actualizar cabaña: " + err.message);
-         }
+        await cabanaService.update(currentItem._id, data);
+        mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente");
+        obtenerCabanas();
+      } catch (err) {
+        mostrarAlerta("Error", "Error al actualizar cabaña: " + err.message);
+      }
     }
   };
 
@@ -73,6 +102,8 @@ const Gestioncabana = () => {
 
 
   return (
+    <>
+    <Header/>
     <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
@@ -181,31 +212,45 @@ const Gestioncabana = () => {
             </tr>
           </thead>
           <tbody id="usersTableBody">
-            {cabanas.length === 0 ?(
+            {cabanas.length === 0 ? (
               <tr>
-                
+
                 <td colSpan={7}>No hay cabañas disponible</td>
               </tr>
-            ):(
-              cabanas.map((caba) =>(
+            ) : (
+              cabanas.map((caba) => (
                 <tr key={caba._id}>
                   <td><input type="checkbox" /></td>
                   <td>{caba._id}</td>
                   <td>{caba.nombre}</td>
                   <td>{caba.descripcion}</td>
                   <td>{caba.capacidad}</td>
-                  <td>{caba.descripcion}</td>
+                  <td>{caba.categoria?.nombre || caba.categoria || 'N/A' }</td>
                   <td>{caba.precio}</td>
-                  <td>{caba.estado}</td>
-                  <td>{caba.descripcion}</td>
-                  <td>{caba.imagen}</td>
+                  <td>
+                    <span className={`badge-tesorero badge-tesorero-${caba.estado} `}>
+                       {caba.estado}
+                    </span>
+                 
+                    </td>
+                  <td>{caba.creadoPor?.nombre || caba.creadoPor || 'N/A'}</td>
+                  <td>
+                    {Array.isArray(caba.imagen) && caba.imagen.length > 0 ? (
+                      <button onClick={() => handleVerImagenes(caba.imagen)} className="btn-image-tesorero">
+                       <i class="fas fa-eye"></i>
+                      </button>
+                    ) : (
+                      <span class="no-image-tesorero">Sin imagen</span>
+                    )}
+
+                  </td>
                   <td className='actions-cell'>
-                    <button className='action-btn edit' onClick={() =>{
+                    <button className='action-btn edit' onClick={() => {
                       setModalCabana('edit');
                       setCurrentItem(caba);
                       setShowModal(true);
                     }}>
-                       <i class="fas fa-edit"></i>
+                      <i class="fas fa-edit"></i>
                     </button>
                   </td>
                 </tr>
@@ -213,6 +258,20 @@ const Gestioncabana = () => {
             )}
           </tbody>
         </table>
+        {modalImagen.abierto && (
+          <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
+            <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
+              <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
+              <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
+              <img
+                src={`http://localhost:3000/uploads/cabanas/${modalImagen.imagenes[modalImagen.actual]}`}
+                alt="Imagen del evento"
+                className="imagen-modal"
+              />
+              <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+            </div>
+          </div>
+        )}
       </div>
       {showModal && (
         <CabanaModal
@@ -224,6 +283,8 @@ const Gestioncabana = () => {
         />
       )}
     </main>
+    <Footer/>
+    </>
   );
 };
 

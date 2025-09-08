@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { FaBookOpen, FaUser, FaIdCard, FaHashtag, FaKey, FaEnvelope, FaLock, FaArrowLeft, FaArrowRight, FaSignInAlt, FaCheckCircle } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { signupService } from '../../services/authService';
 import './registro.css'; // Crearemos este archivo después
 
 const Registro = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({

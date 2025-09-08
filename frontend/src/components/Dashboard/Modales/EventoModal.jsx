@@ -14,7 +14,7 @@ const EventoModal = ({
 }) => {
   if (!mostrar) return null;
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay-admin">
       <div className="modal-admin">
         <div className="modal-header-admin">
           <h3>{modoEdicion ? "Editar Evento" : "Nueva Evento"}</h3>
@@ -22,238 +22,249 @@ const EventoModal = ({
             ✕
           </button>
         </div>
-        <div className="modal-body-admin">
-          <div className="form-grupo-admin">
-            <label>Nombre Evento:</label>
-            <input
-              type="text"
-              value={modoEdicion ? eventoSeleccionado?.nombre : nuevoEvento.nombre}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, nombre: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, nombre: e.target.value })
-              }
-              placeholder="Nombre del Evento"
-            />
-          </div>
-
-          {!modoEdicion && (
+        <form className="modal-body-admin">
+          <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Descripcion Evento:</label>
+              <label>Nombre Evento:</label>
               <input
                 type="text"
-                value={nuevoEvento.descripcion}
-                onChange={e => setNuevoEvento({ ...nuevoEvento, descripcion: e.target.value })
+                value={modoEdicion ? eventoSeleccionado?.nombre : nuevoEvento.nombre}
+                onChange={e =>
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, nombre: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, nombre: e.target.value })
                 }
                 placeholder="Nombre del Evento"
               />
             </div>
-          )}
-          <div className="form-grupo-admin">
-            <label>Precio Evento:</label>
-            <input
-              type="number"
-              value={modoEdicion ? eventoSeleccionado?.precio : nuevoEvento.precio}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, precio: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, precio: e.target.value })
-              }
-              placeholder="Nombre del Evento"
-            />
+
+            {!modoEdicion && (
+              <div className="form-grupo-admin">
+                <label>Descripcion Evento:</label>
+                <input
+                  type="text"
+                  value={nuevoEvento.descripcion}
+                  onChange={e => setNuevoEvento({ ...nuevoEvento, descripcion: e.target.value })
+                  }
+                  placeholder="Nombre del Evento"
+                />
+              </div>
+            )}
           </div>
-          <div className="form-grupo-admin">
-            <label>Categoría:</label>
-            <select
-              value={modoEdicion ? eventoSeleccionado?.categoria : nuevoEvento.categoria}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, categoria: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, categoria: e.target.value })
-              }
-              required
-            >
-              <option value="">Seleccione...</option>
-              {categorias && categorias.map(cat => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-          {!modoEdicion && (
+          <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Etiquetas Evento:</label>
+              <label>Precio Evento:</label>
               <input
-                type="text"
-                value={nuevoEvento.etiquetas}
+                type="number"
+                value={modoEdicion ? eventoSeleccionado?.precio : nuevoEvento.precio}
                 onChange={e =>
-                  setNuevoEvento({ ...nuevoEvento, etiquetas: e.target.value })
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, precio: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, precio: e.target.value })
                 }
                 placeholder="Nombre del Evento"
               />
             </div>
-          )}
-          <div className="form-grupo-admin">
-            <label>Fecha del Evento:</label>
-            <input
-              type="date"
-              value={modoEdicion ? eventoSeleccionado?.fechaEvento : nuevoEvento.fechaEvento}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, fechaEvento: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, fechaEvento: e.target.value })
-              }
-            />
-          </div>
-          <div className="form-grupo-admin">
-            <label>Hora de Inicio:</label>
-            <input
-              type="time"
-              value={modoEdicion ? eventoSeleccionado?.horaInicio : nuevoEvento.horaInicio}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, horaInicio: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, horaInicio: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="form-grupo-admin">
-            <label>Hora de Fin:</label>
-            <input
-              type="time"
-              value={modoEdicion ? eventoSeleccionado?.horaFin : nuevoEvento.horaFin}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, horaFin: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, horaFin: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="form-grupo-admin">
-            <label>Lugar:</label>
-            <input
-              type="text"
-              value={modoEdicion ? eventoSeleccionado?.lugar : nuevoEvento.lugar}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, lugar: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, lugar: e.target.value })
-              }
-              placeholder="Ej: Auditorio Principal"
-            />
-          </div>
-          {!modoEdicion && (
             <div className="form-grupo-admin">
-              <label>Dirección:</label>
+              <label>Categoría:</label>
+              <select
+                value={modoEdicion ? eventoSeleccionado?.categoria : nuevoEvento.categoria}
+                onChange={e =>
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, categoria: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, categoria: e.target.value })
+                }
+                required
+              >
+                <option value="">Seleccione...</option>
+                {categorias && categorias.map(cat => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="from-grid-admin">
+            {!modoEdicion && (
+              <div className="form-grupo-admin">
+                <label>Etiquetas Evento:</label>
+                <input
+                  type="text"
+                  value={nuevoEvento.etiquetas}
+                  onChange={e =>
+                    setNuevoEvento({ ...nuevoEvento, etiquetas: e.target.value })
+                  }
+                  placeholder="Nombre del Evento"
+                />
+              </div>
+            )}
+            <div className="form-grupo-admin">
+              <label>Fecha del Evento:</label>
+              <input
+                type="date"
+                value={modoEdicion ? eventoSeleccionado?.fechaEvento : nuevoEvento.fechaEvento}
+                onChange={e =>
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, fechaEvento: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, fechaEvento: e.target.value })
+                }
+              />
+            </div>
+          </div>
+          <div className="from-grid-admin">
+            <div className="form-grupo-admin">
+              <label>Hora de Inicio:</label>
+              <input
+                type="time"
+                value={modoEdicion ? eventoSeleccionado?.horaInicio : nuevoEvento.horaInicio}
+                onChange={e =>
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, horaInicio: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, horaInicio: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="form-grupo-admin">
+              <label>Hora de Fin:</label>
+              <input
+                type="time"
+                value={modoEdicion ? eventoSeleccionado?.horaFin : nuevoEvento.horaFin}
+                onChange={e =>
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, horaFin: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, horaFin: e.target.value })
+                }
+              />
+            </div>
+          </div>
+          <div className="from-grid-admin">
+            <div className="form-grupo-admin">
+              <label>Lugar:</label>
               <input
                 type="text"
-                value={nuevoEvento.direccion}
+                value={modoEdicion ? eventoSeleccionado?.lugar : nuevoEvento.lugar}
                 onChange={e =>
-                  setNuevoEvento({ ...nuevoEvento, direccion: e.target.value })
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, lugar: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, lugar: e.target.value })
                 }
-                placeholder="Ej: Carrera 45 #50-12, Bogotá"
+                placeholder="Ej: Auditorio Principal"
               />
             </div>
-          )}
-          <div className="form-grupo-admin">
-            <label>Cupos Totales:</label>
-            <input
-              type="number"
-              value={modoEdicion ? eventoSeleccionado?.cuposTotales : nuevoEvento.cuposTotales}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, cuposTotales: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, cuposTotales: e.target.value })
-              }
-            />
+            {!modoEdicion && (
+              <div className="form-grupo-admin">
+                <label>Dirección:</label>
+                <input
+                  type="text"
+                  value={nuevoEvento.direccion}
+                  onChange={e =>
+                    setNuevoEvento({ ...nuevoEvento, direccion: e.target.value })
+                  }
+                  placeholder="Ej: Carrera 45 #50-12, Bogotá"
+                />
+              </div>
+            )}
           </div>
-
-          <div className="form-grupo-admin">
-            <label>Cupos Disponibles:</label>
-            <input
-              type="number"
-              value={modoEdicion ? eventoSeleccionado?.cuposDisponibles : nuevoEvento.cuposDisponibles}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, cuposDisponibles: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, cuposDisponibles: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="form-grupo-admin">
-            <label>Prioridad:</label>
-            <select
-              value={modoEdicion ? eventoSeleccionado?.prioridad : nuevoEvento.prioridad}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, prioridad: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, prioridad: e.target.value })
-              }
-            >
-              <option value="">Seleccione...</option>
-              <option value="Alta">Alta</option>
-              <option value="Media">Media</option>
-              <option value="Baja">Baja</option>
-            </select>
-          </div>
-          {!modoEdicion && (
+          <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Observaciones:</label>
+              <label>Cupos Totales:</label>
               <input
-                type="text"
-                value={nuevoEvento.observaciones}
+                type="number"
+                value={modoEdicion ? eventoSeleccionado?.cuposTotales : nuevoEvento.cuposTotales}
                 onChange={e =>
-                setNuevoEvento({ ...nuevoEvento, observaciones: e.target.value })
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, cuposTotales: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, cuposTotales: e.target.value })
                 }
-                placeholder="Observaciones del evento"
               />
             </div>
-          )}
-          <div className="form-grupo-admin">
-            <label>Estado:</label>
-            <select
-              value={modoEdicion ? eventoSeleccionado?.active : nuevoEvento.active}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, active: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, active: e.target.value })
-              }
-            >
-              <option value="">Seleccione...</option>
-              <option value="true">Activo</option>
-              <option value="false">Inactivo</option>
-            </select>
-          </div>
 
-                {!modoEdicion && (
             <div className="form-grupo-admin">
-              <label>Imagen:</label>
+              <label>Cupos Disponibles:</label>
               <input
-                type="file"
-                value={nuevoEvento.imagen}
+                type="number"
+                value={modoEdicion ? eventoSeleccionado?.cuposDisponibles : nuevoEvento.cuposDisponibles}
                 onChange={e =>
-                setNuevoEvento({ ...nuevoEvento, imagen: e.target.value })
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, cuposDisponibles: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, cuposDisponibles: e.target.value })
                 }
-                placeholder="Imagen del evento"
               />
             </div>
-          )}
-        </div>
+          </div>
+          <div className="from-grid-admin">
+            <div className="form-grupo-admin">
+              <label>Prioridad:</label>
+              <select
+                value={modoEdicion ? eventoSeleccionado?.prioridad : nuevoEvento.prioridad}
+                onChange={e =>
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, prioridad: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, prioridad: e.target.value })
+                }
+              >
+                <option value="">Seleccione...</option>
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+              </select>
+            </div>
+            {!modoEdicion && (
+              <div className="form-grupo-admin">
+                <label>Observaciones:</label>
+                <input
+                  type="text"
+                  value={nuevoEvento.observaciones}
+                  onChange={e =>
+                    setNuevoEvento({ ...nuevoEvento, observaciones: e.target.value })
+                  }
+                  placeholder="Observaciones del evento"
+                />
+              </div>
+            )}
+          </div>
+          <div className="from-grid-admin">
+            <div className="form-grupo-admin">
+              <label>Estado:</label>
+              <select
+                value={modoEdicion ? eventoSeleccionado?.active : nuevoEvento.active}
+                onChange={e =>
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, active: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, active: e.target.value })
+                }
+              >
+                <option value="">Seleccione...</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+              </select>
+            </div>
 
-
-
-        <div className="modal-footer-admin">
-          <button className="btn-secondary" onClick={onClose}>
-            Cancelar
-          </button>
-          <button className="btn-primary" onClick={onSubmit}>
-            {modoEdicion ? "Guardar Cambios" : "Crear Evento"}
-          </button>
-        </div>
+            {!modoEdicion && (
+              <div className="form-grupo-admin">
+                <label>Imagen:</label>
+                <input
+                  type="file"
+                  value={nuevoEvento.imagen}
+                  onChange={e =>
+                    setNuevoEvento({ ...nuevoEvento, imagen: e.target.value })
+                  }
+                  placeholder="Imagen del evento"
+                />
+              </div>
+            )}
+          </div>
+          <div className="modal-action-admin">
+            <button className="btn-admin secondary-admin" onClick={onClose}>
+              Cancelar
+            </button>
+            <button className="btn-admin btn-primary" onClick={onSubmit}>
+              {modoEdicion ? "Guardar Cambios" : "Crear Evento"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import CategorizacionModal from '../modal/CategorizacionModal';
 import { categorizacionService } from '../../../services/categorizacionService';
 import { mostrarAlerta } from '../../utils/alertas';
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
 
 
 const Gestioncategorizacion = () => {
@@ -53,6 +55,8 @@ const Gestioncategorizacion = () => {
     setShowModal(true);
   };
   return (
+    <>
+    <Header/>
     <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
@@ -172,8 +176,8 @@ const Gestioncategorizacion = () => {
                   <td>{cate.nombre}</td>
                   <td>{cate.codigo}</td>
                   <td>
-                    <span className={`status-badge ${cate.activo ? 'active' : 'inactive'}`}>
-                      {cate.activo ? 'Activo' : 'Inactivo'}
+                    <span className={`badge-tesorero badge-tesorero-${cate.activo ? 'activo' : 'desactivado'}`}>
+                      {cate.activo ? 'activo' : 'desactivado'}
                     </span>
                   </td>
 
@@ -198,6 +202,8 @@ const Gestioncategorizacion = () => {
         />
       )}
     </main>
+    <Footer />
+    </>
   );
 };
 

@@ -7,7 +7,7 @@ import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 const GestionCategorizacion = () => {
     const [categorias, setCategorias] = useState([]);
     const [mostrarModal, setMostrarModal] = useState(false);
-    const [modoEdicion, setModoEdicion ] = useState(false);
+    const [modoEdicion, setModoEdicion] = useState(false);
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
     const [nuevaCategoria, setNuevaCategoria] = useState({ nombre: "", codigo: "", estado: "activo" });
 
@@ -84,10 +84,51 @@ const GestionCategorizacion = () => {
     return (
         <div className="seccion-usuarios">
             <div className="page-header-Academicos">
-                <h1 className="titulo-admin">Categorización</h1>
-                <button className="btn-admin" onClick={abrirModalCrear}>
+                <div className="page-title-admin">
+                    <h1>Gestión de Categorización</h1>
+                    <p>Administra las cuentas de usuario del sistema</p>
+                </div>
+                <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
                     + Nueva Categoría
                 </button>
+            </div>
+            <div className="stats-grid-admin">
+                <div className="stat-card-admin">
+                    <div className="stat-icon-admin users">
+                        <i className="fas fa-users"></i>
+                    </div>
+                    <div className="stat-info-admin">
+                        <h3>5</h3>
+                        <p>Total Usuarios</p>
+                    </div>
+                </div>
+                <div className="stat-card-admin">
+                    <div className="stat-icon-admin active">
+                        <i className="fas fa-user-check"></i>
+                    </div>
+                    <div className="stat-info-admin">
+                        <h3>4</h3>
+                        <p>Usuarios Activos</p>
+                    </div>
+                </div>
+                <div className="stat-card-admin">
+                    <div className="stat-icon-admin admins">
+                        <i className="fas fa-user-shield"></i>
+                    </div>
+                    <div className="stat-info-admin">
+                        <h3>1</h3>
+                        <p>Administradores</p>
+                    </div>
+                </div>
+                <div className="stat-card-admin">
+                    <div className="stat-icon-admin new">
+                        <i className="fas fa-user-plus"></i>
+                    </div>
+                    <div className="stat-info-admin">
+                        <h3>12</h3>
+                        <p>Nuevos Este Mes</p>
+                    </div>
+                </div>
             </div>
             <section className="filtros-section-admin">
                 <div className="busqueda-contenedor">
@@ -115,13 +156,12 @@ const GestionCategorizacion = () => {
                         <option>Pendiente</option>
                     </select>
                 </div>
-
+            </section>
                 <TablaCategorias
                     categorias={categorias}
                     onEditar={abrirModalEditar}
                     onEliminar={eliminarCategoria}
                 />
-            </section>
             <CategorizacionModal
                 mostrar={mostrarModal}
                 modoEdicion={modoEdicion}

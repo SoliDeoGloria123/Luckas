@@ -4,6 +4,8 @@ import { eventService } from '../../../services/eventService';
 import { categorizacionService } from '../../../services/categorizacionService';
 import InscripcionModal from '../modal/InscripcionModal';
 import { mostrarAlerta } from '../../utils/alertas';
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
 
 const Gestioninscripcion = () => {
 
@@ -15,6 +17,7 @@ const Gestioninscripcion = () => {
   const [currentItemIncribir, setcurrentItemIncribir] = useState(null);
 
 
+  
   //Obtener inscripciones eventos y ctaegorias
   const obtenerInscripciones = async () => {
     try {
@@ -83,6 +86,8 @@ const Gestioninscripcion = () => {
 
 
   return (
+    <>
+    <Header/>
     <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
@@ -198,7 +203,7 @@ const Gestioninscripcion = () => {
             ) : (
               inscripciones.map((ins) => (
                 <tr key={ins._id}>
-                   <td>
+                  <td>
                     <input type="checkbox" />
                   </td>
                   <td>{ins._id}</td>
@@ -210,11 +215,17 @@ const Gestioninscripcion = () => {
                   <td>{ins.categoria?.nombre}</td>
                   <td>{ins.evento?.nombre}</td>
                   <td>{ins.observaciones}</td>
-                  <td>{ins.fechaInscripcion}</td>
-                  <td>{ins.estado}</td>
+                  <td>
+                    {ins.fechaInscripcion ? new Date(ins.fechaInscripcion).toLocaleDateString('es-ES', { day: 'numeric', month: '2-digit', year: 'numeric' }) : ''}
+                  </td>   
+                  <td className={`badge-tesorero badge-tesorero-${ins.estado}`}>
+                    <span>
+                      {ins.estado}
+                    </span>
+                  </td>
                   <td>{ins.solicitud}</td>
                   <td className='actions-cell'>
-                    <button className='action-btn edit' onclick={() => handleEdit(ins)}>
+                    <button className='action-btn edit' onClick={() => handleEdit(ins)}>
                       <i class="fas fa-edit"></i>
                     </button>
                   </td>
@@ -231,9 +242,13 @@ const Gestioninscripcion = () => {
           initialData={currentItemIncribir || {}}
           onClose={() => setShowModalnscribir(false)}
           onSubmit={handleSubmit}
+          categorias={categorias}
+          eventos={eventos}
         />
       )}
     </main>
+    <Footer/>
+    </>
   );
 };
 

@@ -3,8 +3,8 @@ import { FaEye } from "react-icons/fa";
 
 
 const CabanaTabla = ({ cabanas, onEditar, onEliminar, onVerImagen }) => (
-  <div className="tabla-contenedor">
-    <table className="tabla-usuarios">
+  <div className="tabla-contenedor-admin">
+    <table className="tabla-usuarios-admin">
       <thead>
         <tr>
           <th>ID</th>
@@ -51,12 +51,12 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onVerImagen }) => (
 
               <td>
                 <div className="acciones-botones">
-                  <button className="btn-editar" onClick={() => onEditar(cabana)}>
-                    ✏️
+                  <button className="btn-action editar" onClick={() => onEditar(cabana)}>
+                    <i class="fas fa-edit"></i>
                   </button>
                   {onEliminar && (
-                    <button className="btn-eliminar" onClick={() => onEliminar(cabana._id)}>
-                      🗑️
+                    <button className="btn-action eliminar" onClick={() => onEliminar(cabana._id)}>
+                   <i class="fas fa-trash"></i>
                     </button>
 
                   )}

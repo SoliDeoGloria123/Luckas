@@ -21,7 +21,16 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Normalizar los valores antes de enviar
+    const dataToSend = {
+      ...formData,
+      correo: formData.correo.trim().toLowerCase(),
+      password: formData.password.trim(),
+      estado: formData.estado.toLowerCase(),
+      role: formData.role.toLowerCase(),
+    };
+    console.log("Datos a enviar:", dataToSend); // Para depuración
+    onSubmit(dataToSend);
     onClose();
   };
 
@@ -105,28 +114,30 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                   type="email"
                   name="correo"
                   value={formData.correo}
-                  onChange={handleChange}
+                 onChange={e => setFormData(prev => ({ ...prev, correo: e.target.value.trim().toLowerCase() }))}
                   placeholder="correo@ejemplo.com"
                   required
                 />
               </div>
-              <div className="form-group-tesorero">
-                <label>Contraseña</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Contraseña"
-                  required
-                />
-              </div>
+              {mode === 'create' && (
+                <div className="form-group-tesorero">
+                  <label>Contraseña</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                   onChange={e => setFormData(prev => ({ ...prev, password: e.target.value.trim() }))}
+                    placeholder="Contraseña"
+                    required
+                  />
+                </div>
+              )}
 
 
               <div className="form-group-tesorero">
                 <label>Rol</label>
                 <select
-                  name="rol"
+                  name="role"
                   value={formData.role}
                   onChange={handleChange}
                   required
@@ -146,9 +157,8 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                   onChange={handleChange}
                   required
                 >
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
-                  <option value="Pendiente">Pendiente</option>
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
                 </select>
               </div>
             </div>

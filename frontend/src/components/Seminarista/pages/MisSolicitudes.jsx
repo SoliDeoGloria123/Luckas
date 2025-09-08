@@ -174,7 +174,7 @@ const MisSolicitudes = () => {
           {/* Statistics Cards */}
           <div className="stats-grid-misolicitudes">
             <div className="stat-card-misolicitudes approved">
-              <div className="stat-icon">
+              <div className="stat-icon-misolicitudes">
                 <FaCheckCircle />   
               </div>
               <div className="stat-content">
@@ -183,8 +183,8 @@ const MisSolicitudes = () => {
               </div>
             </div>
 
-            <div className="stat-card review">
-              <div className="stat-icon">
+            <div className="stat-card-misolicitudes review">
+              <div className="stat-icon-misolicitudes">
                 <FaClock />
               </div>
               <div className="stat-content">
@@ -193,8 +193,8 @@ const MisSolicitudes = () => {
               </div>
             </div>
 
-            <div className="stat-card pending">
-              <div className="stat-icon">
+            <div className="stat-card-misolicitudes pending">
+              <div className="stat-icon-misolicitudes">
                 <FaExclamationCircle />
               </div>
               <div className="stat-content">
@@ -203,8 +203,8 @@ const MisSolicitudes = () => {
               </div>
             </div>
 
-            <div className="stat-card total">
-              <div className="stat-icon">
+            <div className="stat-card-misolicitudes total">
+              <div className="stat-icon-misolicitudes">
                 <FaFileAlt />
               </div>
               <div className="stat-content">
@@ -372,15 +372,15 @@ const MisSolicitudes = () => {
 
       {/* Request Details Modal */}
       {showRequestModal && selectedRequest && (
-        <div className="modal-overlay show">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2 className="modal-title">Detalles de: {selectedRequest.title}</h2>
-              <button className="modal-close" onClick={() => setShowRequestModal(false)}>
+        <div className="modal-overlay-misolicitudes show-misolicitudes">
+          <div className="modal-content-misolicitudes">
+            <div className="modal-header-misolicitudes">
+              <h2 className="modal-title-misolicitudes">Detalles de: {selectedRequest.title}</h2>
+              <button className="modal-close-misolicitudes" onClick={() => setShowRequestModal(false)}>
                 <FaTimes />
               </button>
             </div>
-            <div className="modal-body">
+            <div className="modal-body-misolicitudes">
               <div className="request-details">
                 <div className="detail-section">
                   <h4>Información General</h4>
@@ -442,16 +442,16 @@ const MisSolicitudes = () => {
                 )}
               </div>
             </div>
-            <div className="modal-footer">
+            <div className="modal-footer-misolicitudes">
               <button 
-                className="btn btn-secondary" 
+                className="btn-misolicitudes btn-secondary-misolicitudes" 
                 onClick={() => setShowRequestModal(false)}
               >
                 Cerrar
               </button>
               {(selectedRequest.status === 'pendiente' || selectedRequest.status === 'revision') && (
                 <button 
-                  className="btn btn-danger" 
+                  className="btn-misolicitudes btn-danger-misolicitudes" 
                   onClick={() => showCancelConfirmation(selectedRequest.id)}
                 >
                   Cancelar Solicitud
@@ -464,7 +464,7 @@ const MisSolicitudes = () => {
 
       {/* Confirmation Modal */}
       {showConfirmModal && selectedRequest && (
-        <div className="modal-overlay show">
+        <div className="modal-overlay-misolicitudes show-misolicitudes">
           <div className="modal-content modal-small">
             <div className="modal-header">
               <h2 className="modal-title">Confirmar Cancelación</h2>

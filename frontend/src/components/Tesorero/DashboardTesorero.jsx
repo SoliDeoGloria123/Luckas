@@ -1,14 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Gestionusuarios from './Tablas/Gestionusuarios';
-import Gestioncategorizacion from './Tablas/Gestioncategorizar';
-import Gestionsolicitud from './Tablas//Gestionsolicitud';
-import Gestionevento from './Tablas/Gestionevento';
-import Gestioninscripcion from './Tablas/Gestioninscripcion';
-import Gestiontarea from './Tablas/Gestiontareas';
-import Gestioncabana from './Tablas/Gestioncabana';
-import Gestionreserva from './Tablas/Gestionreserva';
-import Gestionreporte from './Tablas/Gestioreportes';
+import  { useEffect, useState } from 'react';
+import { useNavigate} from 'react-router-dom';
 import "./DashboardTesorero.css";
 import Header from './Header/Header-tesorero';
 import Footer from '../footer/Footer';
@@ -19,6 +10,37 @@ const DashboardTesorero = () => {
   const navigate = useNavigate();
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
 
+  const handleGusuariosClick =() =>{
+    navigate('/tesorero/usuarios')
+  };
+  const handleGcategoriasClick =() =>{
+    navigate('/tesorero/categorias')
+  };
+
+  const handleGsolicitudesClick =() =>{
+    navigate('/tesorero/solicitudes')
+  };
+  const handleEventosClick =() =>{
+    navigate('/tesorero/eventos')
+  };
+  const handleGcabanaClick =() =>{
+    navigate('/tesorero/cabañas')
+  };
+  const handleGreservasClick =() =>{
+    navigate('/tesorero/reservas')
+  };
+  /*const handleGcursosClick =() =>{
+    navigate('/tesorero/cursos')
+  };*/
+  const handleGinscripcionClick =() =>{
+    navigate('/tesorero/inscripcion')
+  };
+  const handleGreporteClick =() =>{
+    navigate('/tesorero/reportes')
+  };
+  const handleGtareaClick =() =>{
+    navigate('/tesorero/tarea')
+  };
 
 
   const toggleSidebar = () => {
@@ -51,7 +73,7 @@ const DashboardTesorero = () => {
 
   return (
     <div className="dashboard-tesorero">
-      <Header />
+      <Header usuario={usuario} />
       <main className="main-content-tesorero">
         {seccionActiva === "dashboard" && (
           <>
@@ -127,7 +149,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Usuarios</h3>
                         <p>Administrar cuentas de usuarios del sistema</p>
                       </div>
-                      <button className="function-action" onClick={() => setSeccionActiva("usuarios-tesorero")} >
+                      <button className="function-action" onClick={handleGusuariosClick} >
                         Gestionar →
                       </button>
                     </div>
@@ -146,7 +168,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Categorias</h3>
                         <p>Administrar Categorias del sistema</p>
                       </div>
-                      <button className="function-action" onClick={() => setSeccionActiva("categorias-tesorero")} >
+                      <button className="function-action" onClick={handleGcategoriasClick} >
                         Gestionar →
                       </button>
                     </div>
@@ -166,7 +188,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Solicitudes</h3>
                         <p>Revisar y categorizar solicitudes</p>
                       </div>
-                      <button className="function-action " onClick={()=> setSeccionActiva('solicitud-tesorero')}>
+                      <button className="function-action " onClick={handleGsolicitudesClick}>
                         Gestionar →
                       </button>
                     </div>
@@ -186,7 +208,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Eventos</h3>
                         <p>Organizar y categorizar eventos</p>
                       </div>
-                      <button className="function-action" onClick={()=> setSeccionActiva('evento-tesorero')}>
+                      <button className="function-action" onClick={handleEventosClick}>
                         Gestionar →
                       </button>
                     </div>
@@ -206,7 +228,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Cabañas</h3>
                         <p>Administrar las cabañas</p>
                       </div>
-                      <button className="function-action" onClick={()=> setSeccionActiva('cabana-tesorero')}>
+                      <button className="function-action" onClick={handleGcabanaClick}>
                         Gestionar →
                       </button>
                     </div>
@@ -225,7 +247,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Reservas</h3>
                         <p>Administrar reservas de cabañas</p>
                       </div>
-                      <button className="function-action" onClick={()=> setSeccionActiva('reserva-tesorero')}>
+                      <button className="function-action" onClick={handleGreservasClick}>
                         Gestionar →
                       </button>
                     </div>
@@ -245,7 +267,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Cursos</h3>
                         <p>Administrar programas académicos</p>
                       </div>
-                      <button className="function-action" onClick={()=> setSeccionActiva('curso-tesorero')}>
+                      <button className="function-action" >
                         Gestionar →
                       </button>
                     </div>
@@ -265,7 +287,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Tareas</h3>
                         <p>Asignar y supervisar tareas</p>
                       </div>
-                      <button className="function-action" onClick={()=> setSeccionActiva('tarea-tesorero')}>
+                      <button className="function-action" onClick={handleGtareaClick}>
                         Gestionar →
                       </button>
                     </div>
@@ -285,7 +307,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Inscripciones</h3>
                         <p>Procesar inscripciones y categorizar</p>
                       </div>
-                      <button className="function-action" onClick={()=> setSeccionActiva('inscripcion-tesorero')}>
+                      <button className="function-action" onClick={handleGinscripcionClick}>
                         Gestionar →
                       </button>
                     </div>
@@ -305,7 +327,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Reportes</h3>
                         <p>Generar informes del sistema</p>
                       </div>
-                      <button className="function-action" onClick={()=> setSeccionActiva('reportes-tesorero')}>
+                      <button className="function-action" onClick={handleGreporteClick}>
                         Gestionar →
                       </button>
                     </div>
@@ -364,51 +386,7 @@ const DashboardTesorero = () => {
             </div>
           </>
         )}
-        {seccionActiva === "usuarios-tesorero" && (
-          <div className="seccion-usuarios">
-            <Gestionusuarios />
-          </div>
-        )}
-        {seccionActiva === "categorias-tesorero" && (
-          <div className="seccion-categorizacion">
-            <Gestioncategorizacion />
-          </div>
-        )}
-        {seccionActiva === "solicitud-tesorero" && (
-          <div className="seccion-solicitud">
-            <Gestionsolicitud />
-          </div>
-        )}
-        {seccionActiva === "evento-tesorero" && (
-          <div className="seccion-solicitud">
-            <Gestionevento />
-          </div>
-        )}
-        {seccionActiva === "inscripcion-tesorero" && (
-          <div className="seccion-solicitud">
-            <Gestioninscripcion />
-          </div>
-        )}
-        {seccionActiva === "tarea-tesorero" && (
-          <div className="seccion-solicitud">
-            <Gestiontarea />
-          </div>
-        )}
-        {seccionActiva === "cabana-tesorero" && (
-          <div className="seccion-solicitud">
-            <Gestioncabana />
-          </div>
-        )}
-        {seccionActiva === "reserva-tesorero" && (
-          <div className="seccion-solicitud">
-            <Gestionreserva />
-          </div>
-        )}
-        {seccionActiva === "reportes-tesorero" && (
-          <div className="seccion-solicitud">
-            <Gestionreporte />
-          </div>
-        )}
+       
       </main>
       <Footer />
     </div>

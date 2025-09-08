@@ -20,8 +20,8 @@ import "./Dashboard.css";
 
 
 const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, modoTesorero = false, userRole, readOnly = false, canCreate = true, canEdit = true, canDelete = true }) => {
-
-const [usuarios, setUsuarios] = useState([]);
+  const [submenuAcademicoAbierto, setSubmenuAcademicoAbierto] = useState(false);                                                                                                    
+  const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [busqueda, setBusqueda] = useState("");
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -51,13 +51,13 @@ const [usuarios, setUsuarios] = useState([]);
     if (onCerrarSesionProp) {
       onCerrarSesionProp();
     } else {
-      localStorage.removeItem('token'); 
+      localStorage.removeItem('token');
       localStorage.removeItem('usuario');
       window.location.href = '/login';
     }
   };
 
-  
+
   const [nuevoUsuario, setNuevoUsuario] = useState({
     nombre: "",
     apellido: "",
@@ -103,6 +103,7 @@ const [usuarios, setUsuarios] = useState([]);
   // Crear usuario
   const crearUsuario = async () => {
     try {
+      if (window.event) window.event.preventDefault();
       await userService.createUser(nuevoUsuario);
       mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
       setMostrarModal(false);
@@ -291,26 +292,26 @@ const [usuarios, setUsuarios] = useState([]);
           <div className="logo">
             <i class="fas fa-book-open"></i>
             <span className="luckas">Luckas</span>
+            <p class="subtitle">Panel del Adminsitrador</p>
           </div>
         </div>
 
         <nav className="sidebar-nav">
-          <div className="nav-section-title">PRINCIPAL</div>
           <ul>
             <li className={seccionActiva === "dashboard" ? "activo" : ""}>
-              <a href="#" onClick={() => setSeccionActiva("dashboard")} className="nav-item ">
+              <a href="#" onClick={() => setSeccionActiva("dashboard")} className="nav-item-admin ">
                 <i class="fas fa-tachometer-alt"></i>
                 Dashboard
               </a>
             </li>
             <li className={seccionActiva === "usuarios" ? "activo" : ""}>
-              <a href="#" onClick={() => setSeccionActiva("usuarios")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("usuarios")} className="nav-item-admin">
                 <i class="fas fa-users"></i>
                 Usuarios
               </a>
             </li>
             <li className={seccionActiva === "configuracion" ? "activo" : ""}>
-              <a href="#" onClick={() => setSeccionActiva("configuracion")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("configuracion")} className="nav-item-admin">
                 <i class="fas fa-cog"></i>
                 Configuración
               </a>
@@ -320,26 +321,27 @@ const [usuarios, setUsuarios] = useState([]);
           <div className="nav-section-title">GESTIÓN ACADÉMICA</div>
           <ul>
             <li>
-              <a href="#" onClick={() => setSeccionActiva("categorizacion")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("categorizacion")} className="nav-item-admin">
                 <i class="fas fa-folder"></i>
                 Categorizacion
               </a>
             </li>
-            <li className={seccionActiva === "programas-academicos" ? "activo" : ""} >
-              <a href="#" onClick={() => setSeccionActiva("programas-academicos")} className="nav-item">
+            <li className={seccionActiva === "programas-academicos" ? "activo" : "has-submenu"} >
+              <a href="#" onClick={() => setSeccionActiva("programas-academicos")} className="nav-item-admin">
                 <i class="fas fa-graduation-cap"></i>
                 Programas Académicos
+                <i class="fas fa-chevron-down submenu-arrow"></i>
               </a>
               {/* Submenu para programas académicos */}
               <ul className="submenu">
                 <li className={seccionActiva === "cursos" ? "activo" : ""}>
-                  <a href="#" onClick={() => setSeccionActiva("cursos")} className="nav-item">
+                  <a href="#" onClick={() => setSeccionActiva("cursos")} className="nav-item-admin">
                     <i class="fas fa-book"></i>
                     Cursos
                   </a>
                 </li>
                 <li className={seccionActiva === "programas-tecnicos" ? "activo" : ""}>
-                  <a href="#" onClick={() => setSeccionActiva("programas-tecnicos")} className="nav-item">
+                  <a href="#" onClick={() => setSeccionActiva("programas-tecnicos")} className="nav-item-admin">
                     <i class="fas fa-file-alt"></i>
                     Prog. Técnicos
                   </a>
@@ -347,7 +349,7 @@ const [usuarios, setUsuarios] = useState([]);
               </ul>
             </li>
             <li>
-              <a href="#" onClick={() => setSeccionActiva("eventos")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("eventos")} className="nav-item-admin">
                 <i class="fas fa-calendar-alt"></i>
                 Eventos
               </a>
@@ -356,19 +358,19 @@ const [usuarios, setUsuarios] = useState([]);
           <div className="nav-section-title">ADMINISTRACIÓN</div>
           <ul>
             <li>
-              <a href="#" onClick={() => setSeccionActiva("solicitudes")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("solicitudes")} className="nav-item-admin">
                 <i class="fas fa-envelope-open-text"></i>
                 Solicitudes
               </a>
             </li>
             <li>
-              <a href="#" onClick={() => setSeccionActiva("inscripciones")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("inscripciones")} className="nav-item-admin">
                 <i class="fas fa-user-plus"></i>
                 Inscripciones
               </a>
             </li>
             <li>
-              <a href="#" onClick={() => setSeccionActiva("tareas")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("tareas")} className="nav-item-admin">
                 <i class="fas fa-check-square"></i>
                 Tareas
               </a>
@@ -377,19 +379,19 @@ const [usuarios, setUsuarios] = useState([]);
           <div className="nav-section-title">SERVICIOS</div>
           <ul>
             <li>
-              <a href="#" onClick={() => setSeccionActiva("cabanas")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("cabanas")} className="nav-item-admin">
                 <i class="fas fa-home"></i>
                 Cabañas
               </a>
             </li>
             <li>
-              <a href="#" onClick={() => setSeccionActiva("reservas")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("reservas")} className="nav-item-admin">
                 <i class="fas fa-calendar-check"></i>
                 Reservas
               </a>
             </li>
             <li>
-              <a href="#" onClick={() => setSeccionActiva("reportes")} className="nav-item">
+              <a href="#" onClick={() => setSeccionActiva("reportes")} className="nav-item-admin">
                 <i class="fas fa-chart-line"></i>
                 Reportes
               </a>
@@ -398,13 +400,12 @@ const [usuarios, setUsuarios] = useState([]);
         </nav>
       </aside>
 
-      {/* Contenido Principal */}
       <div className="contenido-principal">
         {/* Header */}
         <header className="admin-header">
           <div className="admin-header-izquierda">
             <button className="btn-menu" onClick={() => setSidebarAbierto(!sidebarAbierto)}>
-              ☰
+              <i class="fas fa-bars"></i>
             </button>
             <div className="breadcrumb">
               <span>Inicio</span>
@@ -417,10 +418,9 @@ const [usuarios, setUsuarios] = useState([]);
             <div className="admin-notificaciones">
               <i class="fas fa-bell"></i>
               <span className="badge">3</span>
-
             </div>
 
-            <div className="usuario-info">
+            <div className="usuario-info-admin">
               <div className="user-avatar-dropdown" ref={menuRef}>
                 <button className="user-avatar" onClick={() => setMostrarMenu(!mostrarMenu)}>
                   {usuarioActual?.nombre?.substring(0, 2).toUpperCase()}
@@ -502,13 +502,57 @@ const [usuarios, setUsuarios] = useState([]);
           {seccionActiva === "usuarios" && (
             <div className="seccion-usuarios">
               <div className="page-header-Academicos">
-                <h1 className="titulo-admin">Gestión de Usuarios</h1>
+                <div className="page-title-admin">
+                  <h1>Gestión de Usuarios</h1>
+                  <p>Administra las cuentas de usuario del sistema</p>
+                </div>
                 {!readOnly && (
-                  <button className="btn-admin" onClick={abrirModalCrear}>
-                    ➕ Nuevo Usuario
+                  <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
+                    <i className="fas fa-plus"></i> Nuevo Usuario
                   </button>
                 )}
               </div>
+
+              <div className="stats-grid-admin">
+                <div className="stat-card-admin">
+                  <div className="stat-icon-admin users">
+                    <i className="fas fa-users"></i>
+                  </div>
+                  <div className="stat-info-admin">
+                    <h3>5</h3>
+                    <p>Total Usuarios</p>
+                  </div>
+                </div>
+                <div className="stat-card-admin">
+                  <div className="stat-icon-admin active">
+                    <i className="fas fa-user-check"></i>
+                  </div>
+                  <div className="stat-info-admin">
+                    <h3>4</h3>
+                    <p>Usuarios Activos</p>
+                  </div>
+                </div>
+                <div className="stat-card-admin">
+                  <div className="stat-icon-admin admins">
+                    <i className="fas fa-user-shield"></i>
+                  </div>
+                  <div className="stat-info-admin">
+                    <h3>1</h3>
+                    <p>Administradores</p>
+                  </div>
+                </div>
+                <div className="stat-card-admin">
+                  <div className="stat-icon-admin new">
+                    <i className="fas fa-user-plus"></i>
+                  </div>
+                  <div className="stat-info-admin">
+                    <h3>12</h3>
+                    <p>Nuevos Este Mes</p>
+                  </div>
+                </div>
+              </div>
+
+
               <section className="filtros-section-admin">
                 <div className="busqueda-contenedor">
                   <i class="fas fa-search"></i>
@@ -517,7 +561,7 @@ const [usuarios, setUsuarios] = useState([]);
                     placeholder="Buscar usuarios..."
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
-                    className="input-busqueda"
+
                   />
                 </div>
                 <div className="filtro-grupo-admin">
@@ -535,12 +579,12 @@ const [usuarios, setUsuarios] = useState([]);
                     <option>Pendiente</option>
                   </select>
                 </div>
-                <TablaUsuarios
-                  usuarios={usuariosFiltrados}
-                  onEditar={readOnly ? null : abrirModalEditar}
-                  onEliminar={(modoTesorero || readOnly) ? null : eliminarUsuario}
-                />
               </section>
+              <TablaUsuarios
+                usuarios={usuariosFiltrados}
+                onEditar={readOnly ? null : abrirModalEditar}
+                onEliminar={(modoTesorero || readOnly) ? null : eliminarUsuario}
+              />
               <UsuarioModal
                 mostrar={mostrarModal && seccionActiva === "usuarios"}
                 modoEdicion={modoEdicion}
@@ -551,6 +595,15 @@ const [usuarios, setUsuarios] = useState([]);
                 onClose={() => setMostrarModal(false)}
                 onSubmit={modoEdicion ? actualizarUsuario : crearUsuario}
               />
+              <div class="pagination-admin">
+                <button class="pagination-btn-admin" disabled>
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="pagination-info-admin">Página 1 de 1</span>
+                <button class="pagination-btn-admin" disabled>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
             </div>
 
           )}
@@ -624,9 +677,10 @@ const [usuarios, setUsuarios] = useState([]);
           )}
 
         </main>
+      <Footer/>
       </div>
     </div>
-  
+
   )
 }
 export default Dashboard

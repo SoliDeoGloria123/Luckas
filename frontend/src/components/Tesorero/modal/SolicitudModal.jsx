@@ -1,17 +1,61 @@
-import React, { useState } from 'react';
-import { userService } from '../../../services/userService';
 
+import React, { useState, useEffect } from 'react';
+import { categorizacionService } from '../../../services/categorizacionService';
+import { userService } from '../../../services/userService';
+import { jwtDecode } from "jwt-decode";
 
 const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
- const [formData, setFormData] = useState({
-    correo: initialData.correo || '',
-    telefono: initialData.telefono || '',
-    tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
-    numeroDocumento: initialData.numeroDocumento || '',
-    rol: initialData.rol || 'Tesorero',
-    estado: initialData.estado || 'Activo'
+  const getUsuarioSesion = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    try {
+      return jwtDecode(token);
+    } catch (e) {
+      return null;
+    }
+  };
+  const usuarioSesion = getUsuarioSesion();
+  console.log("usuarioSesion", usuarioSesion); // <-- Ver en consola qué campos trae el token
+
+  const getNombreUsuarioSesion = () => {
+    if (!usuarioSesion) return "";
+    // Ajusta aquí según el campo real que trae tu token
+    return usuarioSesion.nombre || usuarioSesion.name || usuarioSesion.username || "";
+  };
+  const getResponsableId = () => {
+    if (!usuarioSesion) return "";
+    // El backend puede guardar el id como _id o id en el token
+    return usuarioSesion._id || usuarioSesion.id || "";
+  };
+  const [formData, setFormData] = useState({
+    solicitante: initialData.solicitante?._id?.toString() || initialData.solicitante?.toString() || initialData.solicitante || "",
+    nombre: initialData.solicitante?.nombre || initialData.nombre || "",
+    correo: initialData.correo || "",
+    telefono: initialData.telefono || "",
+    tipoDocumento: initialData.tipoDocumento ? String(initialData.tipoDocumento) : "Cédula de ciudadanía",
+    numeroDocumento: initialData.numeroDocumento || "",
+    categoria: initialData.categoria?._id?.toString() || initialData.categoria?._id || initialData.categoria?.toString() || initialData.categoria || "",
+    categoriaNombre: initialData.categoria?.nombre || "",
+    descripcion: initialData.descripcion || "",
+    estado: initialData.estado ? String(initialData.estado) : "Nuevo",
+    prioridad: initialData.prioridad ? String(initialData.prioridad) : "Media",
+    responsable: mode === 'create' && usuarioSesion ? getResponsableId() : (initialData.responsable?._id?.toString() || initialData.responsable?._id || initialData.responsable?.toString() || initialData.responsable || ""),
+    responsableNombre: mode === 'create' && usuarioSesion ? getNombreUsuarioSesion() : (initialData.responsable?.nombre || ""),
+    observaciones: initialData.observaciones || "",
+    role: initialData.solicitante?.role || initialData.role || "",
+    tipoSolicitud: initialData.tipoSolicitud ? String(initialData.tipoSolicitud) : "",
+    modeloReferencia: initialData.modeloReferencia ? String(initialData.modeloReferencia) : ""
   });
-// Nueva función para buscar usuario
+
+  const [categorias, setCategorias] = useState([]);
+
+  useEffect(() => {
+    // Cargar categorías siempre que se abra el modal
+    categorizacionService.getAll()
+      .then(res => setCategorias(res.data || []))
+      .catch(() => setCategorias([]));
+  }, [mode]);
+
   const buscarUsuarioPorDocumento = async (numeroDocumento) => {
     if (!numeroDocumento) return;
     try {
@@ -19,17 +63,19 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
       if (usuario) {
         setFormData(prev => ({
           ...prev,
+          solicitante: usuario._id || "",
+          nombre: usuario.nombre || "",
           correo: usuario.correo || "",
           telefono: usuario.telefono || "",
-          tipoDocumento: usuario.tipoDocumento || "",
-          numeroDocumento: usuario.numeroDocumento ||"",
-
+          numeroDocumento: usuario.numeroDocumento || numeroDocumento,
+          role: usuario.role || ""
         }));
       }
     } catch (error) {
-      // Si no encuentra usuario, no hace nada
+      console.warn("No se encontró usuario con ese documento");
     }
   };
+
 
   const handleChange = async (e) => {
     const { name, value } = e.target;
@@ -46,7 +92,6 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
     onSubmit(formData);
     onClose();
   };
-
   return (
     <div className="modal-overlay-tesorero">
       <div className="tesorero-modal">
@@ -58,18 +103,32 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
         <div className="modal-body-tesorero">
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
+              {mode === 'create' && (
+                <div className="form-group-tesorero">
+                  <label>Documento Solicitante</label>
+                  <input
+                    type="text"
+                    name="numeroDocumento"
+                    value={formData.numeroDocumento}
+                    onChange={handleChange}
+                    placeholder="Doceumento Solicitante"
+                    required
+                  />
+                </div>
+              )}
+
+
               <div className="form-group-tesorero">
-                <label>Doceumento Solicitante</label>
+                <label>Nombre Solicitante</label>
                 <input
                   type="text"
-                  name="numeroDocumento"
-                  value={formData.numeroDocumento}
-                  onChange={handleChange}
-                  placeholder="Doceumento Solicitante"
+                  name="nombre"
+                  value={formData.nombre}
+                  readOnly
+                  placeholder="Nombre se autocompleta"
                   required
                 />
               </div>
-
               <div className="form-group-tesorero">
                 <label>correo</label>
                 <input
@@ -94,13 +153,27 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
                 />
               </div>
 
-
+              <div className="form-group-tesorero">
+                <label>Rol</label>
+                <select
+                  name="role"
+                  value={formData.role ? String(formData.role) : ''}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccione...</option>
+                  <option value="admin">Administrador</option>
+                  <option value="tesorero">Tesorero</option>
+                  <option value="seminarista">Seminarista</option>
+                  <option value="externo">Externo</option>
+                </select>
+              </div>
 
               <div className="form-group-tesorero">
                 <label>Tipo de Solicitud:</label>
                 <select
-                  name="tipoDocumento"
-                  value={formData.tipoDocumento}
+                  name="tipoSolicitud"
+                  value={formData.tipoSolicitud ? String(formData.tipoSolicitud) : ''}
                   onChange={handleChange}
                   required
                 >
@@ -112,48 +185,38 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
                 </select>
               </div>
 
-              <div className="form-group-tesorero">
-                <label>Número de Documento</label>
-                <input
-                  type="text"
-                  name="numeroDocumento"
-                  value={formData.numeroDocumento}
-                  onChange={handleChange}
-                  placeholder="Número de documento"
-                  required
-                />
-              </div>
 
               <div className="form-group-tesorero">
                 <label>Modelo Referencia:</label>
                 <select
-                  name="rol"
-                  value={formData.rol}
+                  name="modeloReferencia"
+                  value={formData.modeloReferencia ? String(formData.modeloReferencia) : ''}
                   onChange={handleChange}
                   required
                 >
                   <option value="">Seleccione...</option>
                   <option value="Eventos">Eventos</option>
-                  <option value="Curso">Curso</option>
-                  <option value="ProgramaTecnico">Programa Tecnico </option>
                   <option value="Cabana">Cabaña</option>
-                  <option value="Reserva">Rervas</option>
+                  <option value="Inscripcion">Inscripcion</option>
+                  <option value="Reserva">Reserva</option>
+                  <option value="Curso">Curso</option>
+                  <option value="ProgramaTecnico">ProgramaTecnico</option>
                   <option value="Comedor">Comedor</option>
-
                 </select>
               </div>
               <div className="form-group-tesorero">
                 <label>Categoría:</label>
                 <select
-                  name="rol"
-                  value={formData.rol}
+                  name="categoria"
+                  value={formData.categoria ? String(formData.categoria) : ''}
                   onChange={handleChange}
                   required
+                  disabled={mode === 'edit'}
                 >
                   <option value="">Seleccione...</option>
-                  <option value="Tesorero">Tesorero</option>
-                  <option value="Administrador">Administrador</option>
-                  <option value="Usuario">Usuario</option>
+                  {categorias.map(cat => (
+                    <option key={cat._id} value={cat._id}>{cat.nombre}</option>
+                  ))}
                 </select>
               </div>
 
@@ -161,53 +224,55 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
                 <label>Estado:</label>
                 <select
                   name="estado"
-                  value={formData.estado}
+                  value={formData.estado ? String(formData.estado) : ''}
                   onChange={handleChange}
                   required
                 >
                   <option value="Nueva">Nueva</option>
-              <option value="En Revisión">Revisión</option>
-              <option value="Aprobada">Aprobada</option>
-              <option value="Rechazada">Rechazada</option>
-              <option value="Completada">Completada</option>
-              <option value="Pendiente Info">Pendiente</option>
+                  <option value="En Revisión">En Revisión</option>
+                  <option value="Aprobada">Aprobada</option>
+                  <option value="Rechazada">Rechazada</option>
+                  <option value="Completada">Completada</option>
+                  <option value="Pendiente Info">Pendiente Info</option>
                 </select>
               </div>
               <div className="form-group-tesorero">
                 <label>Prioridad:</label>
                 <select
-                  name="estado"
-                  value={formData.estado}
+                  name="prioridad"
+                  value={formData.prioridad ? String(formData.prioridad) : ''}
                   onChange={handleChange}
                   required
                 >
-                 <option value="Alta">Alta</option>
-              <option value="Media">Media</option>
-              <option value="Baja">Baja</option>
+                  <option value="Alta">Alta</option>
+                  <option value="Media">Media</option>
+                  <option value="Baja">Baja</option>
                 </select>
               </div>
-              <div className="form-group-tesorero">
-                <label>Responsable</label>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  placeholder="Teléfono"
-                  required
-                />
-              </div>
+
               <div className="form-group-tesorero">
                 <label>Observaciones</label>
                 <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
+                  type="text"
+                  name="observaciones"
+                  value={formData.observaciones}
                   onChange={handleChange}
-                  placeholder="Teléfono"
+                  placeholder="Observaciones"
+                />
+              </div>
+
+              <div className="form-group-tesorero">
+                <label>Descripción</label>
+                <textarea
+                  name="descripcion"
+                  value={formData.descripcion}
+                  onChange={handleChange}
+                  placeholder="Descripción de la solicitud"
                   required
                 />
               </div>
+
+
             </div>
 
             <div className="modal-footer-tesorero">

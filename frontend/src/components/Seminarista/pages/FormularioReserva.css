@@ -53,32 +53,32 @@
     background-color: var(--white);
 }
 
-.cabin-info {
+.cabin-info-seminario-reserva {
     flex: 1;
 }
 
-.cabin-title {
+.cabin-title-seminario-reserva {
     font-size: 24px;
     font-weight: 700;
     color: var(--orange);
     margin-bottom: 8px;
 }
 
-.cabin-description {
+.cabin-description-seminario-reserva {
     font-size: 16px;
     color: var(--text-gray);
     margin-bottom: 16px;
     line-height: 1.5;
 }
 
-.cabin-details {
+.cabin-details-seminario-reserva {
     display: flex;
     align-items: center;
     gap: 24px;
     flex-wrap: wrap;
 }
 
-.detail-item {
+.detail-item-seminario-reserva {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -86,17 +86,17 @@
     font-size: 14px;
 }
 
-.detail-item i {
+.detail-item-seminario-reserva i {
     color: var(--primary-blue);
 }
 
-.price-tag {
+.price-tag-seminario-reserva {
     font-size: 20px;
     font-weight: 700;
     color: var(--orange);
 }
 
-.close-button {
+.close-button-seminario-reserva {
     background-color: transparent;
     border: 1px solid var(--border-color);
     padding: 8px 16px;
@@ -107,25 +107,25 @@
     transition: all 0.2s;
 }
 
-.close-button:hover {
+.close-button-seminario-reserva:hover {
     background-color: var(--light-gray);
 }
 
 /* Sección de Progreso */
-.progress-section {
+.progress-section-seminario-reserva {
     padding: 24px 32px;
     border-bottom: 1px solid var(--border-color);
     background-color: var(--white);
 }
 
-.progress-title {
+.progress-title-seminario-reserva {
     font-size: 18px;
     font-weight: 600;
     color: var(--dark-gray);
     margin-bottom: 16px;
 }
 
-.progress-bar {
+.progress-bar-seminario-reserva {
     width: 100%;
     height: 8px;
     background-color: var(--border-color);
@@ -134,20 +134,20 @@
     overflow: hidden;
 }
 
-.progress-fill {
+.progress-fill-seminario-reserva {
     height: 100%;
     background-color: var(--primary-blue);
     width: 25%;
     transition: width 0.3s ease;
 }
 
-.steps-container {
+.steps-container-seminario-reserva {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
 }
 
-.step {
+.step-seminario-reserva {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -157,11 +157,11 @@
     transition: all 0.3s;
 }
 
-.step.active {
+.step-seminario-reserva.active {
     background-color: rgba(37, 99, 235, 0.1);
 }
 
-.step-icon {
+.step-icon-seminario-reserva {
     width: 48px;
     height: 48px;
     border-radius: 50%;
@@ -174,12 +174,12 @@
     transition: all 0.3s;
 }
 
-.step.active .step-icon {
+.step-seminario-reserva.active .step-icon-seminario-reserva {
     background-color: var(--primary-blue);
     color: var(--white);
 }
 
-.step.completed .step-icon {
+.step-seminario-reserva.completed .step-icon-seminario-reserva {
     background-color: var(--success-green);
     color: var(--white);
 }
@@ -198,64 +198,64 @@
 }
 
 /* Área de Contenido del Paso */
-.step-content-area {
+.step-content-area-seminario-reserva {
     padding: 32px;
 }
 
-.step-form {
+.step-form-seminario-reserva {
     display: none;
 }
 
-.step-form.active {
+.step-form-seminario-reserva.active {
     display: block;
 }
 
-.form-header {
+.form-header-seminario-reserva {
     margin-bottom: 32px;
 }
 
-.form-title {
+.form-title-seminario-reserva {
     font-size: 24px;
     font-weight: 700;
     color: var(--primary-blue);
     margin-bottom: 8px;
 }
 
-.form-subtitle {
+.form-subtitle-seminario-reserva {
     font-size: 16px;
     color: var(--text-gray);
 }
 
 /* Formulario */
-.reservation-form {
+.reservation-form-seminario-reserva {
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-.form-row-reservation {
+.form-row-reservation-seminario-reserva {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
-.form-group-reservation {
+.form-group-reservation-seminario-reserva {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.form-group-reservation.full-width {
+.form-group-reservation-seminario-reserva.full-width {
     grid-column: 1 / -1;
 }
 
-.form-label-reservation {
+.form-label-reservation-seminario-reserva {
     font-size: 14px;
     font-weight: 500;
     color: var(--dark-gray);
 }
 
-.form-input-reservation,
+.form-input-reservation-seminario-reserva,
 .form-textarea-reservation {
     padding: 12px 16px;
     border: 1px solid var(--border-color);
@@ -265,7 +265,7 @@
     background-color: var(--white);
 }
 
-.form-input-reservation:focus,
+.form-input-reservation-seminario-reserva:focus,
 .form-textarea-reservation:focus {
     outline: none;
     border-color: var(--primary-blue);
@@ -277,7 +277,7 @@
     font-family: inherit;
 }
 
-.date-input-container {
+.date-input-container-seminario-reserva {
     position: relative;
 }
 
@@ -309,13 +309,13 @@
     background-color: #1d4ed8;
 }
 
-.form-actions {
+.form-actions-seminario-reserva {
     display: flex;
     gap: 16px;
     margin-top: 32px;
 }
 
-.back-button {
+.back-button-seminario-reserva {
     flex: 1;
     background-color: transparent;
     color: var(--dark-gray);
@@ -328,66 +328,66 @@
     transition: all 0.2s;
 }
 
-.back-button:hover {
+.back-button-seminario-reserva:hover {
     background-color: var(--light-gray);
 }
 
 /* Contenido de Revisión */
-.review-content {
+.review-content-seminario-reserva {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 32px;
     margin-bottom: 32px;
 }
 
-.review-section {
+.review-section-seminario-reserva {
     background-color: var(--light-gray);
     padding: 24px;
     border-radius: 8px;
 }
 
-.review-section h4 {
+.review-section-seminario-reserva h4 {
     font-size: 18px;
     font-weight: 600;
     color: var(--dark-gray);
     margin-bottom: 16px;
 }
 
-.review-item {
+.review-item-seminario-reserva {
     display: flex;
     justify-content: space-between;
     margin-bottom: 12px;
     font-size: 14px;
 }
 
-.review-item span:first-child {
+.review-item-seminario-reserva span:first-child {
     color: var(--text-gray);
 }
 
-.review-item span:last-child {
+.review-item-seminario-reserva span:last-child {
     font-weight: 600;
     color: var(--dark-gray);
 }
 
 /* Contenido de Pago */
-.payment-content {
+.payment-content-seminario-reserva {
     margin-bottom: 32px;
 }
 
-.payment-methods h4 {
+.payment-methods-seminario-reserva h4 {
     font-size: 18px;
     font-weight: 600;
     color: var(--dark-gray);
     margin-bottom: 20px;
 }
 
-.payment-options {
+.payment-options-seminario-reserva {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-.payment-option {
+.payment-option-seminario-reserva {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -400,39 +400,39 @@
     text-align: left;
 }
 
-.payment-option:hover {
+.payment-option-seminario-reserva:hover {
     border-color: var(--primary-blue);
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
-.payment-option i {
+.payment-option-seminario-reserva i {
     font-size: 24px;
     color: var(--primary-blue);
     width: 32px;
 }
 
-.payment-title {
+.payment-title-seminario-reserva {
     font-size: 16px;
     font-weight: 600;
     color: var(--dark-gray);
     margin-bottom: 4px;
 }
 
-.payment-subtitle {
+.payment-subtitle-seminario-reserva {
     font-size: 14px;
     color: var(--text-gray);
 }
 
 /* Contenido de Éxito */
-.success-content {
+.success-content-seminario-reserva {
     text-align: center;
 }
 
-.success-title {
+.success-title-seminario-reserva {
     color: var(--success-green) !important;
 }
 
-.success-icon {
+.success-icon-seminario-reserva {
     width: 80px;
     height: 80px;
     background-color: var(--success-green);
@@ -443,25 +443,25 @@
     margin: 0 auto 24px;
 }
 
-.success-icon i {
+.success-icon-seminario-reserva i {
     font-size: 40px;
     color: var(--white);
 }
 
-.success-message {
+.success-message-seminario-reserva {
     font-size: 24px;
     font-weight: 700;
     color: var(--success-green);
     margin-bottom: 12px;
 }
 
-.success-description {
+.success-description-seminario-reserva {
     font-size: 16px;
     color: var(--text-gray);
     margin-bottom: 32px;
 }
 
-.confirmation-details {
+.confirmation-details-seminario-reserva {
     background-color: var(--light-gray);
     padding: 24px;
     border-radius: 8px;
@@ -469,7 +469,7 @@
     text-align: left;
 }
 
-.confirmation-details h4 {
+.confirmation-details-seminario-reserva h4 {
     font-size: 18px;
     font-weight: 600;
     color: var(--dark-gray);
@@ -477,28 +477,28 @@
     text-align: center;
 }
 
-.confirmation-grid {
+.confirmation-grid-seminario-reserva {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
 }
 
-.confirmation-item {
+.confirmation-item-seminario-reserva {
     font-size: 14px;
     margin-bottom: 8px;
 }
 
-.confirmation-item strong {
+.confirmation-item-seminario-reserva strong {
     color: var(--dark-gray);
 }
 
-.success-actions {
+.success-actions-seminario-reserva {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.download-button {
+.download-button-seminario-reserva {
     background-color: var(--primary-blue);
     color: var(--white);
     border: none;
@@ -514,11 +514,11 @@
     transition: background-color 0.2s;
 }
 
-.download-button:hover {
+.download-button-seminario-reserva:hover {
     background-color: #1d4ed8;
 }
 
-.back-to-cabins-button {
+.back-to-cabins-button-seminario-reserva {
     background-color: transparent;
     color: var(--dark-gray);
     border: 1px solid var(--border-color);
