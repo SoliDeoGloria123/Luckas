@@ -53,9 +53,10 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
-      {/* Lado Izquierdo - Información del Sistema */}
+    <>
+      <div className="login-container">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+        {/* Lado Izquierdo - Información del Sistema */}
       <div className="col-lg-6 login-left-side">
         <div className="login-info-content">
           {/* Logo */}
@@ -181,65 +182,43 @@ const Login = () => {
                   ¿Olvidaste tu contraseña?
                 </button>
               </div>
-            </div>
 
-            {/* Opciones */}
-            <div className="form-options">
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="remember"
-                  name="remember"
-                />
-                <label className="form-check-label" htmlFor="remember">
-                  Recordarme
-                </label>
+              {/* Botón de Login */}
+              <button type="submit" className="login-btn-login w-100">
+                <span>Iniciar Sesión</span>
+              </button>
+
+              {/* Divisor */}
+              <div className="divider">
+                <span>o continúa con</span>
               </div>
-              <button type="button" className="forgot-password-link" onClick={handleOlvidarrClick}>
-                ¿Olvidaste tu contraseña?
-              </button>
+              <div className="social-buttons">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary social-btn"
+                >
+                  <i className="fab fa-google me-2"></i>
+                  Google
+                </button>
+              </div>
+            </form>
+
+            {/* Footer */}
+            <div className="form-footer">
+              <p>
+                ¿No tienes una cuenta? <button className="register-link" onClick={handleRegisterClick}>Registrate</button>
+              </p>
             </div>
-
-            {/* Botón de Login */}
-            <button type="submit" className=" login-btn-login w-100" >
-              <span>Iniciar Sesión</span>
-
-            </button>
-
-            {/* Divisor */}
-            <div className="divider">
-              <span>o continúa con</span>
-            </div>
-            <div className="social-buttons">
-              <button
-                type="button"
-                className="btn btn-outline-secondary social-btn"
-              >
-                <i className="fab fa-google me-2"></i>
-                Google
-              </button>
-
-            </div>
-          </form>
-
-          {/* Footer */}
-          <div className="form-footer">
-            <p >
-              ¿No tienes una cuenta? <button className="register-link" onClick={handleRegisterClick} >Registrate</button>
-            </p>
           </div>
         </div>
+      </div>
+      <ForgotPasswordModal 
+        isOpen={showForgotModal}
+        onClose={() => setShowForgotModal(false)}
+        onSuccess={handleForgotPasswordSuccess}
+      />
+    </>
+  );
+}
 
-    
-    {/* Modal de Recuperación de Contraseña */}
-    <ForgotPasswordModal
-      isOpen={showForgotModal}
-      onClose={() => setShowForgotModal(false)}
-      onSuccess={handleForgotPasswordSuccess}
-    />
-  </div>
-);
-};
-
-export default Login
+export default Login;
