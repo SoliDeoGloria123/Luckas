@@ -52,11 +52,11 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onVerImagen }) => (
               <td>
                 <div className="acciones-botones">
                   <button className="btn-action editar" onClick={() => onEditar(cabana)}>
-                    <i class="fas fa-edit"></i>
+                    <i className="fas fa-edit"></i>
                   </button>
                   {onEliminar && (
                     <button className="btn-action eliminar" onClick={() => onEliminar(cabana._id)}>
-                   <i class="fas fa-trash"></i>
+                   <i className="fas fa-trash"></i>
                     </button>
 
                   )}

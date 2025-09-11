@@ -38,9 +38,9 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar }) => (
               <td>{user.telefono}</td>
       
               <td>
-                 <div class="document-info">
-                  <span class="doc-type"> {user.tipoDocumento}</span>
-                  <span class="doc-number">{user.numeroDocumento}</span>
+                 <div className="document-info">
+                  <span className="doc-type"> {user.tipoDocumento}</span>
+                  <span className="doc-number">{user.numeroDocumento}</span>
                  
                   
                   </div></td>
@@ -55,9 +55,9 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar }) => (
               <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</td>
               <td>
                 <div className="acciones-botones">
-                  <button className="btn-action editar" onClick={() => onEditar(user)}><i class="fas fa-edit"></i></button>
+                  <button className="btn-action editar" onClick={() => onEditar(user)}><i className="fas fa-edit"></i></button>
                   {onEliminar && (
-                    <button className="btn-action eliminar" onClick={() => onEliminar(user._id)}><i class="fas fa-trash"></i></button>
+                    <button className="btn-action eliminar" onClick={() => onEliminar(user._id)}><i className="fas fa-trash"></i></button>
                   )}
                 </div>
               </td>
