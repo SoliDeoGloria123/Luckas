@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
 const { normalizeTipoDocumento } = require('../utils/userValidation');
-
+const crypto = require('crypto');
 
 //roles del sistema 
 const ROLES = {
@@ -263,6 +263,111 @@ exports.deleteUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Error al eliminar usuario'
+    });
+  }
+};
+
+// 7. Solicitar recuperación de contraseña
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { correo } = req.body;
+
+    if (!correo) {
+      return res.status(400).json({
+        success: false,
+        message: "El correo electrónico es requerido"
+      });
+    }
+
+    // Buscar usuario por correo
+    const user = await User.findOne({ correo: correo.toLowerCase().trim() });
+
+    if (!user) {
+      // Por seguridad, no revelar si el email existe o no
+      return res.status(200).json({
+        success: true,
+        message: "Si el correo existe en nuestro sistema, recibirás un token de recuperación"
+      });
+    }
+
+    // Generar token temporal para reset
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hora
+
+    // Guardar token en el usuario
+    user.passwordResetToken = resetToken;
+    user.passwordResetExpires = resetTokenExpiry;
+    await user.save();
+
+    // En un entorno real, aquí enviarías un email
+    // Por ahora, devolvemos el token en la respuesta para testing
+    console.log(`🔐 Token de reset para ${correo}: ${resetToken}`);
+    
+    res.status(200).json({
+      success: true,
+      message: "Token de recuperación generado exitosamente",
+      // ⚠️ En producción, NO incluir el token en la respuesta
+      resetToken: resetToken, // Solo para testing
+      instructions: "En un entorno de producción, este token sería enviado por email"
+    });
+
+  } catch (error) {
+    console.error('[AuthController] Error en forgotPassword:', error);
+    res.status(500).json({
+      success: false,
+      message: "Error en el servidor"
+    });
+  }
+};
+
+// 8. Resetear contraseña con token
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Token y nueva contraseña son requeridos"
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "La contraseña debe tener al menos 6 caracteres"
+      });
+    }
+
+    // Buscar usuario con token válido y no expirado
+    const user = await User.findOne({
+      passwordResetToken: token,
+      passwordResetExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Token inválido o expirado"
+      });
+    }
+
+    // Actualizar contraseña y limpiar tokens
+    user.password = newPassword; // El middleware se encarga del hash
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Contraseña actualizada exitosamente"
+    });
+
+  } catch (error) {
+    console.error('[AuthController] Error en resetPassword:', error);
+    res.status(500).json({
+      success: false,
+      message: "Error en el servidor"
     });
   }
 };

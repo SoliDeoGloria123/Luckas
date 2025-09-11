@@ -3,12 +3,14 @@ import { useState } from "react"
 import { authService } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import ForgotPasswordModal from './ForgotPasswordModal';
 import "./Login.css"
 
 const Login = () => {
   const [correo, setcorreo] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showForgotModal, setShowForgotModal] = useState(false);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -27,9 +29,8 @@ const Login = () => {
         navigate('/tesorero');
       } else if (data.user.role === 'seminarista') {
         navigate('/seminarista');
-      } else if (data.user.role === 'externo') {
-        // Para usuarios externos, redirigir al dashboard HTML estático
-        window.location.href = '/Externo/templates/dashboard.html';
+      } else if (data.user.role === 'externo' || data.user.role === 'external') {
+        navigate('/external');
       } else {
         navigate('/admin/users'); // Por defecto para otros roles
       }
@@ -42,8 +43,13 @@ const Login = () => {
   const handleRegisterClick = () => {
     navigate('/signup/registro');
   };
-  const handleOlvidarrClick = () => {
-    navigate('/Olvidar-Contraseña');
+
+  const handleForgotPassword = () => {
+    setShowForgotModal(true);
+  };
+
+  const handleForgotPasswordSuccess = () => {
+    mostrarAlerta('Éxito', 'Contraseña actualizada correctamente. Puedes iniciar sesión ahora.', 'success');
   };
 
   return (
@@ -151,8 +157,28 @@ const Login = () => {
                 />
                 <button type="button"
                   className="btn btn-outline-secondary password-toggle"
-                  onClick={() => setShowPassword(!showPassword)} >
-                  <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+
+                  onClick={()=> setShowPassword(!showPassword)} >
+                    <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                  </button>
+                </div>
+              </div>
+
+              {/* Opciones */}
+              <div className="form-options">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="remember"
+                    name="remember"
+                  />
+                  <label className="form-check-label" htmlFor="remember">
+                    Recordarme
+                  </label>
+                </div>
+                <button type="button" className="forgot-password-link" onClick={handleForgotPassword}>
+                  ¿Olvidaste tu contraseña?
                 </button>
               </div>
             </div>
@@ -204,10 +230,16 @@ const Login = () => {
             </p>
           </div>
         </div>
-      </div>
 
-    </div>
-  )
-}
+    
+    {/* Modal de Recuperación de Contraseña */}
+    <ForgotPasswordModal
+      isOpen={showForgotModal}
+      onClose={() => setShowForgotModal(false)}
+      onSuccess={handleForgotPasswordSuccess}
+    />
+  </div>
+);
+};
 
 export default Login
