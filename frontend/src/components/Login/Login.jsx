@@ -1,22 +1,19 @@
-
 import { useState } from "react"
 import { authService } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
-import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import { mostrarAlerta } from '../utils/alertas';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import "./Login.css"
 
 const Login = () => {
   const [correo, setcorreo] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [showForgotModal, setShowForgotModal] = useState(false);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     try {
       const data = await authService.login(correo, password);
       localStorage.setItem('token', data.token);
@@ -35,17 +32,12 @@ const Login = () => {
         navigate('/admin/users'); // Por defecto para otros roles
       }
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión');
       mostrarAlerta('Error', 'Credenciales incorrectas, por favor verifica tus datos.', 'error');
     }
   };
 
   const handleRegisterClick = () => {
     navigate('/signup/registro');
-  };
-
-  const handleForgotPassword = () => {
-    setShowForgotModal(true);
   };
 
   const handleForgotPasswordSuccess = () => {
@@ -178,7 +170,11 @@ const Login = () => {
                     Recordarme
                   </label>
                 </div>
-                <button type="button" className="forgot-password-link" onClick={handleForgotPassword}>
+                <button
+                  type="button"
+                  className="forgot-password-link"
+                  onClick={() => navigate('/Olvidar-Contraseña')}
+                >
                   ¿Olvidaste tu contraseña?
                 </button>
               </div>

@@ -44,7 +44,7 @@ const OlvidarPassword = () => {
     };
 
     return (
-        <div className="princpial">
+        <div className="principal">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
             {step === "email" && (
                 <div className="page-container-olvidarp" id="emailPage">
@@ -89,7 +89,7 @@ const OlvidarPassword = () => {
 
                                 <form className="recovery-form" onSubmit={handleEmailSubmit}>
                                     <div className="form-group-olvidarp">
-                                        <label for="email">Correo Electrónico</label>
+                                        <label htmlFor="email">Correo Electrónico</label>
                                         <div className="input-container-olvidarp">
                                             <i className="fas fa-envelope"></i>
                                             <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="correo@ejemplo.com" required />
@@ -162,7 +162,7 @@ const OlvidarPassword = () => {
 
                                 <form onSubmit={handleCodeSubmit} className="recovery-form">
                                     <div className="form-group-olvidarp">
-                                        <label for="verificationCode">Código de Verificación</label>
+                                        <label htmlFor="verificationCode">Código de Verificación</label>
                                         <div className="code-input-container-olvidarp">
                                             <input
                                                 type="text"
@@ -171,19 +171,13 @@ const OlvidarPassword = () => {
                                                 onChange={(e) => setCode(e.target.value)}
                                                 placeholder="Ingresa tu código"
                                             />
-                                            {/* <input type="text" class="code-digit" value={code}  onChange={(e) => setCode(e.target.value)} maxlength="1" data-index="0" />
-                                            <input type="text" class="code-digit" value={code}  onChange={(e) => setCode(e.target.value)} maxlength="1" data-index="1" />
-                                            <input type="text" class="code-digit" value={code}  onChange={(e) => setCode(e.target.value)}  maxlength="1" data-index="2" />
-                                            <input type="text" class="code-digit" value={code}  onChange={(e) => setCode(e.target.value)} maxlength="1" data-index="3" />
-                                            <input type="text" class="code-digit" value={code}  onChange={(e) => setCode(e.target.value)} maxlength="1" data-index="4" />
-                                            <input type="text" class="code-digit" value={code}  onChange={(e) => setCode(e.target.value)} maxlength="1" data-index="5" />*/}
                                         </div>
                                         <div className="error-message" id="codeError"></div>
                                     </div>
 
                                     <div className="resend-container-olvidarp">
                                         <p>¿No recibiste el código?</p>
-                                        <button type="button" className="resend-btn-olvidarp" id="resendBtn" onclick="resendCode()">
+                                        <button type="button" className="resend-btn-olvidarp" id="resendBtn">
                                             <i className="fas fa-redo"></i>
                                             Reenviar código
                                         </button>
@@ -197,7 +191,7 @@ const OlvidarPassword = () => {
                                 </form>
 
                                 <div className="form-footer">
-                                    <a href="/Olvidar-Contraseña" className="back-link" onclick="goToEmailPage()">
+                                    <a href="/Olvidar-Contraseña" className="back-link">
                                         <i className="fas fa-arrow-left"></i>
                                         Cambiar correo electrónico
                                     </a>
@@ -250,26 +244,20 @@ const OlvidarPassword = () => {
 
                                 <form className="recovery-form-olvidarp" onSubmit={handlePasswordSubmit}>
                                     <div className="form-group-olvidarp">
-                                        <label for="newPassword">Nueva Contraseña</label>
+                                        <label htmlFor="newPassword">Nueva Contraseña</label>
                                         <div className="input-container-olvidarp">
                                             <i className="fas fa-lock"></i>
                                             <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="••••••••" required />
-                                            <button type="button" className="toggle-password-olvidarp" onclick="togglePassword('newPassword')">
-                                                <i className="fas fa-eye"></i>
-                                            </button>
                                         </div>
                                         <div className="password-strength" id="passwordStrength"></div>
                                         <div className="error-message" id="passwordError"></div>
                                     </div>
 
                                     <div className="form-group-olvidarp">
-                                        <label for="confirmPassword">Confirmar Contraseña</label>
+                                        <label htmlFor="confirmPassword">Confirmar Contraseña</label>
                                         <div className="input-container-olvidarp">
                                             <i className="fas fa-lock"></i>
                                             <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" required />
-                                            <button type="button" className="toggle-password-olvidarp" onclick="togglePassword('confirmPassword')">
-                                                <i className="fas fa-eye"></i>
-                                            </button>
                                         </div>
                                         <div className="error-message" id="confirmError"></div>
                                     </div>
@@ -356,4 +344,4 @@ const OlvidarPassword = () => {
     );
 };
 
-export default OlvidarPassword
+export default OlvidarPassword;
