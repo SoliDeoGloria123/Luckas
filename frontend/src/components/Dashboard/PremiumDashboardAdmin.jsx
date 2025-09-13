@@ -26,6 +26,7 @@ import {
 
 // Componentes críticos (no lazy)
 import UsuarioModal from "./Modales/UsuarioModal";
+import PerfilModal from "./Modales/PerfilModal";
 import TablaUsuarios from "./Tablas/UserTabla";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
@@ -46,6 +47,9 @@ import {
 } from './LazyComponents';
 
 const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp }) => {
+  React.useEffect(() => {
+    console.log('mostrarPerfilModal:', mostrarPerfilModal);
+  }, [mostrarPerfilModal]);
   // Estados principales
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -63,6 +67,7 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
     nuevosHoy: 0,
   });
   const [usuarioActual, setUsuarioActual] = useState(usuarioProp);
+  const [mostrarPerfilModal, setMostrarPerfilModal] = useState(false);
   
   const menuRef = useRef(null);
 
@@ -77,6 +82,29 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
     role: "externo",
     estado: "activo"
   });
+
+  // Acciones de perfil
+  const handleActualizarPerfil = async (form, file) => {
+    try {
+      const res = await userService.updateProfile(form, file);
+      mostrarAlerta("¡Éxito!", "Perfil actualizado correctamente");
+      setUsuarioActual(res.data || usuarioActual);
+      localStorage.setItem('usuario', JSON.stringify(res.data || usuarioActual));
+      setMostrarPerfilModal(false);
+    } catch (error) {
+      mostrarAlerta("Error", error.message, "error");
+    }
+  };
+
+  const handleCambiarPassword = async (actual, nueva) => {
+    try {
+      await userService.changePassword(actual, nueva);
+      mostrarAlerta("¡Éxito!", "Contraseña actualizada correctamente");
+      setMostrarPerfilModal(false);
+    } catch (error) {
+      mostrarAlerta("Error", error.message, "error");
+    }
+  };
 
   // Menú de navegación
   const menuItems = [
@@ -199,7 +227,7 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
       });
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `Error al crear el usuario: ${error.message}`);
+      mostrarAlerta("Error", `Error al crear el usuario: ${error.message}`, "error");
     }
   };
 
@@ -237,7 +265,7 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
       }
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`, "error");
     }
   };
 
@@ -254,7 +282,7 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
       mostrarAlerta("¡Éxito!", "Usuario eliminado exitosamente");
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `No se pudo eliminar el usuario: ${error.message}`);
+      mostrarAlerta("Error", `No se pudo eliminar el usuario: ${error.message}`, "error");
     }
   };
 
@@ -419,7 +447,7 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
                     <button className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-100/80 transition-colors">
                       Configuración
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-100/80 transition-colors">
+                    <button className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-100/80 transition-colors" onClick={() => { setMostrarMenu(false); setMostrarPerfilModal(true); }}>
                       Perfil
                     </button>
                     <div className="border-t border-slate-200/50 my-1"></div>
@@ -587,7 +615,7 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
                 />
               </div>
 
-              {/* Modal */}
+              {/* Modal Usuario */}
               <UsuarioModal
                 mostrar={mostrarModal}
                 modoEdicion={modoEdicion}
@@ -600,6 +628,15 @@ const PremiumDashboardAdmin = ({ usuario: usuarioProp, onCerrarSesion: onCerrarS
               />
             </div>
           )}
+      {/* Modal Perfil siempre disponible */}
+      {mostrarPerfilModal && <div style={{position:'fixed',top:0,left:0,zIndex:9999,color:'red',fontWeight:'bold',fontSize:'2rem'}}>DEBUG: mostrarPerfilModal=true</div>}
+      <PerfilModal
+        mostrar={mostrarPerfilModal}
+        usuario={usuarioActual}
+        onClose={() => setMostrarPerfilModal(false)}
+        onActualizar={handleActualizarPerfil}
+        onCambiarPassword={handleCambiarPassword}
+      />
 
           {/* Otros módulos con Lazy Loading */}
           {seccionActiva === "configuracion" && (

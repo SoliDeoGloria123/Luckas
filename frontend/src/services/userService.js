@@ -34,7 +34,6 @@ export const userService = {
     apiRequest("/users", {
       method: "POST",
       body: JSON.stringify(userData),
-
     }),
   updateUser: (userId, userData) =>
     apiRequest(`/users/${userId}`, {
@@ -45,13 +44,37 @@ export const userService = {
     apiRequest(`/users/${userId}`, {
       method: "DELETE",
     }),
-  // Buscar usuario por número de documento
   getByDocumento: (numeroDocumento) =>
     apiRequest(`/users/documento/${numeroDocumento}`)
       .then(res => res.user),
-  //traer datos de lso usuarios por id
   getUserById: (userId) =>
     apiRequest(`/users/${userId}`, {
       method: "GET",
     }),
+  updateProfile: (profileData, file) => {
+    const token = getAuthToken();
+    const formData = new FormData();
+    Object.entries(profileData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) formData.append(key, value);
+    });
+    if (file) formData.append("fotoPerfil", file);
+    return fetch(`${API_BASE_URL}/users/profile`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
+    }).then(handleResponse);
+  },
+  changePassword: (currentPassword, newPassword) => {
+    const token = getAuthToken();
+    return fetch(`${API_BASE_URL}/users/change-password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ currentPassword, newPassword })
+    }).then(handleResponse);
+  }
 };
