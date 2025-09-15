@@ -15,14 +15,17 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    // Limpiar espacios en blanco
+    const correoLimpio = correo.trim();
+    const passwordLimpio = password.trim();
     try {
-      const data = await authService.login(correo, password);
+      const data = await authService.login(correoLimpio, passwordLimpio);
       localStorage.setItem('token', data.token);
       localStorage.setItem('usuario', JSON.stringify(data.user));
 
       // Redireccionar según el rol del usuario
       if (data.user.role === 'admin') {
-        navigate('/admin/users');
+        navigate('/admin/Dashboard');
       } else if (data.user.role === 'tesorero') {
         navigate('/tesorero');
       } else if (data.user.role === 'seminarista') {

@@ -39,14 +39,20 @@ const ReservasModal = ({
   };
 
   return (
-    <div className="modal-overlay-admin">
-      <div className="modal-admin">
-        <div className="modal-header-admin">
-          <h3>{modoEdicion ? "Editar Reserva" : "Crear Nueva Reserva"}</h3>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
+        <div
+          className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
+          style={{
+            background: 'linear-gradient(90deg, var(--color-blue-principal), var(--color-blue-oscuro))',
+            color: 'white'
+          }}
+        >
+          <h2>{modoEdicion ? "Editar Reserva" : "Crear Nueva Reserva"}</h2>
           <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
 
-        <from className="modal-body-admin">
+        <form className="modal-body-admin">
           {/* Usuario */}
           <div className="form-grupo-admin">
             <label>Usuario:</label>
@@ -209,7 +215,7 @@ const ReservasModal = ({
               {modoEdicion ? "Guardar Cambios" : "Crear Reserva"}
             </button>
           </div>
-        </from>
+        </form>
       </div>
     </div>
   );

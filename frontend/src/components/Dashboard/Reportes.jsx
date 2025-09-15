@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { reporteService } from '../../services/reporteService';
 import './Dashboard.css'
+import Sidebar from './Sidebar/Sidebar';
+import Header from './Sidebar/Header';
 
 const Reportes = () => {
   const [tipoReporte, setTipoReporte] = useState('dashboard');
   const [datosReporte, setDatosReporte] = useState(null);
+  const [sidebarAbierto, setSidebarAbierto] = useState(true);
+  const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [filtros, setFiltros] = useState({
     fechaInicio: '',
     fechaFin: '',
@@ -104,6 +108,7 @@ const Reportes = () => {
     const { resumen } = datosReporte;
 
     return (
+
       <>
         <div className="dashboard-grid-reporte-admin">
           <div className="stat-card-reporte-admin">
@@ -399,99 +404,114 @@ const Reportes = () => {
   };
 
   return (
-    <div className="reportes-container">
-      <div className="reportes-header">
-        <div className='page-title-reporte'>
-          <h1>Sistema de Reportes</h1>
-          <p>Genera y administra reportes del sistema</p>
-        </div>
+    <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+      <Sidebar
+        sidebarAbierto={sidebarAbierto}
+        setSidebarAbierto={setSidebarAbierto}
+        seccionActiva={seccionActiva}
+        setSeccionActiva={setSeccionActiva}
+      />
+      <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
+    <Header
+          sidebarAbierto={sidebarAbierto}
+          setSidebarAbierto={setSidebarAbierto}
+          seccionActiva={seccionActiva}
+        />
+        <div className="reportes-container">
+          <div className="reportes-header">
+            <div className='page-title-reporte'>
+              <h1>Sistema de Reportes</h1>
+              <p>Genera y administra reportes del sistema</p>
+            </div>
 
-        <div className="reportes-controls">
-          <div class="dropdown">
-            <select
-              value={tipoReporte}
-              onChange={(e) => setTipoReporte(e.target.value)}
-              className="tipo-reporte-select"
-            >
-              <option value="dashboard">Dashboard General</option>
-              <option value="reservas">Reporte de Reservas</option>
-              <option value="inscripciones">Reporte de Inscripciones</option>
-              <option value="solicitudes">Reporte de Solicitudes</option>
-              <option value="usuarios">Reporte de Usuarios</option>
-              <option value="eventos">Reporte de Eventos</option>
-              <option value="financiero">Reporte Financiero</option>
-              <option value="actividad">Actividad de Usuarios</option>
-            </select>
+            <div className="reportes-controls">
+              <div class="dropdown">
+                <select
+                  value={tipoReporte}
+                  onChange={(e) => setTipoReporte(e.target.value)}
+                  className="tipo-reporte-select"
+                >
+                  <option value="dashboard">Dashboard General</option>
+                  <option value="reservas">Reporte de Reservas</option>
+                  <option value="inscripciones">Reporte de Inscripciones</option>
+                  <option value="solicitudes">Reporte de Solicitudes</option>
+                  <option value="usuarios">Reporte de Usuarios</option>
+                  <option value="eventos">Reporte de Eventos</option>
+                  <option value="financiero">Reporte Financiero</option>
+                  <option value="actividad">Actividad de Usuarios</option>
+                </select>
+              </div>
+
+              <button onClick={exportarPDF} className="btn-reportea btn-export">
+                <i class="fas fa-file-pdf"></i>
+                Exportar PDF
+              </button>
+              <button onClick={exportarExcel} className="btn-reportea btn-export">
+                <i class="fas fa-file-excel"></i>
+                Exportar Excel
+              </button>
+              <button onClick={handleGuardarReporte} className='btn-reportea btn-primary-reportea'>
+                <i class="fas fa-save"></i>
+                Guardar Reporte
+              </button>
+            </div>
           </div>
 
-          <button onClick={exportarPDF} className="btn-reportea btn-export">
-            <i class="fas fa-file-pdf"></i>
-            Exportar PDF
-          </button>
-          <button onClick={exportarExcel} className="btn-reportea btn-export">
-            <i class="fas fa-file-excel"></i>
-            Exportar Excel
-          </button>
-          <button onClick={handleGuardarReporte} className='btn-reportea btn-primary-reportea'>
-            <i class="fas fa-save"></i>
-            Guardar Reporte
-          </button>
-        </div>
-      </div>
+          {tipoReporte !== 'dashboard' && (
+            <div className="filtros-section">
+              <h3>Filtros</h3>
+              <div className="filtros-grid">
+                <input
+                  type="date"
+                  name="fechaInicio"
+                  value={filtros.fechaInicio}
+                  onChange={handleFiltroChange}
+                  placeholder="Fecha Inicio"
+                />
+                <input
+                  type="date"
+                  name="fechaFin"
+                  value={filtros.fechaFin}
+                  onChange={handleFiltroChange}
+                  placeholder="Fecha Fin"
+                />
+                <input
+                  type="text"
+                  name="estado"
+                  value={filtros.estado}
+                  onChange={handleFiltroChange}
+                  placeholder="Estado"
+                />
+                <input
+                  type="text"
+                  name="categoria"
+                  value={filtros.categoria}
+                  onChange={handleFiltroChange}
+                  placeholder="Categoría"
+                />
+                <button onClick={aplicarFiltros} className="btn-filtro">
+                  Aplicar Filtros
+                </button>
+                <button onClick={limpiarFiltros} className="btn-filtro">
+                  Limpiar
+                </button>
+              </div>
+            </div>
+          )}
 
-      {tipoReporte !== 'dashboard' && (
-        <div className="filtros-section">
-          <h3>Filtros</h3>
-          <div className="filtros-grid">
-            <input
-              type="date"
-              name="fechaInicio"
-              value={filtros.fechaInicio}
-              onChange={handleFiltroChange}
-              placeholder="Fecha Inicio"
-            />
-            <input
-              type="date"
-              name="fechaFin"
-              value={filtros.fechaFin}
-              onChange={handleFiltroChange}
-              placeholder="Fecha Fin"
-            />
-            <input
-              type="text"
-              name="estado"
-              value={filtros.estado}
-              onChange={handleFiltroChange}
-              placeholder="Estado"
-            />
-            <input
-              type="text"
-              name="categoria"
-              value={filtros.categoria}
-              onChange={handleFiltroChange}
-              placeholder="Categoría"
-            />
-            <button onClick={aplicarFiltros} className="btn-filtro">
-              Aplicar Filtros
-            </button>
-            <button onClick={limpiarFiltros} className="btn-filtro">
-              Limpiar
-            </button>
+          <div className="reporte-content">
+            {loading && <div className="loading">Cargando reporte...</div>}
+            {error && <div className="error">{error}</div>}
+
+            {!loading && !error && datosReporte && (
+              <div>
+                {tipoReporte === 'dashboard' ? renderDashboard() : renderTablaReporte()}
+
+
+              </div>
+            )}
           </div>
         </div>
-      )}
-
-      <div className="reporte-content">
-        {loading && <div className="loading">Cargando reporte...</div>}
-        {error && <div className="error">{error}</div>}
-
-        {!loading && !error && datosReporte && (
-          <div>
-            {tipoReporte === 'dashboard' ? renderDashboard() : renderTablaReporte()}
-
-
-          </div>
-        )}
       </div>
     </div>
   );
