@@ -1,62 +1,100 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
+import { eventService } from "../../../services/eventService";
+import { categorizacionService } from "../../../services/categorizacionService";
+import { mostrarAlerta } from '../../utils/alertas';
 import EventosModal from '../modal/EventosModal'
+import { FaEye } from "react-icons/fa";
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
 
 
 const Gestionevento = () => {
-  // Datos de ejemplo
-  const users = [
-    {
-      id: "GSI0405100d800b0f9b2c5656",
-      username: "pedrasa",
-      email: "admin@gmail.com",
-      phone: "3115524272",
-      docType: "Cédula de ciudadanía",
-      docNumber: "117200207",
-      role: "(Administrador)",
-      status: "ACTIVO",
-      date: "2/8/2025"
-    },
-    {
-      id: "GSI0405100d800b0f9b2c5667",
-      username: "perera",
-      email: "sabat@mail.com",
-      phone: "1311354354",
-      docType: "Cédula de ciudadanía",
-      docNumber: "12135434354",
-      role: "(Tesorero)",
-      status: "ACTIVO",
-      date: "2/8/2025"
-    },
-    // Más usuarios...
-  ];
+  const [eventos, setEventos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalEvento] = useState('create');
+  const [currentItem, setCurrentItem] = useState(null);
+  const [modalImagen, setModalImagen] = useState({ abierto: false, imagenes: [], actual: 0 });
 
-   const [showModal, setShowModal] = useState(false);
-    const [modalMode, setModalMode] = useState('create');
-    const [currentItem, setCurrentItem] = useState(null);
-  
-    const handleCreate = () => {
-      setModalMode('create');
-      setCurrentItem(null);
-      setShowModal(true);
-    };
-  
-    const handleEdit = (item) => {
-      setModalMode('edit');
-      setCurrentItem(item);
-      setShowModal(true);
-    };
-  
-    const handleSubmit = (data) => {
-      if (modalMode === 'create') {
-        // Lógica para crear
-      } else {
-        // Lógica para editar
+  const handleVerImagenes = (imagenes) => {
+    if (Array.isArray(imagenes) && imagenes.length > 0) {
+      setModalImagen({ abierto: true, imagenes, actual: 0 });
+    }
+  };
+  const handleNext = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual + 1) % prev.imagenes.length
+    }));
+  };
+
+  const handlePrev = () => {
+    setModalImagen(prev => ({
+      ...prev,
+      actual: (prev.actual - 1 + prev.imagenes.length) % prev.imagenes.length
+    }));
+  };
+
+  const cerrarModalImagen = () => {
+    setModalImagen({ abierto: false, imagenes: [], actual: 0 });
+  };
+  // Obtener eventos
+  const obtenerEventos = async () => {
+    try {
+      const data = await eventService.getAllEvents();
+      setEventos(Array.isArray(data.data) ? data.data : []);
+    } catch (error) {
+      setEventos([]);
+    }
+  };
+
+  // Obtener categorías
+  const obtenerCategorias = async () => {
+    try {
+      const res = await categorizacionService.getAll();
+      setCategorias(res.data || []);
+    } catch (error) {
+      setCategorias([]);
+    }
+  };
+
+  useEffect(() => {
+    obtenerEventos();
+    obtenerCategorias();
+  }, []);
+
+  const handleSubmit = async (data) => {
+    if (modalMode === 'create') {
+      try {
+        await eventService.createEvent(data);
+        mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
+        obtenerEventos();
+      } catch (error) {
+        mostrarAlerta("Error", `Error al crear el evento: ${error.message}`);
       }
-    };
-  
+    } else {
+      try {
+        await eventService.updateEvent(currentItem._id, data);
+        mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
+        obtenerEventos();
+      } catch (error) {
+        mostrarAlerta("Error"`Error al actualizar el evento: ${error.message}`);
+      }
+    }
+  };
+
+
+
+  const handleCreate = () => {
+    setModalEvento('create');
+    setCurrentItem(null);
+    setShowModal(true);
+  };
 
   return (
-    <main className="main--solicitudes-tesorero">
+    <>
+    <Header/>
+    <main className="main-content-tesorero">
       <div className="page-header-tesorero">
         <div className="card-header-tesorero">
           <button className="back-btn-tesorero">
@@ -91,7 +129,7 @@ const Gestionevento = () => {
             <div className="stat-label-solicitudes">Próximos</div>
           </div>
           <div className="stat-icon-solicitudes orange">
-           <i class="fas fa-clock"></i>
+            <i class="fas fa-clock"></i>
           </div>
         </div>
 
@@ -101,7 +139,7 @@ const Gestionevento = () => {
             <div className="stat-label-solicitudes">Completados</div>
           </div>
           <div className="stat-icon-solicitudes green">
-           <i class="fas fa-check-circle"></i>
+            <i class="fas fa-check-circle"></i>
           </div>
         </div>
 
@@ -111,7 +149,7 @@ const Gestionevento = () => {
             <div className="stat-label-solicitudes">Cancelados</div>
           </div>
           <div className="stat-icon-solicitudes red">
-             <i class="fas fa-times-circle"></i>
+            <i class="fas fa-times-circle"></i>
           </div>
         </div>
       </div>
@@ -143,8 +181,6 @@ const Gestionevento = () => {
           </button>
         </div>
       </div>
-
-
       <div className="table-container-tesorero">
         <table className="users-table-tesorero">
           <thead>
@@ -152,29 +188,105 @@ const Gestionevento = () => {
               <th>
                 <input type="checkbox" id="selectAll"></input>
               </th>
-              <th>USUARIO</th>
-              <th>ROL</th>
+              <th>ID</th>
+              <th>NOMBRE</th>
+              <th>PRECIO</th>
+              <th>CATEGORIA</th>
+              <th>FECHA EVENTO</th>
+              <th>HORA INICIO</th>
+              <th>HORA FIN </th>
+              <th>LUGAR</th>
+              <th>CUPOS TOTALES</th>
+              <th>CUPOS DISPONIBLES</th>
+              <th>PRIORIDAD</th>
               <th>ESTADO</th>
-              <th>ÚLTIMA ACTIVIDAD</th>
+              <th>FECHA CREACION</th>
+              <th>IMAGEN </th>
               <th>ACCIONES</th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
+            {eventos.map((event) => (
+              <tr key={event._id}>
+                <td>
+                  <input type="checkbox" className="select-row"></input>
+                </td>
+                <td>{event._id}</td>
+                <td>{event.nombre}</td>
+                <td>${event.precio}</td>
+                <td>{event.categoria?.nombre || "Sin categoría"}</td>
+                <td>{event.fechaEvento ? new Date(event.fechaEvento).toLocaleDateString() : "N/A"}</td>
+                <td>{event.horaInicio}</td>
+                <td>{event.horaFin}</td>
+                <td>{event.lugar}</td>
+                <td>{event.cuposTotales}</td>
+                <td>{event.cuposDisponibles}</td>
+                <td><span className={`priority-tesorero priority-tesorero-${event.prioridad }`}>
+                  {event.prioridad }
+                </span>
+                </td>
+                <td>
+                  <span className={`badge-estado estado-${event.active ? "activo" : "inactivo"}`}>
+                    {event.active ? "Activo" : "Inactivo"}
+                  </span>
+                </td>
+                <td>{event.createdAt ? new Date(event.createdAt).toLocaleDateString() : "N/A"}</td>
+
+                <td>
+                  {Array.isArray(event.imagen) && event.imagen.length > 0 ? (
+                    <button onClick={() => handleVerImagenes(event.imagen)} className="btn-image-tesorero ">
+                     <i class="fas fa-eye"></i>
+                    </button>
+                  ) : (
+                    <span class="no-image-tesorero">Sin imagen</span>
+                  )}
+                </td>
+
+                <td className='actions-cell'>
+                  <button className='action-btn edit' onClick={() => {
+                    setModalEvento('edit');
+                    setCurrentItem(event);
+                    setShowModal(true);
+                  }}>
+                    <i class="fas fa-edit"></i>
+                  </button>
+
+                </td>
+
+
+              </tr>
+            ))}
 
           </tbody>
         </table>
       </div>
-
-      {showModal  && (
+      {modalImagen.abierto && (
+        <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
+          <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
+            <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
+            <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
+            <img
+              src={`http://localhost:3000/uploads/eventos/${modalImagen.imagenes[modalImagen.actual]}`}
+              alt="Imagen del evento"
+              className="imagen-modal"
+            />
+            <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+          </div>
+        </div>
+      )}
+      {showModal && (
         <EventosModal
-        mode={modalMode}
-        initialData={currentItem || {}}
-        onClose={() => setShowModal(false)}
-        onSubmit={handleSubmit}
-      
+          mode={modalMode}
+          initialData={currentItem || {}}
+          onClose={() => setShowModal(false)}
+          onSubmit={handleSubmit}
+          categorias={categorias}
+
         />
       )}
     </main>
+    <Footer/>
+    </>
   );
 };
 

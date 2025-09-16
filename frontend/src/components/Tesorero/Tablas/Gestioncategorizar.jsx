@@ -1,63 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CategorizacionModal from '../modal/CategorizacionModal';
+import { categorizacionService } from '../../../services/categorizacionService';
+import { mostrarAlerta } from '../../utils/alertas';
+import Header from '../Header/Header-tesorero'
+import Footer from '../../footer/Footer'
 
 
 const Gestioncategorizacion = () => {
-  // Datos de ejemplo
-  const users = [
-    {
-      id: "GSI0405100d800b0f9b2c5656",
-      username: "pedrasa",
-      email: "admin@gmail.com",
-      phone: "3115524272",
-      docType: "Cédula de ciudadanía",
-      docNumber: "117200207",
-      role: "(Administrador)",
-      status: "ACTIVO",
-      date: "2/8/2025"
-    },
-    {
-      id: "GSI0405100d800b0f9b2c5667",
-      username: "perera",
-      email: "sabat@mail.com",
-      phone: "1311354354",
-      docType: "Cédula de ciudadanía",
-      docNumber: "12135434354",
-      role: "(Tesorero)",
-      status: "ACTIVO",
-      date: "2/8/2025"
-    },
-    // Más usuarios...
-  ];
-
-  const [showModal, setShowModal] = useState(false);
+  const [categorias, setCategorias] = useState([]);
   const [modalMode, setModalMode] = useState('create');
+  const [showModal, setShowModal] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
 
+  // Obtener categorías
+  const obtenerCategorias = async () => {
+    try {
+      const res = await categorizacionService.getAll();
+      setCategorias(res.data || []);
+    } catch (error) {
+      setCategorias([]);
+    }
+  };
+  useEffect(() => {
+    obtenerCategorias();
+  }, []);
+
+  const handleSubmit = async (data) => {
+    try {
+      if (modalMode === "create") {
+        await categorizacionService.create(data);
+        mostrarAlerta("¡EXITO!", "Categoría creada exitosamente");
+      } else {
+        await categorizacionService.update(currentItem._id, data);
+        mostrarAlerta("¡EXITO!", "Categoría actualizada exitosamente");
+      }
+      setShowModal(false);
+      obtenerCategorias();
+  } catch (error) {
+      mostrarAlerta("ERROR", `Error: ${error.message}`,'error');
+    }
+  };
+
+  // Abrir modal para crear
   const handleCreate = () => {
-    setModalMode('create');
+    setModalMode("create");
     setCurrentItem(null);
     setShowModal(true);
   };
 
-  const handleEdit = (item) => {
-    setModalMode('edit');
-    setCurrentItem(item);
+  // Abrir modal para editar
+  const handleEdit = (categoria) => {
+    setModalMode("edit");
+    setCurrentItem(categoria);
     setShowModal(true);
   };
-
-  const handleSubmit = (data) => {
-    if (modalMode === 'create') {
-
-    } else {
-
-    }
-  };
-
   return (
+    <>
+    <Header/>
     <main className="main-content-tesorero">
       <div className="page-header-tesorero">
-        <div className="dashboard-header-tesorero">
+        <div className="card-header-tesorero">
           <button className="back-btn-tesorero">
             <i className="fas fa-arrow-left"></i>
           </button>
@@ -91,7 +93,7 @@ const Gestioncategorizacion = () => {
             <div className="stat-number-usuarios">1</div>
             <div className="stat-label-usuarios">Activas</div>
           </div>
-          
+
         </div>
 
         <div className="stat-card-usuarios">
@@ -102,12 +104,12 @@ const Gestioncategorizacion = () => {
             <div className="stat-number-usuarios">1</div>
             <div className="stat-label-usuarios">Principales</div>
           </div>
-        
+
         </div>
 
         <div className="stat-card-usuarios">
-           <div className="stat-icon-usuarios orange">
-           <i className="fas fa-user-plus"></i>
+          <div className="stat-icon-usuarios orange">
+            <i className="fas fa-user-plus"></i>
           </div>
           <div className="stat-content">
             <div className="stat-number-usuarios">2</div>
@@ -152,15 +154,42 @@ const Gestioncategorizacion = () => {
               <th>
                 <input type="checkbox" id="selectAll"></input>
               </th>
-              <th>USUARIO</th>
-              <th>ROL</th>
-              <th>ESTADO</th>
-              <th>ÚLTIMA ACTIVIDAD</th>
+              <th>ID</th>
+              <th>NOMBRE</th>
+              <th>CODIGO</th>
+              <th>ACTIVO</th>
               <th>ACCIONES</th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
+            {categorias.length === 0 ? (
+              <tr>
+                <td colSpan={5}>no hay categorias para mostrar</td>
+              </tr>
+            ) : (
+              categorias.map((cate) => (
+                <tr key={cate._id}>
+                  <td>
+                    <input type="checkbox" />
+                  </td>
+                  <td>{cate._id}</td>
+                  <td>{cate.nombre}</td>
+                  <td>{cate.codigo}</td>
+                  <td>
+                    <span className={`badge-tesorero badge-tesorero-${cate.activo ? 'activo' : 'desactivado'}`}>
+                      {cate.activo ? 'activo' : 'desactivado'}
+                    </span>
+                  </td>
 
+                  <td className='actions-cell'>
+                    <button className='action-btn edit' onClick={() => handleEdit(cate)}>
+                      <i class="fas fa-edit"></i>
+                    </button>
+                  </td>
+                </tr>
+
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -173,6 +202,8 @@ const Gestioncategorizacion = () => {
         />
       )}
     </main>
+    <Footer />
+    </>
   );
 };
 

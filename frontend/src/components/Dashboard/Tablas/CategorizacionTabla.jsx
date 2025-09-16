@@ -1,7 +1,7 @@
 import React from "react";
 const TablaCategorias = ({ categorias, onEditar, onEliminar }) => (
-  <div className="tabla-contenedor">
-    <table className="tabla-usuarios">
+  <div className="tabla-contenedor-admin">
+    <table className="tabla-usuarios-admin">
       <thead>
         <tr>
           <th>ID</th>
@@ -29,9 +29,9 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar }) => (
               </td>
               <td>
                 <div className="acciones-botones">
-                  <button className="btn-editar" onClick={() => onEditar(cat)}>✏️</button>
+                  <button className="btn-action editar" onClick={() => onEditar(cat)}><i className="fas fa-edit"></i></button>
                   {onEliminar && (
-                    <button className="btn-eliminar" onClick={() => onEliminar(cat._id)}>🗑️</button>
+                    <button className="btn-action eliminar" onClick={() => onEliminar(cat._id)}><i className="fas fa-trash"></i></button>
                   )}
                 </div>
               </td>

@@ -133,7 +133,7 @@
     color: #64748b;
 }
 
-.change-type-btn {
+.change-type-btn-nuevasolicitud {
     position: absolute;
     top: 0;
     right: 0;
@@ -150,18 +150,18 @@
     transition: all 0.2s;
 }
 
-.change-type-btn:hover {
+.change-type-btn-nuevasolicitud:hover {
     background-color: #dbeafe;
 }
 
 /* Request Types */
-.request-types {
+.request-types-nuevasolicitud {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1rem;
 }
 
-.request-type-card {
+.request-type-card-nuevasolicitud {
     border: 2px solid #e2e8f0;
     border-radius: 12px;
     padding: 1.5rem;
@@ -172,17 +172,17 @@
     gap: 1rem;
 }
 
-.request-type-card:hover {
+.request-type-card-nuevasolicitud:hover {
     border-color: #2563eb;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
 }
 
-.request-type-card.selected {
+.request-type-card-nuevasolicitud.selected {
     border-color: #2563eb;
     background-color: #dbeafe;
 }
 
-.card-icon {
+.card-icon-nuevasolicitud {
     width: 48px;
     height: 48px;
     border-radius: 12px;
@@ -195,20 +195,20 @@
     flex-shrink: 0;
 }
 
-.card-content h3 {
+.card-content-nuevasolicitud h3 {
     font-size: 1.125rem;
     font-weight: 600;
     color: #1e293b;
     margin-bottom: 0.25rem;
 }
 
-.card-content p {
+.card-content-nuevasolicitud p {
     color: #64748b;
     font-size: 0.875rem;
 }
 
 /* Selected Type Display */
-.selected-type {
+.selected-type-nuevasolicitud {
     background: linear-gradient(135deg, #dbeafe, #e0e7ff);
     border-radius: 12px;
     padding: 1.5rem;
@@ -218,7 +218,7 @@
     gap: 1rem;
 }
 
-.selected-type-icon {
+.selected-type-icon-nuevasolicitud {
     width: 48px;
     height: 48px;
     border-radius: 12px;
@@ -230,46 +230,46 @@
     font-size: 1.25rem;
 }
 
-.selected-type-content h3 {
+.selected-type-content-nuevasolicitud h3 {
     font-size: 1.125rem;
     font-weight: 600;
     color: #2563eb;
     margin-bottom: 0.25rem;
 }
 
-.selected-type-content p {
+.selected-type-content-nuevasolicitud p {
     color: #64748b;
     font-size: 0.875rem;
 }
 
 /* Form Styles */
-.request-form {
+.request-form-nuevasolicitud {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.form-group {
+.form-group-nuevasolicitud {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.form-row {
+.form-row-nuevasolicitud {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
 }
 
-.form-group label {
+.form-group-nuevasolicitud label {
     font-weight: 500;
     color: #374151;
     font-size: 0.875rem;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
+.form-group-nuevasolicitud input,
+.form-group-nuevasolicitud select,
+.form-group-nuevasolicitud textarea {
     padding: 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 8px;
@@ -345,14 +345,14 @@
     cursor: pointer;
 }
 
-.uploaded-files {
+.uploaded-files-nuevasolicitud {
     margin-top: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.uploaded-file {
+.uploaded-file-nuevasolicitud {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -362,28 +362,28 @@
     border: 1px solid #e2e8f0;
 }
 
-.file-info {
+.file-info-nuevasolicitud {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-.file-icon {
+.file-icon-nuevasolicitud {
     color: #2563eb;
 }
 
-.file-details {
+.file-details-nuevasolicitud {
     display: flex;
     flex-direction: column;
 }
 
-.file-name {
+.file-name-nuevasolicitud {
     font-size: 0.875rem;
     font-weight: 500;
     color: #374151;
 }
 
-.file-size {
+.file-size-nuevasolicitud {
     font-size: 0.75rem;
     color: #6b7280;
 }
@@ -413,33 +413,33 @@
 }
 
 /* Confirmation */
-.confirmation-content {
+.confirmation-content-nuevasolicitud {
     display: flex;
     flex-direction: column;
     gap: 2rem;
 }
 
-.confirmation-card {
+.confirmation-card-nuevasolicitud {
     background-color: #f8fafc;
     border-radius: 12px;
     padding: 1.5rem;
     border: 1px solid #e2e8f0;
 }
 
-.confirmation-card h3 {
+.confirmation-card-nuevasolicitud h3 {
     font-size: 1.125rem;
     font-weight: 600;
     color: #1e293b;
     margin-bottom: 1rem;
 }
 
-.confirmation-details {
+.confirmation-details-nuevasolicitud {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.detail-row {
+.detail-row-nuevasolicitud {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -447,30 +447,30 @@
     border-bottom: 1px solid #e2e8f0;
 }
 
-.detail-row:last-child {
+.detail-row-nuevasolicitud:last-child {
     border-bottom: none;
 }
 
-.detail-label {
+.detail-label-nuevasolicitud {
     font-weight: 500;
     color: #374151;
     min-width: 120px;
 }
 
-.detail-value {
+.detail-value-nuevasolicitud {
     color: #6b7280;
     text-align: right;
     flex: 1;
 }
 
-.terms-section {
+.terms-section-nuevasolicitud {
     background-color: #fffbeb;
     border: 1px solid #fbbf24;
     border-radius: 8px;
     padding: 1rem;
 }
 
-.checkbox-container {
+.checkbox-container-nuevasolicitud {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -479,7 +479,7 @@
     color: #374151;
 }
 
-.checkbox-container input[type="checkbox"] {
+.checkbox-container-nuevasolicitud input[type="checkbox"] {
     display: none;
 }
 
@@ -494,12 +494,12 @@
     transition: all 0.2s;
 }
 
-.checkbox-container input[type="checkbox"]:checked + .checkmark {
+.checkbox-container-nuevasolicitud input[type="checkbox"]:checked + .checkmark {
     background-color: #2563eb;
     border-color: #2563eb;
 }
 
-.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+.checkbox-container-nuevasolicitud input[type="checkbox"]:checked + .checkmark::after {
     content: '✓';
     color: white;
     font-size: 0.75rem;
@@ -516,7 +516,7 @@
     background-color: #f8fafc;
 }
 
-.btn {
+.btn-nuevasolicitud {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -530,30 +530,30 @@
     text-decoration: none;
 }
 
-.btn-primary {
+.btn-primary-nuevasolicitud {
     background-color: #2563eb;
     color: white;
 }
 
-.btn-primary:hover {
+.btn-primary-nuevasolicitud:hover {
     background-color: #1d4ed8;
 }
 
-.btn-secondary {
+.btn-secondary-nuevasolicitud {
     background-color: #6b7280;
     color: white;
 }
 
-.btn-secondary:hover {
+.btn-secondary-nuevasolicitud:hover {
     background-color: #4b5563;
 }
 
-.btn-success {
+.btn-success-nuevasolicitud {
     background-color: #22c55e;
     color: white;
 }
 
-.btn-success:hover {
+.btn-success-nuevasolicitud:hover {
     background-color: #16a34a;
 }
 
@@ -562,72 +562,7 @@
     cursor: not-allowed;
 }
 
-/* Modal */
-.modal {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s;
-}
 
-.modal.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 12px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    transform: scale(0.9);
-    transition: transform 0.3s;
-}
-
-.modal.show .modal-content {
-    transform: scale(1);
-}
-
-.modal-header {
-    padding: 1.5rem 1.5rem 0;
-}
-
-.modal-header h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1e293b;
-}
-
-.modal-body {
-    padding: 1.5rem;
-    text-align: center;
-}
-
-.success-icon {
-    font-size: 3rem;
-    color: #22c55e;
-    margin-bottom: 1rem;
-}
-
-.modal-body p {
-    margin-bottom: 0.5rem;
-    color: #6b7280;
-}
-
-.modal-footer {
-    padding: 0 1.5rem 1.5rem;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
 
 /* Toast Notifications */
 .toast-container {

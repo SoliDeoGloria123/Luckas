@@ -1,72 +1,334 @@
-import React from "react";
+import React, {useState,useEffect} from "react";
 import { FaEye } from "react-icons/fa";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  Home,
+  Users,
+  Wifi,
+  Car,
+  Utensils,
+  DollarSign,
+  Star,
+  Check,
+  X,
+  MapPin
+} from 'lucide-react';
+import { mostrarAlerta, mostrarConfirmacion } from '../../utils/alertas';
 
 
-const CabanaTabla = ({ cabanas, onEditar, onEliminar, onVerImagen }) => (
-  <div className="tabla-contenedor">
-    <table className="tabla-usuarios">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Capacidad</th>
-          <th>Categoría</th>
-          <th>Precio</th>
-          <th>Estado</th>
-          <th>Creado por</th>
-          <th>imagen</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {cabanas.length === 0 ? (
-          <tr>
-            <td colSpan={7}>No hay cabañas para mostrar</td>
-          </tr>
-        ) : (
-          cabanas.map((cabana) => (
-            <tr key={cabana._id}>
-              <td>{cabana._id}</td>
-              <td>{cabana.nombre}</td>
-              <td>{cabana.descripcion}</td>
-              <td>{cabana.capacidad}</td>
-              <td>{cabana.categoria?.nombre || cabana.categoria || "N/A"}</td>
-              <td>{cabana.precio}</td>
-              <td>
-                <span className={`badge-estado estado-${(cabana.estado || "pendiente").toLowerCase()}`}>
-                  {cabana.estado || "Pendiente"}
-                </span>
-              </td>
-              <td>{cabana.creadoPor?.nombre || cabana.creadoPor || "N/A"}</td>
-              <td>
-                {Array.isArray(cabana.imagen) && cabana.imagen.length > 0 ? (
-                  <button onClick={() => onVerImagen(cabana.imagen)} className="btn-ver-imagen">
-                    <FaEye />
-                  </button>
-                ) : (
-                  "Sin imagen"
-                )}
-              </td>
+const CabanaTabla = ({cabanas, onEditar, onEliminar,onInsertar,nuevaCabana,setNuevaCabana, onVerImagen }) => {
 
-              <td>
-                <div className="acciones-botones">
-                  <button className="btn-editar" onClick={() => onEditar(cabana)}>
-                    ✏️
-                  </button>
-                  {onEliminar && (
-                    <button className="btn-eliminar" onClick={() => onEliminar(cabana._id)}>
-                      🗑️
-                    </button>
+  const [filtros, setFiltros] = useState({ busqueda: '', tipo: 'todos', estado: 'todos' });
+  const [cabanaSeleccionada, setCabanaSeleccionada] = useState(null);
+  const [cargando, setCargando] = useState(false);
 
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))
-        )}
-      </tbody>
-    </table>
+ 
+
+  const tiposCabanas = [
+    { value: 'individual', label: 'Individual', icon: '🏠', description: 'Para 1-2 personas' },
+    { value: 'familiar', label: 'Familiar', icon: '🏡', description: 'Para familias pequeñas (3-4 personas)' },
+    { value: 'grupal', label: 'Grupal', icon: '🏘️', description: 'Para grupos medianos (5-8 personas)' },
+    { value: 'dormitorio', label: 'Dormitorio', icon: '🏢', description: 'Para grupos grandes (8+ personas)' }
+  ];
+
+  const serviciosDisponibles = [
+    { value: 'wifi', label: 'Wi-Fi', icon: <Wifi className="w-4 h-4" /> },
+    { value: 'estacionamiento', label: 'Estacionamiento', icon: <Car className="w-4 h-4" /> },
+    { value: 'cocina', label: 'Cocina Completa', icon: <Utensils className="w-4 h-4" /> },
+    { value: 'comedor', label: 'Comedor', icon: '🍽️' },
+    { value: 'sala', label: 'Sala de Estar', icon: '🛋️' },
+    { value: 'terraza', label: 'Terraza/Balcón', icon: '🌅' },
+    { value: 'parrilla', label: 'Parrilla/BBQ', icon: '🔥' },
+    { value: 'fogata', label: 'Área de Fogata', icon: '🔥' },
+    { value: 'jardin', label: 'Jardín', icon: '🌻' },
+    { value: 'piscina', label: 'Acceso a Piscina', icon: '🏊' }
+  ];
+
+  const amenidadesDisponibles = [
+    { value: 'tv', label: 'TV', icon: '📺' },
+    { value: 'aire_acondicionado', label: 'A/C', icon: '❄️' },
+    { value: 'ventilador', label: 'Ventilador', icon: '💨' },
+    { value: 'nevera', label: 'Nevera', icon: '🧊' },
+    { value: 'microondas', label: 'Microondas', icon: '📦' },
+    { value: 'cafetera', label: 'Cafetera', icon: '☕' },
+    { value: 'toallas', label: 'Toallas', icon: '🏖️' },
+    { value: 'sabanas', label: 'Sábanas', icon: '🛏️' },
+    { value: 'almohadas', label: 'Almohadas', icon: '😴' },
+    { value: 'secador', label: 'Secador de Pelo', icon: '💇' }
+  ];
+
+  const cabanasFiltradas = cabanas.filter(cabana => {
+    const cumpleBusqueda = cabana.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+      cabana.ubicacion?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+      cabana.tipo?.toLowerCase().includes(filtros.busqueda.toLowerCase());
+    const cumpleTipo = filtros.tipo === 'todos' || cabana.tipo === filtros.tipo;
+    const cumpleEstado = filtros.estado === 'todos' || cabana.estado === filtros.estado;
+
+    return cumpleBusqueda && cumpleTipo && cumpleEstado;
+  });
+
+  const formatearPrecio = (precio) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0
+    }).format(precio);
+  };
+
+  const obtenerTipoCabana = (tipo) => {
+    return tiposCabanas.find(t => t.value === tipo) || tiposCabanas[0];
+  };
+
+  const toggleServicio = (servicio, isEditing = false) => {
+    if (isEditing) {
+      const serviciosActuales = cabanaSeleccionada.servicios || [];
+      const nuevosServicios = serviciosActuales.includes(servicio)
+        ? serviciosActuales.filter(s => s !== servicio)
+        : [...serviciosActuales, servicio];
+      setCabanaSeleccionada({ ...cabanaSeleccionada, servicios: nuevosServicios });
+    } else {
+      const serviciosActuales = nuevaCabana.servicios;
+      const nuevosServicios = serviciosActuales.includes(servicio)
+        ? serviciosActuales.filter(s => s !== servicio)
+        : [...serviciosActuales, servicio];
+      setNuevaCabana({ ...nuevaCabana, servicios: nuevosServicios });
+    }
+  };
+
+  const toggleAmenidad = (amenidad, isEditing = false) => {
+    if (isEditing) {
+      const amenidadesActuales = cabanaSeleccionada.amenidades || [];
+      const nuevasAmenidades = amenidadesActuales.includes(amenidad)
+        ? amenidadesActuales.filter(a => a !== amenidad)
+        : [...amenidadesActuales, amenidad];
+      setCabanaSeleccionada({ ...cabanaSeleccionada, amenidades: nuevasAmenidades });
+    } else {
+      const amenidadesActuales = nuevaCabana.amenidades;
+      const nuevasAmenidades = amenidadesActuales.includes(amenidad)
+        ? amenidadesActuales.filter(a => a !== amenidad)
+        : [...amenidadesActuales, amenidad];
+      setNuevaCabana({ ...nuevaCabana, amenidades: nuevasAmenidades });
+    }
+  };
+  return (
+  <>  
+  <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="relative">
+        <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Buscar cabañas..."
+          value={filtros.busqueda}
+          onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
+          className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+        />
+      </div>
+
+      <select
+        value={filtros.tipo}
+        onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
+        className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+      >
+        <option value="todos">Todos los tipos</option>
+        {tiposCabanas.map(tipo => (
+          <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
+        ))}
+      </select>
+
+      <select
+        value={filtros.estado}
+        onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
+        className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+      >
+        <option value="todos">Todos los estados</option>
+        <option value="disponible">Disponible</option>
+        <option value="ocupada">Ocupada</option>
+        <option value="mantenimiento">Mantenimiento</option>
+        <option value="inactiva">Inactiva</option>
+      </select>
+
+      <div className="text-sm text-slate-600 flex items-center">
+        <span className="font-medium">{cabanasFiltradas.length}</span> cabaña(s) encontrada(s)
+      </div>
+    </div>
   </div>
-);
+
+    {/* Lista de Cabañas */}
+    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {cargando ? (
+        <div className="col-span-full text-center py-12">
+          <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600">Cargando cabañas...</p>
+        </div>
+      ) : cabanasFiltradas.length > 0 ? (
+        cabanasFiltradas.map((cabana) => {
+          const tipoCabana = obtenerTipoCabana(cabana.tipo);
+          return (
+            <div key={cabana._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+              {/* Imagen principal */}
+              <div className="relative h-48 bg-gradient-to-r from-emerald-500 to-blue-600">
+                {cabana.imagenPrincipal ? (
+                  <img
+                    src={cabana.imagenPrincipal}
+                    alt={cabana.nombre}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className={`absolute inset-0 flex items-center justify-center text-white text-4xl ${cabana.imagenPrincipal ? 'hidden' : 'flex'}`}>
+                  <span>{tipoCabana.icon}</span>
+                </div>
+
+                {/* Badges */}
+                <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-white/90 text-slate-800 text-xs font-medium rounded-full">
+                    {tipoCabana.label}
+                  </span>
+                  {cabana.destacada && (
+                    <span className="px-3 py-1 bg-yellow-500/90 text-white text-xs font-medium rounded-full flex items-center">
+                      <Star className="w-3 h-3 mr-1" />
+                      Destacada
+                    </span>
+                  )}
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${cabana.estado === 'disponible'
+                    ? 'bg-emerald-500/90 text-white'
+                    : cabana.estado === 'ocupada'
+                      ? 'bg-red-500/90 text-white'
+                      : cabana.estado === 'mantenimiento'
+                        ? 'bg-amber-500/90 text-white'
+                        : 'bg-gray-500/90 text-white'
+                    }`}>
+                    {cabana.estado}
+                  </span>
+                </div>
+
+                {/* Botones de acción */}
+                <div className="absolute top-4 right-4 flex space-x-2">
+                  <button
+                    onClick={() => onEditar(cabana)}
+                    className="p-2 bg-white/20 backdrop-blur text-white hover:bg-white/30 rounded-lg transition-colors"
+                    title="Editar"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => onEliminar(cabana)}
+                    className="p-2 bg-red-500/20 backdrop-blur text-white hover:bg-red-500/30 rounded-lg transition-colors"
+                    title="Eliminar"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              {/* Contenido de la cabaña */}
+              <div className="p-6 space-y-4">
+                <div>
+                  <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-2">{cabana.nombre}</h3>
+                  <p className="text-slate-600 text-sm line-clamp-3">{cabana.descripcion}</p>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Capacidad y habitaciones */}
+                  <div className="flex items-center space-x-4 text-sm">
+                    <div className="flex items-center space-x-1">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <span className="text-slate-600">Hasta {cabana.capacidadMaxima} personas</span>
+                    </div>
+                    {cabana.numeroCuartos && (
+                      <div className="flex items-center space-x-1">
+                        <Home className="w-4 h-4 text-green-600" />
+                        <span className="text-slate-600">{cabana.numeroCuartos} cuarto(s)</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Ubicación */}
+                  {cabana.ubicacion && (
+                    <div className="flex items-center space-x-2 text-sm">
+                      <MapPin className="w-4 h-4 text-red-600" />
+                      <span className="text-slate-600 line-clamp-1">{cabana.ubicacion}</span>
+                    </div>
+                  )}
+
+                  {/* Precios */}
+                  <div className="space-y-1">
+                    {cabana.precioPorNoche && (
+                      <div className="flex items-center space-x-2 text-sm">
+                        <DollarSign className="w-4 h-4 text-emerald-600" />
+                        <span className="font-semibold text-emerald-600">
+                          {formatearPrecio(cabana.precioPorNoche)} / noche
+                        </span>
+                      </div>
+                    )}
+                    {cabana.precioPorPersona && (
+                      <div className="flex items-center space-x-2 text-sm ml-6">
+                        <span className="text-slate-600">
+                          {formatearPrecio(cabana.precioPorPersona)} / persona
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Servicios principales */}
+                  <div className="flex flex-wrap gap-2">
+                    {cabana.servicios?.slice(0, 4).map((servicio) => {
+                      const servicioInfo = serviciosDisponibles.find(s => s.value === servicio);
+                      return servicioInfo ? (
+                        <span key={servicio} className="flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-lg">
+                          {servicioInfo.icon}
+                          <span className="ml-1">{servicioInfo.label}</span>
+                        </span>
+                      ) : null;
+                    })}
+                    {cabana.servicios?.length > 4 && (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg">
+                        +{cabana.servicios.length - 4} más
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Disponibilidad */}
+                  <div className="pt-3 border-t border-slate-200/50">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-600">Disponibilidad:</span>
+                      <span className={`flex items-center text-sm font-medium ${cabana.disponibilidad ? 'text-emerald-600' : 'text-red-600'
+                        }`}>
+                        {cabana.disponibilidad ? (
+                          <><Check className="w-4 h-4 mr-1" /> Disponible</>
+                        ) : (
+                          <><X className="w-4 h-4 mr-1" /> No Disponible</>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
+      ) : (
+        <div className="col-span-full text-center py-12">
+          <Home className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay cabañas</h3>
+          <p className="text-slate-500 mb-6">Comienza agregando tu primera cabaña o alojamiento</p>
+          <button
+            onClick={onInsertar}
+            className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
+          >
+            <Plus className="w-5 h-5 mr-2 inline" />
+            Crear Cabaña
+          </button>
+        </div>
+      )}
+    </div>
+  </>
+  );
+};
 export default CabanaTabla;

@@ -65,7 +65,7 @@ body {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.stat-icon {
+.stat-icon-misolicitudes {
     width: 48px;
     height: 48px;
     border-radius: 10px;
@@ -75,22 +75,22 @@ body {
     font-size: 1.5rem;
 }
 
-.stat-card.approved .stat-icon {
+.stat-card-misolicitudes.approved .stat-icon-misolicitudes {
     background-color: #dcfce7;
     color: #16a34a;
 }
 
-.stat-card.review .stat-icon {
+.stat-card-misolicitudes.review .stat-icon-misolicitudes {
     background-color: #e0e7ff;
     color: #7c3aed;
 }
 
-.stat-card.pending .stat-icon {
+.stat-card-misolicitudes.pending .stat-icon-misolicitudes {
     background-color: #fef3c7;
     color: #f59e0b;
 }
 
-.stat-card.total .stat-icon {
+.stat-card-misolicitudes.total .stat-icon-misolicitudes {
     background-color: #dbeafe;
     color: #2563eb;
 }
@@ -320,7 +320,7 @@ body {
     gap: 0.75rem;
 }
 
-.btn {
+.btn-misolicitudes {
     padding: 0.5rem 1rem;
     border-radius: 6px;
     font-size: 0.875rem;
@@ -343,28 +343,28 @@ body {
     background: #1d4ed8;
 }
 
-.btn-secondary {
+.btn-secondary-misolicitudes {
     background: #f1f5f9;
     color: #64748b;
     border: 1px solid #e2e8f0;
 }
 
-.btn-secondary:hover {
+.btn-secondary-misolicitudes:hover {
     background: #e2e8f0;
     color: #334155;
 }
 
-.btn-danger {
+.btn-danger-misolicitudes {
     background: #dc2626;
     color: white;
 }
 
-.btn-danger:hover {
+.btn-danger-misolicitudes:hover {
     background: #b91c1c;
 }
 
 /* Modal Styles */
-.modal-overlay {
+.modal-overlay-misolicitudes {
     position: fixed;
     top: 0;
     left: 0;
@@ -380,12 +380,12 @@ body {
     transition: all 0.3s ease;
 }
 
-.modal-overlay.show {
+.modal-overlay-misolicitudes.show-misolicitudes {
     opacity: 1;
     visibility: visible;
 }
 
-.modal-content {
+.modal-content-misolicitudes {
     background: white;
     border-radius: 12px;
     max-width: 600px;
@@ -396,7 +396,7 @@ body {
     transition: transform 0.3s ease;
 }
 
-.modal-overlay.show .modal-content {
+.modal-overlay-misolicitudes.show-misolicitudes .modal-content-misolicitudes {
     transform: scale(1);
 }
 
@@ -404,7 +404,7 @@ body {
     max-width: 400px;
 }
 
-.modal-header {
+.modal-header-misolicitudes {
     padding: 1.5rem;
     border-bottom: 1px solid #e2e8f0;
     display: flex;
@@ -412,13 +412,13 @@ body {
     align-items: center;
 }
 
-.modal-title {
+.modal-title-misolicitudes {
     font-size: 1.25rem;
     font-weight: 600;
     color: #1e293b;
 }
 
-.modal-close {
+.modal-close-misolicitudes {
     background: none;
     border: none;
     font-size: 1.25rem;
@@ -429,16 +429,16 @@ body {
     transition: all 0.2s ease;
 }
 
-.modal-close:hover {
+.modal-close-misolicitudes:hover {
     background: #f1f5f9;
     color: #334155;
 }
 
-.modal-body {
+.modal-body-misolicitudes {
     padding: 1.5rem;
 }
 
-.modal-footer {
+.modal-footer-misolicitudes {
     padding: 1.5rem;
     border-top: 1px solid #e2e8f0;
     display: flex;

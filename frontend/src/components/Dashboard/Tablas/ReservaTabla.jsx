@@ -1,8 +1,8 @@
 import React from "react";
 
 const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
-  <div className="tabla-contenedor">
-    <table className="tabla-usuarios">
+  <div className="tabla-contenedor-admin">
+    <table className="tabla-usuarios-admin">
       <thead>
         <tr>
           <th>ID</th>
@@ -56,13 +56,13 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
                 {reserva.activo === undefined ? 'N/A' : reserva.activo ? 'Sí' : 'No'}
               </td>
               <td>
-                <div className="acciones-usuario">
-                  <button className="btn-editar" onClick={() => onEditar(reserva)}>
-                    ✏️
+                <div className="acciones-botones">
+                  <button className="btn-action editar" onClick={() => onEditar(reserva)}>
+                 <i className="fas fa-edit"></i>
                   </button>
                   {onEliminar && (
-                    <button className="btn-eliminar" onClick={() => onEliminar(reserva._id)}>
-                      🗑️
+                    <button className="btn-action eliminar" onClick={() => onEliminar(reserva._id)}>
+                     <i className="fas fa-trash"></i>
                     </button>
                   )}
                 </div>

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = "http://localhost:3001/api";
 
 //registro de usuario
 export const signupService = {
@@ -16,6 +16,23 @@ export const authService = {
     const response = await axios.post(`${API_BASE_URL}/auth/signin`, {
       correo,
       password,
+    });
+    return response.data;
+  },
+
+  // Solicitar recuperación de contraseña
+  forgotPassword: async (correo) => {
+    const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, {
+      correo,
+    });
+    return response.data;
+  },
+
+  // Resetear contraseña con token
+  resetPassword: async (token, newPassword) => {
+    const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, {
+      token,
+      newPassword,
     });
     return response.data;
   },

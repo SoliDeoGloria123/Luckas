@@ -205,8 +205,8 @@ const NuevaSolicitud = () => {
       case 'permiso':
         return (
           <>
-            <div className="form-row">
-              <div className="form-group">
+            <div className="form-row-nuevasolicitud">
+              <div className="form-group-nuevasolicitud">
                 <label htmlFor="exitDate">Fecha de Salida *</label>
                 <input 
                   type="date" 
@@ -216,7 +216,7 @@ const NuevaSolicitud = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="form-group">
+              <div className="form-group-nuevasolicitud">
                 <label htmlFor="returnDate">Fecha de Regreso *</label>
                 <input 
                   type="date" 
@@ -227,7 +227,7 @@ const NuevaSolicitud = () => {
                 />
               </div>
             </div>
-            <div className="form-group">
+            <div className="form-group-nuevasolicitud">
               <label htmlFor="destination">Destino</label>
               <input 
                 type="text" 
@@ -237,7 +237,7 @@ const NuevaSolicitud = () => {
                 onChange={handleInputChange}
               />
             </div>
-            <div className="form-group">
+            <div className="form-group-nuevasolicitud">
               <label htmlFor="emergencyContact">Contacto de Emergencia</label>
               <input 
                 type="text" 
@@ -252,8 +252,8 @@ const NuevaSolicitud = () => {
       case 'academico':
         return (
           <>
-            <div className="form-row">
-              <div className="form-group">
+            <div className="form-row-nuevasolicitud">
+              <div className="form-group-nuevasolicitud">
                 <label htmlFor="subject">Materia</label>
                 <select 
                   id="subject" 
@@ -268,7 +268,7 @@ const NuevaSolicitud = () => {
                   <option value="escritura">Sagrada Escritura</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="form-group-nuevasolicitud">
                 <label htmlFor="semester">Semestre</label>
                 <select 
                   id="semester" 
@@ -285,7 +285,7 @@ const NuevaSolicitud = () => {
                 </select>
               </div>
             </div>
-            <div className="form-group">
+            <div className="form-group-nuevasolicitud">
               <label htmlFor="currentSchedule">Horario Actual</label>
               <textarea 
                 id="currentSchedule" 
@@ -295,7 +295,7 @@ const NuevaSolicitud = () => {
                 onChange={handleInputChange}
               ></textarea>
             </div>
-            <div className="form-group">
+            <div className="form-group-nuevasolicitud">
               <label htmlFor="proposedSchedule">Horario Propuesto</label>
               <textarea 
                 id="proposedSchedule" 
@@ -311,7 +311,7 @@ const NuevaSolicitud = () => {
       default:
         return (
           <>
-            <div className="form-group">
+            <div className="form-group-nuevasolicitud">
               <label htmlFor="category">Categoría Específica</label>
               <input 
                 type="text" 
@@ -321,7 +321,7 @@ const NuevaSolicitud = () => {
                 onChange={handleInputChange}
               />
             </div>
-            <div className="form-group">
+            <div className="form-group-nuevasolicitud">
               <label htmlFor="additionalInfo">Información Adicional</label>
               <textarea 
                 id="additionalInfo" 
@@ -357,11 +357,11 @@ const NuevaSolicitud = () => {
             </div>
             <div className={`step-nuevasolicitud ${currentStep > 2 ? 'completed' : ''} ${currentStep === 2 ? 'active' : ''}`}>
               <div className="step-number-nuevasolicitud">2</div>
-              <div className="step-label">Detalles</div>
+              <div className="step-label-nuevasolicitud">Detalles</div>
             </div>
-            <div className={`step ${currentStep === 3 ? 'active' : ''}`}>
+            <div className={`step-nuevasolicitud ${currentStep === 3 ? 'active' : ''}`}>
               <div className="step-number-nuevasolicitud">3</div>
-              <div className="step-label">Confirmación</div>
+              <div className="step-label-nuevasolicitud">Confirmación</div>
             </div>
           </div>
 
@@ -374,18 +374,18 @@ const NuevaSolicitud = () => {
                 <p>Elige la categoría que mejor describa tu solicitud</p>
               </div>
 
-              <div className="request-types">
+              <div className="request-types-nuevasolicitud">
                 {Object.entries(typeConfigs).map(([type, config]) => (
                   <div 
                     key={type}
-                    className={`request-type-card ${selectedType === type ? 'selected' : ''}`}
+                    className={`request-type-card-nuevasolicitud ${selectedType === type ? 'selected' : ''}`}
                     onClick={() => selectRequestType(type)}
                     data-type={type}
                   >
-                    <div className="card-icon">
+                    <div className="card-icon-nuevasolicitud">
                       {config.icon}
                     </div>
-                    <div className="card-content">
+                    <div className="card-content-nuevasolicitud">
                       <h3>{config.title}</h3>
                       <p>{config.description}</p>
                     </div>
@@ -395,12 +395,12 @@ const NuevaSolicitud = () => {
             </div>
 
             {/* Step 2: Detalles */}
-            <div className="step-content" style={{ display: currentStep === 2 ? 'block' : 'none' }}>
-              <div className="step-header">
+            <div className="step-content-nuevasolicitud" style={{ display: currentStep === 2 ? 'block' : 'none' }}>
+              <div className="step-header-nuevasolicitud">
                 <h2>Paso 2: Completa los Detalles</h2>
                 <p>Proporciona toda la información necesaria para tu solicitud</p>
                 <button 
-                  className="change-type-btn"
+                  className="change-type-btn-nuevasolicitud"
                   onClick={() => setCurrentStep(1)}
                 >
                   <FaArrowLeft />
@@ -409,19 +409,19 @@ const NuevaSolicitud = () => {
               </div>
 
               {/* Selected Type Display */}
-              <div className="selected-type">
-                <div className="selected-type-icon">
+              <div className="selected-type-nuevasolicitud">
+                <div className="selected-type-icon-nuevasolicitud">
                   {typeConfigs[selectedType]?.icon}
                 </div>
-                <div className="selected-type-content">
+                <div className="selected-type-content-nuevasolicitud">
                   <h3>{typeConfigs[selectedType]?.title}</h3>
                   <p>{typeConfigs[selectedType]?.description}</p>
                 </div>
               </div>
 
               {/* Form Fields */}
-              <div className="request-form">
-                <div className="form-group">
+              <div className="request-form-nuevasolicitud">
+                <div className="form-group-nuevasolicitud">
                   <label htmlFor="requestTitle">Título de la Solicitud *</label>
                   <input 
                     type="text" 
@@ -433,7 +433,7 @@ const NuevaSolicitud = () => {
                   <div className="error-message"></div>
                 </div>
 
-                <div className="form-group">
+                <div className="form-group-nuevasolicitud">
                   <label htmlFor="requestDescription">Descripción Detallada *</label>
                   <textarea 
                     id="requestDescription" 
@@ -446,7 +446,7 @@ const NuevaSolicitud = () => {
                   <div className="error-message"></div>
                 </div>
 
-                <div className="form-group">
+                <div className="form-group-nuevasolicitud">
                   <label htmlFor="requestJustification">Justificación *</label>
                   <textarea 
                     id="requestJustification" 
@@ -459,8 +459,8 @@ const NuevaSolicitud = () => {
                   <div className="error-message"></div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
+                <div className="form-row-nuevasolicitud">
+                  <div className="form-group-nuevasolicitud">
                     <label htmlFor="requestPriority">Prioridad</label>
                     <select 
                       id="requestPriority" 
@@ -474,7 +474,7 @@ const NuevaSolicitud = () => {
                     </select>
                   </div>
 
-                  <div className="form-group">
+                  <div className="form-group-nuevasolicitud">
                     <label htmlFor="requestDate">Fecha Requerida</label>
                     <input 
                       type="date" 
@@ -491,7 +491,7 @@ const NuevaSolicitud = () => {
                 </div>
 
                 {/* File Upload */}
-                <div className="form-group">
+                <div className="form-group-nuevasolicitud">
                   <label>Documentos Adjuntos</label>
                   <div className="file-upload-area">
                     <div className="file-upload-content">
@@ -507,14 +507,14 @@ const NuevaSolicitud = () => {
                       onChange={handleFileUpload}
                     />
                   </div>
-                  <div className="uploaded-files">
+                  <div className="uploaded-files-nuevasolicitud">
                     {uploadedFiles.map(file => (
-                      <div key={file.name} className="uploaded-file">
-                        <div className="file-info">
-                          <FaFile className="file-icon" />
-                          <div className="file-details">
-                            <div className="file-name">{file.name}</div>
-                            <div className="file-size">{formatFileSize(file.size)}</div>
+                      <div key={file.name} className="uploaded-file-nuevasolicitud">
+                        <div className="file-info-nuevasolicitud">
+                          <FaFile className="file-icon-nuevasolicitud" />
+                          <div className="file-details-nuevasolicitud">
+                            <div className="file-name-nuevasolicitud">{file.name}</div>
+                            <div className="file-size-nuevasolicitud">{formatFileSize(file.size)}</div>
                           </div>
                         </div>
                         <button 
@@ -532,52 +532,52 @@ const NuevaSolicitud = () => {
             </div>
 
             {/* Step 3: Confirmación */}
-            <div className="step-content" style={{ display: currentStep === 3 ? 'block' : 'none' }}>
-              <div className="step-header">
+            <div className="step-content-nuevasolicitud" style={{ display: currentStep === 3 ? 'block' : 'none' }}>
+              <div className="step-header-nuevasolicitud">
                 <h2>Paso 3: Confirmación</h2>
                 <p>Revisa todos los detalles antes de enviar tu solicitud</p>
               </div>
 
-              <div className="confirmation-content">
-                <div className="confirmation-card">
+              <div className="confirmation-content-nuevasolicitud">
+                <div className="confirmation-card-nuevasolicitud">
                   <h3>Resumen de la Solicitud</h3>
-                  <div className="confirmation-details">
-                    <div className="detail-row">
-                      <div className="detail-label">Tipo de Solicitud:</div>
-                      <div className="detail-value">{typeConfigs[selectedType]?.title}</div>
+                  <div className="confirmation-details-nuevasolicitud">
+                    <div className="detail-row-nuevasolicitud">
+                      <div className="detail-label-nuevasolicitud">Tipo de Solicitud:</div>
+                      <div className="detail-value-nuevasolicitud">{typeConfigs[selectedType]?.title}</div>
                     </div>
-                    <div className="detail-row">
-                      <div className="detail-label">Título:</div>
-                      <div className="detail-value">{formData.requestTitle || 'No especificado'}</div>
+                    <div className="detail-row-nuevasolicitud">
+                      <div className="detail-label-nuevasolicitud">Título:</div>
+                      <div className="detail-value-nuevasolicitud">{formData.requestTitle || 'No especificado'}</div>
                     </div>
-                    <div className="detail-row">
-                      <div className="detail-label">Prioridad:</div>
-                      <div className="detail-value">{getPriorityLabel(formData.requestPriority)}</div>
+                    <div className="detail-row-nuevasolicitud">
+                      <div className="detail-label-nuevasolicitud">Prioridad:</div>
+                      <div className="detail-value-nuevasolicitud">{getPriorityLabel(formData.requestPriority)}</div>
                     </div>
-                    <div className="detail-row">
-                      <div className="detail-label">Fecha Requerida:</div>
-                      <div className="detail-value">{formatDate(formData.requestDate)}</div>
+                    <div className="detail-row-nuevasolicitud">
+                      <div className="detail-label-nuevasolicitud">Fecha Requerida:</div>
+                      <div className="detail-value-nuevasolicitud">{formatDate(formData.requestDate)}</div>
                     </div>
-                    <div className="detail-row">
-                      <div className="detail-label">Descripción:</div>
-                      <div className="detail-value">{formData.requestDescription || 'No especificada'}</div>
+                    <div className="detail-row-nuevasolicitud">
+                      <div className="detail-label-nuevasolicitud">Descripción:</div>
+                      <div className="detail-value-nuevasolicitud">{formData.requestDescription || 'No especificada'}</div>
                     </div>
-                    <div className="detail-row">
-                      <div className="detail-label">Archivos Adjuntos:</div>
-                      <div className="detail-value">{uploadedFiles.length} archivo(s)</div>
+                    <div className="detail-row-nuevasolicitud">
+                      <div className="detail-label-nuevasolicitud">Archivos Adjuntos:</div>
+                      <div className="detail-value-nuevasolicitud">{uploadedFiles.length} archivo(s)</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="terms-section">
-                  <label className="checkbox-container">
+                <div className="terms-section-nuevasolicitud">
+                  <label className="checkbox-container-nuevasolicitud">
                     <input 
                       type="checkbox" 
                       id="acceptTerms"
                       checked={acceptTerms}
                       onChange={(e) => setAcceptTerms(e.target.checked)}
                     />
-                    <span className="checkmark"></span>
+              
                     Acepto los términos y condiciones del seminario
                   </label>
                 </div>
@@ -589,7 +589,7 @@ const NuevaSolicitud = () => {
               {currentStep > 1 && (
                 <button 
                   type="button" 
-                  className="btn btn-secondary"
+                  className="btn-nuevasolicitud btn-secondary-nuevasolicitud"
                   onClick={previousStep}
                 >
                   <FaArrowLeft />
@@ -599,7 +599,7 @@ const NuevaSolicitud = () => {
               {currentStep < 3 ? (
                 <button 
                   type="button" 
-                  className="btn btn-primary"
+                  className="btn-nuevasolicitud btn-primary-nuevasolicitud"
                   onClick={nextStep}
                 >
                   <span>Siguiente</span>
@@ -608,7 +608,7 @@ const NuevaSolicitud = () => {
               ) : (
                 <button 
                   type="button" 
-                  className="btn btn-success"
+                  className="btn-nuevasolicitud btn-success-nuevasolicitud"
                   onClick={submitRequest}
                   disabled={!acceptTerms}
                 >
