@@ -620,7 +620,7 @@ class ConfigurationManager {
     const saveBtn = document.getElementById('saveBtn');
     if (saveBtn) {
       saveBtn.style.background = '#f59e0b';
-      saveBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Cambios sin Guardar';
+      saveBtn.innerHTML = '<i className="fas fa-exclamation-circle"></i> Cambios sin Guardar';
     }
   }
   
@@ -629,7 +629,7 @@ class ConfigurationManager {
     const saveBtn = document.getElementById('saveBtn');
     if (saveBtn) {
       saveBtn.style.background = '#6366f1';
-      saveBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios';
+      saveBtn.innerHTML = '<i className="fas fa-save"></i> Guardar Cambios';
     }
   }
   

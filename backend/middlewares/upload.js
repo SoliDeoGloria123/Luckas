@@ -10,6 +10,8 @@ const guardar = multer.diskStorage({
       folder = 'cabanas';
     }else if (req.tipoImagen === 'eventos') {
       folder = 'eventos';
+    }else if (req.tipoImagen === 'perfiles') {
+      folder = 'perfiles';
     }
     cb(null, path.join(__dirname, `../public/uploads/${folder}`)); // Guarda en /backend/uploads
   },
@@ -37,5 +39,6 @@ const upload = multer({ storage: guardar, fileFilter });
 module.exports ={
   uploadSingle: upload.single('imagen'),      // Para una sola imagen
   uploadMultiple: upload.array('imagen', 10), // Para varias imágenes con el mismo campo `imagen`
+  uploadProfile: upload.single('fotoPerfil'), // Para foto de perfil
   upload  
 };

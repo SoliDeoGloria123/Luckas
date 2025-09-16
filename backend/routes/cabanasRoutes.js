@@ -11,7 +11,10 @@ const {
 } = require('../controllers/cabanasController');
 const { authJwt, role } = require('../middlewares');
 
-// Middleware de autenticación para todas las rutas
+// Endpoint público para cabañas (sin autenticación)
+router.get('/publicas', obtenerCabanas);
+
+// Middleware de autenticación para el resto de rutas
 router.use(authJwt.verifyToken);
 
 // Rutas de consulta (todos los roles autenticados)

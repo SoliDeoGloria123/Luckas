@@ -51,6 +51,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['activo', 'inactivo'],
     default: 'activo'
+  },
+  // Campos para recuperación de contraseña
+  passwordResetToken: {
+    type: String,
+    select: false
+  },
+  passwordResetExpires: {
+    type: Date,
+    select: false
   }
 }, { timestamps: true });
 

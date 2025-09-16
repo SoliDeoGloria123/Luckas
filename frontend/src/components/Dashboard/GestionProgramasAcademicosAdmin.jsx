@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
-import {
-  Plus,
-  Edit,
-  Trash2,
+import { 
+  Plus, 
+  Edit, 
+  Trash2, 
   Search,
   GraduationCap,
   BookOpen,
@@ -63,9 +64,9 @@ const GestionProgramasAcademicosAdmin = () => {
         const cursosData = await cursosRes.json();
         const programasData = await programasRes.json();
 
+
         const cursosConTipo = (cursosData.data || []).map(curso => ({ ...curso, tipo: 'curso' }));
         const programasConTipo = (programasData.data || []).map(programa => ({ ...programa, tipo: 'programa-tecnico' }));
-
         setProgramas([...cursosConTipo, ...programasConTipo]);
       }
     } catch (error) {
@@ -196,10 +197,10 @@ const GestionProgramasAcademicosAdmin = () => {
 
   const programasFiltrados = programas.filter(programa => {
     const cumpleBusqueda = programa.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+
       programa.instructor?.toLowerCase().includes(filtros.busqueda.toLowerCase());
     const cumpleTipo = filtros.tipo === 'todos' || programa.tipo === filtros.tipo;
     const cumpleEstado = filtros.estado === 'todos' || programa.estado === filtros.estado;
-
     return cumpleBusqueda && cumpleTipo && cumpleEstado;
   });
 

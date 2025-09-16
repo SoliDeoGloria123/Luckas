@@ -1,14 +1,14 @@
-
 import { useState } from "react"
 import { authService } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
-import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import { mostrarAlerta } from '../utils/alertas';
+import ForgotPasswordModal from './ForgotPasswordModal';
 import "./Login.css"
 
 const Login = () => {
   const [correo, setcorreo] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [showForgotModal, setShowForgotModal] = useState(false);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -30,14 +30,12 @@ const Login = () => {
         navigate('/tesorero');
       } else if (data.user.role === 'seminarista') {
         navigate('/seminarista');
-      } else if (data.user.role === 'externo') {
-        // Para usuarios externos, redirigir al dashboard HTML estático
-        window.location.href = '/Externo/templates/dashboard.html';
+      } else if (data.user.role === 'externo' || data.user.role === 'external') {
+        navigate('/external');
       } else {
         navigate('/admin/users'); // Por defecto para otros roles
       }
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión');
       mostrarAlerta('Error', 'Credenciales incorrectas, por favor verifica tus datos.', 'error');
     }
   };
@@ -45,14 +43,16 @@ const Login = () => {
   const handleRegisterClick = () => {
     navigate('/signup/registro');
   };
-  const handleOlvidarrClick = () => {
-    navigate('/Olvidar-Contraseña');
+
+  const handleForgotPasswordSuccess = () => {
+    mostrarAlerta('Éxito', 'Contraseña actualizada correctamente. Puedes iniciar sesión ahora.', 'success');
   };
 
   return (
-    <div className="login-container">
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
-      {/* Lado Izquierdo - Información del Sistema */}
+    <>
+      <div className="login-container">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+        {/* Lado Izquierdo - Información del Sistema */}
       <div className="col-lg-6 login-left-side">
         <div className="login-info-content">
           {/* Logo */}
@@ -154,63 +154,71 @@ const Login = () => {
                 />
                 <button type="button"
                   className="btn btn-outline-secondary password-toggle"
-                  onClick={() => setShowPassword(!showPassword)} >
-                  <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+
+                  onClick={()=> setShowPassword(!showPassword)} >
+                    <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                  </button>
+                </div>
+              </div>
+
+              {/* Opciones */}
+              <div className="form-options">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="remember"
+                    name="remember"
+                  />
+                  <label className="form-check-label" htmlFor="remember">
+                    Recordarme
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  className="forgot-password-link"
+                  onClick={() => navigate('/Olvidar-Contraseña')}
+                >
+                  ¿Olvidaste tu contraseña?
                 </button>
               </div>
-            </div>
 
-            {/* Opciones */}
-            <div className="form-options">
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="remember"
-                  name="remember"
-                />
-                <label className="form-check-label" htmlFor="remember">
-                  Recordarme
-                </label>
+              {/* Botón de Login */}
+              <button type="submit" className="login-btn-login w-100">
+                <span>Iniciar Sesión</span>
+              </button>
+
+              {/* Divisor */}
+              <div className="divider">
+                <span>o continúa con</span>
               </div>
-              <button type="button" className="forgot-password-link" onClick={handleOlvidarrClick}>
-                ¿Olvidaste tu contraseña?
-              </button>
+              <div className="social-buttons">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary social-btn"
+                >
+                  <i className="fab fa-google me-2"></i>
+                  Google
+                </button>
+              </div>
+            </form>
+
+            {/* Footer */}
+            <div className="form-footer">
+              <p>
+                ¿No tienes una cuenta? <button className="register-link" onClick={handleRegisterClick}>Registrate</button>
+              </p>
             </div>
-
-            {/* Botón de Login */}
-            <button type="submit" className=" login-btn-login w-100" >
-              <span>Iniciar Sesión</span>
-
-            </button>
-
-            {/* Divisor */}
-            <div className="divider">
-              <span>o continúa con</span>
-            </div>
-            <div className="social-buttons">
-              <button
-                type="button"
-                className="btn btn-outline-secondary social-btn"
-              >
-                <i className="fab fa-google me-2"></i>
-                Google
-              </button>
-
-            </div>
-          </form>
-
-          {/* Footer */}
-          <div className="form-footer">
-            <p >
-              ¿No tienes una cuenta? <button className="register-link" onClick={handleRegisterClick} >Registrate</button>
-            </p>
           </div>
         </div>
       </div>
-
-    </div>
-  )
+      <ForgotPasswordModal 
+        isOpen={showForgotModal}
+        onClose={() => setShowForgotModal(false)}
+        onSuccess={handleForgotPasswordSuccess}
+      />
+    </>
+  );
 }
 
-export default Login
+export default Login;

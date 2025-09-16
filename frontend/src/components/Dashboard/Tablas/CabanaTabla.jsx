@@ -227,7 +227,6 @@ const CabanaTabla = ({cabanas, onEditar, onEliminar,onInsertar,nuevaCabana,setNu
                   </button>
                 </div>
               </div>
-
               {/* Contenido de la cabaña */}
               <div className="p-6 space-y-4">
                 <div>

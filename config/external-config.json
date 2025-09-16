@@ -1,0 +1,28 @@
+{
+  "external": {
+    "name": "Dashboard External",
+    "version": "1.0.0",
+    "description": "Dashboard para usuarios externos del Seminario Bautista",
+    "features": [
+      "Inscripción a cursos",
+      "Inscripción a eventos", 
+      "Aplicación para seminarista",
+      "Sistema de pagos",
+      "Dashboard moderno"
+    ],
+    "design": {
+      "theme": "dark",
+      "fonts": ["Figtree", "Instrument Serif"],
+      "colors": {
+        "primary": "#000000",
+        "secondary": "#ffffff", 
+        "accent": "#1b62fc"
+      }
+    },
+    "integrations": {
+      "payments": ["PSE", "Nequi"],
+      "email": "nodemailer",
+      "database": "MongoDB"
+    }
+  }
+}

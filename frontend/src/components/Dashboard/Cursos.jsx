@@ -31,6 +31,8 @@ const Cursos = () => {
     },
     modalidad: 'presencial',
     instructor: '',
+    imagen: '',
+    creditos: '',
     fechaInicio: '',
     fechaFin: '',
     horario: {
@@ -73,6 +75,10 @@ const Cursos = () => {
 
   const abrirModal = (curso = null) => {
     console.log('abrirModal llamado con:', curso);
+    setMostrarModal(true); // ¡Esta línea faltaba!
+    setMensajeError('');
+    setMensajeExito('');
+    
     if (curso) {
       setModoEdicion(true);
       setCursoSeleccionado(curso);
@@ -168,12 +174,18 @@ const Cursos = () => {
 
   const manejarEnvio = async (e) => {
     e.preventDefault();
+    setMensajeError('');
+    setMensajeExito('');
+    
+    console.log('📊 Datos del curso a enviar:', nuevoCurso);
+    
     try {
       if (modoEdicion) {
         await cursosService.actualizarCurso(cursoSeleccionado._id, nuevoCurso);
         setMensajeExito('Curso actualizado exitosamente');
       } else {
-        await cursosService.crearCurso(nuevoCurso);
+        const response = await cursosService.crearCurso(nuevoCurso);
+        console.log('✅ Respuesta del servidor:', response);
         setMensajeExito('Curso creado exitosamente');
       }
       cargarCursos();
@@ -182,6 +194,7 @@ const Cursos = () => {
         cerrarModal();
       }, 2000);
     } catch (error) {
+      console.error('❌ Error al guardar curso:', error);
       setMensajeError(error.message || 'Error al guardar el curso');
     }
   };
