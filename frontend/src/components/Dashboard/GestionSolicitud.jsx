@@ -5,12 +5,16 @@ import TablaUnificadaSolicitudes from "./Tablas/SolicitudTabla";
 import SolicitudModal from "./Modales/SolicitudModal";
 import useBusqueda from "./Busqueda/useBusqueda";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import Sidebar from './Sidebar/Sidebar';
+import Header from './Sidebar/Header';
 
 
 
 const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, modoTesorero = false, userRole, readOnly = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [sidebarAbierto, setSidebarAbierto] = useState(true);
+  const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [modoEdicionSolicitud, setModoEdicionSolicitud] = useState(false);
   const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
   const {
@@ -146,53 +150,29 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
   };
 
   return (
-    <div className="seccion-usuarios">
-      <div className="page-header-Academicos">
-        <div className="page-title-admin">
-          <h1>Gestión de Solicitudes</h1>
-          <p>Administra las cuentas de usuario del sistema</p>
-        </div>
-        <button className="btn-admin btn-primary-admin" onClick={abrirModalCrearSolicitud}>
-          + Nuevo Solicitud
-        </button>
-      </div>
-      <div className="stats-grid-admin">
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin users">
-            <i className="fas fa-users"></i>
+    <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+      <Sidebar
+        sidebarAbierto={sidebarAbierto}
+        setSidebarAbierto={setSidebarAbierto}
+        seccionActiva={seccionActiva}
+        setSeccionActiva={setSeccionActiva}
+      />
+      <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
+        <Header
+          sidebarAbierto={sidebarAbierto}
+          setSidebarAbierto={setSidebarAbierto}
+          seccionActiva={seccionActiva}
+        />
+        <div className="seccion-usuarios">
+          <div className="page-header-Academicos">
+            <div className="page-title-admin">
+              <h1>Gestión de Solicitudes</h1>
+              <p>Administra las cuentas de usuario del sistema</p>
+            </div>
+            <button className="btn-admin btn-primary-admin" onClick={abrirModalCrearSolicitud}>
+              + Nuevo Solicitud
+            </button>
           </div>
-<<<<<<< Updated upstream
-          <div className="stat-info-admin">
-            <h3>5</h3>
-            <p>Total Usuarios</p>
-          </div>
-        </div>
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin active">
-            <i className="fas fa-user-check"></i>
-          </div>
-          <div className="stat-info-admin">
-            <h3>4</h3>
-            <p>Usuarios Activos</p>
-          </div>
-        </div>
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin admins">
-            <i className="fas fa-user-shield"></i>
-          </div>
-          <div className="stat-info-admin">
-            <h3>1</h3>
-            <p>Administradores</p>
-          </div>
-        </div>
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin new">
-            <i className="fas fa-user-plus"></i>
-          </div>
-          <div className="stat-info-admin">
-            <h3>12</h3>
-            <p>Nuevos Este Mes</p>
-=======
           <div className="dashboard-grid-reporte-admin">
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin users">
@@ -230,54 +210,53 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
                 <p>Nuevos Este Mes</p>
               </div>
             </div>
->>>>>>> Stashed changes
           </div>
-        </div>
-      </div>
-      <section className="filtros-section-admin">
-        <div className="busqueda-contenedor">
-          <i class="fas fa-search"></i>
-          <input
-            type="text"
-            placeholder="Buscar Solicitud..."
-            value={busquedaSolicitudes}
-            onChange={e => setBusquedaSolicitudes(e.target.value)}
-            className="input-busqueda"
-            style={{ marginLeft: 10, width: 300 }}
+          <section className="filtros-section-admin">
+            <div className="busqueda-contenedor">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                placeholder="Buscar Solicitud..."
+                value={busquedaSolicitudes}
+                onChange={e => setBusquedaSolicitudes(e.target.value)}
+                className="input-busqueda"
+                style={{ marginLeft: 10, width: 300 }}
+              />
+            </div>
+            <div className="filtro-grupo-admin">
+              <select className="filtro-dropdown">
+                <option>Todos los Roles</option>
+                <option>Administrador</option>
+                <option>Seminarista</option>
+                <option>Tesorero</option>
+                <option>Usuario Externo</option>
+              </select>
+              <select className="filtro-dropdown">
+                <option>Todos los Estados</option>
+                <option>Activo</option>
+                <option>Inactivo</option>
+                <option>Pendiente</option>
+              </select>
+            </div>
+          </section>
+          <TablaUnificadaSolicitudes
+            datosUnificados={{ solicitudes: solicitudesFiltradas, inscripciones: [], reservas: [] }}
+            abrirModalEditarSolicitud={(canEdit && !readOnly) ? abrirModalEditarSolicitud : null}
+            eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
+          />
+          <SolicitudModal
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicionSolicitud}
+            solicitudSeleccionada={solicitudSeleccionada}
+            setSolicitudSeleccionada={setSolicitudSeleccionada}
+            nuevaSolicitud={nuevaSolicitud}
+            setNuevaSolicitud={setNuevaSolicitud}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicionSolicitud ? actualizarSolicitud : crearSolicitud}
+            categorias={categorias}
           />
         </div>
-        <div className="filtro-grupo-admin">
-          <select className="filtro-dropdown">
-            <option>Todos los Roles</option>
-            <option>Administrador</option>
-            <option>Seminarista</option>
-            <option>Tesorero</option>
-            <option>Usuario Externo</option>
-          </select>
-          <select className="filtro-dropdown">
-            <option>Todos los Estados</option>
-            <option>Activo</option>
-            <option>Inactivo</option>
-            <option>Pendiente</option>
-          </select>
-        </div>
-      </section>
-       <TablaUnificadaSolicitudes
-          datosUnificados={{ solicitudes: solicitudesFiltradas, inscripciones: [], reservas: [] }}
-          abrirModalEditarSolicitud={(canEdit && !readOnly) ? abrirModalEditarSolicitud : null}
-          eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
-        />
-      <SolicitudModal
-        mostrar={mostrarModal}
-        modoEdicion={modoEdicionSolicitud}
-        solicitudSeleccionada={solicitudSeleccionada}
-        setSolicitudSeleccionada={setSolicitudSeleccionada}
-        nuevaSolicitud={nuevaSolicitud}
-        setNuevaSolicitud={setNuevaSolicitud}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicionSolicitud ? actualizarSolicitud : crearSolicitud}
-        categorias={categorias}
-      />
+      </div>
     </div>
   );
 };

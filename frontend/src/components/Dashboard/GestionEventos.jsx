@@ -4,12 +4,24 @@ import { categorizacionService } from "../../services/categorizacionService";
 import TablaEventos from "./Tablas/EventoTabla";
 import EventoModal from "./Modales/EventoModal";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import Sidebar from './Sidebar/Sidebar';
+import Header from './Sidebar/Header';
+
+import {
+  Plus,
+  Search,
+
+} from 'lucide-react';
 
 const GestionEventos = () => {
   const [eventos, setEventos] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
+  const [filtros, setFiltros] = useState({ busqueda: '', tipo: 'todos', estado: 'todos' });
+  const [cargando, setCargando] = useState(false);
+  const [sidebarAbierto, setSidebarAbierto] = useState(true);
+  const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [nuevoEvento, setNuevoEvento] = useState({
     nombre: "",
     descripcion: "",
@@ -163,54 +175,46 @@ const GestionEventos = () => {
     setMostrarModal(true);
   };
 
+  const eventosFiltrados = eventos.filter(evento => {
+    const cumpleBusqueda = evento.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+      evento.ubicacion?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+      evento.coordinador?.toLowerCase().includes(filtros.busqueda.toLowerCase());
+    const cumpleTipo = filtros.tipo === 'todos' || evento.tipo === filtros.tipo;
+    const cumpleEstado = filtros.estado === 'todos' || evento.estado === filtros.estado;
+
+    return cumpleBusqueda && cumpleTipo && cumpleEstado;
+  });
+
+
   return (
-    <div className="seccion-usuarios">
-      <div className="page-header-Academicos">
-        <div className="page-title-admin">
-          <h1>Gestión de Eventos</h1>
-          <p>Administra las cuentas de usuario del sistema</p>
-        </div>
-        <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
-          + Nuevo Evento
-        </button>
-      </div>
-      <div className="stats-grid-admin">
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin users">
-            <i className="fas fa-users"></i>
+    <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+      <Sidebar
+        sidebarAbierto={sidebarAbierto}
+        setSidebarAbierto={setSidebarAbierto}
+        seccionActiva={seccionActiva}
+        setSeccionActiva={setSeccionActiva}
+      />
+      <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
+        <Header
+          sidebarAbierto={sidebarAbierto}
+          setSidebarAbierto={setSidebarAbierto}
+          seccionActiva={seccionActiva}
+        />
+        <div className="space-y-7 fade-in-up p-9">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800">Gestión de Eventos</h1>
+              <p className="text-slate-600">Administra campamentos, retiros y actividades del seminario</p>
+            </div>
+            <button
+              onClick={abrirModalCrear}
+              className="btn-premium flex items-center space-x-2 px-4 py-2 text-white rounded-xl font-medium shadow-lg"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Nuevo Evento</span>
+            </button>
           </div>
-<<<<<<< Updated upstream
-          <div className="stat-info-admin">
-            <h3>5</h3>
-            <p>Total Usuarios</p>
-          </div>
-        </div>
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin active">
-            <i className="fas fa-user-check"></i>
-          </div>
-          <div className="stat-info-admin">
-            <h3>4</h3>
-            <p>Usuarios Activos</p>
-          </div>
-        </div>
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin admins">
-            <i className="fas fa-user-shield"></i>
-          </div>
-          <div className="stat-info-admin">
-            <h3>1</h3>
-            <p>Administradores</p>
-          </div>
-        </div>
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin new">
-            <i className="fas fa-user-plus"></i>
-          </div>
-          <div className="stat-info-admin">
-            <h3>12</h3>
-            <p>Nuevos Este Mes</p>
-=======
           <div className="dashboard-grid-reporte-admin">
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin users">
@@ -291,70 +295,46 @@ const GestionEventos = () => {
                 <span className="font-medium">{eventosFiltrados.length}</span> evento(s) encontrado(s)
               </div>
             </div>
->>>>>>> Stashed changes
           </div>
-        </div>
-      </div>
-      <section className="filtros-section-admin">
-        <div className="busqueda-contenedor">
-          <i class="fas fa-search"></i>
-          <input
-            type="text"
-            placeholder="Buscar Eventos..."
-            // value={busqueda}
-            //onChange={(e) => setBusqueda(e.target.value)}
-            className="input-busqueda"
+
+          {/* Lista de Eventos */}
+
+          {modalImagen.abierto && (
+            <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
+              <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
+                <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
+                <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
+                <img
+                  src={`http://localhost:3000/uploads/eventos/${modalImagen.imagenes[modalImagen.actual]}`}
+                  alt="Imagen del evento"
+                  className="imagen-modal"
+                />
+                <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+              </div>
+            </div>
+          )}
+
+          <TablaEventos
+            eventos={eventos}
+            cargando={cargando}
+            onEditar={abrirModalEditar}
+            onEliminar={eliminarEvento}
+            onVerImagen={handleVerImagenes}
+            eventosFiltrados={eventosFiltrados}
+          />
+          <EventoModal
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            eventoSeleccionado={eventoSeleccionado}
+            setEventoSeleccionado={setEventoSeleccionado}
+            nuevoEvento={nuevoEvento}
+            setNuevoEvento={setNuevoEvento}
+            categorias={categorias}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarEvento : crearEvento}
           />
         </div>
-        <div className="filtro-grupo-admin">
-          <select className="filtro-dropdown">
-            <option>Todos los Roles</option>
-            <option>Administrador</option>
-            <option>Seminarista</option>
-            <option>Tesorero</option>
-            <option>Usuario Externo</option>
-          </select>
-          <select className="filtro-dropdown">
-            <option>Todos los Estados</option>
-            <option>Activo</option>
-            <option>Inactivo</option>
-            <option>Pendiente</option>
-          </select>
-        </div>
-
-
-        {modalImagen.abierto && (
-          <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
-            <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
-              <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
-              <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
-              <img
-                src={`http://localhost:3000/uploads/eventos/${modalImagen.imagenes[modalImagen.actual]}`}
-                alt="Imagen del evento"
-                className="imagen-modal"
-              />
-              <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
-            </div>
-          </div>
-        )}
-      </section>
-      <TablaEventos
-        eventos={eventos}
-        onEditar={abrirModalEditar}
-        onEliminar={eliminarEvento}
-        onVerImagen={handleVerImagenes}
-      />
-      <EventoModal
-        mostrar={mostrarModal}
-        modoEdicion={modoEdicion}
-        eventoSeleccionado={eventoSeleccionado}
-        setEventoSeleccionado={setEventoSeleccionado}
-        nuevoEvento={nuevoEvento}
-        setNuevoEvento={setNuevoEvento}
-        categorias={categorias}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicion ? actualizarEvento : crearEvento}
-      />
+      </div>
     </div>
   );
 };

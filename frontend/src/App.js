@@ -5,8 +5,6 @@ import Login from './components/Login/Login';
 import Registro from './components/signup/registro';
 import OlvidoPassw from './components/forget password/olvidarPassword';
 import DashboardAdmin from "./components/Dashboard/DashboardAdmin";
-<<<<<<< Updated upstream
-=======
 import Dashboarduser from "./components/Dashboard/GestionUsuario";
 import GestionAcategorizacion from "./components/Dashboard/GestionCategorizacion";
 import GestionAprogramas from "./components/Dashboard/ProgramasAcademicos";
@@ -19,7 +17,6 @@ import GestionAcabanas from "./components/Dashboard/GestioCabañas";
 import GestionAreservas from "./components/Dashboard/GestionReservas";
 import GestionAreportes from "./components/Dashboard/Reportes";
 import MiPerfil from "./components/Dashboard/Perfil";
->>>>>>> Stashed changes
 import DashboardTesorero from "./components/Tesorero/DashboardTesorero";
 import GestionTusuarios from "./components/Tesorero/Tablas/Gestionusuarios";
 import GestionTcategorias from "./components/Tesorero/Tablas/Gestioncategorizar";
@@ -66,9 +63,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup/registro" element={<Registro />}/>
         <Route path="/Olvidar-Contraseña" element={<OlvidoPassw />}/>
-<<<<<<< Updated upstream
-        <Route path="/admin/users" element={<DashboardAdmin />}/>
-=======
         {/* Rutas para Admin */}
         <Route path="/admin/Dashboard" element={<DashboardAdmin />}/>
         <Route path="/admin/usuarios" element={<Dashboarduser />}/>
@@ -84,7 +78,6 @@ function App() {
         <Route path="/admin/reportes" element={<GestionAreportes />}/>
         <Route path="/admin/perfil" element={<MiPerfil/>} />
         {/* Rutas para Tesorero */}
->>>>>>> Stashed changes
         <Route path="/tesorero" element={<DashboardTesorero />}/>
         <Route path="/tesorero/usuarios" element={<GestionTusuarios />}/>
         <Route path="/tesorero/categorias" element={<GestionTcategorias />}/>
@@ -97,6 +90,7 @@ function App() {
         <Route path="/tesorero/inscripcion" element={<GestionTinscripcion/>}/>
         <Route path="/tesorero/reportes" element={<GestionTreportes/>}/>
         <Route path='/tesorero-Gestiones' element={<GestionTesorero/>}/>
+        {/* Rutas para Seminarista */}
         <Route path="/seminarista" element={<DashboardSeminarista />} />
         <Route path="/dashboard/seminarista/eventos" element={<EventosNavegables />} />
         <Route path="/dashboard/seminarista/cabanas" element={<CabanasNavegables />} />

@@ -4,12 +4,16 @@ import { userService } from "../../services/userService";
 import { cabanaService } from "../../services/cabanaService";
 import TablaReservas from "./Tablas/ReservaTabla";
 import ReservasModal from "./Modales/ReservaModal";
+import Sidebar from './Sidebar/Sidebar';
+import Header from './Sidebar/Header';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 
 const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [reservas, setReservas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [cabanas, setCabanas] = useState([]);
+  const [sidebarAbierto, setSidebarAbierto] = useState(true);
+  const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [busqueda, setBusqueda] = useState("");
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -154,67 +158,6 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   });
 
   return (
-<<<<<<< Updated upstream
-    <div className="seccion-usuarios">
-      <div className="page-header-Academicos">
-        <div className="page-title-admin">
-          <h1>Gestión de Reservas</h1>
-          <p>Administra las cuentas de usuario del sistema</p>
-        </div>
-        {canCreate && !readOnly && (
-          <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
-            + Nueva Reserva
-          </button>
-        )}
-      </div>
-        <div className="stats-grid-admin">
-                <div className="stat-card-admin">
-                  <div className="stat-icon-admin users">
-                    <i className="fas fa-users"></i>
-                  </div>
-                  <div className="stat-info-admin">
-                    <h3>5</h3>
-                    <p>Total Usuarios</p>
-                  </div>
-                </div>
-                <div className="stat-card-admin">
-                  <div className="stat-icon-admin active">
-                    <i className="fas fa-user-check"></i>
-                  </div>
-                  <div className="stat-info-admin">
-                    <h3>4</h3>
-                    <p>Usuarios Activos</p>
-                  </div>
-                </div>
-                <div className="stat-card-admin">
-                  <div className="stat-icon-admin admins">
-                    <i className="fas fa-user-shield"></i>
-                  </div>
-                  <div className="stat-info-admin">
-                    <h3>1</h3>
-                    <p>Administradores</p>
-                  </div>
-                </div>
-                <div className="stat-card-admin">
-                  <div className="stat-icon-admin new">
-                    <i className="fas fa-user-plus"></i>
-                  </div>
-                  <div className="stat-info-admin">
-                    <h3>12</h3>
-                    <p>Nuevos Este Mes</p>
-                  </div>
-                </div>
-              </div>
-      <section className="filtros-section-admin">
-        <div className="busqueda-contenedor">
-          <i class="fas fa-search"></i>
-          <input
-            type="text"
-            placeholder="Buscar Reserva..."
-            value={busqueda}
-            onChange={e => setBusqueda(e.target.value)}
-            className="input-busqueda"
-=======
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
       <Sidebar
         sidebarAbierto={sidebarAbierto}
@@ -322,43 +265,9 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
             cabanas={cabanas}
             onClose={() => setMostrarModal(false)}
             onSubmit={modoEdicion ? actualizarReserva : crearReserva}
->>>>>>> Stashed changes
           />
         </div>
-        <div class="filtro-grupo-admin">
-          <select className="filtro-dropdown">
-            <option>Todos los Roles</option>
-            <option>Administrador</option>
-            <option>Seminarista</option>
-            <option>Tesorero</option>
-            <option>Usuario Externo</option>
-          </select>
-          <select className="filtro-dropdown">
-            <option>Todos los Estados</option>
-            <option>Activo</option>
-            <option>Inactivo</option>
-            <option>Pendiente</option>
-          </select>
-        </div>
-      </section>
-       {error && <div className="error-message">{error}</div>}
-        <TablaReservas
-          reservas={reservasFiltradas}
-          onEditar={canEdit && !readOnly ? abrirModalEditar : null}
-          onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarReserva : null}
-        />
-      <ReservasModal
-        mostrar={mostrarModal}
-        modoEdicion={modoEdicion}
-        reservaSeleccionada={reservaSeleccionada}
-        setReservaSeleccionada={setReservaSeleccionada}
-        nuevaReserva={nuevaReserva}
-        setNuevaReserva={setNuevaReserva}
-        usuarios={usuarios}
-        cabanas={cabanas}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicion ? actualizarReserva : crearReserva}
-      />
+      </div>
     </div>
   );
 };

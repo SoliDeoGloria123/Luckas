@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, {useState} from "react";
 
 
 const CabanaModal = ({
@@ -13,13 +13,85 @@ const CabanaModal = ({
   onSubmit,
   categorias
 }) => {
+    const [selectedImages, setSelectedImages] = useState([]);
+  const [progress, setProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+  function normalizeCategoria(categoria) {
+    if (!categoria) return '';
+    if (typeof categoria === 'object' && categoria._id) return String(categoria._id);
+    return String(categoria);
+  }
+
+
+  // Manejo de archivos seleccionados
+  const handleFileSelection = (files) => {
+    const validFiles = [];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+    Array.from(files).forEach(file => {
+      if (!allowedTypes.includes(file.type)) return;
+      if (file.size > maxSize) return;
+      validFiles.push(file);
+    });
+
+    if (validFiles.length > 0) {
+      uploadImages(validFiles);
+    }
+  };
+
+  // Simulación de carga de imágenes
+  const uploadImages = (files) => {
+    if (isUploading) return;
+    setIsUploading(true);
+    setProgress(0);
+
+    let uploadedCount = 0;
+    const totalFiles = files.length;
+
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = {
+          id: Date.now() + index,
+          file,
+          url: e.target.result,
+          name: file.name
+        };
+
+        setSelectedImages(prev => [...prev, imageData]);
+
+        uploadedCount++;
+        const progressValue = (uploadedCount / totalFiles) * 100;
+        setProgress(progressValue);
+
+        if (uploadedCount === totalFiles) {
+          setTimeout(() => {
+            setIsUploading(false);
+          }, 500);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (id) => {
+    setSelectedImages(prev => prev.filter(img => img.id !== id));
+  };
   if (!mostrar) return null;
 
   return (
-    <div className="modal-overlay-admin">
-      <div className="modal-admin">
-        <div className="modal-header-admin">
-          <h3>{modoEdicion ? "Editar Cabaña" : "Crear Nueva Cabaña"}</h3>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
+        <div
+          className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
+          style={{
+            background: 'linear-gradient(90deg, var(--color-blue-principal), var(--color-blue-oscuro))',
+            color: 'white'
+          }}
+        >
+          <h2>{modoEdicion ? "Editar Cabaña" : "Crear Nueva Cabaña"}</h2>
           <button className="modal-cerrar" onClick={onClose}>
             ✕
           </button>
@@ -119,7 +191,7 @@ const CabanaModal = ({
               </div>
             )}
           </div>
-          <div className="from-grid-admin">
+      
             <div className="form-grupo-admin">
               <label>Estado:</label>
               <select
@@ -153,16 +225,48 @@ const CabanaModal = ({
                   }
                 }}
               />
-
-
             </div>
-          </div>
-          <samll style={{ color: "#555", marginTop: "5px" }}>
+            <div className="form-group-tesorero full-width">
+              <label>Imagen</label>
+              <div className="image-upload-container">
+                <div className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    handleFileSelection(e.dataTransfer.files);
+                  }}>
+                  <div className="upload-content">
+                    <i className="fas fa-cloud-upload-alt upload-icon"></i>
+                    <h3>Arrastra y suelta tus imágenes aquí</h3>
+                    <p>o <span className="browse-text">haz clic para seleccionar</span></p>
+                    <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
+                  </div>
+                  <input type="file" id='imageInput' multiple accept="image/*" hidden onChange={(e) => handleFileSelection(e.target.files)} />
+                </div>
+
+
+                <div className="image-preview-grid" id="imagePreviewGrid">
+                  {selectedImages.map(img => (
+                    <div key={img.id} className="image-preview">
+                      <img src={img.url} alt={img.name} />
+                      <div className="image-overlay">
+                        <button type="button" className="remove-btn" onClick={() => removeImage(img.id)}>
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                </div>
+              </div>
+            </div>
+      
+          <small style={{ color: "#555", marginTop: "5px" }}>
             Puedes seleccionar varias imágenes manteniendo presionada la tecla Ctrl o Shift
-          </samll>
+          </small>
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" onClick={onClose}>
-                 <i class="fas fa-times"></i>
+              <i class="fas fa-times"></i>
               Cancelar
             </button>
             <button className="btn-admin btn-primary" onClick={onSubmit}>
