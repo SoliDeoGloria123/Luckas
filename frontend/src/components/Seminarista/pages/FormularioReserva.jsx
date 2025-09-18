@@ -1,12 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import './FormularioReserva.css';
+import { reservaService } from "../../../services/reservaService";
 
 const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [reservationData, setReservationData] = useState({});
+  const [reservationData, setReservationData] = useState({
+    usuario: "",
+    cabana: "",
+    nombreCompleto: "",
+    numeroDocumento: "",
+    correoElectronico: "",
+    telefono: "",
+    numeroPersonas: "",
+    propositoEstadia: "",
+    solicitudesEspeciales: "",
+    fechaInicio: "",
+    fechaFin: "",
+    estado: "Pendiente",
+    observaciones: "",
+    activo: true
+  });
   const [checkInMinDate, setCheckInMinDate] = useState('');
-  
+
+
 
 
   // Efecto para establecer la fecha mínima de check-in al cargar el componente
@@ -16,14 +33,14 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
   }, []);
 
 
-const closeReservationModal = () => {
-  if (onClose) onClose();
-};
+  const closeReservationModal = () => {
+    if (onClose) onClose();
+  };
 
   // Función para ir a un paso específico
   const goToStep = (stepNumber) => {
     setCurrentStep(stepNumber);
-    
+
     // Si es el paso 2, validar que tenemos los datos necesarios
     if (stepNumber === 2 && (!reservationData.checkInDate || !reservationData.checkOutDate)) {
       alert('Por favor completa los datos del paso 1 primero');
@@ -31,16 +48,58 @@ const closeReservationModal = () => {
     }
   };
 
+  const crearReserva = async () => {
+    try {
+      // Obtener usuario logueado desde localStorage como objeto
+      const usuarioLogueado = (() => {
+        try {
+          const usuarioStorage = localStorage.getItem('usuario');
+          return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+        } catch {
+          return null;
+        }
+      })();
+      const userId = usuarioLogueado?._id || usuarioLogueado?.id;
+      if (!userId) {
+        alert('No se encontró el usuario logueado. Inicia sesión nuevamente.');
+        return;
+      }
+      // Tomar la cabaña seleccionada
+      const cabanaId = cabana?._id || cabana?.id;
+      // Construir objeto reserva para la API
+      const reservaData = {
+        usuario: userId,
+        cabana: cabanaId,
+        nombreCompleto: reservationData.fullName || "",
+        numeroDocumento: reservationData.documentNumber || "",
+        correoElectronico: reservationData.email || "",
+        telefono: reservationData.phone || "",
+        numeroPersonas: reservationData.numberOfPeople || "",
+        propositoEstadia: reservationData.stayPurpose || "",
+        solicitudesEspeciales: reservationData.specialRequests || "",
+        fechaInicio: reservationData.checkInDate || "",
+        fechaFin: reservationData.checkOutDate || "",
+        estado: "Pendiente",
+        observaciones: "",
+        activo: true
+      };
+      await reservaService.create(reservaData);
+      if (onSucces) onSucces();
+    } catch (err) {
+      alert("Error al crear la reserva: " + err.message);
+    }
+  };
+
   // Función para manejar cambios en las fechas
   const handleDateChange = (e) => {
     const { id, value } = e.target;
     setReservationData(prev => ({ ...prev, [id]: value }));
-    
+
     // Si es el check-in, actualizar el mínimo del check-out
     if (id === 'checkInDate' && value) {
       const checkOutInput = document.getElementById('checkOutDate');
       checkOutInput.min = value;
-      
+
       // Si la fecha de check-out es anterior a la nueva fecha de check-in, limpiarla
       if (checkOutInput.value && checkOutInput.value <= value) {
         checkOutInput.value = '';
@@ -58,18 +117,18 @@ const closeReservationModal = () => {
   // Función para manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Validar fechas
     if (!reservationData.checkInDate || !reservationData.checkOutDate) {
       alert('Por favor selecciona las fechas de check-in y check-out');
       return;
     }
-    
+
     if (new Date(reservationData.checkOutDate) <= new Date(reservationData.checkInDate)) {
       alert('La fecha de check-out debe ser posterior a la fecha de check-in');
       return;
     }
-    
+
     // Avanzar al paso 2
     goToStep(2);
   };
@@ -77,8 +136,10 @@ const closeReservationModal = () => {
   // Función para procesar el pago
   const processPayment = (method) => {
     // Simular procesamiento de pago
-    setTimeout(() => {
+    setTimeout(async () => {
       goToStep(4);
+      // Cuando el pago simulado finaliza, crear la reserva
+      await crearReserva();
     }, 2000);
   };
 
@@ -164,8 +225,8 @@ const closeReservationModal = () => {
           <div className="progress-section-seminario-reserva">
             <h3 className="progress-title-seminario-reserva">Progreso de Reserva</h3>
             <div className="progress-bar-seminario-reserva">
-              <div 
-                className="progress-fill-seminario-reserva" 
+              <div
+                className="progress-fill-seminario-reserva"
                 style={{ width: `${progressPercentage}%` }}
               ></div>
             </div>
@@ -180,7 +241,7 @@ const closeReservationModal = () => {
                   <div className="step-description">Selecciona fechas y completa tus datos</div>
                 </div>
               </div>
-              
+
               {/* Paso 2 */}
               <div className={`step-seminario-reserva ${currentStep === 2 ? 'active' : currentStep > 2 ? 'completed' : ''}`} data-step="2">
                 <div className="step-icon-seminario-reserva">
@@ -191,7 +252,7 @@ const closeReservationModal = () => {
                   <div className="step-description">Verifica los detalles de tu reserva</div>
                 </div>
               </div>
-              
+
               {/* Paso 3 */}
               <div className={`step-seminario-reserva ${currentStep === 3 ? 'active' : currentStep > 3 ? 'completed' : ''}`} data-step="3">
                 <div className="step-icon-seminario-reserva">
@@ -202,7 +263,7 @@ const closeReservationModal = () => {
                   <div className="step-description">Realiza el pago para confirmar tu reserva</div>
                 </div>
               </div>
-              
+
               {/* Paso 4 */}
               <div className={`step-seminario-reserva ${currentStep === 4 ? 'active' : ''}`} data-step="4">
                 <div className="step-icon-seminario-reserva">
@@ -224,16 +285,16 @@ const closeReservationModal = () => {
                 <h3 className="form-title-seminario-reserva">Paso 1: Detalles de Reserva</h3>
                 <p className="form-subtitle-seminario-reserva">Selecciona las fechas de tu estadía y completa tus datos personales</p>
               </div>
-              
+
               <form className="reservation-form-seminario" onSubmit={handleSubmit}>
                 <div className="form-row-reservation-seminario">
                   <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Fecha de Inicio </label>
                     <div className="date-input-container-seminario">
-                      <input 
-                        type="date" 
-                        className="form-input-reservation" 
-                        id="checkInDate" 
+                      <input
+                        type="date"
+                        className="form-input-reservation"
+                        id="checkInDate"
                         min={checkInMinDate}
                         value={reservationData.checkInDate || ''}
                         onChange={handleDateChange}
@@ -245,10 +306,10 @@ const closeReservationModal = () => {
                   <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Fecha de Fin </label>
                     <div className="date-input-container-seminario">
-                      <input 
-                        type="date" 
-                        className="form-input-reservation" 
-                        id="checkOutDate" 
+                      <input
+                        type="date"
+                        className="form-input-reservation"
+                        id="checkOutDate"
                         min={reservationData.checkInDate || ''}
                         value={reservationData.checkOutDate || ''}
                         onChange={handleDateChange}
@@ -262,10 +323,10 @@ const closeReservationModal = () => {
                 <div className="form-row-reservation-seminario">
                   <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Nombre Completo *</label>
-                    <input 
-                      type="text" 
-                      className="form-input-reservation" 
-                      id="fullName" 
+                    <input
+                      type="text"
+                      className="form-input-reservation"
+                      id="fullName"
                       value={reservationData.fullName || ''}
                       onChange={handleInputChange}
                       required
@@ -273,10 +334,10 @@ const closeReservationModal = () => {
                   </div>
                   <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Número de Documento</label>
-                    <input 
-                      type="text" 
-                      className="form-input-reservation" 
-                      id="documentNumber" 
+                    <input
+                      type="text"
+                      className="form-input-reservation"
+                      id="documentNumber"
                       value={reservationData.documentNumber || ''}
                       onChange={handleInputChange}
                       required
@@ -287,10 +348,10 @@ const closeReservationModal = () => {
                 <div className="form-row-reservation-seminario">
                   <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Correo Electrónico </label>
-                    <input 
-                      type="email" 
-                      className="form-input-reservation" 
-                      id="email" 
+                    <input
+                      type="email"
+                      className="form-input-reservation"
+                      id="email"
                       value={reservationData.email || ''}
                       onChange={handleInputChange}
                       required
@@ -298,10 +359,10 @@ const closeReservationModal = () => {
                   </div>
                   <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Teléfono *</label>
-                    <input 
-                      type="tel" 
-                      className="form-input-reservation" 
-                      id="phone" 
+                    <input
+                      type="tel"
+                      className="form-input-reservation"
+                      id="phone"
                       value={reservationData.phone || ''}
                       onChange={handleInputChange}
                       required
@@ -312,23 +373,23 @@ const closeReservationModal = () => {
                 <div className="form-row-reservation-seminario">
                   <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Número de Personas *</label>
-                    <input 
-                      type="number" 
-                      className="form-input-reservation" 
-                      id="numberOfPeople" 
+                    <input
+                      type="number"
+                      className="form-input-reservation"
+                      id="numberOfPeople"
                       value={reservationData.numberOfPeople || 1}
-                      min="1" 
-                      max="6" 
+                      min="1"
+                      max="6"
                       onChange={handleInputChange}
                       required
                     />
                   </div>
                   <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Propósito de la Estadía</label>
-                    <input 
-                      type="text" 
-                      className="form-input-reservation" 
-                      id="stayPurpose" 
+                    <input
+                      type="text"
+                      className="form-input-reservation"
+                      id="stayPurpose"
                       value={reservationData.stayPurpose || ''}
                       onChange={handleInputChange}
                       placeholder="Retiro espiritual, descanso, etc."
@@ -338,10 +399,10 @@ const closeReservationModal = () => {
 
                 <div className="form-group-reservation-seminario full-width">
                   <label className="form-label-reservation-seminario">Solicitudes Especiales</label>
-                  <textarea 
-                    className="form-textarea-reservation" 
-                    id="specialRequests" 
-                    rows="4" 
+                  <textarea
+                    className="form-textarea-reservation"
+                    id="specialRequests"
+                    rows="4"
                     value={reservationData.specialRequests || ''}
                     onChange={handleInputChange}
                     placeholder="Alguna solicitud especial o necesidad particular..."
@@ -382,7 +443,7 @@ const closeReservationModal = () => {
                     <span>Huéspedes:</span>
                     <span>{reservationData.numberOfPeople || 1} personas</span>
                   </div>
-                  
+
                   <h4 style={{ marginTop: '24px' }}>Datos del Huésped</h4>
                   <div className="review-item-seminario-reserva">
                     <span>Nombre:</span>
@@ -401,7 +462,7 @@ const closeReservationModal = () => {
                     <span>{reservationData.documentNumber || '-'}</span>
                   </div>
                 </div>
-                
+
                 <div className="review-section-seminario-reserva">
                   <h4>Resumen de Costos</h4>
                   <div className="review-item-seminario-reserva">
@@ -479,7 +540,7 @@ const closeReservationModal = () => {
                 <p className="success-description-seminario-reserva">
                   Tu reserva en "Cabaña del Bosque" ha sido confirmada exitosamente.
                 </p>
-                
+
                 <div className="confirmation-details-seminario-reserva">
                   <h4>Detalles de tu Reserva</h4>
                   <div className="confirmation-grid-seminario-reserva">
@@ -513,7 +574,7 @@ const closeReservationModal = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="success-actions-seminario-reserva">
                   <button className="download-button-seminario-reserva">
                     <i className="fas fa-download"></i>

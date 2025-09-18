@@ -12,10 +12,11 @@ import {
   faMapMarkerAlt,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
+import { reservaService } from '../../../services/reservaService';
 
-const MisInscripciones = () => {
+const MisReservas = () => {
   // Estados
-  const [inscripciones, setInscripciones] = useState([]);
+  const [reservas, setReservas] = useState([]);
   const [activeFilter, setActiveFilter] = useState('Todas');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentInscripcion, setCurrentInscripcion] = useState(null);
@@ -25,48 +26,28 @@ const MisInscripciones = () => {
     canceladas: 0,
     total: 0
   });
+  const usuarioLogueado = (() => {
+  try {
+    const usuarioStorage = localStorage.getItem('usuario');
+    return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+  } catch {
+    return null;
+  }
+})();
+const userId = usuarioLogueado?._id || usuarioLogueado?.id;
 
-  // Datos de ejemplo (simulando API)
   useEffect(() => {
-    const mockData = [
-      {
-        id: 1,
-        titulo: "Retiro Espiritual en Montaña",
-        imagen: "https://images.ctfassets.net/denf86kkcx7r/4IPlg4Qazd4sFRuCUHIJ1T/f6c71da7eec727babcd554d843a528b8/gatocomuneuropeo-97?fm=webp&w=612",
-        fecha: "2023-11-15",
-        horario: "8:00 AM - 5:00 PM",
-        ubicacion: "Centro de Retiros La Paz, Antioquia",
-        estado: "Confirmada",
-        fechaInscripcion: "2023-10-10",
-        precio: "$120,000 COP"
-      },
-      {
-        id: 2,
-        titulo: "Taller de Meditación",
-        imagen: "/placeholder.svg",
-        fecha: "2023-12-05",
-        horario: "9:00 AM - 12:00 PM",
-        ubicacion: "Centro Cultural de la Ciudad",
-        estado: "Pendiente",
-        fechaInscripcion: "2023-11-20",
-        precio: "$80,000 COP"
-      },
-      {
-        id: 3,
-        titulo: "Conferencia de Mindfulness",
-        imagen: "/placeholder.svg",
-        fecha: "2023-10-28",
-        horario: "3:00 PM - 6:00 PM",
-        ubicacion: "Auditorio Principal",
-        estado: "Cancelada",
-        fechaInscripcion: "2023-09-15",
-        precio: "$50,000 COP"
-      }
-    ];
-
-    setInscripciones(mockData);
-    updateStats(mockData);
-  }, []);
+    if (!userId) return;
+    reservaService.getReservasPorUsuario(userId)
+      .then(data => {
+        // Si la respuesta viene como {success, data}, usa data
+        const reservasData = Array.isArray(data) ? data : data.data;
+        setReservas(reservasData);
+      })
+      .catch(err => {
+        console.error('Error al obtener reservas:', err);
+      });
+  }, [userId]);
 
   // Actualizar estadísticas
   const updateStats = (data) => {
@@ -84,8 +65,8 @@ const MisInscripciones = () => {
   };
 
   // Abrir modal
-  const openModal = (inscripcion) => {
-    setCurrentInscripcion(inscripcion);
+  const openModal = (reserva) => {
+    setCurrentInscripcion(reserva);
     setIsModalOpen(true);
   };
 
@@ -100,10 +81,10 @@ const MisInscripciones = () => {
     closeModal();
   };
 
-  // Inscripciones filtradas
-  const filteredInscripciones = activeFilter === 'Todas'
-    ? inscripciones
-    : inscripciones.filter(i => i.estado === activeFilter);
+  // Reservas filtradas
+   const filteredReservas = activeFilter === 'Todas'
+    ? reservas
+    : reservas.filter(r => r.estado === activeFilter);
   return (
 
     <main className="main-content-seminario-inscripciones">
@@ -191,47 +172,47 @@ const MisInscripciones = () => {
         </div>
 
         {/* Lista de inscripciones */}
-        {filteredInscripciones.map((inscripcion) => (
+        {filteredReservas.map((reserva) => (
           <div className="inscripciones-container-misinscripciones">
-            <div className="inscripcion-card-misinscripciones" key={inscripcion.id}>
+            <div className="inscripcion-card-misinscripciones" key={reserva.id}>
               <div className="inscripcion-content-misinscripciones">
                 <img src="https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg" className="inscripcion-image-misinscripciones"></img>
                 <div className="inscripcion-body-misinscripciones">
                   <div className="header-misinscripciones">
                     <div className="inscripcion-title-section-misinscripciones">
                       <div className="inscripcion-title-row-misinscripciones">
-                        <h3 className="inscripcion-title-misinscripciones">{inscripcion.titulo}</h3>
-                        <span className={`status-badge-misinscripciones ${inscripcion.estado.toLowerCase()}`}>{inscripcion.estado}</span>
+                        <h3 className="inscripcion-title-misinscripciones">{reserva.cabana?.nombre || 'Cabaña'}</h3>
+                        <span className={`status-badge-misinscripciones ${reserva.estado.toLowerCase()}`}>{reserva.estado}</span>
                       </div>
                       {/* Si tienes categoría, puedes mostrarla aquí */}
                       {/* <span className={`categoria-badge ${inscripcion.categoria?.toLowerCase()}`}>{inscripcion.categoria}</span> */}
                     </div>
                     <div className="inscripcion-price-section-misinscripciones">
-                      <div className="inscripcion-price-misinscripciones">{inscripcion.precio}</div>
-                      <div className="inscripcion-date-misinscripciones">Inscrito: {inscripcion.fechaInscripcion}</div>
+                      <div className="inscripcion-price-misinscripciones">{reserva.precio}</div>
+                      <div className="inscripcion-date-misinscripciones">Fecha de Reserva: {new Date(reserva.fechaInicio).toLocaleDateString()} - {new Date(reserva.fechaFin).toLocaleDateString()}</div>
                     </div>
                   </div>
                   <div className="inscripcion-details-misinscripciones">
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-calendar"></i>
-                      <span>{inscripcion.fecha}</span>
+                      <span>{reserva.fecha}</span>
                     </div>
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-clock"></i>
-                      <span>{inscripcion.horario}</span>
+                      <span>{reserva.horario}</span>
                     </div>
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-map-marker-alt"></i>
-                      <span>{inscripcion.ubicacion}</span>
+                      <span>{reserva.ubicacion}</span>
                     </div>
                   </div>
                   <div className="inscripcion-footer-misinscripciones">
                     <div className="status-info-misinscripciones">
-                      <i className={`fas status-icon-misinscripciones-${inscripcion.estado.toLowerCase()}`}></i>
-                      <span className="status-text-misinscripciones">{inscripcion.estado}</span>
+                      <i className={`fas status-icon-misinscripciones-${reserva.estado.toLowerCase()}`}></i>
+                      <span className="status-text-misinscripciones">{reserva.estado}</span>
                     </div>
                     <div className="inscripcion-actions-misinscripciones">
-                      <button className="btn-outline-misinscripciones" onClick={() => openModal(inscripcion)}>
+                      <button className="btn-outline-misinscripciones" onClick={() => openModal(reserva)}>
                         <i className="fas fa-eye"></i>
                         Ver Detalles
                       </button>
@@ -326,4 +307,4 @@ const MisInscripciones = () => {
   );
 };
 
-export default MisInscripciones;
+export default MisReservas;
