@@ -7,7 +7,6 @@ import {
     Calendar,
     Home,
     GraduationCap,
-    FileText,
     UserPlus,
     Mail,
     CheckSquare,
@@ -35,8 +34,6 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
             items: [
                 { id: "categorizacion", icon: Layers, label: "Categorización", color: "text-emerald-500" },
                 { id: "programas-academicos", icon: GraduationCap, label: "Programas Académicos", color: "text-blue-600" },
-                { id: "cursos", icon: BookOpen, label: "Cursos", color: "text-indigo-500" },
-                { id: "programas-tecnicos", icon: FileText, label: "Prog. Técnicos", color: "text-violet-500" },
                 { id: "eventos", icon: CalendarIcon, label: "Eventos", color: "text-amber-500" },
             ]
         },
@@ -59,8 +56,9 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
     ];
     return (
         <>
+         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
             {/* Sidebar Premium con animaciones */}
-            <div className={`fixed left-0 top-0 h-full glass-card border-r shadow-2xl transition-all duration-300 z-30 ${sidebarAbierto ? 'w-72' : 'w-20'}`}> 
+            <div className={`fixed left-0 top-0 h-full glass-card border-r shadow-2xl transition-all duration-300 z-30 ${sidebarAbierto ? 'w-72' : 'w-20'}`}>
                 {/* Logo con efecto shimmer */}
                 < div className="p-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
                     <div className="flex items-center space-x-3">
@@ -68,8 +66,8 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
                             <BookOpen className="w-6 h-6 text-white icon-bounce" />
                         </div>
                         {sidebarAbierto && (
-                            <div className="fade-in-up">
-                                <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Luckas</h1>
+                            <div className="fade-in-up ">
+                                <h1 className="luckas" >LUCKAS</h1>
                                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Admin Panel</p>
                             </div>
                         )}
@@ -95,13 +93,12 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
                                                 <button
                                                     onClick={() => {
                                                         setSeccionActiva(item.id);
-                                                        // Navegación para todos los ítems de gestión académica
-                                                        if (["Dashboard","usuarios", "categorizacion", "programas-academicos", "cursos","solicitudes","inscripcion","tareas","cabanas","reservas","reportes", "programas-tecnicos", "eventos"].includes(item.id)) {
+                                                        if (["dashboard", "usuarios", "categorizacion", "programas-academicos", "solicitudes", "inscripciones", "tareas", "cabanas", "reservas", "reportes", "eventos"].includes(item.id)) {
                                                             navigate(`/admin/${item.id}`);
                                                         }
                                                     }}
                                                     className={`sidebar-item w-full flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                                        ? 'active text-white shadow-lg'
+                                                        ? `active text-white shadow-lg ${item.color}`
                                                         : 'hover:bg-slate-100/80 dark:hover:bg-slate-700/80'
                                                         }`}
                                                     style={{
@@ -128,5 +125,5 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
         </>
     )
 };
-             
+
 export default Sidebar;

@@ -299,11 +299,13 @@
     transform: rotate(180deg);
 }
 
-
-
 .user-menu-container {
   position: relative;
   display: inline-block;
+}
+.user-info-seminario{
+    display: flex;
+    flex-direction: column;
 }
 
 .user-name-seminario {
@@ -311,7 +313,10 @@
     font-weight: 500;
     font-size: 0.9rem;
 }
-
+.user-role-seminario {
+    font-size: 0.75rem;
+    color: #64748b;
+}
 
 
 .user-dropdown-header {

@@ -16,6 +16,7 @@ import GestionAtareas from "./components/Dashboard/GestionTarea";
 import GestionAcabanas from "./components/Dashboard/GestioCabañas";
 import GestionAreservas from "./components/Dashboard/GestionReservas";
 import GestionAreportes from "./components/Dashboard/Reportes";
+import MiPerfil from "./components/Dashboard/Perfil";
 import DashboardTesorero from "./components/Tesorero/DashboardTesorero";
 import GestionTusuarios from "./components/Tesorero/Tablas/Gestionusuarios";
 import GestionTcategorias from "./components/Tesorero/Tablas/Gestioncategorizar";
@@ -45,7 +46,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Index to="/index" replace />} />
         <Route path="/external" element={<TailwindExternalDashboard />} />
         <Route path="/external/login" element={<Login />} />
         <Route path="/external/dashboard" element={<TailwindExternalDashboard />} />
@@ -64,11 +65,12 @@ function App() {
         <Route path="/admin/cursos" element={<GestionAcursos />}/>
         <Route path="/admin/eventos" element={<GestionAeventos />}/>
         <Route path="/admin/solicitudes" element={<GestionAsolicitud />}/>
-        <Route path="/admin/inscripcion" element={<GestionAinscripcion />}/>
+        <Route path="/admin/inscripciones" element={<GestionAinscripcion />}/>
         <Route path="/admin/tareas" element={<GestionAtareas />}/>
         <Route path="/admin/cabanas" element={<GestionAcabanas />}/>
         <Route path="/admin/reservas" element={<GestionAreservas />}/>
         <Route path="/admin/reportes" element={<GestionAreportes />}/>
+        <Route path="/admin/perfil" element={<MiPerfil/>} />
         {/* Rutas para Tesorero */}
         <Route path="/tesorero" element={<DashboardTesorero />}/>
         <Route path="/tesorero/usuarios" element={<GestionTusuarios />}/>

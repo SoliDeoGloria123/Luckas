@@ -135,6 +135,7 @@ const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, o
                       </span>
                     </div>
                   )}
+
                   {/* Servicios incluidos */}
                   <div className="flex flex-wrap gap-2">
                     {evento.incluyeAlojamiento && (
@@ -149,6 +150,7 @@ const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, o
                     )}
                   </div>
                 </div>
+
                 {/* Coordinador */}
                 {evento.coordinador && (
                   <div className="pt-3 border-t border-slate-200/50">

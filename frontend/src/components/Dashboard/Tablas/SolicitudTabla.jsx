@@ -94,9 +94,9 @@ const TablaUnificadaSolicitudes = ({
             </td>
             <td>
               <div className="acciones-botones">
-                <button className="btn-action editar" onClick={() => abrirModalEditarSolicitud(sol)}><i className="fas fa-edit"></i></button>
+                <button className="btn-action editar" onClick={() => abrirModalEditarSolicitud(sol)}><i class="fas fa-edit"></i></button>
                 {eliminarSolicitud && (
-                  <button className="btn-action eliminar" onClick={() => eliminarSolicitud(sol._id)}><i className="fas fa-trash"></i></button>
+                  <button className="btn-action eliminar" onClick={() => eliminarSolicitud(sol._id)}><i class="fas fa-trash"></i></button>
                 )}
               </div>
             </td>

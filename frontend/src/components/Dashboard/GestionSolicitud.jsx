@@ -173,9 +173,9 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
               + Nuevo Solicitud
             </button>
           </div>
-          <div className="stats-grid-admin">
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin users">
+          <div className="dashboard-grid-reporte-admin">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin users">
                 <i className="fas fa-users"></i>
               </div>
               <div className="stat-info-admin">
@@ -183,8 +183,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
                 <p>Total Usuarios</p>
               </div>
             </div>
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin active">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin active">
                 <i className="fas fa-user-check"></i>
               </div>
               <div className="stat-info-admin">
@@ -192,8 +192,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
                 <p>Usuarios Activos</p>
               </div>
             </div>
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin admins">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin admins">
                 <i className="fas fa-user-shield"></i>
               </div>
               <div className="stat-info-admin">
@@ -201,8 +201,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
                 <p>Administradores</p>
               </div>
             </div>
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin new">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin new">
                 <i className="fas fa-user-plus"></i>
               </div>
               <div className="stat-info-admin">

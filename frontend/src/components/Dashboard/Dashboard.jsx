@@ -158,7 +158,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
                   return (
                     <div
                       key={index}
-                      className={`stat-card glass-card ${stat.bgColor} rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up`}
+                      className={`stat-card-dashboard-admin glass-card ${stat.bgColor} rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up`}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       <div className="flex items-center justify-between mb-4">

@@ -46,9 +46,9 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
               <td>{ins.solicitud?._id || ins.solicitud || ""}</td>
               <td>
                 <div className="acciones-botones">
-                  <button className="btn-action editar" onClick={() => onEditar(ins)}><i className="fas fa-edit"></i></button>
+                  <button className="btn-action editar" onClick={() => onEditar(ins)}><i class="fas fa-edit"></i></button>
                   {onEliminar && (
-                    <button className="btn-action eliminar" onClick={() => onEliminar(ins._id)}><i className="fas fa-trash"></i></button>
+                    <button className="btn-action eliminar" onClick={() => onEliminar(ins._id)}><i class="fas fa-trash"></i></button>
                   )}
                 </div>
               </td>

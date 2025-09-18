@@ -53,11 +53,11 @@ const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => 
               <td>
                 <div className="acciones-botones">
                   <button className="btn-action editar" onClick={() => onEditar(tarea)}>
-                    <i className="fas fa-edit"></i>
+                    <i class="fas fa-edit"></i>
                   </button>
                   {onEliminar && (
                     <button className="btn-action eliminar" onClick={() => onEliminar(tarea._id)}>
-                      <i className="fas fa-trash"></i>
+                      <i class="fas fa-trash"></i>
                     </button>
                   )}
                 </div>

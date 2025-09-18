@@ -159,14 +159,14 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
-        <Sidebar
+      <Sidebar
         sidebarAbierto={sidebarAbierto}
         setSidebarAbierto={setSidebarAbierto}
         seccionActiva={seccionActiva}
         setSeccionActiva={setSeccionActiva}
       />
       <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
-       <Header
+        <Header
           sidebarAbierto={sidebarAbierto}
           setSidebarAbierto={setSidebarAbierto}
           seccionActiva={seccionActiva}
@@ -183,9 +183,9 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
               </button>
             )}
           </div>
-          <div className="stats-grid-admin">
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin users">
+          <div className="dashboard-grid-reporte-admin">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin users">
                 <i className="fas fa-users"></i>
               </div>
               <div className="stat-info-admin">
@@ -193,8 +193,8 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
                 <p>Total Usuarios</p>
               </div>
             </div>
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin active">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin active">
                 <i className="fas fa-user-check"></i>
               </div>
               <div className="stat-info-admin">
@@ -202,8 +202,8 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
                 <p>Usuarios Activos</p>
               </div>
             </div>
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin admins">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin admins">
                 <i className="fas fa-user-shield"></i>
               </div>
               <div className="stat-info-admin">
@@ -211,8 +211,8 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
                 <p>Administradores</p>
               </div>
             </div>
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin new">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin new">
                 <i className="fas fa-user-plus"></i>
               </div>
               <div className="stat-info-admin">

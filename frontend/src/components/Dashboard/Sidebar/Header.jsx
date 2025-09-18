@@ -1,12 +1,14 @@
 import React, { useState, useRef } from "react";
 import { Menu, Search, Sun, Moon, Bell } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
+import { useNavigate } from 'react-router-dom';
 
 
 
 const Header = ({sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard", onCerrarSesion: onCerrarSesionProp }) => {
   const { toggleTema, esTemaOscuro } = useTheme();
   const menuRef = useRef(null);
+  const navigate = useNavigate();
   const [mostrarMenu, setMostrarMenu] = useState(false);
   // Fallback para evitar error si no se pasa la función
   const safeSetSidebarAbierto = typeof setSidebarAbierto === 'function' ? setSidebarAbierto : () => {};
@@ -29,7 +31,9 @@ const Header = ({sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard",
       window.location.href = '/login';
     }
   };
-
+  const perfil = () => {
+    navigate('/admin/perfil');
+  };
 
   return (
     <>
@@ -107,7 +111,7 @@ const Header = ({sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard",
                   <button className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-100/80 transition-colors">
                     Configuración
                   </button>
-                  <button className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-100/80 transition-colors">
+                  <button className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-100/80 transition-colors" onClick={perfil}>
                     Perfil
                   </button>
                   <div className="border-t border-slate-200/50 my-1"></div>

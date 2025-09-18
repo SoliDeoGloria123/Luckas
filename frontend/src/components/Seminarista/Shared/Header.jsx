@@ -24,6 +24,16 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
     };
   }, [menuUsuarioAbierto]);
 
+
+  // Obtener usuario logueado desde localStorage
+  const usuarioLogueado = (() => {
+    try {
+      const usuarioStorage = localStorage.getItem('usuario');
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  })();
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -120,9 +130,11 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
             </button>
           </div>
           <div className="user-profile-seminario" onClick={toggleDropdown}>
-            <div className="user-avatar-seminario">S</div>
-            <span class="user-name-seminario">Seminarista</span>
-
+            <span className="user-avatar-seminario">S</span>
+            <div className="user-info-seminario">
+              <span className="user-name-seminario">{usuarioLogueado && usuarioLogueado.nombre ? usuarioLogueado.nombre : 'Usuario'}</span>
+              <span className="user-role-seminario">{usuarioLogueado?.role || "Rol"}</span>
+            </div>
             <div className={`user-dropdown-header ${showUserDropdown ? "show" : ""}`}>
               <a href="/dashboard/seminarista/Mi-Perfil" className="dropdown-item">
                 <span>Mi Perfil</span>

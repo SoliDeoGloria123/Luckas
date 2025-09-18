@@ -177,14 +177,14 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   };
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
-   <Sidebar
+      <Sidebar
         sidebarAbierto={sidebarAbierto}
         setSidebarAbierto={setSidebarAbierto}
         seccionActiva={seccionActiva}
         setSeccionActiva={setSeccionActiva}
       />
       <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
-    <Header
+        <Header
           sidebarAbierto={sidebarAbierto}
           setSidebarAbierto={setSidebarAbierto}
           seccionActiva={seccionActiva}
@@ -203,9 +203,9 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
               <span>Nueva Cabaña</span>
             </button>
           </div>
-          <div className="stats-grid-admin">
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin users">
+          <div className="dashboard-grid-reporte-admin">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin users">
                 <i className="fas fa-users"></i>
               </div>
               <div className="stat-info-admin">
@@ -213,8 +213,8 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
                 <p>Total Usuarios</p>
               </div>
             </div>
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin active">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin active">
                 <i className="fas fa-user-check"></i>
               </div>
               <div className="stat-info-admin">
@@ -222,8 +222,8 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
                 <p>Usuarios Activos</p>
               </div>
             </div>
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin admins">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin admins">
                 <i className="fas fa-user-shield"></i>
               </div>
               <div className="stat-info-admin">
@@ -231,8 +231,8 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
                 <p>Administradores</p>
               </div>
             </div>
-            <div className="stat-card-admin">
-              <div className="stat-icon-admin new">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin new">
                 <i className="fas fa-user-plus"></i>
               </div>
               <div className="stat-info-admin">
@@ -241,21 +241,21 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
               </div>
             </div>
           </div>
-       
+
           {modalImagen.abierto && (
-              <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
-                <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
-                  <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
-                  <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
-                  <img
-                    src={`http://localhost:3000/uploads/cabanas/${modalImagen.imagenes[modalImagen.actual]}`}
-                    alt="Imagen de la cabaña"
-                    className="imagen-modal"
-                  />
-                  <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
-                </div>
+            <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
+              <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
+                <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
+                <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
+                <img
+                  src={`http://localhost:3000/uploads/cabanas/${modalImagen.imagenes[modalImagen.actual]}`}
+                  alt="Imagen de la cabaña"
+                  className="imagen-modal"
+                />
+                <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
               </div>
-            )}
+            </div>
+          )}
           {error && <div className="error-message">{error}</div>}
           <CabanaTabla
             cabanas={cabanasFiltradas}

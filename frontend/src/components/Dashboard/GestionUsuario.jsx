@@ -102,6 +102,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
     // Crear usuario
     const crearUsuario = async () => {
         try {
+             console.log("Datos enviados al backend:", nuevoUsuario); // <-- Agrega esto
             if (window.event) window.event.preventDefault();
             await userService.createUser(nuevoUsuario);
             mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
@@ -178,12 +179,6 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
         } catch (error) {
             mostrarAlerta("Error", `No se pudo eliminar el usuario: ${error.message}`);
         }
-    };
-    //para cerrar la sesion 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("usuario");
-        window.location.href = "/login";
     };
 
     // Abrir modal para crear usuario
@@ -316,6 +311,44 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                             + Nueva Usuario
                         </button>
                     </div>
+                    <div className="dashboard-grid-reporte-admin">
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin users">
+                                <i className="fas fa-users"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>5</h3>
+                                <p>Total Usuarios</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin active">
+                                <i className="fas fa-user-check"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>4</h3>
+                                <p>Usuarios Activos</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin admins">
+                                <i className="fas fa-user-shield"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>1</h3>
+                                <p>Administradores</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin new">
+                                <i className="fas fa-user-plus"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>12</h3>
+                                <p>Nuevos Este Mes</p>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Filters */}
                     <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
@@ -361,7 +394,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
 
                     {/* Modal */}
                     <UsuarioModal
-                        mostrar={mostrarModal && seccionActiva === "usuarios"}
+                        mostrar={mostrarModal}
                         modoEdicion={modoEdicion}
                         usuarioSeleccionado={usuarioSeleccionado}
                         setUsuarioSeleccionado={setUsuarioSeleccionado}
