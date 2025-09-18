@@ -259,6 +259,7 @@ const ProgramasAcademicos = () => {
                             <option value="diplomado">Diplomados</option>
                         </select>
                     </div>
+<<<<<<< Updated upstream
                     <div className="filtro-item-Academicos">
                         <label>Modalidad</label>
                         <select 
@@ -279,6 +280,86 @@ const ProgramasAcademicos = () => {
                             value={filtros.busqueda}
                             onChange={(e) => setFiltros({...filtros, busqueda: e.target.value})}
                         />
+=======
+                    
+                    <div className="dashboard-grid-reporte-admin">
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin users">
+                                <i className="fas fa-users"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>5</h3>
+                                <p>Total Usuarios</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin active">
+                                <i className="fas fa-user-check"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>4</h3>
+                                <p>Usuarios Activos</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin admins">
+                                <i className="fas fa-user-shield"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>1</h3>
+                                <p>Administradores</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin new">
+                                <i className="fas fa-user-plus"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>12</h3>
+                                <p>Nuevos Este Mes</p>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Filtros */}
+                    <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="relative">
+                                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar programas..."
+                                    value={filtros.busqueda}
+                                    onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
+                                    className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                />
+                            </div>
+
+                            <select
+                                value={filtros.tipo}
+                                onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
+                                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            >
+                                <option value="todos">Todos los tipos</option>
+                                <option value="curso">Cursos</option>
+                                <option value="programa-tecnico">Programas Técnicos</option>
+                            </select>
+
+                            <select
+                                value={filtros.estado}
+                                onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
+                                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            >
+                                <option value="todos">Todos los estados</option>
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                                <option value="borrador">Borrador</option>
+                            </select>
+
+                            <div className="text-sm text-slate-600 flex items-center">
+                                <span className="font-medium">{/*programasFiltrados.length*/}</span> programa(s) encontrado(s)
+                            </div>
+                        </div>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>

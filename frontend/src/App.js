@@ -5,6 +5,21 @@ import Login from './components/Login/Login';
 import Registro from './components/signup/registro';
 import OlvidoPassw from './components/forget password/olvidarPassword';
 import DashboardAdmin from "./components/Dashboard/DashboardAdmin";
+<<<<<<< Updated upstream
+=======
+import Dashboarduser from "./components/Dashboard/GestionUsuario";
+import GestionAcategorizacion from "./components/Dashboard/GestionCategorizacion";
+import GestionAprogramas from "./components/Dashboard/ProgramasAcademicos";
+import GestionAcursos from "./components/Dashboard/Cursos";
+import GestionAeventos from "./components/Dashboard/GestionEventos";
+import GestionAsolicitud from "./components/Dashboard/GestionSolicitud";
+import GestionAinscripcion from "./components/Dashboard/GestionIscripcion";
+import GestionAtareas from "./components/Dashboard/GestionTarea";
+import GestionAcabanas from "./components/Dashboard/GestioCabañas";
+import GestionAreservas from "./components/Dashboard/GestionReservas";
+import GestionAreportes from "./components/Dashboard/Reportes";
+import MiPerfil from "./components/Dashboard/Perfil";
+>>>>>>> Stashed changes
 import DashboardTesorero from "./components/Tesorero/DashboardTesorero";
 import GestionTusuarios from "./components/Tesorero/Tablas/Gestionusuarios";
 import GestionTcategorias from "./components/Tesorero/Tablas/Gestioncategorizar";
@@ -51,7 +66,25 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup/registro" element={<Registro />}/>
         <Route path="/Olvidar-Contraseña" element={<OlvidoPassw />}/>
+<<<<<<< Updated upstream
         <Route path="/admin/users" element={<DashboardAdmin />}/>
+=======
+        {/* Rutas para Admin */}
+        <Route path="/admin/Dashboard" element={<DashboardAdmin />}/>
+        <Route path="/admin/usuarios" element={<Dashboarduser />}/>
+        <Route path="/admin/categorizacion" element={<GestionAcategorizacion />}/>
+        <Route path="/admin/programas-academicos" element={<GestionAprogramas />}/>
+        <Route path="/admin/cursos" element={<GestionAcursos />}/>
+        <Route path="/admin/eventos" element={<GestionAeventos />}/>
+        <Route path="/admin/solicitudes" element={<GestionAsolicitud />}/>
+        <Route path="/admin/inscripciones" element={<GestionAinscripcion />}/>
+        <Route path="/admin/tareas" element={<GestionAtareas />}/>
+        <Route path="/admin/cabanas" element={<GestionAcabanas />}/>
+        <Route path="/admin/reservas" element={<GestionAreservas />}/>
+        <Route path="/admin/reportes" element={<GestionAreportes />}/>
+        <Route path="/admin/perfil" element={<MiPerfil/>} />
+        {/* Rutas para Tesorero */}
+>>>>>>> Stashed changes
         <Route path="/tesorero" element={<DashboardTesorero />}/>
         <Route path="/tesorero/usuarios" element={<GestionTusuarios />}/>
         <Route path="/tesorero/categorias" element={<GestionTcategorias />}/>

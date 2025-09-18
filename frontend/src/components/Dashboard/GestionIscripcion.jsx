@@ -5,11 +5,15 @@ import { categorizacionService } from "../../services/categorizacionService";
 import TablaInscripciones from "./Tablas/InscripcionTabla";
 import InscripcionModal from "./Modales/InscripsionModal";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import Sidebar from './Sidebar/Sidebar';
+import Header from './Sidebar/Header';
 
 const GestionIscripcion = () => {
   const [eventos, setEventos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [inscripciones, setInscripciones] = useState([]);
+  const [sidebarAbierto, setSidebarAbierto] = useState(true);
+  const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
@@ -158,102 +162,117 @@ const GestionIscripcion = () => {
   };
 
   return (
-    <div className="seccion-usuarios">
-      <div className="page-header-Academicos">
-        <div className="page-title-admin">
-          <h1>Gestión de Inscripciones</h1>
-          <p>Administra las cuentas de usuario del sistema</p>
-        </div>
-        <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
-          + Nueva Inscripción
-        </button>
-      </div>
+    <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+      <Sidebar
+        sidebarAbierto={sidebarAbierto}
+        setSidebarAbierto={setSidebarAbierto}
+        seccionActiva={seccionActiva}
+        setSeccionActiva={setSeccionActiva}
+      />
+      <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
+        <Header
+          sidebarAbierto={sidebarAbierto}
+          setSidebarAbierto={setSidebarAbierto}
+          seccionActiva={seccionActiva}
+        />
+        <div className="seccion-usuarios">
+          <div className="page-header-Academicos">
+            <div className="page-title-admin">
+              <h1>Gestión de Inscripciones</h1>
+              <p>Administra las cuentas de usuario del sistema</p>
+            </div>
+            <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
+              + Nueva Inscripción
+            </button>
+          </div>
 
-      <div className="stats-grid-admin">
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin users">
-            <i className="fas fa-users"></i>
+          <div className="dashboard-grid-reporte-admin">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin users">
+                <i className="fas fa-users"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>5</h3>
+                <p>Total Usuarios</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin active">
+                <i className="fas fa-user-check"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>4</h3>
+                <p>Usuarios Activos</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin admins">
+                <i className="fas fa-user-shield"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>1</h3>
+                <p>Administradores</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin new">
+                <i className="fas fa-user-plus"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>12</h3>
+                <p>Nuevos Este Mes</p>
+              </div>
+            </div>
           </div>
-          <div className="stat-info-admin">
-            <h3>5</h3>
-            <p>Total Usuarios</p>
-          </div>
-        </div>
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin active">
-            <i className="fas fa-user-check"></i>
-          </div>
-          <div className="stat-info-admin">
-            <h3>4</h3>
-            <p>Usuarios Activos</p>
-          </div>
-        </div>
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin admins">
-            <i className="fas fa-user-shield"></i>
-          </div>
-          <div className="stat-info-admin">
-            <h3>1</h3>
-            <p>Administradores</p>
-          </div>
-        </div>
-        <div className="stat-card-admin">
-          <div className="stat-icon-admin new">
-            <i className="fas fa-user-plus"></i>
-          </div>
-          <div className="stat-info-admin">
-            <h3>12</h3>
-            <p>Nuevos Este Mes</p>
-          </div>
-        </div>
-      </div>
 
-      <section className="filtros-section-admin">
-        <div className="busqueda-contenedor">
-          <i class="fas fa-search"></i>
-          <input
-            type="text"
-            placeholder="Buscar Incripcion..."
-            // value={busqueda}
-            //onChange={(e) => setBusqueda(e.target.value)}
-            className="input-busqueda"
+          <section className="filtros-section-admin">
+            <div className="busqueda-contenedor">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                placeholder="Buscar Incripcion..."
+                // value={busqueda}
+                //onChange={(e) => setBusqueda(e.target.value)}
+                className="input-busqueda"
+              />
+            </div>
+            <div className="filtro-grupo-admin">
+              <select className="filtro-dropdown">
+                <option>Todos los Roles</option>
+                <option>Administrador</option>
+                <option>Seminarista</option>
+                <option>Tesorero</option>
+                <option>Usuario Externo</option>
+              </select>
+              <select className="filtro-dropdown">
+                <option>Todos los Estados</option>
+                <option>Activo</option>
+                <option>Inactivo</option>
+                <option>Pendiente</option>
+              </select>
+            </div>
+
+          </section>
+
+          <TablaInscripciones
+            inscripciones={inscripciones}
+            onEditar={abrirModalEditar}
+            onEliminar={eliminarInscripcion}
+          />
+          <InscripcionModal
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            inscripcionSeleccionada={inscripcionSeleccionada}
+            setInscripcionSeleccionada={setInscripcionSeleccionada}
+            nuevaInscripcion={nuevaInscripcion}
+            setNuevaInscripcion={setNuevaInscripcion}
+            eventos={eventos}
+            categorias={categorias}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarInscripcion : crearInscripcion}
           />
         </div>
-        <div className="filtro-grupo-admin">
-          <select className="filtro-dropdown">
-            <option>Todos los Roles</option>
-            <option>Administrador</option>
-            <option>Seminarista</option>
-            <option>Tesorero</option>
-            <option>Usuario Externo</option>
-          </select>
-          <select className="filtro-dropdown">
-            <option>Todos los Estados</option>
-            <option>Activo</option>
-            <option>Inactivo</option>
-            <option>Pendiente</option>
-          </select>
-        </div>
-
-      </section>
-    
-        <TablaInscripciones
-          inscripciones={inscripciones}
-          onEditar={abrirModalEditar}
-          onEliminar={eliminarInscripcion}
-        />
-      <InscripcionModal
-        mostrar={mostrarModal}
-        modoEdicion={modoEdicion}
-        inscripcionSeleccionada={inscripcionSeleccionada}
-        setInscripcionSeleccionada={setInscripcionSeleccionada}
-        nuevaInscripcion={nuevaInscripcion}
-        setNuevaInscripcion={setNuevaInscripcion}
-        eventos={eventos}
-        categorias={categorias}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicion ? actualizarInscripcion : crearInscripcion}
-      />
+      </div>
     </div>
   );
 };

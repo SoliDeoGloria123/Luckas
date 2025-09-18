@@ -108,7 +108,7 @@ exports.createUser = async (req, res) => {
             tipoDocumento: tipoDocumentoNormalizado,
             numeroDocumento,
             estado,
-            password: await bcrypt.hash(password, 10),
+            password,
             role
         });
         const savedUser = await user.save();

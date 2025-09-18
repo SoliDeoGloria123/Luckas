@@ -15,6 +15,14 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+<<<<<<< Updated upstream
+=======
+    // Limpiar espacios en blanco y normalizar correo
+    const correoLimpio = correo.trim().toLowerCase();
+    const passwordLimpio = password.trim();
+    console.log('Correo enviado:', correoLimpio);
+    console.log('Contraseña enviada:', passwordLimpio);
+>>>>>>> Stashed changes
     try {
       const data = await authService.login(correo, password);
       localStorage.setItem('token', data.token);

@@ -441,6 +441,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
         {/* Contenido */}
         <main className="contenido">
           {seccionActiva === "dashboard" && (
+<<<<<<< Updated upstream
             <>
               {/* Tarjetas de Estadísticas */}
               <div className="estadisticas-grid">
@@ -479,6 +480,74 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, m
                   </div>
                   <div className="stat-grafico">📊</div>
                 </div>
+=======
+            <div className="space-y-6">
+              {/* Stats Grid con animaciones */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  {
+                    title: "Usuarios Totales",
+                    value: estadisticas.totalUsuarios,
+                    change: "+12.4%",
+                    trend: "up",
+                    icon: Users,
+                    color: "from-blue-600 to-blue-700",
+                    bgColor: "bg-blue-50/50"
+                  },
+                  {
+                    title: "Usuarios Activos",
+                    value: estadisticas.usuariosActivos,
+                    change: "+40.9%",
+                    trend: "up",
+                    icon: Activity,
+                    color: "from-emerald-600 to-emerald-700",
+                    bgColor: "bg-emerald-50/50"
+                  },
+                  {
+                    title: "Administradores",
+                    value: estadisticas.administradores,
+                    change: "+84.7%",
+                    trend: "up",
+                    icon: Shield,
+                    color: "from-purple-600 to-purple-700",
+                    bgColor: "bg-purple-50/50"
+                  },
+                  {
+                    title: "Nuevos Hoy",
+                    value: estadisticas.nuevosHoy,
+                    change: "-23.6%",
+                    trend: "down",
+                    icon: UserPlus,
+                    color: "from-rose-600 to-rose-700",
+                    bgColor: "bg-rose-50/50"
+                  }
+                ].map((stat, index) => {
+                  const Icon = stat.icon;
+                  const TrendIcon = stat.trend === "up" ? TrendingUp : TrendingDown;
+                  return (
+                    <div
+                      key={index}
+                      className={`stat-card-dashboard-admin glass-card ${stat.bgColor} rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up`}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg icon-bounce`}>
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                        <div className={`flex items-center text-sm font-medium ${stat.trend === "up" ? "text-emerald-600" : "text-rose-600"
+                          }`}>
+                          <TrendIcon className="w-4 h-4 mr-1 icon-bounce" />
+                          {stat.change}
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-slate-800 mb-1 stat-number">{stat.value}</h3>
+                        <p className="text-slate-600 text-sm">{stat.title}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+>>>>>>> Stashed changes
               </div>
 
               {/* Gráfico de Actividad */}

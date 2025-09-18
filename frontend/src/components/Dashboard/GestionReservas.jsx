@@ -154,6 +154,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   });
 
   return (
+<<<<<<< Updated upstream
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
         <div className="page-title-admin">
@@ -213,6 +214,115 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
             value={busqueda}
             onChange={e => setBusqueda(e.target.value)}
             className="input-busqueda"
+=======
+    <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+      <Sidebar
+        sidebarAbierto={sidebarAbierto}
+        setSidebarAbierto={setSidebarAbierto}
+        seccionActiva={seccionActiva}
+        setSeccionActiva={setSeccionActiva}
+      />
+      <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
+        <Header
+          sidebarAbierto={sidebarAbierto}
+          setSidebarAbierto={setSidebarAbierto}
+          seccionActiva={seccionActiva}
+        />
+        <div className="seccion-usuarios">
+          <div className="page-header-Academicos">
+            <div className="page-title-admin">
+              <h1>Gestión de Reservas</h1>
+              <p>Administra las cuentas de usuario del sistema</p>
+            </div>
+            {canCreate && !readOnly && (
+              <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
+                + Nueva Reserva
+              </button>
+            )}
+          </div>
+          <div className="dashboard-grid-reporte-admin">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin users">
+                <i className="fas fa-users"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>5</h3>
+                <p>Total Usuarios</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin active">
+                <i className="fas fa-user-check"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>4</h3>
+                <p>Usuarios Activos</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin admins">
+                <i className="fas fa-user-shield"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>1</h3>
+                <p>Administradores</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin new">
+                <i className="fas fa-user-plus"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>12</h3>
+                <p>Nuevos Este Mes</p>
+              </div>
+            </div>
+          </div>
+          <section className="filtros-section-admin">
+            <div className="busqueda-contenedor">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                placeholder="Buscar Reserva..."
+                value={busqueda}
+                onChange={e => setBusqueda(e.target.value)}
+                className="input-busqueda"
+              />
+            </div>
+            <div class="filtro-grupo-admin">
+              <select className="filtro-dropdown">
+                <option>Todos los Roles</option>
+                <option>Administrador</option>
+                <option>Seminarista</option>
+                <option>Tesorero</option>
+                <option>Usuario Externo</option>
+              </select>
+              <select className="filtro-dropdown">
+                <option>Todos los Estados</option>
+                <option>Activo</option>
+                <option>Inactivo</option>
+                <option>Pendiente</option>
+              </select>
+            </div>
+          </section>
+          {error && <div className="error-message">{error}</div>}
+          <TablaReservas
+            reservas={reservasFiltradas}
+            onEditar={canEdit && !readOnly ? abrirModalEditar : null}
+            onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarReserva : null}
+          />
+          <ReservasModal
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            reservaSeleccionada={reservaSeleccionada}
+            setReservaSeleccionada={setReservaSeleccionada}
+            nuevaReserva={nuevaReserva}
+            setNuevaReserva={setNuevaReserva}
+            usuarios={usuarios}
+            cabanas={cabanas}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarReserva : crearReserva}
+>>>>>>> Stashed changes
           />
         </div>
         <div class="filtro-grupo-admin">

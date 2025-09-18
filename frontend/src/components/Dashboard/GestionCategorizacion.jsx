@@ -97,6 +97,7 @@ const GestionCategorizacion = () => {
                     <div className="stat-icon-admin users">
                         <i className="fas fa-users"></i>
                     </div>
+<<<<<<< Updated upstream
                     <div className="stat-info-admin">
                         <h3>5</h3>
                         <p>Total Usuarios</p>
@@ -127,6 +128,45 @@ const GestionCategorizacion = () => {
                     <div className="stat-info-admin">
                         <h3>12</h3>
                         <p>Nuevos Este Mes</p>
+=======
+                    <div className="dashboard-grid-reporte-admin">
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin users">
+                                <i className="fas fa-users"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>5</h3>
+                                <p>Total Usuarios</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin active">
+                                <i className="fas fa-user-check"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>4</h3>
+                                <p>Usuarios Activos</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin admins">
+                                <i className="fas fa-user-shield"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>1</h3>
+                                <p>Administradores</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin new">
+                                <i className="fas fa-user-plus"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>12</h3>
+                                <p>Nuevos Este Mes</p>
+                            </div>
+                        </div>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>

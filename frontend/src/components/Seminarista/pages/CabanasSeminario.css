@@ -1,3 +1,4 @@
+
 /* Variables CSS para la paleta de colores */
 :root {
   --color-blue-primary: #2563eb;
@@ -105,14 +106,9 @@
 }
 
 .cabanas-seminario .page-title h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--color-gray-900);
-  margin-bottom: var(--spacing-sm);
-  background: linear-gradient(135deg, var(--color-green) 0%, var(--color-blue-primary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-blue-primary);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .cabanas-seminario .page-title p {
@@ -121,31 +117,31 @@
   max-width: 600px;
 }
 
-.cabanas-seminario .page-stats {
+.cabanas-seminario .page-stats-seminario {
   display: flex;
-  gap: var(--spacing-xl);
+  gap: 2rem;
 }
 
-.cabanas-seminario .stat-item {
+.cabanas-seminario .stat-item-seminario {
   text-align: center;
 }
 
-.cabanas-seminario .stat-number {
+.cabanas-seminario .stat-number-seminario {
   display: block;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--color-green);
+  color: var(--color-blue-primary);
   margin-bottom: var(--spacing-xs);
 }
 
-.cabanas-seminario .stat-label {
+.cabanas-seminario .stat-label-seminario {
   font-size: 0.875rem;
-  color: var(--color-gray-600);
+  color: var(--color-gray-700);
   font-weight: 500;
 }
 
 /* Filters Section */
-.cabanas-seminario .filters-section {
+.cabanas-seminario .filters-section-seminario {
   display: flex;
   gap: var(--spacing-lg);
   align-items: center;
@@ -211,14 +207,14 @@
 }
 
 .cabanas-seminario .filter-btn:hover {
-  border-color: var(--color-green);
-  color: var(--color-green);
+  border-color: var(--color-blue-primary);
+  color: var(--color-blue-primary);
 }
 
 .cabanas-seminario .filter-btn.active {
-  background: var(--color-green);
+  background: var(--color-blue-primary);
   color: var(--color-white);
-  border-color: var(--color-green);
+  border-color: var(--color-blue-primary);
 }
 
 .cabanas-seminario .sort-dropdown select {
@@ -396,11 +392,9 @@
   color: var(--color-gray-900);
   margin-bottom: var(--spacing-sm);
   line-height: 1.3;
+  text-transform: capitalize;
 }
 
-.cabin-card:hover .cabin-title-cabana {
-  color: var(--color-blue-primary);
-}
 
 
 .cabin-description {

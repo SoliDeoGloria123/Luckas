@@ -132,27 +132,27 @@ const closeReservationModal = () => {
 
   return (
     <>
-      {/* Botón de prueba para abrir el modal */}
-
       {/* Modal */}
       <div id="reservationModal" className="modal-overlay-seminarista-reserva active">
         <div className="modal-container-seminarista-reserva">
           <div className="cabin-header-seminarista-reserva">
             <div className="cabin-info-seminario-reserva">
-              <h2 className="cabin-title-seminario-reserva">Cabaña del Bosque</h2>
+              <h2 className="cabin-title-seminario-reserva">{cabana?.nombre || 'Cabaña seleccionada'}</h2>
               <p className="cabin-description-seminario-reserva">
-                Hermosa cabaña rodeada de naturaleza, perfecta para familias que buscan tranquilidad y conexión espiritual.
+                {cabana?.descripcion || 'Descripción no disponible.'}
               </p>
               <div className="cabin-details-seminario-reserva">
                 <div className="detail-item-seminario-reserva">
                   <i className="fas fa-users"></i>
-                  <span>Hasta 6 personas</span>
+                  <span>{cabana?.capacidad ? `Hasta ${cabana.capacidad} personas` : 'Capacidad no disponible'}</span>
                 </div>
                 <div className="detail-item-seminario-reserva">
                   <i className="fas fa-map-marker-alt"></i>
-                  <span>Zona Norte</span>
+                  <span>{cabana?.ubicacion || 'Ubicación no disponible'}</span>
                 </div>
-                <div className="price-tag-seminario-reserva">$180,000 COP/noche</div>
+                <div className="price-tag-seminario-reserva">
+                  {cabana?.precio ? `$${cabana.precio.toLocaleString()} COP/noche` : 'Precio no disponible'}
+                </div>
               </div>
             </div>
             <button className="close-button-seminario-reserva" onClick={onClose}>
@@ -225,14 +225,14 @@ const closeReservationModal = () => {
                 <p className="form-subtitle-seminario-reserva">Selecciona las fechas de tu estadía y completa tus datos personales</p>
               </div>
               
-              <form className="reservation-form-seminario-reserva" onSubmit={handleSubmit}>
-                <div className="form-row-reservation-seminario-reserva">
-                  <div className="form-group-reservation-seminario-reserva">
-                    <label className="form-label-reservation-seminario-reserva">Fecha de Check-in *</label>
-                    <div className="date-input-container-seminario-reserva">
+              <form className="reservation-form-seminario" onSubmit={handleSubmit}>
+                <div className="form-row-reservation-seminario">
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Fecha de Inicio </label>
+                    <div className="date-input-container-seminario">
                       <input 
                         type="date" 
-                        className="form-input-reservation-seminario-reserva" 
+                        className="form-input-reservation" 
                         id="checkInDate" 
                         min={checkInMinDate}
                         value={reservationData.checkInDate || ''}
@@ -242,12 +242,12 @@ const closeReservationModal = () => {
                       <i className="fas fa-calendar-alt date-icon"></i>
                     </div>
                   </div>
-                  <div className="form-group-reservation-seminario-reserva">
-                    <label className="form-label-reservation-seminario-reserva">Fecha de Check-out *</label>
-                    <div className="date-input-container-seminario-reserva">
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Fecha de Fin </label>
+                    <div className="date-input-container-seminario">
                       <input 
                         type="date" 
-                        className="form-input-reservation-seminario-reserva" 
+                        className="form-input-reservation" 
                         id="checkOutDate" 
                         min={reservationData.checkInDate || ''}
                         value={reservationData.checkOutDate || ''}
@@ -259,23 +259,23 @@ const closeReservationModal = () => {
                   </div>
                 </div>
 
-                <div className="form-row-reservation-seminario-reserva">
-                  <div className="form-group-reservation-seminario-reserva">
-                    <label className="form-label-reservation-seminario-reserva">Nombre Completo *</label>
+                <div className="form-row-reservation-seminario">
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Nombre Completo *</label>
                     <input 
                       type="text" 
-                      className="form-input-reservation-seminario-reserva" 
+                      className="form-input-reservation" 
                       id="fullName" 
                       value={reservationData.fullName || ''}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-                  <div className="form-group-reservation-seminario-reserva">
-                    <label className="form-label-reservation-seminario-reserva">Número de Documento *</label>
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Número de Documento</label>
                     <input 
                       type="text" 
-                      className="form-input-reservation-seminario-reserva" 
+                      className="form-input-reservation" 
                       id="documentNumber" 
                       value={reservationData.documentNumber || ''}
                       onChange={handleInputChange}
@@ -284,23 +284,23 @@ const closeReservationModal = () => {
                   </div>
                 </div>
 
-                <div className="form-row-reservation-seminario-reserva">
-                  <div className="form-group-reservation-seminario-reserva">
-                    <label className="form-label-reservation-seminario-reserva">Correo Electrónico *</label>
+                <div className="form-row-reservation-seminario">
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Correo Electrónico </label>
                     <input 
                       type="email" 
-                      className="form-input-reservation-seminario-reserva" 
+                      className="form-input-reservation" 
                       id="email" 
                       value={reservationData.email || ''}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-                  <div className="form-group-reservation-seminario-reserva">
-                    <label className="form-label-reservation-seminario-reserva">Teléfono *</label>
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Teléfono *</label>
                     <input 
                       type="tel" 
-                      className="form-input-reservation-seminario-reserva" 
+                      className="form-input-reservation" 
                       id="phone" 
                       value={reservationData.phone || ''}
                       onChange={handleInputChange}
@@ -309,12 +309,12 @@ const closeReservationModal = () => {
                   </div>
                 </div>
 
-                <div className="form-row-reservation-seminario-reserva">
-                  <div className="form-group-reservation-seminario-reserva">
-                    <label className="form-label-reservation-seminario-reserva">Número de Personas *</label>
+                <div className="form-row-reservation-seminario">
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Número de Personas *</label>
                     <input 
                       type="number" 
-                      className="form-input-reservation-seminario-reserva" 
+                      className="form-input-reservation" 
                       id="numberOfPeople" 
                       value={reservationData.numberOfPeople || 1}
                       min="1" 
@@ -323,11 +323,11 @@ const closeReservationModal = () => {
                       required
                     />
                   </div>
-                  <div className="form-group-reservation-seminario-reserva">
-                    <label className="form-label-reservation-seminario-reserva">Propósito de la Estadía</label>
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Propósito de la Estadía</label>
                     <input 
                       type="text" 
-                      className="form-input-reservation-seminario-reserva" 
+                      className="form-input-reservation" 
                       id="stayPurpose" 
                       value={reservationData.stayPurpose || ''}
                       onChange={handleInputChange}
@@ -336,10 +336,10 @@ const closeReservationModal = () => {
                   </div>
                 </div>
 
-                <div className="form-group-reservation-seminario-reserva full-width">
-                  <label className="form-label-reservation-seminario-reserva">Solicitudes Especiales</label>
+                <div className="form-group-reservation-seminario full-width">
+                  <label className="form-label-reservation-seminario">Solicitudes Especiales</label>
                   <textarea 
-                    className="form-textarea-reservation-seminario-reserva" 
+                    className="form-textarea-reservation" 
                     id="specialRequests" 
                     rows="4" 
                     value={reservationData.specialRequests || ''}

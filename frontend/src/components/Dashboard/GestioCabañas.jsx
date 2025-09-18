@@ -169,6 +169,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     setModalImagen({ abierto: false, imagenes: [], actual: 0 });
   };
   return (
+<<<<<<< Updated upstream
     <div className="seccion-usuarios">
       <div className="page-header-Academicos">
         <div className="page-title-admin">
@@ -228,6 +229,108 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
             value={busqueda}
             onChange={e => setBusqueda(e.target.value)}
             className="input-busqueda"
+=======
+    <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+      <Sidebar
+        sidebarAbierto={sidebarAbierto}
+        setSidebarAbierto={setSidebarAbierto}
+        seccionActiva={seccionActiva}
+        setSeccionActiva={setSeccionActiva}
+      />
+      <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
+        <Header
+          sidebarAbierto={sidebarAbierto}
+          setSidebarAbierto={setSidebarAbierto}
+          seccionActiva={seccionActiva}
+        />
+        <div className="seccion-usuarios">
+          <div className="p-9 flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800">Gestión de Cabañas</h1>
+              <p className="text-slate-600">Administra las cabañas y alojamientos del seminario</p>
+            </div>
+            <button
+              onClick={abrirModalCrear}
+              className="btn-premium flex items-center space-x-2 px-4 py-2 text-white rounded-xl font-medium shadow-lg"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Nueva Cabaña</span>
+            </button>
+          </div>
+          <div className="dashboard-grid-reporte-admin">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin users">
+                <i className="fas fa-users"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>5</h3>
+                <p>Total Usuarios</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin active">
+                <i className="fas fa-user-check"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>4</h3>
+                <p>Usuarios Activos</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin admins">
+                <i className="fas fa-user-shield"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>1</h3>
+                <p>Administradores</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin new">
+                <i className="fas fa-user-plus"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>12</h3>
+                <p>Nuevos Este Mes</p>
+              </div>
+            </div>
+          </div>
+
+          {modalImagen.abierto && (
+            <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
+              <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
+                <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
+                <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
+                <img
+                  src={`http://localhost:3000/uploads/cabanas/${modalImagen.imagenes[modalImagen.actual]}`}
+                  alt="Imagen de la cabaña"
+                  className="imagen-modal"
+                />
+                <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+              </div>
+            </div>
+          )}
+          {error && <div className="error-message">{error}</div>}
+          <CabanaTabla
+            cabanas={cabanasFiltradas}
+            onEditar={canEdit && !readOnly ? abrirModalEditar : null}
+            onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarCabana : null}
+            onVerImagen={handleVerImagenes}
+            onInsertar={abrirModalCrear}
+            nuevaCabana={nuevaCabana}
+            setNuevaCabana={setNuevaCabana}
+          />
+          <CabanaModal
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            cabanaSeleccionada={cabanaSeleccionada}
+            setCabanaSeleccionada={setCabanaSeleccionada}
+            nuevaCabana={nuevaCabana}
+            setNuevaCabana={setNuevaCabana}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarCabana : crearCabana}
+            categorias={categorias}
+>>>>>>> Stashed changes
           />
         </div>
         <div className="filtro-grupo-admin">

@@ -8,18 +8,15 @@ const HeaderTesorero = () => {
     const [usuario, setUsuario] = useState({});
     const [seccionActiva, setSeccionActiva] = useState("gestion");
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                setUsuario(decoded);
-            } catch (e) {
-                setUsuario(null);
-            }
-        }
-    }, []);
-
+   // Obtener usuario logueado desde localStorage
+  const usuarioLogueado = (() => {
+    try {
+      const usuarioStorage = localStorage.getItem('usuario');
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  })();
     const toogleMenuTesorero = () => {
         setOpenMenu(!openmenu)
     }
@@ -63,11 +60,10 @@ const HeaderTesorero = () => {
                     </div>
                     <div className="user-profile-tesorero" onClick={toogleMenuTesorero}>
                         <div className="user-info-tesorero">
-                            <span className="user-name-tesorero">{usuario?.nombre || "Usuario"}</span>
-                            <span className="user-role-tesorero">{usuario?.role || "Rol"}</span>
+                            <span className="user-name-tesorero">{usuarioLogueado && usuarioLogueado.nombre ? usuarioLogueado.nombre : 'Usuario'}</span>
+                            <span className="user-role-tesorero">{usuarioLogueado?.role || "Rol"}</span>
                         </div>
                         <i className="fas fa-chevron-down"></i>
-
 
                         {openmenu && (
                             <div className="dropdown-menu-tesorero">
