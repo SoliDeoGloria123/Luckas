@@ -13,13 +13,14 @@ import {
     StyleSheet
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../contexts/AuthContext';
-import { cabanasService } from '../services/cabanas';
+import { useAuth } from '../context/AuthContext';
+import { cabanasService } from '../services';
 import { Cabana } from '../types';
 import { seminaristaStyles } from '../styles/SeminaristaMovil';
+import { colors } from '../styles/colors';
 
 const CabanasScreen: React.FC = () => {
-    const { canEdit, canDelete, user } = useAuth();
+    const { canEdit, canDelete, user, hasRole } = useAuth();
     const [cabanas, setCabanas] = useState<Cabana[]>([]);
     const [searchText, setSearchText] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +28,18 @@ const CabanasScreen: React.FC = () => {
     const [selectedCabana, setSelectedCabana] = useState<Cabana | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [filterEstado, setFilterEstado] = useState<string>('Todos');
+
+    // Verificar si el usuario tiene permisos para ver cabañas
+    useEffect(() => {
+        if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista'))) {
+            Alert.alert(
+                'Acceso Denegado',
+                'No tienes permisos para ver la información de las cabañas',
+                [{ text: 'OK' }]
+            );
+            // Aquí podrías redirigir al usuario a otra pantalla si lo deseas
+        }
+    }, [user, hasRole]);
 
     // Estados disponibles
     const estados = ['Todos', ...cabanasService.getEstados()];
@@ -74,22 +87,11 @@ const CabanasScreen: React.FC = () => {
         return matchesSearch && matchesFilter;
     });
 
-    // Manejar agregar cabaña
-    const handleAddCabana = () => {
-        if (canEdit()) {
-            Alert.alert('Información', 'Función de agregar cabaña en desarrollo');
-        } else {
-            Alert.alert('Sin permisos', 'No tienes permisos para agregar cabañas');
-        }
-    };
+    // Nota: Funcionalidad de agregar cabañas deshabilitada en la versión móvil
 
-    // Manejar editar cabaña
+    // Manejar editar cabaña - solo visualización
     const handleEditCabana = (cabana: Cabana) => {
-        if (canEdit()) {
-            Alert.alert('Información', `Editar cabaña "${cabana.nombre}" - En desarrollo`);
-        } else {
-            Alert.alert('Sin permisos', 'No tienes permisos para editar cabañas');
-        }
+        Alert.alert('Solo Visualización', 'La funcionalidad de edición no está disponible en la versión móvil');
     };
 
     // Manejar cambiar estado de cabaña
@@ -162,14 +164,6 @@ const CabanasScreen: React.FC = () => {
             <View style={[seminaristaStyles.card, { marginBottom: 10 }]}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={seminaristaStyles.title}>Cabañas</Text>
-                    {canEdit() && (
-                        <TouchableOpacity 
-                            style={[seminaristaStyles.button, { padding: 8 }]} 
-                            onPress={handleAddCabana}
-                        >
-                            <Ionicons name="add" size={24} color="#fff" />
-                        </TouchableOpacity>
-                    )}
                 </View>
             </View>
 

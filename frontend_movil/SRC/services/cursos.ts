@@ -4,13 +4,22 @@ import { authService } from './auth';
 import { Curso } from '../types';
 import { API_CONFIG } from '../config';
 
-export class CursosService {
+class CursosService {
+    constructor() {
+        console.log('CursosService inicializado');
+    }
     
     async getAllCursos(): Promise<{ success: boolean; data?: Curso[]; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CURSOS, {
+            const response = await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CURSOS, {
                 method: 'GET',
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al obtener cursos' };
+            }
+            // Asegurar que la respuesta sea un array
+            const cursos = Array.isArray(response.data) ? response.data : [];
+            return { success: true, data: cursos as Curso[] };
         } catch (error) {
             console.error('Error getting cursos:', error);
             return { success: false, message: 'Error de conexión' };
@@ -19,9 +28,13 @@ export class CursosService {
 
     async getCursoById(id: string): Promise<{ success: boolean; data?: Curso; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CURSOS}/${id}`, {
+            const response = await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CURSOS}/${id}`, {
                 method: 'GET',
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al obtener el curso' };
+            }
+            return { success: true, data: response.data as Curso };
         } catch (error) {
             console.error('Error getting curso:', error);
             return { success: false, message: 'Error de conexión' };
@@ -30,10 +43,14 @@ export class CursosService {
 
     async createCurso(cursoData: Partial<Curso>): Promise<{ success: boolean; data?: Curso; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CURSOS, {
+            const response = await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CURSOS, {
                 method: 'POST',
                 body: JSON.stringify(cursoData),
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al crear el curso' };
+            }
+            return { success: true, data: response.data as Curso };
         } catch (error) {
             console.error('Error creating curso:', error);
             return { success: false, message: 'Error de conexión' };
@@ -42,10 +59,14 @@ export class CursosService {
 
     async updateCurso(id: string, cursoData: Partial<Curso>): Promise<{ success: boolean; data?: Curso; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CURSOS}/${id}`, {
+            const response = await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CURSOS}/${id}`, {
                 method: 'PUT',
                 body: JSON.stringify(cursoData),
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al actualizar el curso' };
+            }
+            return { success: true, data: response.data as Curso };
         } catch (error) {
             console.error('Error updating curso:', error);
             return { success: false, message: 'Error de conexión' };
@@ -54,9 +75,13 @@ export class CursosService {
 
     async deleteCurso(id: string): Promise<{ success: boolean; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CURSOS}/${id}`, {
+            const response = await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CURSOS}/${id}`, {
                 method: 'DELETE',
             });
+            return {
+                success: response.success,
+                message: response.message || (response.success ? 'Curso eliminado con éxito' : 'Error al eliminar el curso')
+            };
         } catch (error) {
             console.error('Error deleting curso:', error);
             return { success: false, message: 'Error de conexión' };

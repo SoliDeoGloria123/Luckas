@@ -1,6 +1,6 @@
 // Pantalla de lista de cursos
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     View,
     Text,
@@ -8,80 +8,67 @@ import {
     ScrollView,
     TouchableOpacity,
     TextInput,
-    Alert
+    Alert,
+    RefreshControl
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { cursosService } from '../services/cursos';
 import { colors, spacing, typography, shadows } from '../styles';
 
 const CursosScreen: React.FC = () => {
-    const { canEdit, canDelete } = useAuth();
+    const { canEdit, canDelete, user, hasRole } = useAuth();
+    const [cursos, setCursos] = useState<any[]>([]);
     const [searchText, setSearchText] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
-    // Datos de ejemplo - en una app real vendrían de la API
-    const cursos = [
-        {
-            id: '1',
-            nombre: 'Teología Fundamental',
-            descripcion: 'Curso básico de teología para seminaristas',
-            duracion: '6 meses',
-            estado: 'activo',
-            instructor: 'P. José González'
-        },
-        {
-            id: '2',
-            nombre: 'Historia de la Iglesia',
-            descripcion: 'Estudio de la historia eclesiástica',
-            duracion: '4 meses',
-            estado: 'activo',
-            instructor: 'P. María Rodríguez'
-        },
-        {
-            id: '3',
-            nombre: 'Filosofía Cristiana',
-            descripcion: 'Fundamentos de la filosofía desde la perspectiva cristiana',
-            duracion: '5 meses',
-            estado: 'inactivo',
-            instructor: 'P. Carlos Méndez'
+    // Verificar si el usuario tiene permisos para ver cursos
+    useEffect(() => {
+        if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista'))) {
+            Alert.alert(
+                'Acceso Denegado',
+                'No tienes permisos para ver la información de los cursos',
+                [{ text: 'OK' }]
+            );
+            // Aquí podrías redirigir al usuario a otra pantalla si lo deseas
+            return;
         }
-    ];
+        loadCursos();
+    }, [user, hasRole]);
+
+    // Cargar cursos desde el backend
+    const loadCursos = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            const response = await cursosService.getAllCursos();
+            if (response.success && response.data) {
+                setCursos(response.data);
+            } else {
+                Alert.alert('Error', response.message || 'No se pudieron cargar los cursos');
+                setCursos([]);
+            }
+        } catch (error) {
+            console.error('Error loading cursos:', error);
+            Alert.alert('Error', 'Error de conexión');
+            setCursos([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
 
     const filteredCursos = cursos.filter(curso =>
         curso.nombre.toLowerCase().includes(searchText.toLowerCase()) ||
         curso.instructor.toLowerCase().includes(searchText.toLowerCase())
     );
 
-    const handleAddCurso = () => {
-        if (canEdit()) {
-            Alert.alert('Información', 'Función de agregar curso en desarrollo');
-        } else {
-            Alert.alert('Sin permisos', 'No tienes permisos para agregar cursos');
-        }
-    };
-
+    // Nota: Funcionalidad de agregar cursos deshabilitada
     const handleEditCurso = (cursoId: string) => {
-        if (canEdit()) {
-            Alert.alert('Información', `Editar curso ${cursoId} - En desarrollo`);
-        } else {
-            Alert.alert('Sin permisos', 'No tienes permisos para editar cursos');
-        }
+        Alert.alert('Solo Visualización', 'La funcionalidad de edición no está disponible en la versión móvil');
     };
 
     const handleDeleteCurso = (cursoId: string) => {
-        if (canDelete()) {
-            Alert.alert(
-                'Eliminar Curso',
-                '¿Estás seguro de que quieres eliminar este curso?',
-                [
-                    { text: 'Cancelar', style: 'cancel' },
-                    { text: 'Eliminar', style: 'destructive', onPress: () => {
-                        Alert.alert('Información', `Curso ${cursoId} eliminado - En desarrollo`);
-                    }}
-                ]
-            );
-        } else {
-            Alert.alert('Sin permisos', 'No tienes permisos para eliminar cursos');
-        }
+        Alert.alert('Solo Visualización', 'La funcionalidad de eliminación no está disponible en la versión móvil');
     };
 
     const renderCursoCard = (curso: any) => (
@@ -144,11 +131,6 @@ const CursosScreen: React.FC = () => {
             {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Cursos</Text>
-                {canEdit() && (
-                    <TouchableOpacity style={styles.addButton} onPress={handleAddCurso}>
-                        <Ionicons name="add" size={24} color={colors.textOnPrimary} />
-                    </TouchableOpacity>
-                )}
             </View>
 
             {/* Barra de búsqueda */}

@@ -1,10 +1,12 @@
 // Tipos TypeScript para la aplicación móvil
 
+import { ReactNode } from 'react';
+
 // Re-exportar tipos de navegación
 export * from './navigation';
 
 // Tipo de usuario según el modelo del backend
-export interface User {
+export interface User extends BaseModel {
     _id: string;
     nombre: string;
     apellido: string;
@@ -14,8 +16,6 @@ export interface User {
     numeroDocumento: string;
     role: 'admin' | 'tesorero' | 'seminarista' | 'externo';
     estado: 'activo' | 'inactivo';
-    createdAt: string;
-    updatedAt: string;
 }
 
 // Credenciales para login
@@ -96,6 +96,25 @@ export interface ValidationError {
     message: string;
 }
 
+// Tipo para tareas
+export interface Tarea extends BaseModel {
+    _id: string;
+    titulo: string;
+    descripcion: string;
+    fechaLimite: string;
+    estado: 'pendiente' | 'en_progreso' | 'completada' | 'cancelada';
+    prioridad: 'alta' | 'media' | 'baja';
+    asignadoA: string | User;
+    asignadoPor: string | User;
+    categoria?: string;
+    etiquetas?: string[];
+    observaciones?: string;
+    fechaCompletada?: string;
+    comentarios?: string[];
+    archivosAdjuntos?: string[];
+    fechaCreacion?: string;
+}
+
 // Estado de carga
 export interface LoadingState {
     isLoading: boolean;
@@ -103,10 +122,17 @@ export interface LoadingState {
     success: boolean;
 }
 
+// Interfaz base para modelos con timestamps
+export interface BaseModel {
+    createdAt: string;
+    updatedAt: string;
+}
+
 // Tipos basados en los modelos del backend
 
 // Tipo Evento basado en models/Eventos.js
-export interface Evento {
+export interface Evento extends BaseModel {
+    cupos: ReactNode;
     _id: string;
     nombre: string;
     descripcion: string;
@@ -128,19 +154,30 @@ export interface Evento {
     categorizadoPor?: string; // ObjectId como string
     fechaCategorizacion?: string;
     active: boolean;
-    createdAt: string;
-    updatedAt: string;
 }
 
-export interface ProgramaEvento {
+export interface ProgramaEvento extends BaseModel {
     horaInicio: string;
     horaFin: string;
-    tema: string;
+    _id: string;
+    titulo: string;
     descripcion: string;
+    fechaLimite: string;
+    estado: 'pendiente' | 'en_progreso' | 'completada' | 'cancelada';
+    prioridad: 'alta' | 'media' | 'baja';
+    asignadoA: string; // ID del usuario
+    asignadoPor: string; // ID del usuario
+    categoria?: string;
+    etiquetas?: string[];
+    observaciones?: string;
+    fechaCompletada?: string;
+    creadoPor?: string; // ObjectId como string
+    imagen: string[];
 }
 
-// Tipo Cabaña basado en models/Cabana.js
-export interface Cabana {
+// Tipo Reserva basado en models/Reservas.js
+// Tipo Cabana basado en models/Cabana.js
+export interface Cabana extends BaseModel {
     _id: string;
     nombre: string;
     descripcion?: string;
@@ -151,11 +188,8 @@ export interface Cabana {
     estado: 'disponible' | 'ocupada' | 'mantenimiento';
     creadoPor?: string; // ObjectId como string
     imagen: string[];
-    createdAt: string;
-    updatedAt: string;
 }
 
-// Tipo Reserva basado en models/Reservas.js
 export interface Reserva {
     _id: string;
     usuario: string | User; // ObjectId como string o Usuario poblado
