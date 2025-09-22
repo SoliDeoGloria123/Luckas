@@ -8,21 +8,40 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
   const [reservationData, setReservationData] = useState({
     usuario: "",
     cabana: "",
-    nombreCompleto: "",
-    numeroDocumento: "",
-    correoElectronico: "",
-    telefono: "",
-    numeroPersonas: "",
-    propositoEstadia: "",
-    solicitudesEspeciales: "",
-    fechaInicio: "",
-    fechaFin: "",
+    fullName: "",
+    lastName: "",
+    documentType: "",
+    documentNumber: "",
+    email: "",
+    phone: "",
+    numberOfPeople: 1,
+    stayPurpose: "",
+    specialRequests: "",
+    checkInDate: "",
+    checkOutDate: "",
     estado: "Pendiente",
     observaciones: "",
     activo: true
   });
+  // Obtener usuario logueado y rellenar datos personales al cargar el modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const usuarioStorage = localStorage.getItem('usuario');
+    const usuario = usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    if (usuario) {
+      setReservationData(prev => ({
+        ...prev,
+        fullName: usuario.nombre || "",
+        lastName: usuario.apellido || "",
+        documentType: usuario.tipoDocumento || "",
+        documentNumber: usuario.numeroDocumento || "",
+        email: usuario.correo || usuario.correoElectronico || usuario.email || "",
+        phone: usuario.telefono || usuario.phone || "",
+      }));
+    }
+  }, [isOpen]);
   const [checkInMinDate, setCheckInMinDate] = useState('');
-
+  const [reservasExistentes, setReservasExistentes] = useState([]);
 
 
 
@@ -31,6 +50,29 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
     const today = new Date().toISOString().split('T')[0];
     setCheckInMinDate(today);
   }, []);
+
+  // Obtener reservas existentes de la cabaña y usuario
+  useEffect(() => {
+    if (!cabana) return;
+    const usuarioLogueado = (() => {
+      try {
+        const usuarioStorage = localStorage.getItem('usuario');
+        return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+      } catch {
+        return null;
+      }
+    })();
+    const userId = usuarioLogueado?._id || usuarioLogueado?.id;
+    if (!userId) return;
+    reservaService.getReservasPorUsuario(userId)
+      .then(data => {
+        const reservasData = Array.isArray(data) ? data : data.data;
+        // Solo reservas de la cabaña actual
+        const reservasCabana = reservasData.filter(r => r.cabana === cabana._id || r.cabana === cabana.id);
+        setReservasExistentes(reservasCabana);
+      })
+      .catch(() => setReservasExistentes([]));
+  }, [cabana]);
 
 
   const closeReservationModal = () => {
@@ -70,10 +112,12 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
       const reservaData = {
         usuario: userId,
         cabana: cabanaId,
-        nombreCompleto: reservationData.fullName || "",
+        nombre: reservationData.fullName || "",
+        apellido: reservationData.lastName || "",
         numeroDocumento: reservationData.documentNumber || "",
         correoElectronico: reservationData.email || "",
         telefono: reservationData.phone || "",
+        tipoDocumento: reservationData.documentType || "",
         numeroPersonas: reservationData.numberOfPeople || "",
         propositoEstadia: reservationData.stayPurpose || "",
         solicitudesEspeciales: reservationData.specialRequests || "",
@@ -93,18 +137,21 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
   // Función para manejar cambios en las fechas
   const handleDateChange = (e) => {
     const { id, value } = e.target;
-    setReservationData(prev => ({ ...prev, [id]: value }));
-
-    // Si es el check-in, actualizar el mínimo del check-out
-    if (id === 'checkInDate' && value) {
-      const checkOutInput = document.getElementById('checkOutDate');
-      checkOutInput.min = value;
-
-      // Si la fecha de check-out es anterior a la nueva fecha de check-in, limpiarla
-      if (checkOutInput.value && checkOutInput.value <= value) {
-        checkOutInput.value = '';
-        setReservationData(prev => ({ ...prev, checkOutDate: '' }));
-      }
+    if (id === 'checkInDate') {
+      // Si cambia la fecha de inicio, ajusta la fecha mínima de fin
+      setReservationData(prev => {
+        let newCheckOut = prev.checkOutDate;
+        if (newCheckOut && new Date(newCheckOut) <= new Date(value)) {
+          newCheckOut = '';
+        }
+        return {
+          ...prev,
+          checkInDate: value,
+          checkOutDate: newCheckOut
+        };
+      });
+    } else if (id === 'checkOutDate') {
+      setReservationData(prev => ({ ...prev, checkOutDate: value }));
     }
   };
 
@@ -126,6 +173,12 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
     if (new Date(reservationData.checkOutDate) <= new Date(reservationData.checkInDate)) {
       alert('La fecha de check-out debe ser posterior a la fecha de check-in');
+      return;
+    }
+
+    // Validar solapamiento
+    if (haySolapamiento()) {
+      alert('Ya tienes una reserva para esta cabaña en las fechas seleccionadas. Elige otras fechas.');
       return;
     }
 
@@ -187,6 +240,21 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
   // Calcular progreso
   const progressPercentage = ((currentStep - 1) / 3) * 100;
+
+  // Validar solapamiento de fechas
+  const haySolapamiento = () => {
+    if (!reservationData.checkInDate || !reservationData.checkOutDate) return false;
+    const nuevaInicio = new Date(reservationData.checkInDate);
+    const nuevaFin = new Date(reservationData.checkOutDate);
+    return reservasExistentes.some(r => {
+      const inicio = new Date(r.fechaInicio);
+      const fin = new Date(r.fechaFin);
+      // Si las fechas se solapan
+      return (
+        (nuevaInicio <= fin && nuevaFin >= inicio)
+      );
+    });
+  };
 
   if (!isOpen) return null;
 
@@ -294,11 +362,11 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                       <input
                         type="date"
                         className="form-input-reservation"
-                        id="checkInDate"
                         min={checkInMinDate}
                         value={reservationData.checkInDate || ''}
                         onChange={handleDateChange}
                         required
+                        id="checkInDate"
                       />
                       <i className="fas fa-calendar-alt date-icon"></i>
                     </div>
@@ -309,11 +377,11 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                       <input
                         type="date"
                         className="form-input-reservation"
-                        id="checkOutDate"
-                        min={reservationData.checkInDate || ''}
+                        min={reservationData.checkInDate ? new Date(new Date(reservationData.checkInDate).getTime() + 86400000).toISOString().split('T')[0] : checkInMinDate}
                         value={reservationData.checkOutDate || ''}
                         onChange={handleDateChange}
                         required
+                        id="checkOutDate"
                       />
                       <i className="fas fa-calendar-alt date-icon"></i>
                     </div>
@@ -322,15 +390,45 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
                 <div className="form-row-reservation-seminario">
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Nombre Completo *</label>
+                    <label className="form-label-reservation-seminario">Nombre</label>
                     <input
                       type="text"
                       className="form-input-reservation"
-                      id="fullName"
                       value={reservationData.fullName || ''}
-                      onChange={handleInputChange}
+                      readOnly
                       required
                     />
+                  </div>
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Apellido</label>
+                    <input
+                      type="text"
+                      className="form-input-reservation"
+                      value={reservationData.lastName || ''}
+                      readOnly
+                      required
+                    />
+                  </div>
+                </div>
+
+
+
+                <div className="form-row-reservation-seminario">
+                  <div className="form-group-reservation-seminario">
+                    <label className="form-label-reservation-seminario">Tipo de Documento</label>
+                    <select
+                      id="documentType"
+                      name="documentType"
+                      value={reservationData.documentType || ''}
+                      disabled
+                      required
+                    >
+                      <option value="">Selecciona...</option>
+                      <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
+                      <option value="Tarjeta de identidad">Tarjeta de identidad</option>
+                      <option value="Cédula de extranjería">Cédula de extranjería</option>
+                      <option value="Pasaporte">Pasaporte</option>
+                    </select>
                   </div>
                   <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Número de Documento</label>
@@ -339,10 +437,12 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                       className="form-input-reservation"
                       id="documentNumber"
                       value={reservationData.documentNumber || ''}
-                      onChange={handleInputChange}
+                      readOnly
                       required
                     />
                   </div>
+
+                 
                 </div>
 
                 <div className="form-row-reservation-seminario">
@@ -353,25 +453,24 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                       className="form-input-reservation"
                       id="email"
                       value={reservationData.email || ''}
-                      onChange={handleInputChange}
+                      readOnly
                       required
                     />
                   </div>
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Teléfono *</label>
+                    <label className="form-label-reservation-seminario">Teléfono </label>
                     <input
                       type="tel"
                       className="form-input-reservation"
                       id="phone"
                       value={reservationData.phone || ''}
-                      onChange={handleInputChange}
+                      readOnly
                       required
                     />
                   </div>
                 </div>
-
                 <div className="form-row-reservation-seminario">
-                  <div className="form-group-reservation-seminario">
+                <div className="form-group-reservation-seminario">
                     <label className="form-label-reservation-seminario">Número de Personas *</label>
                     <input
                       type="number"
@@ -384,17 +483,17 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                       required
                     />
                   </div>
-                  <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Propósito de la Estadía</label>
-                    <input
-                      type="text"
-                      className="form-input-reservation"
-                      id="stayPurpose"
-                      value={reservationData.stayPurpose || ''}
-                      onChange={handleInputChange}
-                      placeholder="Retiro espiritual, descanso, etc."
-                    />
-                  </div>
+                <div className="form-group-reservation-seminario">
+                  <label className="form-label-reservation-seminario">Propósito de la Estadía</label>
+                  <input
+                    type="text"
+                    className="form-input-reservation"
+                    id="stayPurpose"
+                    value={reservationData.stayPurpose || ''}
+                    onChange={handleInputChange}
+                    placeholder="Retiro espiritual, descanso, etc."
+                  />
+                </div>
                 </div>
 
                 <div className="form-group-reservation-seminario full-width">

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FaHome, FaCalendarAlt, FaUserCheck, FaBed, FaFileAlt, FaPlus, FaBell, FaUser, FaChevronDown, FaBars, FaTimes, FaCheckCircle, FaClock, FaExclamationCircle, FaHashtag, FaCalendar, FaUser as FaUserIcon, FaComment, FaEye, FaCheck, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 import './MisSolicitudes.css'; // Asegúrate de tener un archivo CSS para los estilos
 import Header from '../Shared/Header'
-import Frooter from '../../footer/Footer'
 import Footer from '../../footer/Footer';
+import {solicitudService} from '../../../services/solicirudService';
 // Datos de ejemplo para las solicitudes
 const requestsData = [
   {
@@ -22,7 +22,7 @@ const requestsData = [
 ];
 
 const MisSolicitudes = () => {
-  const [currentRequests, setCurrentRequests] = useState([...requestsData]);
+  const [currentRequests, setCurrentRequests] = useState([]);
   const [currentStatusFilter, setCurrentStatusFilter] = useState('all');
   const [currentCategoryFilter, setCurrentCategoryFilter] = useState('all');
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -32,10 +32,32 @@ const MisSolicitudes = () => {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [toasts, setToasts] = useState([]);
 
+  const usuarioLogueado = (() => {
+    try {
+      const usuarioStorage = localStorage.getItem('usuario');
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const userId = usuarioLogueado?._id || usuarioLogueado?.id;
+  useEffect(() => {
+    if(!userId) return;
+    solicitudService.getSolicitudesPorUsuario(userId)
+      .then(data => {
+        const solicitudData = Array.isArray(data.data) ? data.data : [];
+        setCurrentRequests(solicitudData);
+
+      })
+      .catch(error => {
+        console.error("Error al obtener solicitudes:", error);
+      });
+
+  }, [userId]);
+
   useEffect(() => {
     filterRequests();
-  }, [currentStatusFilter, currentCategoryFilter]);
-
+  }, [currentStatusFilter, currentCategoryFilter, currentRequests]);
   const handleStatusFilter = (status) => {
     setCurrentStatusFilter(status);
   };
@@ -45,9 +67,10 @@ const MisSolicitudes = () => {
   };
 
   const filterRequests = () => {
-    const filtered = requestsData.filter(request => {
-      const statusMatch = currentStatusFilter === 'all' || request.status === currentStatusFilter;
-      const categoryMatch = currentCategoryFilter === 'all' || request.category === currentCategoryFilter;
+    // Filtrar sobre currentRequests (que ahora viene del backend)
+    const filtered = currentRequests.filter(request => {
+      const statusMatch = currentStatusFilter === 'all' || request.estado === currentStatusFilter;
+      const categoryMatch = currentCategoryFilter === 'all' || (request.categoria && request.categoria.nombre === currentCategoryFilter);
       return statusMatch && categoryMatch;
     });
     setCurrentRequests(filtered);
@@ -309,19 +332,19 @@ const MisSolicitudes = () => {
                   <div className="request-header">
                     <div className="request-title-section">
                       <h3 className="request-title">
-                        {request.title}
-                        {getStatusIcon(request.status)}
+                        {/*request.title*/}
+                        {getStatusIcon(request.estado)}
                       </h3>
-                      <p className="request-description">{request.description}</p>
+                      <p className="request-description">{request.descripcion}</p>
                     </div>
                   </div>
 
                   <div className="request-badges">
-                    <span className={`status-badge ${request.status}`}>
-                      {getStatusText(request.status)}
+                    <span className={`status-badge ${request.estado}`}>
+                      {getStatusText(request.estado)}
                     </span>
-                    <span className={`priority-badge ${request.priority}`}>
-                      {getPriorityText(request.priority)}
+                    <span className={`priority-badge ${request.prioridad}`}>
+                      {getPriorityText(request.prioridad)}
                     </span>
                   </div>
 

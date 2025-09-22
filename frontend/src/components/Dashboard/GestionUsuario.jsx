@@ -64,6 +64,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
         telefono: "",
         tipoDocumento: "",
         numeroDocumento: "",
+        fechaNacimiento: "",
         password: "",
         role: "externo",
         estado: "activo"
@@ -114,6 +115,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                 telefono: "",
                 tipoDocumento: "",
                 numeroDocumento: "",
+                fechaNacimiento: "",
                 password: "",
                 role: "externo",
                 estado: "activo"
@@ -134,6 +136,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                 telefono: usuarioSeleccionado.telefono,
                 tipoDocumento: usuarioSeleccionado.tipoDocumento,
                 numeroDocumento: usuarioSeleccionado.numeroDocumento,
+                fechaNacimiento: usuarioSeleccionado.fechaNacimiento,
                 role: usuarioSeleccionado.role,
                 estado: usuarioSeleccionado.estado,
             });
@@ -153,6 +156,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                     numeroDocumento: usuarioSeleccionado.numeroDocumento,
                     role: usuarioSeleccionado.role,
                     estado: usuarioSeleccionado.estado,
+                    fechaNacimiento: usuarioSeleccionado.fechaNacimiento,
                 };
                 setUsuarioActual(nuevoUsuarioActual);
                 localStorage.setItem('usuario', JSON.stringify(nuevoUsuarioActual));

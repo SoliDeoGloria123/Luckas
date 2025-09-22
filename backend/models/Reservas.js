@@ -19,8 +19,17 @@ const reservaSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    nombreCompleto: {
+    nombre: {
         type: String,
+        required: true
+    },
+    apellido: {
+        type: String,
+        required: true
+    },
+    tipoDocumento: {
+        type: String,
+        enum: ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad'],
         required: true
     },
     numeroDocumento: {
@@ -62,7 +71,7 @@ const reservaSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Solicitud'
     }
-}, { 
+}, {
     timestamps: true
 });
 

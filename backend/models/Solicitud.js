@@ -79,6 +79,11 @@ const solicitudSchema = new mongoose.Schema({
   modificadoPor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'usuarios'
+  },
+  origen: {
+    type: String,
+    enum: ['formulario', 'reserva', 'inscripcion'],
+    default: 'formulario'
   }
 }, {
   timestamps: true

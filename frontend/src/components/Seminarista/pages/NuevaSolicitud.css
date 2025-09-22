@@ -56,6 +56,7 @@
     z-index: 1;
 }
 
+
 .step-nuevasolicitud {
     display: flex;
     flex-direction: column;
@@ -87,21 +88,21 @@
     text-align: center;
 }
 
-.step.completed .step-number {
+.step-nuevasolicitud.completed .step-number-nuevasolicitud {
     background-color: #22c55e;
     color: white;
 }
 
-.step.completed .step-label {
+.step-nuevasolicitud.completed .step-label-nuevasolicitud {
     color: #22c55e;
 }
 
-.step.active .step-number {
+.step-nuevasolicitud.active .step-number-nuevasolicitud {
     background-color: #2563eb;
     color: white;
 }
 
-.step.active .step-label {
+.step-nuevasolicitud.active .step-label-nuevasolicitud {
     color: #2563eb;
 }
 

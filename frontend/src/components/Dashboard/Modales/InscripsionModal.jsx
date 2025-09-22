@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { userService } from "../../../services/ObteneruserService";
 
-
 const InscripcionModal = ({
   mostrar,
   modoEdicion,

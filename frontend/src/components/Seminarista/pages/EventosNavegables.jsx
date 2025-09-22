@@ -5,7 +5,6 @@ import { inscripcionService } from '../../../services/inscripcionService';
 import './EventosSeminario.css';
 import Header from '../Shared/Header';
 import Footer from '../../footer/Footer'
-import formualrioIncripcion from '../pages/FormularioInscripcion';
 import FormularioInscripcion from '../pages/FormularioInscripcion';
 
 const EventosSeminario = () => {
@@ -181,7 +180,11 @@ const EventosSeminario = () => {
             eventos.map(ev => {
               const inscrito = estaInscrito(ev._id);
               return (
-                <div className="event-card" data-category="academico" key={ev._id}>
+                <div
+                  className={`event-card${inscrito ? ' event-card-inscrito' : ''}`}
+                  data-category="academico"
+                  key={ev._id}
+                >
                   <div className="event-image">
                     {Array.isArray(ev.imagen) && ev.imagen.length > 0 ? (
                       <img
@@ -202,7 +205,6 @@ const EventosSeminario = () => {
                     <div className="event-category">Académico</div>
                     <h3 className="event-title">{ev.nombre || '-'}</h3>
                     <p className="event-description">{ev.descripcion}</p>
-
                     <div className="event-details">
                       <div className="detail-item--seminarista">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -228,7 +230,6 @@ const EventosSeminario = () => {
                         <span>{ev.lugar}</span>
                       </div>
                     </div>
-
                     <div className="event-footer">
                       <div className="event-price">
                         <span className="price">${ev.precio}</span>
@@ -243,7 +244,11 @@ const EventosSeminario = () => {
                         </div>
                       </div>
                     </div>
-
+                    {inscrito && (
+                      <div className="inscrito-msg">
+                        <span style={{fontSize: '1.1em', fontWeight: 700}}>Estás inscrito a este evento</span>
+                      </div>
+                    )}
                     <button className="evento-btn" onClick={() => handleInscribir(ev)} disabled={inscrito}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M9 12l2 2 4-4" />

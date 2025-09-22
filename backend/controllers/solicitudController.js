@@ -170,7 +170,8 @@ exports.obtenerSolicitudes = async (req, res) => {
         prioridad: req.body.prioridad,
         observaciones: req.body.observaciones,
         fechaSolicitud: req.body.fechaSolicitud,
-        responsable: req.body.responsable
+        responsable: req.body.responsable,
+        origen: req.body.origen || 'formulario'
       });
 
       const solicitudGuardada = await nuevaSolicitud.save();
@@ -394,8 +395,9 @@ exports.obtenerSolicitudes = async (req, res) => {
   // Consultar solicitudes por usuario autenticado
 exports.obtenerSolicitudesPorUsuario = async (req, res) => {
   try {
-    // Busca solicitudes creadas por el usuario autenticado
-    const solicitudes = await Solicitud.find({ creadoPor: req.userId });
+    // Solo devuelve solicitudes manuales (origen: 'formulario') del usuario
+    const id = req.params.id || req.userId;
+    const solicitudes = await Solicitud.find({ solicitante: id, origen: 'formulario' });
     res.status(200).json({
       success: true,
       data: solicitudes

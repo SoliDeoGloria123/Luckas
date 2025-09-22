@@ -12,6 +12,7 @@ import {
   faMapMarkerAlt,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
+import { inscripcionService } from '../../../services/inscripcionService';
 
 const MisInscripciones = () => {
   // Estados
@@ -25,48 +26,29 @@ const MisInscripciones = () => {
     canceladas: 0,
     total: 0
   });
+   const usuarioLogueado = (() => {
+    try {
+      const usuarioStorage = localStorage.getItem('usuario');
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const userId = usuarioLogueado?._id || usuarioLogueado?.id;
 
   // Datos de ejemplo (simulando API)
   useEffect(() => {
-    const mockData = [
-      {
-        id: 1,
-        titulo: "Retiro Espiritual en Montaña",
-        imagen: "https://images.ctfassets.net/denf86kkcx7r/4IPlg4Qazd4sFRuCUHIJ1T/f6c71da7eec727babcd554d843a528b8/gatocomuneuropeo-97?fm=webp&w=612",
-        fecha: "2023-11-15",
-        horario: "8:00 AM - 5:00 PM",
-        ubicacion: "Centro de Retiros La Paz, Antioquia",
-        estado: "Confirmada",
-        fechaInscripcion: "2023-10-10",
-        precio: "$120,000 COP"
-      },
-      {
-        id: 2,
-        titulo: "Taller de Meditación",
-        imagen: "/placeholder.svg",
-        fecha: "2023-12-05",
-        horario: "9:00 AM - 12:00 PM",
-        ubicacion: "Centro Cultural de la Ciudad",
-        estado: "Pendiente",
-        fechaInscripcion: "2023-11-20",
-        precio: "$80,000 COP"
-      },
-      {
-        id: 3,
-        titulo: "Conferencia de Mindfulness",
-        imagen: "/placeholder.svg",
-        fecha: "2023-10-28",
-        horario: "3:00 PM - 6:00 PM",
-        ubicacion: "Auditorio Principal",
-        estado: "Cancelada",
-        fechaInscripcion: "2023-09-15",
-        precio: "$50,000 COP"
-      }
-    ];
-
-    setInscripciones(mockData);
-    updateStats(mockData);
-  }, []);
+        if (!userId) return;
+         inscripcionService.getIncripcionesPorUsuario(userId)
+          .then(data => {
+            // Si la respuesta viene como {success, data}, usa data
+            const inscripcionData = Array.isArray(data) ? data : data.data;
+            setInscripciones(inscripcionData);
+      })
+      .catch(err => {
+        console.error('Error al obtener las inscripciones:', err);
+      });
+  }, [userId]);
 
   // Actualizar estadísticas
   const updateStats = (data) => {
@@ -190,40 +172,51 @@ const MisInscripciones = () => {
             </div>
           </div>
         </div>
+        {/* Lista de inscripciones */}
+          {filteredInscripciones.length === 0 && (
+            <div className='no-data-container-misinscripciones'>
+              <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="Sin reservas" style={{width: '120px', marginBottom: '20px', opacity: 0.7}} />
+              <div>No tienes inscripciones registradas.</div>
+              <div style={{fontSize: '0.95em', color: '#888', marginTop: '8px'}}>¡Haz tu primera inscripción y disfruta la experiencia!</div>
+            </div>
+          )}
 
         {/* Lista de inscripciones */}
         {filteredInscripciones.map((inscripcion) => (
         <div className="inscripciones-container-misinscripciones">
           <div className="inscripcion-card-misinscripciones" key={inscripcion.id}>
             <div className="inscripcion-content-misinscripciones">
-              <img src="https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg"  className="inscripcion-image-misinscripciones"></img>
+              {/* Carrusel de imágenes en la tarjeta */}
+              <div className="inscripcion-image-gallery">
+                <CardImageCarousel images={inscripcion.evento?.imagen} />
+              </div>
               <div className="inscripcion-body-misinscripciones">
                 <div className="header-misinscripciones">
                   <div className="inscripcion-title-section-misinscripciones">
                     <div className="inscripcion-title-row-misinscripciones">
-                      <h3 className="inscripcion-title-misinscripciones">{inscripcion.titulo}</h3>
+                      <h3 className="inscripcion-title-misinscripciones">{inscripcion.evento?.nombre || 'Evento'}</h3>
                       <span className={`status-badge-misinscripciones ${inscripcion.estado.toLowerCase()}`}>{inscripcion.estado}</span>
                     </div>
                     {/* Si tienes categoría, puedes mostrarla aquí */}
                     {/* <span className={`categoria-badge ${inscripcion.categoria?.toLowerCase()}`}>{inscripcion.categoria}</span> */}
                   </div>
                   <div className="inscripcion-price-section-misinscripciones">
-                    <div className="inscripcion-price-misinscripciones">{inscripcion.precio}</div>
-                    <div className="inscripcion-date-misinscripciones">Inscrito: {inscripcion.fechaInscripcion}</div>
+                    <div className="inscripcion-price-misinscripciones">{inscripcion.evento?.precio || 'Precio no disponible'}</div>
+                    <div className="inscripcion-date-misinscripciones">Inscrito: {new Date(inscripcion.createdAt).toLocaleDateString()}</div>
                   </div>
                 </div>
                 <div className="inscripcion-details-misinscripciones">
                   <div className="detail-row-misinscripciones">
                     <i className="fas fa-calendar"></i>
-                    <span>{inscripcion.fecha}</span>
+                    <span>{new Date(inscripcion.evento?.fechaEvento).toLocaleDateString()}</span>
                   </div>
                   <div className="detail-row-misinscripciones">
                     <i className="fas fa-clock"></i>
-                    <span>{inscripcion.horario}</span>
+                    <span>Hora Inicio: {inscripcion.evento?.horaInicio || 'Horario no disponible'} - Hora Fin: {inscripcion.evento?.horaFin || 'Horario no disponible'}</span>
                   </div>
                   <div className="detail-row-misinscripciones">
                     <i className="fas fa-map-marker-alt"></i>
-                    <span>{inscripcion.ubicacion}</span>
+                    <span>{inscripcion.evento?.lugar || 'Ubicación no disponible'}</span>
                   </div>
                 </div>
                 <div className="inscripcion-footer-misinscripciones">
@@ -246,15 +239,21 @@ const MisInscripciones = () => {
         ))}
         {/* Modal de Detalles */}
         {isModalOpen && currentInscripcion && (
-          <div className="" id="modalOverlay" onClick={closeModal}>
+          <div className="modal-overlay-misinscripciones show" onClick={closeModal}>
             <div className="modal-container-misinscripciones" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <img
-                  id="modalImage"
-                  src={currentInscripcion.imagen}
-                  alt=""
-                  className="modal-image-misinscripciones"
-                />
+              <div className="modal-header-misinscripciones">
+                {/* Carrusel de imágenes en el modal */}
+                <div className="modal-image-gallery">
+                  {Array.isArray(currentInscripcion.evento?.imagen) && currentInscripcion.evento.imagen.length > 0 ? (
+                    <ModalImageCarousel images={currentInscripcion.evento.imagen} />
+                  ) : (
+                    <img
+                      src={'https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg'}
+                      alt="Imagen del evento"
+                      className="modal-image-misinscripciones"
+                    />
+                  )}
+                </div>
                 <button className="modal-close-misinscripciones" onClick={closeModal}>
                   <FontAwesomeIcon icon={faTimes} />
                 </button>
@@ -329,3 +328,56 @@ const MisInscripciones = () => {
 };
 
 export default MisInscripciones;
+
+// Carrusel simple para el modal
+function ModalImageCarousel({ images }) {
+  const [index, setIndex] = useState(0);
+  const prev = () => setIndex(i => (i === 0 ? images.length - 1 : i - 1));
+  const next = () => setIndex(i => (i === images.length - 1 ? 0 : i + 1));
+  return (
+    <div className="modal-carousel-wrapper">
+      <button className="carousel-arrow left" onClick={prev}>&lt;</button>
+      <img
+        src={`http://localhost:3000/uploads/eventos/${images[index]}`}
+        alt={`Imagen ${index + 1}`}
+        className="modal-image-misinscripciones"
+        style={{ maxHeight: '260px', borderRadius: '12px' }}
+      />
+      <button className="carousel-arrow right" onClick={next}>&gt;</button>
+      <div className="carousel-indicator">
+        {index + 1} / {images.length}
+      </div>
+    </div>
+  );
+}
+
+// Carrusel para las imágenes en la tarjeta de inscripción
+function CardImageCarousel({ images }) {
+  const [index, setIndex] = useState(0);
+  if (!Array.isArray(images) || images.length === 0) {
+    return (
+      <img
+        src={'https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg'}
+        alt="Imagen del evento"
+        className="inscripcion-image-misinscripciones"
+      />
+    );
+  }
+  const prev = () => setIndex(i => (i === 0 ? images.length - 1 : i - 1));
+  const next = () => setIndex(i => (i === images.length - 1 ? 0 : i + 1));
+  return (
+    <div className="card-carousel-wrapper">
+      <button className="carousel-arrow left" onClick={prev}>&lt;</button>
+      <img
+        src={`http://localhost:3000/uploads/eventos/${images[index]}`}
+        alt={`Imagen ${index + 1}`}
+        className="inscripcion-image-misinscripciones"
+        style={{ maxHeight: '160px', borderRadius: '10px' }}
+      />
+      <button className="carousel-arrow right" onClick={next}>&gt;</button>
+      <div className="carousel-indicator">
+        {index + 1} / {images.length}
+      </div>
+    </div>
+  );
+}

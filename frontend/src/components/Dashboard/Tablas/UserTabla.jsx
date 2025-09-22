@@ -12,6 +12,7 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar }) => (
           <th>Correo</th>
           <th>Teléfono</th>
           <th>Número de Documento</th>
+          <th>Fecha de Nacimiento</th>
           <th>Rol</th>
           <th>Estado</th>
           <th>Fecha Registro</th>
@@ -41,9 +42,9 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar }) => (
                  <div class="document-info">
                   <span class="doc-type"> {user.tipoDocumento}</span>
                   <span class="doc-number">{user.numeroDocumento}</span>
-                 
-                  
-                  </div></td>
+                  </div>
+              </td>
+              <td>{user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : "N/A"}</td>
               <td>
                 <span className={`badge-rol rol-${user.role}`}>{user.role}</span>
               </td>

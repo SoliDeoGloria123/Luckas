@@ -123,26 +123,41 @@ const UsuarioModal = ({
               />
             </div>
           </div>
-          {!modoEdicion && (
-            <div className="form-grupo-admin">
-              <label><i class="fas fa-lock"></i> Contraseña</label>
-
+          <div className="from-grid-admin">
+             <div className="form-grupo-admin">
+              <label><i class="fas fa-hashtag"></i> Fecha de Nacimiento</label>
               <input
-                type="password"
-                value={nuevoUsuario.password}
+                type="date"
+                value={modoEdicion ? usuarioSeleccionado?.fechaNacimiento : nuevoUsuario.fechaNacimiento}
                 onChange={e =>
-                  setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })
+                  modoEdicion
+                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, fechaNacimiento: e.target.value })
+                    : setNuevoUsuario({ ...nuevoUsuario, fechaNacimiento: e.target.value })
                 }
-                placeholder="Contraseña"
-                required={!modoEdicion}
+                required
               />
-              <button type="button" class="password-toggle-admin" >
-                <i class="fas fa-eye"></i>
-              </button>
-              <span class="error-message" id="passwordError"></span>
-              <div class="password-strength" id="passwordStrength"></div>
             </div>
-          )}
+            {!modoEdicion && (
+              <div className="form-grupo-admin">
+                <label><i class="fas fa-lock"></i> Contraseña</label>
+
+                <input
+                  type="password"
+                  value={nuevoUsuario.password}
+                  onChange={e =>
+                    setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })
+                  }
+                  placeholder="Contraseña"
+                  required={!modoEdicion}
+                />
+                <button type="button" class="password-toggle-admin" >
+                  <i class="fas fa-eye"></i>
+                </button>
+                <span class="error-message" id="passwordError"></span>
+                <div class="password-strength" id="passwordStrength"></div>
+              </div>
+            )}
+          </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
               <label>

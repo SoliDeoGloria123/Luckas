@@ -95,7 +95,7 @@ exports.getUserByDocumento = async (req, res) => {
 //Crear usurio 
 exports.createUser = async (req, res) => {
     try {
-        const { nombre, apellido, correo, telefono, tipoDocumento, numeroDocumento, estado, password, role } = req.body;
+        const { nombre, apellido, correo, telefono, tipoDocumento, numeroDocumento, fechaNacimiento, estado, password, role } = req.body;
 
         // Normalizar el tipo de documento
         const tipoDocumentoNormalizado = normalizeTipoDocumento(tipoDocumento);
@@ -107,6 +107,7 @@ exports.createUser = async (req, res) => {
             telefono,
             tipoDocumento: tipoDocumentoNormalizado,
             numeroDocumento,
+            fechaNacimiento,
             estado,
             password,
             role
@@ -123,6 +124,7 @@ exports.createUser = async (req, res) => {
                 telefono: savedUser.telefono,
                 tipoDocumento: savedUser.tipoDocumento,
                 numeroDocumento: savedUser.numeroDocumento,
+                fechaNacimiento: savedUser.fechaNacimiento,
                 estado: savedUser.estado,
                 role: savedUser.role
             }

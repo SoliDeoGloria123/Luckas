@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './FormularioInscripcion.css';
+import { inscripcionService } from "../../../services/inscripcionService";
+
 
 const FormularioInscripcion = ({
   evento,
@@ -13,13 +15,68 @@ const FormularioInscripcion = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     nombre: usuario?.nombre || '',
-    documento: usuario?.documento || '',
-    email: usuario?.email || '',
+    apellido: usuario?.apellido || '',
+    tipoDocumento: usuario?.tipoDocumento || '',
+    numeroDocumento: usuario?.numeroDocumento || '',
+    correo: usuario?.correo || '',
     telefono: usuario?.telefono || '',
+    edad: '',
     motivacion: '',
     experiencia: ''
   });
+  const [edadError, setEdadError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Crear inscripción usando usuario logueado y evento
+  const crearInscripcion = async () => {
+    try {
+      // Obtener usuario logueado desde localStorage como objeto
+      const usuarioLogueado = (() => {
+        try {
+          const usuarioStorage = localStorage.getItem('usuario');
+          return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+        } catch {
+          return null;
+        }
+      })();
+      const userId = usuarioLogueado?._id || usuarioLogueado?.id;
+      if (!userId) {
+        alert('No se encontró el usuario logueado. Inicia sesión nuevamente.');
+        return;
+      }
+      // Calcular edad usando fechaNacimiento del usuario
+      const calcularEdad = (fechaNacimiento) => {
+        if (!fechaNacimiento) return '';
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const m = hoy.getMonth() - nacimiento.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+          edad--;
+        }
+        return edad;
+      };
+      const edadCalculada = calcularEdad(usuarioLogueado?.fechaNacimiento);
+      // Construir objeto inscripción para la API
+      const inscripcionData = {
+        usuario: userId,
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        tipoDocumento: formData.tipoDocumento,
+        numeroDocumento: formData.numeroDocumento,
+        correo: formData.email,
+        telefono: formData.telefono,
+        edad: edadCalculada,
+        evento: evento?._id || evento?.id,
+        categoria: evento?.categoria?._id || evento?.categoria,
+        observaciones: formData.motivacion,
+      };
+      await inscripcionService.create(inscripcionData);
+      if (onSubmit) onSubmit(inscripcionData);
+    } catch (err) {
+      alert('Error al crear la inscripción: ' + err.message);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,6 +84,40 @@ const FormularioInscripcion = ({
       ...prev,
       [name]: value
     }));
+
+    // Validar edad si se modifica
+    if (name === 'edad') {
+      let fechaNacimiento = usuario?.fechaNacimiento;
+      if (!fechaNacimiento) {
+        try {
+          const usuarioStorage = localStorage.getItem('usuario');
+          if (usuarioStorage) {
+            const usuarioLocal = JSON.parse(usuarioStorage);
+            fechaNacimiento = usuarioLocal?.fechaNacimiento;
+          }
+        } catch {}
+      }
+      if (fechaNacimiento) {
+        const nacimiento = new Date(fechaNacimiento);
+        if (!isNaN(nacimiento.getTime())) {
+          const hoy = new Date();
+          let edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
+          const m = hoy.getMonth() - nacimiento.getMonth();
+          if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edadCalculada--;
+          }
+          if (parseInt(value) !== edadCalculada) {
+            setEdadError(`La edad ingresada (${value}) no coincide con la calculada (${edadCalculada}) según la fecha de nacimiento.`);
+          } else {
+            setEdadError('');
+          }
+        } else {
+          setEdadError('Fecha de nacimiento inválida.');
+        }
+      } else {
+        setEdadError('No se encontró la fecha de nacimiento.');
+      }
+    }
   };
 
   // Llama a onSubmit del padre al enviar el formulario
@@ -53,12 +144,13 @@ const FormularioInscripcion = ({
     }, 1000);
   };
 
-  const procesarPago = (metodo) => {
+  const procesarPago = async (metodo) => {
     setIsLoading(true);
 
     // Simular procesamiento de pago
-    setTimeout(() => {
+    setTimeout(async () => {
       setIsLoading(false);
+      await crearInscripcion();
       setCurrentStep(4);
       updateProgress(100);
     }, 2000);
@@ -173,7 +265,7 @@ const FormularioInscripcion = ({
             <form onSubmit={handleSubmit} className="registration-form-seminario">
               <div className="form-row-semianrio">
                 <div className="form-group-semianrio">
-                  <label htmlFor="nombre">Nombre Completo *</label>
+                  <label htmlFor="nombre">Nombres</label>
                   <input
                     type="text"
                     id="nombre"
@@ -184,31 +276,66 @@ const FormularioInscripcion = ({
                   />
                 </div>
                 <div className="form-group-semianrio">
-                  <label htmlFor="documento">Número de Documento *</label>
+                  <label htmlFor="apellido">Apellidos</label>
                   <input
                     type="text"
+                    id="apellido"
+                    name="apellido"
+                    value={formData.apellido}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+
+              </div>
+              <div className="form-row-semianrio">
+                <div className="form-group-semianrio">
+                  <label htmlFor="documento">Tipo de Documento</label>
+                  <select
                     id="documento"
-                    name="documento"
-                    value={formData.documento}
+                    name="tipoDocumento"
+                    value={formData.tipoDocumento || usuario?.tipoDocumento || ''}
+                    onChange={handleInputChange}
+                    required
+                    disabled={!!usuario?.tipoDocumento}
+                  >
+                    <option value="">Selecciona...</option>
+                    <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
+                    <option value="Tarjeta de identidad">Tarjeta de identidad</option>
+                    <option value="Cédula de extranjería">Cédula de extranjería</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                  </select>
+                </div>
+                <div className="form-group-semianrio">
+                  <label htmlFor="numeroDocumento">Número de Documento</label>
+                  <input
+                    type="text"
+                    id="numeroDocumento"
+                    name="numeroDocumento"
+                    value={formData.numeroDocumento}
                     onChange={handleInputChange}
                     required
                   />
                 </div>
               </div>
               <div className="form-row-semianrio">
+
                 <div className="form-group-semianrio">
-                  <label htmlFor="email">Correo Electrónico *</label>
+                  <label htmlFor="edad">Edad</label>
                   <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
+                    type="number"
+                    id="edad"
+                    name="edad"
+                    value={formData.edad}
                     onChange={handleInputChange}
                     required
                   />
+                  {edadError && (
+                    <div style={{ color: 'red', fontSize: '0.9em' }}>{edadError}</div>
+                  )}
                 </div>
                 <div className="form-group-semianrio">
-                  <label htmlFor="telefono">Teléfono *</label>
+                  <label htmlFor="telefono">Teléfono</label>
                   <input
                     type="tel"
                     id="telefono"
@@ -220,7 +347,20 @@ const FormularioInscripcion = ({
                 </div>
               </div>
               <div className="form-group-semianrio">
-                <label htmlFor="motivacion">Motivación para participar *</label>
+                <label htmlFor="email">Correo Electrónico</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+
+              <div className="form-group-semianrio">
+                <label htmlFor="motivacion">Motivación para participar</label>
                 <textarea
                   id="motivacion"
                   name="motivacion"
@@ -255,19 +395,80 @@ const FormularioInscripcion = ({
               <p>Tu solicitud está siendo revisada por el personal académico</p>
             </div>
             <div className="review-content-seminario">
-              <div className="loading-spinner-seminario">
-
-              </div>
+              <div className="loading-spinner-seminario"></div>
               <h4>Revisando tu solicitud...</h4>
               <p>El personal académico está evaluando tu solicitud. Este proceso puede tomar entre 1-3 días hábiles.</p>
+
+              {/* Validación automática de datos */}
+              {(() => {
+                let usuarioLogueado = usuario;
+                if (!usuarioLogueado) {
+                  try {
+                    const usuarioStorage = localStorage.getItem('usuario');
+                    if (usuarioStorage) {
+                      usuarioLogueado = JSON.parse(usuarioStorage);
+                    }
+                  } catch {}
+                }
+                const advertencias = [];
+                if (usuarioLogueado) {
+                  if (formData.nombre !== usuarioLogueado.nombre) {
+                    advertencias.push('El nombre ingresado no coincide con el registrado.');
+                  }
+                  if (formData.apellido !== usuarioLogueado.apellido) {
+                    advertencias.push('El apellido ingresado no coincide con el registrado.');
+                  }
+                  if (formData.tipoDocumento !== usuarioLogueado.tipoDocumento) {
+                    advertencias.push('El tipo de documento no coincide con el registrado.');
+                  }
+                  if (formData.numeroDocumento !== usuarioLogueado.numeroDocumento) {
+                    advertencias.push('El número de documento no coincide con el registrado.');
+                  }
+                  if (formData.email !== usuarioLogueado.correo) {
+                    advertencias.push('El correo electrónico no coincide con el registrado.');
+                  }
+                  if (formData.telefono !== usuarioLogueado.telefono) {
+                    advertencias.push('El teléfono no coincide con el registrado.');
+                  }
+                  if (formData.edad) {
+                    const nacimiento = new Date(usuarioLogueado.fechaNacimiento);
+                    if (!isNaN(nacimiento.getTime())) {
+                      const hoy = new Date();
+                      let edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
+                      const m = hoy.getMonth() - nacimiento.getMonth();
+                      if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+                        edadCalculada--;
+                      }
+                      if (parseInt(formData.edad) !== edadCalculada) {
+                        advertencias.push('La edad ingresada no coincide con la calculada según la fecha de nacimiento.');
+                      }
+                    }
+                  }
+                }
+                return advertencias.length > 0 ? (
+                  <div style={{color: 'red', marginBottom: '1em'}}>
+                    <strong>Advertencias de validación:</strong>
+                    <ul>
+                      {advertencias.map((adv, idx) => <li key={idx}>{adv}</li>)}
+                    </ul>
+                  </div>
+                ) : (
+                  <div style={{color: 'green', marginBottom: '1em'}}>
+                    Todos los datos coinciden con el usuario registrado.
+                  </div>
+                );
+              })()}
 
               <div className="submitted-data-seminario">
                 <h5>Datos enviados:</h5>
                 <div>
                   <p><strong>Nombre:</strong> {formData.nombre}</p>
-                  <p><strong>Documento:</strong> {formData.documento}</p>
+                  <p><strong>Apellido:</strong> {formData.apellido}</p>
+                  <p><strong>Tipo de Documento:</strong> {formData.tipoDocumento}</p>
+                  <p><strong>Número de Documento:</strong> {formData.numeroDocumento}</p>
                   <p><strong>Email:</strong> {formData.email}</p>
                   <p><strong>Teléfono:</strong> {formData.telefono}</p>
+                  <p><strong>Edad:</strong> {formData.edad}</p>
                   <p><strong>Motivación:</strong> {formData.motivacion}</p>
                   {formData.experiencia && <p><strong>Experiencia:</strong> {formData.experiencia}</p>}
                 </div>

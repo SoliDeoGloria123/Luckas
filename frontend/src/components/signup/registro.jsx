@@ -14,6 +14,7 @@ const Registro = () => {
     telefono: '',
     tipoDocumento: '',
     numeroDocumento: '',
+    fechaNacimiento: '',
     password: '',
     confirmPassword: ''
   });
@@ -40,6 +41,7 @@ const Registro = () => {
         telefono: formData.telefono,
         tipoDocumento: formData.tipoDocumento,
         numeroDocumento: formData.numeroDocumento,
+        fechaNacimiento: formData.fechaNacimiento,
         password: formData.password,
       });
       setCurrentStep(3); // Avanza al paso de éxito
@@ -150,10 +152,10 @@ const Registro = () => {
                     </div>
                   </div>
                   <div className="form-group-registro">
-                    <label htmlFor="apellido">Apellido</label>
-                    <div class="input-group-registro">
+                    <label htmlFor="fechaNacimiento">Fecha de Nacimiento</label>
+                    <div className="input-group-registro">
                       <FaUser className="input-icon" />
-                      <input type="text" name="apellido" placeholder="Ingrese su apellido" required onChange={handleChange} />
+                      <input type="date" name="fechaNacimiento" required onChange={handleChange} />
                     </div>
                   </div>
 

@@ -27,14 +27,14 @@ const MisReservas = () => {
     total: 0
   });
   const usuarioLogueado = (() => {
-  try {
-    const usuarioStorage = localStorage.getItem('usuario');
-    return usuarioStorage ? JSON.parse(usuarioStorage) : null;
-  } catch {
-    return null;
-  }
-})();
-const userId = usuarioLogueado?._id || usuarioLogueado?.id;
+    try {
+      const usuarioStorage = localStorage.getItem('usuario');
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const userId = usuarioLogueado?._id || usuarioLogueado?.id;
 
   useEffect(() => {
     if (!userId) return;
@@ -58,6 +58,28 @@ const userId = usuarioLogueado?._id || usuarioLogueado?.id;
       total: data.length
     });
   };
+  
+// Carrusel simple para el modal
+const ModalImageCarousel = ({ images }) => {
+  const [index, setIndex] = useState(0);
+  const prev = () => setIndex(i => (i === 0 ? images.length - 1 : i - 1));
+  const next = () => setIndex(i => (i === images.length - 1 ? 0 : i + 1));
+  return (
+    <div className="modal-carousel-wrapper">
+      <button className="carousel-arrow left" onClick={prev}>&lt;</button>
+      <img
+        src={`http://localhost:3000/uploads/cabanas/${images[index]}`}
+        alt={`Imagen ${index + 1}`}
+        className="modal-image-misinscripciones"
+        style={{ maxHeight: '260px', borderRadius: '12px' }}
+      />
+      <button className="carousel-arrow right" onClick={next}>&gt;</button>
+      <div className="carousel-indicator">
+        {index + 1} / {images.length}
+      </div>
+    </div>
+  );
+}
 
   // Filtrar inscripciones
   const filterInscripciones = (filter) => {
@@ -82,7 +104,7 @@ const userId = usuarioLogueado?._id || usuarioLogueado?.id;
   };
 
   // Reservas filtradas
-   const filteredReservas = activeFilter === 'Todas'
+  const filteredReservas = activeFilter === 'Todas'
     ? reservas
     : reservas.filter(r => r.estado === activeFilter);
   return (
@@ -95,7 +117,7 @@ const userId = usuarioLogueado?._id || usuarioLogueado?.id;
           <h1 className="page-title-seminario-inscripciones">Mis Reservas</h1>
           <p className="page-subtitle">Gestiona y revisa el estado de tus reservas de cabañas</p>
         </div>
-       
+
         <div className="stats-grid-inscripciones-semianrista">
           <div className="stat-card-misolicitudes">
             <div className="stat-icon-inscripciones-semianrista confirmed">
@@ -172,11 +194,26 @@ const userId = usuarioLogueado?._id || usuarioLogueado?.id;
         </div>
 
         {/* Lista de inscripciones */}
+          {filteredReservas.length === 0 && (
+            <div className='no-data-container-misinscripciones'>
+              <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="Sin reservas" style={{width: '120px', marginBottom: '20px', opacity: 0.7}} />
+              <div>No tienes reservas registradas.</div>
+              <div style={{fontSize: '0.95em', color: '#888', marginTop: '8px'}}>¡Haz tu primera reserva y disfruta la experiencia!</div>
+            </div>
+          )}
         {filteredReservas.map((reserva) => (
           <div className="inscripciones-container-misinscripciones">
             <div className="inscripcion-card-misinscripciones" key={reserva.id}>
               <div className="inscripcion-content-misinscripciones">
-                <img src="https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg" className="inscripcion-image-misinscripciones"></img>
+                {Array.isArray(reserva.cabana?.imagen) && reserva.cabana.imagen.length > 0 ? (
+                    <ModalImageCarousel images={reserva.cabana.imagen} />
+                  ) : (
+                    <img
+                      src={'https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg'}
+                      alt="Imagen del evento"
+                      className="modal-image-misinscripciones"
+                    />
+                  )}
                 <div className="inscripcion-body-misinscripciones">
                   <div className="header-misinscripciones">
                     <div className="inscripcion-title-section-misinscripciones">
@@ -189,21 +226,21 @@ const userId = usuarioLogueado?._id || usuarioLogueado?.id;
                     </div>
                     <div className="inscripcion-price-section-misinscripciones">
                       <div className="inscripcion-price-misinscripciones">{reserva.precio}</div>
-                      <div className="inscripcion-date-misinscripciones">Fecha de Reserva: {new Date(reserva.fechaInicio).toLocaleDateString()} - {new Date(reserva.fechaFin).toLocaleDateString()}</div>
+                      <div className="inscripcion-date-misinscripciones">Fecha de Reserva: {new Date(reserva.createdAt).toLocaleDateString()}</div>
                     </div>
                   </div>
                   <div className="inscripcion-details-misinscripciones">
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-calendar"></i>
-                      <span>{reserva.fecha}</span>
+                      <span>{new Date(reserva.createdAt).toLocaleDateString()} - {new Date(reserva.fechaFin).toLocaleDateString()}</span>
                     </div>
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-clock"></i>
-                      <span>{reserva.horario}</span>
+                      <span>{reserva.horario} </span>
                     </div>
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-map-marker-alt"></i>
-                      <span>{reserva.ubicacion}</span>
+                      <span>{reserva.cabana?.ubicacion}</span>
                     </div>
                   </div>
                   <div className="inscripcion-footer-misinscripciones">
@@ -226,19 +263,20 @@ const userId = usuarioLogueado?._id || usuarioLogueado?.id;
         ))}
         {/* Modal de Detalles */}
         {isModalOpen && currentInscripcion && (
-          <div className="" id="modalOverlay" onClick={closeModal}>
+          <div className="modal-overlay-misinscripciones show" onClick={closeModal}>
             <div className="modal-container-misinscripciones" onClick={e => e.stopPropagation()}>
               <div className="modal-header-misinscripciones">
                 <img
-                  src={currentInscripcion.imagen}
-                  alt=""
+                  src={currentInscripcion.cabana?.imagen?.[0]
+                    ? `/uploads/cabanas/${currentInscripcion.cabana.imagen[0]}`
+                    : "https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg"}
+                  alt="Imagen de la cabaña"
                   className="modal-image-misinscripciones"
                 />
                 <button className="modal-close-misinscripciones" onClick={closeModal}>
                   <FontAwesomeIcon icon={faTimes} />
                 </button>
               </div>
-
               <div className="modal-content-misinscripciones">
                 <div className="modal-status-price-misinscripciones">
                   <span id="modalStatus" className={`status-badge-misinscripciones ${currentInscripcion.estado.toLowerCase()}`}>
@@ -248,43 +286,24 @@ const userId = usuarioLogueado?._id || usuarioLogueado?.id;
                     {currentInscripcion.precio}
                   </span>
                 </div>
-
-                <h2 id="modalTitle" className="modal-title-misinscripciones">{currentInscripcion.titulo}</h2>
-
+                <h2 id="modalTitle" className="modal-title-misinscripciones">{currentInscripcion.cabana?.nombre || 'Cabaña'}</h2>
                 <div className="modal-details-grid-misinscripciones">
                   <div className="modal-section-misinscripciones">
-                    <h3 className="section-title-misinscripciones">Detalles del Evento</h3>
-                    <div className="detail-item-misinscripciones">
-                      <FontAwesomeIcon icon={faCalendar} className="detail-icon-misinscripciones" />
-                      <span id="modalFecha">{currentInscripcion.fecha}</span>
-                    </div>
-                    <div className="detail-item-misinscripciones">
-                      <FontAwesomeIcon icon={faClock} className="detail-icon-misinscripciones" />
-                      <span id="modalHorario">{currentInscripcion.horario}</span>
-                    </div>
-                    <div className="detail-item-misinscripciones">
-                      <FontAwesomeIcon icon={faMapMarkerAlt} className="detail-icon-misinscripciones" />
-                      <span id="modalUbicacion">{currentInscripcion.ubicacion}</span>
-                    </div>
+                    <h3 className="section-title-misinscripciones">Datos de la Cabaña</h3>
+                    <div className="detail-item-misinscripciones"><strong>Descripción:</strong> {currentInscripcion.cabana?.descripcion}</div>
+                    <div className="detail-item-misinscripciones"><strong>Ubicación:</strong> {currentInscripcion.cabana?.ubicacion}</div>
+                    <div className="detail-item-misinscripciones"><strong>Capacidad:</strong> {currentInscripcion.cabana?.capacidad}</div>
+                    <div className="detail-item-misinscripciones"><strong>Precio:</strong> {currentInscripcion.cabana?.precio}</div>
                   </div>
-
                   <div className="modal-section-misinscripciones">
-                    <h3 className="section-title-misinscripciones">Información de Inscripción</h3>
-                    <div className="detail-item-misinscripciones">
-                      <FontAwesomeIcon icon={faCheckCircle} className="detail-icon-misinscripciones" />
-                      <span>Estado: <span id="modalEstadoText">{currentInscripcion.estado}</span></span>
-                    </div>
-                    <div className="detail-item-misinscripciones">
-                      <FontAwesomeIcon icon={faCalendar} className="detail-icon-misinscripciones" />
-                      <span>Inscrito: <span id="modalFechaInscripcion">{currentInscripcion.fechaInscripcion}</span></span>
-                    </div>
-                    <div className="detail-item-misinscripciones">
-                      <span className="detail-icon-misinscripciones">💰</span>
-                      <span>Precio: <span id="modalPrecioText">{currentInscripcion.precio}</span></span>
-                    </div>
+                    <h3 className="section-title-misinscripciones">Datos de la Reserva</h3>
+                    <div className="detail-item-misinscripciones"><strong>Fecha de Reserva:</strong> {new Date(currentInscripcion.createdAt).toLocaleDateString()}</div>
+                    <div className="detail-item-misinscripciones"><strong>Fechas de estadía:</strong> {new Date(currentInscripcion.fechaInicio).toLocaleDateString()} - {new Date(currentInscripcion.fechaFin).toLocaleDateString()}</div>
+                    <div className="detail-item-misinscripciones"><strong>Personas:</strong> {currentInscripcion.numeroPersonas}</div>
+                    <div className="detail-item-misinscripciones"><strong>Estado:</strong> {currentInscripcion.estado}</div>
+                    <div className="detail-item-misinscripciones"><strong>Observaciones:</strong> {currentInscripcion.observaciones}</div>
                   </div>
                 </div>
-
                 <div className="modal-actions-misinscripciones">
                   <button className="btn-secondary-misinscripciones" onClick={closeModal}>Cerrar</button>
                   {currentInscripcion.estado === 'Confirmada' && (
@@ -293,7 +312,7 @@ const userId = usuarioLogueado?._id || usuarioLogueado?.id;
                       className="btn-danger-misinscripciones"
                       onClick={cancelarInscripcion}
                     >
-                      Cancelar Inscripción
+                      Cancelar Reserva
                     </button>
                   )}
                 </div>

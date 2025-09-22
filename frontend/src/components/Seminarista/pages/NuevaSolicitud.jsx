@@ -1,57 +1,140 @@
-import React, { useState } from 'react';
-import { 
-   FaCalendarAlt,  FaTimes, FaDoorOpen, FaGraduationCap, 
+import React, { useState,useEffect } from 'react';
+import {
+  FaCalendarAlt, FaTimes, FaDoorOpen, FaGraduationCap,
   FaTools, FaHeart, FaEllipsisH, FaArrowLeft, FaArrowRight, FaPaperPlane,
   FaCheckCircle, FaExclamationCircle, FaExclamationTriangle, FaInfoCircle,
-  FaCloudUploadAlt, FaFile, 
+  FaCloudUploadAlt, FaFile,
 } from 'react-icons/fa';
 import './NuevaSolicitud.css';
 import Header from '../Shared/Header';
+import { solicitudService } from '../../../services/solicirudService';
+import { categorizacionService } from '../../../services/categorizacionService';
+import { userService } from '../../../services/userService'; // Debes tener un servicio para usuarios
+
 
 const NuevaSolicitud = () => {
- const [currentStep, setCurrentStep] = useState(2);
-  const [selectedType, setSelectedType] = useState('permiso');
+  const [currentStep, setCurrentStep] = useState(2);
+  const [selectedType, setSelectedType] = useState('Inscripción');
   const [formData, setFormData] = useState({});
+  const [usuarioLogueado, setUsuarioLogueado] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [toasts, setToasts] = useState([]);
+  const [tesoreroId, setTesoreroId] = useState(null);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [modeloReferencia, setModeloReferencia] = useState('');
+const [referencia, setReferencia] = useState('');
+const [opcionesReferencia, setOpcionesReferencia] = useState([]);
+
+  // Obtener usuario logueado al montar
+  useEffect(() => {
+    const usuarioStorage = localStorage.getItem('usuario');
+    if (usuarioStorage) {
+      setUsuarioLogueado(JSON.parse(usuarioStorage));
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await categorizacionService.getAll();
+        setCategories(Array.isArray(data.data) ? data.data : []);
+      } catch (err) {
+        showToast('error', 'Error al cargar categorías', err.message || 'No se pudieron cargar las categorías');
+      }
+    };
+    fetchCategories();
+  }, []);
+
+useEffect(() => {
+  const fetchTesorero = async () => {
+    try {
+      const res = await userService.getAll(); // Debe devolver todos los usuarios
+      const tesorero = res.data.find(u => u.role === 'tesorero');
+      if (tesorero) setTesoreroId(tesorero._id);
+    } catch (err) {
+     console.log('Error fetching tesorero:', err);
+    }
+  };
+  fetchTesorero();
+}, []);
 
   const typeConfigs = {
-    permiso: {
-      title: 'Permiso de Salida',
-      description: 'Solicitar permiso para salir del seminario',
-      icon: <FaDoorOpen />
-    },
-    academico: {
-      title: 'Solicitud Académica',
-      description: 'Cambios de horario, materias o evaluaciones',
+    Inscripción: {
+      title: 'Inscripción',
+      description: 'Solicitudes para inscribirse en eventos, cursos, etc.',
       icon: <FaGraduationCap />
     },
-    recursos: {
-      title: 'Solicitud de Recursos',
-      description: 'Materiales, equipos o espacios',
-      icon: <FaTools />
+    Hospedaje: {
+      title: 'Hospedaje',
+      description: 'Solicitudes relacionadas con alojamiento o cabañas.',
+      icon: <FaDoorOpen />
     },
-    eventos: {
-      title: 'Participación en Eventos',
-      description: 'Congresos, conferencias o actividades',
-      icon: <FaCalendarAlt />
-    },
-    bienestar: {
-      title: 'Bienestar y Salud',
-      description: 'Apoyo psicológico, médico o personal',
+    Alimentación: {
+      title: 'Alimentación',
+      description: 'Solicitudes sobre comidas, comedor, dietas, etc.',
       icon: <FaHeart />
     },
-    otros: {
-      title: 'Otros',
-      description: 'Solicitudes que no encajan en las categorías anteriores',
+    Otra: {
+      title: 'Otra',
+      description: 'Cualquier otra solicitud que no encaje en las anteriores.',
       icon: <FaEllipsisH />
     }
   };
 
+  const cargarOpcionesReferencia = async (modelo) => {
+  let endpoint = '';
+  switch (modelo) {
+    case 'Eventos':
+      endpoint = '/api/eventos';
+      break;
+    case 'Cabana':
+      endpoint = '/api/cabanas';
+      break;
+    case 'Curso':
+      endpoint = '/api/cursos';
+      break;
+    case 'ProgramaTecnico':
+      endpoint = '/api/programas-tecnicos';
+      break;
+    case 'Inscripcion':
+      endpoint = '/api/inscripciones';
+      break;
+    case 'Reserva':
+      endpoint = '/api/reservas';
+      break;
+    case 'Comedor':
+      endpoint = '/api/comedor';
+      break;
+    default:
+      endpoint = '';
+  }
+  if (!endpoint) {
+    setOpcionesReferencia([]);
+    return;
+  }
+  try {
+    const res = await fetch(endpoint);
+    const data = await res.json();
+    setOpcionesReferencia(data.data || []);
+  } catch (err) {
+    setOpcionesReferencia([]);
+  }
+};
+
   const handleInputChange = (e) => {
+    if (e.target.name === 'modeloReferencia') {
+    setModeloReferencia(e.target.value);
+    setReferencia('');
+    cargarOpcionesReferencia(e.target.value);
+    return;
+  }
+  if (e.target.name === 'referencia') {
+    setReferencia(e.target.value);
+    return;
+  }
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
@@ -147,9 +230,9 @@ const NuevaSolicitud = () => {
       title,
       message
     };
-    
+
     setToasts([...toasts, newToast]);
-    
+
     setTimeout(() => {
       removeToast(newToast.id);
     }, 5000);
@@ -159,19 +242,50 @@ const NuevaSolicitud = () => {
     setToasts(toasts.filter(toast => toast.id !== id));
   };
 
-  const submitRequest = () => {
+  const submitRequest = async () => {
     if (!acceptTerms) {
       showToast('warning', 'Términos requeridos', 'Debes aceptar los términos y condiciones');
       return;
     }
 
-    showToast('success', 'Enviando solicitud', 'Por favor espera...');
-    
-    setTimeout(() => {
-      const requestNumber = generateRequestNumber();
-      showToast('success', '¡Solicitud enviada!', `Número de solicitud: ${requestNumber}`);
-      // Here you would typically redirect or show a success modal
-    }, 2000);
+    if (!tesoreroId) {
+      showToast('error', 'Responsable no encontrado', 'No se pudo asignar el tesorero como responsable');
+      return;
+    }
+
+    showToast('info', 'Enviando solicitud', 'Por favor espera...');
+
+    // Obtener usuario logueado
+    const usuarioStorage = localStorage.getItem('usuario');
+    const usuario = usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    if (!usuario) {
+      showToast('error', 'Usuario no encontrado', 'Debes iniciar sesión para enviar la solicitud');
+      return;
+    }
+
+    // Construir objeto solicitud para la API
+    const solicitudData = {
+      solicitante: usuario._id || usuario.id,
+      correo: usuario.correo || usuario.correoElectronico || usuario.email,
+      telefono: usuario.telefono || '',
+      tipoSolicitud: selectedType,
+      categoria: formData.category || null, // Debes ajustar según tu lógica de categorías
+      descripcion: formData.requestDescription || '',
+      prioridad: formData.requestPriority || 'Media',
+      observaciones: formData.requestJustification || '',
+      responsable: tesoreroId,
+      fechaSolicitud: new Date(),
+      origen: 'formulario', // <-- Campo para distinguir solicitudes manuales
+      // Puedes agregar más campos según tu modelo y lógica
+    };
+
+    try {
+      await solicitudService.create(solicitudData);
+      showToast('success', '¡Solicitud enviada!', 'Tu solicitud ha sido registrada correctamente.');
+      // Aquí puedes redirigir o limpiar el formulario
+    } catch (err) {
+      showToast('error', 'Error al enviar', err.message || 'No se pudo enviar la solicitud');
+    }
   };
 
   const generateRequestNumber = () => {
@@ -208,20 +322,20 @@ const NuevaSolicitud = () => {
             <div className="form-row-nuevasolicitud">
               <div className="form-group-nuevasolicitud">
                 <label htmlFor="exitDate">Fecha de Salida *</label>
-                <input 
-                  type="date" 
-                  id="exitDate" 
-                  name="exitDate" 
+                <input
+                  type="date"
+                  id="exitDate"
+                  name="exitDate"
                   required
                   onChange={handleInputChange}
                 />
               </div>
               <div className="form-group-nuevasolicitud">
                 <label htmlFor="returnDate">Fecha de Regreso *</label>
-                <input 
-                  type="date" 
-                  id="returnDate" 
-                  name="returnDate" 
+                <input
+                  type="date"
+                  id="returnDate"
+                  name="returnDate"
                   required
                   onChange={handleInputChange}
                 />
@@ -229,20 +343,20 @@ const NuevaSolicitud = () => {
             </div>
             <div className="form-group-nuevasolicitud">
               <label htmlFor="destination">Destino</label>
-              <input 
-                type="text" 
-                id="destination" 
-                name="destination" 
+              <input
+                type="text"
+                id="destination"
+                name="destination"
                 placeholder="¿A dónde vas?"
                 onChange={handleInputChange}
               />
             </div>
             <div className="form-group-nuevasolicitud">
               <label htmlFor="emergencyContact">Contacto de Emergencia</label>
-              <input 
-                type="text" 
-                id="emergencyContact" 
-                name="emergencyContact" 
+              <input
+                type="text"
+                id="emergencyContact"
+                name="emergencyContact"
                 placeholder="Nombre y teléfono"
                 onChange={handleInputChange}
               />
@@ -255,8 +369,8 @@ const NuevaSolicitud = () => {
             <div className="form-row-nuevasolicitud">
               <div className="form-group-nuevasolicitud">
                 <label htmlFor="subject">Materia</label>
-                <select 
-                  id="subject" 
+                <select
+                  id="subject"
                   name="subject"
                   onChange={handleInputChange}
                 >
@@ -270,8 +384,8 @@ const NuevaSolicitud = () => {
               </div>
               <div className="form-group-nuevasolicitud">
                 <label htmlFor="semester">Semestre</label>
-                <select 
-                  id="semester" 
+                <select
+                  id="semester"
                   name="semester"
                   onChange={handleInputChange}
                 >
@@ -287,20 +401,20 @@ const NuevaSolicitud = () => {
             </div>
             <div className="form-group-nuevasolicitud">
               <label htmlFor="currentSchedule">Horario Actual</label>
-              <textarea 
-                id="currentSchedule" 
-                name="currentSchedule" 
-                rows="3" 
+              <textarea
+                id="currentSchedule"
+                name="currentSchedule"
+                rows="3"
                 placeholder="Describe tu horario actual"
                 onChange={handleInputChange}
               ></textarea>
             </div>
             <div className="form-group-nuevasolicitud">
               <label htmlFor="proposedSchedule">Horario Propuesto</label>
-              <textarea 
-                id="proposedSchedule" 
-                name="proposedSchedule" 
-                rows="3" 
+              <textarea
+                id="proposedSchedule"
+                name="proposedSchedule"
+                rows="3"
                 placeholder="Describe el horario que propones"
                 onChange={handleInputChange}
               ></textarea>
@@ -313,20 +427,24 @@ const NuevaSolicitud = () => {
           <>
             <div className="form-group-nuevasolicitud">
               <label htmlFor="category">Categoría Específica</label>
-              <input 
-                type="text" 
-                id="category" 
-                name="category" 
-                placeholder="Especifica la categoría de tu solicitud"
+              <select
+                id="category"
+                name="category"
                 onChange={handleInputChange}
-              />
+                required
+              >
+                <option value="">Selecciona una categoría</option>
+                {categories.map(cat => (
+                  <option key={cat._id} value={cat._id}>{cat.nombre}</option>
+                ))}
+              </select>
             </div>
             <div className="form-group-nuevasolicitud">
               <label htmlFor="additionalInfo">Información Adicional</label>
-              <textarea 
-                id="additionalInfo" 
-                name="additionalInfo" 
-                rows="4" 
+              <textarea
+                id="additionalInfo"
+                name="additionalInfo"
+                rows="4"
                 placeholder="Proporciona cualquier información adicional relevante"
                 onChange={handleInputChange}
               ></textarea>
@@ -338,8 +456,7 @@ const NuevaSolicitud = () => {
 
   return (
     <div className="app">
-      <Header/>
-  
+      <Header />
       {/* Main Content */}
       <main className="main-content-nuevasolicitud">
         <div className="container-nuevasolicitud">
@@ -376,7 +493,7 @@ const NuevaSolicitud = () => {
 
               <div className="request-types-nuevasolicitud">
                 {Object.entries(typeConfigs).map(([type, config]) => (
-                  <div 
+                  <div
                     key={type}
                     className={`request-type-card-nuevasolicitud ${selectedType === type ? 'selected' : ''}`}
                     onClick={() => selectRequestType(type)}
@@ -399,7 +516,7 @@ const NuevaSolicitud = () => {
               <div className="step-header-nuevasolicitud">
                 <h2>Paso 2: Completa los Detalles</h2>
                 <p>Proporciona toda la información necesaria para tu solicitud</p>
-                <button 
+                <button
                   className="change-type-btn-nuevasolicitud"
                   onClick={() => setCurrentStep(1)}
                 >
@@ -421,12 +538,80 @@ const NuevaSolicitud = () => {
 
               {/* Form Fields */}
               <div className="request-form-nuevasolicitud">
+                {/* Campos autocompletados y solo lectura */}
+                <div className="form-row-nuevasolicitud">
+                  <div className="form-group-nuevasolicitud">
+                    <label htmlFor="correo">Correo</label>
+                    <input
+                      type="email"
+                      id="correo"
+                      name="correo"
+                      value={usuarioLogueado?.correo || usuarioLogueado?.correoElectronico || usuarioLogueado?.email || ''}
+                      readOnly
+                      disabled
+                    />
+                  </div>
+                  <div className="form-group-nuevasolicitud">
+                    <label htmlFor="telefono">Teléfono</label>
+                    <input
+                      type="text"
+                      id="telefono"
+                      name="telefono"
+                      value={usuarioLogueado?.telefono || ''}
+                      readOnly
+                      disabled
+                    />
+                  </div>
+                </div>
+                {/* Campos dinámicos para modeloReferencia y referencia */}
+                {(selectedType === 'Inscripción' || selectedType === 'Hospedaje') && (
+                  <>
+                    <div className="form-group-nuevasolicitud">
+                      <label htmlFor="modeloReferencia">Modelo de Referencia</label>
+                      <select
+                        id="modeloReferencia"
+                        name="modeloReferencia"
+                        value={modeloReferencia}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Selecciona el modelo</option>
+                        <option value="Eventos">Evento</option>
+                        <option value="Cabana">Cabaña</option>
+                        <option value="Curso">Curso</option>
+                        <option value="ProgramaTecnico">Programa Técnico</option>
+                        <option value="Inscripcion">Inscripción</option>
+                        <option value="Reserva">Reserva</option>
+                        <option value="Comedor">Comedor</option>
+                      </select>
+                    </div>
+                    {modeloReferencia && (
+                      <div className="form-group-nuevasolicitud">
+                        <label htmlFor="referencia">Referencia</label>
+                        <select
+                          id="referencia"
+                          name="referencia"
+                          value={referencia}
+                          onChange={handleInputChange}
+                          required
+                        >
+                          <option value="">Selecciona una opción</option>
+                          {opcionesReferencia.map((op) => (
+                            <option key={op._id || op.id} value={op._id || op.id}>
+                              {op.nombre || op.titulo || op.descripcion || op._id}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </>
+                )}
                 <div className="form-group-nuevasolicitud">
-                  <label htmlFor="requestTitle">Título de la Solicitud *</label>
-                  <input 
-                    type="text" 
-                    id="requestTitle" 
-                    name="requestTitle" 
+                  <label htmlFor="requestTitle">Título de la Solicitud</label>
+                  <input
+                    type="text"
+                    id="requestTitle"
+                    name="requestTitle"
                     required
                     onChange={handleInputChange}
                   />
@@ -434,12 +619,12 @@ const NuevaSolicitud = () => {
                 </div>
 
                 <div className="form-group-nuevasolicitud">
-                  <label htmlFor="requestDescription">Descripción Detallada *</label>
-                  <textarea 
-                    id="requestDescription" 
-                    name="requestDescription" 
-                    rows="6" 
-                    placeholder="Describe detalladamente lo que necesitas..." 
+                  <label htmlFor="requestDescription">Descripción Detallada</label>
+                  <textarea
+                    id="requestDescription"
+                    name="requestDescription"
+                    rows="6"
+                    placeholder="Describe detalladamente lo que necesitas..."
                     required
                     onChange={handleInputChange}
                   ></textarea>
@@ -447,12 +632,12 @@ const NuevaSolicitud = () => {
                 </div>
 
                 <div className="form-group-nuevasolicitud">
-                  <label htmlFor="requestJustification">Justificación *</label>
-                  <textarea 
-                    id="requestJustification" 
-                    name="requestJustification" 
-                    rows="4" 
-                    placeholder="Explica por qué es necesaria esta solicitud..." 
+                  <label htmlFor="requestJustification">Justificación</label>
+                  <textarea
+                    id="requestJustification"
+                    name="requestJustification"
+                    rows="4"
+                    placeholder="Explica por qué es necesaria esta solicitud..."
                     required
                     onChange={handleInputChange}
                   ></textarea>
@@ -462,23 +647,23 @@ const NuevaSolicitud = () => {
                 <div className="form-row-nuevasolicitud">
                   <div className="form-group-nuevasolicitud">
                     <label htmlFor="requestPriority">Prioridad</label>
-                    <select 
-                      id="requestPriority" 
+                    <select
+                      id="requestPriority"
                       name="requestPriority"
                       onChange={handleInputChange}
                     >
-                      <option value="baja">Baja</option>
-                      <option value="normal" selected>Normal</option>
-                      <option value="alta">Alta</option>
-                      <option value="urgente">Urgente</option>
+                      <option value="Baja">Baja</option>
+                      <option value="Media" selected>Media</option>
+                      <option value="Alta">Alta</option>
+                
                     </select>
                   </div>
 
                   <div className="form-group-nuevasolicitud">
                     <label htmlFor="requestDate">Fecha Requerida</label>
-                    <input 
-                      type="date" 
-                      id="requestDate" 
+                    <input
+                      type="date"
+                      id="requestDate"
                       name="requestDate"
                       onChange={handleInputChange}
                     />
@@ -499,10 +684,10 @@ const NuevaSolicitud = () => {
                       <p>Arrastra archivos aquí o <span className="upload-link">selecciona archivos</span></p>
                       <small>Máximo 5MB por archivo. Formatos: PDF, DOC, DOCX, JPG, PNG</small>
                     </div>
-                    <input 
-                      type="file" 
-                      id="fileInput" 
-                      multiple 
+                    <input
+                      type="file"
+                      id="fileInput"
+                      multiple
                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                       onChange={handleFileUpload}
                     />
@@ -517,8 +702,8 @@ const NuevaSolicitud = () => {
                             <div className="file-size-nuevasolicitud">{formatFileSize(file.size)}</div>
                           </div>
                         </div>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="remove-file"
                           onClick={() => removeFile(file.name)}
                         >
@@ -571,13 +756,13 @@ const NuevaSolicitud = () => {
 
                 <div className="terms-section-nuevasolicitud">
                   <label className="checkbox-container-nuevasolicitud">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       id="acceptTerms"
                       checked={acceptTerms}
                       onChange={(e) => setAcceptTerms(e.target.checked)}
                     />
-              
+
                     Acepto los términos y condiciones del seminario
                   </label>
                 </div>
@@ -587,8 +772,8 @@ const NuevaSolicitud = () => {
             {/* Navigation Buttons */}
             <div className="form-navigation">
               {currentStep > 1 && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn-nuevasolicitud btn-secondary-nuevasolicitud"
                   onClick={previousStep}
                 >
@@ -597,8 +782,8 @@ const NuevaSolicitud = () => {
                 </button>
               )}
               {currentStep < 3 ? (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn-nuevasolicitud btn-primary-nuevasolicitud"
                   onClick={nextStep}
                 >
@@ -606,11 +791,12 @@ const NuevaSolicitud = () => {
                   <FaArrowRight />
                 </button>
               ) : (
-                <button 
-                  type="button" 
-                  className="btn-nuevasolicitud btn-success-nuevasolicitud"
-                  onClick={submitRequest}
+                <button
+                  type="button"
+                  className={`btn-nuevasolicitud btn-success-nuevasolicitud${!acceptTerms ? ' disabled' : ''}`}
+                  onClick={acceptTerms ? submitRequest : undefined}
                   disabled={!acceptTerms}
+                  style={{ opacity: !acceptTerms ? 0.5 : 1, cursor: !acceptTerms ? 'not-allowed' : 'pointer' }}
                 >
                   <FaPaperPlane />
                   <span>Enviar Solicitud</span>
@@ -640,13 +826,15 @@ const NuevaSolicitud = () => {
                 <div className="toast-title">{toast.title}</div>
                 <div className="toast-message">{toast.message}</div>
               </div>
-              <button 
+              <button
                 className="toast-close"
                 onClick={() => removeToast(toast.id)}
               >
                 <FaTimes />
               </button>
             </div>
+
+            
           );
         })}
       </div>
