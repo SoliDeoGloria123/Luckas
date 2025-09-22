@@ -4,14 +4,13 @@ import React from 'react';
 import {
     View,
     Text,
-    StyleSheet,
     ScrollView,
     TouchableOpacity,
     Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
-import { colors, spacing, typography, shadows } from '../styles';
+import { seminaristaStyles } from '../styles/SeminaristaMovil';
 
 const HomeScreen: React.FC = () => {
     const { user, logout, isAdmin, isTesorero, isSeminarista } = useAuth();
@@ -55,96 +54,103 @@ const HomeScreen: React.FC = () => {
     };
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={seminaristaStyles.container}>
             {/* Header con información del usuario */}
-            <View style={styles.header}>
-                <View style={styles.userInfo}>
-                    <Text style={styles.greeting}>
+            <View style={[seminaristaStyles.card, { marginTop: 10 }]}>
+                <View>
+                    <Text style={seminaristaStyles.cardTitle}>
                         {getWelcomeMessage()}, {user?.nombre}
                     </Text>
-                    <Text style={styles.roleText}>
+                    <Text style={seminaristaStyles.cardText}>
                         {getRoleDisplayName(user?.role || '')}
                     </Text>
                 </View>
                 <TouchableOpacity 
-                    style={styles.logoutButton}
+                    style={[seminaristaStyles.button, { backgroundColor: 'transparent' }]}
                     onPress={handleLogout}
                 >
-                    <Ionicons name="log-out-outline" size={24} color={colors.danger} />
+                    <Ionicons name="log-out-outline" size={24} color="#dc3545" />
                 </TouchableOpacity>
             </View>
 
-            {/* Cards de acceso rápido */}
-            <View style={styles.quickAccessContainer}>
-                <Text style={styles.sectionTitle}>Acceso Rápido</Text>
-                
-                <View style={styles.cardGrid}>
-                    {/* Card Cursos */}
-                    <TouchableOpacity style={styles.card}>
-                        <View style={[styles.cardIcon, { backgroundColor: colors.primary + '20' }]}>
-                            <Ionicons name="school-outline" size={32} color={colors.primary} />
+            {/* Sección de acceso rápido */}
+            <Text style={seminaristaStyles.sectionTitle}>Acceso Rápido</Text>
+            
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                {/* Card Cursos */}
+                <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                    <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                        <Ionicons name="school-outline" size={32} color="#198754" />
+                    </View>
+                    <Text style={seminaristaStyles.cardTitle}>Cursos</Text>
+                    <Text style={seminaristaStyles.cardText}>Gestionar cursos</Text>
+                </TouchableOpacity>
+
+                {/* Card Eventos */}
+                <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                    <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                        <Ionicons name="calendar-outline" size={32} color="#198754" />
+                    </View>
+                    <Text style={seminaristaStyles.cardTitle}>Eventos</Text>
+                    <Text style={seminaristaStyles.cardText}>Ver eventos</Text>
+                </TouchableOpacity>
+
+                {/* Card Reservas */}
+                <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                    <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                        <Ionicons name="bed-outline" size={32} color="#198754" />
+                    </View>
+                    <Text style={seminaristaStyles.cardTitle}>Reservas</Text>
+                    <Text style={seminaristaStyles.cardText}>Gestionar reservas</Text>
+                </TouchableOpacity>
+
+                {/* Card Perfil */}
+                <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                    <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                        <Ionicons name="person-outline" size={32} color="#198754" />
+                    </View>
+                    <Text style={seminaristaStyles.cardTitle}>Perfil</Text>
+                    <Text style={seminaristaStyles.cardText}>Ver mi perfil</Text>
+                </TouchableOpacity>
+
+                {/* Card Programas (solo admin y tesorero) */}
+                {(isAdmin() || isTesorero()) && (
+                    <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                        <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                            <Ionicons name="library-outline" size={32} color="#198754" />
                         </View>
-                        <Text style={styles.cardTitle}>Cursos</Text>
-                        <Text style={styles.cardSubtitle}>Gestionar cursos</Text>
+                        <Text style={seminaristaStyles.cardTitle}>Programas</Text>
+                        <Text style={seminaristaStyles.cardText}>Programas Técnicos</Text>
                     </TouchableOpacity>
+                )}
 
-                    {/* Card Eventos */}
-                    <TouchableOpacity style={styles.card}>
-                        <View style={[styles.cardIcon, { backgroundColor: colors.success + '20' }]}>
-                            <Ionicons name="calendar-outline" size={32} color={colors.success} />
+                {/* Card Reportes (solo admin y tesorero) */}
+                {(isAdmin() || isTesorero()) && (
+                    <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                        <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                            <Ionicons name="bar-chart-outline" size={32} color="#198754" />
                         </View>
-                        <Text style={styles.cardTitle}>Eventos</Text>
-                        <Text style={styles.cardSubtitle}>Ver eventos</Text>
+                        <Text style={seminaristaStyles.cardTitle}>Reportes</Text>
+                        <Text style={seminaristaStyles.cardText}>Ver estadísticas</Text>
                     </TouchableOpacity>
+                )}
 
-                    {/* Card Reservas */}
-                    <TouchableOpacity style={styles.card}>
-                        <View style={[styles.cardIcon, { backgroundColor: colors.warning + '20' }]}>
-                            <Ionicons name="bed-outline" size={32} color={colors.warning} />
+                {/* Card Usuarios (solo admin) */}
+                {isAdmin() && (
+                    <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                        <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                            <Ionicons name="people-outline" size={32} color="#198754" />
                         </View>
-                        <Text style={styles.cardTitle}>Reservas</Text>
-                        <Text style={styles.cardSubtitle}>Cabañas</Text>
+                        <Text style={seminaristaStyles.cardTitle}>Usuarios</Text>
+                        <Text style={seminaristaStyles.cardText}>Gestionar usuarios</Text>
                     </TouchableOpacity>
-
-                    {/* Card Programas (solo admin y tesorero) */}
-                    {(isAdmin() || isTesorero()) && (
-                        <TouchableOpacity style={styles.card}>
-                            <View style={[styles.cardIcon, { backgroundColor: colors.info + '20' }]}>
-                                <Ionicons name="library-outline" size={32} color={colors.info} />
-                            </View>
-                            <Text style={styles.cardTitle}>Programas</Text>
-                            <Text style={styles.cardSubtitle}>Técnicos</Text>
-                        </TouchableOpacity>
-                    )}
-
-                    {/* Card Reportes (solo admin y tesorero) */}
-                    {(isAdmin() || isTesorero()) && (
-                        <TouchableOpacity style={styles.card}>
-                            <View style={[styles.cardIcon, { backgroundColor: colors.secondary + '20' }]}>
-                                <Ionicons name="bar-chart-outline" size={32} color={colors.secondary} />
-                            </View>
-                            <Text style={styles.cardTitle}>Reportes</Text>
-                            <Text style={styles.cardSubtitle}>Estadísticas</Text>
-                        </TouchableOpacity>
-                    )}
-
-                    {/* Card Usuarios (solo admin) */}
-                    {isAdmin() && (
-                        <TouchableOpacity style={styles.card}>
-                            <View style={[styles.cardIcon, { backgroundColor: colors.danger + '20' }]}>
-                                <Ionicons name="people-outline" size={32} color={colors.danger} />
-                            </View>
-                            <Text style={styles.cardTitle}>Usuarios</Text>
-                            <Text style={styles.cardSubtitle}>Gestionar</Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
+                )}
             </View>
 
             {/* Información del sistema */}
-            <View style={styles.systemInfo}>
-                <Text style={styles.sectionTitle}>Sistema Seminario</Text>
-                <Text style={styles.systemText}>
+            <View style={[seminaristaStyles.card, { marginTop: 20 }]}>
+                <Text style={seminaristaStyles.cardTitle}>Sistema Seminario</Text>
+                <Text style={seminaristaStyles.cardText}>
                     Bienvenido al sistema de gestión del seminario. 
                     Desde aquí puedes acceder a todas las funcionalidades disponibles según tu rol.
                 </Text>
@@ -152,92 +158,5 @@ const HomeScreen: React.FC = () => {
         </ScrollView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: spacing.lg,
-        backgroundColor: colors.surface,
-        ...shadows.small,
-    },
-    userInfo: {
-        flex: 1,
-    },
-    greeting: {
-        fontSize: typography.fontSize.xl,
-        fontWeight: typography.fontWeight.bold,
-        color: colors.text,
-        marginBottom: spacing.xs,
-    },
-    roleText: {
-        fontSize: typography.fontSize.sm,
-        color: colors.textSecondary,
-        fontWeight: typography.fontWeight.medium,
-    },
-    logoutButton: {
-        padding: spacing.sm,
-    },
-    quickAccessContainer: {
-        padding: spacing.lg,
-    },
-    sectionTitle: {
-        fontSize: typography.fontSize.lg,
-        fontWeight: typography.fontWeight.bold,
-        color: colors.text,
-        marginBottom: spacing.md,
-    },
-    cardGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-    },
-    card: {
-        width: '48%',
-        backgroundColor: colors.surface,
-        borderRadius: 12,
-        padding: spacing.md,
-        marginBottom: spacing.md,
-        alignItems: 'center',
-        ...shadows.medium,
-    },
-    cardIcon: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: spacing.sm,
-    },
-    cardTitle: {
-        fontSize: typography.fontSize.md,
-        fontWeight: typography.fontWeight.semiBold,
-        color: colors.text,
-        marginBottom: spacing.xs,
-        textAlign: 'center',
-    },
-    cardSubtitle: {
-        fontSize: typography.fontSize.sm,
-        color: colors.textSecondary,
-        textAlign: 'center',
-    },
-    systemInfo: {
-        padding: spacing.lg,
-        backgroundColor: colors.surface,
-        margin: spacing.lg,
-        borderRadius: 12,
-        ...shadows.small,
-    },
-    systemText: {
-        fontSize: typography.fontSize.md,
-        color: colors.textSecondary,
-        lineHeight: typography.lineHeight.relaxed,
-    },
-});
 
 export default HomeScreen;

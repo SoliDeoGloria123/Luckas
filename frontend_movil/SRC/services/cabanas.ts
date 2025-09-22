@@ -4,13 +4,22 @@ import { authService } from './auth';
 import { Cabana } from '../types';
 import { API_CONFIG } from '../config';
 
-export class CabanasService {
+class CabanasService {
+    constructor() {
+        console.log('CabanasService inicializado');
+    }
     
     async getAllCabanas(): Promise<{ success: boolean; data?: Cabana[]; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CABANAS, {
+            const response = await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CABANAS, {
                 method: 'GET',
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al obtener cabañas' };
+            }
+            // Asegurar que la respuesta sea un array
+            const cabanas = Array.isArray(response.data) ? response.data : [];
+            return { success: true, data: cabanas as Cabana[] };
         } catch (error) {
             console.error('Error getting cabanas:', error);
             return { success: false, message: 'Error de conexión' };
@@ -19,9 +28,13 @@ export class CabanasService {
 
     async getCabanaById(id: string): Promise<{ success: boolean; data?: Cabana; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CABANAS}/${id}`, {
+            const response = await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CABANAS}/${id}`, {
                 method: 'GET',
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al obtener la cabaña' };
+            }
+            return { success: true, data: response.data as Cabana };
         } catch (error) {
             console.error('Error getting cabana:', error);
             return { success: false, message: 'Error de conexión' };
@@ -30,10 +43,14 @@ export class CabanasService {
 
     async createCabana(cabanaData: Partial<Cabana>): Promise<{ success: boolean; data?: Cabana; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CABANAS, {
+            const response = await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CABANAS, {
                 method: 'POST',
                 body: JSON.stringify(cabanaData),
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al crear la cabaña' };
+            }
+            return { success: true, data: response.data as Cabana };
         } catch (error) {
             console.error('Error creating cabana:', error);
             return { success: false, message: 'Error de conexión' };
@@ -42,10 +59,14 @@ export class CabanasService {
 
     async updateCabana(id: string, cabanaData: Partial<Cabana>): Promise<{ success: boolean; data?: Cabana; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CABANAS}/${id}`, {
+            const response = await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CABANAS}/${id}`, {
                 method: 'PUT',
                 body: JSON.stringify(cabanaData),
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al actualizar la cabaña' };
+            }
+            return { success: true, data: response.data as Cabana };
         } catch (error) {
             console.error('Error updating cabana:', error);
             return { success: false, message: 'Error de conexión' };
@@ -54,9 +75,13 @@ export class CabanasService {
 
     async deleteCabana(id: string): Promise<{ success: boolean; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CABANAS}/${id}`, {
+            const response = await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.CABANAS}/${id}`, {
                 method: 'DELETE',
             });
+            return {
+                success: response.success,
+                message: response.message || (response.success ? 'Cabaña eliminada con éxito' : 'Error al eliminar la cabaña')
+            };
         } catch (error) {
             console.error('Error deleting cabana:', error);
             return { success: false, message: 'Error de conexión' };

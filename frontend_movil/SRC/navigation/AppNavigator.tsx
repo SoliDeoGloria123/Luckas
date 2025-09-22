@@ -1,13 +1,20 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-//importar de react-navigation
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList, MainTabParamList } from '../types/navigation';
-import { colors, spacing, typography } from '../styles';
+import { seminaristaStyles } from '../styles/SeminaristaMovil';
 
-//importar pantallas
+// Constantes de estilo
+const NAVIGATION_COLORS = {
+    active: '#198754',
+    inactive: '#6c757d',
+    background: '#ffffff',
+    border: '#e9ecef'
+};
+
+// Importar pantallas
 import LoginScreen from '../screens/LoginScreen';
 import LoadingScreen from '../screens/LoadingScreen';
 import HomeScreen from '../screens/HomeScreen';
@@ -16,63 +23,13 @@ import EventosScreen from '../screens/EventosScreen';
 import CabanasScreen from '../screens/CabanasScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
-// Pantallas temporales para desarrollo
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-
-// Componente temporal para pantallas en desarrollo
-const TemporaryScreen = ({ title }: { title: string }) => (
-    <View style={tempStyles.container}>
-        <Ionicons name="construct-outline" size={64} color={colors.textSecondary} />
-        <Text style={tempStyles.title}>{title}</Text>
-        <Text style={tempStyles.subtitle}>En desarrollo</Text>
-        <TouchableOpacity 
-            style={tempStyles.button}
-            onPress={() => Alert.alert('Info', `Pantalla de ${title} en construcción`)}
-        >
-            <Text style={tempStyles.buttonText}>Próximamente</Text>
-        </TouchableOpacity>
-    </View>
-);
-
-const tempStyles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: colors.background,
-        padding: spacing.lg,
-    },
-    title: {
-        fontSize: typography.fontSize.xl,
-        fontWeight: typography.fontWeight.bold,
-        color: colors.text,
-        marginTop: spacing.md,
-        marginBottom: spacing.sm,
-    },
-    subtitle: {
-        fontSize: typography.fontSize.md,
-        color: colors.textSecondary,
-        marginBottom: spacing.lg,
-    },
-    button: {
-        backgroundColor: colors.primary,
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-        borderRadius: 8,
-    },
-    buttonText: {
-        color: colors.textOnPrimary,
-        fontWeight: typography.fontWeight.medium,
-    },
-});
-
 // Ya no necesitamos pantallas temporales, todas están implementadas
 
 //Creacion de navegadores
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-//Navegador principal con tabs
+// Navegador principal con tabs
 const MainTabNavigator: React.FC = () => {
     const { isAdmin, isTesorero } = useAuth();
 
@@ -80,18 +37,18 @@ const MainTabNavigator: React.FC = () => {
         <Tab.Navigator
             screenOptions={{
                 headerShown: false,
-                tabBarActiveTintColor: colors.primary,
-                tabBarInactiveTintColor: colors.textSecondary,
+                tabBarActiveTintColor: NAVIGATION_COLORS.active,
+                tabBarInactiveTintColor: NAVIGATION_COLORS.inactive,
                 tabBarStyle: {
-                    backgroundColor: colors.surface,
-                    borderTopColor: colors.border,
+                    backgroundColor: NAVIGATION_COLORS.background,
+                    borderTopColor: NAVIGATION_COLORS.border,
                     height: 60,
-                    paddingBottom: spacing.sm,
-                    paddingTop: spacing.sm,
+                    paddingBottom: 5,
+                    paddingTop: 5,
                 },
                 tabBarLabelStyle: {
                     fontSize: 12,
-                    fontWeight: typography.fontWeight.medium,
+                    fontWeight: '500',
                 },
             }}
         >
@@ -149,7 +106,7 @@ const MainTabNavigator: React.FC = () => {
                     tabBarLabel: 'Cabañas',
                     tabBarIcon: ({ focused, color, size }: any) => (
                         <Ionicons
-                            name={focused ? 'home' : 'home-outline'}
+                            name={focused ? 'bed' : 'bed-outline'}
                             size={size}
                             color={color}
                         />
@@ -176,8 +133,8 @@ const MainTabNavigator: React.FC = () => {
     );
 };
 
-//Navigator principal de la aplicación
-function AppNavigator() {
+// Navegador principal de la aplicación
+const AppNavigator: React.FC = () => {
     const { isAuthenticated, isLoading } = useAuth();
     
     if (isLoading) {
@@ -187,25 +144,29 @@ function AppNavigator() {
     return (
         <Stack.Navigator 
             screenOptions={{ 
-                headerShown: false, 
-                animation: 'slide_from_right' 
+                headerShown: false,
+                animation: 'slide_from_right'
             }}
         >
             {isAuthenticated ? (
                 <Stack.Screen 
                     name="Main" 
                     component={MainTabNavigator} 
-                    options={{ animationTypeForReplace: 'push' }} 
+                    options={{ 
+                        animationTypeForReplace: 'push'
+                    }} 
                 />
             ) : (
                 <Stack.Screen 
                     name="Login" 
                     component={LoginScreen} 
-                    options={{ animationTypeForReplace: 'pop' }} 
+                    options={{ 
+                        animationTypeForReplace: 'pop'
+                    }}
                 />
             )}
         </Stack.Navigator> 
     );
-}
+};
 
 export default AppNavigator;

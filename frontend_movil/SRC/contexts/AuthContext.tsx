@@ -74,16 +74,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
             setIsLoading(true);
             const response = await authService.login(credentials);
-            if (response.success && response.data) {
+            
+            if (response.success && response.data && response.data.token) {
+                // Verificar que tenemos todos los datos necesarios
+                if (!response.data.user || !response.data.user.role) {
+                    throw new Error('Datos de usuario incompletos');
+                }
+                
+                // Actualizar el estado del usuario
                 setUser(response.data.user);
+                
+                // Verificar que el usuario se haya establecido correctamente
+                console.log('Usuario establecido:', response.data.user);
+                return response;
+            } else {
+                setUser(null);
+                return response;
             }
-            return response;
         } catch (error) {
             console.error('Error en login:', error);
             setUser(null);
             return { 
                 success: false, 
-                message: 'Error en login', 
+                message: error instanceof Error ? error.message : 'Error en login', 
                 data: { 
                     user: null as unknown as User,
                     token: '',

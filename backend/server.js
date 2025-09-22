@@ -5,8 +5,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
 const config = require('./config');
-const{MongoClient, ObjectId} = require('mongodb');
-//importar Rutas
+
+// Importar Rutas
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const solicitudRoutes = require('./routes/solicitudRoutes');
@@ -14,28 +14,24 @@ const eventosRoutes = require('./routes/eventosRoutes');
 const tareaRoutes = require('./routes/tareaRoutes');
 const categotizacionRoutes = require('./routes/categorizacionRoutes');
 const reservasRoutes = require('./routes/reservasRoutes'); 
-const cabanasRoutes = require('./routes/cabanasRoutes'); // Asegúrate de que esta ruta exista
+const cabanasRoutes = require('./routes/cabanasRoutes');
 const inscripcionRoutes = require('./routes/inscripcionRoutes');
-const ReportesRoutes= require ('./routes/reportesRoutes')// Asegúrate de que esta ruta exista
+const ReportesRoutes = require('./routes/reportesRoutes');
 const cursosRoutes = require('./routes/cursosRoutes');
 const programasTecnicosRoutes = require('./routes/programasTecnicosRoutes');
 const reporteguardarRoutes = require('./routes/reporteRoutes');
-// Primero declaramos app
+
+// Inicializar Express
 const app = express();
 
-// Luego usamos app
-const mongoClient = new MongoClient(process.env.MONGODB_URI);
-(async ()=>{
-    await mongoClient.connect();
-    app.set('mongoDb', mongoClient.db());
-    console.log('Conexión directa a mongoDB establecida'); // Corregir typo
-})();
-
-//Middlewares
-app.use(cors());
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+// Configuración de middlewares
+app.use(morgan('dev')); // Logging
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:19006', 'http://10.0.2.2:19006'],
+    credentials: true
+}));
+app.use(express.json()); // Para parsear JSON
+app.use(express.urlencoded({ extended: true })); // Para parsear URL-encoded
 
 // Servir archivos estáticos del frontend
 app.use('/Externo', express.static(path.join(__dirname, '../frontend/public/Externo')));

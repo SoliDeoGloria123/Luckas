@@ -1,7 +1,8 @@
 // Ejemplo de uso de los servicios de inscripciones, reportes y solicitudes
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Alert, TouchableOpacity } from 'react-native';
+import { seminaristaStyles as styles } from '../styles/SeminaristaMovil';
 import { 
     inscripcionesService, 
     reportesService, 
@@ -111,29 +112,29 @@ const ServicesTestScreen: React.FC<ServicesTestScreenProps> = () => {
     }, []);
 
     const renderInscripcion = ({ item }: { item: Inscripcion }) => (
-        <View style={styles.item}>
-            <Text style={styles.itemTitle}>ID: {item._id}</Text>
-            <Text>Estado: {item.estado}</Text>
-            <Text>Fecha: {new Date(item.fechaInscripcion).toLocaleDateString()}</Text>
-            <Text>Pago: ${item.pago.monto}</Text>
+        <View style={styles.card}>
+            <Text style={styles.cardTitle}>ID: {item._id}</Text>
+            <Text style={styles.cardText}>Estado: {item.estado}</Text>
+            <Text style={styles.cardText}>Fecha: {new Date(item.fechaInscripcion).toLocaleDateString()}</Text>
+            <Text style={styles.cardText}>Pago: ${item.pago.monto}</Text>
         </View>
     );
 
     const renderReporte = ({ item }: { item: Reporte }) => (
-        <View style={styles.item}>
-            <Text style={styles.itemTitle}>{item.titulo}</Text>
-            <Text>Tipo: {item.tipo}</Text>
-            <Text>Fecha: {new Date(item.fechaGeneracion).toLocaleDateString()}</Text>
+        <View style={styles.card}>
+            <Text style={styles.cardTitle}>{item.titulo}</Text>
+            <Text style={styles.cardText}>Tipo: {item.tipo}</Text>
+            <Text style={styles.cardText}>Fecha: {new Date(item.fechaGeneracion).toLocaleDateString()}</Text>
         </View>
     );
 
     const renderSolicitud = ({ item }: { item: Solicitud }) => (
-        <View style={styles.item}>
-            <Text style={styles.itemTitle}>{item.titulo}</Text>
-            <Text>Tipo: {item.tipo}</Text>
-            <Text>Estado: {item.estado}</Text>
-            <Text>Prioridad: {item.prioridad}</Text>
-            <Text>Fecha: {new Date(item.fechaSolicitud).toLocaleDateString()}</Text>
+        <View style={styles.card}>
+            <Text style={styles.cardTitle}>{item.titulo}</Text>
+            <Text style={styles.cardText}>Tipo: {item.tipo}</Text>
+            <Text style={styles.cardText}>Estado: {item.estado}</Text>
+            <Text style={styles.cardText}>Prioridad: {item.prioridad}</Text>
+            <Text style={styles.cardText}>Fecha: {new Date(item.fechaSolicitud).toLocaleDateString()}</Text>
         </View>
     );
 
@@ -141,7 +142,7 @@ const ServicesTestScreen: React.FC<ServicesTestScreenProps> = () => {
         <View style={styles.container}>
             <Text style={styles.title}>Prueba de Servicios</Text>
             
-            <View style={styles.buttonContainer}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around', marginBottom: 20 }}>
                 <TouchableOpacity 
                     style={styles.button} 
                     onPress={testInscripciones}
@@ -167,7 +168,7 @@ const ServicesTestScreen: React.FC<ServicesTestScreenProps> = () => {
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                    style={[styles.button, styles.createButton]} 
+                    style={styles.button} 
                     onPress={testCreateInscripcion}
                     disabled={loading}
                 >
@@ -178,7 +179,7 @@ const ServicesTestScreen: React.FC<ServicesTestScreenProps> = () => {
             {loading && <Text style={styles.loading}>Cargando...</Text>}
 
             {inscripciones.length > 0 && (
-                <View style={styles.section}>
+                <View style={styles.container}>
                     <Text style={styles.sectionTitle}>Inscripciones:</Text>
                     <FlatList
                         data={inscripciones}
@@ -190,7 +191,7 @@ const ServicesTestScreen: React.FC<ServicesTestScreenProps> = () => {
             )}
 
             {reportes.length > 0 && (
-                <View style={styles.section}>
+                <View style={styles.container}>
                     <Text style={styles.sectionTitle}>Reportes:</Text>
                     <FlatList
                         data={reportes}
@@ -202,7 +203,7 @@ const ServicesTestScreen: React.FC<ServicesTestScreenProps> = () => {
             )}
 
             {solicitudes.length > 0 && (
-                <View style={styles.section}>
+                <View style={styles.container}>
                     <Text style={styles.sectionTitle}>Solicitudes:</Text>
                     <FlatList
                         data={solicitudes}
@@ -216,75 +217,6 @@ const ServicesTestScreen: React.FC<ServicesTestScreenProps> = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#f5f5f5',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
-        color: '#333',
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-        marginBottom: 20,
-    },
-    button: {
-        backgroundColor: '#007bff',
-        padding: 12,
-        borderRadius: 8,
-        margin: 4,
-        minWidth: 120,
-    },
-    createButton: {
-        backgroundColor: '#28a745',
-    },
-    buttonText: {
-        color: 'white',
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
-    loading: {
-        textAlign: 'center',
-        fontSize: 16,
-        color: '#666',
-        marginVertical: 10,
-    },
-    section: {
-        marginBottom: 20,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
-    },
-    list: {
-        maxHeight: 200,
-    },
-    item: {
-        backgroundColor: 'white',
-        padding: 12,
-        marginVertical: 4,
-        borderRadius: 8,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-    },
-    itemTitle: {
-        fontWeight: 'bold',
-        fontSize: 16,
-        marginBottom: 4,
-        color: '#333',
-    },
-});
+
 
 export default ServicesTestScreen;

@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
-const {DB_URI} = require('./config');
-
+const config = require('./config');
 
 const connectDB = async () => {
-    try{
-        await mongoose.connect(DB_URI,{
-            userNewUrlParser: true,
-            useUifiedTopology: true,
+    try {
+        await mongoose.connect(config.DB.URL, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
         });
         console.log('OK MongoDB conectado');
     }catch(err){

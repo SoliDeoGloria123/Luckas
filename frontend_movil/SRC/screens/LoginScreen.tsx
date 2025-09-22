@@ -48,17 +48,36 @@ const LoginScreen: React.FC = () => {
         if (!validateFields()) return;
 
         try {
+            console.log('Intentando login con:', {
+                correo: credentials.correo,
+                passwordLength: credentials.password.length
+            });
+
             const response = await login(credentials);
             
-            if (response.success) {
-                // El AuthContext ya maneja la navegación al cambiar isAuthenticated
-                Alert.alert('Éxito', 'Bienvenido al sistema');
+            console.log('Respuesta de login:', {
+                success: response.success,
+                message: response.message,
+                hasUser: response.data?.user ? 'SI' : 'NO',
+                hasToken: response.data?.token ? 'SI' : 'NO',
+                userRole: response.data?.user?.role
+            });
+            
+            if (!response.success) {
+                // Solo mostrar alerta en caso de error
+                Alert.alert(
+                    'Error de inicio de sesión',
+                    response.message || 'Credenciales incorrectas. Por favor verifica tus datos.'
+                );
             } else {
-                Alert.alert('Error', response.message || 'Error al iniciar sesión');
+                console.log('Login exitoso, esperando redirección automática...');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Login error:', error);
-            Alert.alert('Error', 'Error de conexión');
+            Alert.alert(
+                'Error de conexión',
+                'No se pudo conectar con el servidor. Por favor verifica tu conexión a internet.'
+            );
         }
     };
 
@@ -140,7 +159,7 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f8fafc', // Color más claro y moderno
     },
     scrollContainer: {
         flexGrow: 1,
@@ -149,8 +168,8 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 20,
+        borderRadius: 12,
+        padding: 24,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -160,13 +179,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#198754', // Color principal del seminario
         textAlign: 'center',
         marginBottom: 10,
     },
     subtitle: {
         fontSize: 18,
-        color: '#666',
+        color: '#6c757d', // Color secundario más suave
         textAlign: 'center',
         marginBottom: 30,
     },
@@ -181,7 +200,7 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#e9ecef', // Color del borde más suave
         borderRadius: 8,
         padding: 12,
         fontSize: 16,
@@ -196,7 +215,7 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     loginButton: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#198754', // Color principal del seminario
         borderRadius: 8,
         padding: 15,
         alignItems: 'center',
@@ -216,7 +235,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     registerLinkText: {
-        color: '#007bff',
+        color: '#198754', // Color principal del seminario
         fontSize: 16,
     },
 });

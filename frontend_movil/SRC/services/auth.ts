@@ -39,14 +39,25 @@ class AuthService {
             const url = `${API_CONFIG.BASE_URL}${endpoint}`;
             const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
                 ...(options.headers as Record<string, string>)
             };
 
             // Agregar token si existe
             if (this.token) {
-                headers['Authorization'] = `Bearer ${this.token}`;
                 headers['x-access-token'] = this.token;
+                headers['Authorization'] = `Bearer ${this.token}`;
             }
+            
+            console.log(`[API] Haciendo petición a ${endpoint}:`, {
+                url,
+                method: options.method || 'GET',
+                headers: { ...headers, Authorization: headers.Authorization ? 'Bearer [HIDDEN]' : undefined }
+            });
+
+            console.log('Haciendo petición a:', url);
+            console.log('Con headers:', headers);
+            console.log('Y opciones:', options);
 
             const response = await fetch(url, {
                 ...options,
@@ -54,7 +65,10 @@ class AuthService {
             });
 
             const data = await response.json();
+            
+            console.log('Respuesta del servidor:', data);
 
+            // Transformar la respuesta al formato esperado
             if (!response.ok) {
                 return {
                     success: false,
@@ -63,7 +77,16 @@ class AuthService {
                 };
             }
 
-            return data;
+            // Si la respuesta es exitosa, asegurarse de que tenga el formato correcto
+            return {
+                success: true,
+                message: data.message || 'Operación exitosa',
+                data: {
+                    ...data,
+                    token: data.token,
+                    user: data.user
+                }
+            };
         } catch (error) {
             console.error('Request error:', error);
             return {
@@ -78,24 +101,52 @@ class AuthService {
     async login(credentials: LoginCredentials): Promise<LoginResponse> {
         try {
             const response = await this.makeRequest<{
-                user: User;
+                success: boolean;
+                message: string;
                 token: string;
+                user: User;
             }>(API_CONFIG.ENDPOINTS.LOGIN, {
                 method: 'POST',
                 body: JSON.stringify(credentials)
             });
 
-            if (response.success && response.data) {
-                this.token = response.data.token;
-                this.user = response.data.user;
+            console.log('Respuesta completa del servidor:', response);
 
-                // Guardar en AsyncStorage
+            if (response.success && response.data) {
+                const { token, user } = response.data;
+                
+                // Asegurarse de que tenemos los datos necesarios
+                if (!token || !user || !user.role) {
+                    console.error('Respuesta del servidor incompleta:', response);
+                    throw new Error('Datos de sesión incompletos del servidor');
+                }
+
+                this.token = token;
+                this.user = user;
+
+                // Guardar en AsyncStorage y verificar que se guardó correctamente
                 await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, this.token);
                 await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(this.user));
+                
+                // Verificar que se guardó correctamente
+                const storedToken = await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
+                const storedUser = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
+                
+                if (!storedToken || !storedUser) {
+                    throw new Error('Error al guardar los datos de sesión');
+                }
+
+                console.log('Login exitoso:', {
+                    token: this.token ? 'PRESENTE' : 'NO PRESENTE',
+                    user: this.user ? {
+                        role: this.user.role,
+                        id: this.user._id
+                    } : 'NO PRESENTE'
+                });
 
                 return {
                     success: true,
-                    message: response.message,
+                    message: 'Inicio de sesión exitoso',
                     data: {
                         user: this.user,
                         token: this.token,

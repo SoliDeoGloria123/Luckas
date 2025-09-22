@@ -4,13 +4,22 @@ import { authService } from './auth';
 import { Evento } from '../types';
 import { API_CONFIG } from '../config';
 
-export class EventosService {
+class EventosService {
+    constructor() {
+        console.log('EventosService inicializado');
+    }
     
     async getAllEventos(): Promise<{ success: boolean; data?: Evento[]; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.EVENTOS, {
+            const response = await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.EVENTOS, {
                 method: 'GET',
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al obtener eventos' };
+            }
+            // Asegurar que la respuesta sea un array
+            const eventos = Array.isArray(response.data) ? response.data : [];
+            return { success: true, data: eventos as Evento[] };
         } catch (error) {
             console.error('Error getting eventos:', error);
             return { success: false, message: 'Error de conexión' };
@@ -19,9 +28,13 @@ export class EventosService {
 
     async getEventoById(id: string): Promise<{ success: boolean; data?: Evento; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.EVENTOS}/${id}`, {
+            const response = await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.EVENTOS}/${id}`, {
                 method: 'GET',
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al obtener el evento' };
+            }
+            return { success: true, data: response.data as Evento };
         } catch (error) {
             console.error('Error getting evento:', error);
             return { success: false, message: 'Error de conexión' };
@@ -30,10 +43,14 @@ export class EventosService {
 
     async createEvento(eventoData: Partial<Evento>): Promise<{ success: boolean; data?: Evento; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.EVENTOS, {
+            const response = await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.EVENTOS, {
                 method: 'POST',
                 body: JSON.stringify(eventoData),
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al crear el evento' };
+            }
+            return { success: true, data: response.data as Evento };
         } catch (error) {
             console.error('Error creating evento:', error);
             return { success: false, message: 'Error de conexión' };
@@ -42,10 +59,14 @@ export class EventosService {
 
     async updateEvento(id: string, eventoData: Partial<Evento>): Promise<{ success: boolean; data?: Evento; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.EVENTOS}/${id}`, {
+            const response = await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.EVENTOS}/${id}`, {
                 method: 'PUT',
                 body: JSON.stringify(eventoData),
             });
+            if (!response.success) {
+                return { success: false, message: response.message || 'Error al actualizar el evento' };
+            }
+            return { success: true, data: response.data as Evento };
         } catch (error) {
             console.error('Error updating evento:', error);
             return { success: false, message: 'Error de conexión' };
@@ -54,9 +75,13 @@ export class EventosService {
 
     async deleteEvento(id: string): Promise<{ success: boolean; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.EVENTOS}/${id}`, {
+            const response = await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.EVENTOS}/${id}`, {
                 method: 'DELETE',
             });
+            return {
+                success: response.success,
+                message: response.message || (response.success ? 'Evento eliminado con éxito' : 'Error al eliminar el evento')
+            };
         } catch (error) {
             console.error('Error deleting evento:', error);
             return { success: false, message: 'Error de conexión' };
@@ -143,4 +168,5 @@ export class EventosService {
     }
 }
 
+// Exportar una instancia única del servicio
 export const eventosService = new EventosService();
