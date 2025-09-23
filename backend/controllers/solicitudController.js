@@ -159,6 +159,7 @@ exports.obtenerSolicitudes = async (req, res) => {
 
       const nuevaSolicitud = new Solicitud({
         solicitante: req.body.solicitante,
+        titulo: req.body.titulo,
         correo: req.body.correo,
         telefono: req.body.telefono,
         tipoSolicitud: req.body.tipoSolicitud,

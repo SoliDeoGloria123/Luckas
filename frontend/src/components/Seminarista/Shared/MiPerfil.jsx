@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaHome, FaCalendarAlt, FaHouseUser, FaFileAlt, FaBook, FaClipboardList, FaPlus, FaBell, FaUser, FaChevronDown, FaEdit, FaPhoneAlt, FaMapMarkerAlt, FaGraduationCap } from 'react-icons/fa';
+import { User, Mail, Phone, Calendar, BookOpen, GraduationCap, Award, Clock, Eye, EyeOff } from "lucide-react"
 import './MiPerfil.css';
 import Header from './Header';
 import Footer from '../../footer/Footer';
@@ -7,25 +7,74 @@ import { userService } from '../../../services/userService';
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({});
+  const [profileData, setProfileData] = useState({
+        nombre: "Luis",
+    apellido: "Muguel",
+    tipoDocumento: "Cédula de Ciudadanía",
+    numeroDocumento: "435412543534534",
+    telefono: "120524521546",
+    correo: "luis@gmail.com",
+    fechaNacimiento: "2005-05-05",
+    direccion: "Carrera 15 #32-45, Medellín",
+    nivelActual: "Filosofía II",
+    fechaIngreso: "2023-02-01",
+    directorEspiritual: "Padre Miguel",
+    idiomas: "Español, Inglés",
+    especialidad: "Teología Pastoral",
+  });
   const [formData, setFormData] = useState({});
+  
+  const [showPassword, setShowPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
 
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id.replace('edit', '').toLowerCase()]: value
-    }));
-  };
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
 
-  const handleCancelClick = () => {
-    setFormData({ ...profileData });
+  const usuarioLogueado = (() => {
+    try {
+      const usuarioStorage = localStorage.getItem('usuario');
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  const handleSaveChanges = async () => {
+  try {
+    const userId = localStorage.getItem("userId");
+    await userService.updateUser(userId, formData);
+    alert("Perfil actualizado correctamente");
+    setProfileData(formData);
     setIsEditing(false);
-  };
+  } catch (error) {
+    alert("Error al actualizar el perfil: " + error.message);
+  }
+};
+
+
+  const [securityData, setSecurityData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    emailNotifications: true,
+    academicReminders: true,
+    theme: "Claro",
+    language: "Español",
+  })
+
+  const handleSave = () => {
+    setShowSuccess(true)
+    setIsEditing(false)
+    setTimeout(() => setShowSuccess(false), 3000)
+  }
+
+  const seminaristaStats = [
+    { label: "Eventos Participados", value: "24", color: "bg-blue-500" },
+    { label: "Reservas Activas", value: "3", color: "bg-green-500" },
+    { label: "Solicitudes", value: "8", color: "bg-purple-500" },
+    { label: "Inscripciones", value: "12", color: "bg-orange-500" },
+  ]
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -74,245 +123,434 @@ const ProfilePage = () => {
   return (
     <>
       <Header />
-      <main className="main-content-miperfil">
-        <div className="profile-header-miperfil">
-          <div>
-            <h1>Mi Perfil</h1>
-            <p>Gestiona tu información personal y académica</p>
-          </div>
-          {!isEditing && (
-            <button id="editProfileBtn" className="btn-miperfil btn-primary-miperfil" onClick={handleEditClick}>
-              <FaEdit /> Editar Perfil
-            </button>
-          )}
+       <div className="min-h-screen bg-gray-50">
+      {/* Success Notification */}
+      {showSuccess && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in">
+          ✓ Perfil actualizado exitosamente
         </div>
+      )}
 
-        <div className="profile-container-miperfil">
-          <div className="profile-card-miperfil">
-              <div className="profile-picture-wrapper-miperfil">
-                <img src="/profile-picture.png" alt="Profile Picture" className="profile-picture-miperfil" />
+      {/* Header */}
+      <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <div className="relative">
+                <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-3xl font-bold">
+                  LM
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <GraduationCap className="w-4 h-4 text-white" />
+                </div>
               </div>
-              <h2 className="profile-name-miperfil">{formData.nombre}</h2>
-              <p className="profile-academic-info-miperfil"></p>
-              <p className="profile-contact-info-miperfil"></p>
-              <p className="profile-contact-info-miperfil"><FaPhoneAlt /> {formData.phone}</p>
-              <p className="profile-contact-info-miperfil"><FaMapMarkerAlt /> {formData.address}</p>
-              <p className="profile-contact-info-miperfil"><FaCalendarAlt /> Ingreso: {formatDate(formData.admissionDate)}</p>
-
-              <h3 className="section-title-miperfil">Estadísticas</h3>
-              <div className="stats-grid-miperfil">
-                <div className="stat-card-miperfil stat-events">
-                  <span className="stat-value-miperfil" >{formData.eventsCount}</span>
-                  <span className="stat-label-miperfil">Eventos</span>
-                </div>
-                <div className="stat-card-miperfil stat-reservations">
-                  <span className="stat-value-miperfil">{formData.reservationsCount}</span>
-                  <span className="stat-label-miperfil">Reservas</span>
-                </div>
-                <div className="stat-card-miperfil stat-requests">
-                  <span className="stat-value-miperfil">{formData.requestsCount}</span>
-                  <span className="stat-label-miperfil">Solicitudes</span>
-                </div>
-                <div className="stat-card-miperfil stat-subscriptions">
-                  <span className="stat-value-miperfil">{formData.subscriptionsCount}</span>
-                  <span className="stat-label-miperfil">Inscripciones</span>
+              <div>
+                <h1 className="text-3xl font-bold">
+                  {usuarioLogueado.nombre} {usuarioLogueado.apellido}
+                </h1>
+                <p className="text-green-100 text-lg">Seminarista del Sistema</p>
+                <div className="flex items-center space-x-4 mt-2 text-green-100">
+                  <span className="flex items-center space-x-1">
+                    <Phone className="w-4 h-4" />
+                    <span>{usuarioLogueado.telefono}</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <Calendar className="w-4 h-4" />
+                    <span>Desde {new Date(usuarioLogueado.fechaIngreso).toLocaleDateString()}</span>
+                  </span>
                 </div>
               </div>
             </div>
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+            >
+              <User className="w-5 h-5" />
+              <span>{isEditing ? "Cancelar" : "Editar Perfil"}</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
-          <div className="profile-details">
-            <div className="info-section-miperfil">
-              <h3 className="section-title-miperfil"><FaUser /> Información Personal</h3>
-              {!isEditing ? (
-                <div className="info-grid-miperfil view-mode">
-                  <div className="info-item-miperfil">
-                    <span className="info-label">Nombre Completo</span>
-                    <span className="info-value" >{formData.nombre}</span>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar with Stats */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas</h3>
+              <div className="space-y-4">
+                {seminaristaStats.map((stat, index) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <div className={`w-3 h-3 rounded-full ${stat.color}`}></div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-600">{stat.label}</p>
+                      <p className="text-xl font-bold text-gray-900">{stat.value}</p>
+                    </div>
                   </div>
-                  <div className="info-item-miperfil">
-                    <span className="info-label">Documento de Identidad</span>
-                    <span className="info-value" >{formData.documentId}</span>
-                  </div>
-                  <div className="info-item-miperfil">
-                    <span className="info-label">Fecha de Nacimiento</span>
-                    <span className="info-value" >{formData.dob}</span>
-                  </div>
-                  <div className="info-item-miperfil">
-                    <span className="info-label">Lugar de Nacimiento</span>
-                    <span className="info-value" >{formData.pob}</span>
-                  </div>
-                  <div className="info-item-miperfil full-width">
-                    <span className="info-label">Dirección</span>
-                    <span className="info-value" >{formData.address}</span>
-                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Acceso Rápido</h3>
+              <div className="space-y-2">
+                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                  Mis Eventos
+                </button>
+                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                  Reservas de Cabañas
+                </button>
+                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                  Mis Inscripciones
+                </button>
+                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                  Solicitudes
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {/* Personal Information */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              <div className="flex items-center space-x-2 mb-6">
+                <User className="w-5 h-5 text-blue-600" />
+                <h2 className="text-xl font-semibold text-gray-900">Información Personal</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profileData.nombre}
+                      onChange={(e) => setProfileData({ ...profileData, nombre: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.nombre}</p>
+                  )}
                 </div>
-              ) : (
-                <div className="info-grid-miperfil edit-mode">
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editNombre">Nombre Completo</label>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+                  {isEditing ? (
                     <input
                       type="text"
-                      id="editNombre"
-                      data-field="nombre"
-                      value={formData.nombre}
-                      onChange={handleInputChange}
-                      required
+                      value={profileData.apellido}
+                      onChange={(e) => setProfileData({ ...profileData, apellido: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
-                  </div>
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editDocumentId">Documento de Identidad</label>
+                  ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.apellido}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
+                  {isEditing ? (
+                    <select
+                      value={profileData.tipoDocumento}
+                      onChange={(e) => setProfileData({ ...profileData, tipoDocumento: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option>Cédula de Ciudadanía</option>
+                      <option>Cédula de Extranjería</option>
+                      <option>Pasaporte</option>
+                    </select>
+                  ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.tipoDocumento}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
+                  {isEditing ? (
                     <input
                       type="text"
-                      id="editDocumentId"
-                      data-field="documentId"
-                      value={formData.documentId}
-                      onChange={handleInputChange}
-                      required
+                      value={profileData.numeroDocumento}
+                      onChange={(e) => setProfileData({ ...profileData, numeroDocumento: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
-                  </div>
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editDob">Fecha de Nacimiento</label>
-                    <input
-                      type="date"
-                      id="editDob"
-                      data-field="dob"
-                      value={formData.dob}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editPob">Lugar de Nacimiento</label>
-                    <input
-                      type="text"
-                      id="editPob"
-                      data-field="pob"
-                      value={formData.pob}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group-miperfil full-width-miperfil">
-                    <label htmlFor="editAddress">Dirección</label>
-                    <input
-                      type="text"
-                      id="editAddress"
-                      data-field="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editCorreo">Correo</label>
-                    <input
-                      type="email"
-                      id="editCorreo"
-                      data-field="correo"
-                      value={formData.correo}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editPhone">Teléfono</label>
+                  ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.numeroDocumento}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                  {isEditing ? (
                     <input
                       type="tel"
-                      id="editPhone"
-                      data-field="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
+                      value={profileData.telefono}
+                      onChange={(e) => setProfileData({ ...profileData, telefono: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
-                  </div>
+                  ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.telefono}</p>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <div className="info-section-miperfil">
-              <h3 className="section-title-miperfil"><FaGraduationCap /> Información Académica</h3>
-              {!isEditing ? (
-                <div className="info-grid-miperfil view-mode">
-                  <div className="info-item-miperfil">
-                    <span className="info-label-miperfil">Nivel Actual</span>
-                    <span className="info-value-miperfil" >{profileData.currentLevel}</span>
-                  </div>
-                  <div className="info-item-miperfil">
-                    <span className="info-label-miperfil">Fecha de Ingreso</span>
-                    <span className="info-value-miperfil" data-field="admissionDate">{formatDate(profileData.admissionDate)}</span>
-                  </div>
-                  <div className="info-item-miperfil">
-                    <span className="info-label-miperfil">Director Espiritual</span>
-                    <span className="info-value-miperfil" data-field="spiritualDirector">{profileData.spiritualDirector}</span>
-                  </div>
-                  <div className="info-item-miperfil">
-                    <span className="info-label-miperfil">Idiomas</span>
-                    <span className="info-value-miperfil" data-field="languages">{profileData.languages}</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="info-grid-miperfil edit-mode">
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editCurrentLevel">Nivel Actual</label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                  {isEditing ? (
                     <input
-                      type="text"
-                      id="editCurrentLevel"
-                      data-field="currentLevel"
-                      value={formData.currentLevel}
-                      onChange={handleInputChange}
-                      required
+                      type="email"
+                      value={profileData.correo}
+                      onChange={(e) => setProfileData({ ...profileData, correo: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
-                  </div>
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editAdmissionDate">Fecha de Ingreso</label>
+                  ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.correo}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
+                  {isEditing ? (
                     <input
                       type="date"
-                      id="editAdmissionDate"
-                      data-field="admissionDate"
-                      value={formData.admissionDate}
-                      onChange={handleInputChange}
-                      required
+                      value={profileData.fechaNacimiento}
+                      onChange={(e) => setProfileData({ ...profileData, fechaNacimiento: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
-                  </div>
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editSpiritualDirector">Director Espiritual</label>
-                    <input
-                      type="text"
-                      id="editSpiritualDirector"
-                      data-field="spiritualDirector"
-                      value={formData.spiritualDirector}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group-miperfil">
-                    <label htmlFor="editLanguages">Idiomas</label>
-                    <input
-                      type="text"
-                      id="editLanguages"
-                      data-field="languages"
-                      value={formData.languages}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
+                  ) : (
+                    <p className="text-gray-900 py-3">{new Date(usuarioLogueado.fechaNacimiento).toLocaleDateString()}</p>
+                  )}
                 </div>
-              )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profileData.direccion}
+                      onChange={(e) => setProfileData({ ...profileData, direccion: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <p className="text-gray-900 py-3">{profileData.direccion}</p>
+                  )}
+                </div>
+              </div>
             </div>
 
+            {/* Academic Information */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              <div className="flex items-center space-x-2 mb-6">
+                <BookOpen className="w-5 h-5 text-green-600" />
+                <h2 className="text-xl font-semibold text-gray-900">Información Académica</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nivel Actual</label>
+                  {isEditing ? (
+                    <select
+                      value={profileData.nivelActual}
+                      onChange={(e) => setProfileData({ ...profileData, nivelActual: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option>Filosofía I</option>
+                      <option>Filosofía II</option>
+                      <option>Teología I</option>
+                      <option>Teología II</option>
+                      <option>Teología III</option>
+                      <option>Teología IV</option>
+                    </select>
+                  ) : (
+                    <p className="text-gray-900 py-3">{profileData.nivelActual}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
+                  <p className="text-gray-900 py-3">{new Date(profileData.fechaIngreso).toLocaleDateString()}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Director Espiritual</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profileData.directorEspiritual}
+                      onChange={(e) => setProfileData({ ...profileData, directorEspiritual: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <p className="text-gray-900 py-3">{profileData.directorEspiritual}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Idiomas</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profileData.idiomas}
+                      onChange={(e) => setProfileData({ ...profileData, idiomas: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <p className="text-gray-900 py-3">{profileData.idiomas}</p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Especialidad</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profileData.especialidad}
+                      onChange={(e) => setProfileData({ ...profileData, especialidad: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <p className="text-gray-900 py-3">{profileData.especialidad}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Security Settings */}
             {isEditing && (
-              <div className="edit-actions-miperfil">
-                <button id="saveChangesBtn" className="btn-miperfil btn-primary-miperfil" >
-                  Guardar Cambios
-                </button>
-                <button id="cancelEditBtn" className="btn-miperfil btn-secondary-miperfil" onClick={handleCancelClick}>
+              <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+                <div className="flex items-center space-x-2 mb-6">
+                  <Award className="w-5 h-5 text-purple-600" />
+                  <h2 className="text-xl font-semibold text-gray-900">Configuración de Cuenta</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={securityData.currentPassword}
+                        onChange={(e) => setSecurityData({ ...securityData, currentPassword: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        value={securityData.newPassword}
+                        onChange={(e) => setSecurityData({ ...securityData, newPassword: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={securityData.confirmPassword}
+                        onChange={(e) => setSecurityData({ ...securityData, confirmPassword: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Preferencias</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <Mail className="w-5 h-5 text-gray-400" />
+                        <span className="text-gray-700">Notificaciones por Email</span>
+                      </div>
+                      <button
+                        onClick={() =>
+                          setSecurityData({ ...securityData, emailNotifications: !securityData.emailNotifications })
+                        }
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                          securityData.emailNotifications ? "bg-green-600" : "bg-gray-200"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            securityData.emailNotifications ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <Clock className="w-5 h-5 text-gray-400" />
+                        <span className="text-gray-700">Recordatorios Académicos</span>
+                      </div>
+                      <button
+                        onClick={() =>
+                          setSecurityData({ ...securityData, academicReminders: !securityData.academicReminders })
+                        }
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                          securityData.academicReminders ? "bg-green-600" : "bg-gray-200"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            securityData.academicReminders ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            {isEditing && (
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
                   Cancelar
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Guardar Cambios
                 </button>
               </div>
             )}
           </div>
         </div>
-      </main>
+      </div>
+    </div>
       <Footer />
     </>
   );

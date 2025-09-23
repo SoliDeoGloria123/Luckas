@@ -4,6 +4,7 @@ import Index from './components/Panel Principal/Panel'
 import Login from './components/Login/Login';
 import Registro from './components/signup/registro';
 import OlvidoPassw from './components/forget password/olvidarPassword';
+import ExternalDashboard from './components/External/TailwindExternalDashboard';
 import DashboardAdmin from "./components/Dashboard/DashboardAdmin";
 import Dashboarduser from "./components/Dashboard/GestionUsuario";
 import GestionAcategorizacion from "./components/Dashboard/GestionCategorizacion";
@@ -29,6 +30,7 @@ import GestionTtarea from "./components/Tesorero/Tablas/Gestiontareas";
 import GestionTinscripcion from "./components/Tesorero/Tablas/Gestioninscripcion";
 import GestionTreportes from "./components/Tesorero/Tablas/Gestioreportes";
 import GestionTesorero from './components/Tesorero/Gestion';
+import GestionTperfil from './components/Tesorero/perfil';
 import DashboardSeminarista from "./components/Seminarista/DashboardSeminarista";
 import EventosNavegables from "./components/Seminarista/pages/EventosNavegables";
 import CabanasNavegables from "./components/Seminarista/pages/CabanasNavegables";
@@ -41,25 +43,14 @@ import Configuracion from './components/Seminarista/pages/configuracion';
 
 
 // Componente para usuarios externos
-const ExternalHome = () => {
-  return (
-    <div style={{width: '100%', height: '100vh'}}>
-      <iframe 
-        src="http://localhost:3000" 
-        style={{width: '100%', height: '100%', border: 'none'}} 
-        title="Página Externa"
-      />
-    </div>
-  );
-};
+
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Index to="/index" replace />} />
-        <Route path="/external" element={<ExternalHome />} />
-        <Route path="/home" element={<div style={{width: '100%', height: '100vh'}}><iframe src="/Externo/templates/home.html" style={{width: '100%', height: '100%', border: 'none'}} /></div>} />
+        <Route path="/external" element={<ExternalDashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup/registro" element={<Registro />}/>
         <Route path="/Olvidar-Contraseña" element={<OlvidoPassw />}/>
@@ -89,6 +80,7 @@ function App() {
         <Route path="/tesorero/tarea" element={<GestionTtarea/>}/>
         <Route path="/tesorero/inscripcion" element={<GestionTinscripcion/>}/>
         <Route path="/tesorero/reportes" element={<GestionTreportes/>}/>
+        <Route path="/tesorero/perfil" element={<GestionTperfil/>}/>
         <Route path='/tesorero-Gestiones' element={<GestionTesorero/>}/>
         {/* Rutas para Seminarista */}
         <Route path="/seminarista" element={<DashboardSeminarista />} />

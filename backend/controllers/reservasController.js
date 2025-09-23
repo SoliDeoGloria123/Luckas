@@ -98,6 +98,7 @@ exports.crearReserva = async (req, res) => {
       categoria: cabanaExiste.categoria,
       descripcion: `Reserva de cabaña ${cabanaExiste.nombre}`,
       estado: 'Nueva',
+      origin: 'reserva',
       prioridad: 'Media',
       modeloReferencia: 'Reserva',
       referencia: reserva._id

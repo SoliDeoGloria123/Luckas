@@ -34,7 +34,7 @@ const Login = () => {
         navigate('/seminarista');
       } else if (data.user.role === 'externo') {
         // Para usuarios externos, redirigir al dashboard HTML estático
-        window.location.href = '/Externo/templates/dashboard.html';
+        navigate('/external');
       } else {
         navigate('/admin/users'); // Por defecto para otros roles
       }
@@ -108,9 +108,9 @@ const Login = () => {
       <div className="col-lg-6 login-right-side">
         <div className="login-form-container">
           {/* Header del formulario */}
-          <div className="form-header">
-            <h3 className="welcome-title">Bienvenido de vuelta</h3>
-            <p className="welcome-subtitle">Ingresa tus credenciales para acceder al sistema</p>
+          <div className="form-header-login">
+            <h3 className="welcome-title-login">Bienvenido de vuelta</h3>
+            <p className="welcome-subtitle-login">Ingresa tus credenciales para acceder al sistema</p>
           </div>
 
           {/* Formulario */}

@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FaCalendarAlt, FaTimes, FaDoorOpen, FaGraduationCap,
   FaTools, FaHeart, FaEllipsisH, FaArrowLeft, FaArrowRight, FaPaperPlane,
@@ -25,8 +25,10 @@ const NuevaSolicitud = () => {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [categories, setCategories] = useState([]);
   const [modeloReferencia, setModeloReferencia] = useState('');
-const [referencia, setReferencia] = useState('');
-const [opcionesReferencia, setOpcionesReferencia] = useState([]);
+  const [referencia, setReferencia] = useState('');
+  const [opcionesReferencia, setOpcionesReferencia] = useState([]);
+  const token = localStorage.getItem('token');
+
 
   // Obtener usuario logueado al montar
   useEffect(() => {
@@ -48,18 +50,18 @@ const [opcionesReferencia, setOpcionesReferencia] = useState([]);
     fetchCategories();
   }, []);
 
-useEffect(() => {
-  const fetchTesorero = async () => {
-    try {
-      const res = await userService.getAll(); // Debe devolver todos los usuarios
-      const tesorero = res.data.find(u => u.role === 'tesorero');
-      if (tesorero) setTesoreroId(tesorero._id);
-    } catch (err) {
-     console.log('Error fetching tesorero:', err);
-    }
-  };
-  fetchTesorero();
-}, []);
+  useEffect(() => {
+    const fetchTesorero = async () => {
+      try {
+        const res = await userService.getAll(); // Debe devolver todos los usuarios
+        const tesorero = res.data.find(u => u.role === 'tesorero');
+        if (tesorero) setTesoreroId(tesorero._id);
+      } catch (err) {
+        console.log('Error fetching tesorero:', err);
+      }
+    };
+    fetchTesorero();
+  }, []);
 
   const typeConfigs = {
     Inscripción: {
@@ -85,56 +87,86 @@ useEffect(() => {
   };
 
   const cargarOpcionesReferencia = async (modelo) => {
-  let endpoint = '';
-  switch (modelo) {
-    case 'Eventos':
-      endpoint = '/api/eventos';
-      break;
-    case 'Cabana':
-      endpoint = '/api/cabanas';
-      break;
-    case 'Curso':
-      endpoint = '/api/cursos';
-      break;
-    case 'ProgramaTecnico':
-      endpoint = '/api/programas-tecnicos';
-      break;
-    case 'Inscripcion':
-      endpoint = '/api/inscripciones';
-      break;
-    case 'Reserva':
-      endpoint = '/api/reservas';
-      break;
-    case 'Comedor':
-      endpoint = '/api/comedor';
-      break;
-    default:
-      endpoint = '';
-  }
-  if (!endpoint) {
-    setOpcionesReferencia([]);
-    return;
-  }
-  try {
-    const res = await fetch(endpoint);
-    const data = await res.json();
-    setOpcionesReferencia(data.data || []);
-  } catch (err) {
-    setOpcionesReferencia([]);
-  }
-};
+    let endpoint = '';
+    switch (modelo) {
+      case 'Eventos':
+        endpoint = 'http://localhost:3000/api/eventos';
+        break;
+      case 'Cabana':
+        endpoint = 'http://localhost:3000/api/cabanas';
+        break;
+      case 'Curso':
+        endpoint = 'http://localhost:3000/api/cursos';
+        break;
+      case 'ProgramaTecnico':
+        endpoint = 'http://localhost:3000/api/programas-tecnicos';
+        break;
+      case 'Inscripcion':
+        endpoint = 'http://localhost:3000/api/inscripciones';
+        break;
+      case 'Reserva':
+        endpoint = 'http://localhost:3000/api/reservas';
+        break;
+      case 'Comedor':
+        endpoint = 'http://localhost:3000/api/comedor';
+        break;
+      default:
+        endpoint = '';
+    }
+    if (!endpoint) {
+      setOpcionesReferencia([]);
+      return;
+    }
+    try {
+      const res = await fetch(endpoint, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      setOpcionesReferencia(data.data || []);
+    } catch (err) {
+      setOpcionesReferencia([]);
+    }
+  };
+
+  const modeloCategoriaMap = {
+    'Eventos': 'evento',
+    'Cabana': 'cabana',
+    'Curso': 'curso',
+    'ProgramaTecnico': 'programa_tecnico',
+    'Inscripcion': 'inscripcion',
+    'Reserva': 'reserva',
+    'Comedor': 'comedor'
+  };
 
   const handleInputChange = (e) => {
     if (e.target.name === 'modeloReferencia') {
-    setModeloReferencia(e.target.value);
-    setReferencia('');
-    cargarOpcionesReferencia(e.target.value);
-    return;
-  }
-  if (e.target.name === 'referencia') {
-    setReferencia(e.target.value);
-    return;
-  }
+      setModeloReferencia(e.target.value);
+      setReferencia('');
+      cargarOpcionesReferencia(e.target.value);
+      setFormData({
+        ...formData,
+        category: '' // Limpiar categoría al cambiar modelo
+      });
+      return;
+    }
+    if (e.target.name === 'referencia') {
+      setReferencia(e.target.value);
+      // Buscar la referencia seleccionada en opcionesReferencia
+      const refObj = opcionesReferencia.find(op => (op._id || op.id) === e.target.value);
+      // Buscar la categoría asociada a la referencia
+      let categoriaId = '';
+      if (refObj && refObj.categoria) {
+        // Puede ser un objeto o solo el id
+        categoriaId = typeof refObj.categoria === 'object' ? refObj.categoria._id : refObj.categoria;
+      }
+      setFormData({
+        ...formData,
+        category: categoriaId
+      });
+      return;
+    }
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
@@ -243,6 +275,11 @@ useEffect(() => {
   };
 
   const submitRequest = async () => {
+
+    // DEBUG extra: mostrar tesoreroId
+    console.log('tesoreroId:', tesoreroId);
+    window.alert('tesoreroId: ' + tesoreroId);
+
     if (!acceptTerms) {
       showToast('warning', 'Términos requeridos', 'Debes aceptar los términos y condiciones');
       return;
@@ -250,6 +287,7 @@ useEffect(() => {
 
     if (!tesoreroId) {
       showToast('error', 'Responsable no encontrado', 'No se pudo asignar el tesorero como responsable');
+      window.alert('No hay tesoreroId, no se puede enviar');
       return;
     }
 
@@ -266,25 +304,40 @@ useEffect(() => {
     // Construir objeto solicitud para la API
     const solicitudData = {
       solicitante: usuario._id || usuario.id,
+      titulo: formData.requestTitle || '',
       correo: usuario.correo || usuario.correoElectronico || usuario.email,
       telefono: usuario.telefono || '',
       tipoSolicitud: selectedType,
-      categoria: formData.category || null, // Debes ajustar según tu lógica de categorías
+      modeloReferencia: modeloReferencia || null,
+      referencia: referencia || null,
+      categoria: formData.category || null,
       descripcion: formData.requestDescription || '',
       prioridad: formData.requestPriority || 'Media',
       observaciones: formData.requestJustification || '',
       responsable: tesoreroId,
       fechaSolicitud: new Date(),
-      origen: 'formulario', // <-- Campo para distinguir solicitudes manuales
-      // Puedes agregar más campos según tu modelo y lógica
+      origen: 'formulario'
     };
 
+    // DEBUG: Mostrar datos a enviar
+    console.log('Datos a enviar:', solicitudData);
+    window.alert('Datos a enviar: ' + JSON.stringify(solicitudData, null, 2));
+
     try {
-      await solicitudService.create(solicitudData);
-      showToast('success', '¡Solicitud enviada!', 'Tu solicitud ha sido registrada correctamente.');
-      // Aquí puedes redirigir o limpiar el formulario
+      const response = await solicitudService.create(solicitudData);
+      console.log('Respuesta backend:', response);
+      window.alert('Respuesta backend: ' + JSON.stringify(response, null, 2));
+      if (response.success) {
+        showToast('success', '¡Solicitud enviada!', 'Tu solicitud ha sido registrada correctamente.');
+        window.alert('Inscripción enviada correctamente');
+        // Aquí puedes redirigir o limpiar el formulario
+      } else {
+        showToast('error', 'Error al enviar', response.message || 'No se pudo enviar la solicitud');
+        window.alert('Error al enviar la inscripción: ' + (response.message || 'No se pudo enviar la solicitud'));
+      }
     } catch (err) {
       showToast('error', 'Error al enviar', err.message || 'No se pudo enviar la solicitud');
+      window.alert('Error al enviar la inscripción: ' + (err.message || 'No se pudo enviar la solicitud'));
     }
   };
 
@@ -331,7 +384,7 @@ useEffect(() => {
                 />
               </div>
               <div className="form-group-nuevasolicitud">
-                <label htmlFor="returnDate">Fecha de Regreso *</label>
+                <label htmlFor="returnDate">Fecha de Regreso </label>
                 <input
                   type="date"
                   id="returnDate"
@@ -430,13 +483,16 @@ useEffect(() => {
               <select
                 id="category"
                 name="category"
-                onChange={handleInputChange}
+                value={formData.category || ''}
+                disabled // Deshabilitado para que no se pueda cambiar manualmente
                 required
               >
-                <option value="">Selecciona una categoría</option>
-                {categories.map(cat => (
-                  <option key={cat._id} value={cat._id}>{cat.nombre}</option>
-                ))}
+                <option value="">{formData.category ? 'Categoría asociada' : 'No hay categoría asociada'}</option>
+                {formData.category && categories
+                  .filter(cat => cat._id === formData.category)
+                  .map(cat => (
+                    <option key={cat._id} value={cat._id}>{cat.nombre}</option>
+                  ))}
               </select>
             </div>
             <div className="form-group-nuevasolicitud">
@@ -655,7 +711,7 @@ useEffect(() => {
                       <option value="Baja">Baja</option>
                       <option value="Media" selected>Media</option>
                       <option value="Alta">Alta</option>
-                
+
                     </select>
                   </div>
 
@@ -834,7 +890,7 @@ useEffect(() => {
               </button>
             </div>
 
-            
+
           );
         })}
       </div>

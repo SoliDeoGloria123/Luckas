@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import './header.css'
 
@@ -29,6 +29,7 @@ const HeaderTesorero = () => {
     const handleGestionar = (seccion) => {
         setSeccionActiva(seccion);
     };
+
 
     return (
         <header className="header-tesorero-header">
@@ -67,7 +68,7 @@ const HeaderTesorero = () => {
 
                         {openmenu && (
                             <div className="dropdown-menu-tesorero">
-                                <a href="">Mi Perfil</a>
+                                <a href="/tesorero/perfil">Mi Perfil</a>
                                 <a href="">Configuraciones</a>
                                 <button onClick={handleLogout}>
                                     Cerrar Sesion

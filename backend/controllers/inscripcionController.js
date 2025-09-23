@@ -89,6 +89,7 @@ exports.crearInscripcion = async (req, res) => {
       descripcion: `Inscripción al evento ${eventoExiste.nombre}`,
       estado: 'Nueva',
       prioridad: 'Media',
+      origin: 'inscripcion',
       modeloReferencia: 'Inscripcion',
       referencia: inscripcion._id
     });
