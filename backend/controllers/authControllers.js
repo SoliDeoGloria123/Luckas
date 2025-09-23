@@ -24,7 +24,7 @@ exports.signup = async (req, res) => {
   try {
     //valdacion manual adicional
     if (!req.body.nombre || !req.body.apellido || !req.body.correo || !req.body.telefono ||
-      !req.body.tipoDocumento || !req.body.numeroDocumento || !req.body.password) {
+      !req.body.tipoDocumento || !req.body.numeroDocumento || !req.body.fechaNacimiento || !req.body.password) {
       return res.status(400).json({
         success: false,
         message: "Faltan campos obligatorios para el registro"
@@ -42,6 +42,7 @@ exports.signup = async (req, res) => {
       telefono: req.body.telefono.trim(),
       tipoDocumento: tipoDocumentoNormalizado,
       numeroDocumento: req.body.numeroDocumento.trim(),
+      fechaNacimiento: req.body.fechaNacimiento,
       password: req.body.password,
       role: req.body.role || 'externo'
     });

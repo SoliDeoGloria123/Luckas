@@ -39,14 +39,20 @@ const ReservasModal = ({
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-admin">
-        <div className="modal-header-admin">
-          <h3>{modoEdicion ? "Editar Reserva" : "Crear Nueva Reserva"}</h3>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
+        <div
+          className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
+          style={{
+            background: 'linear-gradient(90deg, var(--color-blue-principal), var(--color-blue-oscuro))',
+            color: 'white'
+          }}
+        >
+          <h2>{modoEdicion ? "Editar Reserva" : "Crear Nueva Reserva"}</h2>
           <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
 
-        <div className="modal-body-admin">
+        <form className="modal-body-admin">
           {/* Usuario */}
           <div className="form-grupo-admin">
             <label>Usuario:</label>
@@ -67,50 +73,52 @@ const ReservasModal = ({
               ))}
             </select>
           </div>
+          
+          <div className="form-grid-admin">
+            <div className="form-grupo-admin">
+              <label>Cabaña:</label>
+              <select
+                value={modoEdicion ? reservaSeleccionada?.cabana : nuevaReserva.cabana}
+                onChange={e => {
+                  const cabanaId = e.target.value;
+                  const cabanaSeleccionada = cabanas.find(c => c._id === cabanaId);
+                  const nuevoPrecio = cabanaSeleccionada ? cabanaSeleccionada.precio : "";
 
-          {/* Cabaña */}
-          <div className="form-grupo-admin">
-            <label>Cabaña:</label>
-            <select
-              value={modoEdicion ? reservaSeleccionada?.cabana : nuevaReserva.cabana}
-              onChange={e => {
-                const cabanaId = e.target.value;
-                const cabanaSeleccionada = cabanas.find(c => c._id === cabanaId);
-                const nuevoPrecio = cabanaSeleccionada ? cabanaSeleccionada.precio : "";
-
-                if (modoEdicion) {
-                  setReservaSeleccionada({
-                    ...reservaSeleccionada,
-                    cabana: cabanaId,
-                    precio: nuevoPrecio
-                  });
-                } else {
-                  setNuevaReserva({
-                    ...nuevaReserva,
-                    cabana: cabanaId,
-                    precio: nuevoPrecio
-                  });
-                }
-              }}
-              required
-            >
-              <option value="">Seleccione...</option>
-              {cabanas && cabanas.map(cab => (
-                <option key={cab._id} value={cab._id}>
-                  {cab.nombre} {cab.precio ? `- $${cab.precio}` : ''}
-                </option>
-              ))}
-            </select>
+                  if (modoEdicion) {
+                    setReservaSeleccionada({
+                      ...reservaSeleccionada,
+                      cabana: cabanaId,
+                      precio: nuevoPrecio
+                    });
+                  } else {
+                    setNuevaReserva({
+                      ...nuevaReserva,
+                      cabana: cabanaId,
+                      precio: nuevoPrecio
+                    });
+                  }
+                }}
+                required
+              >
+                <option value="">Seleccione...</option>
+                {cabanas && cabanas.map(cab => (
+                  <option key={cab._id} value={cab._id}>
+                    {cab.nombre} {cab.precio ? `- $${cab.precio}` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-grupo-admin">
+              <label>Precio:</label>
+              <input
+                type="number"
+                value={modoEdicion ? reservaSeleccionada?.precio : nuevaReserva.precio}
+                readOnly
+                required
+              />
+            </div>
           </div>
-          <div className="form-grupo-admin">
-            <label>Precio:</label>
-            <input
-              type="number"
-              value={modoEdicion ? reservaSeleccionada?.precio : nuevaReserva.precio}
-              readOnly
-              required
-            />
-          </div>
+          <div className="from-grid-admin">
           {/* Fecha Inicio */}
           <div className="form-grupo-admin">
             <label>Fecha Inicio:</label>
@@ -148,9 +156,8 @@ const ReservasModal = ({
               required
             />
           </div>
-
-
-
+              </div>
+              <div className="from-grid-admin">
           {/* Estado */}
           <div className="form-grupo-admin">
             <label>Estado:</label>
@@ -185,6 +192,7 @@ const ReservasModal = ({
               <option value="false">No</option>
             </select>
           </div>
+          </div>
 
           {/* Observaciones */}
           <div className="form-grupo-admin">
@@ -201,15 +209,13 @@ const ReservasModal = ({
             />
           </div>
 
-
-        </div>
-
-        <div className="modal-footer-admin">
-          <button className="btn-secondary" onClick={onClose}>Cancelar</button>
-          <button className="btn-primary" onClick={onSubmit}>
-            {modoEdicion ? "Guardar Cambios" : "Crear Reserva"}
-          </button>
-        </div>
+          <div className="modal-action-admin">
+            <button className="btn-admin secondary-admin" onClick={onClose}>Cancelar</button>
+            <button className="btn-admin btn-primary" onClick={onSubmit}>
+              {modoEdicion ? "Guardar Cambios" : "Crear Reserva"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

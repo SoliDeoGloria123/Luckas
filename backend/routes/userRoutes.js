@@ -20,6 +20,7 @@ router.use(authJwt.verifyToken);
 
 // Rutas de consulta (admin y tesorero)
 router.get('/', role.checkRole('admin', 'tesorero'), userController.getAllUsers);
+router.get('/documento/:numeroDocumento', role.checkRole('admin', 'tesorero', 'externo', 'seminarista'), userController.getUserByDocumento);
 router.get('/:id', role.checkRole('admin', 'tesorero'), userController.getUserById);
 
 // Rutas de creación y modificación (admin y tesorero)

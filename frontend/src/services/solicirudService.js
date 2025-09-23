@@ -36,5 +36,14 @@ export const solicitudService = {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     });
     return await res.json();
+  },
+
+  // Obtener solicitudes por usuario
+   getSolicitudesPorUsuario: async (userId) => {
+    const res = await fetch(`${API_URL}/usuario/${userId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
+    if (!res.ok) throw new Error("Error al obtener solicitudes por usuario");
+    return await res.json();
   }
 };

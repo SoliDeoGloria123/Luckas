@@ -42,8 +42,18 @@ const DashboardAdmin = () => {
     navigate('/login');
   };
 
+ 
   if (!usuario) {
-    return <div>Cargando...</div>;
+    return (
+      <div className="   bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
+          <div className="flex items-center space-x-4">
+            <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
+            <span className="text-lg font-semibold text-slate-700">Cargando dashboard administrador...</span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

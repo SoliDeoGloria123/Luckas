@@ -11,6 +11,9 @@ router.get('/', inscripcionController.obtenerInscripciones);
 router.get('/datos-para-crear', inscripcionController.obtenerDatosParaInscripcion); // Ruta temporal para debug
 router.get('/:id', inscripcionController.obtenerInscripcionPorId);
 
+// Obtener inscripciones por usuario
+router.get('/usuario/:userId', inscripcionController.obtenerInscripcionesPorUsuario);
+
 // Rutas de creación y modificación (admin, tesorero y seminarista)
 router.post('/', role.checkRole('admin', 'tesorero', 'seminarista','externo'), inscripcionController.crearInscripcion);
 router.put('/:id', role.checkRole('admin', 'tesorero','seminarista','externo'), inscripcionController.actualizarInscripcion);

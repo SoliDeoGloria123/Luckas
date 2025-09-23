@@ -1,18 +1,83 @@
 import React, { useState } from 'react';
 
 
-const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
+const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, categorias }) => {
   const [formData, setFormData] = useState({
     nombre: initialData.nombre || '',
-    apellido: initialData.apellido || '',
-    email: initialData.email || '',
-    telefono: initialData.telefono || '',
-    tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
-    numeroDocumento: initialData.numeroDocumento || '',
-    rol: initialData.rol || 'Tesorero',
-    estado: initialData.estado || 'Activo'
+    descripcion: initialData.descripcion || '',
+    capacidad: initialData.capacidad || '',
+    categoria: normalizeCategoria (initialData.categoria),
+    precio: initialData.precio || '',
+    ubicacion: initialData.ubicacion || '',
+    estado: initialData.estado || '',
+    imagen: initialData.imagen || ''
   });
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [progress, setProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
+  function normalizeCategoria(categoria) {
+    if (!categoria) return '';
+    if (typeof categoria === 'object' && categoria._id) return String(categoria._id);
+    return String(categoria);
+  }
+
+
+  // Manejo de archivos seleccionados
+  const handleFileSelection = (files) => {
+    const validFiles = [];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+    Array.from(files).forEach(file => {
+      if (!allowedTypes.includes(file.type)) return;
+      if (file.size > maxSize) return;
+      validFiles.push(file);
+    });
+
+    if (validFiles.length > 0) {
+      uploadImages(validFiles);
+    }
+  };
+
+  // Simulación de carga de imágenes
+  const uploadImages = (files) => {
+    if (isUploading) return;
+    setIsUploading(true);
+    setProgress(0);
+
+    let uploadedCount = 0;
+    const totalFiles = files.length;
+
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = {
+          id: Date.now() + index,
+          file,
+          url: e.target.result,
+          name: file.name
+        };
+
+        setSelectedImages(prev => [...prev, imageData]);
+
+        uploadedCount++;
+        const progressValue = (uploadedCount / totalFiles) * 100;
+        setProgress(progressValue);
+
+        if (uploadedCount === totalFiles) {
+          setTimeout(() => {
+            setIsUploading(false);
+          }, 500);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (id) => {
+    setSelectedImages(prev => prev.filter(img => img.id !== id));
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -31,7 +96,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) =
           <h2>{mode === 'create' ? 'Crear Nuevo Cabaña' : 'Editar Cabaña'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
-        
+
         <div className="modal-body-tesorero">
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
@@ -46,99 +111,120 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) =
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Apellido</label>
+                <label>Descripción</label>
                 <input
                   type="text"
-                  name="apellido"
-                  value={formData.apellido}
+                  name="descripcion"
+                  value={formData.descripcion}
                   onChange={handleChange}
-                  placeholder="Apellido"
+                  placeholder="Descripción"
                   required
                 />
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Email</label>
+                <label>Capacidad</label>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="number"
+                  name="capacidad"
+                  value={formData.capacidad}
                   onChange={handleChange}
-                  placeholder="correo@ejemplo.com"
+                  placeholder="Capacidad"
                   required
                 />
               </div>
-              
               <div className="form-group-tesorero">
-                <label>Teléfono</label>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  placeholder="Teléfono"
-                  required
-                />
-              </div>
-              
-              <div className="form-group-tesorero">
-                <label>Tipo de Documento</label>
+                <label>Categoría</label>
                 <select
-                  name="tipoDocumento"
-                  value={formData.tipoDocumento}
+                  name="categoria"
+                  value={formData.categoria}
                   onChange={handleChange}
                   required
                 >
-                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
-                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                  <option value="Cédula extranjería">Cédula extranjería</option>
+                  <option value="">Seleccione...</option>
+                  {categorias && categorias.map(cat => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.nombre}
+                    </option>
+                  ))}
                 </select>
               </div>
-              
+
               <div className="form-group-tesorero">
-                <label>Número de Documento</label>
+                <label>Precio</label>
                 <input
-                  type="text"
-                  name="numeroDocumento"
-                  value={formData.numeroDocumento}
+                  type="number"
+                  name="precio"
+                  value={formData.precio}
                   onChange={handleChange}
-                  placeholder="Número de documento"
+                  placeholder="precio"
                   required
                 />
               </div>
-              
               <div className="form-group-tesorero">
-                <label>Rol</label>
-                <select
-                  name="rol"
-                  value={formData.rol}
+                <label>Ubicacion</label>
+                <input
+                  type="text"
+                  name="ubicacion"
+                  value={formData.ubicacion}
                   onChange={handleChange}
+                  placeholder="Ubicacion"
                   required
-                >
-                  <option value="Tesorero">Tesorero</option>
-                  <option value="Administrador">Administrador</option>
-                  <option value="Usuario">Usuario</option>
-                </select>
+                />
               </div>
-              
               <div className="form-group-tesorero">
-                <label>Estado</label>
+                <label> Estado</label>
                 <select
                   name="estado"
                   value={formData.estado}
                   onChange={handleChange}
                   required
                 >
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
-                  <option value="Pendiente">Pendiente</option>
+                  <option value="">Seleccione...</option>
+                  <option value="disponible">Disponible</option>
+                  <option value="ocupada">Ocupada</option>
+                  <option value="mantenimiento">Mantenimiento</option>
                 </select>
               </div>
             </div>
-            
+
+            <div className="form-group-tesorero full-width">
+              <label>Imagen</label>
+              <div className="image-upload-container">
+                <div className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    handleFileSelection(e.dataTransfer.files);
+                  }}>
+                  <div className="upload-content">
+                    <i className="fas fa-cloud-upload-alt upload-icon"></i>
+                    <h3>Arrastra y suelta tus imágenes aquí</h3>
+                    <p>o <span className="browse-text">haz clic para seleccionar</span></p>
+                    <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
+                  </div>
+                  <input type="file" id='imageInput' multiple accept="image/*" hidden onChange={(e) => handleFileSelection(e.target.files)} />
+                </div>
+
+
+                <div className="image-preview-grid" id="imagePreviewGrid">
+                  {selectedImages.map(img => (
+                    <div key={img.id} className="image-preview">
+                      <img src={img.url} alt={img.name} />
+                      <div className="image-overlay">
+                        <button type="button" className="remove-btn" onClick={() => removeImage(img.id)}>
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                </div>
+              </div>
+            </div>
+
             <div className="modal-footer-tesorero">
               <button type="button" className="cancel-btn" onClick={onClose}>
                 Cancelar

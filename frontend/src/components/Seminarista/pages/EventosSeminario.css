@@ -1,4 +1,3 @@
-
 :root {
   --color-blue-primary: #2563eb;
   --color-blue-dark: #1d4ed8;
@@ -537,4 +536,31 @@ body {
 
 .notification-message {
   font-weight: 500;
+}
+
+/* Tarjeta de evento cuando el usuario está inscrito */
+.event-card-inscrito {
+  background: linear-gradient(120deg, #ffffff 60%, #ffffff 100%) !important;
+  opacity: 0.7;
+  filter: grayscale(0.2);
+  position: relative;
+}
+
+.event-card-inscrito .event-image img {
+  filter: grayscale(0.5);
+  opacity: 0.7;
+}
+
+.event-card-inscrito .inscrito-msg {
+  width: 100%;
+  text-align: center;
+  border-radius: 12px;
+  padding: 14px 0;
+  margin: 16px 0;
+  font-weight: bold;
+  color: #ff5252;
+  font-size: 1.15em;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 12px #23243a44;
+  border: 2px solid #ff5252;
 }

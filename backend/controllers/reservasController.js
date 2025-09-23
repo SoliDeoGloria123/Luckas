@@ -72,7 +72,15 @@ exports.crearReserva = async (req, res) => {
       cabana: req.body.cabana,
       fechaInicio: req.body.fechaInicio,
       fechaFin: req.body.fechaFin,
-      precio: req.body.precio ? Number(req.body.precio) : 14000, // Asegura que sea número
+      nombre: req.body.nombre,
+      apellido: req.body.apellido,
+      tipoDocumento: req.body.tipoDocumento,
+      numeroDocumento: req.body.numeroDocumento,
+      correoElectronico: req.body.correoElectronico,
+      telefono: req.body.telefono,
+      numeroPersonas: req.body.numeroPersonas,
+      propositoEstadia: req.body.propositoEstadia,
+      solicitudesEspeciales: req.body.solicitudesEspeciales,
       estado: req.body.estado || 'Pendiente',
       observaciones: req.body.observaciones,
       activo
@@ -136,7 +144,15 @@ exports.obtenerDatosParaReserva = async (req, res) => {
         ejemplo: {
           usuario: usuarios[0]?._id || 'ID_DEL_USUARIO',
           cabana: cabanas[0]?._id || 'ID_DE_LA_CABANA',
-          precio: 14000,
+          nombre: 'Nombre ',
+          apellido: 'Apellido',
+          tipoDocumento: 'Cédula de ciudadanía',
+          numeroDocumento: '123456789',
+          correoElectronico: 'correo@ejemplo.com',
+          telefono: '3001234567',
+          numeroPersonas: 4,
+          propositoEstadia: 'Vacaciones familiares',
+          solicitudesEspeciales: 'Ninguna',
           fechaInicio: '2025-08-01',
           fechaFin: '2025-08-05',
           estado: 'Pendiente',
@@ -189,5 +205,17 @@ exports.eliminarReserva = async (req, res) => {
     res.json({ success: true, message: 'Reserva eliminada' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+exports.obtenerReservasPorUsuario = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ error: 'Falta el parámetro userId' });
+    }
+    const reservas = await require('../models/Reservas').find({ usuario: userId }).populate('cabana');
+    res.json(reservas);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener reservas por usuario', details: error.message });
   }
 };

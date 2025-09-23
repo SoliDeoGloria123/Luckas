@@ -1,8 +1,8 @@
 import React from "react";
 
 const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => (
-  <div className="tabla-contenedor">
-    <table className="tabla-usuarios">
+  <div className="tabla-contenedor-admin">
+    <table className="tabla-usuarios-admin">
       <thead>
         <tr>
           <th>ID</th>
@@ -52,12 +52,12 @@ const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => 
               </td>
               <td>
                 <div className="acciones-botones">
-                  <button className="btn-editar" onClick={() => onEditar(tarea)}>
-                    ✏️
+                  <button className="btn-action editar" onClick={() => onEditar(tarea)}>
+                    <i class="fas fa-edit"></i>
                   </button>
                   {onEliminar && (
-                    <button className="btn-eliminar" onClick={() => onEliminar(tarea._id)}>
-                      🗑️
+                    <button className="btn-action eliminar" onClick={() => onEliminar(tarea._id)}>
+                      <i class="fas fa-trash"></i>
                     </button>
                   )}
                 </div>

@@ -56,7 +56,7 @@ const validarId = [
 router.use(authJwt.verifyToken);
 
 // Rutas de consulta - Todos los roles autenticados
-router.get('/usuario/mis-solicitudes', solicitudController.obtenerSolicitudesPorUsuario);
+router.get('/usuario/:id', solicitudController.obtenerSolicitudesPorUsuario);
 router.get('/unificado', async (req, res) => {
   try {
     const solicitudes = await Solicitud.find()

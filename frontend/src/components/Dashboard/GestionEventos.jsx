@@ -4,12 +4,24 @@ import { categorizacionService } from "../../services/categorizacionService";
 import TablaEventos from "./Tablas/EventoTabla";
 import EventoModal from "./Modales/EventoModal";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import Sidebar from './Sidebar/Sidebar';
+import Header from './Sidebar/Header';
+
+import {
+  Plus,
+  Search,
+
+} from 'lucide-react';
 
 const GestionEventos = () => {
   const [eventos, setEventos] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
+  const [filtros, setFiltros] = useState({ busqueda: '', tipo: 'todos', estado: 'todos' });
+  const [cargando, setCargando] = useState(false);
+  const [sidebarAbierto, setSidebarAbierto] = useState(true);
+  const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [nuevoEvento, setNuevoEvento] = useState({
     nombre: "",
     descripcion: "",
@@ -163,73 +175,166 @@ const GestionEventos = () => {
     setMostrarModal(true);
   };
 
-  return (
-    <div className="seccion-usuarios">
-      <div className="page-header-Academicos">
-        <h1 className="titulo-admin" >Gestión de Eventos</h1>
-        <button className="btn-admin" onClick={abrirModalCrear}>
-          + Nuevo Evento
-        </button>
-      </div>
-      <section className="filtros-section-admin">
-        <div className="busqueda-contenedor">
-          <i class="fas fa-search"></i>
-          <input
-            type="text"
-            placeholder="Buscar Eventos..."
-            // value={busqueda}
-            //onChange={(e) => setBusqueda(e.target.value)}
-            className="input-busqueda"
-          />
-        </div>
-        <div className="filtro-grupo-admin">
-          <select className="filtro-dropdown">
-            <option>Todos los Roles</option>
-            <option>Administrador</option>
-            <option>Seminarista</option>
-            <option>Tesorero</option>
-            <option>Usuario Externo</option>
-          </select>
-          <select className="filtro-dropdown">
-            <option>Todos los Estados</option>
-            <option>Activo</option>
-            <option>Inactivo</option>
-            <option>Pendiente</option>
-          </select>
-        </div>
+  const eventosFiltrados = eventos.filter(evento => {
+    const cumpleBusqueda = evento.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+      evento.ubicacion?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+      evento.coordinador?.toLowerCase().includes(filtros.busqueda.toLowerCase());
+    const cumpleTipo = filtros.tipo === 'todos' || evento.tipo === filtros.tipo;
+    const cumpleEstado = filtros.estado === 'todos' || evento.estado === filtros.estado;
 
-        <TablaEventos
-          eventos={eventos}
-          onEditar={abrirModalEditar}
-          onEliminar={eliminarEvento}
-          onVerImagen={handleVerImagenes}
+    return cumpleBusqueda && cumpleTipo && cumpleEstado;
+  });
+
+
+  return (
+    <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+      <Sidebar
+        sidebarAbierto={sidebarAbierto}
+        setSidebarAbierto={setSidebarAbierto}
+        seccionActiva={seccionActiva}
+        setSeccionActiva={setSeccionActiva}
+      />
+      <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
+        <Header
+          sidebarAbierto={sidebarAbierto}
+          setSidebarAbierto={setSidebarAbierto}
+          seccionActiva={seccionActiva}
         />
-        {modalImagen.abierto && (
-          <div className="modal-overlay" onClick={cerrarModalImagen}>
-            <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
-              <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
-              <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
-              <img
-                src={`http://localhost:3000/uploads/eventos/${modalImagen.imagenes[modalImagen.actual]}`}
-                alt="Imagen del evento"
-                className="imagen-modal"
-              />
-              <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+        <div className="space-y-7 fade-in-up p-9">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800">Gestión de Eventos</h1>
+              <p className="text-slate-600">Administra campamentos, retiros y actividades del seminario</p>
+            </div>
+            <button
+              onClick={abrirModalCrear}
+              className="btn-premium flex items-center space-x-2 px-4 py-2 text-white rounded-xl font-medium shadow-lg"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Nuevo Evento</span>
+            </button>
+          </div>
+          <div className="dashboard-grid-reporte-admin">
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin users">
+                <i className="fas fa-users"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>5</h3>
+                <p>Total Usuarios</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin active">
+                <i className="fas fa-user-check"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>4</h3>
+                <p>Usuarios Activos</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin admins">
+                <i className="fas fa-user-shield"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>1</h3>
+                <p>Administradores</p>
+              </div>
+            </div>
+            <div className="stat-card-reporte-admin">
+              <div className="stat-icon-reporte-admin-admin new">
+                <i className="fas fa-user-plus"></i>
+              </div>
+              <div className="stat-info-admin">
+                <h3>12</h3>
+                <p>Nuevos Este Mes</p>
+              </div>
             </div>
           </div>
-        )}
-      </section>
-      <EventoModal
-        mostrar={mostrarModal}
-        modoEdicion={modoEdicion}
-        eventoSeleccionado={eventoSeleccionado}
-        setEventoSeleccionado={setEventoSeleccionado}
-        nuevoEvento={nuevoEvento}
-        setNuevoEvento={setNuevoEvento}
-        categorias={categorias}
-        onClose={() => setMostrarModal(false)}
-        onSubmit={modoEdicion ? actualizarEvento : crearEvento}
-      />
+
+          {/* Filtros */}
+          <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar eventos..."
+                  value={filtros.busqueda}
+                  onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
+                  className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              <select
+                value={filtros.tipo}
+                onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
+                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="todos">Todos los tipos</option>
+                {/*tiposEventos.map(tipo => (
+                  <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
+                ))*/}
+              </select>
+
+              <select
+                value={filtros.estado}
+                onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
+                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="todos">Todos los estados</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+                <option value="cancelado">Cancelado</option>
+                <option value="finalizado">Finalizado</option>
+              </select>
+
+              <div className="text-sm text-slate-600 flex items-center">
+                <span className="font-medium">{eventosFiltrados.length}</span> evento(s) encontrado(s)
+              </div>
+            </div>
+          </div>
+
+          {/* Lista de Eventos */}
+
+          {modalImagen.abierto && (
+            <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
+              <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
+                <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
+                <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
+                <img
+                  src={`http://localhost:3000/uploads/eventos/${modalImagen.imagenes[modalImagen.actual]}`}
+                  alt="Imagen del evento"
+                  className="imagen-modal"
+                />
+                <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+              </div>
+            </div>
+          )}
+
+          <TablaEventos
+            eventos={eventos}
+            cargando={cargando}
+            onEditar={abrirModalEditar}
+            onEliminar={eliminarEvento}
+            onVerImagen={handleVerImagenes}
+            eventosFiltrados={eventosFiltrados}
+          />
+          <EventoModal
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            eventoSeleccionado={eventoSeleccionado}
+            setEventoSeleccionado={setEventoSeleccionado}
+            nuevoEvento={nuevoEvento}
+            setNuevoEvento={setNuevoEvento}
+            categorias={categorias}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarEvento : crearEvento}
+          />
+        </div>
+      </div>
     </div>
   );
 };
