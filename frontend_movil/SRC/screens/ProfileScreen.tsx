@@ -10,14 +10,16 @@ import {
     Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { colors, spacing, typography, shadows } from '../styles';
 
 const ProfileScreen: React.FC = () => {
     const { user, logout } = useAuth();
+    const navigation = useNavigation();
 
     const handleEditProfile = () => {
-        Alert.alert('Información', 'Función de editar perfil en desarrollo');
+        navigation.navigate('EditProfile');
     };
 
     const handleChangePassword = () => {

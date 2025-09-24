@@ -22,6 +22,7 @@ import CursosScreen from '../screens/CursosScreen';
 import EventosScreen from '../screens/EventosScreen';
 import CabanasScreen from '../screens/CabanasScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import { PerfilScreen } from '../screens/PerfilScreen';
 import { TareasScreen } from '../screens/TareasScreen';
 
 // Ya no necesitamos pantallas temporales, todas están implementadas
@@ -166,13 +167,24 @@ const AppNavigator: React.FC = () => {
             }}
         >
             {isAuthenticated ? (
-                <Stack.Screen 
-                    name="Main" 
-                    component={MainTabNavigator} 
-                    options={{ 
-                        animationTypeForReplace: 'push'
-                    }} 
-                />
+                <>
+                    <Stack.Screen 
+                        name="Main" 
+                        component={MainTabNavigator} 
+                        options={{ 
+                            animationTypeForReplace: 'push'
+                        }} 
+                    />
+                    <Stack.Screen 
+                        name="EditProfile" 
+                        component={PerfilScreen}
+                        options={{
+                            headerShown: true,
+                            headerTitle: 'Editar Perfil',
+                            animation: 'slide_from_right'
+                        }}
+                    />
+                </>
             ) : (
                 <Stack.Screen 
                     name="Login" 

@@ -4,6 +4,7 @@ export type RootStackParamList = {
     Login: undefined;
     Main: undefined;
     Loading: undefined;
+    EditProfile: undefined;
 };
 
 export type MainTabParamList = {
