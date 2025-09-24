@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'seminarista', 'externo', 'tesorero'], default: 'externo' },
+  role: { type: String, enum: ['externo'], default: 'externo' },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   telefono: String,
@@ -31,24 +31,6 @@ const User = mongoose.model('User', userSchema);
 // Usuarios de prueba
 const usuariosPrueba = [
   {
-    username: 'admin',
-    email: 'admin@luckas.com',
-    password: 'admin123',
-    role: 'admin',
-    firstName: 'Administrador',
-    lastName: 'Sistema',
-    telefono: '123456789'
-  },
-  {
-    username: 'seminarista',
-    email: 'seminarista@luckas.com',
-    password: 'seminarista123',
-    role: 'seminarista',
-    firstName: 'Juan',
-    lastName: 'Seminarista',
-    telefono: '987654321'
-  },
-  {
     username: 'externo',
     email: 'externo@luckas.com',
     password: 'externo123',
@@ -56,15 +38,6 @@ const usuariosPrueba = [
     firstName: 'María',
     lastName: 'Externa',
     telefono: '555666777'
-  },
-  {
-    username: 'tesorero',
-    email: 'tesorero@luckas.com',
-    password: 'tesorero123',
-    role: 'tesorero',
-    firstName: 'Carlos',
-    lastName: 'Tesorero',
-    telefono: '111222333'
   }
 ];
 
