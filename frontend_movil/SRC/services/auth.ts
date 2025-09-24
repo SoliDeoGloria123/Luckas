@@ -45,19 +45,18 @@ class AuthService {
 
             // Agregar token si existe
             if (this.token) {
-                headers['x-access-token'] = this.token;
+                // Usar solo Authorization: Bearer <token> como estándar
                 headers['Authorization'] = `Bearer ${this.token}`;
             }
             
-            console.log(`[API] Haciendo petición a ${endpoint}:`, {
-                url,
+            // Debug de la petición
+            console.log('🔄 [API Request]:', {
+                url: url,
                 method: options.method || 'GET',
-                headers: { ...headers, Authorization: headers.Authorization ? 'Bearer [HIDDEN]' : undefined }
+                endpoint: endpoint,
+                hasToken: !!this.token,
+                body: options.body ? JSON.parse(options.body as string) : undefined
             });
-
-            console.log('Haciendo petición a:', url);
-            console.log('Con headers:', headers);
-            console.log('Y opciones:', options);
 
             const response = await fetch(url, {
                 ...options,

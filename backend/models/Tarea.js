@@ -11,13 +11,13 @@ const tareaSchema = new mongoose.Schema({
     },
     estado: { 
         type: String, 
-        enum: ['pendiente', 'en progreso', 'completada', 'cancelada'], 
+        enum: ['pendiente', 'en_progreso', 'completada', 'cancelada'], 
         default: 'pendiente' 
     },
     prioridad: {
         type: String,
-        enum: ['alta', 'media', 'baja'],
-        default: 'media'
+        enum: ['Alta', 'Media', 'Baja'],
+        default: 'Media'
     },
     asignadoA: { 
         type: mongoose.Schema.Types.ObjectId, 

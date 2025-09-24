@@ -12,6 +12,9 @@ export type MainTabParamList = {
     Eventos: undefined;
     Reservas: undefined;
     Profile: undefined;
+    Tasks: undefined;
+    TaskDetail: { taskId: string };
+    TaskCreate: undefined;
     // Tabs adicionales según rol
     Programas?: undefined;
     Reportes?: undefined;

@@ -96,12 +96,19 @@ export class TareasService {
     // Obtener tareas asignadas a un usuario
     async getTareasByUsuario(usuarioId: string): Promise<{ success: boolean; data?: Tarea[]; message?: string }> {
         try {
-            const response = await this.getAllTareas();
-            if (response.success && response.data) {
-                const filtered = response.data.filter(tarea => tarea.asignadoA === usuarioId);
-                return { success: true, data: filtered };
+            console.log('🔄 Obteniendo tareas del usuario:', usuarioId);
+            if (!usuarioId) {
+                console.error('getTareasByUsuario: ID de usuario no proporcionado');
+                return { success: false, message: 'ID de usuario no proporcionado' };
             }
-            return response;
+            
+            console.log('getTareasByUsuario - ID:', usuarioId);
+            const url = `${API_CONFIG.ENDPOINTS.TAREAS}/usuario/${usuarioId}`;
+            console.log('getTareasByUsuario - URL:', url);
+            
+            return await authService.makeAuthenticatedRequest(url, {
+                method: 'GET',
+            });
         } catch (error) {
             console.error('Error getting tareas by usuario:', error);
             return { success: false, message: 'Error de conexión' };

@@ -22,6 +22,9 @@ import CursosScreen from '../screens/CursosScreen';
 import EventosScreen from '../screens/EventosScreen';
 import CabanasScreen from '../screens/CabanasScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import TaskListScreen from '../screens/TaskListScreen';
+import TaskDetailScreen from '../screens/TaskDetailScreen';
+import TaskCreateScreen from '../screens/TaskCreateScreen';
 
 // Ya no necesitamos pantallas temporales, todas están implementadas
 
@@ -107,6 +110,22 @@ const MainTabNavigator: React.FC = () => {
                     tabBarIcon: ({ focused, color, size }: any) => (
                         <Ionicons
                             name={focused ? 'bed' : 'bed-outline'}
+                            size={size}
+                            color={color}
+                        />
+                    ),
+                }} 
+            />
+
+            {/* Tab de tareas */}
+            <Tab.Screen 
+                name="Tasks" 
+                component={TaskListScreen} 
+                options={{
+                    tabBarLabel: 'Tareas',
+                    tabBarIcon: ({ focused, color, size }: any) => (
+                        <Ionicons
+                            name={focused ? 'checkbox' : 'checkbox-outline'}
                             size={size}
                             color={color}
                         />

@@ -7,8 +7,9 @@ const { authJwt, role } = require('../middlewares');
 router.use(authJwt.verifyToken);
 
 // Rutas de consulta (todos los roles autenticados)
-router.get('/', tareaController.obtenerTareas);
+router.get('/usuario/:usuarioId', tareaController.obtenerTareasPorUsuario); // Esta ruta debe ir primero
 router.get('/:id', tareaController.obtenerTareaPorId);
+router.get('/', tareaController.obtenerTareas);
 
 // Rutas de creación y modificación (admin y tesorero)
 router.post('/', role.checkRole('admin', 'tesorero','seminarista'), tareaController.crearTarea);

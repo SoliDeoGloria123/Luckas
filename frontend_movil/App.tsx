@@ -32,4 +32,8 @@ const App: React.FC = () => {
     );
 };
 
+import { AppRegistry } from 'react-native';
+
 export default App;
+
+AppRegistry.registerComponent('main', () => App);

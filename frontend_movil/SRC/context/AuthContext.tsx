@@ -7,7 +7,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (username: string, password: string) => Promise<boolean>;
-    logout: () => void;
+    logout: () => Promise<void>;  // Cambiado a Promise<void> ya que es async
     verifyToken: () => Promise<boolean>;
     canEdit: () => boolean;
     canDelete: () => boolean;
@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     loading: true,
     login: async () => false,
-    logout: () => {},
+    logout: async () => {},  // Cambiado a async
     verifyToken: async () => false,
     canEdit: () => false,
     canDelete: () => false,
@@ -61,12 +61,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = async (username: string, password: string) => {
         try {
+            setLoading(true);
+            console.log('Iniciando login para:', username);
             const response = await authService.login({ correo: username, password });
             if (response.success && response.data?.user) {
+                console.log('Login exitoso, estableciendo usuario:', response.data.user);
                 setUser(response.data.user);
                 setIsAuthenticated(true);
                 return true;
             }
+            console.log('Login fallido:', response);
             setUser(null);
             setIsAuthenticated(false);
             return false;
@@ -78,10 +82,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const logout = () => {
-        authService.logout();
-        setUser(null);
-        setIsAuthenticated(false);
+    const logout = async () => {
+        try {
+            setLoading(true);
+            await authService.logout();
+            setUser(null);
+            setIsAuthenticated(false);
+        } catch (error) {
+            console.error('Error en logout:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -100,12 +111,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return user?.role === role;
     };
 
+    // Envolver el login original para asegurar que loading se limpia
+    const loginWithLoading = async (username: string, password: string) => {
+        try {
+            console.log('Iniciando proceso de login con loading...');
+            return await login(username, password);
+        } finally {
+            console.log('Finalizando proceso de login - limpiando loading');
+            setLoading(false);
+        }
+    };
+
     return (
         <AuthContext.Provider value={{
             isAuthenticated,
             user,
             loading,
-            login,
+            login: loginWithLoading, // Usar la versión que maneja loading correctamente
             logout,
             verifyToken,
             canEdit,

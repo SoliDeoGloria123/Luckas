@@ -13,11 +13,11 @@ import {
     ScrollView
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
-import { LoginCredentials } from '../types';
+import type { LoginCredentials } from '../types';
 
 const LoginScreen: React.FC = () => {
-    const { login, isLoading } = useAuth();
-    const [credentials, setCredentials] = useState<LoginCredentials>({
+    const { login } = useAuth();
+    const [credentials, setCredentials] = useState({
         correo: '',
         password: ''
     });
@@ -48,29 +48,16 @@ const LoginScreen: React.FC = () => {
         if (!validateFields()) return;
 
         try {
-            console.log('Intentando login con:', {
-                correo: credentials.correo,
-                passwordLength: credentials.password.length
-            });
-
-            const response = await login(credentials);
+            console.log('Intentando login con credenciales:', { correo: credentials.correo });
+            const success = await login(credentials);
             
-            console.log('Respuesta de login:', {
-                success: response.success,
-                message: response.message,
-                hasUser: response.data?.user ? 'SI' : 'NO',
-                hasToken: response.data?.token ? 'SI' : 'NO',
-                userRole: response.data?.user?.role
-            });
-            
-            if (!response.success) {
-                // Solo mostrar alerta en caso de error
+            if (success) {
+                console.log('Login exitoso, esperando redirección automática...');
+            } else {
                 Alert.alert(
                     'Error de inicio de sesión',
-                    response.message || 'Credenciales incorrectas. Por favor verifica tus datos.'
+                    'Credenciales incorrectas. Por favor verifica tus datos.'
                 );
-            } else {
-                console.log('Login exitoso, esperando redirección automática...');
             }
         } catch (error: any) {
             console.error('Login error:', error);
@@ -107,7 +94,7 @@ const LoginScreen: React.FC = () => {
                             keyboardType="email-address"
                             autoCapitalize="none"
                             autoCorrect={false}
-                            editable={!isLoading}
+                            editable={true}
                         />
                         {errors.correo && <Text style={styles.errorText}>{errors.correo}</Text>}
                     </View>
@@ -128,19 +115,19 @@ const LoginScreen: React.FC = () => {
                             secureTextEntry
                             autoCapitalize="none"
                             autoCorrect={false}
-                            editable={!isLoading}
+                            editable={!loading}
                         />
                         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
                     </View>
 
                     {/* Botón de login */}
                     <TouchableOpacity
-                        style={[styles.loginButton, isLoading && styles.buttonDisabled]}
+                        style={styles.loginButton}
                         onPress={handleLogin}
-                        disabled={isLoading}
+                        disabled={false}
                     >
                         <Text style={styles.loginButtonText}>
-                            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                            Iniciar Sesión
                         </Text>
                     </TouchableOpacity>
 

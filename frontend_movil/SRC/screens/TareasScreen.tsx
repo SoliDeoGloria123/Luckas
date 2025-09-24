@@ -25,12 +25,19 @@ export const TareasScreen = () => {
     const cargarTareas = async () => {
         try {
             let response;
-            if (user?.role === 'admin' || user?.role === 'tesorero') {
+            console.log('Usuario actual:', user?._id, user?.role);
+            
+            if (!user?._id) {
+                Alert.alert('Error', 'No se encontró el ID del usuario');
+                return;
+            }
+
+            if (user.role === 'admin' || user.role === 'tesorero') {
                 // Los admin y tesoreros ven todas las tareas
                 response = await tareasService.getAllTareas();
             } else {
                 // Los demás solo ven sus tareas asignadas
-                response = await tareasService.getTareasByUsuario(user?._id || '');
+                response = await tareasService.getTareasByUsuario(user._id);
             }
 
             if (response.success && response.data) {
@@ -50,8 +57,11 @@ export const TareasScreen = () => {
     // Cargar tareas cuando la pantalla obtiene el foco
     useFocusEffect(
         React.useCallback(() => {
-            cargarTareas();
-        }, [user?._id])
+            if (user?._id && !loading) {
+                console.log('Cargando tareas para usuario:', user._id, 'con rol:', user.role);
+                cargarTareas();
+            }
+        }, [user?._id, user?.role, loading])
     );
 
     const onRefresh = () => {

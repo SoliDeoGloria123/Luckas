@@ -6,6 +6,21 @@ const mongoose = require('mongoose');
 exports.crearTarea = async (req, res) => {
    try {
         const { asignadoA, asignadoPor, comentarios } = req.body;
+        const userRole = req.userRole;
+        const userId = req.userId;
+
+        // Si es seminarista, solo puede asignar tareas a sí mismo
+        if (userRole === 'seminarista' && asignadoA !== userId) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Como seminarista, solo puedes crear tareas asignadas a ti mismo' 
+            });
+        }
+
+        // Para seminaristas, asignadoPor debe ser ellos mismos
+        if (userRole === 'seminarista') {
+            req.body.asignadoPor = userId;
+        }
 
         // Validar que los IDs sean ObjectId válidos
         if (!mongoose.Types.ObjectId.isValid(asignadoA)) {
@@ -68,31 +83,98 @@ exports.obtenerTareas = async (req, res) => {
          const tareas = await Tarea.find()
             .populate('asignadoA', 'username email nombre role')
             .populate('asignadoPor', 'username email nombre role');
-        res.json(tareas);
+        res.json({ success: true, data: tareas });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Obtener tareas por usuario
+exports.obtenerTareasPorUsuario = async (req, res) => {
+    try {
+        const usuarioId = req.params.usuarioId;
+        
+        if (!mongoose.Types.ObjectId.isValid(usuarioId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID de usuario inválido'
+            });
+        }
+
+        const tareas = await Tarea.find({ asignadoA: usuarioId })
+            .populate('asignadoA', 'username email nombre role')
+            .populate('asignadoPor', 'username email nombre role')
+            .sort({ createdAt: -1 });
+
+        res.json({
+            success: true,
+            data: tareas
+        });
+    } catch (error) {
+        console.error('Error al obtener tareas del usuario:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener las tareas del usuario',
+            error: error.message
+        });
     }
 };
 
 // Obtener tarea por ID
 exports.obtenerTareaPorId = async (req, res) => {
     try {
-        const tarea = await Tarea.findById(req.params.id).populate('asignadoA');
-        if (!tarea) return res.status(404).json({ message: 'Tarea no encontrada' });
-        res.json(tarea);
+        const tarea = await Tarea.findById(req.params.id)
+            .populate('asignadoA', 'username email nombre role')
+            .populate('asignadoPor', 'username email nombre role');
+            
+        if (!tarea) {
+            return res.status(404).json({
+                success: false,
+                message: 'Tarea no encontrada'
+            });
+        }
+        
+        res.json({
+            success: true,
+            data: tarea
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener la tarea',
+            error: error.message
+        });
     }
 };
 
 // Actualizar tarea
 exports.actualizarTarea = async (req, res) => {
     try {
-        const tarea = await Tarea.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!tarea) return res.status(404).json({ message: 'Tarea no encontrada' });
-        res.json(tarea);
+        const tarea = await Tarea.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        ).populate('asignadoA', 'username email nombre role')
+         .populate('asignadoPor', 'username email nombre role');
+
+        if (!tarea) {
+            return res.status(404).json({
+                success: false,
+                message: 'Tarea no encontrada'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Tarea actualizada exitosamente',
+            data: tarea
+        });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({
+            success: false,
+            message: 'Error al actualizar la tarea',
+            error: error.message
+        });
     }
 };
 
