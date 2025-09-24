@@ -31,8 +31,15 @@ router.use((req, res, next)=> {
 });
 
 
-//Rutas de login (sin proteccion )
+
+// Rutas de login (sin proteccion )
 router.post('/signin', authController.signin);
+
+// Recuperar contraseña: enviar código al correo
+router.post('/forgot-password', authController.forgotPassword);
+
+// Restablecer contraseña: validar código y cambiar password
+router.post('/reset-password', authController.resetPassword);
 
 // Ruta de registro
 router.post('/signup',

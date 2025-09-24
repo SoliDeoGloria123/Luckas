@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
-  }, 
+  },
   fechaNacimiento: {
     type: Date,
     required: true
@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     select: false // No devolver el password en las consultas
   },
- 
+
   role: {
     type: String,
     enum: ['admin', 'tesorero', 'seminarista', 'externo'],
@@ -56,6 +56,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['activo', 'inactivo'],
     default: 'activo'
+  },
+  resetPasswordCode: {
+    type: String
+  },
+  resetPasswordExpires: {
+    type: Date
   }
 }, { timestamps: true });
 

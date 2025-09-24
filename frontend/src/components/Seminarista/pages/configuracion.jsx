@@ -24,10 +24,11 @@ const ConfiguracionPage = () => {
   };
 
   return (
+    <>
+     <Header/>
     <div className="main-content">
-        <Header/>
+       
       <div className="container">
-        
         <div className="page-header">
           <div className="page-title-section">
             <h1 className="page-title">Configuración</h1>
@@ -427,8 +428,10 @@ const ConfiguracionPage = () => {
           <span>{toast.message}</span>
         </div>
       )}
-      <Footer/>
+    
     </div>
+      <Footer/>
+    </>
   );
 };
 

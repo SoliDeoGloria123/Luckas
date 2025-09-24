@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
 const { normalizeTipoDocumento } = require('../utils/userValidation');
+const sendEmail = require('../utils/sendEmail');
 
 
 //roles del sistema 
@@ -267,3 +268,59 @@ exports.deleteUser = async (req, res) => {
     });
   }
 };
+
+exports.forgotPassword = async (req, res) => {
+  const { correo } = req.body;
+  try {
+    const user = await User.findOne({ correo });
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Generar código de 6 dígitos
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
+
+    user.resetPasswordCode = code;
+    user.resetPasswordExpires = expires;
+    await user.save();
+
+
+    // Enviar el código por email
+    try {
+      await sendEmail(user.correo, 'Código de recuperación', `Tu código es: ${code}`);
+    } catch (err) {
+      return res.status(500).json({ message: 'Error al enviar el correo', error: err.message });
+    }
+
+    res.json({ message: 'Código enviado al correo electrónico' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error en el servidor', error });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const { correo, code, newPassword } = req.body;
+  try {
+    const user = await User.findOne({
+      correo,
+      resetPasswordCode: code,
+      resetPasswordExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Código inválido o expirado' });
+    }
+
+    // Cambiar la contraseña
+    user.password = newPassword; // <-- sin hash aquí
+    user.resetPasswordCode = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: 'Contraseña actualizada correctamente' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error en el servidor', error });
+  }
+};
+

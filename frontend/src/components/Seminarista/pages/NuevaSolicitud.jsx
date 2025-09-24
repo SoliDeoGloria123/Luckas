@@ -53,7 +53,7 @@ const NuevaSolicitud = () => {
   useEffect(() => {
     const fetchTesorero = async () => {
       try {
-        const res = await userService.getAll(); // Debe devolver todos los usuarios
+       const res = await userService.getAllUsers(); // Debe devolver todos los usuarios
         const tesorero = res.data.find(u => u.role === 'tesorero');
         if (tesorero) setTesoreroId(tesorero._id);
       } catch (err) {

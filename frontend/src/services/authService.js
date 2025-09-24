@@ -20,3 +20,22 @@ export const authService = {
     return response.data;
   },
 };
+// envio de codigo de recuperacion
+export const enviarCodigoRecuperacion = {
+  enviarCodigo: async (correo) => {
+    const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { correo });
+    return response.data;
+  },
+};
+
+//cambiar contraseña
+export const cambiarContraseñaService = {
+  cambiarContraseña: async (correo, code, newPassword) => {
+    const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, {
+      correo,
+      code,
+      newPassword
+    });
+    return response.data;
+  }
+}
