@@ -1,18 +1,12 @@
-// Archivo principal de la aplicación móvil del seminario
-
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import { AppRegistry } from 'react-native';
 
-// Context providers
-import { AuthProvider } from './SRC/contexts/AuthContext';
-
-// Navegación principal
+import { AuthProvider } from './SRC/context/AuthContext';
 import AppNavigator from './SRC/navigation/AppNavigator';
-
-// Estilos
 import { colors } from './SRC/styles';
 
 const App: React.FC = () => {
@@ -32,8 +26,7 @@ const App: React.FC = () => {
     );
 };
 
-import { AppRegistry } from 'react-native';
-
 export default App;
 
+// Registrar la aplicación
 AppRegistry.registerComponent('main', () => App);

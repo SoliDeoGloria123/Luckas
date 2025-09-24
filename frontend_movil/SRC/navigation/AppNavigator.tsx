@@ -2,7 +2,7 @@ import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { RootStackParamList, MainTabParamList } from '../types/navigation';
 import { seminaristaStyles } from '../styles/SeminaristaMovil';
 
@@ -22,9 +22,7 @@ import CursosScreen from '../screens/CursosScreen';
 import EventosScreen from '../screens/EventosScreen';
 import CabanasScreen from '../screens/CabanasScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import TaskListScreen from '../screens/TaskListScreen';
-import TaskDetailScreen from '../screens/TaskDetailScreen';
-import TaskCreateScreen from '../screens/TaskCreateScreen';
+import { TareasScreen } from '../screens/TareasScreen';
 
 // Ya no necesitamos pantallas temporales, todas están implementadas
 
@@ -120,7 +118,7 @@ const MainTabNavigator: React.FC = () => {
             {/* Tab de tareas */}
             <Tab.Screen 
                 name="Tasks" 
-                component={TaskListScreen} 
+                component={TareasScreen} 
                 options={{
                     tabBarLabel: 'Tareas',
                     tabBarIcon: ({ focused, color, size }: any) => (

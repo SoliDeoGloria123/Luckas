@@ -9,11 +9,12 @@ import {
     Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { seminaristaStyles } from '../styles/SeminaristaMovil';
 
 const HomeScreen: React.FC = () => {
-    const { user, logout, isAdmin, isTesorero, isSeminarista } = useAuth();
+    const { user, logout } = useAuth();
+    const { isAdmin, isTesorero, isSeminarista } = useAuth();
 
     const handleLogout = async () => {
         Alert.alert(

@@ -31,7 +31,7 @@ class AuthService {
     }
 
     // Realizar petición HTTP con manejo de errores
-    private async makeRequest<T>(
+    async makeRequest<T>(
         endpoint: string,
         options: RequestInit = {}
     ): Promise<ApiResponse<T>> {

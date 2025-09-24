@@ -22,6 +22,42 @@ exports.getAllUsers = async (req, res)=>{
 };
 
 //Obtener usuario espesifico
+// Actualizar perfil propio
+exports.updateOwnProfile = async (req, res) => {
+    try {
+        console.log('[CONTROLLER] Actualizando perfil propio');
+        console.log('ID del usuario:', req.userId);
+        console.log('Datos a actualizar:', req.body);
+
+        // Solo permitir actualizar nombre y apellido
+        const { nombre, apellido } = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.userId,
+            { nombre, apellido },
+            { new: true }
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: updatedUser
+        });
+    } catch (error) {
+        console.error('[CONTROLLER] Error actualizando perfil:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al actualizar el perfil'
+        });
+    }
+};
+
 exports.getUserById = async(req, res)=>{
     try{
         console.log('[CONTROLLER] getUserById - req.userId:', req.userId);

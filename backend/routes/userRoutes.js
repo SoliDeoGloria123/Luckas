@@ -22,6 +22,9 @@ router.use(authJwt.verifyToken);
 router.get('/', role.checkRole('admin', 'tesorero'), userController.getAllUsers);
 router.get('/:id', role.checkRole('admin', 'tesorero'), userController.getUserById);
 
+// Ruta para actualizar perfil propio
+router.put('/profile/update', userController.updateOwnProfile);
+
 // Rutas de creación y modificación (admin y tesorero)
 router.post('/', role.checkRole('admin', 'tesorero'), userController.createUser);
 router.put('/:id', role.checkRole('admin', 'tesorero'), userController.updateUser);

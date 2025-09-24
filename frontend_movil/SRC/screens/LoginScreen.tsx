@@ -10,9 +10,10 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
-    ScrollView
+    ScrollView,
+    ActivityIndicator
 } from 'react-native';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import type { LoginCredentials } from '../types';
 
 const LoginScreen: React.FC = () => {
@@ -22,6 +23,7 @@ const LoginScreen: React.FC = () => {
         password: ''
     });
     const [errors, setErrors] = useState<{ correo?: string; password?: string }>({});
+    const [isLoading, setIsLoading] = useState(false);
 
     // Validar campos
     const validateFields = (): boolean => {
@@ -47,9 +49,10 @@ const LoginScreen: React.FC = () => {
     const handleLogin = async () => {
         if (!validateFields()) return;
 
+        setIsLoading(true);
         try {
             console.log('Intentando login con credenciales:', { correo: credentials.correo });
-            const success = await login(credentials);
+            const success = await login(credentials.correo, credentials.password);
             
             if (success) {
                 console.log('Login exitoso, esperando redirección automática...');
@@ -65,6 +68,8 @@ const LoginScreen: React.FC = () => {
                 'Error de conexión',
                 'No se pudo conectar con el servidor. Por favor verifica tu conexión a internet.'
             );
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -94,7 +99,7 @@ const LoginScreen: React.FC = () => {
                             keyboardType="email-address"
                             autoCapitalize="none"
                             autoCorrect={false}
-                            editable={true}
+                            editable={!isLoading}
                         />
                         {errors.correo && <Text style={styles.errorText}>{errors.correo}</Text>}
                     </View>
@@ -115,25 +120,29 @@ const LoginScreen: React.FC = () => {
                             secureTextEntry
                             autoCapitalize="none"
                             autoCorrect={false}
-                            editable={!loading}
+                            editable={!isLoading}
                         />
                         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
                     </View>
 
                     {/* Botón de login */}
                     <TouchableOpacity
-                        style={styles.loginButton}
+                        style={[styles.loginButton, isLoading && styles.buttonDisabled]}
                         onPress={handleLogin}
-                        disabled={false}
+                        disabled={isLoading}
                     >
-                        <Text style={styles.loginButtonText}>
-                            Iniciar Sesión
-                        </Text>
+                        {isLoading ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text style={styles.loginButtonText}>
+                                Iniciar Sesión
+                            </Text>
+                        )}
                     </TouchableOpacity>
 
                     {/* Link para registro (si lo necesitas) */}
-                    <TouchableOpacity style={styles.registerLink}>
-                        <Text style={styles.registerLinkText}>
+                    <TouchableOpacity style={styles.registerLink} disabled={isLoading}>
+                        <Text style={[styles.registerLinkText, isLoading && styles.textDisabled]}>
                             ¿No tienes cuenta? Contacta al administrador
                         </Text>
                     </TouchableOpacity>
@@ -207,6 +216,7 @@ const styles = StyleSheet.create({
         padding: 15,
         alignItems: 'center',
         marginTop: 10,
+        minHeight: 52, // Altura mínima para mantener consistencia con el loader
     },
     buttonDisabled: {
         backgroundColor: '#6c757d',
@@ -219,12 +229,16 @@ const styles = StyleSheet.create({
     },
     registerLink: {
         marginTop: 20,
-        alignItems: 'center',
+        alignItems: 'center'
     },
     registerLinkText: {
         color: '#198754', // Color principal del seminario
-        fontSize: 16,
+        opacity: 1,
+        fontSize: 16
     },
+    textDisabled: {
+        opacity: 0.6
+    }
 });
 
 export default LoginScreen;

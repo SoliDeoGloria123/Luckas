@@ -33,6 +33,7 @@ export { inscripcionesService } from './inscripciones';
 export { solicitudesService } from './solicitudes';
 export { programasTecnicosService } from './programas';
 export { reservasService } from './reservas';
+export { userService } from './userService';
 
 // Tipos comunes para servicios
 export interface ServiceResponse<T = any> {

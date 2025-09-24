@@ -7,11 +7,15 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (username: string, password: string) => Promise<boolean>;
-    logout: () => Promise<void>;  // Cambiado a Promise<void> ya que es async
+    logout: () => Promise<void>;
     verifyToken: () => Promise<boolean>;
+    updateUserInContext: (updatedUser: User) => void;
     canEdit: () => boolean;
     canDelete: () => boolean;
     hasRole: (role: string) => boolean;
+    isAdmin: () => boolean;
+    isTesorero: () => boolean;
+    isSeminarista: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -19,11 +23,15 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     loading: true,
     login: async () => false,
-    logout: async () => {},  // Cambiado a async
+    logout: async () => {},
     verifyToken: async () => false,
+    updateUserInContext: () => {},
     canEdit: () => false,
     canDelete: () => false,
     hasRole: () => false,
+    isAdmin: () => false,
+    isTesorero: () => false,
+    isSeminarista: () => false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -111,6 +119,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return user?.role === role;
     };
 
+    // Función para actualizar el usuario en el contexto
+    const updateUserInContext = (updatedUser: User) => {
+        setUser(updatedUser);
+    };
+
     // Envolver el login original para asegurar que loading se limpia
     const loginWithLoading = async (username: string, password: string) => {
         try {
@@ -122,17 +135,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    // Funciones de verificación de roles
+    const isAdmin = () => hasRole('admin');
+    const isTesorero = () => hasRole('tesorero');
+    const isSeminarista = () => hasRole('seminarista');
+
     return (
         <AuthContext.Provider value={{
             isAuthenticated,
             user,
             loading,
-            login: loginWithLoading, // Usar la versión que maneja loading correctamente
+            login: loginWithLoading,
             logout,
             verifyToken,
+            updateUserInContext,
             canEdit,
             canDelete,
-            hasRole
+            hasRole,
+            isAdmin,
+            isTesorero,
+            isSeminarista
         }}>
             {children}
         </AuthContext.Provider>

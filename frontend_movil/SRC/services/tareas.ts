@@ -36,12 +36,33 @@ export class TareasService {
     
     async getAllTareas(): Promise<{ success: boolean; data?: Tarea[]; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.TAREAS, {
+            const response = await authService.makeRequest<any>(API_CONFIG.ENDPOINTS.TAREAS, {
                 method: 'GET',
             });
+
+            console.log('🔍 Respuesta completa:', JSON.stringify(response, null, 2));
+
+            if (response.success) {
+                // Navegar a través de la estructura anidada
+                const responseData = response.data?.data || response.data || [];
+                const tareas = Array.isArray(responseData) ? responseData : [];
+                
+                console.log('🔍 Tareas procesadas:', tareas.length);
+                return {
+                    success: true,
+                    data: tareas
+                };
+            }
+
+            console.log('❌ Error al obtener tareas:', response.message);
+            return { 
+                success: false, 
+                message: response.message || 'Error al obtener tareas',
+                data: []
+            };
         } catch (error) {
             console.error('Error getting tareas:', error);
-            return { success: false, message: 'Error de conexión' };
+            return { success: false, message: 'Error de conexión', data: [] };
         }
     }
 
