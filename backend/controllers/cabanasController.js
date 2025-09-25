@@ -1,3 +1,14 @@
+// Endpoint público: obtener solo cabañas disponibles para el rol external
+exports.obtenerCabanasPublicas = async (req, res) => {
+  try {
+    const cabanas = await Cabana.find({ estado: 'disponible' })
+      .populate('categoria', 'nombre')
+      .populate('creadoPor', 'nombre email');
+    res.json({ success: true, data: cabanas });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 const mongoose = require('mongoose');
 const Cabana = require('../models/Cabana');
 const Categorizacion = require('../models/categorizacion');

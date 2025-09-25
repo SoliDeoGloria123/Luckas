@@ -204,26 +204,25 @@ const TailwindExternalDashboard = () => {
         const [cursosResponse, eventosResponse, cabanasResponse, inscripcionesResponse] = await Promise.all([
           externalService.getCursos(),
           externalService.getEventos(),
-          fetch('http://localhost:3001/api/cabanas/publicas').then(res => res.json()),
+          fetch('/api/cabanas/publicas').then(res => res.json()),
           userData && userData._id ? externalService.getMisInscripciones(userData._id) : Promise.resolve({ success: true, data: [] })
         ]);
 
-        // Asegurarse de que los datos sean arrays planos
-        // DEBUG: Mostrar en consola los datos recibidos
-        console.log('DEBUG cursosResponse:', cursosResponse);
-        console.log('DEBUG eventosResponse:', eventosResponse);
-        console.log('DEBUG cabanasResponse:', cabanasResponse);
+        // LOGS DE DIAGNÓSTICO
+        console.log('Cursos recibidos:', cursosResponse);
+        console.log('Eventos recibidos:', eventosResponse);
+        console.log('Cabañas recibidas:', cabanasResponse);
+        console.log('Inscripciones recibidas:', inscripcionesResponse);
 
-        // Si cursosResponse es un array y tiene elementos, usarlo directamente
-        // Asignar siempre el array recibido, aunque esté vacío
+        // Robustez: Asegurar que los datos sean arrays planos y nunca null
         let cursosData = Array.isArray(cursosResponse) ? cursosResponse : (Array.isArray(cursosResponse?.data) ? cursosResponse.data : []);
         let eventosData = Array.isArray(eventosResponse) ? eventosResponse : (Array.isArray(eventosResponse?.data) ? eventosResponse.data : []);
         let cabanasData = Array.isArray(cabanasResponse) ? cabanasResponse : (Array.isArray(cabanasResponse?.data) ? cabanasResponse.data : []);
 
-        setCursos(cursosData);
-        setEventos(eventosData);
-        setCabanas(cabanasData);
-        setInscripciones(Array.isArray(inscripcionesResponse.data) ? inscripcionesResponse.data : (Array.isArray(inscripcionesResponse) ? inscripcionesResponse : []));
+        setCursos(Array.isArray(cursosData) ? cursosData : []);
+        setEventos(Array.isArray(eventosData) ? eventosData : []);
+        setCabanas(Array.isArray(cabanasData) ? cabanasData : []);
+        setInscripciones(Array.isArray(inscripcionesResponse?.data) ? inscripcionesResponse.data : (Array.isArray(inscripcionesResponse) ? inscripcionesResponse : []));
       } catch (error) {
         console.error('Error loading data:', error);
         setCursos([]);
@@ -711,7 +710,6 @@ const TailwindExternalDashboard = () => {
                   </div>
                 ) : (
                   Array.isArray(cursos) && cursos.map((curso, idx) => {
-                    // Asegurar que el key sea único
                     const key = curso._id || curso.id || idx;
                     const inscrito = isInscrito(curso._id || curso.id, 'curso');
                     return (

@@ -1,3 +1,4 @@
+
 const express = require('express');
 const router = express.Router();
 const {uploadMultiple} = require('../middlewares/upload');
@@ -7,9 +8,13 @@ const {
   obtenerCabanaPorId,
   actualizarCabana,
   eliminarCabana,
-  categorizarCabana 
+  categorizarCabana,
+  obtenerCabanasPublicas // Agregado aquí
 } = require('../controllers/cabanasController');
 const { authJwt, role } = require('../middlewares');
+
+// Endpoint público para cabañas disponibles (sin autenticación)
+router.get('/publicas', obtenerCabanasPublicas);
 
 // Middleware de autenticación para todas las rutas
 router.use(authJwt.verifyToken);

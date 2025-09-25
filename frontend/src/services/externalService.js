@@ -1,11 +1,10 @@
 // frontend/src/services/externalService.js
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3000/api"; // Usar URL correcta del backend
 
-// Configurar axios con el token
+// Configurar axios con el token y ruta relativa para proxy
 const api = axios.create({
-  baseURL: API_BASE_URL
+  baseURL: '/api'
 });
 
 // Interceptor para añadir el token automáticamente
@@ -18,39 +17,35 @@ api.interceptors.request.use((config) => {
 });
 
 const externalService = {
+
   // Obtener cursos disponibles (usar ruta pública)
-    getCursos: async () => {
-      try {
-        console.log('Making request to /api/cursos/publicos...');
-        // Usar fetch con ruta relativa para aprovechar el proxy
-        const response = await fetch('/api/cursos/publicos');
-        const data = await response.json();
-        if (data && data.success && data.data) {
-          console.log('Returning courses:', data.data);
-          return data.data;
-        } else {
-          console.log('No data found in response, returning empty array');
-          return [];
-        }
-      } catch (error) {
-        console.error('Error al obtener cursos:', error);
+  getCursos: async () => {
+    try {
+      const response = await fetch('/api/cursos/publicos');
+      const data = await response.json();
+      if (data && data.success && data.data) {
+        return data.data;
+      } else {
         return [];
       }
-    },
+    } catch (error) {
+      console.error('Error al obtener cursos:', error);
+      return [];
+    }
+  },
+
 
   // Obtener eventos disponibles
-    getEventos: async () => {
-      try {
-        // Usar fetch con ruta relativa para aprovechar el proxy
-        const response = await fetch('/api/eventos/publicos');
-        const data = await response.json();
-        console.log('Eventos API response:', data);
-        return data.data || [];
-      } catch (error) {
-        console.error('Error al obtener eventos:', error);
-        return [];
-      }
-    },
+  getEventos: async () => {
+    try {
+      const response = await fetch('/api/eventos/publicos');
+      const data = await response.json();
+      return data.data || [];
+    } catch (error) {
+      console.error('Error al obtener eventos:', error);
+      return [];
+    }
+  },
 
   // Inscribirse a un curso
   inscribirCurso: async (cursoId, userId) => {
@@ -104,10 +99,16 @@ const externalService = {
   getInscripciones: async () => {
     try {
       const response = await api.get('/inscripciones');
-      console.log('Inscripciones API response:', response.data);
-      // El backend retorna { success: true, data: [...] }
-      return response.data.data || [];
+      if (response && response.data && response.data.success && Array.isArray(response.data.data)) {
+        return response.data.data;
+      } else {
+        return [];
+      }
     } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // Si el endpoint no existe, retorna vacío
+        return [];
+      }
       console.error('Error al obtener inscripciones:', error);
       return [];
     }
@@ -117,8 +118,15 @@ const externalService = {
   getMisInscripciones: async () => {
     try {
       const response = await api.get('/inscripciones');
-      return response.data;
+      if (response && response.data && response.data.success && Array.isArray(response.data.data)) {
+        return response.data;
+      } else {
+        return { success: true, data: [] };
+      }
     } catch (error) {
+      if (error.response && error.response.status === 404) {
+        return { success: true, data: [] };
+      }
       console.error('Error al obtener inscripciones:', error);
       return { success: true, data: [] };
     }

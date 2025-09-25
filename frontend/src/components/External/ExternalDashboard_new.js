@@ -45,9 +45,9 @@ const ExternalDashboard = () => {
           externalService.getMisInscripciones()
         ]);
 
-        setCursos(cursosResponse.data || []);
-        setEventos(eventosResponse.data || []);
-        setInscripciones(inscripcionesResponse.data || []);
+        setCursos(Array.isArray(cursosResponse) ? cursosResponse : []);
+        setEventos(Array.isArray(eventosResponse) ? eventosResponse : []);
+        setInscripciones(Array.isArray(inscripcionesResponse.data) ? inscripcionesResponse.data : []);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
