@@ -19,38 +19,38 @@ api.interceptors.request.use((config) => {
 
 const externalService = {
   // Obtener cursos disponibles (usar ruta pública)
-  getCursos: async () => {
-    try {
-      console.log('Making request to /cursos/publicos...');
-      // Usar fetch sin headers de autorización para endpoint público
-  const response = await fetch('http://localhost:3000/api/cursos/publicos');
-      const data = await response.json();
-      if (data && data.success && data.data) {
-        console.log('Returning courses:', data.data);
-        return data.data;
-      } else {
-        console.log('No data found in response, returning empty array');
+    getCursos: async () => {
+      try {
+        console.log('Making request to /api/cursos/publicos...');
+        // Usar fetch con ruta relativa para aprovechar el proxy
+        const response = await fetch('/api/cursos/publicos');
+        const data = await response.json();
+        if (data && data.success && data.data) {
+          console.log('Returning courses:', data.data);
+          return data.data;
+        } else {
+          console.log('No data found in response, returning empty array');
+          return [];
+        }
+      } catch (error) {
+        console.error('Error al obtener cursos:', error);
         return [];
       }
-    } catch (error) {
-      console.error('Error al obtener cursos:', error);
-      return [];
-    }
-  },
+    },
 
   // Obtener eventos disponibles
-  getEventos: async () => {
-    try {
-      // Usar fetch sin headers de autorización para endpoint público
-  const response = await fetch('http://localhost:3000/api/eventos/publicos');
-      const data = await response.json();
-      console.log('Eventos API response:', data);
-      return data.data || [];
-    } catch (error) {
-      console.error('Error al obtener eventos:', error);
-      return [];
-    }
-  },
+    getEventos: async () => {
+      try {
+        // Usar fetch con ruta relativa para aprovechar el proxy
+        const response = await fetch('/api/eventos/publicos');
+        const data = await response.json();
+        console.log('Eventos API response:', data);
+        return data.data || [];
+      } catch (error) {
+        console.error('Error al obtener eventos:', error);
+        return [];
+      }
+    },
 
   // Inscribirse a un curso
   inscribirCurso: async (cursoId, userId) => {
