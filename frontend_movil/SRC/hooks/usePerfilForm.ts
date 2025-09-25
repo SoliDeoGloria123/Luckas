@@ -5,10 +5,26 @@ import { User } from '../types';
 
 export const usePerfilForm = (user: User | null, onSuccess: () => void) => {
     const [loading, setLoading] = useState(false);
+    // Opciones válidas para tipoDocumento
+    const tipoDocumentoOpciones = [
+        'Cédula de ciudadanía',
+        'Cédula de extranjería',
+        'Pasaporte',
+        'Tarjeta de identidad'
+    ] as const;
+
+    // Si el valor actual no es válido, se asigna el primero
+    const tipoDocumentoInicial = tipoDocumentoOpciones.includes(user?.tipoDocumento as any)
+        ? user?.tipoDocumento
+        : tipoDocumentoOpciones[0];
+
     const [perfilData, setPerfilData] = useState({
         nombre: user?.nombre || '',
         apellido: user?.apellido || '',
-        username: user?.username || '',
+        telefono: user?.telefono || '',
+        correo: user?.correo || '',
+        tipoDocumento: tipoDocumentoInicial,
+        numeroDocumento: user?.numeroDocumento || '',
         role: user?.role || ''
     });
 
@@ -27,8 +43,14 @@ export const usePerfilForm = (user: User | null, onSuccess: () => void) => {
                 return;
             }
 
+            // Aseguramos que tipoDocumento sea uno de los valores válidos
+            const tipoDocumentoValido = tipoDocumentoOpciones.includes(perfilData.tipoDocumento as any)
+                ? perfilData.tipoDocumento
+                : tipoDocumentoOpciones[0];
+
             const response = await userService.updateUser(user._id, {
                 ...perfilData,
+                tipoDocumento: tipoDocumentoValido,
                 role: user.role // Mantenemos el rol actual
             });
 

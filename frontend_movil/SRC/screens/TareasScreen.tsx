@@ -17,7 +17,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../context/AuthContext';
 import { Tarea } from '../types';
-import { colors } from '../styles/colors';
+import { colors, spacing, typography, shadows } from '../styles';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TareaCard } from '../components/Tareas/TareaCard';
 import { TareaFilterModal } from '../components/Tareas/TareaFilterModal';
@@ -27,6 +27,7 @@ import { useTareasHandlers } from '../hooks/useTareasHandlers';
 import { useCrearTareaForm } from '../hooks/useCrearTareaForm';
 import { tareasService } from '../services';
 
+
 const INITIAL_FILTROS = {
     estado: '',
     prioridad: '',
@@ -34,7 +35,7 @@ const INITIAL_FILTROS = {
 };
 
 export const TareasScreen = () => {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const navigation = useNavigation();
 
     // State hooks
@@ -90,24 +91,32 @@ export const TareasScreen = () => {
     // User role check
     const canCreateTasks = user?.role === 'admin' || user?.role === 'tesorero';
 
-    // Show loading indicator
-    if (loading) {
+    // Mostrar loader si el usuario aún no está cargado o el contexto de auth está en loading
+    if (authLoading || !user) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={{ marginTop: 16, color: colors.gray }}>Cargando usuario...</Text>
             </View>
         );
     }
 
+    // ...existing code...
     return (
         <View style={styles.container}>
+            {/* Header visual tipo eventos/cabañas */}
+            <View style={styles.headerTareas}>
+                <Text style={styles.headerTareasTitle}>Tareas</Text>
+                <Text style={styles.headerTareasSubtitle}>Gestiona y revisa tus tareas pendientes</Text>
+            </View>
+
             <TareasHeader
                 onFilterPress={() => setShowFilters(true)}
                 cantidadTareas={tareas.length}
             />
 
             <FlatList
-                data={tareas}
+                data={Array.isArray(tareas) ? tareas : (tareas ? [tareas] : [])}
                 renderItem={({ item }) => (
                     <TareaCard
                         tarea={item}
@@ -271,6 +280,29 @@ export const TareasScreen = () => {
 };
 
 const styles = StyleSheet.create({
+    headerTareas: {
+        backgroundColor: colors.surface,
+            paddingVertical: spacing.lg + 40,
+            paddingHorizontal: spacing.md,
+            alignItems: 'center',
+            marginBottom: spacing.md,
+            borderBottomWidth: 1,
+            borderBottomColor: '#f1f5f9',
+            height: 170,
+    },
+    headerTareasTitle: {
+       fontSize: typography.fontSize.xl + 4,
+        fontWeight: typography.fontWeight.bold,
+        color: colors.primary,
+        marginBottom: spacing.xs,
+        textAlign: 'center',
+    },
+    headerTareasSubtitle: {
+         fontSize: typography.fontSize.md,
+        color: colors.textSecondary,
+        marginBottom: spacing.xs,
+        textAlign: 'center',
+    },
     container: {
         flex: 1,
         backgroundColor: '#F5F5F5',

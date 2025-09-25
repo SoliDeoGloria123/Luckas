@@ -8,7 +8,7 @@ class EventosService {
     constructor() {
         console.log('EventosService inicializado');
     }
-    
+
     async getAllEventos(): Promise<{ success: boolean; data?: Evento[]; message?: string }> {
         try {
             const response = await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.EVENTOS, {
@@ -18,7 +18,7 @@ class EventosService {
                 return { success: false, message: response.message || 'Error al obtener eventos' };
             }
             // Asegurar que la respuesta sea un array
-            const eventos = Array.isArray(response.data) ? response.data : [];
+            const eventos = Array.isArray((response.data as any)?.data) ? (response.data as any).data : [];
             return { success: true, data: eventos as Evento[] };
         } catch (error) {
             console.error('Error getting eventos:', error);

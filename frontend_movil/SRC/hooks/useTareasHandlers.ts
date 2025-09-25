@@ -32,9 +32,19 @@ export const useTareasHandlers = (user: any, onTareasUpdated: (tareas: Tarea[]) 
 
             console.log('📥 Respuesta del servidor:', response);
 
-            if (response.success && Array.isArray(response.data)) {
-                console.log('✅ Tareas cargadas exitosamente:', response.data.length, 'tareas');
-                onTareasUpdated(response.data);
+            // Adaptar para aceptar array anidado en data o data.data
+            let tareasArray = [];
+            if (response.success) {
+                if (Array.isArray(response.data)) {
+                    tareasArray = response.data;
+                } else if (response.data && Array.isArray(response.data.data)) {
+                    tareasArray = response.data.data;
+                }
+            }
+
+            if (response.success && Array.isArray(tareasArray)) {
+                console.log('✅ Tareas cargadas exitosamente:', tareasArray.length, 'tareas');
+                onTareasUpdated(tareasArray);
             } else {
                 console.error('❌ Error en la respuesta:', response.message);
                 Alert.alert('Error', response.message || 'Error al cargar las tareas');

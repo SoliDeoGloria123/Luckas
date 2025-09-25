@@ -1,5 +1,4 @@
 // Pantalla de lista de cursos
-
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     View,
@@ -22,6 +21,10 @@ const CursosScreen: React.FC = () => {
     const [searchText, setSearchText] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [selectedModalidad, setSelectedModalidad] = useState('Todas');
+    const [selectedEstado, setSelectedEstado] = useState('Todos');
+    const modalidades = ['Todas', 'Presencial', 'Virtual', 'Semipresencial'];
+    const estados = ['Todos', 'Activo', 'Inactivo', 'Finalizado', 'Suspendido'];
 
     // Verificar si el usuario tiene permisos para ver cursos
     useEffect(() => {
@@ -43,7 +46,13 @@ const CursosScreen: React.FC = () => {
             setIsLoading(true);
             const response = await cursosService.getAllCursos();
             if (response.success && response.data) {
-                setCursos(response.data);
+                // Forzar el tipo de la respuesta para evitar errores de tipado
+                const cursosArray = Array.isArray(response.data)
+                    ? response.data
+                    : Array.isArray((response.data as any).data)
+                        ? (response.data as any).data
+                        : [];
+                setCursos(cursosArray);
             } else {
                 Alert.alert('Error', response.message || 'No se pudieron cargar los cursos');
                 setCursos([]);
@@ -57,10 +66,13 @@ const CursosScreen: React.FC = () => {
         }
     }, []);
 
-    const filteredCursos = cursos.filter(curso =>
-        curso.nombre.toLowerCase().includes(searchText.toLowerCase()) ||
-        curso.instructor.toLowerCase().includes(searchText.toLowerCase())
-    );
+    const filteredCursos = cursos.filter(curso => {
+        const matchSearch = curso.nombre.toLowerCase().includes(searchText.toLowerCase()) ||
+            curso.instructor.toLowerCase().includes(searchText.toLowerCase());
+        const matchModalidad = selectedModalidad === 'Todas' || (curso.modalidad && curso.modalidad.toLowerCase() === selectedModalidad.toLowerCase());
+        const matchEstado = selectedEstado === 'Todos' || (curso.estado && curso.estado.toLowerCase() === selectedEstado.toLowerCase());
+        return matchSearch && matchModalidad && matchEstado;
+    });
 
     // Nota: Funcionalidad de agregar cursos deshabilitada
     const handleEditCurso = (cursoId: string) => {
@@ -72,66 +84,65 @@ const CursosScreen: React.FC = () => {
     };
 
     const renderCursoCard = (curso: any) => (
-        <View key={curso.id} style={styles.cursoCard}>
-            <View style={styles.cursoHeader}>
-                <View style={styles.cursoInfo}>
-                    <Text style={styles.cursoTitle}>{curso.nombre}</Text>
-                    <Text style={styles.cursoInstructor}>Por: {curso.instructor}</Text>
-                    <Text style={styles.cursoDuracion}>Duración: {curso.duracion}</Text>
+        <View key={curso._id || curso.id} style={styles.cursoCardWeb}>
+            <View style={styles.cardHeaderWeb}>
+                <View style={[styles.modalidadTag, styles[`modalidad${curso.modalidad}`]]}>
+                    <Text style={styles.modalidadText}>{curso.modalidad}</Text>
                 </View>
-                <View style={[
-                    styles.statusBadge,
-                    curso.estado === 'activo' ? styles.statusActive : styles.statusInactive
-                ]}>
-                    <Text style={[
-                        styles.statusText,
-                        curso.estado === 'activo' ? styles.statusActiveText : styles.statusInactiveText
-                    ]}>
-                        {curso.estado}
-                    </Text>
+                <View style={[styles.estadoTag, styles[`estado${curso.estado}`]]}>
+                    <Text style={styles.estadoText}>{curso.estado}</Text>
                 </View>
             </View>
-            
-            <Text style={styles.cursoDescription}>{curso.descripcion}</Text>
-            
-            <View style={styles.cursoActions}>
+            <Text style={styles.cursoTitleWeb}>{curso.nombre}</Text>
+            <Text style={styles.cursoInstructorWeb}>Por: {curso.instructor}</Text>
+            <Text style={styles.cursoDuracionWeb}>
+                Duración: {curso.duracion?.horas ? `${curso.duracion.horas} horas` : ''} {curso.duracion?.semanas ? `/ ${curso.duracion.semanas} semanas` : ''}
+            </Text>
+            <Text style={styles.cursoDescripcionWeb} numberOfLines={2}>{curso.descripcion}</Text>
+            <View style={styles.cursoActionsWeb}>
                 <TouchableOpacity 
-                    style={styles.actionButton}
-                    onPress={() => Alert.alert('Información', 'Ver detalles - En desarrollo')}
+                    style={styles.actionButtonWeb}
+                    onPress={() => Alert.alert('Información', `Nombre: ${curso.nombre}\nInstructor: ${curso.instructor}\nModalidad: ${curso.modalidad}\nDuración: ${curso.duracion?.horas || ''} horas / ${curso.duracion?.semanas || ''} semanas\nDescripción: ${curso.descripcion}`)}
                 >
                     <Ionicons name="eye-outline" size={20} color={colors.primary} />
-                    <Text style={styles.actionText}>Ver</Text>
+                    <Text style={styles.actionTextWeb}>Ver</Text>
                 </TouchableOpacity>
-                
-                {canEdit() && (
-                    <TouchableOpacity 
-                        style={styles.actionButton}
-                        onPress={() => handleEditCurso(curso.id)}
-                    >
-                        <Ionicons name="pencil-outline" size={20} color={colors.warning} />
-                        <Text style={styles.actionText}>Editar</Text>
-                    </TouchableOpacity>
-                )}
-                
-                {canDelete() && (
-                    <TouchableOpacity 
-                        style={styles.actionButton}
-                        onPress={() => handleDeleteCurso(curso.id)}
-                    >
-                        <Ionicons name="trash-outline" size={20} color={colors.danger} />
-                        <Text style={styles.actionText}>Eliminar</Text>
-                    </TouchableOpacity>
-                )}
             </View>
         </View>
     );
 
     return (
         <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Cursos</Text>
+            {/* Header moderno */}
+            <View style={styles.headerWeb}>
+                <Text style={styles.tituloWeb}>Cursos y Talleres</Text>
+                <Text style={styles.subtituloWeb}>Explora y participa en los cursos más importantes del seminario</Text>
             </View>
+
+            {/* Filtros de modalidad */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtrosContainer} contentContainerStyle={styles.filtrosContent}>
+                {modalidades.map(mod => (
+                    <TouchableOpacity
+                        key={mod}
+                        style={[styles.filtroBtn, selectedModalidad === mod && styles.filtroBtnActivo]}
+                        onPress={() => setSelectedModalidad(mod)}
+                    >
+                        <Text style={[styles.filtroText, selectedModalidad === mod && styles.filtroTextActivo]}>{mod}</Text>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
+            {/* Filtros de estado */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtrosContainer} contentContainerStyle={styles.filtrosContent}>
+                {estados.map(est => (
+                    <TouchableOpacity
+                        key={est}
+                        style={[styles.filtroBtn, selectedEstado === est && styles.filtroBtnActivo]}
+                        onPress={() => setSelectedEstado(est)}
+                    >
+                        <Text style={[styles.filtroText, selectedEstado === est && styles.filtroTextActivo]}>{est}</Text>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
 
             {/* Barra de búsqueda */}
             <View style={styles.searchContainer}>
@@ -163,39 +174,18 @@ const CursosScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: colors.surface,
-        padding: spacing.lg,
-        ...shadows.small,
-    },
-    headerTitle: {
-        fontSize: typography.fontSize.xl,
-        fontWeight: typography.fontWeight.bold,
-        color: colors.text,
-    },
-    addButton: {
-        backgroundColor: colors.primary,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.surface,
-        margin: spacing.md,
+        backgroundColor: '#f1f5f9',
+        marginHorizontal: spacing.md,
+        marginTop: spacing.sm,
+        marginBottom: spacing.md,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
-        borderRadius: 8,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
         ...shadows.small,
     },
     searchInput: {
@@ -203,86 +193,171 @@ const styles = StyleSheet.create({
         marginLeft: spacing.sm,
         fontSize: typography.fontSize.md,
         color: colors.text,
+        backgroundColor: 'transparent',
+        borderWidth: 0,
+        paddingVertical: 2,
     },
-    scrollContainer: {
+    container: {
         flex: 1,
-        paddingHorizontal: spacing.md,
+        backgroundColor: colors.background,
     },
-    cursoCard: {
+    headerWeb: {
         backgroundColor: colors.surface,
-        borderRadius: 12,
-        padding: spacing.md,
+        paddingVertical: spacing.lg + 40,
+        paddingHorizontal: spacing.md,
+        alignItems: 'center',
         marginBottom: spacing.md,
-        ...shadows.medium,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f5f9',
+        height: 170,
     },
-    cursoHeader: {
+    tituloWeb: {
+        fontSize: typography.fontSize.xl + 4,
+        fontWeight: typography.fontWeight.bold,
+        color: colors.primary,
+        marginBottom: spacing.xs,
+        textAlign: 'center',
+    },
+    subtituloWeb: {
+        fontSize: typography.fontSize.md,
+        color: colors.textSecondary,
+        marginBottom: spacing.xs,
+        textAlign: 'center',
+    },
+    filtrosContainer: {
+        marginBottom: spacing.sm,
+        marginHorizontal: spacing.md,
+        height: 36,
+        minHeight: 36,
+        maxHeight: 36,
+    },
+    filtrosContent: {
+        alignItems: 'center',
+        gap: spacing.xs,
+        height: 36,
+        minHeight: 36,
+        maxHeight: 36,
+        paddingVertical: 0,
+    },
+    filtroBtn: {
+        paddingVertical: 2,
+        paddingHorizontal: 12,
+        borderRadius: 14,
+        backgroundColor: '#f1f5f9',
+        marginRight: spacing.xs,
+        minHeight: 28,
+        height: 28,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    filtroBtnActivo: {
+        backgroundColor: colors.primary,
+    },
+    filtroText: {
+        color: colors.textSecondary,
+        fontWeight: '600',
+        fontSize: 13,
+    },
+    filtroTextActivo: {
+        color: '#fff',
+    },
+    cursoCardWeb: {
+        backgroundColor: colors.surface,
+        margin: spacing.md,
+        marginBottom: 0,
+        padding: spacing.lg,
+        borderRadius: 12,
+        ...shadows.medium,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+    },
+    cardHeaderWeb: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: spacing.sm,
+        alignItems: 'center',
+        marginBottom: spacing.xs,
     },
-    cursoInfo: {
-        flex: 1,
-        marginRight: spacing.sm,
+    modalidadTag: {
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 8,
+        backgroundColor: '#8b5cf6',
+        alignSelf: 'flex-start',
     },
-    cursoTitle: {
+    modalidadPresencial: {
+        backgroundColor: '#059669',
+    },
+    modalidadVirtual: {
+        backgroundColor: '#2563eb',
+    },
+    modalidadSemipresencial: {
+        backgroundColor: '#1d4ed8',
+    },
+    modalidadText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: typography.fontSize.sm,
+    },
+    estadoTag: {
+        backgroundColor: '#f1f5f9',
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+    },
+    estadoActivo: {
+        backgroundColor: '#059669',
+    },
+    estadoInactivo: {
+        backgroundColor: '#334155',
+    },
+    estadoFinalizado: {
+        backgroundColor: '#8b5cf6',
+    },
+    estadoSuspendido: {
+        backgroundColor: '#dc3545',
+    },
+    estadoText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: typography.fontSize.sm,
+        textTransform: 'capitalize',
+    },
+    cursoTitleWeb: {
         fontSize: typography.fontSize.lg,
         fontWeight: typography.fontWeight.bold,
         color: colors.text,
         marginBottom: spacing.xs,
     },
-    cursoInstructor: {
+    cursoInstructorWeb: {
         fontSize: typography.fontSize.sm,
         color: colors.textSecondary,
         marginBottom: spacing.xs,
     },
-    cursoDuracion: {
+    cursoDuracionWeb: {
         fontSize: typography.fontSize.sm,
         color: colors.textSecondary,
+        marginBottom: spacing.xs,
     },
-    statusBadge: {
-        paddingHorizontal: spacing.sm,
-        paddingVertical: spacing.xs,
-        borderRadius: 12,
-    },
-    statusActive: {
-        backgroundColor: colors.success + '20',
-    },
-    statusInactive: {
-        backgroundColor: colors.danger + '20',
-    },
-    statusText: {
-        fontSize: typography.fontSize.xs,
-        fontWeight: typography.fontWeight.medium,
-        textTransform: 'capitalize',
-    },
-    statusActiveText: {
-        color: colors.success,
-    },
-    statusInactiveText: {
-        color: colors.danger,
-    },
-    cursoDescription: {
+    cursoDescripcionWeb: {
         fontSize: typography.fontSize.md,
         color: colors.textSecondary,
-        lineHeight: typography.lineHeight.relaxed,
-        marginBottom: spacing.md,
+        marginBottom: spacing.xs,
     },
-    cursoActions: {
+    cursoActionsWeb: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
         borderTopWidth: 1,
         borderTopColor: colors.borderLight,
         paddingTop: spacing.sm,
     },
-    actionButton: {
+    actionButtonWeb: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: spacing.sm,
         paddingVertical: spacing.xs,
         marginLeft: spacing.sm,
     },
-    actionText: {
+    actionTextWeb: {
         marginLeft: spacing.xs,
         fontSize: typography.fontSize.sm,
         color: colors.textSecondary,

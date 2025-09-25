@@ -1,6 +1,5 @@
 // Pantalla principal (Dashboard) del sistema seminario
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -12,9 +11,35 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { seminaristaStyles } from '../styles/SeminaristaMovil';
 
+
+
 const HomeScreen: React.FC = () => {
     const { user, logout } = useAuth();
     const { isAdmin, isTesorero, isSeminarista } = useAuth();
+    
+    // Estados para estadísticas (simuladas por ahora)
+    const [stats, setStats] = useState({
+        cursos: 12,
+        eventos: 8,
+        reservas: 25,
+        usuarios: 145
+    });
+
+    // Simular carga de estadísticas
+    useEffect(() => {
+        // Aquí podrías hacer una llamada a la API para obtener estadísticas reales
+        const fetchStats = () => {
+            // Simulación de datos dinámicos
+            setStats({
+                cursos: Math.floor(Math.random() * 20) + 10,
+                eventos: Math.floor(Math.random() * 15) + 5,
+                reservas: Math.floor(Math.random() * 50) + 20,
+                usuarios: Math.floor(Math.random() * 100) + 100
+            });
+        };
+        
+        fetchStats();
+    }, []);
 
     const handleLogout = async () => {
         Alert.alert(
@@ -54,24 +79,88 @@ const HomeScreen: React.FC = () => {
         return 'Buenas noches';
     };
 
+    const getUserInitials = (name: string) => {
+        if (!name) return 'U';
+        const nameParts = name.split(' ');
+        if (nameParts.length >= 2) {
+            return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+        }
+        return name[0].toUpperCase();
+    };
+
     return (
         <ScrollView style={seminaristaStyles.container}>
-            {/* Header con información del usuario */}
-            <View style={[seminaristaStyles.card, { marginTop: 10 }]}>
-                <View>
-                    <Text style={seminaristaStyles.cardTitle}>
+            {/* Header con información del usuario mejorado */}
+            <View style={seminaristaStyles.userHeader}>
+                {/* Avatar con iniciales */}
+                <View style={seminaristaStyles.userAvatar}>
+                    <Text style={seminaristaStyles.avatarText}>
+                        {getUserInitials(user?.nombre || 'Usuario')}
+                    </Text>
+                </View>
+                
+                <View style={seminaristaStyles.userInfo}>
+                    <Text style={seminaristaStyles.welcomeText}>
                         {getWelcomeMessage()}, {user?.nombre}
                     </Text>
-                    <Text style={seminaristaStyles.cardText}>
+                    <Text style={seminaristaStyles.roleText}>
                         {getRoleDisplayName(user?.role || '')}
                     </Text>
                 </View>
+                
                 <TouchableOpacity 
-                    style={[seminaristaStyles.button, { backgroundColor: 'transparent' }]}
+                    style={seminaristaStyles.logoutButton}
                     onPress={handleLogout}
                 >
-                    <Ionicons name="log-out-outline" size={24} color="#dc3545" />
+                    <Ionicons name="log-out-outline" size={20} color="white" />
+                    <Text style={seminaristaStyles.logoutButtonText}>Salir</Text>
                 </TouchableOpacity>
+            </View>
+
+            {/* Sección de estadísticas */}
+            <Text style={seminaristaStyles.sectionTitle}>Estadísticas del Sistema</Text>
+            <View style={seminaristaStyles.statsGrid}>
+                <View style={[seminaristaStyles.statCard, { borderLeftColor: '#2563eb' }]}>
+                    <View style={seminaristaStyles.statIcon}>
+                        <Ionicons name="school-outline" size={32} color="#2563eb" />
+                    </View>
+                    <Text style={seminaristaStyles.statNumber}>{stats.cursos}</Text>
+                    <Text style={seminaristaStyles.statLabel}>Cursos Activos</Text>
+                </View>
+                
+                <View style={[seminaristaStyles.statCard, { borderLeftColor: '#059669' }]}>
+                    <View style={seminaristaStyles.statIcon}>
+                        <Ionicons name="calendar-outline" size={32} color="#059669" />
+                    </View>
+                    <Text style={seminaristaStyles.statNumber}>{stats.eventos}</Text>
+                    <Text style={seminaristaStyles.statLabel}>Eventos</Text>
+                </View>
+                
+                <View style={[seminaristaStyles.statCard, { borderLeftColor: '#8b5cf6' }]}>
+                    <View style={seminaristaStyles.statIcon}>
+                        <Ionicons name="bed-outline" size={32} color="#8b5cf6" />
+                    </View>
+                    <Text style={seminaristaStyles.statNumber}>{stats.reservas}</Text>
+                    <Text style={seminaristaStyles.statLabel}>Reservas</Text>
+                </View>
+                
+                <View style={[seminaristaStyles.statCard, { borderLeftColor: '#059669' }]}>
+                    <View style={seminaristaStyles.statIcon}>
+                        <Ionicons name="bed-outline" size={32} color="#059669" />
+                    </View>
+                    <Text style={seminaristaStyles.statNumber}>{stats.reservas}</Text>
+                    <Text style={seminaristaStyles.statLabel}>Tareas Pendientes</Text>
+                </View>
+                
+                {(isAdmin() || isTesorero()) && (
+                    <View style={[seminaristaStyles.statCard, { borderLeftColor: '#334155' }]}>
+                        <View style={seminaristaStyles.statIcon}>
+                            <Ionicons name="people-outline" size={32} color="#334155" />
+                        </View>
+                        <Text style={seminaristaStyles.statNumber}>{stats.usuarios}</Text>
+                        <Text style={seminaristaStyles.statLabel}>Usuarios</Text>
+                    </View>
+                )}
             </View>
 
             {/* Sección de acceso rápido */}
@@ -81,7 +170,7 @@ const HomeScreen: React.FC = () => {
                 {/* Card Cursos */}
                 <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
                     <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                        <Ionicons name="school-outline" size={32} color="#198754" />
+                        <Ionicons name="school-outline" size={32} color="#2563eb" />
                     </View>
                     <Text style={seminaristaStyles.cardTitle}>Cursos</Text>
                     <Text style={seminaristaStyles.cardText}>Gestionar cursos</Text>
@@ -90,7 +179,7 @@ const HomeScreen: React.FC = () => {
                 {/* Card Eventos */}
                 <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
                     <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                        <Ionicons name="calendar-outline" size={32} color="#198754" />
+                        <Ionicons name="calendar-outline" size={32} color="#059669" />
                     </View>
                     <Text style={seminaristaStyles.cardTitle}>Eventos</Text>
                     <Text style={seminaristaStyles.cardText}>Ver eventos</Text>
@@ -99,7 +188,7 @@ const HomeScreen: React.FC = () => {
                 {/* Card Reservas */}
                 <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
                     <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                        <Ionicons name="bed-outline" size={32} color="#198754" />
+                        <Ionicons name="bed-outline" size={32} color="#8b5cf6" />
                     </View>
                     <Text style={seminaristaStyles.cardTitle}>Reservas</Text>
                     <Text style={seminaristaStyles.cardText}>Gestionar reservas</Text>
@@ -113,12 +202,11 @@ const HomeScreen: React.FC = () => {
                     <Text style={seminaristaStyles.cardTitle}>Perfil</Text>
                     <Text style={seminaristaStyles.cardText}>Ver mi perfil</Text>
                 </TouchableOpacity>
-
                 {/* Card Programas (solo admin y tesorero) */}
                 {(isAdmin() || isTesorero()) && (
                     <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
                         <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                            <Ionicons name="library-outline" size={32} color="#198754" />
+                            <Ionicons name="library-outline" size={32} color="#334155" />
                         </View>
                         <Text style={seminaristaStyles.cardTitle}>Programas</Text>
                         <Text style={seminaristaStyles.cardText}>Programas Técnicos</Text>
@@ -129,7 +217,7 @@ const HomeScreen: React.FC = () => {
                 {(isAdmin() || isTesorero()) && (
                     <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
                         <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                            <Ionicons name="bar-chart-outline" size={32} color="#198754" />
+                            <Ionicons name="bar-chart-outline" size={32} color="#1d4ed8" />
                         </View>
                         <Text style={seminaristaStyles.cardTitle}>Reportes</Text>
                         <Text style={seminaristaStyles.cardText}>Ver estadísticas</Text>
@@ -140,7 +228,7 @@ const HomeScreen: React.FC = () => {
                 {isAdmin() && (
                     <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
                         <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                            <Ionicons name="people-outline" size={32} color="#198754" />
+                            <Ionicons name="people-outline" size={32} color="#059669" />
                         </View>
                         <Text style={seminaristaStyles.cardTitle}>Usuarios</Text>
                         <Text style={seminaristaStyles.cardText}>Gestionar usuarios</Text>

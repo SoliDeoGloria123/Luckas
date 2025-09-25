@@ -24,6 +24,7 @@ import CabanasScreen from '../screens/CabanasScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { PerfilScreen } from '../screens/PerfilScreen';
 import { TareasScreen } from '../screens/TareasScreen';
+import ChangePasswordScreen  from '../screens/ChangePasswordScreen';
 
 // Ya no necesitamos pantallas temporales, todas están implementadas
 
@@ -181,6 +182,15 @@ const AppNavigator: React.FC = () => {
                         options={{
                             headerShown: true,
                             headerTitle: 'Editar Perfil',
+                            animation: 'slide_from_right'
+                        }}
+                    />
+                    <Stack.Screen 
+                        name="ChangePassword" 
+                        component={ChangePasswordScreen}
+                        options={{
+                            headerShown: true,
+                            headerTitle: 'Cambiar Contraseña',
                             animation: 'slide_from_right'
                         }}
                     />

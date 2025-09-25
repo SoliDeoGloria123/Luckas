@@ -13,6 +13,7 @@ import {
     ScrollView,
     ActivityIndicator
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import type { LoginCredentials } from '../types';
 
@@ -24,6 +25,7 @@ const LoginScreen: React.FC = () => {
     });
     const [errors, setErrors] = useState<{ correo?: string; password?: string }>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     // Validar campos
     const validateFields = (): boolean => {
@@ -80,8 +82,15 @@ const LoginScreen: React.FC = () => {
         >
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.formContainer}>
-                    <Text style={styles.title}>Sistema Seminario</Text>
-                    <Text style={styles.subtitle}>Iniciar Sesión</Text>
+                    {/* Logo y título principal */}
+                    <View style={styles.logoContainer}>
+                        <Ionicons name="book-outline" size={48} color="#fff" style={styles.logoIcon} />
+                    </View>
+                    <Text style={styles.luckasTitle}>LUCKAS</Text>
+                    <Text style={styles.subtitleWeb}>Sistema de Gestión Integral</Text>
+                    <Text style={styles.descriptionWeb}>
+                        Plataforma digital para la administración eficiente de las actividades del Seminario Bautista de Colombia
+                    </Text>
 
                     {/* Campo de correo */}
                     <View style={styles.inputContainer}>
@@ -95,7 +104,7 @@ const LoginScreen: React.FC = () => {
                                     setErrors({ ...errors, correo: undefined });
                                 }
                             }}
-                            placeholder="ejemplo@correo.com"
+                            placeholder="Ingrese su Correo electronico"
                             keyboardType="email-address"
                             autoCapitalize="none"
                             autoCorrect={false}
@@ -104,24 +113,37 @@ const LoginScreen: React.FC = () => {
                         {errors.correo && <Text style={styles.errorText}>{errors.correo}</Text>}
                     </View>
 
-                    {/* Campo de contraseña */}
+                    {/* Campo de contraseña con ojito dentro del input */}
                     <View style={styles.inputContainer}>
                         <Text style={styles.label}>Contraseña</Text>
-                        <TextInput
-                            style={[styles.input, errors.password ? styles.inputError : null]}
-                            value={credentials.password}
-                            onChangeText={(text) => {
-                                setCredentials({ ...credentials, password: text });
-                                if (errors.password) {
-                                    setErrors({ ...errors, password: undefined });
-                                }
-                            }}
-                            placeholder="Ingresa tu contraseña"
-                            secureTextEntry
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            editable={!isLoading}
-                        />
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                style={[styles.input, errors.password ? styles.inputError : null, styles.inputWithIcon]}
+                                value={credentials.password}
+                                onChangeText={(text) => {
+                                    setCredentials({ ...credentials, password: text });
+                                    if (errors.password) {
+                                        setErrors({ ...errors, password: undefined });
+                                    }
+                                }}
+                                placeholder="Ingresa tu contraseña"
+                                secureTextEntry={!showPassword}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                editable={!isLoading}
+                            />
+                            <TouchableOpacity
+                                style={styles.eyeIconInside}
+                                onPress={() => setShowPassword((prev) => !prev)}
+                                disabled={isLoading}
+                            >
+                                <Ionicons
+                                    name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                                    size={22}
+                                    color="#2563eb"
+                                />
+                            </TouchableOpacity>
+                        </View>
                         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
                     </View>
 
@@ -153,9 +175,58 @@ const LoginScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+    logoContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#2563eb',
+        borderRadius: 32,
+        width: 64,
+        height: 64,
+        alignSelf: 'center',
+        marginBottom: 12,
+    },
+    logoIcon: {
+        marginTop: 8,
+    },
+    luckasTitle: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#2563eb',
+        textAlign: 'center',
+        marginBottom: 4,
+        letterSpacing: 2,
+    },
+    subtitleWeb: {
+        fontSize: 18,
+        color: '#334155',
+        textAlign: 'center',
+        marginBottom: 4,
+        fontWeight: '600',
+    },
+    descriptionWeb: {
+        fontSize: 14,
+        color: '#334155',
+        textAlign: 'center',
+        marginBottom: 24,
+        opacity: 0.8,
+    },
+    inputWrapper: {
+        position: 'relative',
+        justifyContent: 'center',
+    },
+    inputWithIcon: {
+        paddingRight: 40, // Espacio para el ícono
+    },
+    eyeIconInside: {
+        position: 'absolute',
+        right: 10,
+        top: 12,
+        padding: 4,
+        zIndex: 2,
+    },
     container: {
         flex: 1,
-        backgroundColor: '#f8fafc', // Color más claro y moderno
+        backgroundColor: '#f1f5f9', // Gris claro de la nueva paleta
     },
     scrollContainer: {
         flexGrow: 1,
@@ -167,21 +238,22 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 24,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 8, // Para Android
+        marginHorizontal: 10,
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#198754', // Color principal del seminario
+        color: '#2563eb', // Azul principal de la nueva paleta
         textAlign: 'center',
         marginBottom: 10,
     },
     subtitle: {
         fontSize: 18,
-        color: '#6c757d', // Color secundario más suave
+        color: '#334155', // Gris oscuro de la nueva paleta
         textAlign: 'center',
         marginBottom: 30,
     },
@@ -191,19 +263,21 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#333',
+        color: '#334155', // Gris oscuro de la nueva paleta
         marginBottom: 8,
     },
     input: {
         borderWidth: 1,
-        borderColor: '#e9ecef', // Color del borde más suave
+        borderColor: '#d1d5db', // Color del borde más neutro
         borderRadius: 8,
         padding: 12,
         fontSize: 16,
-        backgroundColor: '#fff',
+        backgroundColor: '#f9fafb', // Fondo más claro como el web
+        color: '#374151', // Color de texto más oscuro
     },
     inputError: {
         borderColor: '#dc3545',
+        backgroundColor: '#fef2f2', // Fondo ligeramente rojizo para errores
     },
     errorText: {
         color: '#dc3545',
@@ -211,15 +285,20 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     loginButton: {
-        backgroundColor: '#198754', // Color principal del seminario
+        backgroundColor: '#2563eb', // Azul principal de la nueva paleta
         borderRadius: 8,
         padding: 15,
         alignItems: 'center',
         marginTop: 10,
         minHeight: 52, // Altura mínima para mantener consistencia con el loader
+        shadowColor: '#2563eb', // Sombra del mismo color del botón
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8, // Para Android
     },
     buttonDisabled: {
-        backgroundColor: '#6c757d',
+        backgroundColor: '#334155', // Gris oscuro de la nueva paleta
         opacity: 0.6,
     },
     loginButtonText: {
@@ -232,7 +311,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     registerLinkText: {
-        color: '#198754', // Color principal del seminario
+        color: '#2563eb', // Azul principal de la nueva paleta
         opacity: 1,
         fontSize: 16
     },

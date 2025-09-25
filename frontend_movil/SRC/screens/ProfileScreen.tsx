@@ -1,5 +1,4 @@
 // Pantalla de perfil de usuario
-
 import React from 'react';
 import {
     View,
@@ -23,7 +22,7 @@ const ProfileScreen: React.FC = () => {
     };
 
     const handleChangePassword = () => {
-        Alert.alert('Información', 'Función de cambiar contraseña en desarrollo');
+        navigation.navigate('ChangePassword');
     };
 
     const handleLogout = async () => {
@@ -32,8 +31,8 @@ const ProfileScreen: React.FC = () => {
             '¿Estás seguro de que quieres cerrar sesión?',
             [
                 { text: 'Cancelar', style: 'cancel' },
-                { 
-                    text: 'Cerrar Sesión', 
+                {
+                    text: 'Cerrar Sesión',
                     style: 'destructive',
                     onPress: async () => {
                         try {
@@ -75,15 +74,15 @@ const ProfileScreen: React.FC = () => {
                         <Ionicons name="person" size={50} color={colors.textOnPrimary} />
                     </View>
                 </View>
-                
+
                 <Text style={styles.userName}>
                     {user?.nombre} {user?.apellido}
                 </Text>
                 <Text style={styles.userRole}>
                     {getRoleDisplayName(user?.role || '')}
                 </Text>
-                <Text style={[styles.userStatus, 
-                    user?.estado === 'activo' ? styles.statusActive : styles.statusInactive
+                <Text style={[styles.userStatus,
+                user?.estado === 'activo' ? styles.statusActive : styles.statusInactive
                 ]}>
                     {getStatusDisplayName(user?.estado || 'inactivo')}
                 </Text>
@@ -92,7 +91,22 @@ const ProfileScreen: React.FC = () => {
             {/* Información detallada */}
             <View style={styles.infoSection}>
                 <Text style={styles.sectionTitle}>Información Personal</Text>
-                
+                <View style={styles.infoItem}>
+                    <Ionicons name="person-outline" size={20} color={colors.primary} />
+                    <View style={styles.infoContent}>
+                        <Text style={styles.infoLabel}>Nombre</Text>
+                        <Text style={styles.infoValue}>{user?.nombre}</Text>
+                    </View>
+                </View>
+                <View style={styles.infoItem}>
+                    <Ionicons name="person-outline" size={20} color={colors.primary} />
+                    <View style={styles.infoContent}>
+                        <Text style={styles.infoLabel}>Apellido</Text>
+                        <Text style={styles.infoValue}>{user?.apellido}</Text>
+                    </View>
+                </View>
+
+
                 <View style={styles.infoItem}>
                     <Ionicons name="mail-outline" size={20} color={colors.primary} />
                     <View style={styles.infoContent}>
@@ -100,6 +114,7 @@ const ProfileScreen: React.FC = () => {
                         <Text style={styles.infoValue}>{user?.correo}</Text>
                     </View>
                 </View>
+
 
                 <View style={styles.infoItem}>
                     <Ionicons name="call-outline" size={20} color={colors.primary} />
@@ -114,16 +129,27 @@ const ProfileScreen: React.FC = () => {
                     <View style={styles.infoContent}>
                         <Text style={styles.infoLabel}>Documento</Text>
                         <Text style={styles.infoValue}>
-                            {user?.tipoDocumento}: {user?.numeroDocumento}
+                            {user?.tipoDocumento}
                         </Text>
+                        <Text style={styles.infoValue}>
+                           {user?.numeroDocumento} 
+                        </Text>
+                    </View>
+                </View>
+                <View style={styles.infoItem}>
+                    <Ionicons name="checkmark-circle-outline" size={20} color={colors.primary} />
+                    <View style={styles.infoContent}>
+                        <Text style={styles.infoLabel}>Estado</Text>
+                        <Text style={styles.infoValue}>{user?.estado}</Text>
                     </View>
                 </View>
             </View>
 
+
             {/* Opciones del perfil */}
             <View style={styles.optionsSection}>
                 <Text style={styles.sectionTitle}>Opciones</Text>
-                
+
                 <TouchableOpacity style={styles.optionItem} onPress={handleEditProfile}>
                     <Ionicons name="pencil-outline" size={20} color={colors.primary} />
                     <Text style={styles.optionText}>Editar Perfil</Text>

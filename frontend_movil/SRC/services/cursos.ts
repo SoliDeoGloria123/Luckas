@@ -17,9 +17,14 @@ class CursosService {
             if (!response.success) {
                 return { success: false, message: response.message || 'Error al obtener cursos' };
             }
-            // Asegurar que la respuesta sea un array
-            const cursos = Array.isArray(response.data) ? response.data : [];
-            return { success: true, data: cursos as Curso[] };
+            // Si la respuesta es paginada, tomar el array correcto
+            let cursos: Curso[] = [];
+            if (Array.isArray(response.data)) {
+                cursos = response.data;
+            } else if (response.data && Array.isArray(response.data.data)) {
+                cursos = response.data.data;
+            }
+            return { success: true, data: cursos };
         } catch (error) {
             console.error('Error getting cursos:', error);
             return { success: false, message: 'Error de conexión' };

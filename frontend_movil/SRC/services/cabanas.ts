@@ -11,15 +11,22 @@ class CabanasService {
     
     async getAllCabanas(): Promise<{ success: boolean; data?: Cabana[]; message?: string }> {
         try {
+            console.log('Llamando a:', API_CONFIG.ENDPOINTS.CABANAS);
             const response = await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CABANAS, {
                 method: 'GET',
             });
+            console.log('Respuesta de la API:', JSON.stringify(response, null, 2));
             if (!response.success) {
                 return { success: false, message: response.message || 'Error al obtener cabañas' };
             }
-            // Asegurar que la respuesta sea un array
-            const cabanas = Array.isArray(response.data) ? response.data : [];
-            return { success: true, data: cabanas as Cabana[] };
+            // Extraer array de cabañas aunque esté anidado
+            let cabanas: Cabana[] = [];
+            if (Array.isArray(response.data)) {
+                cabanas = response.data;
+            } else if (response.data && Array.isArray(response.data.data)) {
+                cabanas = response.data.data;
+            }
+            return { success: true, data: cabanas };
         } catch (error) {
             console.error('Error getting cabanas:', error);
             return { success: false, message: 'Error de conexión' };
