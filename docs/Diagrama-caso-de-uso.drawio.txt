@@ -1,0 +1,203 @@
+                                              Tesorero
+
+                     CU01Iniciar_sesion
+
+
+
+
+                  CU02Gestionar_usuarios
+
+administrador
+
+
+
+
+                   CU03 Categorizar las
+                       solicitudes
+
+
+
+
+                                                         Seminarista
+
+                 CU04Gestionar_inscripcion
+
+                                                                       Externo
+
+
+
+
+                   CU05Gestionar_tareas
+
+
+
+
+                    CU06Categorizar los
+                        eventos
+
+
+
+
+                  CU07Gestionar_eventos
+
+
+
+
+                 CU08Gestion_de_reservas
+
+
+
+
+                 CU09Gestion_de_solicitud
+
+
+
+
+                  CU10Gestionar_reportes
+
+
+
+
+                 CU11Categorizar incripcion
+
+
+
+
+                   CU12Gestionar Cursos
+
+
+
+
+                  CU13Gestionar_cabañas
+
+
+
+
+                CU14Categorizar las cabañas
+                                                                                                                      Crear Consultar Modificar                                                         Crear Consultar Modificar
+                                                                                                                         Eliminar Desabilitar                                                              Eliminar Desabilitar
+                                                                                                                                                                                                       <<extend>>
+                                                                                                         <<extend>>
+
+                                                                     CU02Gestionar_usuarios
+                                                                                                                                                                                              CU06Gestion_de_reservas
+
+
+
+                                                                         <<include>>                                                         Consultar
+                                                                                                                                                                            <<include>>
+                                                                                                                                                                                               Crear Consultar Modificar
+                                                                                                                                                         <<extend>>                               Eliminar Desabilitar
+
+                                                                                                       Crear Consultar Modificar
+                                                                   CU01Iniciar_sesion                                                                                                     <<extend>>
+                                                                                                              Eliminar
+
+                                                          <<include>>                    <<include>>          <<extend>>
+                                                                                                                                                           CU07Gestion_de_solicitud <<include>>                     CU08Gestionar_reportes
+
+ Administrador                                                             <<include>>                                                 <<include>>
+
+                                     CU08Categorizar los eventos                                         CU03 Categorizar las
+                                                                                                             solicitudes                                                        <<include>>
+
+
+
+
+                      <<extend>>                                                                                                        <<include>>
+                                                                        CU05Gestionar_cabañas                                                                                                       CU03Gestionar_inscripcion
+
+
+
+                                                                                              <<include>>
+Crear Consultar Modificar Eliminar
+                                                                                                                                         <<include>>                                                                 <<include>>
+                                                                        <<include>>
+
+
+                                                                                                       CU08Categorizar las cabañas
+
+                                                                                                                                                                                                            CU04Gestionar_tareas
+
+
+
+
+                                                                                           CU05Gestionar_eventos
+                                                                         <<extend>>
+
+
+                                         Crear Consultar Modificar Eliminar
+                                                   Desabilitar
+                                                                                                                                           CU06Gestion_de_reservas
+                                                                    CU03Categorizar las
+                                                                        solicitudes         <<include>>                   <<include>>
+
+                                                      <<include>>
+                                                                                                                                                          <<extend>>
+
+                                                                                               CU07Gestion_de_solicitud
+                             CU01Iniciar_sesion
+
+
+                                                                                                                                                                     Consultar Modificar
+Tesorero
+
+
+                           <<include>>
+
+
+
+
+           CU08Categorizar los eventos
+
+                                                  <<include>>
+                                                                                                 <<include>>
+                                                                    CU05Gestionar_eventos                                  CU03Gestionar_inscripcion
+
+
+
+
+                                          <<extend>>
+                                                                                                                                                 <<extend>>
+
+
+
+
+            Crear Consultar Modificar
+                                                                                                                                                         Crea Consulta Modificar
+                                                                                                                     <<include>>          CU06Gestion_de_reservas
+                                                                                  CU07Gestion_de_solicitud
+                                                                                                                                                           <<extend>>
+
+
+                                                                                                                                                                            Crear Consultar Modificar
+                                                                    <<include>>                               <<extend>>                                                           Desabilitar
+
+
+
+
+                                              CU01Iniciar_sesion                                                                                     <<include>>
+
+                                                                                                              Crear Consultar Modificar
+Seminarista
+
+
+
+                                                      <<include>>
+
+
+
+
+                                                                                                             <<include>>                             CU04Gestionar_tareas
+                                                CU05Gestionar_eventos
+
+                                                                                                                                                                    <<extend>>
+                                 <<extend>>
+
+
+
+                                                                                                                                                                         Crear Consultar Modificar Desabilitar
+
+
+              Crear Consultar Modificar Desabilitar
+

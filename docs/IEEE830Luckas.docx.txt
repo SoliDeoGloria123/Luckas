@@ -1,0 +1,1326 @@
+﻿Servicio Nacional de Aprendizaje
+IEEE 830
+	0.3
+Pág. 
+	
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	Especificación de requisitos de software
+
+
+Proyecto: 
+Revisión 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+	
+
+	
+
+
+
+	
+
+Instrucciones para el uso de este formato
+Este formato es una plantilla tipo para documentos de requisitos del software.
+
+
+Está basado y es conforme con el estándar IEEE Std 830-1998.
+
+
+Las secciones que no se consideren aplicables al sistema descrito podrán de forma justificada indicarse como no aplicables (NA).
+
+
+Notas:
+Los textos en color azul son indicaciones que deben eliminarse y, en su caso, sustituirse por los contenidos descritos en cada apartado.
+
+
+Los textos entre corchetes del tipo “” permiten la inclusión directa de texto con el color y estilo adecuado a la sección, al pulsar sobre ellos con el puntero del ratón.
+
+
+Los títulos y subtítulos de cada apartado están definidos como estilos de MS Word, de forma que su numeración consecutiva se genera automáticamente según se trate de estilos “Titulo1, Titulo2 y Titulo3”.
+
+
+La sangría de los textos dentro de cada apartado se genera automáticamente al pulsar Intro al final de la línea de título. (Estilos Normal indentado1, Normal indentado 2 y Normal indentado 3).
+
+
+El índice del documento es una tabla de contenido que MS Word actualiza tomando como criterio los títulos del documento.
+Una vez terminada su redacción debe indicarse a Word que actualice todo su contenido para reflejar el contenido definitivo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+De la plantilla de formato del documento © & Coloriuris http://www.qualitatis.org
+.
+Historial de Revisiones
+
+
+
+
+Fecha
+	Revisión
+	Descripción
+	Autor
+	05/08/2025
+	1.0
+	“Revisión de documentación”
+	Mauricio Lara
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Documento validado por las partes en fecha: 
+
+
+Por el cliente
+	Por la empresa suministradora
+	
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+	Fdo. D./ Dña 
+	Fdo. D./Dña 
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+Contenido
+FICHA DEL DOCUMENTO        3
+CONTENIDO        4
+1        INTRODUCCIÓN        6
+1.1        Propósito        6
+1.2        Alcance        6
+1.3        Personal involucrado        6
+1.4        Definiciones, acrónimos y abreviaturas        6
+1.5        Referencias        6
+1.6        Resumen        6
+2        DESCRIPCIÓN GENERAL        7
+2.1        Perspectiva del producto        7
+2.2        Funcionalidad del producto        7
+2.3        Características de los usuarios        7
+2.4        Restricciones        7
+2.5        Suposiciones y dependencias        7
+2.6        Evolución previsible del sistema        7
+3        REQUISITOS ESPECÍFICOS        7
+3.1        Requisitos comunes de los interfaces        8
+3.1.1        Interfaces de usuario        8
+3.1.2        Interfaces de hardware        8
+3.1.3        Interfaces de software        8
+3.1.4        Interfaces de comunicación        8
+3.2        Requisitos funcionales        8
+3.2.1        Requisito funcional 1        9
+3.2.2        Requisito funcional 2        9
+3.2.3        Requisito funcional 3        9
+3.2.4        Requisito funcional n        9
+3.3        Requisitos no funcionales        9
+3.3.1        Requisitos de rendimiento        9
+3.3.2        Seguridad        9
+3.3.3        Fiabilidad        9
+3.3.4        Disponibilidad        9
+3.3.5        Mantenibilidad        10
+3.3.6        Portabilidad        10
+3.4        Otros requisitos        10
+4        APÉNDICES        10
+
+
+________________
+1. Introducción
+El producto "Luckas" es un software de gestión integral diseñado para los procesos administrativos y logísticos del Seminario Bautista de Colombia (SBC). El sistema permitirá administrar las diversas actividades del seminario, incluyendo la inscripción de participantes, la programación de eventos, el control de pagos y la asignación de cabañas, agregando que también puede crearlas, eliminarlas, modificarlas, consultarlas según el Rol asignado dentro del sistema por el Seminario. 
+
+
+
+
+   1. Propósito
+El propósito principal de este documento es especificar de manera exhaustiva todos los requisitos funcionales y no funcionales del sistema digital de gestión integral, denominado Luckas. Al detallar los requisitos de forma clara y precisa, se busca asegurar que el sistema Luckas se desarrolle conforme a las necesidades y expectativas, permitiendo la centralización de información, la automatización de tareas recurrentes y la mejora significativa de la experiencia para el equipo organizador del S.B.C y para los participantes del seminario 
+
+
+
+
+
+
+
+
+
+
+   2. Alcance  
+Luckas es un sistema digital de gestión integral, especializada en una solución software para centralizar la información, automatizar tareas recurrentes y mejorar la experiencia de los usuarios dentro del contexto del S.B.C,  a lo que, gestionará las siguientes funcionalidades, como la
+Gestión de procesos administrativos y logísticos: Se abordarán los flujos de trabajo esenciales para la operación del S.B.C.
+Construcción de una base de datos robusta: Diseñada para almacenar de manera centralizada y segura la información relevante de los usuarios y procesos.
+Creación de una interfaz de usuario (UI) intuitiva: Orientada a facilitar la interacción y mejorar la experiencia de los diferentes perfiles de usuario.
+En cuanto a la seguridad, el prototipo funcional de Luckas incluirá los mecanismos básicos de autenticación de usuarios y control de acceso basado en roles para los perfiles definidos. También se considerará la protección de la confidencialidad de los datos en tránsito y en reposo para la información crítica. Sin embargo, las auditorías de seguridad exhaustivas, las pruebas de penetración avanzadas y la implementación de políticas de seguridad de nivel empresarial quedan fuera del alcance de esta fase de prototipo y se abordarán en etapas posteriores del proyecto.
+
+
+
+
+   3. Personal involucrado
+Nombre
+	Juan David Mahecha
+	Rol
+	Programador
+	Categoría profesional
+	Programador
+	Responsabilidades
+	Diseño y programación
+	Información de contacto
+	(+57) 311 502 44 30 
+	Aprobación
+	Juan David Mahecha
+	
+
+Nombre
+	Steveen Peraza
+	Rol
+	Programador
+	Categoría profesional
+	Programador
+	Responsabilidades
+	Diseño y programación
+	Información de contacto
+	(+57) 310 889 57 40
+	Aprobación
+	Juan David Mahecha
+	
+
+Nombre
+	Luis Felipe sanchez sierra
+	Rol
+	Programador
+	Categoría profesional
+	Programador
+	Responsabilidades
+	Diseño y programación
+	Información de contacto
+	(+57) 322 839 52 41
+	Aprobación
+	Juan David Mahecha
+	
+
+
+
+   4. Definiciones, acrónimos y abreviaturas
+
+
+Nombre o abreviación
+	Descripción
+	SBC
+	Acrónimo para referirse al Seminario Bautista de Colombia
+	Admin
+	Persona que interviene en todo el Sistema
+	Seminarista
+	Persona perteneciente al Seminario Bautista de Colombia
+	Tesorero
+	Persona encargada de la tesorería y la Logística del Seminario
+	Externo
+	Persona no perteneciente al Seminario
+	Luckas
+	Software o Producto a realizar
+	
+
+
+
+   5. Referencias
+Referencia
+	Título
+	Ruta
+	Fecha
+	Autor
+	Proyecto
+	Github
+	Clic Aquí
+	05/08/2025
+	Todos
+	
+
+
+
+   6. Resumen
+
+
+2. Descripción general
+
+
+   7. Perspectiva del producto 
+“Luckas” es un software de gestión integral diseñado para centralizar y optimizar las operaciones administrativas y logísticas del Seminario Bautista de Colombia (SBC). ayudando a mejorar, las inscripciones a eventos, cabañas, y programas académicos que ofrece el seminario, en donde se le proporciona las facultades como la implementación de una pasarela de pagos, también un mejor control  administradores mediante una interfaz, y no mediante simple formulario de google forms.
+Este software le servirá al seminario, para agilizar procesos en tiempo real, como internos y externos del seminario.
+Su función principal es unificar la información y los procesos que tradicionalmente se manejan de manera manual o descentralizada. Esta herramienta se encarga de gestionar de forma organizada los datos de todos los usuarios (administradores, tesoreros, seminaristas y externos), la organización y planificación de eventos, el control de recursos como las cabañas y, la gestión de las inscripciones y los pagos. En esencia, el sistema "Luckas" opera como un núcleo digital que consolida y simplifica las tareas operativas, mejorando la eficiencia del personal del SBC y la experiencia general de sus estudiantes y visitantes.
+¿Es un producto independiente?
+Sí, "Luckas" se clasifica como un producto de software independiente. Esto implica que ha sido concebido como un sistema completo y autónomo, cuyo objetivo es resolver una problemática específica del SBC, el cual es, la gestión administrativa y logística. 
+A pesar de que su funcionamiento requiere la interacción con diversas áreas de la institución, no depende de ningún otro sistema de software preexistente para operar. Funciona como una plataforma integral que centraliza todas estas tareas, lo que le otorga su carácter de solución independiente y completa.
+
+
+
+
+        
+
+
+
+
+   8. Funcionalidad del producto
+
+
+"Luckas" es un software de gestión integral que permite a sus usuarios (administradores, tesoreros, seminaristas y externos) buscar, registrarse, administrar y dar seguimiento a los procesos administrativos y logísticos del Seminario Bautista de Colombia (SBC) de manera eficiente y centralizada.
+
+
+"Luckas" cuenta con una serie de módulos de gestión que permiten a los usuarios interactuar con las actividades del seminario según sus roles y permisos. El sistema facilita la consulta de eventos programados, la inscripción en línea a través de formularios dedicados y el control de pagos. Esto ayuda a los distintos usuarios a explorar las actividades disponibles y a gestionar su participación de forma ordenada.
+
+
+Además, los usuarios pueden registrarse en los eventos directamente a través de la web. Para ello, el software proporciona un proceso de inscripción intuitivo, donde los participantes pueden seleccionar las actividades de su interés y gestionar los pagos correspondientes de manera segura. También podrán gestionar recursos logísticos, como la asignación de cabañas, mejorando la organización del alojamiento.
+
+
+Una vez que un usuario se ha registrado, "Luckas" le permite acceder a una experiencia personalizada para administrar sus actividades. Aquí, los usuarios pueden dar seguimiento a sus inscripciones y solicitudes, como certificaciones o reporte de problemas con pagos. Los administradores, por su parte, obtienen un control centralizado para la planeación, la ejecución de tareas y la toma de decisiones basada en datos.
+
+
+El sistema está equipado con un sistema de notificaciones y alertas que mantiene a los usuarios informados sobre el estado de sus procesos. Puede enviar confirmaciones de inscripción automáticas vía correo electrónico y, potencialmente, actualizaciones sobre horarios o detalles de los eventos, ayudando a los participantes a estar al tanto de cualquier cambio relevante en el itinerario.
+
+
+"Luckas" se desarrolla teniendo en cuenta la seguridad y privacidad de los usuarios. Se implementan medidas de seguridad para proteger los datos personales a través de una base de datos robusta y un sistema de autenticación seguro, garantizando la confidencialidad de la información de toda la comunidad del seminario.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   9. Características de los usuarios
+Tipo de usuario
+	Administrador
+	Formación
+	Profesional en el ámbito de la agencia y las TIC
+	Habilidades
+	Manejo total de la Página de gestión y logística del Seminario.
+	Actividades
+	Manejo total de todos los aspectos que involucran a “Luckas” (crear cuenta, iniciar sesión, crear, buscar, modificar, eliminar y gestionar).
+	Tipo de usuario
+	Tesorero
+	Formación
+	NA
+	Habilidades
+	Manejo Avanzado de la página de gestión y logística del Seminario.
+	Actividades
+	Crear una cuenta, iniciar sesión, comprar y reservar uno o más cabañas, inscribirse a un curso u formación, Inscribirse a un evento.
+	Tipo de usuario
+	Seminarista
+	Formación
+	NA
+	Habilidades
+	Manejo Intermedio de la página de gestión y logística del Seminario.
+	Actividades
+	Crear una cuenta, iniciar sesión, comprar y reservar uno o más cabañas, inscribirse a un curso u formación, Inscribirse a un evento.
+	Tipo de usuario
+	Externo
+	Formación
+	NA
+	Habilidades
+	Manejo básico de la página de gestión y logística del Seminario.
+	Actividades
+	Crear una cuenta, iniciar sesión, comprar y reservar uno o más cabañas, inscribirse a un curso u formación, Inscribirse a un evento.
+	
+
+Descripción de  los usuarios del producto, incluyendo nivel educacional, experiencia y experiencia técnica.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   10. Restricciones
+
+
+Metodología de Desarrollo: El proyecto debe seguir la Metodología SCRUM para la gestión del desarrollo, lo que implica sprints, reuniones diarias y entregas incrementales.
+
+
+Lenguajes de Programación y Tecnologías: El sistema debe ser diseñado e implementado utilizando la siguiente pila tecnológica:
+* Frontend: React
+* Backend: Node.js (inferido de la combinación de React y MongoDB)
+* Base de Datos: MongoDB
+* Seguridad: Debe incluir encriptación de contraseñas y medidas de seguridad adecuadas.
+Tecnológicas: El sistema se desarrollará como una aplicación web, accesible a través de navegadores estándar. Se priorizará el uso de tecnologías de código abierto cuando sea posible.
+Dispositivos de Acceso y Conectividad: El sistema está diseñado para ser accedido a través de navegadores web modernos en una variedad de dispositivos (computadoras de escritorio, portátiles, tabletas y teléfonos inteligentes). Se requiere una conexión a internet estable para que los usuarios puedan acceder y utilizar el sistema de manera efectiva. La disponibilidad y calidad de la conexión a internet por parte del usuario final es una restricción externa al sistema.
+
+
+Compatibilidad: El sistema web debe ser compatible con los navegadores más utilizados para garantizar la accesibilidad a todos los usuarios.
+
+
+Normas y Estándares: El documento de especificación de requisitos sigue el estándar IEEE 830, lo que es una restricción en la documentación del proyecto.
+   11. Suposiciones y dependencias
+Estabilidad de la Tecnología: Las librerías, APIs y herramientas de la pila tecnológica (React, MongoDB, Node.js) se mantendrán estables y compatibles entre sí. Un cambio importante en alguna de estas tecnologías podría requerir modificaciones en la SRS y en el cronograma de desarrollo.
+
+
+Conocimiento del Equipo: Se asume que el equipo de desarrollo, aunque pequeño, cuenta con las habilidades y la experiencia necesarias en las tecnologías y metodologías de trabajo (SCRUM) para llevar a cabo el proyecto.
+
+
+Cooperación de Terceros: El sistema depende de la disponibilidad y el correcto funcionamiento de servicios externos, como la pasarela de pagos y el servicio de correo electrónico. Se asume que estos servicios no presentarán fallas ni cambios significativos en sus APIs o tarifas durante el desarrollo.
+
+
+   12. Evolución previsible del sistema
+
+
+Escalabilidad
+* Implementar un diseño modular para facilitar la adición de nuevas funcionalidades.
+como:
+* Mejorar el frontend con frameworks modernos (React, Vue.js o Svelte).
+* Añadir soporte para temas oscuros, accesibilidad y diseño responsive.
+Documentación
+* Crear un wiki detallado o usar herramientas como MkDocs/Docusaurus.
+* Añadir ejemplos de uso y guías para contribuidores.
+Integraciones
+* Extensión a una aplicación de escritorio.
+Internacionalización
+* Soporte para múltiples idiomas si el proyecto tiene alcance global.
+* Aplicación móvil de software.
+* aplicación de escritorio.
+
+
+
+
+3. Requisitos específicos
+Número de requisito
+	RF01
+	Nombre de requisito
+	Gestionar Cursos
+	Tipo
+	X Requisito
+	☐ Restricción
+	Fuente del requisito
+	HU01
+	Prioridad del requisito
+	X Alta/Esencial
+	☐ Media/Deseado
+	☐ Baja/ Opcional
+	
+
+Número de requisito
+	RF02
+	Nombre de requisito
+	Gestión usuarios
+	Tipo
+	X Requisito
+	☐ Restricción
+	Fuente del requisito
+	HU02
+	Prioridad del requisito
+	X Alta/Esencial
+	☐ Media/Deseado
+	☐ Baja/ Opcional
+	
+
+Número de requisito
+	RF03
+	Nombre de requisito
+	Gestión Eventos
+	Tipo
+	X Requisito
+	☐ Restricción
+	Fuente del requisito
+	HU03
+	Prioridad del requisito
+	X Alta/Esencial
+	☐ Media/Deseado
+	☐ Baja/ Opcional
+	
+
+
+
+Número de requisito
+	RF04
+	Nombre de requisito
+	Gestión cabañas
+	Tipo
+	X Requisito
+	☐ Restricción
+	Fuente del requisito
+	HU04
+	Prioridad del requisito
+	X Alta/Esencial
+	☐ Media/Deseado
+	☐ Baja/ Opcional
+	
+
+Número de requisito
+	RF05
+	Nombre de requisito
+	Gestión solicitudes
+	Tipo
+	X Requisito
+	☐ Restricción
+	Fuente del requisito
+	HU05
+	Prioridad del requisito
+	X Alta/Esencial
+	☐ Media/Deseado
+	☐ Baja/ Opcional
+	
+
+Número de requisito
+	RF06
+	Nombre de requisito
+	Reportes
+	Tipo
+	X Requisito
+	☐ Restricción
+	Fuente del requisito
+	HU06
+	Prioridad del requisito
+	X Alta/Esencial
+	☐ Media/Deseado
+	☐ Baja/ Opcional
+	
+
+Número de requisito
+	RF07
+	Nombre de requisito
+	Gestion Inscripciones
+	Tipo
+	X Requisito
+	☐ Restricción
+	Fuente del requisito
+	HU07
+	Prioridad del requisito
+	X Alta/Esencial
+	☐ Media/Deseado
+	☐ Baja/ Opcional
+	
+
+Número de requisito
+	RF08
+	Nombre de requisito
+	Gestion reservas
+	Tipo
+	X Requisito
+	☐ Restricción
+	Fuente del requisito
+	HU08
+	Prioridad del requisito
+	X Alta/Esencial
+	☐ Media/Deseado
+	☐ Baja/ Opcional
+	
+
+Número de requisito
+	RF09
+	Nombre de requisito
+	Gestion categorización 
+	Tipo
+	X Requisito
+	☐ Restricción
+	Fuente del requisito
+	HU09
+	Prioridad del requisito
+	X Alta/Esencial
+	☐ Media/Deseado
+	☐ Baja/ Opcional
+	
+
+
+
+y realizar la descripción del requisito
+
+
+La distribución de los párrafos que forman este punto puede diferir del propuesto en esta plantilla, si las características del sistema aconsejan otra distribución para ofrecer mayor claridad en la exposición.
+
+
+
+
+
+
+   13. Requisitos comunes de los interfaces
+Admin: 
+Gestión de solicitudes  CRUD (Crear, Leer, Actualizar y Eliminar
+Gestión de reservas  CRUD (Crear, Leer, Actualizar y Eliminar
+Gestión de inscripciones  CRUD (Crear, Leer, Actualizar y Eliminar
+Gestión de cabañas  CRUD (Crear, Leer, Actualizar y Eliminar
+Gestión de eventos  CRUD (Crear, Leer, Actualizar y Eliminar
+Gestión de categorización CRUD(Crear, Leer, Actualizar y Eliminar
+Gestión de usuario: CRUD (Crear, Leer, Actualizar y Eliminar
+Gestión de cursos CRUD (Crear, Leer, Actualizar y Eliminar
+Gestión de reportes
+
+
+Tesorero: 
+Gestión de solicitudes  CRUD (Crear, Leer, Actualizar
+Gestión de reservas  CRUD (Crear, Leer, Actualizar
+Gestión de inscripciones  CRUD (Crear, Leer, Actualizar
+Gestión de cabañas  CRUD (Crear, Leer, Actualizar
+Gestión de eventos  CRUD (Crear, Leer, Actualizar
+Gestión de categorización CRUD(Crear, Leer, Actualizar
+Gestión de usuario: CRUD (Crear, Leer, Actualizar
+Gestión de cursos CRUD (Crear, Leer, Actualizar
+Gestión de reportes
+
+
+
+
+Seminarista:
+Gestión de usuario: Leer, Actualizar 
+Gestión de cabañas  Leer, Actualizar 
+Gestión de eventos  Leer, Actualizar 
+Gestión de cursos Leer, Actualizar
+ 
+Externo:
+Gestión de usuario: Leer, Actualizar 
+Gestión de cabañas  Leer, Actualizar 
+Gestión de eventos  Leer, Actualizar 
+Gestión de cursos Leer, Actualizar
+
+
+
+
+
+
+      1. Interfaces de usuario
+
+
+  
+
+
+
+  
+
+
+
+      2. Interfaces de hardware
+El sistema está diseñado para funcionar en computadores (PC o portátiles) y dispositivos móviles Android. A continuación, se describen los requisitos mínimos para que un usuario pueda utilizar correctamente la plataforma.
+ Uso en Computador o Portátil (Página Web)
+* El software puede usarse desde cualquier computador de escritorio o portátil, siempre que cumpla con los siguientes requisitos:
+* Sistema operativo: Windows 10 o superior / Linux Ubuntu 20.04 o superior
+* Procesador: Intel Core i3 o equivalente
+* Memoria RAM: 4 GB o más
+* Almacenamiento libre: mínimo 300 MB para uso del navegador
+* Conexión a internet: estable, preferiblemente Wi-Fi o por cable (mínimo 5 Mbps)
+* Navegador compatible: Google Chrome, Firefox o Edge
+* Pantalla recomendada: 14” o más con resolución mínima de 1366x768 px
+* Dispositivos de entrada: teclado y mouse o panel táctil (touchpad)
+* Este acceso es ideal para los roles de administrador, tesorero, organizador y usuario seminarista que requieran mayor control del sistema y funciones administrativas.
+Uso en Dispositivo Móvil Android (Aplicación)
+* El sistema también podrá consultarse desde celulares Android mediante una aplicación adaptada, diseñada para ser intuitiva y ligera. Requisitos mínimos:
+* Sistema operativo: Android 8.0 (Oreo) o superior
+* Procesador: Quad-core 1.5 GHz
+* Memoria RAM: 2 GB
+* Almacenamiento libre: mínimo 150 MB
+* Conexión a internet: Wi-Fi o datos móviles (4G recomendado)
+* Pantalla: mínimo 5 pulgadas con buena resolución
+* Interacción: táctil (toques, gestos)
+* Permisos del sistema: acceso a internet, almacenamiento (opcional), notificaciones
+
+
+Este acceso es ideal para participantes o usuarios externos que deseen consultar eventos, realizar inscripciones o revisar tareas.
+
+
+
+
+
+
+
+
+      3. Interfaces de software
+El sistema "Luckas" no es un producto completamente aislado; debe integrarse con otros productos de software para cumplir con sus funcionalidades clave.
+
+
+Los Servidores, clientes y aplicaciones se comunicaran entre sí mediante protocolos, estándares de internet, siempre que sea posible. Por ejemplo, para transferir archivos o documentos deberán utilizarse protocolos existentes (FTP u otros).
+
+
+      4. Interfaces de comunicación
+
+
+  
+
+
+
+ . Interacción del Usuario y la Interfaz
+Punto de Entrada: Los usuarios (Administrador, Encargado, Seminarista, Externo) interactúan con el sistema a través de una aplicación cliente (App-Test) construida con React.
+Conexión con el Backend: La aplicación cliente se comunica con el backend mediante peticiones HTTP/S a una API REST. Un balanceador de carga (Nginx, Redis Cluster) gestiona y distribuye estas peticiones.
+2. Capa del Backend y Lógica de Negocio
+API REST (Node.js): Funciona como el cerebro del sistema. Recibe las solicitudes de la aplicación cliente y las dirige a los módulos internos correspondientes.
+Módulos Internos: El backend está segmentado en microservicios o módulos lógicos:Autenticación: Maneja el registro de usuarios, el inicio de sesión y la autorización utilizando JWT (JSON Web Tokens) y bcrypt para el hashing de contraseñas.
+Pagos: Procesa las transacciones financieras, integrándose con plataformas de pago externas como Stripe y PayU.
+Tareas, Agregador de Cuentas, Eventos, Reportes: Gestionan las funcionalidades específicas del negocio.
+Notificaciones: Un módulo de notificaciones utiliza Nodemailer y SMTP para enviar correos electrónicos de confirmación y otras alertas.
+3. Persistencia de Datos y Servicios Externos
+Base de Datos: La persistencia de los datos se gestiona con MongoDB Atlas. Todos los módulos del backend (Autenticación, Tareas, etc.) se conectan a esta base de datos para almacenar y recuperar la información del sistema (usuarios, eventos, reportes).
+Servicios Externos: El sistema depende de servicios de terceros para funcionalidades especializadas:
+Stripe / PayU: Para el procesamiento de pagos.
+SMTP: Para el envío de correos electrónicos.
+
+
+
+
+
+
+
+
+
+
+
+
+   14. Requisitos funcionales
+
+
+Requisito funcional 1
+Identificación del requerimiento:
+	RF01.
+	Nombre del requerimiento: 
+	Iniciar sesión 
+	Características:
+	Inicia sesión para ingresar a sistema para los diferentes usuarios (administradores, tesoreros, seminaristas y externos).
+	Descripción del requerimiento:
+	El sistema permitirá al usuario ingresar datos como: Nombre, Documento de identidad, Usuario (correo), contraseña, etc. 
+	Requerimientos NO funcionales:
+	RNF01 
+RNF03
+RNF04
+RNF05
+RNF06
+RNF08
+RNF10
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Requisito funcional 2
+Identificación del requerimiento:
+	RF02.
+	Nombre del requerimiento: 
+	Gestion de usuarios
+	Características:
+	El sistema proporcionará un módulo completo para que los administradores y tesoreros puedan gestionar eficientemente las cuentas de los diferentes usuarios del SBC. Esto incluye la capacidad de crear nuevas cuentas, consultar la información detallada de cada usuario, modificar sus datos (como nombre, documento de identidad, correo electrónico) y asignar o cambiar sus roles y permisos, así como eliminar cuentas que ya no sean necesarias, asegurando un control granular sobre el acceso y las funcionalidades.
+	Descripción del requerimiento:
+	Permite a los roles autorizados (Administrador y Tesorero).
+Permite asignar y modificar roles y permisos de los usuarios.
+Permite consultar la información detallada de los usuarios registrados.
+	Requerimientos NO funcionales:
+	RFN01
+RFN02
+RFN03
+RFN04
+RFN05
+RFN06
+RFN08
+RFN10
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Requisito funcional 3
+Identificación del requerimiento:
+	RF03.
+	Nombre del requerimiento: 
+	Gestión de Eventos
+	Características:
+	Permite a los roles autorizados (Administrador y Tesorero) crear, consultar, modificar y eliminar eventos.
+Facilita la planificación y comunicación de las actividades del seminario.
+Permite especificar fechas, horarios, descripciones y capacidades de los eventos.
+	Descripción del requerimiento:
+	El sistema incluirá un módulo visual que permitirá a los administradores y tesoreros gestionar todos los eventos y actividades del Seminario Bautista de Colombia. Podrán crear nuevos eventos, especificando detalladamente su nombre, fechas, horarios, lugar, descripción, capacidad máxima de participantes y recursos necesarios. Adicionalmente, podrán consultar los detalles de los eventos existentes, modificar cualquier información relevante y eliminar eventos que se cancelen o finalicen, optimizando la organización y difusión de la agenda del seminario.
+	Requerimientos NO funcionales:
+	RFN01
+RFN02
+RFN03
+RFN04
+RFN05
+RFN06
+RFN08
+RFN10
+	
+
+
+
+
+
+
+Requisito funcional 4
+Identificación del requerimiento:
+	RF04.
+	Nombre del requerimiento: 
+	Gestión de Reportes
+	Características:
+	Permite visualizar y exportar reportes en formatos PDF o Excel.
+Genera reportes financieros detallados sobre pagos e ingresos.
+Genera reportes analíticos sobre asistencia a eventos y asignaciones de recursos (ej. cabañas).
+Permite aplicar filtros por fecha, tipo de evento o estado para la generación de reportes.
+	Descripción del requerimiento:
+	El sistema proporcionará módulos avanzados para la generación de informes detallados y gráficos sobre las operaciones del SBC. Los administradores y tesoreros podrán visualizar reportes financieros (ingresos, pagos pendientes), reportes de asistencia a eventos, y reportes sobre la asignación de cabañas y otros recursos. Tendrán la capacidad de filtrar estos reportes por rangos de fechas o criterios específicos y exportarlos en formatos PDF o Excel, facilitando la toma de decisiones estratégicas basadas en datos en tiempo real.
+	Requerimientos NO funcionales:
+	RFN01
+RFN02
+RFN03
+RFN04
+RFN05
+RFN06
+RFN08
+RFN10
+	
+
+
+
+
+
+
+
+
+Requisito funcional 5
+Identificación del requerimiento:
+	RF05.
+	Nombre del requerimiento: 
+	Gestión de Cabañas y Alojamiento
+	Características:
+	Muestra el estado de disponibilidad y la asignación actual de cabañas.
+Permite asignar cabañas a seminaristas y personas externas.
+Permite a los roles autorizados (Administrador y Tesorero) crear, consultar, modificar y eliminar la información de las cabañas.
+	Descripción del requerimiento:
+	El sistema automatiza la gestión y distribución de los hospedajes en cabañas. Permitirá a los administradores y tesoreros visualizar la disponibilidad de cada cabaña, asignar espacios a seminaristas y participantes externos, y registrar los detalles de la ocupación. Además, podrán crear nuevas cabañas en el sistema, consultar su información, modificar sus características (capacidad, estado, etc.) y eliminar registros de cabañas si es necesario, optimizando el uso del espacio y mejorando la logística del alojamiento.
+	Requerimientos NO funcionales:
+	RFN01
+RFN02
+RFN03
+RFN04
+RFN05
+RFN06
+RFN07
+RFN08
+RFN09
+RFN10
+	
+
+
+
+Requisito funcional 6
+Identificación del requerimiento:
+	RF06.
+	Nombre del requerimiento: 
+	Gestión de Reservas
+	Características:
+	Muestra el estado de las reservas de espacios y recursos (ej. salones, equipos).
+Permite a los roles autorizados (Administrador y Tesorero) crear, consultar, modificar y cancelar reservas.
+Permite registrar datos vitales para la reserva como hora, fecha y tipo de recurso.
+	Descripción del requerimiento:
+	El sistema ofrecerá herramientas robustas para gestionar las reservas de diversos espacios y recursos dentro del seminario, como salones de clases, equipos audiovisuales o áreas comunes. Los administradores y tesoreros podrán crear nuevas reservas registrando datos vitales como la hora, fecha, duración, el espacio/recurso a reservar y el usuario solicitante. Además, podrán consultar el estado de las reservas existentes, modificarlas si hay cambios en los detalles, y cancelarlas si es necesario, permitiendo un control adecuado y eficiente de los recursos disponibles.
+	Requerimientos NO funcionales:
+	RFN01
+RFN02
+RFN03
+RFN04
+RFN05
+RFN06
+RFN08
+RFN10
+	
+
+
+
+Requisito funcional 7
+Identificación del requerimiento:
+	RF07.
+	Nombre del requerimiento: 
+	Gestión de inscripción
+	Características:
+	Muestra el estado de inscripción y pago de los participantes.
+Envía confirmaciones automáticas por correo electrónico al inscribirse.
+Permite a los roles autorizados (Administrador y Tesorero) crear, consultar, modificar y eliminar registros de inscripción.
+	Descripción del requerimiento:
+	El sistema incluirá un formulario en línea intuitivo para la inscripción de participantes en eventos y programas académicos del SBC. Gestionará el estado de las inscripciones, incluyendo la verificación de pagos asociados, y enviará confirmaciones automáticas por correo electrónico a los inscritos. Además, los administradores y tesoreros tendrán la capacidad de crear nuevas inscripciones manualmente, consulta los detalles de las inscripciones existentes, modificar cualquier dato del participante o de la inscripción, y eliminar registros si es necesario, optimizando el proceso de registro y seguimiento de los asistentes.
+	Requerimientos NO funcionales:
+	RFN01
+RFN02
+RFN03
+RFN04
+RFN05
+RFN06
+RFN08
+RFN10
+	
+
+Requisito funcional 8
+
+
+Identificación del requerimiento:
+	RF08.
+	Nombre del requerimiento: 
+	Gestión de solicitudes
+	Características:
+	Permite a los usuarios enviar diferentes tipos de solicitudes (ej. certificaciones, problemas de pago, consultas).
+Muestra el estado y permite el seguimiento de las solicitudes.
+Permite a los roles autorizados (Administrador y Tesorero) consultar, responder, rechazar o aceptar solicitudes.
+	Descripción del requerimiento:
+	El sistema permitirá la gestión integral de diversas solicitudes que puedan surgir por parte de los usuarios, como peticiones de certificaciones, reportes de problemas con pagos a eventos, o consultas generales. El sistema registrará cada solicitud, mostrará su estado actual y permitirá el seguimiento por parte del usuario. El personal administrativo y tesorero podrá consultar estas solicitudes, responder a las dudas planteadas, y tener la opción de rechazar o aceptar la solicitud según corresponda, brindando un proceso organizado y una respuesta eficiente.
+	Requerimientos NO funcionales:
+	RFN01
+RFN02
+RFN03
+RFN04
+RFN05
+RFN06
+RFN08
+RFN10
+	
+
+Requisito funcional 9
+
+
+Identificación del requerimiento:
+	RF09.
+	Nombre del requerimiento: 
+	Gestión de Tareas Administrativas y Logísticas
+	Características:
+	El sistema facilitará la automatización y gestión de las funciones y responsabilidades asignadas al personal logístico y administrativo del SBC. Los administradores y tesoreros podrán crear nuevas tareas, asignarlas a miembros específicos del equipo, consultar el progreso de las tareas existentes, modificar sus detalles (como fechas límite o descripciones) y marcarlas como completadas una vez finalizadas, mejorando significativamente la eficiencia y la coordinación en las operaciones diarias del seminario.
+	Descripción del requerimiento:
+	Permite la asignación y seguimiento de tareas al personal logístico y administrativo.
+Automatiza funciones y responsabilidades.
+Permite a los roles autorizados (Administrador y Tesorero) crear, consultar, modificar y marcar como completadas las tareas.
+	Requerimientos NO funcionales:
+	RFN01
+RFN02
+RFN03
+RFN04
+RFN05
+RFN06
+RFN08
+RFN10
+
+
+	   15. Requisitos no funcionales
+
+
+
+
+Identificación del requerimiento:
+	RNF01.
+	Nombre del requerimiento: 
+	Desempeño.
+	Características:
+	El sistema debe estar disponible el 99% del tiempo.
+	Descripción del requerimiento:
+	El sistema permitirá garantizar su desempeño a los diferentes usuarios.
+	Prioridad del requerimiento: 
+	Alta.
+	
+
+
+
+Identificación del requerimiento:
+	RNF02.
+	Nombre del requerimiento: 
+	Aplicativo.
+	Características:
+	El sistema debe ser accesible desde dispositivos móviles y computadoras.
+	Descripción del requerimiento:
+	El sistema permitirá garantizar su desempeño a los diferentes usuarios.
+	Prioridad del requerimiento: 
+	Alta.
+	
+
+
+
+
+
+Identificación del requerimiento:
+	RNF03.
+	Nombre del requerimiento: 
+	Seguridad.
+	Características:
+	El sistema debe cumplir con la normativa de protección de datos vigente.
+El sistema debe garantizar la seguridad de los datos personales.
+Las contraseñas deben estar cifradas y no deben ser visibles.
+	Descripción del requerimiento:
+	El sistema permitirá garantizar su desempeño a los diferentes usuarios.
+	Prioridad del requerimiento: 
+	Alta.
+	
+
+
+
+
+
+
+
+      1. Requisitos de rendimiento
+
+
+Especificación de los requisitos relacionados con la carga que se espera tenga que soportar el sistema. Por ejemplo, el número de terminales, el número esperado de usuarios simultáneamente conectados, número de transacciones por segundo que deberá soportar el sistema, etc.
+Todos estos requisitos deben ser mesurables. Por ejemplo, indicando “el 95% de las transacciones deben realizarse en menos de 1 segundo”, en lugar de “los operadores no deben esperar a que se complete la transacción”.[a]
+
+
+      2. Seguridad
+
+
+* Autenticación  con web token.
+* Autenticación de roles.
+* Encriptación de contraseñas.
+
+
+      3. Fiabilidad
+
+
+Especificación de los factores de fiabilidad necesaria del sistema. Esto se expresa generalmente como el tiempo entre los incidentes permisibles, o el total de incidentes permisibles.[b]
+      4. Disponibilidad
+
+
+La disponibilidad del sistema "Luckas" es un factor crítico, ya que los usuarios (seminaristas, administradores, etc.) deben poder acceder a las funcionalidades de gestión en cualquier momento.
+
+
+Nivel de Disponibilidad Requerido: Se exige una disponibilidad de 99.9% del tiempo.
+
+
+
+
+      5. Mantenibilidad
+
+
+Mantenimiento Correctivo: Se enfoca en la corrección de errores (bugs) y defectos que se descubren después del lanzamiento del sistema.
+
+
+Mantenimiento Adaptativo: Consiste en adaptar el sistema a cambios en su entorno, como nuevas versiones de navegadores web, actualizaciones del sistema operativo del servidor, o cambios en las APIs de servicios externos (ej. pasarela de pagos).
+
+
+Mantenimiento Evolutivo: Implica la adición de nuevas funcionalidades o mejoras a las existentes, basándose en el feedback de los usuarios o en la evolución de las necesidades del negocio.
+
+
+Mantenimiento Preventivo: Tareas proactivas para optimizar el rendimiento, refactorizar el código y asegurar la salud del sistema.
+
+
+El equipo de desarrollo: Es el principal responsable del mantenimiento correctivo, adaptativo y evolutivo, ya que son los encargados de modificar el código fuente del sistema.
+
+
+El equipo de operaciones o administración del sistema: Es responsable del mantenimiento de la infraestructura, como la administración del servidor, las copias de seguridad de la base de datos y el monitoreo del rendimiento.
+
+
+
+
+      6. Portabilidad
+
+
+ Luckas tiene potencial para ser altamente portable, pero requiere ajustes en dependencias, configuración, contenedores y pruebas multiplataforma para garantizar compatibilidad con distintos entornos (Linux, Windows, cloud, etc.).
+
+
+   16. Otros requisitos
+
+
+Cualquier otro requisito que no encaje en ninguna de las secciones anteriores.
+
+
+Por ejemplo: 
+Requisitos culturales y políticos
+Requisitos Legales
+4. Apéndices
+
+
+Pueden contener todo tipo de información relevante para la SRS pero que, propiamente, no forme parte de la SRS.
+
+
+
+
+	
+
+	Descripción de requisitos del software
+	
+
+[a]caja blanca y negra
+[b]cajas negra y blanca

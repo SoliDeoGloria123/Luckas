@@ -13,7 +13,11 @@ const validarEvento = [
   body('categoria').isMongoId().withMessage('ID de categoría inválido')
 ];
 
-// Middleware de autenticación para todas las rutas
+
+// Rutas públicas (sin autenticación)
+router.get('/publicos', eventosController.getPublicEvents);
+
+// Middleware de autenticación para rutas protegidas
 router.use(authJwt.verifyToken);
 
 // Rutas de consulta (todos los roles autenticados)

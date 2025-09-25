@@ -4,7 +4,7 @@ const cursosController = require('../controllers/cursosController');
 const { authJwt, role } = require('../middlewares');
 
 // Rutas públicas (para usuarios externos que quieren ver cursos disponibles)
-router.get('/publicos', cursosController.obtenerCursos);
+router.get('/publicos', cursosController.obtenerCursosPublicos);
 router.get('/publicos/:id', cursosController.obtenerCursoPorId);
 
 // Obtener estadísticas de cursos (solo admin) - Debe ir antes de /:id

@@ -1,7 +1,7 @@
 // frontend/src/services/externalService.js
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3001/api"; // Usar URL completa temporalmente
+const API_BASE_URL = "http://localhost:3000/api"; // Usar URL correcta del backend
 
 // Configurar axios con el token
 const api = axios.create({
@@ -23,7 +23,7 @@ const externalService = {
     try {
       console.log('Making request to /cursos/publicos...');
       // Usar fetch sin headers de autorización para endpoint público
-      const response = await fetch('http://localhost:3001/api/cursos/publicos');
+  const response = await fetch('http://localhost:3000/api/cursos/publicos');
       const data = await response.json();
       if (data && data.success && data.data) {
         console.log('Returning courses:', data.data);
@@ -42,7 +42,7 @@ const externalService = {
   getEventos: async () => {
     try {
       // Usar fetch sin headers de autorización para endpoint público
-      const response = await fetch('http://localhost:3001/api/eventos/publicos');
+  const response = await fetch('http://localhost:3000/api/eventos/publicos');
       const data = await response.json();
       console.log('Eventos API response:', data);
       return data.data || [];
@@ -100,23 +100,23 @@ const externalService = {
     }
   },
 
-  // Obtener mis inscripciones
-  getInscripciones: async (userId) => {
+  // Obtener mis inscripciones (para el usuario autenticado, rol externo/seminarista)
+  getInscripciones: async () => {
     try {
-      const response = await api.get(`/users/${userId}/inscripciones`);
+      const response = await api.get('/inscripciones');
       console.log('Inscripciones API response:', response.data);
-      return response.data.data || response.data;
+      // El backend retorna { success: true, data: [...] }
+      return response.data.data || [];
     } catch (error) {
       console.error('Error al obtener inscripciones:', error);
-      // En caso de error, retornar array vacío para no romper la UI
       return [];
     }
   },
 
-  // Obtener mis inscripciones (alias para compatibilidad)
-  getMisInscripciones: async (userId) => {
+  // Alias para compatibilidad
+  getMisInscripciones: async () => {
     try {
-      const response = await api.get('/users/inscripciones');
+      const response = await api.get('/inscripciones');
       return response.data;
     } catch (error) {
       console.error('Error al obtener inscripciones:', error);

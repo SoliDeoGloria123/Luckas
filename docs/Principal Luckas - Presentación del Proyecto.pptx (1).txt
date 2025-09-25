@@ -1,0 +1,192 @@
+Luckas
+1
+
+Luckas
+Pedraza Martinez Steeven Sebastian
+Sanchez Sierra Luis Felipe
+Mahecha Sabogal Juan David
+Servicio Nacional de Aprendizaje – SENA, Centro de Electricidad Electrónica y Telecomunicaciones
+Tecnologo en Analisis y Desarrollo de Software - ADSO, Primer Trimestre
+Instructor Albeiro Ramos
+Bogotá, 09 de Julio de 2025
+
+
+El presente documento inicia con la proyección problemática, de la dificultad, en los procesos administrativos y logísticos del Seminario Bautista de Colombia(SBC).
+Introducción
+
+Con el objetivo de desarrollar un sistema digital de gestión integral, denominado Luckas, que permita a los usuarios externos, seminaristas, tesoreros y administradores del S.B.C centralizar su información, automatizar tareas recurrentes y mejorar la experiencia tanto para el equipo organizador como para los participantes del seminario, lo dicho anterior, se justifica en la necesidad de herramientas automatizadas para centralizar mejor la información, automatizar tareas recurrentes y mejorar la experiencia tanto para el equipo organizador, el S.B.C, como para los participantes del seminario, (Usuarios externos o External).
+Introducción
+
+El alcance del estudio se centrará en el desarrollo de un prototipo funcional de Luckas, que incluirá la Gestión de procesos administrativos y logísticos, la construcción de una base de datos robusta y la creación de una interfaz de usuario intuitiva. No obstante, se delimitará el estudio a los roles external, seminarista, tesorero y administrador .
+Introducción
+
+Luckas
+Objetivos
+Justificación
+Alcance
+Delimitación
+Trimestre
+
+Objetivo General
+Desarrollar un Sistema Digital de Gestión Integral Web llamado 'Luckas' para la administración de las actividades del Seminario Bautista de Colombia, incluyendo la inscripción de participantes, programación de eventos, control de pagos, asignación de cabañas y automatización de tareas administrativas.
+Objetivos Específicos
+Gestionar los usuarios del Sistema Luckas.
+
+Gestionar la automatización de la asignación y el control de recursos logísticos (eventos, programas académicos, cabañas, tareas, etc) para las actividades del Seminario Bautista de Colombia, reduciendo la carga administrativa mediante Luckas.
+
+Gestionar los reportes analíticos sobre asistencia, pagos y asignaciones del Seminario Bautista de Colombia, facilitando la toma de decisiones estratégicas en tiempo real, a través de Luckas.
+
+Justificación
+La meta de de este sistema informático de gestión integral, denominado Luckas, consiste en fortalecer la organización y eficiencia en los procesos administrativos y logísticos del Seminario Bautista de Colombia, ofreciendo una solución tecnológica que permitirá centralizar la información, automatizar tareas recurrentes y mejorar la experiencia tanto para el equipo organizador como para los participantes del seminario. 
+
+
+Justificación
+Para abordar las dificultades planteadas y aprovechar las oportunidades identificadas, el sistema de gestión integral Luckas, para el Seminario Bautista de Colombia se plantea como una solución integral con los siguientes objetivos:
+
+Gestión de usuarios: Se implementará la gestión eficiente de los diferentes roles de usuarios (Administrador, Tesorero, Seminarista, Externo), asegurando un manejo seguro de sus datos, acceso personalizado a las funcionalidades de la plataforma según sus permisos, y facilitando la interacción con el sistema.
+
+
+Justificación
+
+Gestión de eventos: El sistema proporcionará un módulo visual para crear, consultar y administrar las fechas y detalles de las actividades del seminario, facilitando la planificación y comunicación.
+
+Gestión de solicitudes: Se permitirá la gestión de las diferentes solicitudes, como certificaciones, problemas con el pago a eventos, entre otros, que puedan surgir, brindando un seguimiento organizado y una respuesta eficiente.
+
+Gestión de inscripciones: Se incluirá un formulario en línea para la inscripción de participantes, con confirmaciones automáticas vía correo electrónico, optimizando el proceso de registro.
+
+
+Justificación
+
+Gestión de cabañas: El sistema automatizará la distribución de hospedajes, optimizando el uso del espacio y evitando conflictos, lo que mejorará la logística del alojamiento.
+
+Gestión de reservas: Se ofrecerán herramientas para gestionar las reservas, permitiendo un control adecuado de los espacios y recursos disponibles.
+
+Gestión de tareas: Se automatizan las funciones y responsabilidades asignadas al personal logístico y administrativo, mejorando la eficiencia y la coordinación.
+
+
+
+
+
+Justificación
+
+Gestión de reportes: El sistema proporcionará módulos avanzados para generar informes detallados sobre asistencia, pagos, asignaciones y otros aspectos logísticos del evento, permitiendo la toma de decisiones basada en datos.
+
+
+
+
+
+Justificación
+Con base en lo anterior, los beneficiarios y beneficios esperados son:
+
+Administrador: Obtendrá un mayor control y orden en la planeación y ejecución del seminario, reducción del trabajo manual y errores humanos, y acceso centralizado a toda la información relevante del evento para una mejor toma de decisiones.
+
+Tesorero: Podrá gestionar eficientemente los pagos y reservas, así como consultar la información relevante para su rol, lo que redundará en una mayor exactitud financiera y administrativa.
+
+Justificación
+Seminarista: Experimentará una inscripción más fluida y profesional, así como una mejor organización de las actividades y asignaciones, lo que mejorará su experiencia en el seminario.
+
+Externo: Se beneficiará de un proceso de inscripción claro y de confirmaciones automaticas, brindando una experiencia más profesional.
+
+Alcance
+Luckas es un software diseñado para la gestión de procesos administrativos y logísticos del SBC. 
+
+A través de la administración de las actividades del Seminario Bautista de Colombia, incluyendo la inscripción de participantes, programación de eventos, control de pagos, asignación de cabañas y automatización de tareas administrativas, proporcionando a los usuarios externos, seminaristas, tesoreros y administradores, un sistema con la solución a la problemática en base a las facultades del rol, más acordes a una institución educativa acreditada en colombia y EEUU.
+
+Alcance
+El proyecto se enfoca en la gestión de procesos administrativos y logísticos, tomando en cuenta la Justificación, se desarrolla lo siguiente.
+
+Almacenamiento de información: Almacenar la información en una base de datos NoSQL para gran manejo de datos.
+Funcionalidad: Para poder interactuar con el software, y dar solución a la problemática del SBC, se ha definido una serie de roles y gestiones dentro del software.A continuación, se mostrará la lista de funciones del Software Luckas, los roles con sus facultades:
+16
+
+Alcance
+Lista de Funciones del Software Luckas para el Seminario Bautista de Colombia:
+Gestión de usuarios
+Gestión de eventos
+Categorización
+Gestión de solicitudes
+Gestión de inscripción
+Gestión de cabañas
+Gestión de reservas
+Gestión de tareas
+Gestión de reportes
+ADMIN
+TESORERO
+SEMINARISTA
+EXTERNAL
+Diagramas de Caso de Uso
+17
+
+Alcance
+Funcionalidades: La versión inicial se centrará en la comparación de precios, dejando para futuras versiones funcionalidades más avanzadas como análisis de tendencias o recomendaciones personalizadas.
+
+Fuentes de datos: Dependerá de la disponibilidad y estructura de los datos que tenga actualmente el SBC.
+
+Ética y legalidad: Se respetarán las políticas de uso de datos, mediante una base de datos robusta.
+
+Visualización de datos: Mostrar objetivos estipulados en la Justificación.
+18
+
+Alcance
+
+Ubicación geográfica: Se centra en Personas de Habla Hispana.
+
+Integración con otros servicios: En una primera fase, se integrarán con servicios de terceros como plataformas de pago o sistemas de lealtad.
+
+Desarrollo de una aplicación móvil nativa: Se priorizará el desarrollo de una versión web responsive, dejando la app móvil para futuras versiones.
+19
+
+Alcance
+Tecnologías 
+	Herramientas
+Logos representativos
+Backend
+Node.js.
+Express.
+MongoDB.
+Mongoose.
+
+Autenticación: JWT
+Frontend
+- Herramienta de prototipado: FigmaReact, React Router, Bootstrap
+20
+
+Delimitación
+Tiempo de desarrollo: 1 Año y 3 meses (finales del 2024 y 2025).
+
+
+Como se va ha desarrollar: Mediante el diagrama de gantt se planteó(ver Aquí) una serie de actividades para realizar, el cual, pretende delimitar el tiempo para el desarrollo del software.
+
+
+
+Entregables Proyecto Formativopor Trimestre
+Plan de Proyecto
+Levantamiento de Información
+Diagrama de Procesos
+Historias de Usuario
+Diagrama Casos de Uso
+Casos de Uso Extendido
+Diagrama de Clases
+Prototipo No Funcional
+Primer Trimestre
+Modelo Entidad Relación
+Modelo Relacional
+Diccionario de Datos
+Script de la BBDD
+Sentencias DDL
+Consultas DML
+Automatización de la BBDD
+Sistema de Información Web – Servidor Local
+Segundo Trimestre
+Tercer Trimestre
+Planeación de Pruebas
+Ejecución de Pruebas
+Cuarto Trimestre
+Manual de Instalación 
+Configuración del Servidor de Aplicaciones
+Configuración del Servidor de BBDD
+Quinto Trimestre
+Manual de Usuario
+Sistema de Información Web – Servidor Externo
+22
+

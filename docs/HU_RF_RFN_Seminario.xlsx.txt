@@ -1,0 +1,62 @@
+ ID             Rol                            Función                                        Objetivo
+HU01   Administrador General   Crear, editar y eliminar seminarios      Mantener actualizada la información del evento
+HU02   Administrador General   Gestionar los usuarios del sistema       Garantizar el acceso adecuado a cada rol
+HU03   Administrador General   Asignar roles de usuario                 Definir responsabilidades en el sistema
+HU04   Administrador General   Auditar actividades del sistema          Identificar fallos y asegurar buenas prácticas
+HU05   Administrador General   Supervisar el estado del evento          Asegurar el buen desarrollo del seminario
+HU06   Administrador General   Ver y exportar reportes generales        Tener control del sistema y compartir información
+HU07   Tesorero                Registrar pagos                          Mantener actualizada la información financiera
+HU08   Tesorero                Ver historial de pagos                   Realizar auditorías o seguimientos
+HU09   Tesorero                Validar pagos pendientes                 Autorizar o rechazar inscripciones
+HU10   Tesorero                Generar reportes financieros             Informar al equipo administrativo
+HU11   Participante            Realizar inscripción en línea            Participar en el seminario
+HU12   Participante            Consultar estado de inscripción y pago   Estar al tanto de mi proceso
+HU13   Participante            Recibir confirmación por correo          Asegurarme de que mi inscripción fue exitosa
+HU14   Participante            Ver asignación de cabaña                 Saber dónde me hospedaré
+HU15   Participante            Consultar calendario de eventos          Organizar mi participación
+HU16   Participante            Descargar certificados o comprobantes    Tener constancia de mi asistencia
+HU17   Participante            Iniciar sesión                           Acceder a mi cuenta
+HU18   Participante            Cerrar sesión                            Finalizar mi sesión de forma segura
+HU19   Participante            Editar perfil / cambiar contraseña       Mantener actualizada mi información personal
+HU20   Participante            Solicitar soporte                        Obtener ayuda ante cualquier inconveniente
+HU21   Administrador General   Gestionar tareas del staff               Coordinar el trabajo del equipo
+HU22   Administrador General   Asignar cabañas a participantes          Organizar el hospedaje
+HU23   Administrador General   Gestionar eventos                        Planear y coordinar los eventos
+HU24   Administrador General   Cargar información logística             Facilitar la operación del evento
+HU25   Administrador General   Ver reportes logísticos                  Evaluar y mejorar la logística
+ ID                                    Requisito Funcional
+RF01   El sistema debe permitir al administrador crear, editar y eliminar seminarios.
+RF02   El sistema debe permitir la gestión y edición de usuarios.
+RF03   El sistema debe permitir asignar roles a los usuarios.
+RF04   El sistema debe registrar y almacenar logs para auditoría.
+RF05   El sistema debe mostrar el estado actual del evento.
+RF06   El sistema debe permitir ver y exportar reportes en formato PDF o Excel.
+RF07   El sistema debe permitir al tesorero registrar pagos.
+RF08   El sistema debe mostrar el historial de pagos por usuario.
+RF09   El sistema debe permitir al tesorero validar pagos pendientes.
+RF10   El sistema debe generar reportes financieros.
+RF11   El sistema debe permitir a los participantes realizar inscripción en línea.
+RF12   El sistema debe mostrar el estado de inscripción y pago.
+RF13   El sistema debe enviar confirmaciones por correo al inscribirse.
+RF14   El sistema debe mostrar la asignación de cabañas.
+RF15   El sistema debe mostrar un calendario de eventos.
+RF16   El sistema debe permitir descargar certificados y comprobantes.
+RF17   El sistema debe permitir iniciar sesión con usuario y contraseña.
+RF18   El sistema debe permitir cerrar sesión de forma segura.
+RF19   El sistema debe permitir editar el perfil y cambiar la contraseña.
+RF20   El sistema debe permitir gestionar tareas del staff.
+RF21   El sistema debe permitir asignar cabañas a participantes.
+RF22   El sistema debe permitir cargar información logística del evento.
+RF23   El sistema debe permitir enviar notificaciones a usuarios y staff.
+  ID                                 Requisito No Funcional
+RFN01   El sistema debe estar disponible el 99% del tiempo.
+RFN02   El tiempo de respuesta del sistema no debe superar los 3 segundos.
+RFN03   El sistema debe garantizar la seguridad de los datos personales.
+RFN04   Las contraseñas deben estar cifradas y no deben ser visibles.
+RFN05   El sistema debe ser accesible desde dispositivos móviles y computadoras.
+RFN06   El sistema debe tener respaldo automático diario de la base de datos.
+RFN07   La interfaz debe ser amigable y fácil de usar para todos los roles.
+RFN08   El sistema debe cumplir con la normativa de protección de datos vigente.
+RFN09   El sistema debe permitir escalar usuarios sin afectar el rendimiento.
+RFN10   El sistema debe funcionar correctamente en los principales navegadores web.
+

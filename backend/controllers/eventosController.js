@@ -1,3 +1,12 @@
+// Obtener eventos públicos (solo activos, sin autenticación)
+exports.getPublicEvents = async (req, res) => {
+  try {
+    const eventos = await Evento.find({ active: true });
+    res.status(200).json({ success: true, data: eventos });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error al obtener eventos públicos', error: error.message });
+  }
+};
 const mongoose = require('mongoose');
 const Evento = require('../models/Eventos');
 const Categorizacion = require('../models/categorizacion');

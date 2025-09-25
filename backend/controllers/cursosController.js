@@ -1,3 +1,12 @@
+// Obtener cursos públicos (solo activos, sin autenticación)
+exports.obtenerCursosPublicos = async (req, res) => {
+  try {
+    const cursos = await Curso.find({ estado: 'activo' });
+    res.status(200).json({ success: true, data: cursos });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error al obtener cursos públicos', error: error.message });
+  }
+};
 const Curso = require('../models/Curso');
 const usuarios = require('../models/User');
 

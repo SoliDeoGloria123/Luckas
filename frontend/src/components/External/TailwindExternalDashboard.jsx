@@ -207,15 +207,23 @@ const TailwindExternalDashboard = () => {
           fetch('http://localhost:3001/api/cabanas/publicas').then(res => res.json()),
           userData && userData._id ? externalService.getMisInscripciones(userData._id) : Promise.resolve({ success: true, data: [] })
         ]);
-        
-        const cursosData = Array.isArray(cursosResponse) ? cursosResponse : (cursosResponse.data || []);
-        const eventosData = Array.isArray(eventosResponse) ? eventosResponse : (eventosResponse.data || []);
-        const cabanasData = Array.isArray(cabanasResponse) ? cabanasResponse : (cabanasResponse.data || []);
-        
+
+        // Asegurarse de que los datos sean arrays planos
+        // DEBUG: Mostrar en consola los datos recibidos
+        console.log('DEBUG cursosResponse:', cursosResponse);
+        console.log('DEBUG eventosResponse:', eventosResponse);
+        console.log('DEBUG cabanasResponse:', cabanasResponse);
+
+        // Si cursosResponse es un array y tiene elementos, usarlo directamente
+        // Asignar siempre el array recibido, aunque esté vacío
+        let cursosData = Array.isArray(cursosResponse) ? cursosResponse : (Array.isArray(cursosResponse?.data) ? cursosResponse.data : []);
+        let eventosData = Array.isArray(eventosResponse) ? eventosResponse : (Array.isArray(eventosResponse?.data) ? eventosResponse.data : []);
+        let cabanasData = Array.isArray(cabanasResponse) ? cabanasResponse : (Array.isArray(cabanasResponse?.data) ? cabanasResponse.data : []);
+
         setCursos(cursosData);
         setEventos(eventosData);
         setCabanas(cabanasData);
-        setInscripciones(inscripcionesResponse.data || inscripcionesResponse || []);
+        setInscripciones(Array.isArray(inscripcionesResponse.data) ? inscripcionesResponse.data : (Array.isArray(inscripcionesResponse) ? inscripcionesResponse : []));
       } catch (error) {
         console.error('Error loading data:', error);
         setCursos([]);
@@ -662,7 +670,7 @@ const TailwindExternalDashboard = () => {
                 <Card>
                   <div className="p-6">
                     <h3 className="text-sm font-medium text-white/80 mb-2">Cursos Disponibles</h3>
-                    <div className="text-3xl font-bold text-white">{cursos.length}</div>
+                    <div className="text-3xl font-bold text-white">{Array.isArray(cursos) ? cursos.length : 0}</div>
                     <p className="text-xs text-white/60">Para inscribirse</p>
                   </div>
                 </Card>
@@ -670,7 +678,7 @@ const TailwindExternalDashboard = () => {
                 <Card>
                   <div className="p-6">
                     <h3 className="text-sm font-medium text-white/80 mb-2">Eventos Próximos</h3>
-                    <div className="text-3xl font-bold text-white">{eventos.length}</div>
+                    <div className="text-3xl font-bold text-white">{Array.isArray(eventos) ? eventos.length : 0}</div>
                     <p className="text-xs text-white/60">Este mes</p>
                   </div>
                 </Card>
@@ -678,7 +686,7 @@ const TailwindExternalDashboard = () => {
                 <Card>
                   <div className="p-6">
                     <h3 className="text-sm font-medium text-white/80 mb-2">Cabañas Disponibles</h3>
-                    <div className="text-3xl font-bold text-white">{cabanas.length}</div>
+                    <div className="text-3xl font-bold text-white">{Array.isArray(cabanas) ? cabanas.length : 0}</div>
                     <p className="text-xs text-white/60">Para reservar</p>
                   </div>
                 </Card>
@@ -696,53 +704,60 @@ const TailwindExternalDashboard = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {cursos.map((curso) => {
-                  const inscrito = isInscrito(curso._id, 'curso');
-                  return (
-                    <Card key={curso._id}>
-                      <div className="p-6">
-                        <div className="flex justify-between items-start mb-3">
-                          <Badge variant={inscrito ? 'success' : 'default'}>
-                            {inscrito ? 'Inscrito' : 'Disponible'}
-                          </Badge>
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm text-white/60">4.8</span>
+                {Array.isArray(cursos) && cursos.length === 0 ? (
+                  <div className="col-span-full text-center text-white/70 py-12">
+                    <p className="text-lg font-semibold mb-2">No hay cursos disponibles en este momento.</p>
+                    <p className="text-sm">Vuelve más tarde o contacta al administrador si crees que esto es un error.</p>
+                  </div>
+                ) : (
+                  Array.isArray(cursos) && cursos.map((curso, idx) => {
+                    // Asegurar que el key sea único
+                    const key = curso._id || curso.id || idx;
+                    const inscrito = isInscrito(curso._id || curso.id, 'curso');
+                    return (
+                      <Card key={key}>
+                        <div className="p-6">
+                          <div className="flex justify-between items-start mb-3">
+                            <Badge variant={inscrito ? 'success' : 'default'}>
+                              {inscrito ? 'Inscrito' : 'Disponible'}
+                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                              <span className="text-sm text-white/60">4.8</span>
+                            </div>
+                          </div>
+                          <h3 className="text-white font-semibold text-lg mb-2">{curso.nombre}</h3>
+                          <p className="text-white/60 text-sm mb-4">{curso.descripcion}</p>
+                          <div className="flex justify-between text-sm text-white/60 mb-4">
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {typeof curso.duracion === 'object' 
+                                ? `${curso.duracion.semanas} semanas`
+                                : curso.duracion
+                              }
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Users className="h-4 w-4" />
+                              {curso.cuposDisponibles}
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xl font-bold text-primary">
+                              ${curso.costo?.toLocaleString()}
+                            </span>
+                            <Button
+                              variant={inscrito ? 'secondary' : 'primary'}
+                              onClick={() => !inscrito && handleInscribirse(curso, 'curso')}
+                              disabled={inscrito}
+                            >
+                              {inscrito ? 'Inscrito' : 'Inscribirse'}
+                            </Button>
                           </div>
                         </div>
-                        <h3 className="text-white font-semibold text-lg mb-2">{curso.nombre}</h3>
-                        <p className="text-white/60 text-sm mb-4">{curso.descripcion}</p>
-                        
-                        <div className="flex justify-between text-sm text-white/60 mb-4">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {typeof curso.duracion === 'object' 
-                              ? `${curso.duracion.semanas} semanas`
-                              : curso.duracion
-                            }
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="h-4 w-4" />
-                            {curso.cuposDisponibles} cupos
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between items-center">
-                          <span className="text-xl font-bold text-primary">
-                            ${curso.costo?.toLocaleString()}
-                          </span>
-                          <Button
-                            variant={inscrito ? 'secondary' : 'primary'}
-                            onClick={() => !inscrito && handleInscribirse(curso, 'curso')}
-                            disabled={inscrito}
-                          >
-                            {inscrito ? 'Inscrito' : 'Inscribirse'}
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  );
-                })}
+                      </Card>
+                    );
+                  })
+                )}
               </div>
             </div>
           )}
@@ -757,35 +772,40 @@ const TailwindExternalDashboard = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {eventos.map((evento) => (
-                  <Card key={evento._id}>
-                    <div className="p-6">
-                      <Badge className="mb-3">Próximamente</Badge>
-                      <h3 className="text-white font-semibold text-lg mb-2">{evento.nombre}</h3>
-                      <p className="text-white/60 text-sm mb-4">{evento.descripcion}</p>
-                      
-                      <div className="space-y-2 text-sm text-white/60 mb-4">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(evento.fechaEvento).toLocaleDateString()}
+                {eventos.length === 0 ? (
+                  <div className="col-span-full text-center text-white/70 py-12">
+                    <p className="text-lg font-semibold mb-2">No hay eventos próximos disponibles.</p>
+                    <p className="text-sm">Vuelve más tarde o contacta al administrador si crees que esto es un error.</p>
+                  </div>
+                ) : (
+                  eventos.map((evento) => (
+                    <Card key={evento._id}>
+                      <div className="p-6">
+                        <Badge className="mb-3">Próximamente</Badge>
+                        <h3 className="text-white font-semibold text-lg mb-2">{evento.nombre}</h3>
+                        <p className="text-white/60 text-sm mb-4">{evento.descripcion}</p>
+                        <div className="space-y-2 text-sm text-white/60 mb-4">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            {new Date(evento.fechaEvento).toLocaleDateString()}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            {evento.lugar}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4" />
-                          {evento.lugar}
+                        <div className="flex justify-between items-center">
+                          <span className="text-xl font-bold text-primary">
+                            ${evento.precio?.toLocaleString()}
+                          </span>
+                          <Button onClick={() => handleInscribirse(evento, 'evento')}>
+                            Registrarse
+                          </Button>
                         </div>
                       </div>
-
-                      <div className="flex justify-between items-center">
-                        <span className="text-xl font-bold text-primary">
-                          ${evento.precio?.toLocaleString()}
-                        </span>
-                        <Button onClick={() => handleInscribirse(evento, 'evento')}>
-                          Registrarse
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -800,35 +820,40 @@ const TailwindExternalDashboard = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {cabanas.map((cabana) => (
-                  <Card key={cabana._id}>
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-3">
-                        <Badge variant="success">Disponible</Badge>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm text-white/60">4.9</span>
+                {cabanas.length === 0 ? (
+                  <div className="col-span-full text-center text-white/70 py-12">
+                    <p className="text-lg font-semibold mb-2">No hay cabañas disponibles en este momento.</p>
+                    <p className="text-sm">Vuelve más tarde o contacta al administrador si crees que esto es un error.</p>
+                  </div>
+                ) : (
+                  cabanas.map((cabana) => (
+                    <Card key={cabana._id}>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-3">
+                          <Badge variant="success">Disponible</Badge>
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-sm text-white/60">4.9</span>
+                          </div>
+                        </div>
+                        <h3 className="text-white font-semibold text-lg mb-2">{cabana.nombre}</h3>
+                        <p className="text-white/60 text-sm mb-4">{cabana.descripcion}</p>
+                        <div className="flex items-center gap-2 text-sm text-white/60 mb-4">
+                          <Users className="h-4 w-4" />
+                          {cabana.capacidad} personas
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xl font-bold text-primary">
+                            ${cabana.precio?.toLocaleString()}/noche
+                          </span>
+                          <Button onClick={() => handleReservarCabana(cabana)}>
+                            Reservar
+                          </Button>
                         </div>
                       </div>
-                      <h3 className="text-white font-semibold text-lg mb-2">{cabana.nombre}</h3>
-                      <p className="text-white/60 text-sm mb-4">{cabana.descripcion}</p>
-                      
-                      <div className="flex items-center gap-2 text-sm text-white/60 mb-4">
-                        <Users className="h-4 w-4" />
-                        {cabana.capacidad} personas
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <span className="text-xl font-bold text-primary">
-                          ${cabana.precio?.toLocaleString()}/noche
-                        </span>
-                        <Button onClick={() => handleReservarCabana(cabana)}>
-                          Reservar
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  ))
+                )}
               </div>
             </div>
           )}
