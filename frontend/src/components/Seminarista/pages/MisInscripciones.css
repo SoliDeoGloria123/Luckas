@@ -49,17 +49,8 @@ body {
     margin-bottom: 2rem;
 }
 
-.stat-card-inscripciones-semianrista {
-    background: white;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
-    display: flex;
-    align-items: center;
-}
 
-.stat-icon {
+.stat-icon-inscripciones-semianrista {
     width: 2rem;
     height: 2rem;
     border-radius: 0.375rem;
@@ -69,22 +60,22 @@ body {
     margin-right: 1rem;
 }
 
-.stat-icon.confirmed {
+.stat-icon-inscripciones-semianrista.confirmed {
     background: #dcfce7;
     color: #16a34a;
 }
 
-.stat-icon.pending {
+.stat-icon-inscripciones-semianrista.pending {
     background: #fef3c7;
     color: #d97706;
 }
 
-.stat-icon.cancelled {
+.stat-icon-inscripciones-semianrista.cancelled {
     background: #fee2e2;
     color: #dc2626;
 }
 
-.stat-icon.total {
+.stat-icon-inscripciones-semianrista.total {
     background: #dbeafe;
     color: #2563eb;
 }
@@ -101,7 +92,7 @@ body {
 }
 
 /* Filters */
-.filters-card {
+.filters-card-inscripciones-semianrista {
     background: white;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
@@ -110,26 +101,26 @@ body {
     margin-bottom: 2rem;
 }
 
-.filters-content {
+.filters-content-inscripciones-semianrista {
     display: flex;
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
 }
 
-.filter-label {
+.filter-label-inscripciones-semianrista {
     font-size: 0.875rem;
     font-weight: 500;
     color: #334155;
 }
 
-.filter-buttons {
+.filter-buttons-inscripciones-semianrista {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-.filter-btn {
+.filter-btn-inscripciones-semianrista {
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     font-size: 0.875rem;
@@ -141,23 +132,23 @@ body {
     color: #334155;
 }
 
-.filter-btn:hover {
+.filter-btn-inscripciones-semianrista:hover {
     background: #e2e8f0;
 }
 
-.filter-btn.active {
+.filter-btn-inscripciones-semianrista.active {
     background: #2563eb;
     color: white;
 }
 
 /* Inscripciones Container */
-.inscripciones-container-seminario-inscripciones {
+.inscripciones-container-misinscripciones {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.inscripcion-card-semianrio-inscripciones {
+.inscripcion-card-misinscripciones {
 
     align-items: center;
     background: white;
@@ -167,18 +158,18 @@ body {
     transition: box-shadow 0.2s;
 }
 
-.inscripcion-card-semianrio-inscripciones:hover {
+.inscripcion-card-misinscripciones:hover {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.inscripcion-content-seminario-inscripciones {
+.inscripcion-content-misinscripciones {
     display: flex;
     flex-direction: row;
     gap: 1rem;
     padding: 1rem;
 }
 
-.inscripcion-image {
+.inscripcion-image-misinscripciones {
     width: 189px;
     height: auto;
     border-radius: 8px;
@@ -186,25 +177,25 @@ body {
     flex-shrink: 0;
 }
 
-.inscripcion-body-seminario-inscripciones {
+.inscripcion-body-misinscripciones {
         flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-.header-seminario-inscripciones {
+.header-misinscripciones {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1rem;
 }
 
-.inscripcion-title-section-seminario-inscripciones {
+.inscripcion-title-section-misinscripciones {
     flex: 1;
 }
 
-.inscripcion-title-row-seminario-inscripciones {
+.inscripcion-title-row-misinscripciones {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -212,13 +203,13 @@ body {
     flex-wrap: wrap;
 }
 
-.inscripcion-title {
+.inscripcion-title-misinscripciones {
     font-size: 1.25rem;
     font-weight: 600;
     color: #334155;
 }
 
-.status-badge {
+.status-badge-misinscripciones {
     padding: 0.25rem 0.75rem;
     font-size: 0.875rem;
     font-weight: 500;
@@ -226,19 +217,19 @@ body {
     border: 1px solid;
 }
 
-.status-badge.confirmada {
+.status-badge-misinscripciones.confirmada {
     background: #dcfce7;
     color: #16a34a;
     border-color: #bbf7d0;
 }
 
-.status-badge.pendiente {
+.status-badge-misinscripciones.pendiente {
     background: #fef3c7;
     color: #d97706;
     border-color: #fde68a;
 }
 
-.status-badge.cancelada {
+.status-badge-misinscripciones.cancelada {
     background: #fee2e2;
     color: #dc2626;
     border-color: #fecaca;
@@ -271,41 +262,41 @@ body {
     color: #ea580c;
 }
 
-.inscripcion-price-section {
+.inscripcion-price-section-misinscripciones {
     text-align: right;
 }
 
-.inscripcion-price {
+.inscripcion-price-misinscripciones {
     font-size: 1.125rem;
     font-weight: bold;
     color: #2563eb;
 }
 
-.inscripcion-date {
+.inscripcion-date-misinscripciones {
     font-size: 0.875rem;
     color: #6b7280;
 }
 
-.inscripcion-details {
+.inscripcion-details-misinscripciones {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
     margin-bottom: 1rem;
 }
 
-.detail-row {
+.detail-row-misinscripciones {
     display: flex;
     align-items: center;
     color: #6b7280;
     font-size: 0.875rem;
 }
 
-.detail-row i {
+.detail-row-misinscripciones i {
     width: 1rem;
     margin-right: 0.5rem;
 }
 
-.inscripcion-footer {
+.inscripcion-footer-misinscripciones {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -313,41 +304,41 @@ body {
     gap: 1rem;
 }
 
-.status-info {
+.status-info-misinscripciones {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.status-icon {
+.status-icon-misinscripciones {
     width: 1.25rem;
     height: 1.25rem;
 }
 
-.status-icon.confirmada {
+.status-icon-misinscripciones.confirmada {
     color: #16a34a;
 }
 
-.status-icon.pendiente {
+.status-icon-misinscripciones.pendiente {
     color: #d97706;
 }
 
-.status-icon.cancelada {
+.status-icon-misinscripciones.cancelada {
     color: #dc2626;
 }
 
-.status-text {
+.status-text-misinscripciones {
     font-size: 0.875rem;
     color: #6b7280;
 }
 
-.inscripcion-actions {
+.inscripcion-actions-misinscripciones {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-.btn-outline {
+.btn-outline-misinscripciones {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -363,11 +354,11 @@ body {
     transition: all 0.2s;
 }
 
-.btn-outline:hover {
+.btn-outline-misinscripciones:hover {
     background: rgba(37, 99, 235, 0.1);
 }
 
-.btn-danger {
+.btn-danger-misinscripciones {
     padding: 0.5rem 1rem;
     background: #dc2626;
     color: white;
@@ -379,7 +370,7 @@ body {
     transition: all 0.2s;
 }
 
-.btn-danger:hover {
+.btn-danger-misinscripciones:hover {
     background: #b91c1c;
 }
 
@@ -423,7 +414,7 @@ body {
 }
 
 /* Modal Styles */
-.modal-overlay {
+.modal-overlay-misinscripciones {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
@@ -437,12 +428,12 @@ body {
     transition: all 0.3s;
 }
 
-.modal-overlay.show {
+.modal-overlay-misinscripciones.show {
     opacity: 1;
     visibility: visible;
 }
 
-.modal-container {
+.modal-container-misinscripciones {
     background: white;
     border-radius: 0.5rem;
     max-width: 42rem;
@@ -453,21 +444,21 @@ body {
     transition: transform 0.3s;
 }
 
-.modal-overlay.show .modal-container {
+.modal-overlay-misinscripciones.show .modal-container-misinscripciones {
     transform: scale(1);
 }
 
-.modal-header {
+.modal-header-misinscripciones {
     position: relative;
 }
 
-.modal-image {
+.modal-image-misinscripciones {
     width: 100%;
     height: 12rem;
     object-fit: cover;
 }
 
-.modal-close {
+.modal-close-misinscripciones {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -484,55 +475,55 @@ body {
     transition: all 0.2s;
 }
 
-.modal-close:hover {
+.modal-close-misinscripciones:hover {
     background: #f3f4f6;
 }
 
-.modal-content {
+.modal-content-misinscripciones {
     padding: 1.5rem;
 }
 
-.modal-status-price {
+.modal-status-price-misinscripciones {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
 }
 
-.modal-price {
+.modal-price-misinscripciones {
     font-size: 1.5rem;
     font-weight: bold;
     color: #2563eb;
 }
 
-.modal-title {
+.modal-title-misinscripciones {
     font-size: 1.5rem;
     font-weight: bold;
     color: #334155;
     margin-bottom: 1.5rem;
 }
 
-.modal-details-grid {
+.modal-details-grid-misinscripciones {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
     margin-bottom: 1.5rem;
 }
 
-.modal-section {
+.modal-section-misinscripciones {
     background: #f8fafc;
     padding: 1rem;
     border-radius: 0.5rem;
 }
 
-.section-title {
+.section-title-misinscripciones {
     font-size: 1.125rem;
     font-weight: 600;
     color: #334155;
     margin-bottom: 0.75rem;
 }
 
-.detail-item {
+.detail-item-misinscripciones {
     display: flex;
     align-items: center;
     color: #374151;
@@ -543,20 +534,20 @@ body {
     margin-bottom: 0;
 }
 
-.detail-icon {
+.detail-icon-misinscripciones {
     width: 1.25rem;
     height: 1.25rem;
     margin-right: 0.75rem;
     color: #2563eb;
 }
 
-.modal-actions {
+.modal-actions-misinscripciones {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
 }
 
-.btn-secondary {
+.btn-secondary-misinscripciones {
     flex: 1;
     padding: 0.75rem 1.5rem;
     border: 1px solid #d1d5db;
@@ -568,7 +559,20 @@ body {
     transition: all 0.2s;
 }
 
-.btn-secondary:hover {
+.btn-secondary-misinscripciones:hover {
     background: #f9fafb;
+}
+.no-data-container-misinscripciones{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #555;
+  font-size: 1.2em;
+  background: rgba(255,255,255,0.8);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  margin: 32px 0;
 }
 

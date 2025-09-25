@@ -1,10 +1,17 @@
 const mongoose = require('mongoose');
 
 const solicitudSchema = new mongoose.Schema({
+
   solicitante: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'usuarios',
     required: true
+  },  
+  titulo: {
+    type: String,
+    required: [true, 'El título es obligatorio'],
+    trim: true,
+    maxlength: [200, 'El título no puede exceder 200 caracteres']
   },
   correo: {
     type: String,
@@ -79,6 +86,11 @@ const solicitudSchema = new mongoose.Schema({
   modificadoPor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'usuarios'
+  },
+  origen: {
+    type: String,
+    enum: ['formulario', 'reserva', 'inscripcion'],
+    default: 'formulario'
   }
 }, {
   timestamps: true

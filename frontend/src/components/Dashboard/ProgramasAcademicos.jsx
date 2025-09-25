@@ -3,11 +3,21 @@ import axios from 'axios';
 import ProgramasTabla from './Tablas/ProgramasTabla';
 import { cursosService } from '../../services/cursosService';
 import { programasTecnicosService } from '../../services/programasTecnicosService';
+import Sidebar from './Sidebar/Sidebar';
+import Header from './Sidebar/Header';
+import {
+    Plus,
+    Search
+} from 'lucide-react';
 
 const ProgramasAcademicos = () => {
     const [programas, setProgramas] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [sidebarAbierto, setSidebarAbierto] = useState(true);
+    const [seccionActiva, setSeccionActiva] = useState("dashboard");
+    const [mostrarModal, setMostrarModal] = useState(false);
     const [error, setError] = useState('');
+    const [cargando, setCargando] = useState(false);
     const [filtros, setFiltros] = useState({
         tipo: '',
         modalidad: '',
@@ -44,62 +54,62 @@ const ProgramasAcademicos = () => {
 
     const cargarProgramas = async () => {
         try {
-        setLoading(true);
-        setError('');
-        // Traer cursos
-        const cursosRes = await cursosService.obtenerCursos({});
-        // Traer programas técnicos
-        const tecnicosRes = await programasTecnicosService.obtenerProgramasTecnicos({});
-        // Normalizar y unificar
-        const cursos = (cursosRes.data || []).map(curso => ({
-            ...curso,
-            tipo: 'curso',
-            titulo: curso.nombre,
-            profesor: curso.instructor,
-            precio: curso.costo,
-            fechaInicio: curso.fechaInicio,
-            cupos: curso.cuposDisponibles,
-            activo: curso.estado === 'activo'
-        }));
-        const tecnicos = (tecnicosRes.data || []).map(prog => ({
-            ...prog,
-            tipo: 'tecnico',
-            titulo: prog.nombre,
-            profesor: prog.instructor,
-            precio: prog.costo,
-            fechaInicio: prog.fechaInicio,
-            cupos: prog.cuposDisponibles,
-            activo: prog.estado === 'activo'
-        }));
-        // Filtrar por tipo y modalidad si el usuario selecciona filtros
-        let resultado = [...cursos, ...tecnicos];
-        if (filtros.tipo) {
-            resultado = resultado.filter(p => p.tipo === filtros.tipo);
+            setLoading(true);
+            setError('');
+            // Traer cursos
+            const cursosRes = await cursosService.obtenerCursos({});
+            // Traer programas técnicos
+            const tecnicosRes = await programasTecnicosService.obtenerProgramasTecnicos({});
+            // Normalizar y unificar
+            const cursos = (cursosRes.data || []).map(curso => ({
+                ...curso,
+                tipo: 'curso',
+                titulo: curso.nombre,
+                profesor: curso.instructor,
+                precio: curso.costo,
+                fechaInicio: curso.fechaInicio,
+                cupos: curso.cuposDisponibles,
+                activo: curso.estado === 'activo'
+            }));
+            const tecnicos = (tecnicosRes.data || []).map(prog => ({
+                ...prog,
+                tipo: 'tecnico',
+                titulo: prog.nombre,
+                profesor: prog.instructor,
+                precio: prog.costo,
+                fechaInicio: prog.fechaInicio,
+                cupos: prog.cuposDisponibles,
+                activo: prog.estado === 'activo'
+            }));
+            // Filtrar por tipo y modalidad si el usuario selecciona filtros
+            let resultado = [...cursos, ...tecnicos];
+            if (filtros.tipo) {
+                resultado = resultado.filter(p => p.tipo === filtros.tipo);
+            }
+            if (filtros.modalidad) {
+                resultado = resultado.filter(p => p.modalidad === filtros.modalidad);
+            }
+            if (filtros.busqueda) {
+                const texto = filtros.busqueda.toLowerCase();
+                resultado = resultado.filter(p =>
+                    (p.titulo && p.titulo.toLowerCase().includes(texto)) ||
+                    (p.profesor && p.profesor.toLowerCase().includes(texto))
+                );
+            }
+            setProgramas(resultado);
+        } catch (error) {
+            setError('Error de conexión');
+            console.error('Error:', error);
+        } finally {
+            setLoading(false);
         }
-        if (filtros.modalidad) {
-            resultado = resultado.filter(p => p.modalidad === filtros.modalidad);
-        }
-        if (filtros.busqueda) {
-            const texto = filtros.busqueda.toLowerCase();
-            resultado = resultado.filter(p =>
-                (p.titulo && p.titulo.toLowerCase().includes(texto)) ||
-                (p.profesor && p.profesor.toLowerCase().includes(texto))
-            );
-        }
-        setProgramas(resultado);
-    } catch (error) {
-        setError('Error de conexión');
-        console.error('Error:', error);
-    } finally {
-        setLoading(false);
-    }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            
+
             // Limpiar arrays vacíos
             const dataToSend = {
                 ...formData,
@@ -155,6 +165,11 @@ const ProgramasAcademicos = () => {
         alert(mensaje);
     };
 
+    const abrirModalCrear = () => {
+        setModalEditar(false);
+        setFormData();
+        setMostrarModal(true);
+    };
     const agregarRequisito = () => {
         setFormData({
             ...formData,
@@ -227,73 +242,129 @@ const ProgramasAcademicos = () => {
     }
 
     return (
-        <div className="programas-academicos-container">
-            <div className="page-header-Academicos">
-                <h1>
-                    <i className="fas fa-graduation-cap"></i>
-                    Gestión de Programas Académicos
-                </h1>
-             
-            </div>
-
-            {error && (
-                <div className="alert alert-error">
-                    <i className="fas fa-exclamation-triangle"></i>
-                    {error}
-                </div>
-            )}
-
-            {/* Filtros */}
-            <div className="filtros-Academicos">
-                <div className="filtros-group-Academicos">
-                    <div className="filtro-item-Academicos">
-                        <label>Tipo de Programa</label>
-                        <select 
-                            value={filtros.tipo} 
-                            onChange={(e) => setFiltros({...filtros, tipo: e.target.value})}
-                        >
-                            <option value="">Todos</option>
-                            <option value="curso">Cursos</option>
-                            <option value="tecnico">Técnicos</option>
-                            <option value="especializacion">Especializaciones</option>
-                            <option value="diplomado">Diplomados</option>
-                        </select>
-                    </div>
-                    <div className="filtro-item-Academicos">
-                        <label>Modalidad</label>
-                        <select 
-                            value={filtros.modalidad} 
-                            onChange={(e) => setFiltros({...filtros, modalidad: e.target.value})}
-                        >
-                            <option value="">Todas</option>
-                            <option value="presencial">Presencial</option>
-                            <option value="virtual">Virtual</option>
-                            <option value="mixta">Mixta</option>
-                        </select>
-                    </div>
-                    <div className="filtro-item-Academicos">
-                        <label>Buscar</label>
-                        <input
-                            type="text"
-                            placeholder="Título, profesor..."
-                            value={filtros.busqueda}
-                            onChange={(e) => setFiltros({...filtros, busqueda: e.target.value})}
-                        />
-                    </div>
-                </div>
-            </div>
-
-
-            {/* Tabla de programas */}
-            <ProgramasTabla
-                programas={programas}
-                eliminarPrograma={eliminarPrograma}
-                formatearPrecio={formatearPrecio}
-                formatearFecha={formatearFecha}
+        <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+            <Sidebar
+                sidebarAbierto={sidebarAbierto}
+                setSidebarAbierto={setSidebarAbierto}
+                seccionActiva={seccionActiva}
+                setSeccionActiva={setSeccionActiva}
             />
+            <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
+                <Header
+                    sidebarAbierto={sidebarAbierto}
+                    setSidebarAbierto={setSidebarAbierto}
+                    seccionActiva={seccionActiva}
+                />
+                <div className="space-y-7 fade-in-up p-9">
+                    {/* Header */}
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-800">Gestión de Programas Académicos</h1>
+                            <p className="text-slate-600">Administra cursos y programas técnicos del seminario</p>
+                        </div>
+                        <button
+                            onClick={abrirModalCrear}
+                            className="btn-premium flex items-center space-x-2 px-4 py-2 text-white rounded-xl font-medium shadow-lg"
+                        >
+                            <Plus className="w-4 h-4" />
+                            <span>Nuevo Programa</span>
+                        </button>
+                    </div>
+                    
+                    <div className="dashboard-grid-reporte-admin">
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin users">
+                                <i className="fas fa-users"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>5</h3>
+                                <p>Total Usuarios</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin active">
+                                <i className="fas fa-user-check"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>4</h3>
+                                <p>Usuarios Activos</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin admins">
+                                <i className="fas fa-user-shield"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>1</h3>
+                                <p>Administradores</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin new">
+                                <i className="fas fa-user-plus"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>12</h3>
+                                <p>Nuevos Este Mes</p>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Filtros */}
+                    <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="relative">
+                                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar programas..."
+                                    value={filtros.busqueda}
+                                    onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
+                                    className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                />
+                            </div>
 
-            
-            
+                            <select
+                                value={filtros.tipo}
+                                onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
+                                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            >
+                                <option value="todos">Todos los tipos</option>
+                                <option value="curso">Cursos</option>
+                                <option value="programa-tecnico">Programas Técnicos</option>
+                            </select>
+
+                            <select
+                                value={filtros.estado}
+                                onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
+                                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            >
+                                <option value="todos">Todos los estados</option>
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                                <option value="borrador">Borrador</option>
+                            </select>
+
+                            <div className="text-sm text-slate-600 flex items-center">
+                                <span className="font-medium">{/*programasFiltrados.length*/}</span> programa(s) encontrado(s)
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {/* Tabla de programas */}
+                    <ProgramasTabla
+                        programas={programas}
+                        eliminarPrograma={eliminarPrograma}
+                        formatearPrecio={formatearPrecio}
+                        formatearFecha={formatearFecha}
+                        cargando={cargando}
+                        abrirModalCrear={abrirModalCrear}
+                    />
+
+
+
+                </div>
+            </div>
         </div>
     );
 };

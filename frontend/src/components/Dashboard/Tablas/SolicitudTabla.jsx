@@ -6,8 +6,8 @@ const TablaUnificadaSolicitudes = ({
   eliminarSolicitud,
 
 }) => (
-  <div className="tabla-contenedor">
-    <table className="tabla-usuarios">
+  <div className="tabla-contenedor-admin">
+    <table className="tabla-usuarios-admin">
       <thead>
         <tr>
           <th>ID</th>
@@ -94,9 +94,9 @@ const TablaUnificadaSolicitudes = ({
             </td>
             <td>
               <div className="acciones-botones">
-                <button className="btn-editar" onClick={() => abrirModalEditarSolicitud(sol)}>✏️</button>
+                <button className="btn-action editar" onClick={() => abrirModalEditarSolicitud(sol)}><i class="fas fa-edit"></i></button>
                 {eliminarSolicitud && (
-                  <button className="btn-eliminar" onClick={() => eliminarSolicitud(sol._id)}>🗑️</button>
+                  <button className="btn-action eliminar" onClick={() => eliminarSolicitud(sol._id)}><i class="fas fa-trash"></i></button>
                 )}
               </div>
             </td>

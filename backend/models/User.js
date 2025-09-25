@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
   },
   apellido: {
     type: String,
-    required: true, 
+    required: true,
     trim: true
   },
   correo: {
@@ -30,34 +30,45 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad'],
     required: true
-   },
-   numeroDocumento: {
+  },
+  numeroDocumento: {
     type: String,
     required: true,
     unique: true,
     trim: true,
-   },
+  },
+  fechaNacimiento: {
+    type: Date,
+    required: true
+  },
   password: {
     type: String,
     required: true,
     select: false // No devolver el password en las consultas
   },
+
   role: {
     type: String,
-     enum: ['admin', 'tesorero', 'seminarista', 'externo'],
+    enum: ['admin', 'tesorero', 'seminarista', 'externo'],
     default: 'externo'
   },
   estado: {
     type: String,
     enum: ['activo', 'inactivo'],
     default: 'activo'
+  },
+  resetPasswordCode: {
+    type: String
+  },
+  resetPasswordExpires: {
+    type: Date
   }
 }, { timestamps: true });
 
 // Middleware para hashear la contraseña antes de guardar
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -68,7 +79,7 @@ userSchema.pre('save', async function(next) {
 });
 
 // Método para comparar contraseñas
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 

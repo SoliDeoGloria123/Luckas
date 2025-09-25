@@ -6,7 +6,7 @@ const reservaSchema = new mongoose.Schema({
         ref: 'usuarios',
         required: [true, 'El usuario es obligatorio']
     },
-    cabana: { // <-- Cambia de categoria a cabana
+    cabana: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Cabana',
         required: true
@@ -19,9 +19,40 @@ const reservaSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    precio: {
+    nombre: {
+        type: String,
+        required: true
+    },
+    apellido: {
+        type: String,
+        required: true
+    },
+    tipoDocumento: {
+        type: String,
+        enum: ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad'],
+        required: true
+    },
+    numeroDocumento: {
+        type: String,
+        required: true
+    },
+    correoElectronico: {
+        type: String,
+        required: true
+    },
+    telefono: {
+        type: String,
+        required: true
+    },
+    numeroPersonas: {
         type: Number,
         required: true
+    },
+    propositoEstadia: {
+        type: String
+    },
+    solicitudesEspeciales: {
+        type: String
     },
     estado: {
         type: String,
@@ -40,7 +71,7 @@ const reservaSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Solicitud'
     }
-}, { 
+}, {
     timestamps: true
 });
 

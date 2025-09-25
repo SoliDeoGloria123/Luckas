@@ -12,7 +12,7 @@
   --color-gray-light: #f1f5f9;
   --color-white: #ffffff;
   --color-black: #000000;
-  
+
   /* Colores adicionales para gradientes y efectos */
   --color-blue-light: #3b82f6;
   --color-purple-light: #a78bfa;
@@ -50,6 +50,7 @@
   --border-radius-xl: 16px;
   --border-radius-2xl: 24px;
 }
+
 /* Header */
 .header-seminario {
   background: linear-gradient(135deg, var(--color-gray-dark) 0%, var(--color-gray-800) 100%);
@@ -95,6 +96,7 @@
   white-space: nowrap;
   z-index: 6;
 }
+
 .role-badge-seminario {
   background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-purple-light) 100%);
   color: var(--color-white);
@@ -108,29 +110,100 @@
 .header-nav-seminario {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 0.5rem;
 }
 
 .nav-item-seminario {
-  color: var(--color-gray-300);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  color: #cbd5e1;
   text-decoration: none;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-md);
+  border-radius: 12px;
   font-weight: 500;
   transition: all 0.3s ease;
   position: relative;
 }
 
 .nav-item-seminario:hover {
-  color: var(--color-white);
   background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateY(-1px);
 }
 
 .nav-item-seminario.active {
-  color: var(--color-white);
-  background: linear-gradient(135deg, var(--color-blue-primary) 0%, var(--color-blue-light) 100%);
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
+
+.nav-icon-seminario {
+
+  font-size: 1.1rem;
+}
+
+.dropdown-arrow-seminario {
+  font-size: 0.7rem;
+  margin-left: 0.3rem;
+  transition: transform 0.3s ease;
+}
+
+.nav-item-seminario:hover .dropdown-arrow-seminario {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.dropdown-menu-seminario {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border-top: 3px solid #2563eb;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.dropdown-menu-seminario.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-container-seminario {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.dropdown-item-seminario {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #334155;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.dropdown-item-seminario:hover {
+  background: #e2e8f0;
+  border-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+
 
 .header-right-seminario {
   display: flex;
@@ -145,20 +218,38 @@
 }
 
 .icon-btn-seminario {
+  position: relative;
   background: rgba(255, 255, 255, 0.1);
   border: none;
-  color: var(--color-white);
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius-md);
+  padding: 0.7rem;
+  border-radius: 12px;
+  color: white;
   cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
 }
 
 .icon-btn-seminario:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
+.notification-icon-seminario {
+    font-size: 1.2rem;
+}
+
+.notification-badge-seminario {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.4rem;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
 
 .notification-dot-seminario {
   position: absolute;
@@ -172,74 +263,82 @@
 }
 
 .user-profile-seminario {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
+     display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.user-profile-seminario:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
 }
 
 .user-avatar-seminario {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, var(--color-blue-primary) 0%, var(--color-blue-light) 100%);
-  color: var(--color-white);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.875rem;
-  box-shadow: var(--shadow-sm);
+   width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.dropdown-arrow {
+    font-size: 0.7rem;
+    margin-left: 0.3rem;
+    transition: transform 0.3s ease;
 }
 
-/*.user-name-seminario {
-  font-weight: 500;
-  color: var(--color-white);
-}*/
+.nav-item:hover .dropdown-arrow {
+    transform: rotate(180deg);
+}
 
 .user-menu-container {
   position: relative;
   display: inline-block;
 }
+.user-info-seminario{
+    display: flex;
+    flex-direction: column;
+}
 
-.user-menu-button {
-  display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
+.user-name-seminario {
+   color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+.user-role-seminario {
+    font-size: 0.75rem;
     color: #64748b;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.875rem;
 }
 
-.user-menu-button:hover {
-  background-color: #f1f5f9;
-    color: #2563eb;
-}
 
 .user-dropdown-header {
-position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    min-width: 200px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.2s;
-    z-index: 1000;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s;
+  z-index: 1000;
 }
 
 .user-dropdown-header.show {
   opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .dropdown-item {

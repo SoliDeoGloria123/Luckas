@@ -60,4 +60,13 @@ export const reservaService = {
     if (!res.ok) throw new Error("Error al eliminar reserva");
     return await res.json();
   },
+  // Obtener historial de reservas de un usuario
+  getReservasPorUsuario: async (userId) => {
+    const res = await fetch(`${API_URL}/usuario/${userId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
+    if (!res.ok) throw new Error("Error al obtener reservas del usuario");
+    return await res.json();
+  }
 };
+

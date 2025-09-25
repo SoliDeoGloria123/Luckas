@@ -65,7 +65,6 @@
 }
 
 .luckas-login{
-
     display: block;
     position: relative;
     height: 45px;
@@ -151,19 +150,19 @@
 }
 
 /* Header del formulario */
-.form-header {
+.form-header-login {
   text-align: center;
   margin-bottom: 2rem;
 }
 
-.welcome-title {
+.welcome-title-login {
   font-size: 1.75rem;
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 0.5rem;
 }
 
-.welcome-subtitle {
+.welcome-subtitle-login {
   color: #6b7280;
   font-size: 1rem;
   margin: 0;

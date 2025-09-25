@@ -89,6 +89,7 @@ exports.crearInscripcion = async (req, res) => {
       descripcion: `Inscripción al evento ${eventoExiste.nombre}`,
       estado: 'Nueva',
       prioridad: 'Media',
+      origin: 'inscripcion',
       modeloReferencia: 'Inscripcion',
       referencia: inscripcion._id
     });
@@ -218,6 +219,26 @@ exports.eliminarInscripcion = async (req, res) => {
     const inscripcion = await Inscripcion.findByIdAndDelete(req.params.id);
     if (!inscripcion) return res.status(404).json({ success: false, message: 'Inscripción no encontrada' });
     res.json({ success: true, message: 'Inscripción eliminada' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.obtenerInscripcionesPorUsuario = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'Falta el parámetro userId' });
+    }
+    const inscripciones = await Inscripcion.find({ usuario: userId })
+      .populate('usuario', 'nombre apellido correo')
+      .populate({
+        path: 'evento',
+        select: 'nombre fechaEvento lugar descripcion imagen imagenUrl precio etiquetas horaInicio horaFin cuposDisponibles cuposTotales direccion programa observaciones',
+      })
+      .populate('categoria', 'nombre descripcion codigo')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, data: inscripciones });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

@@ -17,8 +17,6 @@ exports.getAllEvents = async (req, res) => {
     // Verificar cuántos eventos activos hay
     const activeEvents = await Evento.countDocuments({ active: true });
     console.log('[EVENTOS] Eventos activos:', activeEvents);
-
-
     // Si no hay eventos activos, mostrar algunos eventos sin filtro para debug
     if (activeEvents === 0 && totalEvents > 0) {
       const allEvents = await Evento.find().limit(5);
@@ -331,5 +329,14 @@ exports.activarTodosLosEventos = async (req, res) => {
       message: 'Error al activar eventos',
       error: error.message
     });
+  }
+};
+
+exports.obtenerEventos = async (req, res) => {
+  try {
+    const eventos = await Evento.find();
+    res.json({ success: true, data: eventos });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
