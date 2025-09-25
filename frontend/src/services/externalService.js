@@ -23,11 +23,19 @@ const externalService = {
     try {
       const response = await fetch('/api/cursos/publicos');
       const data = await response.json();
-      if (data && data.success && data.data) {
-        return data.data;
-      } else {
-        return [];
+      // Si la respuesta es un array directo, úsala
+      if (Array.isArray(data)) {
+        return data;
       }
+      // Si la respuesta es objeto con data
+      if (data && data.success && Array.isArray(data.data)) {
+        return data.data;
+      }
+      // Si la respuesta es objeto con cursos
+      if (data && Array.isArray(data.cursos)) {
+        return data.cursos;
+      }
+      return [];
     } catch (error) {
       console.error('Error al obtener cursos:', error);
       return [];

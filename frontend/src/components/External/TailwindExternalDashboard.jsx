@@ -381,6 +381,14 @@ const TailwindExternalDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background font-figtree">
+      {/* Tarjeta de diagnóstico para datos recibidos */}
+      <div style={{position:'fixed',top:10,right:10,zIndex:9999,background:'#222',color:'#fff',padding:'12px',borderRadius:'8px',maxWidth:'400px',fontSize:'12px'}}>
+        <strong>Diagnóstico datos:</strong>
+        <div><b>Cursos:</b> {Array.isArray(cursos) ? cursos.length : 'No array'} {cursos && cursos.length > 0 ? '✔️' : '❌'}</div>
+        <div><b>Eventos:</b> {Array.isArray(eventos) ? eventos.length : 'No array'} {eventos && eventos.length > 0 ? '✔️' : '❌'}</div>
+        <div><b>Cabañas:</b> {Array.isArray(cabanas) ? cabanas.length : 'No array'} {cabanas && cabanas.length > 0 ? '✔️' : '❌'}</div>
+        <div><b>Inscripciones:</b> {Array.isArray(inscripciones) ? inscripciones.length : 'No array'} {inscripciones && inscripciones.length > 0 ? '✔️' : '❌'}</div>
+      </div>
       <ShaderBackground />
       {/* Sidebar */}
       <div className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ${
@@ -703,13 +711,8 @@ const TailwindExternalDashboard = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Array.isArray(cursos) && cursos.length === 0 ? (
-                  <div className="col-span-full text-center text-white/70 py-12">
-                    <p className="text-lg font-semibold mb-2">No hay cursos disponibles en este momento.</p>
-                    <p className="text-sm">Vuelve más tarde o contacta al administrador si crees que esto es un error.</p>
-                  </div>
-                ) : (
-                  Array.isArray(cursos) && cursos.map((curso, idx) => {
+                {Array.isArray(cursos) && cursos.length > 0 ? (
+                  cursos.map((curso, idx) => {
                     const key = curso._id || curso.id || idx;
                     const inscrito = isInscrito(curso._id || curso.id, 'curso');
                     return (
@@ -755,6 +758,11 @@ const TailwindExternalDashboard = () => {
                       </Card>
                     );
                   })
+                ) : (
+                  <div className="col-span-full text-center text-white/70 py-12">
+                    <p className="text-lg font-semibold mb-2">No hay cursos disponibles en este momento.</p>
+                    <p className="text-sm">Vuelve más tarde o contacta al administrador si crees que esto es un error.</p>
+                  </div>
                 )}
               </div>
             </div>
