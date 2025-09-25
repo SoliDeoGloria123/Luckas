@@ -18,10 +18,14 @@ const Login = () => {
     // Limpiar espacios en blanco y normalizar correo
     const correoLimpio = correo.trim().toLowerCase();
     const passwordLimpio = password.trim();
-    console.log('Correo enviado:', correoLimpio);
-    console.log('Contraseña enviada:', passwordLimpio);
+    console.log('📧 Correo enviado:', correoLimpio);
+    console.log('🔑 Contraseña enviada:', passwordLimpio);
+    
     try {
+      console.log('🔄 Iniciando proceso de login...');
       const data = await authService.login(correoLimpio, passwordLimpio);
+      console.log('✅ Login exitoso:', data);
+      
       localStorage.setItem('token', data.token);
       localStorage.setItem('usuario', JSON.stringify(data.user));
 
@@ -39,8 +43,18 @@ const Login = () => {
         navigate('/admin/users'); // Por defecto para otros roles
       }
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión');
-      mostrarAlerta('Error', 'Credenciales incorrectas, por favor verifica tus datos.', 'error');
+      console.error('❌ Error completo en login:', err);
+      console.error('❌ Mensaje de error:', err.message);
+      console.error('❌ Status:', err.status);
+      console.error('❌ Data:', err.data);
+      
+      let errorMessage = 'Error al iniciar sesión';
+      if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+      mostrarAlerta('Error', errorMessage, 'error');
     }
   };
 

@@ -5,6 +5,7 @@ import { cursosService } from '../../services/cursosService';
 import { programasTecnicosService } from '../../services/programasTecnicosService';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
+import ProgramaModal from './Modales/ProgramaModal';
 import {
     Plus,
     Search
@@ -24,6 +25,7 @@ const ProgramasAcademicos = () => {
         busqueda: ''
     });
     const [modalEditar, setModalEditar] = useState(false);
+    const [modoEdicion, setModoEdicion] = useState(false);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
     const [formData, setFormData] = useState({
         titulo: '',
@@ -165,11 +167,96 @@ const ProgramasAcademicos = () => {
         alert(mensaje);
     };
 
+    // Funciones del modal
     const abrirModalCrear = () => {
-        setModalEditar(false);
-        setFormData();
+        setModoEdicion(false);
+        setProgramaSeleccionado(null);
+        setFormData({
+            titulo: '',
+            descripcion: '',
+            tipo: 'curso',
+            modalidad: 'presencial',
+            duracion: '',
+            precio: '',
+            fechaInicio: '',
+            fechaFin: '',
+            cupos: '',
+            profesor: '',
+            profesorBio: '',
+            requisitos: [''],
+            pensum: [{ modulo: '', descripcion: '', horas: '' }],
+            objetivos: [''],
+            metodologia: '',
+            evaluacion: '',
+            certificacion: '',
+            imagen: '',
+            destacado: false
+        });
         setMostrarModal(true);
     };
+
+    const abrirModalEditar = (programa) => {
+        setModoEdicion(true);
+        setProgramaSeleccionado(programa);
+        setMostrarModal(true);
+    };
+
+    const cerrarModal = () => {
+        setMostrarModal(false);
+        setModoEdicion(false);
+        setProgramaSeleccionado(null);
+        setError('');
+    };
+
+    const handleSubmitModal = async (e) => {
+        e.preventDefault();
+        setCargando(true);
+        try {
+            const token = localStorage.getItem('token');
+
+            // Limpiar arrays vacíos
+            const dataToSend = {
+                ...formData,
+                requisitos: formData.requisitos.filter(req => req.trim() !== ''),
+                objetivos: formData.objetivos.filter(obj => obj.trim() !== ''),
+                pensum: formData.pensum.filter(item => item.modulo.trim() !== ''),
+                precio: parseFloat(formData.precio),
+                cupos: parseInt(formData.cupos)
+            };
+
+            let response;
+            if (modoEdicion && programaSeleccionado) {
+                response = await axios.put(`/api/programas-academicos/${programaSeleccionado._id}`, dataToSend, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } else {
+                response = await axios.post('/api/programas-academicos', dataToSend, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
+
+            if (response.status === 200 || response.status === 201) {
+                cargarProgramas();
+                cerrarModal();
+                mostrarMensaje(
+                    modoEdicion ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente', 
+                    'success'
+                );
+            }
+        } catch (error) {
+            console.error('Error al guardar programa:', error);
+            setError(error.response?.data?.message || 'Error al guardar el programa');
+        } finally {
+            setCargando(false);
+        }
+    };
+
     const agregarRequisito = () => {
         setFormData({
             ...formData,
@@ -361,10 +448,19 @@ const ProgramasAcademicos = () => {
                         abrirModalCrear={abrirModalCrear}
                     />
 
-
-
                 </div>
             </div>
+
+            {/* Modal de Programa */}
+            <ProgramaModal
+                mostrar={mostrarModal}
+                modoEdicion={modoEdicion}
+                programaSeleccionado={programaSeleccionado}
+                formData={formData}
+                setFormData={setFormData}
+                onClose={cerrarModal}
+                onSubmit={handleSubmitModal}
+            />
         </div>
     );
 };

@@ -105,9 +105,12 @@ exports.signup = async (req, res) => {
 exports.signin = async (req, res) => {
   try {
     const { correo, password } = req.body;
+    
+    console.log('[AUTH] Intento de login para:', correo);
 
     // 1. Validación básica
     if (!correo || !password) {
+      console.log('[AUTH] Faltan campos obligatorios');
       return res.status(400).json({
         success: false,
         message: "Email y contraseña son requeridos"
@@ -116,8 +119,15 @@ exports.signin = async (req, res) => {
 
     // 2. Buscar usuario incluyendo el password (que normalmente está oculto)
     const user = await User.findOne({ correo }).select('+password');
+    
+    console.log('[AUTH] Usuario encontrado:', user ? 'Sí' : 'No');
+    if (user) {
+      console.log('[AUTH] Correo del usuario:', user.correo);
+      console.log('[AUTH] Hash de password almacenado:', user.password ? 'Existe' : 'No existe');
+    }
 
     if (!user) {
+      console.log('[AUTH] Usuario no encontrado para correo:', correo);
       return res.status(404).json({
         success: false,
         message: "Usuario no encontrado"
@@ -125,14 +135,20 @@ exports.signin = async (req, res) => {
     }
 
     // 3. Comparar contraseñas
+    console.log('[AUTH] Comparando contraseñas...');
+    console.log('[AUTH] Password ingresado:', password);
     const isMatch = await user.comparePassword(password);
+    console.log('[AUTH] Contraseñas coinciden:', isMatch);
 
     if (!isMatch) {
+      console.log('[AUTH] Credenciales inválidas para usuario:', correo);
       return res.status(401).json({
         success: false,
         message: "Credenciales inválidas"
       });
     }
+
+    console.log('[AUTH] Login exitoso para usuario:', correo);
 
     // 4. Generar token JWT
     const token = jwt.sign(

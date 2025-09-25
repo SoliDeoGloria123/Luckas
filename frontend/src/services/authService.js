@@ -13,11 +13,29 @@ export const signupService = {
 // inicio de sesion
 export const authService = {
   login: async (correo, password) => {
-    const response = await axios.post(`${API_BASE_URL}/auth/signin`, {
-      correo,
-      password,
-    });
-    return response.data;
+    try {
+      console.log('🚀 Enviando petición de login:', { correo, url: `${API_BASE_URL}/auth/signin` });
+      
+      const response = await axios.post(`${API_BASE_URL}/auth/signin`, {
+        correo,
+        password,
+      });
+      
+      console.log('✅ Respuesta del servidor:', response.data);
+      return response.data;
+      
+    } catch (error) {
+      console.error('❌ Error en login:', error);
+      console.error('❌ Response data:', error.response?.data);
+      console.error('❌ Status:', error.response?.status);
+      
+      // Lanzar el error con información más específica
+      throw {
+        message: error.response?.data?.message || 'Error de conexión',
+        status: error.response?.status || 500,
+        data: error.response?.data
+      };
+    }
   },
 };
 // envio de codigo de recuperacion

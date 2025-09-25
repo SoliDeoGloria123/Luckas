@@ -31,6 +31,11 @@ router.use((req, res, next)=> {
 });
 
 
+// Ruta de prueba
+router.get('/test', (req, res) => {
+    console.log('[AuthRoutes] Ruta de prueba llamada');
+    res.json({ message: 'Servidor funcionando correctamente' });
+});
 
 // Rutas de login (sin proteccion )
 router.post('/signin', authController.signin);

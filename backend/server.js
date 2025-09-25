@@ -27,7 +27,7 @@ const app = express();
 // Configuración de middlewares
 app.use(morgan('dev')); // Logging
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:19006', 'http://10.0.2.2:19006'],
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:19006', 'http://10.0.2.2:19006'],
     credentials: true
 }));
 app.use(express.json()); // Para parsear JSON

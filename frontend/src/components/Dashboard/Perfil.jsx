@@ -27,10 +27,16 @@ const Perfil = () => {
         notificacionesEmail: true,
     })
 
-    const handleSave = () => {
-        setShowSuccess(true)
-        setIsEditing(false)
-        setTimeout(() => setShowSuccess(false), 3000)
+    const handleSave = async () => {
+        try {
+            await actualizarPerfil();
+            setShowSuccess(true);
+            setIsEditing(false);
+            setTimeout(() => setShowSuccess(false), 3000);
+        } catch (error) {
+            console.error('Error al guardar el perfil:', error);
+            alert('Error al guardar los cambios');
+        }
     }
 
     // Obtener usuario logueado desde localStorage
@@ -55,22 +61,95 @@ const Perfil = () => {
         // agrega más campos si los tienes
     });
 
+    // Estado para cambio de contraseña
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+    });
+
 
     // Función para guardar cambios
     const actualizarPerfil = async () => {
         try {
-            await userService.updateUser(usuarioLogueado._id, datosEditados);
+            const response = await userService.updateOwnProfile(datosEditados);
+            console.log('Perfil actualizado:', response);
+            
+            // Actualizar localStorage con los nuevos datos
+            const usuarioActualizado = { ...usuarioLogueado, ...datosEditados };
+            localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
+            
             alert('Perfil actualizado correctamente');
-            // Opcional: actualiza localStorage si quieres que los cambios se reflejen al instante
-            localStorage.setItem('usuario', JSON.stringify({ ...usuarioLogueado, ...datosEditados }));
         } catch (error) {
-            alert('Error al actualizar el perfil: ' + error.message);
+            console.error('Error al actualizar el perfil:', error);
+            throw error;
         }
     };
 
 
-    const handleInputChange = (field: string, value: string | boolean) => {
-        setAdminData((prev) => ({ ...prev, [field]: value }))
+    const handleInputChange = (field, value) => {
+        setDatosEditados((prev) => ({ ...prev, [field]: value }))
+    }
+
+    const handleCancelEdit = () => {
+        // Resetear los datos editados a los valores originales
+        setDatosEditados({
+            nombre: usuarioLogueado?.nombre || "",
+            apellido: usuarioLogueado?.apellido || "",
+            correo: usuarioLogueado?.correo || "",
+            telefono: usuarioLogueado?.telefono || "",
+            tipoDocumento: usuarioLogueado?.tipoDocumento || "",
+            numeroDocumento: usuarioLogueado?.numeroDocumento || "",
+            fechaNacimiento: usuarioLogueado?.fechaNacimiento || "",
+        });
+        // Resetear campos de contraseña
+        setPasswordData({
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: ""
+        });
+        setIsEditing(false);
+    }
+
+    const handlePasswordChange = (field, value) => {
+        setPasswordData(prev => ({ ...prev, [field]: value }));
+    }
+
+    const cambiarContrasena = async () => {
+        try {
+            if (!passwordData.currentPassword || !passwordData.newPassword) {
+                alert('Por favor complete todos los campos de contraseña');
+                return;
+            }
+
+            if (passwordData.newPassword !== passwordData.confirmPassword) {
+                alert('Las contraseñas nuevas no coinciden');
+                return;
+            }
+
+            if (passwordData.newPassword.length < 6) {
+                alert('La nueva contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            const response = await userService.changePassword({
+                currentPassword: passwordData.currentPassword,
+                newPassword: passwordData.newPassword
+            });
+
+            console.log('Contraseña cambiada:', response);
+            alert('Contraseña cambiada correctamente');
+            
+            // Limpiar campos de contraseña
+            setPasswordData({
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: ""
+            });
+        } catch (error) {
+            console.error('Error al cambiar contraseña:', error);
+            alert(error.message || 'Error al cambiar la contraseña');
+        }
     }
 
 
@@ -181,7 +260,7 @@ const Perfil = () => {
                                             {isEditing ? (
                                                 <input
                                                     type="text"
-                                                    value={usuarioLogueado.nombre}
+                                                    value={datosEditados.nombre}
                                                     onChange={(e) => handleInputChange("nombre", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                 />
@@ -195,7 +274,7 @@ const Perfil = () => {
                                             {isEditing ? (
                                                 <input
                                                     type="text"
-                                                    value={usuarioLogueado.apellido}
+                                                    value={datosEditados.apellido}
                                                     onChange={(e) => handleInputChange("apellido", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                 />
@@ -208,13 +287,14 @@ const Perfil = () => {
                                             <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
                                             {isEditing ? (
                                                 <select
-                                                    value={usuarioLogueado.tipoDocumento}
+                                                    value={datosEditados.tipoDocumento}
                                                     onChange={(e) => handleInputChange("tipoDocumento", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                 >
-                                                    <option>Cédula de Ciudadanía</option>
-                                                    <option>Cédula de Extranjería</option>
-                                                    <option>Pasaporte</option>
+                                                    <option value="Cédula de ciudadanía">Cédula de Ciudadanía</option>
+                                                    <option value="Cédula de extranjería">Cédula de Extranjería</option>
+                                                    <option value="Pasaporte">Pasaporte</option>
+                                                    <option value="Tarjeta de identidad">Tarjeta de Identidad</option>
                                                 </select>
                                             ) : (
                                                 <p className="text-gray-900 py-3">{usuarioLogueado.tipoDocumento}</p>
@@ -226,7 +306,7 @@ const Perfil = () => {
                                             {isEditing ? (
                                                 <input
                                                     type="text"
-                                                    value={usuarioLogueado.numeroDocumento}
+                                                    value={datosEditados.numeroDocumento}
                                                     onChange={(e) => handleInputChange("numeroDocumento", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                 />
@@ -240,7 +320,7 @@ const Perfil = () => {
                                             {isEditing ? (
                                                 <input
                                                     type="tel"
-                                                    value={usuarioLogueado.telefono}
+                                                    value={datosEditados.telefono}
                                                     onChange={(e) => handleInputChange("telefono", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                 />
@@ -254,7 +334,7 @@ const Perfil = () => {
                                             {isEditing ? (
                                                 <input
                                                     type="date"
-                                                    value={usuarioLogueado.fechaNacimiento}
+                                                    value={datosEditados.fechaNacimiento ? datosEditados.fechaNacimiento.split('T')[0] : ''}
                                                     onChange={(e) => handleInputChange("fechaNacimiento", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                 />
@@ -268,7 +348,7 @@ const Perfil = () => {
                                             {isEditing ? (
                                                 <input
                                                     type="email"
-                                                    value={usuarioLogueado.correo}
+                                                    value={datosEditados.correo}
                                                     onChange={(e) => handleInputChange("correo", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                 />
@@ -350,6 +430,8 @@ const Perfil = () => {
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
                                                 <input
                                                     type="password"
+                                                    value={passwordData.currentPassword}
+                                                    onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                     placeholder="Ingresa tu contraseña actual"
                                                 />
@@ -359,6 +441,8 @@ const Perfil = () => {
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
                                                 <input
                                                     type="password"
+                                                    value={passwordData.newPassword}
+                                                    onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                     placeholder="Ingresa tu nueva contraseña"
                                                 />
@@ -368,9 +452,24 @@ const Perfil = () => {
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
                                                 <input
                                                     type="password"
+                                                    value={passwordData.confirmPassword}
+                                                    onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                     placeholder="Confirma tu nueva contraseña"
                                                 />
+                                            </div>
+
+                                            {/* Botón para cambiar contraseña */}
+                                            <div className="pt-4">
+                                                <button
+                                                    onClick={cambiarContrasena}
+                                                    className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2-2v6a2 2 0 002 2h6z" />
+                                                    </svg>
+                                                    Cambiar Contraseña
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -483,7 +582,7 @@ const Perfil = () => {
                                             Guardar Cambios
                                         </button>
                                         <button
-                                            onClick={() => setIsEditing(false)}
+                                            onClick={handleCancelEdit}
                                             className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200"
                                         >
                                             Cancelar

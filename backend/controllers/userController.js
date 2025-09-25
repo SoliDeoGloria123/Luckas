@@ -171,6 +171,114 @@ exports.updateUser = async (req, res) => {
     }
 };
 
+// Actualizar perfil propio
+exports.updateOwnProfile = async (req, res) => {
+    console.log('[CONTROLLER] Ejecutando updateOwnProfile para usuario:', req.userId);
+    try {
+        const { nombre, apellido, telefono, correo } = req.body;
+        
+        // Validar que el usuario existe
+        const user = await User.findById(req.userId);
+        if (!user) {
+            console.log('[CONTROLLER] Usuario no encontrado para actualizar perfil');
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        // Preparar datos de actualización (solo campos permitidos para perfil propio)
+        const updateData = {};
+        if (nombre) updateData.nombre = nombre;
+        if (apellido) updateData.apellido = apellido;
+        if (telefono) updateData.telefono = telefono;
+        if (correo) updateData.correo = correo;
+
+        console.log('[CONTROLLER] Datos a actualizar:', updateData);
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.userId,
+            updateData,
+            { 
+                new: true, 
+                runValidators: true 
+            }
+        ).select('-password');
+
+        if (!updatedUser) {
+            console.log('[CONTROLLER] Error al actualizar perfil propio');
+            return res.status(404).json({
+                success: false,
+                message: 'Error al actualizar perfil'
+            });
+        }
+
+        console.log('[CONTROLLER] Perfil actualizado exitosamente:', updatedUser._id);
+        res.status(200).json({
+            success: true,
+            message: 'Perfil actualizado correctamente',
+            user: updatedUser
+        });
+    } catch (error) {
+        console.error('[CONTROLLER] Error al actualizar perfil propio:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Error al actualizar perfil',
+            error: error.message
+        });
+    }
+};
+
+// Cambiar contraseña propia
+exports.changePassword = async (req, res) => {
+    console.log('[CONTROLLER] Ejecutando changePassword para usuario:', req.userId);
+    try {
+        const { currentPassword, newPassword } = req.body;
+        
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Se requieren la contraseña actual y la nueva contraseña'
+            });
+        }
+
+        // Buscar usuario con contraseña incluida
+        const user = await User.findById(req.userId).select('+password');
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        // Verificar contraseña actual
+        const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+        if (!isCurrentPasswordValid) {
+            return res.status(400).json({
+                success: false,
+                message: 'La contraseña actual es incorrecta'
+            });
+        }
+
+        // Actualizar con la nueva contraseña
+        user.password = newPassword; // El middleware pre('save') se encargará del hashing
+        await user.save();
+
+        console.log('[CONTROLLER] Contraseña cambiada exitosamente para usuario:', req.userId);
+        res.status(200).json({
+            success: true,
+            message: 'Contraseña cambiada correctamente'
+        });
+    } catch (error) {
+        console.error('[CONTROLLER] Error al cambiar contraseña:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Error al cambiar contraseña',
+            error: error.message
+        });
+    }
+};
+
 // Eliminar usuaario (solo admin)
 exports.deleteUser = async (req, res) => {
     console.log('[CONTROLLER ] Ejecutando deleteUser para ID:', req.params.id);//Diagnostico

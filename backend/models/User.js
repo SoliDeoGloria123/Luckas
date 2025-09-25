@@ -36,6 +36,38 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
+    validate: {
+      validator: function(value) {
+        // Validación basada en el tipo de documento
+        switch (this.tipoDocumento) {
+          case 'Cédula de ciudadanía':
+          case 'Cédula de extranjería':
+            // Para cédulas: solo números, mínimo 8 dígitos, máximo 10
+            return /^[0-9]{8,10}$/.test(value);
+          case 'Pasaporte':
+            // Para pasaporte: alfanumérico, mínimo 6 caracteres, máximo 15
+            return /^[A-Za-z0-9]{6,15}$/.test(value);
+          case 'Tarjeta de identidad':
+            // Para tarjeta de identidad: solo números, mínimo 10 dígitos, máximo 15
+            return /^[0-9]{10,15}$/.test(value);
+          default:
+            return false;
+        }
+      },
+      message: function(props) {
+        switch (this.tipoDocumento) {
+          case 'Cédula de ciudadanía':
+          case 'Cédula de extranjería':
+            return 'La cédula debe contener solo números y tener entre 8 y 10 dígitos';
+          case 'Pasaporte':
+            return 'El pasaporte debe ser alfanumérico y tener entre 6 y 15 caracteres';
+          case 'Tarjeta de identidad':
+            return 'La tarjeta de identidad debe contener solo números y tener entre 10 y 15 dígitos';
+          default:
+            return 'Número de documento inválido';
+        }
+      }
+    }
   },
   fechaNacimiento: {
     type: Date,

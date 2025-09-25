@@ -26,6 +26,9 @@ router.get('/:id', role.checkRole('admin', 'tesorero'), userController.getUserBy
 // Ruta para actualizar perfil propio
 router.put('/profile/update', userController.updateOwnProfile);
 
+// Ruta para cambiar contraseña propia
+router.put('/change-password', userController.changePassword);
+
 // Rutas de creación y modificación (admin y tesorero)
 router.post('/', role.checkRole('admin', 'tesorero'), userController.createUser);
 router.put('/:id', role.checkRole('admin', 'tesorero'), userController.updateUser);

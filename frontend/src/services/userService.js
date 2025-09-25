@@ -41,6 +41,16 @@ export const userService = {
       method: "PUT",
       body: JSON.stringify(userData),
     }),
+  updateOwnProfile: (userData) =>
+    apiRequest("/users/profile/update", {
+      method: "PUT",
+      body: JSON.stringify(userData),
+    }),
+  changePassword: (passwordData) =>
+    apiRequest("/users/change-password", {
+      method: "PUT",
+      body: JSON.stringify(passwordData),
+    }),
   deleteUser: (userId) =>
     apiRequest(`/users/${userId}`, {
       method: "DELETE",
