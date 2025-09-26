@@ -4,6 +4,7 @@ import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaInscripciones from "./Tablas/InscripcionTabla";
 import InscripcionModal from "./Modales/InscripsionModal";
+import useBusqueda from "./Busqueda/useBusqueda";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
@@ -17,6 +18,25 @@ const GestionIscripcion = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
+  const {
+    busqueda: busquedaInscripciones,
+    setBusqueda: setBusquedaInscripciones,
+    datosFiltrados: inscripcionesFiltradas
+  } = useBusqueda(
+    inscripciones,
+    [
+      "nombre",
+      "apellido", 
+      "numeroDocumento", // Búsqueda por cédula desde inscripción
+      "usuario.numeroDocumento", // Búsqueda por cédula desde usuario poblado
+      "correo",
+      "usuario.correo",
+      "telefono",
+      "usuario.telefono",
+      "evento.nombre",
+      "categoria.nombre"
+    ]
+  );
   const [nuevaInscripcion, setNuevaInscripcion] = useState({
     usuario: "",
     nombre: "",
@@ -230,10 +250,11 @@ const GestionIscripcion = () => {
               <i class="fas fa-search"></i>
               <input
                 type="text"
-                placeholder="Buscar Incripcion..."
-                // value={busqueda}
-                //onChange={(e) => setBusqueda(e.target.value)}
+                placeholder="Buscar por nombre, apellido, cédula, correo..."
+                value={busquedaInscripciones}
+                onChange={(e) => setBusquedaInscripciones(e.target.value)}
                 className="input-busqueda"
+                style={{ marginLeft: 10, width: 350 }}
               />
             </div>
             <div className="filtro-grupo-admin">
@@ -255,7 +276,7 @@ const GestionIscripcion = () => {
           </section>
 
           <TablaInscripciones
-            inscripciones={inscripciones}
+            inscripciones={inscripcionesFiltradas}
             onEditar={abrirModalEditar}
             onEliminar={eliminarInscripcion}
           />

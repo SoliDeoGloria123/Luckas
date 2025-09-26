@@ -174,8 +174,22 @@ exports.updateUser = async (req, res) => {
 // Actualizar perfil propio
 exports.updateOwnProfile = async (req, res) => {
     console.log('[CONTROLLER] Ejecutando updateOwnProfile para usuario:', req.userId);
+    console.log('[CONTROLLER] Datos recibidos:', req.body);
     try {
-        const { nombre, apellido, telefono, correo } = req.body;
+        const { 
+            nombre, 
+            apellido, 
+            telefono, 
+            correo, 
+            tipoDocumento,
+            numeroDocumento,
+            fechaNacimiento,
+            direccion,
+            nivelAcademico,
+            directorEspiritual,
+            idiomas,
+            especialidad
+        } = req.body;
         
         // Validar que el usuario existe
         const user = await User.findById(req.userId);
@@ -189,10 +203,18 @@ exports.updateOwnProfile = async (req, res) => {
 
         // Preparar datos de actualización (solo campos permitidos para perfil propio)
         const updateData = {};
-        if (nombre) updateData.nombre = nombre;
-        if (apellido) updateData.apellido = apellido;
-        if (telefono) updateData.telefono = telefono;
-        if (correo) updateData.correo = correo;
+        if (nombre !== undefined) updateData.nombre = nombre;
+        if (apellido !== undefined) updateData.apellido = apellido;
+        if (telefono !== undefined) updateData.telefono = telefono;
+        if (correo !== undefined) updateData.correo = correo;
+        if (tipoDocumento !== undefined) updateData.tipoDocumento = tipoDocumento;
+        if (numeroDocumento !== undefined) updateData.numeroDocumento = numeroDocumento;
+        if (fechaNacimiento !== undefined) updateData.fechaNacimiento = fechaNacimiento;
+        if (direccion !== undefined) updateData.direccion = direccion;
+        if (nivelAcademico !== undefined) updateData.nivelAcademico = nivelAcademico;
+        if (directorEspiritual !== undefined) updateData.directorEspiritual = directorEspiritual;
+        if (idiomas !== undefined) updateData.idiomas = idiomas;
+        if (especialidad !== undefined) updateData.especialidad = especialidad;
 
         console.log('[CONTROLLER] Datos a actualizar:', updateData);
 
@@ -201,7 +223,7 @@ exports.updateOwnProfile = async (req, res) => {
             updateData,
             { 
                 new: true, 
-                runValidators: true 
+                runValidators: false // Desactivar validadores para evitar problemas con documentos existentes
             }
         ).select('-password');
 

@@ -4,6 +4,7 @@ import { userService } from "../../services/userService";
 import { cabanaService } from "../../services/cabanaService";
 import TablaReservas from "./Tablas/ReservaTabla";
 import ReservasModal from "./Modales/ReservaModal";
+import useBusqueda from "./Busqueda/useBusqueda";
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';

@@ -25,6 +25,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
     solicitudes,
     [
       "solicitante.nombre",
+      "solicitante.apellido",
+      "solicitante.numeroDocumento", // Agregar búsqueda por cédula
       "correo",
       "tipoSolicitud",
       "categoria.nombre",
@@ -216,7 +218,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
               <i class="fas fa-search"></i>
               <input
                 type="text"
-                placeholder="Buscar Solicitud..."
+                placeholder="Buscar por nombre, apellido, cédula, correo..."
                 value={busquedaSolicitudes}
                 onChange={e => setBusquedaSolicitudes(e.target.value)}
                 className="input-busqueda"

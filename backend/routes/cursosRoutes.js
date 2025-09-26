@@ -7,6 +7,9 @@ const { authJwt, role } = require('../middlewares');
 router.get('/publicos', cursosController.obtenerCursos);
 router.get('/publicos/:id', cursosController.obtenerCursoPorId);
 
+// Obtener cursos y programas técnicos combinados (para seminaristas)
+router.get('/navegables', [authJwt.verifyToken], cursosController.obtenerCursosYProgramas);
+
 // Obtener estadísticas de cursos (solo admin) - Debe ir antes de /:id
 router.get('/admin/estadisticas', [authJwt.verifyToken, role.isAdmin], cursosController.obtenerEstadisticas);
 

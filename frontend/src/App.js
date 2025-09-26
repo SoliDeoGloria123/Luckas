@@ -25,7 +25,7 @@ import GestionTsolicitudes from "./components/Tesorero/Tablas/Gestionsolicitud";
 import GestionTeventos from "./components/Tesorero/Tablas/Gestionevento";
 import GestionTcabanas from "./components/Tesorero/Tablas/Gestioncabana";
 import GestionTreservas from "./components/Tesorero/Tablas/Gestionreserva";
-//import GestionTcursos from "./components/Tesorero/Tablas/Gestioncurso";
+import GestionTcursos from "./components/Tesorero/Tablas/Gestioncursos";
 import GestionTtarea from "./components/Tesorero/Tablas/Gestiontareas";
 import GestionTinscripcion from "./components/Tesorero/Tablas/Gestioninscripcion";
 import GestionTreportes from "./components/Tesorero/Tablas/Gestioreportes";
@@ -34,6 +34,7 @@ import GestionTperfil from './components/Tesorero/perfil';
 import DashboardSeminarista from "./components/Seminarista/DashboardSeminarista";
 import EventosNavegables from "./components/Seminarista/pages/EventosNavegables";
 import CabanasNavegables from "./components/Seminarista/pages/CabanasNavegables";
+import CursosNavegables from "./components/Seminarista/pages/CursosNavegables";
 import MisInscripciones from "./components/Seminarista/pages/MisInscripciones";
 import MisReservas from "./components/Seminarista/pages/MisReservas";
 import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
@@ -76,7 +77,7 @@ function App() {
         <Route path="/tesorero/eventos" element={<GestionTeventos/>}/>
         <Route path="/tesorero/cabañas" element={<GestionTcabanas/>}/>
         <Route path="/tesorero/reservas" element={<GestionTreservas/>}/>
-        {/*<Route path="/tesorero/cursos" element={<GestionTcursos/>}/>*/}
+        <Route path="/tesorero/cursos" element={<GestionTcursos/>}/>
         <Route path="/tesorero/tarea" element={<GestionTtarea/>}/>
         <Route path="/tesorero/inscripcion" element={<GestionTinscripcion/>}/>
         <Route path="/tesorero/reportes" element={<GestionTreportes/>}/>
@@ -86,6 +87,7 @@ function App() {
         <Route path="/seminarista" element={<DashboardSeminarista />} />
         <Route path="/dashboard/seminarista/eventos" element={<EventosNavegables />} />
         <Route path="/dashboard/seminarista/cabanas" element={<CabanasNavegables />} />
+        <Route path="/dashboard/seminarista/cursos" element={<CursosNavegables />} />
         <Route path="/dashboard/seminarista/mis-inscripciones" element={<MisInscripciones />} />
         <Route path="/dashboard/seminarista/mis-reservas" element={<MisReservas />} />
         <Route path="/dashboard/seminarista/mis-solicitudes" element={<MisSolicitudes />} />

@@ -39,7 +39,7 @@ exports.obtenerSolicitudes = async (req, res) => {
 
       // Ejecutar consulta
       const solicitudes = await Solicitud.find(filtros)
-        .populate('solicitante', 'username nombre correo telefono role')
+        .populate('solicitante', 'username nombre apellido correo telefono numeroDocumento tipoDocumento role')
         .populate('categoria', 'nombre  codigo')
         .populate('responsable', 'nombre apellido')
         .sort(sortOptions)
@@ -94,7 +94,10 @@ exports.obtenerSolicitudes = async (req, res) => {
     try {
       const { id } = req.params;
       
-      const solicitud = await Solicitud.findById(id);
+      const solicitud = await Solicitud.findById(id)
+        .populate('solicitante', 'username nombre apellido correo telefono numeroDocumento tipoDocumento role')
+        .populate('categoria', 'nombre codigo')
+        .populate('responsable', 'nombre apellido');
       
       if (!solicitud) {
         return res.status(404).json({

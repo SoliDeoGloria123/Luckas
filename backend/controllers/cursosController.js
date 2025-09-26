@@ -296,3 +296,112 @@ exports.obtenerEstadisticas = async (req, res) => {
     });
   }
 };
+
+// Obtener cursos y programas técnicos combinados para seminaristas
+exports.obtenerCursosYProgramas = async (req, res) => {
+  try {
+    const ProgramaTecnico = require('../models/ProgramaTecnico');
+    
+    const { categoria, estado = 'activo', modalidad, nivel, search } = req.query;
+    
+    // Filtros base
+    const filtroBase = { estado: estado };
+    
+    if (modalidad) filtroBase.modalidad = modalidad;
+    if (nivel) filtroBase.nivel = nivel;
+    
+    // Filtros específicos para cursos
+    const filtroCursos = { ...filtroBase };
+    if (categoria && categoria !== 'todos') {
+      filtroCursos.categoria = categoria;
+    }
+    
+    // Filtros específicos para programas técnicos
+    const filtroProgramas = { ...filtroBase };
+    if (categoria && categoria !== 'todos') {
+      filtroProgramas.area = categoria;
+    }
+    
+    // Búsqueda por texto
+    if (search) {
+      const searchRegex = { $regex: search, $options: 'i' };
+      filtroCursos.$or = [
+        { nombre: searchRegex },
+        { descripcion: searchRegex },
+        { instructor: searchRegex }
+      ];
+      filtroProgramas.$or = [
+        { nombre: searchRegex },
+        { descripcion: searchRegex },
+        { coordinador: searchRegex }
+      ];
+    }
+    
+    // Obtener cursos
+    const cursos = await Curso.find(filtroCursos)
+      .select('nombre descripcion categoria nivel duracion modalidad instructor fechaInicio fechaFin cupos estado precio')
+      .sort({ fechaInicio: 1 });
+    
+    // Obtener programas técnicos
+    const programasTecnicos = await ProgramaTecnico.find(filtroProgramas)
+      .select('nombre descripcion area nivel duracion modalidad coordinador fechaInicio fechaFin cupos estado precio')
+      .sort({ fechaInicio: 1 });
+    
+    // Normalizar datos para que tengan la misma estructura
+    const cursosNormalizados = cursos.map(curso => ({
+      id: curso._id,
+      nombre: curso.nombre,
+      descripcion: curso.descripcion,
+      categoria: curso.categoria,
+      nivel: curso.nivel,
+      duracion: curso.duracion,
+      modalidad: curso.modalidad,
+      instructor: curso.instructor,
+      fechaInicio: curso.fechaInicio,
+      fechaFin: curso.fechaFin,
+      cupos: curso.cupos || { disponibles: 20, ocupados: 0, total: 20 },
+      estado: curso.estado,
+      precio: curso.precio || 0,
+      tipo: 'curso'
+    }));
+    
+    const programasNormalizados = programasTecnicos.map(programa => ({
+      id: programa._id,
+      nombre: programa.nombre,
+      descripcion: programa.descripcion,
+      categoria: programa.area,
+      nivel: programa.nivel,
+      duracion: programa.duracion,
+      modalidad: programa.modalidad,
+      instructor: programa.coordinador,
+      fechaInicio: programa.fechaInicio,
+      fechaFin: programa.fechaFin,
+      cupos: programa.cupos || { disponibles: 15, ocupados: 0, total: 15 },
+      estado: programa.estado,
+      precio: programa.precio || 0,
+      tipo: 'programa_tecnico'
+    }));
+    
+    // Combinar y ordenar por fecha de inicio
+    const todosCursos = [...cursosNormalizados, ...programasNormalizados]
+      .sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio));
+    
+    res.status(200).json({
+      success: true,
+      data: todosCursos,
+      total: todosCursos.length,
+      categorias: {
+        cursos: cursosNormalizados.length,
+        programasTecnicos: programasNormalizados.length
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error al obtener cursos y programas:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};

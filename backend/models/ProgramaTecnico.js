@@ -39,6 +39,9 @@ const programaTecnicoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  instructor: {
+    type: String // Campo de compatibilidad con cursos
+  },
   fechaInicio: {
     type: Date,
     required: true
@@ -101,6 +104,18 @@ const programaTecnicoSchema = new mongoose.Schema({
     duracionHoras: Number,
     orden: Number
   }],
+  metodologia: {
+    type: String,
+    default: ''
+  },
+  evaluacion: {
+    type: String,
+    default: ''
+  },
+  destacado: {
+    type: Boolean,
+    default: false
+  },
   estado: {
     type: String,
     default: 'activo',

@@ -119,7 +119,7 @@ exports.obtenerInscripciones = async (req, res) => {
       console.log('[INSCRIPCIONES] Filtrando por usuario:', req.userId);
     }
     const inscripciones = await Inscripcion.find(filtro)
-      .populate('usuario', 'nombre apellido correo')
+      .populate('usuario', 'nombre apellido correo telefono numeroDocumento tipoDocumento')
       .populate({
         path: 'evento',
         select: 'nombre descripcion imagen imagenUrl precio etiquetas fechaEvento horaInicio horaFin lugar direccion duracionDias cuposTotales cuposDisponibles programa prioridad observaciones categoria',
@@ -140,7 +140,7 @@ exports.obtenerMisInscripciones = async (req, res) => {
   try {
     console.log('[MIS INSCRIPCIONES] Usuario:', req.userId);
     const inscripciones = await Inscripcion.find({ usuario: req.userId })
-      .populate('usuario', 'nombre apellido correo')
+      .populate('usuario', 'nombre apellido correo telefono numeroDocumento tipoDocumento')
       .populate({
         path: 'evento',
         select: 'nombre fechaEvento lugar descripcion imagen imagenUrl precio etiquetas horaInicio horaFin cuposDisponibles cuposTotales direccion programa observaciones',
@@ -231,7 +231,7 @@ exports.obtenerInscripcionesPorUsuario = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Falta el parámetro userId' });
     }
     const inscripciones = await Inscripcion.find({ usuario: userId })
-      .populate('usuario', 'nombre apellido correo')
+      .populate('usuario', 'nombre apellido correo telefono numeroDocumento tipoDocumento')
       .populate({
         path: 'evento',
         select: 'nombre fechaEvento lugar descripcion imagen imagenUrl precio etiquetas horaInicio horaFin cuposDisponibles cuposTotales direccion programa observaciones',

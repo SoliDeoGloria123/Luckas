@@ -12,6 +12,7 @@ const TablaUnificadaSolicitudes = ({
         <tr>
           <th>ID</th>
           <th>Nombre Solicitante</th>
+          <th>Cédula</th>
           <th>Correo</th>
           <th>Teléfono</th>
           <th>Rol</th>
@@ -36,6 +37,13 @@ const TablaUnificadaSolicitudes = ({
               {typeof sol.solicitante === "object"
                 ? sol.solicitante?.username || sol.solicitante?.nombre || sol.solicitante?.correo || sol.solicitante?._id || "N/A"
                 : sol.solicitante || "N/A"}
+            </td>
+            
+            {/* Cédula del solicitante */}
+            <td>
+              {typeof sol.solicitante === "object"
+                ? sol.solicitante?.numeroDocumento || "N/A"
+                : "N/A"}
             </td>
             <td>
               {typeof sol.solicitante === "object"

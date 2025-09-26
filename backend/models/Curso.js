@@ -78,9 +78,24 @@ const cursoSchema = new mongoose.Schema({
   requisitos: [{
     type: String
   }],
+  objetivos: [{
+    type: String
+  }],
   material: [{
     type: String
   }],
+  metodologia: {
+    type: String,
+    default: ''
+  },
+  evaluacion: {
+    type: String,
+    default: ''
+  },
+  destacado: {
+    type: Boolean,
+    default: false
+  },
   estado: {
     type: String,
     default: 'activo',

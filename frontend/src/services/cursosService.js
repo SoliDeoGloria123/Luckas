@@ -36,6 +36,18 @@ export const cursosService = {
     }
   },
 
+  // Obtener cursos y programas técnicos navegables (para seminaristas)
+  obtenerCursosNavegables: async (filtros = {}) => {
+    try {
+      const params = new URLSearchParams(filtros).toString();
+      const response = await axios.get(`${API_URL}/navegables${params ? `?${params}` : ''}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener cursos navegables:', error);
+      throw error.response?.data || error;
+    }
+  },
+
   // Obtener un curso por ID
   obtenerCursoPorId: async (id) => {
     try {

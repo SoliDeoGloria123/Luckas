@@ -19,6 +19,7 @@ const inscripcionRoutes = require('./routes/inscripcionRoutes');
 const ReportesRoutes = require('./routes/reportesRoutes');
 const cursosRoutes = require('./routes/cursosRoutes');
 const programasTecnicosRoutes = require('./routes/programasTecnicosRoutes');
+const programasAcademicosRoutes = require('./routes/programasAcademicosRoutes');
 const reporteguardarRoutes = require('./routes/reporteRoutes');
 
 // Inicializar Express
@@ -54,6 +55,7 @@ app.use('/api/inscripciones', inscripcionRoutes); // Asegúrate de que esta ruta
 app.use('/api/reportes', ReportesRoutes);
 app.use('/api/cursos', cursosRoutes);
 app.use('/api/programas-tecnicos', programasTecnicosRoutes);
+app.use('/api/programas-academicos', programasAcademicosRoutes);
 app.use('/api/reporte', reporteguardarRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 

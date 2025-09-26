@@ -45,10 +45,10 @@ const HeaderTesorero = () => {
                 </div>
 
                 <nav className="main-nav-tesorero">
-                    <a href="/tesorero" className="nav-item-tesorero">Dasbhoard</a>
+                    <a href="/tesorero" className="nav-item-tesorero">Dashboard</a>
                     <a href="/tesorero-Gestiones" className="nav-item-tesorero">Gestiones</a>
                     <a href="" className="nav-item-tesorero">Finanzas</a>
-                    <a href="" onClick={e => { e.preventDefault(); handleGestionar("reportes-tesorero"); }} className="nav-item-tesorero">Reportes</a>
+                    <a href="/tesorero/reportes" className="nav-item-tesorero">Reportes</a>
                 </nav>
 
                 <div className="header-actions-tesorero">

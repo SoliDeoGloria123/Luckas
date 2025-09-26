@@ -1,49 +1,15 @@
 
-import { useState } from "react";
-import {
-  Users,
-  FileText,
-  Calendar,
-  Home,
-  GraduationCap,
-  CheckSquare,
-  UserPlus,
-  BarChart3,
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  ChevronDown,
-  Camera,
-  Save,
-  Edit3,
-  Mail,
-  Phone,
-  MapPin,
-  CalendarIcon,
-  Shield,
-} from "lucide-react";
+import React, { useState } from "react";
 import Header from './Header/Header-tesorero';
 import Footer from '../footer/Footer';
-import {userService} from '../../services/userService';
+import { userService } from '../../services/userService';
+import './Gestion.css';
 
-const Dashboard = () => {
-  const [activeSection, setActiveSection] = useState("dashboard")
-  const [isEditingProfile, setIsEditingProfile] = useState(false)
-  const [profileData, setProfileData] = useState({
-    nombre: "Sofía",
-    apellido: "Martínez",
-    email: "sofia.martinez@luckas.edu.co",
-    telefono: "+57 300 123 4567",
-    documento: "1234567890",
-    tipoDocumento: "Cédula de Ciudadanía",
-    fechaNacimiento: "1990-05-15",
-    direccion: "Calle 123 #45-67, Bogotá",
-    cargo: "Tesorera",
-    departamento: "Administración Financiera",
-    fechaIngreso: "2020-03-01",
-    estado: "Activo",
-  })
-   // Obtener usuario logueado desde localStorage
+const Perfil = () => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    // Obtener usuario logueado desde localStorage
     const usuarioLogueado = (() => {
         try {
             const usuarioStorage = localStorage.getItem('usuario');
@@ -53,278 +19,451 @@ const Dashboard = () => {
         }
     })();
 
+    // Estado para los datos editables
+    const [datosEditados, setDatosEditados] = useState({
+        nombre: usuarioLogueado?.nombre || "",
+        apellido: usuarioLogueado?.apellido || "",
+        correo: usuarioLogueado?.correo || "",
+        telefono: usuarioLogueado?.telefono || "",
+        tipoDocumento: usuarioLogueado?.tipoDocumento || "",
+        numeroDocumento: usuarioLogueado?.numeroDocumento || "",
+        fechaNacimiento: usuarioLogueado?.fechaNacimiento || "",
+    });
 
-  
+    // Estado para cambio de contraseña
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+    });
 
-  return (
+    // Función para guardar cambios
+    const actualizarPerfil = async () => {
+        try {
+            const response = await userService.updateOwnProfile(datosEditados);
+            console.log('Perfil actualizado:', response);
+            
+            // Actualizar localStorage con los nuevos datos
+            const usuarioActualizado = { ...usuarioLogueado, ...datosEditados };
+            localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
+            
+            alert('Perfil actualizado correctamente');
+        } catch (error) {
+            console.error('Error al actualizar el perfil:', error);
+            throw error;
+        }
+    };
 
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <Header />
-        <div className="bg-gradient-to-r  to-purple-600 h-32"></div>
-        <div className="px-6 pb-6">
-          <div className="flex items-center space-x-8 -mt-16">
-            <div className="relative">
-              <div className="w-32 h-32 bg-green-500 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
-                <span className="text-white text-4xl font-bold">S</span>
-              </div>
-              <button className="absolute bottom-2 right-2 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
-                <Camera className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex-1 pt-16">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {usuarioLogueado.nombre} {usuarioLogueado.apellido}
-                  </h1>
-                  <p className="text-gray-600">{usuarioLogueado.role} - {profileData.departamento}</p>
-                  <div className="flex items-center space-x-4 mt-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
-                      {profileData.estado}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      Miembro desde {new Date(profileData.fechaIngreso).toLocaleDateString('es-ES', { 
-                        year: 'numeric', 
-                        month: 'long' 
-                      })}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setIsEditingProfile(!isEditingProfile)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2 transition-colors"
-                >
-                  <Edit3 className="w-4 h-4" />
-                  <span>{isEditingProfile ? "Cancelar" : "Editar Perfil"}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+    const handleSave = async () => {
+        try {
+            await actualizarPerfil();
+            setShowSuccess(true);
+            setIsEditing(false);
+            setTimeout(() => setShowSuccess(false), 3000);
+        } catch (error) {
+            console.error('Error al guardar el perfil:', error);
+            alert('Error al guardar los cambios');
+        }
+    };
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Personal Information */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Información Personal</h2>
-                {isEditingProfile && (
-                  <button
-                    onClick={() => {
-                      setIsEditingProfile(false)
-                      // Here you would typically save the data
-                    }}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2 transition-colors"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>Guardar</span>
-                  </button>
+    const handleInputChange = (field, value) => {
+        setDatosEditados((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleCancelEdit = () => {
+        // Resetear los datos editados a los valores originales
+        setDatosEditados({
+            nombre: usuarioLogueado?.nombre || "",
+            apellido: usuarioLogueado?.apellido || "",
+            correo: usuarioLogueado?.correo || "",
+            telefono: usuarioLogueado?.telefono || "",
+            tipoDocumento: usuarioLogueado?.tipoDocumento || "",
+            numeroDocumento: usuarioLogueado?.numeroDocumento || "",
+            fechaNacimiento: usuarioLogueado?.fechaNacimiento || "",
+        });
+        // Resetear campos de contraseña
+        setPasswordData({
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: ""
+        });
+        setIsEditing(false);
+    };
+
+    const handlePasswordChange = (field, value) => {
+        setPasswordData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const cambiarContrasena = async () => {
+        try {
+            if (!passwordData.currentPassword || !passwordData.newPassword) {
+                alert('Por favor complete todos los campos de contraseña');
+                return;
+            }
+
+            if (passwordData.newPassword !== passwordData.confirmPassword) {
+                alert('Las contraseñas nuevas no coinciden');
+                return;
+            }
+
+            if (passwordData.newPassword.length < 6) {
+                alert('La nueva contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            const response = await userService.changePassword({
+                currentPassword: passwordData.currentPassword,
+                newPassword: passwordData.newPassword
+            });
+
+            console.log('Contraseña cambiada:', response);
+            alert('Contraseña cambiada correctamente');
+            
+            // Limpiar campos de contraseña
+            setPasswordData({
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: ""
+            });
+        } catch (error) {
+            console.error('Error al cambiar contraseña:', error);
+            alert(error.message || 'Error al cambiar la contraseña');
+        }
+    };
+
+    return (
+        <>
+            <Header />
+            <div className="min-h-screen bg-gray-50">
+                {/* Success Notification */}
+                {showSuccess && (
+                    <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Perfil actualizado exitosamente
+                    </div>
                 )}
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
-                  {isEditingProfile ? (
-                    <input
-                      type="text"
-                      value={usuarioLogueado.nombre}
-                      onChange={(e) => setProfileData({...usuarioLogueado, nombre: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{usuarioLogueado.nombre}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
-                  {isEditingProfile ? (
-                    <input
-                      type="text"
-                      value={usuarioLogueado.apellido}
-                      onChange={(e) => setProfileData({...usuarioLogueado, apellido: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{usuarioLogueado.apellido}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
-                  {isEditingProfile ? (
-                    <input
-                      type="email"
-                      value={usuarioLogueado.email}
-                      onChange={(e) => setProfileData({...usuarioLogueado, email: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      <p className="text-gray-900">{usuarioLogueado.correo}</p>
+                {/* Header */}
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                    <div className="max-w-7xl mx-auto px-6 py-8">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-6">
+                                <div className="relative">
+                                    <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-3xl font-bold backdrop-blur-sm">
+                                        {usuarioLogueado?.nombre?.charAt(0)}
+                                        {usuarioLogueado?.apellido?.charAt(0)}
+                                    </div>
+                                    <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                                    </div>
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold">
+                                        {usuarioLogueado?.nombre} {usuarioLogueado?.apellido}
+                                    </h1>
+                                    <p className="text-blue-100 text-lg">{usuarioLogueado?.role}</p>
+                                    <div className="flex items-center gap-4 mt-2 text-blue-100">
+                                        <div className="flex items-center gap-1">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                                />
+                                            </svg>
+                                            {usuarioLogueado?.correo}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => isEditing ? handleCancelEdit() : setIsEditing(true)}
+                                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h4a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586a2 2 0 002 2h6a2 2 0 002-2L16 7"
+                                    />
+                                </svg>
+                                {isEditing ? "Cancelar" : "Editar Perfil"}
+                            </button>
+                        </div>
                     </div>
-                  )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
-                  {isEditingProfile ? (
-                    <input
-                      type="tel"
-                      value={usuarioLogueado.telefono}
-                      onChange={(e) => setProfileData({...usuarioLogueado, telefono: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <p className="text-gray-900">{usuarioLogueado.telefono}</p>
+                <div className="max-w-7xl mx-auto px-6 py-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Main Content */}
+                        <div className="lg:col-span-2 space-y-6">
+                            {/* Personal Information */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900">Información Personal</h3>
+                                        <p className="text-sm text-gray-600">Datos básicos del tesorero</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                                        {isEditing ? (
+                                            <input
+                                                type="text"
+                                                value={datosEditados.nombre}
+                                                onChange={(e) => handleInputChange("nombre", e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-3">{usuarioLogueado?.nombre}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+                                        {isEditing ? (
+                                            <input
+                                                type="text"
+                                                value={datosEditados.apellido}
+                                                onChange={(e) => handleInputChange("apellido", e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-3">{usuarioLogueado?.apellido}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
+                                        {isEditing ? (
+                                            <select
+                                                value={datosEditados.tipoDocumento}
+                                                onChange={(e) => handleInputChange("tipoDocumento", e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            >
+                                                <option value="Cédula de ciudadanía">Cédula de Ciudadanía</option>
+                                                <option value="Cédula de extranjería">Cédula de Extranjería</option>
+                                                <option value="Pasaporte">Pasaporte</option>
+                                                <option value="Tarjeta de identidad">Tarjeta de Identidad</option>
+                                            </select>
+                                        ) : (
+                                            <p className="text-gray-900 py-3">{usuarioLogueado?.tipoDocumento}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
+                                        {isEditing ? (
+                                            <input
+                                                type="text"
+                                                value={datosEditados.numeroDocumento}
+                                                onChange={(e) => handleInputChange("numeroDocumento", e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-3">{usuarioLogueado?.numeroDocumento}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                                        {isEditing ? (
+                                            <input
+                                                type="tel"
+                                                value={datosEditados.telefono}
+                                                onChange={(e) => handleInputChange("telefono", e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-3">{usuarioLogueado?.telefono}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
+                                        {isEditing ? (
+                                            <input
+                                                type="date"
+                                                value={datosEditados.fechaNacimiento ? datosEditados.fechaNacimiento.split('T')[0] : ''}
+                                                onChange={(e) => handleInputChange("fechaNacimiento", e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-3">{usuarioLogueado?.fechaNacimiento ? new Date(usuarioLogueado.fechaNacimiento).toLocaleDateString() : 'No especificada'}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                                        {isEditing ? (
+                                            <input
+                                                type="email"
+                                                value={datosEditados.correo}
+                                                onChange={(e) => handleInputChange("correo", e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            />
+                                        ) : (
+                                            <p className="text-gray-900 py-3">{usuarioLogueado?.correo}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Botón de guardar */}
+                                {isEditing && (
+                                    <div className="flex justify-end mt-6 pt-6 border-t border-gray-200">
+                                        <button
+                                            onClick={handleSave}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Guardar Cambios
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Security Section */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900">Seguridad</h3>
+                                        <p className="text-sm text-gray-600">Gestiona tu contraseña y configuraciones de seguridad</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+                                        <input
+                                            type="password"
+                                            value={passwordData.currentPassword}
+                                            onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            placeholder="Ingresa tu contraseña actual"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                                            <input
+                                                type="password"
+                                                value={passwordData.newPassword}
+                                                onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                                placeholder="Nueva contraseña"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
+                                            <input
+                                                type="password"
+                                                value={passwordData.confirmPassword}
+                                                onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                                placeholder="Confirmar nueva contraseña"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end pt-4">
+                                        <button
+                                            onClick={cambiarContrasena}
+                                            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                                />
+                                            </svg>
+                                            Cambiar Contraseña
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Sidebar */}
+                        <div className="space-y-6">
+                            {/* Professional Info */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Información Profesional</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
+                                        <p className="text-gray-900">{usuarioLogueado?.role}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
+                                        <p className="text-gray-900">Administración Financiera</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
+                                            Activo
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Account Stats */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas de Cuenta</h3>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-gray-600">Última conexión</span>
+                                        <span className="text-sm font-medium text-gray-900">Hoy</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-gray-600">Perfil completado</span>
+                                        <span className="text-sm font-medium text-green-600">95%</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-gray-600">Miembro desde</span>
+                                        <span className="text-sm font-medium text-gray-900">2020</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  )}
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
-                  {isEditingProfile ? (
-                    <select
-                      value={usuarioLogueado.tipoDocumento}
-                      onChange={(e) => setProfileData({...usuarioLogueado, tipoDocumento: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option>Cédula de Ciudadanía</option>
-                      <option>Cédula de Extranjería</option>
-                      <option>Pasaporte</option>
-                    </select>
-                  ) : (
-                    <p className="text-gray-900">{usuarioLogueado.tipoDocumento}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
-                  {isEditingProfile ? (
-                    <input
-                      type="text"
-                      value={usuarioLogueado.documento}
-                      onChange={(e) => setProfileData({...usuarioLogueado, documento: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{usuarioLogueado.numeroDocumento}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
-                  {isEditingProfile ? (
-                    <input
-                      type="date"
-                      value={usuarioLogueado.fechaNacimiento}
-                      onChange={(e) => setProfileData({...usuarioLogueado, fechaNacimiento: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <CalendarIcon className="w-4 h-4 text-gray-400" />
-                      <p className="text-gray-900">
-                        {new Date(usuarioLogueado.fechaNacimiento).toLocaleDateString('es-ES')}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
-                  {isEditingProfile ? (
-                    <input
-                      type="text"
-                      value={profileData.direccion}
-                      onChange={(e) => setProfileData({...profileData, direccion: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="w-4 h-4 text-gray-400" />
-                      <p className="text-gray-900">{profileData.direccion}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
-          </div>
+            <Footer />
+        </>
+    );
+};
 
-          {/* Professional Information & Quick Stats */}
-          <div className="space-y-6">
-            {/* Professional Info */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Información Profesional</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-4 h-4 text-gray-400" />
-                    <p className="text-gray-900">{usuarioLogueado.role}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
-                  <p className="text-gray-900">{profileData.departamento}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Ingreso</label>
-                  <p className="text-gray-900">
-                    {new Date(profileData.fechaIngreso).toLocaleDateString('es-ES')}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas Rápidas</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Gestiones Activas</span>
-                  <span className="text-lg font-semibold text-blue-600">10</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Reportes Generados</span>
-                  <span className="text-lg font-semibold text-green-600">25</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Tareas Completadas</span>
-                  <span className="text-lg font-semibold text-purple-600">156</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Security Settings */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Configuración de Seguridad</h3>
-              <div className="space-y-3">
-                <button className="w-full text-left px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">Cambiar Contraseña</span>
-                    <ChevronDown className="w-4 h-4 text-gray-400 rotate-[-90deg]" />
-                  </div>
-                </button>
-                <button className="w-full text-left px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">Autenticación de Dos Factores</span>
-                    <ChevronDown className="w-4 h-4 text-gray-400 rotate-[-90deg]" />
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <Footer />
-      </div>
-  )
-  
-}
-
-export default Dashboard
+export default Perfil;
+             

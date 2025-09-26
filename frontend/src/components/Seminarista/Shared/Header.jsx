@@ -41,9 +41,8 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
   };
 
   const handleModificarPerfil = () => {
-    // Emit event to parent component
-    const event = new CustomEvent('modificar-perfil');
-    window.dispatchEvent(event);
+    // Navegar directamente a la página de perfil
+    window.location.href = '/dashboard/seminarista/Mi-Perfil';
     setMenuUsuarioAbierto(false);
   };
 
@@ -101,6 +100,12 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
             className={`nav-item-seminario${window.location.pathname === '/dashboard/seminarista/cabanas' ? ' active' : ''}`}
           >
             <span className="nav-icon-seminario">🏠</span>Cabañas
+          </a>
+          <a
+            href="/dashboard/seminarista/cursos"
+            className={`nav-item-seminario${window.location.pathname === '/dashboard/seminarista/cursos' ? ' active' : ''}`}
+          >
+            <span className="nav-icon-seminario">📚</span>Cursos
           </a>
           <a href="#" className="nav-item-seminario mis-gestiones-btn" onClick={e => { e.preventDefault(); setShowGestionesDropdown(prev => !prev); }}
           >

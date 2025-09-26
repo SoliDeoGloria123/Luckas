@@ -29,9 +29,9 @@ const DashboardTesorero = () => {
   const handleGreservasClick =() =>{
     navigate('/tesorero/reservas')
   };
-  /*const handleGcursosClick =() =>{
+  const handleGcursosClick =() =>{
     navigate('/tesorero/cursos')
-  };*/
+  };
   const handleGinscripcionClick =() =>{
     navigate('/tesorero/inscripcion')
   };
@@ -267,7 +267,7 @@ const DashboardTesorero = () => {
                         <h3>Gestionar Cursos</h3>
                         <p>Administrar programas académicos</p>
                       </div>
-                      <button className="function-action" >
+                      <button className="function-action" onClick={handleGcursosClick}>
                         Gestionar →
                       </button>
                     </div>

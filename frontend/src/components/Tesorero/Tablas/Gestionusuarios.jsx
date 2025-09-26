@@ -10,6 +10,8 @@ import Footer from '../../footer/Footer'
 const Gestionusuarios = () => {
   // Datos de ejemplo
   const [usuarios, setUsuarios] = useState([]);
+  const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModalUsuario] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
@@ -27,13 +29,46 @@ const Gestionusuarios = () => {
       const data = await userService.getAllUsers();
       const usuariosData = Array.isArray(data.data) ? data.data : [];
       setUsuarios(usuariosData);
+      setUsuariosFiltrados(usuariosData);
     } catch (error) {
       console.error("Error al obtener los usuarios de la base de datos", error.mensage);
     }
   };
+
+  // Función de búsqueda por número de cédula, nombre, apellido y correo
+  const handleSearch = (searchValue) => {
+    setSearchTerm(searchValue);
+    if (!searchValue.trim()) {
+      setUsuariosFiltrados(usuarios);
+    } else {
+      const searchLower = searchValue.toLowerCase().trim();
+      const filteredUsers = usuarios.filter(user => {
+        const numeroDocumento = user.numeroDocumento?.toString().toLowerCase();
+        const nombre = user.nombre?.toLowerCase();
+        const apellido = user.apellido?.toLowerCase();
+        const correo = user.correo?.toLowerCase();
+        
+        return numeroDocumento?.includes(searchLower) ||
+               nombre?.includes(searchLower) ||
+               apellido?.includes(searchLower) ||
+               correo?.includes(searchLower);
+      });
+      setUsuariosFiltrados(filteredUsers);
+    }
+  };
+
   useEffect(() => {
     obtenerUsuarios();
   }, []);
+
+  // Efecto para actualizar usuarios filtrados cuando cambia la lista de usuarios
+  useEffect(() => {
+    if (searchTerm) {
+      handleSearch(searchTerm);
+    } else {
+      setUsuariosFiltrados(usuarios);
+    }
+  }, [usuarios]);
 
   const handleSubmit = async (Usuariodata) => {
     try {
@@ -117,7 +152,12 @@ const Gestionusuarios = () => {
         <div className="search-filters-tesorero">
           <div className="search-input-container-tesorero">
             <i className="fas fa-search"></i>
-            <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+            <input 
+              type="text" 
+              placeholder="Buscar por cédula, nombre, apellido o correo..." 
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
           </div>
           <select className="filter-select">
             <option value="">Todos los roles</option>
@@ -142,6 +182,21 @@ const Gestionusuarios = () => {
       </div>
 
       <div className="table-container-tesorero">
+        {searchTerm && (
+          <div className="search-results-info" style={{
+            padding: '10px 15px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '6px',
+            marginBottom: '15px',
+            fontSize: '14px',
+            color: '#666'
+          }}>
+            {usuariosFiltrados.length === 0 
+              ? `No se encontraron usuarios que coincidan con "${searchTerm}"`
+              : `Se encontraron ${usuariosFiltrados.length} usuario${usuariosFiltrados.length === 1 ? '' : 's'} que coinciden con "${searchTerm}"`
+            }
+          </div>
+        )}
         <table className="users-table-tesorero">
           <thead>
             <tr>
@@ -161,12 +216,14 @@ const Gestionusuarios = () => {
             </tr>
           </thead>
           <tbody id="usersTableBody">
-            {usuarios.length === 0 ? (
+            {usuariosFiltrados.length === 0 ? (
               <tr>
-                <td colSpan={9}>No hay usuarios para mostrar</td>
+                <td colSpan={11}>
+                  {searchTerm ? 'No se encontraron usuarios con ese número de cédula' : 'No hay usuarios para mostrar'}
+                </td>
               </tr>
             ) : (
-              usuarios.map((user) => (
+              usuariosFiltrados.map((user) => (
                 <tr hey={user._id}>
                   <td>
                     <input type="checkbox" />

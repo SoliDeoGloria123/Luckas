@@ -7,110 +7,233 @@ import { userService } from '../../../services/userService';
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-        nombre: "Luis",
-    apellido: "Muguel",
-    tipoDocumento: "Cédula de Ciudadanía",
-    numeroDocumento: "435412543534534",
-    telefono: "120524521546",
-    correo: "luis@gmail.com",
-    fechaNacimiento: "2005-05-05",
-    direccion: "Carrera 15 #32-45, Medellín",
-    nivelActual: "Filosofía II",
-    fechaIngreso: "2023-02-01",
-    directorEspiritual: "Padre Miguel",
-    idiomas: "Español, Inglés",
-    especialidad: "Teología Pastoral",
-  });
-  const [formData, setFormData] = useState({});
-  
-  const [showPassword, setShowPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false);
 
-
-
+  // Obtener usuario logueado desde localStorage
   const usuarioLogueado = (() => {
     try {
       const usuarioStorage = localStorage.getItem('usuario');
-      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
-    } catch {
+      const usuario = usuarioStorage ? JSON.parse(usuarioStorage) : null;
+      console.log('Usuario logueado:', usuario);
+      return usuario;
+    } catch (error) {
+      console.error('Error al obtener usuario de localStorage:', error);
       return null;
     }
   })();
 
-  const handleSaveChanges = async () => {
-  try {
-    const userId = localStorage.getItem("userId");
-    await userService.updateUser(userId, formData);
-    alert("Perfil actualizado correctamente");
-    setProfileData(formData);
-    setIsEditing(false);
-  } catch (error) {
-    alert("Error al actualizar el perfil: " + error.message);
-  }
-};
+  // Estado para los datos editables
+  const [datosEditados, setDatosEditados] = useState({
+    nombre: usuarioLogueado?.nombre || "",
+    apellido: usuarioLogueado?.apellido || "",
+    correo: usuarioLogueado?.correo || "",
+    telefono: usuarioLogueado?.telefono || "",
+    tipoDocumento: usuarioLogueado?.tipoDocumento || "",
+    numeroDocumento: usuarioLogueado?.numeroDocumento || "",
+    fechaNacimiento: usuarioLogueado?.fechaNacimiento ? usuarioLogueado.fechaNacimiento.split('T')[0] : "",
+    direccion: usuarioLogueado?.direccion || "",
+    // Campos específicos del seminarista
+    nivelAcademico: usuarioLogueado?.nivelAcademico || "",
+    fechaIngreso: usuarioLogueado?.fechaIngreso ? usuarioLogueado.fechaIngreso.split('T')[0] : "",
+    directorEspiritual: usuarioLogueado?.directorEspiritual || "",
+    idiomas: usuarioLogueado?.idiomas || "",
+    especialidad: usuarioLogueado?.especialidad || ""
+  });
 
+  console.log('Estado isEditing:', isEditing);
+  console.log('Datos editados:', datosEditados);
 
-  const [securityData, setSecurityData] = useState({
+  // Estado para cambio de contraseña
+  const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
-    confirmPassword: "",
+    confirmPassword: ""
+  });
+
+  // Datos estáticos del perfil (solo lectura)
+  const [profileData, setProfileData] = useState({
+    nombre: usuarioLogueado?.nombre || "Luis",
+    apellido: usuarioLogueado?.apellido || "Muguel", 
+    tipoDocumento: usuarioLogueado?.tipoDocumento || "Cédula de Ciudadanía",
+    numeroDocumento: usuarioLogueado?.numeroDocumento || "435412543534534",
+    telefono: usuarioLogueado?.telefono || "120524521546",
+    correo: usuarioLogueado?.correo || "luis@gmail.com",
+    fechaNacimiento: usuarioLogueado?.fechaNacimiento || "2005-05-05",
+    direccion: usuarioLogueado?.direccion || "Carrera 15 #32-45, Medellín",
+    nivelActual: usuarioLogueado?.nivelAcademico || "Filosofía II",
+    fechaIngreso: usuarioLogueado?.fechaIngreso || "2023-02-01",
+    directorEspiritual: usuarioLogueado?.directorEspiritual || "Padre Miguel",
+    idiomas: usuarioLogueado?.idiomas || "Español, Inglés",
+    especialidad: usuarioLogueado?.especialidad || "Teología Pastoral"
+  });
+
+  const [formData, setFormData] = useState({});
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Función para guardar cambios del perfil
+  const actualizarPerfil = async () => {
+    try {
+      const response = await userService.updateOwnProfile(datosEditados);
+      console.log('Perfil actualizado:', response);
+      
+      // Actualizar localStorage con los nuevos datos
+      const usuarioActualizado = { ...usuarioLogueado, ...datosEditados };
+      localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
+      
+      // Actualizar los datos mostrados
+      setProfileData(prev => ({ ...prev, ...datosEditados }));
+      
+      alert('Perfil actualizado correctamente');
+    } catch (error) {
+      console.error('Error al actualizar el perfil:', error);
+      throw error;
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      await actualizarPerfil();
+      setShowSuccess(true);
+      setIsEditing(false);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error al guardar el perfil:', error);
+      alert('Error al guardar los cambios');
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    console.log('handleInputChange llamado:', field, value);
+    setDatosEditados((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCancelEdit = () => {
+    // Resetear los datos editados a los valores originales
+    setDatosEditados({
+      nombre: usuarioLogueado?.nombre || "",
+      apellido: usuarioLogueado?.apellido || "",
+      correo: usuarioLogueado?.correo || "",
+      telefono: usuarioLogueado?.telefono || "",
+      tipoDocumento: usuarioLogueado?.tipoDocumento || "",
+      numeroDocumento: usuarioLogueado?.numeroDocumento || "",
+      fechaNacimiento: usuarioLogueado?.fechaNacimiento ? usuarioLogueado.fechaNacimiento.split('T')[0] : "",
+      direccion: usuarioLogueado?.direccion || "",
+      nivelAcademico: usuarioLogueado?.nivelAcademico || "",
+      fechaIngreso: usuarioLogueado?.fechaIngreso ? usuarioLogueado.fechaIngreso.split('T')[0] : "",
+      directorEspiritual: usuarioLogueado?.directorEspiritual || "",
+      idiomas: usuarioLogueado?.idiomas || "",
+      especialidad: usuarioLogueado?.especialidad || ""
+    });
+    // Resetear campos de contraseña
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: ""
+    });
+    setIsEditing(false);
+  };
+
+  const handlePasswordChange = (field, value) => {
+    setPasswordData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const cambiarContrasena = async () => {
+    try {
+      if (!passwordData.currentPassword || !passwordData.newPassword) {
+        alert('Por favor, completa todos los campos de contraseña');
+        return;
+      }
+
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        alert('Las contraseñas nuevas no coinciden');
+        return;
+      }
+
+      if (passwordData.newPassword.length < 6) {
+        alert('La nueva contraseña debe tener al menos 6 caracteres');
+        return;
+      }
+
+      const response = await userService.changePassword({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+
+      alert('Contraseña cambiada correctamente');
+      
+      // Resetear campos de contraseña
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      });
+
+    } catch (error) {
+      console.error('Error al cambiar contraseña:', error);
+      alert('Error al cambiar la contraseña: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  // Configuraciones de seguridad
+  const [securityData, setSecurityData] = useState({
     emailNotifications: true,
     academicReminders: true,
     theme: "Claro",
     language: "Español",
-  })
+  });
 
-  const handleSave = () => {
-    setShowSuccess(true)
-    setIsEditing(false)
-    setTimeout(() => setShowSuccess(false), 3000)
-  }
-
+  // Estadísticas del seminarista
   const seminaristaStats = [
     { label: "Eventos Participados", value: "24", color: "bg-blue-500" },
     { label: "Reservas Activas", value: "3", color: "bg-green-500" },
     { label: "Solicitudes", value: "8", color: "bg-purple-500" },
     { label: "Inscripciones", value: "12", color: "bg-orange-500" },
-  ]
+  ];
 
+  // useEffect para cargar datos del usuario al iniciar
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    console.log("userId en localStorage:", userId);
-    if (userId) {
-      userService.getUserById(userId)
-        .then(data => {
-          console.log("Datos recibidos del backend:", data);
-          const user = data.user || {};
-          const mappedData = {
-            nombre: user.nombre,
-            currentLevel: user.nivelAcademico || "",
-            correo: user.correo,
-            phone: user.telefono,
-            address: user.direccion,
-            admissionDate: user.fechaIngreso,
-            documentId: user.numeroDocumento,
-            dob: user.fechaNacimiento,
-            pob: user.lugarNacimiento,
-            spiritualDirector: user.directorEspiritual,
-            languages: user.idiomas,
-            eventsCount: user.eventosCount || 0,
-            reservationsCount: user.reservasCount || 0,
-            requestsCount: user.solicitudesCount || 0,
-            subscriptionsCount: user.inscripcionesCount || 0,
-          };
-          setProfileData(mappedData);
-          setFormData(mappedData);
-        })
-        .catch(err => {
-          console.error("Error al obtener datos del usuario:", err);
-        });
-    } else {
-      console.warn("No hay userId en localStorage, usuario no logueado");
+    // Si hay datos en localStorage, actualizar los estados
+    if (usuarioLogueado) {
+      console.log("Datos del usuario logueado:", usuarioLogueado);
+      
+      // Actualizar datos editables
+      setDatosEditados({
+        nombre: usuarioLogueado.nombre || "",
+        apellido: usuarioLogueado.apellido || "",
+        correo: usuarioLogueado.correo || "",
+        telefono: usuarioLogueado.telefono || "",
+        tipoDocumento: usuarioLogueado.tipoDocumento || "",
+        numeroDocumento: usuarioLogueado.numeroDocumento || "",
+        fechaNacimiento: usuarioLogueado.fechaNacimiento || "",
+        direccion: usuarioLogueado.direccion || "",
+        nivelAcademico: usuarioLogueado.nivelAcademico || "",
+        fechaIngreso: usuarioLogueado.fechaIngreso || "",
+        directorEspiritual: usuarioLogueado.directorEspiritual || "",
+        idiomas: usuarioLogueado.idiomas || "",
+        especialidad: usuarioLogueado.especialidad || ""
+      });
+
+      // Actualizar datos de visualización
+      setProfileData({
+        nombre: usuarioLogueado.nombre || "Luis",
+        apellido: usuarioLogueado.apellido || "Muguel", 
+        tipoDocumento: usuarioLogueado.tipoDocumento || "Cédula de Ciudadanía",
+        numeroDocumento: usuarioLogueado.numeroDocumento || "435412543534534",
+        telefono: usuarioLogueado.telefono || "120524521546",
+        correo: usuarioLogueado.correo || "luis@gmail.com",
+        fechaNacimiento: usuarioLogueado.fechaNacimiento || "2005-05-05",
+        direccion: usuarioLogueado.direccion || "Carrera 15 #32-45, Medellín",
+        nivelActual: usuarioLogueado.nivelAcademico || "Filosofía II",
+        fechaIngreso: usuarioLogueado.fechaIngreso || "2023-02-01",
+        directorEspiritual: usuarioLogueado.directorEspiritual || "Padre Miguel",
+        idiomas: usuarioLogueado.idiomas || "Español, Inglés",
+        especialidad: usuarioLogueado.especialidad || "Teología Pastoral"
+      });
     }
-  }, []);
+  }, [usuarioLogueado]);
 
   // Formatea la fecha para mostrarla en formato legible
   const formatDate = (dateStr) => {
@@ -162,7 +285,10 @@ const ProfilePage = () => {
               </div>
             </div>
             <button
-              onClick={() => setIsEditing(!isEditing)}
+              onClick={() => {
+                console.log('Botón editar clickeado, isEditing actual:', isEditing);
+                setIsEditing(!isEditing);
+              }}
               className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
             >
               <User className="w-5 h-5" />
@@ -225,12 +351,16 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={profileData.nombre}
-                      onChange={(e) => setProfileData({ ...profileData, nombre: e.target.value })}
+                      value={datosEditados.nombre}
+                      onChange={(e) => {
+                        console.log('Cambiando nombre a:', e.target.value);
+                        handleInputChange('nombre', e.target.value);
+                      }}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Escribe tu nombre aquí"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{usuarioLogueado.nombre}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.nombre}</p>
                   )}
                 </div>
 
@@ -239,12 +369,12 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={profileData.apellido}
-                      onChange={(e) => setProfileData({ ...profileData, apellido: e.target.value })}
+                      value={datosEditados.apellido}
+                      onChange={(e) => handleInputChange('apellido', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{usuarioLogueado.apellido}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.apellido}</p>
                   )}
                 </div>
 
@@ -252,16 +382,17 @@ const ProfilePage = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
                   {isEditing ? (
                     <select
-                      value={profileData.tipoDocumento}
-                      onChange={(e) => setProfileData({ ...profileData, tipoDocumento: e.target.value })}
+                      value={datosEditados.tipoDocumento}
+                      onChange={(e) => handleInputChange('tipoDocumento', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
-                      <option>Cédula de Ciudadanía</option>
-                      <option>Cédula de Extranjería</option>
-                      <option>Pasaporte</option>
+                      <option value="Cédula de Ciudadanía">Cédula de Ciudadanía</option>
+                      <option value="Cédula de Extranjería">Cédula de Extranjería</option>
+                      <option value="Pasaporte">Pasaporte</option>
+                      <option value="Tarjeta de identidad">Tarjeta de identidad</option>
                     </select>
                   ) : (
-                    <p className="text-gray-900 py-3">{usuarioLogueado.tipoDocumento}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.tipoDocumento}</p>
                   )}
                 </div>
 
@@ -270,12 +401,12 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={profileData.numeroDocumento}
-                      onChange={(e) => setProfileData({ ...profileData, numeroDocumento: e.target.value })}
+                      value={datosEditados.numeroDocumento}
+                      onChange={(e) => handleInputChange('numeroDocumento', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{usuarioLogueado.numeroDocumento}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.numeroDocumento}</p>
                   )}
                 </div>
 
@@ -284,12 +415,12 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="tel"
-                      value={profileData.telefono}
-                      onChange={(e) => setProfileData({ ...profileData, telefono: e.target.value })}
+                      value={datosEditados.telefono}
+                      onChange={(e) => handleInputChange('telefono', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{usuarioLogueado.telefono}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.telefono}</p>
                   )}
                 </div>
 
@@ -298,12 +429,12 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="email"
-                      value={profileData.correo}
-                      onChange={(e) => setProfileData({ ...profileData, correo: e.target.value })}
+                      value={datosEditados.correo}
+                      onChange={(e) => handleInputChange('correo', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{usuarioLogueado.correo}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.correo}</p>
                   )}
                 </div>
 
@@ -312,12 +443,12 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="date"
-                      value={profileData.fechaNacimiento}
-                      onChange={(e) => setProfileData({ ...profileData, fechaNacimiento: e.target.value })}
+                      value={datosEditados.fechaNacimiento}
+                      onChange={(e) => handleInputChange('fechaNacimiento', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{new Date(usuarioLogueado.fechaNacimiento).toLocaleDateString()}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.fechaNacimiento ? new Date(datosEditados.fechaNacimiento).toLocaleDateString() : ''}</p>
                   )}
                 </div>
 
@@ -326,12 +457,12 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={profileData.direccion}
-                      onChange={(e) => setProfileData({ ...profileData, direccion: e.target.value })}
+                      value={datosEditados.direccion}
+                      onChange={(e) => handleInputChange('direccion', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{profileData.direccion}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.direccion}</p>
                   )}
                 </div>
               </div>
@@ -349,8 +480,8 @@ const ProfilePage = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nivel Actual</label>
                   {isEditing ? (
                     <select
-                      value={profileData.nivelActual}
-                      onChange={(e) => setProfileData({ ...profileData, nivelActual: e.target.value })}
+                      value={datosEditados.nivelAcademico}
+                      onChange={(e) => handleInputChange('nivelAcademico', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option>Filosofía I</option>
@@ -361,7 +492,7 @@ const ProfilePage = () => {
                       <option>Teología IV</option>
                     </select>
                   ) : (
-                    <p className="text-gray-900 py-3">{profileData.nivelActual}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.nivelAcademico}</p>
                   )}
                 </div>
 
@@ -375,12 +506,12 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={profileData.directorEspiritual}
-                      onChange={(e) => setProfileData({ ...profileData, directorEspiritual: e.target.value })}
+                      value={datosEditados.directorEspiritual}
+                      onChange={(e) => handleInputChange('directorEspiritual', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{profileData.directorEspiritual}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.directorEspiritual}</p>
                   )}
                 </div>
 
@@ -389,12 +520,12 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={profileData.idiomas}
-                      onChange={(e) => setProfileData({ ...profileData, idiomas: e.target.value })}
+                      value={datosEditados.idiomas}
+                      onChange={(e) => handleInputChange('idiomas', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{profileData.idiomas}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.idiomas}</p>
                   )}
                 </div>
 
@@ -403,12 +534,12 @@ const ProfilePage = () => {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={profileData.especialidad}
-                      onChange={(e) => setProfileData({ ...profileData, especialidad: e.target.value })}
+                      value={datosEditados.especialidad}
+                      onChange={(e) => handleInputChange('especialidad', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{profileData.especialidad}</p>
+                    <p className="text-gray-900 py-3">{datosEditados.especialidad}</p>
                   )}
                 </div>
               </div>
@@ -428,8 +559,8 @@ const ProfilePage = () => {
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
-                        value={securityData.currentPassword}
-                        onChange={(e) => setSecurityData({ ...securityData, currentPassword: e.target.value })}
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
                       />
                       <button
@@ -447,8 +578,8 @@ const ProfilePage = () => {
                     <div className="relative">
                       <input
                         type={showNewPassword ? "text" : "password"}
-                        value={securityData.newPassword}
-                        onChange={(e) => setSecurityData({ ...securityData, newPassword: e.target.value })}
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
                       />
                       <button
@@ -461,13 +592,13 @@ const ProfilePage = () => {
                     </div>
                   </div>
 
-                  <div className="md:col-span-2">
+                    <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
                     <div className="relative">
                       <input
                         type={showConfirmPassword ? "text" : "password"}
-                        value={securityData.confirmPassword}
-                        onChange={(e) => setSecurityData({ ...securityData, confirmPassword: e.target.value })}
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
                       />
                       <button
@@ -479,6 +610,16 @@ const ProfilePage = () => {
                       </button>
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <button
+                    onClick={cambiarContrasena}
+                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+                  >
+                    <Award className="w-5 h-5" />
+                    <span>Cambiar Contraseña</span>
+                  </button>
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-gray-200">
@@ -534,7 +675,7 @@ const ProfilePage = () => {
             {isEditing && (
               <div className="flex justify-end space-x-4">
                 <button
-                  onClick={() => setIsEditing(false)}
+                  onClick={handleCancelEdit}
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Cancelar
