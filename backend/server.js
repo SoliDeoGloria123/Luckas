@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
-const http = require('http');
 const { Server } = require('socket.io');
 const config = require('./config');
 const{MongoClient, ObjectId} = require('mongodb');
@@ -33,7 +32,7 @@ const mongoClient = new MongoClient(process.env.MONGODB_URI);
     console.log('Conexión directa a mongoDB establecida'); // Corregir typo
 })();
 
-const cors = require('cors');
+
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
