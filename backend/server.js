@@ -33,8 +33,13 @@ const mongoClient = new MongoClient(process.env.MONGODB_URI);
     console.log('Conexión directa a mongoDB establecida'); // Corregir typo
 })();
 
+const cors = require('cors');
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
+
 //Middlewares
-app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -74,18 +79,16 @@ app.get('/login', (req, res) => {
 });
 
 // Manejo de rutas no encontradas
-app.get('*', (req, res) => {
-    // Si la ruta no es de API, devolver 404 (no servir HTML)
+app.all('*', (req, res, next) => {
     if (!req.path.startsWith('/api/')) {
-        res.status(404).json({ message: 'Ruta no encontrada' });
-    } else {
-        res.status(404).json({ message: 'Ruta de API no encontrada' });
+        return res.status(404).json({ message: 'Ruta no encontrada' });
     }
+    next();
 });
 
 
 //Inicio del servidor
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {

@@ -172,6 +172,8 @@ exports.updateUser = async (req, res) => {
     // Buscar usuario a actualizar
     const userToUpdate = await User.findById(id);
     if (!userToUpdate) {
+      console.log('[AUTH CONTROLLER] Login request body:', req.body);
+      const { correo, password } = req.body;
       return res.status(404).json({
         success: false,
         message: 'Usuario no encontrado'

@@ -22,21 +22,24 @@ const Login = () => {
     console.log('Contraseña enviada:', passwordLimpio);
     try {
       const data = await authService.login(correoLimpio, passwordLimpio);
+      console.log('Respuesta login:', data);
       localStorage.setItem('token', data.token);
       localStorage.setItem('usuario', JSON.stringify(data.user));
 
+      // Mensaje de confirmación visible
+      mostrarAlerta('Éxito', `Bienvenido ${data.user?.nombre || ''} (${data.user?.role || ''})`, 'success');
+
       // Redireccionar según el rol del usuario
-      if (data.user.role === 'admin') {
+      if (data.user && data.user.role === 'admin') {
         navigate('/admin/Dashboard');
-      } else if (data.user.role === 'tesorero') {
+      } else if (data.user && data.user.role === 'tesorero') {
         navigate('/tesorero');
-      } else if (data.user.role === 'seminarista') {
+      } else if (data.user && data.user.role === 'seminarista') {
         navigate('/seminarista');
-      } else if (data.user.role === 'externo') {
-        // Para usuarios externos, redirigir al dashboard HTML estático
+      } else if (data.user && data.user.role === 'externo') {
         navigate('/external');
       } else {
-        navigate('/admin/users'); // Por defecto para otros roles
+        navigate('/admin/users');
       }
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión');

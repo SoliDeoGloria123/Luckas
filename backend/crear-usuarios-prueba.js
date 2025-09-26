@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-const User = mongoose.model('usuarios', userSchema);
+const User = mongoose.model('users', userSchema);
 
 const usuariosPrueba = [
   {

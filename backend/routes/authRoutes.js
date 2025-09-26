@@ -33,7 +33,10 @@ router.use((req, res, next)=> {
 
 
 // Rutas de login (sin proteccion )
-router.post('/signin', authController.signin);
+router.post('/signin', (req, res, next) => {
+    console.log('[AUTH ROUTES] POST /signin body:', req.body);
+    next();
+}, authController.signin);
 
 // Recuperar contraseña: enviar código al correo
 router.post('/forgot-password', authController.forgotPassword);
