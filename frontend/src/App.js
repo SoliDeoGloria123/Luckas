@@ -40,6 +40,7 @@ import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
 import Perfil from './components/Seminarista/Shared/MiPerfil';
 import Configuracion from './components/Seminarista/pages/configuracion';
+import DashboardExternal from './components/ExternalDashboard/DashboardExternal';
 
 
 // Componente para usuarios externos
