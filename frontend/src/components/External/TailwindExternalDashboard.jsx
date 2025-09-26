@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import cabanaService from '../../services/cabanaService';
+import eventService from '../../services/eventService';
+import cursosService from '../../services/courseService';
 import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
@@ -204,7 +207,7 @@ const TailwindExternalDashboard = () => {
         const [cursosResponse, eventosResponse, cabanasResponse, inscripcionesResponse] = await Promise.all([
           externalService.getCursos(),
           externalService.getEventos(),
-          fetch('http://localhost:3001/api/cabanas/publicas').then(res => res.json()),
+          fetch('http://localhost:3000/api/cabanas/publicas').then(res => res.json()),
           userData && userData._id ? externalService.getMisInscripciones(userData._id) : Promise.resolve({ success: true, data: [] })
         ]);
         

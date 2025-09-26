@@ -1,7 +1,7 @@
 // frontend/src/services/externalService.js
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3001/api"; // Usar URL completa temporalmente
+const API_BASE_URL = "http://localhost:3000/api"; // Usar URL completa temporalmente
 
 // Configurar axios con el token
 const api = axios.create({
@@ -23,11 +23,11 @@ const externalService = {
     try {
       console.log('Making request to /cursos/publicos...');
       // Usar fetch sin headers de autorización para endpoint público
-      const response = await fetch('http://localhost:3001/api/cursos/publicos');
-      const data = await response.json();
-      if (data && data.success && data.data) {
-        console.log('Returning courses:', data.data);
-        return data.data;
+      const response = await api.get('/cursos');
+      console.log('Cursos API response:', response.data);
+      if (response.data && response.data.success && response.data.data) {
+        console.log('Returning courses:', response.data.data);
+        return response.data.data;
       } else {
         console.log('No data found in response, returning empty array');
         return [];
@@ -38,14 +38,12 @@ const externalService = {
     }
   },
 
-  // Obtener eventos disponibles
+  // Obtener eventos disponibles (usando axios para enviar el token)
   getEventos: async () => {
     try {
-      // Usar fetch sin headers de autorización para endpoint público
-      const response = await fetch('http://localhost:3001/api/eventos/publicos');
-      const data = await response.json();
-      console.log('Eventos API response:', data);
-      return data.data || [];
+      const response = await api.get('/eventos');
+      console.log('Eventos API response:', response.data);
+      return response.data.data || response.data || [];
     } catch (error) {
       console.error('Error al obtener eventos:', error);
       return [];
