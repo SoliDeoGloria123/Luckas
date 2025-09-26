@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { userService } from "../../../services/ObteneruserService";
 
 const SolicitudModal = ({
@@ -12,6 +12,63 @@ const SolicitudModal = ({
   onSubmit,
   categorias
 }) => {
+  const [cedulaBusqueda, setCedulaBusqueda] = useState("");
+  const [cargandoUsuario, setCargandoUsuario] = useState(false);
+  const [usuarioEncontrado, setUsuarioEncontrado] = useState(null);
+
+  // Función para buscar usuario por cédula
+  const buscarUsuarioPorCedula = async (cedula) => {
+    if (!cedula || cedula.length < 6) return;
+    
+    setCargandoUsuario(true);
+    try {
+      const usuario = await userService.getByDocumento(cedula);
+      setUsuarioEncontrado(usuario);
+      
+      // Llenar automáticamente los campos del formulario
+      setNuevaSolicitud(prev => ({
+        ...prev,
+        solicitante: usuario._id,
+        correo: usuario.correo || "",
+        telefono: usuario.telefono || ""
+      }));
+    } catch (error) {
+      console.error("Usuario no encontrado:", error);
+      setUsuarioEncontrado(null);
+      // Limpiar los campos si no se encuentra el usuario
+      setNuevaSolicitud(prev => ({
+        ...prev,
+        solicitante: "",
+        correo: "",
+        telefono: ""
+      }));
+    } finally {
+      setCargandoUsuario(false);
+    }
+  };
+
+  // Detectar pegado en el campo de cédula
+  const handlePasteCedula = (e) => {
+    setTimeout(() => {
+      const valorPegado = e.target.value;
+      setCedulaBusqueda(valorPegado);
+      buscarUsuarioPorCedula(valorPegado);
+    }, 10);
+  };
+
+  // Detectar cambios en el campo de cédula
+  const handleChangeCedula = (e) => {
+    const valor = e.target.value;
+    setCedulaBusqueda(valor);
+    
+    // Buscar automáticamente cuando se escriban más de 6 caracteres
+    if (valor.length >= 6) {
+      buscarUsuarioPorCedula(valor);
+    } else {
+      setUsuarioEncontrado(null);
+    }
+  };
+
   // PRIMERO EL useEffect
   useEffect(() => {
     const cargarDatosSolicitante = async () => {
@@ -39,6 +96,15 @@ const SolicitudModal = ({
     cargarDatosSolicitante();
     // eslint-disable-next-line
   }, [nuevaSolicitud.solicitante, modoEdicion]);
+
+  // Limpiar campos cuando se cierre el modal
+  useEffect(() => {
+    if (!mostrar) {
+      setCedulaBusqueda("");
+      setUsuarioEncontrado(null);
+      setCargandoUsuario(false);
+    }
+  }, [mostrar]);
   if (!mostrar) return null;
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -59,13 +125,72 @@ const SolicitudModal = ({
            <div className="from-grid-admin">
           {!modoEdicion && (
             <div className="form-grupo-admin">
+              <label>Cédula del Solicitante:</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={cedulaBusqueda}
+                  onChange={handleChangeCedula}
+                  onPaste={handlePasteCedula}
+                  placeholder="Ingrese o pegue la cédula del solicitante"
+                  style={{
+                    paddingRight: cargandoUsuario ? '40px' : '10px'
+                  }}
+                />
+                {cargandoUsuario && (
+                  <div style={{ 
+                    position: 'absolute', 
+                    right: '10px', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)',
+                    fontSize: '14px',
+                    color: '#666'
+                  }}>
+                    🔄
+                  </div>
+                )}
+              </div>
+              {usuarioEncontrado && (
+                <div style={{ 
+                  marginTop: '5px', 
+                  padding: '8px', 
+                  backgroundColor: '#d4edda', 
+                  border: '1px solid #c3e6cb',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  color: '#155724'
+                }}>
+                  ✅ Usuario encontrado: {usuarioEncontrado.nombre} {usuarioEncontrado.apellido} - {usuarioEncontrado.correo}
+                </div>
+              )}
+              {cedulaBusqueda && !usuarioEncontrado && !cargandoUsuario && (
+                <div style={{ 
+                  marginTop: '5px', 
+                  padding: '8px', 
+                  backgroundColor: '#f8d7da', 
+                  border: '1px solid #f5c6cb',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  color: '#721c24'
+                }}>
+                  ❌ Usuario no encontrado con esta cédula
+                </div>
+              )}
+            </div>
+          )}
+          {!modoEdicion && (
+            <div className="form-grupo-admin">
               <label>Solicitante (ID):</label>
               <input
                 type="text"
                 value={nuevaSolicitud.solicitante}
                 onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, solicitante: e.target.value })}
-                placeholder="ID del solicitante"
-                required
+                placeholder="ID del solicitante (se llena automáticamente)"
+                readOnly={usuarioEncontrado ? true : false}
+                style={{
+                  backgroundColor: usuarioEncontrado ? '#f8f9fa' : 'white',
+                  cursor: usuarioEncontrado ? 'not-allowed' : 'text'
+                }}
               />
             </div>
           )}
@@ -73,10 +198,15 @@ const SolicitudModal = ({
             <div className="form-grupo-admin">
               <label>Correo:</label>
               <input
-                type="correo"
+                type="email"
                 value={nuevaSolicitud.correo}
                 onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, correo: e.target.value })}
                 placeholder="correo@ejemplo.com"
+                readOnly={usuarioEncontrado ? true : false}
+                style={{
+                  backgroundColor: usuarioEncontrado ? '#f8f9fa' : 'white',
+                  cursor: usuarioEncontrado ? 'not-allowed' : 'text'
+                }}
                 required
               />
             </div>
@@ -90,8 +220,12 @@ const SolicitudModal = ({
               type="text"
               value={nuevaSolicitud.telefono}
               onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, telefono: e.target.value })}
-              readOnly
               placeholder="Teléfono"
+              readOnly={usuarioEncontrado ? true : false}
+              style={{
+                backgroundColor: usuarioEncontrado ? '#f8f9fa' : 'white',
+                cursor: usuarioEncontrado ? 'not-allowed' : 'text'
+              }}
               required
             />
           </div>
