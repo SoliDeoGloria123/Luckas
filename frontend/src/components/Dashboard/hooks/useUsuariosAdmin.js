@@ -37,7 +37,7 @@ export const useUsuariosAdmin = (obtenerUsuarios, usuarioActual, setUsuarioActua
       });
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `Error al crear el usuario: ${error.message}`);
+  mostrarAlerta("Error", `Error al crear el usuario: ${error.message || ""}${error.error ? " - " + error.error : ""}`);
     }
   }, [nuevoUsuario, obtenerUsuarios]);
 

@@ -157,11 +157,11 @@ const TareaModal = ({
           </div>
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" onClick={onClose}>
-               <i class="fas fa-times"></i>
+               <i className="fas fa-times"></i>
               Cancelar
             </button>
             <button className="btn-admin btn-primary" onClick={onSubmit}>
-                    <i class="fas fa-save"></i>
+                    <i className="fas fa-save"></i>
               {modoEdicion ? "Guardar Cambios" : "Crear Tarea"}
             </button>
           </div>

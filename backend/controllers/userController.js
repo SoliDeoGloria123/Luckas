@@ -97,8 +97,46 @@ exports.createUser = async (req, res) => {
     try {
         const { nombre, apellido, correo, telefono, tipoDocumento, numeroDocumento, fechaNacimiento, estado, password, role } = req.body;
 
-        // Normalizar el tipo de documento
+        // Validación de formato de teléfono
+        if (!/^[0-9]{7,15}$/.test(telefono)) {
+            return res.status(400).json({
+                success: false,
+                message: 'El teléfono debe contener solo dígitos y tener entre 7 y 15 caracteres.'
+            });
+        }
+
+        // Validación de tipo de documento
         const tipoDocumentoNormalizado = normalizeTipoDocumento(tipoDocumento);
+        const tiposValidos = ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad'];
+        if (!tiposValidos.includes(tipoDocumentoNormalizado)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Tipo de documento inválido.'
+            });
+        }
+
+        // Validación de duplicados
+        const existeCorreo = await User.findOne({ correo });
+        if (existeCorreo) {
+            return res.status(409).json({
+                success: false,
+                message: 'El correo ya está registrado.'
+            });
+        }
+        const existeTelefono = await User.findOne({ telefono });
+        if (existeTelefono) {
+            return res.status(409).json({
+                success: false,
+                message: 'El teléfono ya está registrado.'
+            });
+        }
+        const existeDocumento = await User.findOne({ numeroDocumento });
+        if (existeDocumento) {
+            return res.status(409).json({
+                success: false,
+                message: 'El número de documento ya está registrado.'
+            });
+        }
 
         const user = new User({
             nombre,
@@ -130,9 +168,18 @@ exports.createUser = async (req, res) => {
             }
         });
     } catch (error) {
+        // Error de validación de mongoose
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Error de validación',
+                error: error.message
+            });
+        }
         res.status(500).json({
             success: false,
-            message: 'Error al crear usuario', error: error.message
+            message: 'Error al crear usuario',
+            error: error.message
         });
     }
 };

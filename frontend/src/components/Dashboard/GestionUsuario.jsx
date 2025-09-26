@@ -122,7 +122,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
             });
             obtenerUsuarios();
         } catch (error) {
-            mostrarAlerta("Error", `Error al crear el usuario: ${error.message}`);
+            mostrarAlerta("Error", `Error al crear el usuario: ${error.message || ""}${error.error ? " - " + error.error : ""}`);
         }
     };
 
@@ -188,7 +188,18 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
     // Abrir modal para crear usuario
     const abrirModalCrear = () => {
         setModoEdicion(false);
-        setNuevoUsuario({ nombre: "", apellido: "", correo: "", telefono: "", password: "", role: "participante" });
+        setNuevoUsuario({
+            nombre: "",
+            apellido: "",
+            correo: "",
+            telefono: "",
+            tipoDocumento: "",
+            numeroDocumento: "",
+            fechaNacimiento: "",
+            password: "",
+            role: "externo",
+            estado: "activo"
+        });
         setMostrarModal(true);
     };
 

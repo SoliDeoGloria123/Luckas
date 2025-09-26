@@ -425,7 +425,7 @@ const Reportes = () => {
             </div>
 
             <div className="reportes-controls">
-              <div class="dropdown">
+              <div className="dropdown">
                 <select
                   value={tipoReporte}
                   onChange={(e) => setTipoReporte(e.target.value)}
@@ -443,15 +443,15 @@ const Reportes = () => {
               </div>
 
               <button onClick={exportarPDF} className="btn-reportea btn-export">
-                <i class="fas fa-file-pdf"></i>
+                <i className="fas fa-file-pdf"></i>
                 Exportar PDF
               </button>
               <button onClick={exportarExcel} className="btn-reportea btn-export">
-                <i class="fas fa-file-excel"></i>
+                <i className="fas fa-file-excel"></i>
                 Exportar Excel
               </button>
               <button onClick={handleGuardarReporte} className='btn-reportea btn-primary-reportea'>
-                <i class="fas fa-save"></i>
+                <i className="fas fa-save"></i>
                 Guardar Reporte
               </button>
             </div>

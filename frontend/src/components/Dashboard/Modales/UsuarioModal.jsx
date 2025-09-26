@@ -30,7 +30,7 @@ const UsuarioModal = ({
         <form className="modal-body-admin" onSubmit={onSubmit}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label><i class="fas fa-user"></i>Nombre</label>
+              <label><i className="fas fa-user"></i>Nombre</label>
               <input
                 type="text"
                 value={modoEdicion ? usuarioSeleccionado?.nombre : nuevoUsuario.nombre}
@@ -44,7 +44,7 @@ const UsuarioModal = ({
               />
             </div>
             <div className="form-grupo-admin">
-              <label><i class="fas fa-user"></i> Apellido</label>
+              <label><i className="fas fa-user"></i> Apellido</label>
               <input
                 type="text"
                 value={modoEdicion ? usuarioSeleccionado?.apellido : nuevoUsuario.apellido}
@@ -61,7 +61,7 @@ const UsuarioModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>  <i class="fas fa-envelope"></i> Correo</label>
+              <label>  <i className="fas fa-envelope"></i> Correo</label>
               <input
                 type="email"
                 value={modoEdicion ? usuarioSeleccionado?.correo : nuevoUsuario.correo}
@@ -75,7 +75,7 @@ const UsuarioModal = ({
               />
             </div>
             <div className="form-grupo-admin">
-              <label><i class="fas fa-phone"></i> Teléfono</label>
+              <label><i className="fas fa-phone"></i> Teléfono</label>
               <input
                 type="text"
                 value={modoEdicion ? usuarioSeleccionado?.telefono : nuevoUsuario.telefono}
