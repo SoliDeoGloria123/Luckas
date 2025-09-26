@@ -125,7 +125,7 @@ const HomeScreen: React.FC = () => {
                         <Ionicons name="school-outline" size={32} color="#2563eb" />
                     </View>
                     <Text style={seminaristaStyles.statNumber}>{stats.cursos}</Text>
-                    <Text style={seminaristaStyles.statLabel}>Cursos Activos</Text>
+                    <Text style={seminaristaStyles.statLabel}>Cursos </Text>
                 </View>
                 
                 <View style={[seminaristaStyles.statCard, { borderLeftColor: '#059669' }]}>
@@ -149,18 +149,10 @@ const HomeScreen: React.FC = () => {
                         <Ionicons name="bed-outline" size={32} color="#059669" />
                     </View>
                     <Text style={seminaristaStyles.statNumber}>{stats.reservas}</Text>
-                    <Text style={seminaristaStyles.statLabel}>Tareas Pendientes</Text>
+                    <Text style={seminaristaStyles.statLabel}>Tareas </Text>
                 </View>
                 
-                {(isAdmin() || isTesorero()) && (
-                    <View style={[seminaristaStyles.statCard, { borderLeftColor: '#334155' }]}>
-                        <View style={seminaristaStyles.statIcon}>
-                            <Ionicons name="people-outline" size={32} color="#334155" />
-                        </View>
-                        <Text style={seminaristaStyles.statNumber}>{stats.usuarios}</Text>
-                        <Text style={seminaristaStyles.statLabel}>Usuarios</Text>
-                    </View>
-                )}
+               
             </View>
 
             {/* Sección de acceso rápido */}
@@ -212,28 +204,7 @@ const HomeScreen: React.FC = () => {
                         <Text style={seminaristaStyles.cardText}>Programas Técnicos</Text>
                     </TouchableOpacity>
                 )}
-
-                {/* Card Reportes (solo admin y tesorero) */}
-                {(isAdmin() || isTesorero()) && (
-                    <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
-                        <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                            <Ionicons name="bar-chart-outline" size={32} color="#1d4ed8" />
-                        </View>
-                        <Text style={seminaristaStyles.cardTitle}>Reportes</Text>
-                        <Text style={seminaristaStyles.cardText}>Ver estadísticas</Text>
-                    </TouchableOpacity>
-                )}
-
-                {/* Card Usuarios (solo admin) */}
-                {isAdmin() && (
-                    <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
-                        <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                            <Ionicons name="people-outline" size={32} color="#059669" />
-                        </View>
-                        <Text style={seminaristaStyles.cardTitle}>Usuarios</Text>
-                        <Text style={seminaristaStyles.cardText}>Gestionar usuarios</Text>
-                    </TouchableOpacity>
-                )}
+               
             </View>
 
             {/* Información del sistema */}

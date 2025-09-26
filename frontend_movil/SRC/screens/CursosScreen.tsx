@@ -29,11 +29,6 @@ const CursosScreen: React.FC = () => {
     // Verificar si el usuario tiene permisos para ver cursos
     useEffect(() => {
         if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista'))) {
-            Alert.alert(
-                'Acceso Denegado',
-                'No tienes permisos para ver la información de los cursos',
-                [{ text: 'OK' }]
-            );
             // Aquí podrías redirigir al usuario a otra pantalla si lo deseas
             return;
         }
