@@ -4,7 +4,7 @@ import Index from './components/Panel Principal/Panel'
 import Login from './components/Login/Login';
 import Registro from './components/signup/registro';
 import OlvidoPassw from './components/forget password/olvidarPassword';
-import ExternalDashboard from './components/External/TailwindExternalDashboard';
+// import eliminado: TailwindExternalDashboard
 import DashboardAdmin from "./components/Dashboard/DashboardAdmin";
 import Dashboarduser from "./components/Dashboard/GestionUsuario";
 import GestionAcategorizacion from "./components/Dashboard/GestionCategorizacion";
@@ -51,7 +51,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Index to="/index" replace />} />
-        <Route path="/external" element={<ExternalDashboard />} />
+  <Route path="/external" element={<DashboardExternal />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup/registro" element={<Registro />}/>
         <Route path="/Olvidar-Contraseña" element={<OlvidoPassw />}/>

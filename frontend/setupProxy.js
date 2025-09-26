@@ -5,7 +5,7 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-        target: 'http://localhost:3001',
+  target: 'http://localhost:3001',
       changeOrigin: true,
       logLevel: 'debug'
     })
@@ -15,7 +15,7 @@ module.exports = function(app) {
   app.use(
     '/Externo',
     createProxyMiddleware({
-        target: 'http://localhost:3001',
+  target: 'http://localhost:3001',
       changeOrigin: true,
       logLevel: 'debug'
     })

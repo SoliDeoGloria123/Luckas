@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 const config = require('./config');
 const{MongoClient, ObjectId} = require('mongodb');
 //importar Rutas
@@ -64,18 +66,18 @@ app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // Ruta para el login/admin - redirigir al frontend React
 app.get('/admin', (req, res) => {
-    res.redirect('http://localhost:3001/login');
+    res.redirect('http://localhost:3000/login');
 });
 
 app.get('/login', (req, res) => {
-    res.redirect('http://localhost:3001/login');
+    res.redirect('http://localhost:3000/login');
 });
 
 // Manejo de rutas no encontradas
 app.get('*', (req, res) => {
-    // Si la ruta no es de API, servir la página de inicio
+    // Si la ruta no es de API, devolver 404 (no servir HTML)
     if (!req.path.startsWith('/api/')) {
-        res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/home.html'));
+        res.status(404).json({ message: 'Ruta no encontrada' });
     } else {
         res.status(404).json({ message: 'Ruta de API no encontrada' });
     }
@@ -83,7 +85,23 @@ app.get('*', (req, res) => {
 
 
 //Inicio del servidor
-const PORT = process.env.PORT || 3001;
-app.listen(PORT,()=>{
+const PORT = process.env.PORT || 3000;
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('Nuevo cliente conectado:', socket.id);
+    // Puedes agregar aquí tus eventos personalizados
+    socket.on('disconnect', () => {
+        console.log('Cliente desconectado:', socket.id);
+    });
+});
+
+server.listen(PORT, () => {
     console.log(`Servidor en http://localhost:${PORT}`);
 });
