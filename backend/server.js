@@ -17,9 +17,7 @@ const reservasRoutes = require('./routes/reservasRoutes');
 const cabanasRoutes = require('./routes/cabanasRoutes');
 const inscripcionRoutes = require('./routes/inscripcionRoutes');
 const ReportesRoutes = require('./routes/reportesRoutes');
-const cursosRoutes = require('./routes/cursosRoutes');
-const programasTecnicosRoutes = require('./routes/programasTecnicosRoutes');
-const programasAcademicosRoutes = require('./routes/programasAcademicosRoutes');
+const programasAcademicosRoutes = require('./routes/programaAcademicoRoutes');
 const reporteguardarRoutes = require('./routes/reporteRoutes');
 
 // Inicializar Express
@@ -53,11 +51,8 @@ app.use('/api/categorizacion', categotizacionRoutes);
 app.use('/api/reservas', reservasRoutes); // Asegúrate de que esta ruta exista
 app.use('/api/inscripciones', inscripcionRoutes); // Asegúrate de que esta ruta exista
 app.use('/api/reportes', ReportesRoutes);
-app.use('/api/cursos', cursosRoutes);
-app.use('/api/programas-tecnicos', programasTecnicosRoutes);
 app.use('/api/programas-academicos', programasAcademicosRoutes);
 app.use('/api/reporte', reporteguardarRoutes);
-app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 
 // Ruta para el login/admin - redirigir al frontend React

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { cursosService } from "../../../services/cursosService";
+import { programasAcademicosService } from "../../../services/programasAcademicosService";
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
@@ -21,17 +21,7 @@ const Gestioncursos = () => {
   //------------------------------------------------------------------------------------------------------------------------------------
   //obtener cursos
   const obtenerCursos = async () => {
-    try {
-      const data = await cursosService.obtenerCursosNavegables();
-      if (data.success) {
-        const cursosData = Array.isArray(data.data) ? data.data : [];
-        setCursos(cursosData);
-        setCursosFiltrados(cursosData);
-      }
-    } catch (error) {
-      console.error("Error al obtener los cursos de la base de datos", error.message);
-      mostrarAlerta("Error", "No se pudieron cargar los cursos", "error");
-    }
+  
   };
 
   // Función de búsqueda por nombre, instructor o categoría

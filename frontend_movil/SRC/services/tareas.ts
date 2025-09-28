@@ -39,15 +39,11 @@ export class TareasService {
             const response = await authService.makeRequest<any>(API_CONFIG.ENDPOINTS.TAREAS, {
                 method: 'GET',
             });
-
-            console.log('🔍 Respuesta completa:', JSON.stringify(response, null, 2));
-
             if (response.success) {
                 // Navegar a través de la estructura anidada
                 const responseData = response.data?.data || response.data || [];
                 const tareas = Array.isArray(responseData) ? responseData : [];
-                
-                console.log('🔍 Tareas procesadas:', tareas.length);
+            
                 return {
                     success: true,
                     data: tareas

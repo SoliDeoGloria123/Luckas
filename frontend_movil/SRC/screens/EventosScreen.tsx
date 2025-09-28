@@ -1,5 +1,6 @@
 // Pantalla de gestión de eventos
 import React, { useState, useEffect, useCallback } from 'react';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {
     View,
     Text,
@@ -14,12 +15,21 @@ import {
     KeyboardAvoidingView,
     Platform
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { eventosService } from '../services/eventos';
-
 import { Evento, EventoForm, Categorizacion } from '../types';
 import { colors, spacing, typography, shadows } from '../styles';
+import categorizacionService from '../services/categorizacion';
+
+// Tipos para el programa del evento
+interface ProgramaEvento {
+    horaInicio: string;
+    horaFin: string;
+    tema: string;
+    descripcion: string;
+}
 
 const EventosScreen: React.FC = () => {
     // Filtro modal igual a CabañasScreen
@@ -47,10 +57,11 @@ const EventosScreen: React.FC = () => {
     const { canEdit, canDelete, user, hasRole } = useAuth();
     const [eventos, setEventos] = useState<Evento[]>([]);
     const [categorias, setCategorias] = useState<Categorizacion[]>([]);
+    const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const [selectedCategoria, setSelectedCategoria] = useState('Todos');
+
     const [showModal, setShowModal] = useState(false);
     const [editingEvento, setEditingEvento] = useState<Evento | null>(null);
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -60,32 +71,90 @@ const EventosScreen: React.FC = () => {
         precio: 0,
         categoria: '',
         etiquetas: [],
-        fechaEvento: '',
+        fechaEvento: '', // Se enviará como string ISO
         horaInicio: '',
         horaFin: '',
         lugar: '',
         direccion: '',
-        duracionDias: 1,
+        cuposDisponibles: 0,
         cuposTotales: 50,
-        programa: [],
+        programa: [], // ProgramaEvento[]
         prioridad: 'Media',
-        observaciones: ''
+        observaciones: '',
+        imagen: [] // Nuevo campo para imágenes
     });
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     // Opciones para el filtro de categorías (debe ir después de declarar 'categorias')
-    const categoriasFiltro = categorias.map(cat => ({ label: cat.nombre, value: cat.nombre }));
+    const categoriasFiltro = categorias.map(cat => ({ label: cat.nombre, value: cat._id }));
 
     // Verificar si el usuario tiene permisos para ver eventos
     useEffect(() => {
         if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista'))) {
-            
             return;
         }
         loadEventos();
-      
+        loadCategorias(); // Cargar categorías una sola vez al inicio
+
     }, [user, hasRole]);
 
-   
+    // Cargar categorías
+    const loadCategorias = useCallback(async () => {
+        try {
+            console.log('🔄 Iniciando carga de categorías...');
+            const response = await categorizacionService.getAllCategorizaciones();
+            console.log('📥 Respuesta completa del servicio:', JSON.stringify(response, null, 2));
+
+            let categoriasArray: Categorizacion[] = [];
+            if (response.success && response.data) {
+                console.log('✅ Respuesta exitosa, procesando datos...');
+                console.log('📊 Tipo de response.data:', Array.isArray(response.data) ? 'array' : typeof response.data);
+                console.log('📊 Contenido de response.data:', response.data);
+
+                // Si response.data es un array directamente
+                if (Array.isArray(response.data)) {
+                    console.log('📋 Datos son array directo');
+                    categoriasArray = response.data;
+                }
+                // Si response.data es un objeto con .data
+                else if ((response.data as any).data && Array.isArray((response.data as any).data)) {
+                    console.log('📋 Datos están en response.data.data');
+                    categoriasArray = (response.data as any).data;
+                }
+
+                console.log('📋 Array de categorías extraído:', categoriasArray);
+                console.log('📊 Cantidad de categorías:', categoriasArray.length);
+
+                // Filtrar solo las activas
+                const activas = categoriasArray.filter(cat => cat.activo);
+                console.log('✅ Categorías activas filtradas:', activas);
+                console.log('📊 Cantidad de activas:', activas.length);
+
+                setCategorias(activas);
+            } else {
+                console.error('❌ Respuesta sin éxito o sin datos');
+                setCategorias([]);
+            }
+        } catch (error) {
+            console.error('❌ Error en loadCategorias:', error);
+            setCategorias([]);
+        }
+    }, []);
+
+    // Debug: Mostrar las categorías cuando cambien
+    useEffect(() => {
+        console.log('🎯 Estado de categorías actualizado:', categorias);
+        console.log('🎯 Cantidad de categorías:', categorias.length);
+        if (categorias.length > 0) {
+            console.log('🎯 Primera categoría:', categorias[0]);
+            console.log('🎯 Todas las categorías:', categorias.map(cat => ({
+                id: cat._id,
+                nombre: cat.nombre,
+                activo: cat.activo
+            })));
+        }
+    }, [categorias]);
+
     // Cargar eventos
     const loadEventos = useCallback(async () => {
         try {
@@ -122,15 +191,9 @@ const EventosScreen: React.FC = () => {
         // Soporta categoria como string (ObjectId) o como objeto populado
         let categoriaNombre = '';
         if (typeof evento.categoria === 'string') {
-            const cat = categorias.find(c => c._id === evento.categoria);
-            categoriaNombre = cat?.nombre || '';
-        } else if (evento.categoria && typeof evento.categoria === 'object') {
-            if ('_id' in evento.categoria) {
-                const cat = categorias.find(c => c._id === evento.categoria._id);
-                categoriaNombre = cat?.nombre || '';
-            } else {
-                categoriaNombre = '';
-            }
+            categoriaNombre = evento.categoria;
+        } else {
+            categoriaNombre = '';
         }
 
         const matchCategoria = !filtros.categoria || categoriaNombre === filtros.categoria;
@@ -150,42 +213,40 @@ const EventosScreen: React.FC = () => {
     };
 
     // Abrir modal para crear evento
-    const handleCrearEvento = () => {
+    const handleCrearEvento = async () => {
         setEditingEvento(null);
         setSelectedImages([]);
         setFormData({
             nombre: '',
             descripcion: '',
             precio: 0,
-            categoria: categorias.length > 0 ? categorias[0]._id : '',
+            categoria: '',
             etiquetas: [],
-            fechaEvento: '',
+            fechaEvento: '', // Se enviará como string ISO
             horaInicio: '',
             horaFin: '',
             lugar: '',
             direccion: '',
-            duracionDias: 1,
+            cuposDisponibles: 50,
             cuposTotales: 50,
-            programa: [],
+            programa: [], // ProgramaEvento[]
             prioridad: 'Media',
-            observaciones: ''
+            observaciones: '',
+            imagen: [] // Nuevo campo para imágenes
         });
         setShowModal(true);
     };
 
-    // Abrir modal para editar evento
-    const handleEditarEvento = (evento: Evento) => {
+    const handleEditarEvento = async (evento: Evento) => {
         setEditingEvento(evento);
         setSelectedImages(evento.imagen || []);
-        
-        // Obtener el ID de la categoría
+
         let categoriaId = '';
         if (typeof evento.categoria === 'string') {
             categoriaId = evento.categoria;
         } else if (evento.categoria && typeof evento.categoria === 'object' && '_id' in evento.categoria) {
             categoriaId = (evento.categoria as any)._id;
         }
-
         setFormData({
             nombre: evento.nombre,
             descripcion: evento.descripcion,
@@ -197,11 +258,12 @@ const EventosScreen: React.FC = () => {
             horaFin: evento.horaFin,
             lugar: evento.lugar,
             direccion: evento.direccion || '',
-            duracionDias: evento.duracionDias || 1,
+            cuposDisponibles: evento.cuposDisponibles || evento.cuposTotales,
             cuposTotales: evento.cuposTotales,
             programa: evento.programa || [],
             prioridad: evento.prioridad,
-            observaciones: evento.observaciones || ''
+            observaciones: evento.observaciones || '',
+            imagen: evento.imagen || []
         });
         setShowModal(true);
     };
@@ -209,26 +271,72 @@ const EventosScreen: React.FC = () => {
     // Guardar evento (crear o editar)
     const handleGuardarEvento = async () => {
         try {
-            // Validar formulario
-            const validation = eventosService.validateEvento(formData);
-            if (!validation.valid) {
-                Alert.alert('Error de Validación', validation.errors.join('\n'));
+            // Validación básica manual
+            if (!formData.nombre.trim()) {
+                Alert.alert('Error de Validación', 'El nombre del evento es obligatorio');
+                return;
+            }
+            if (!formData.descripcion.trim()) {
+                Alert.alert('Error de Validación', 'La descripción es obligatoria');
+                return;
+            }
+            if (!formData.fechaEvento) {
+                Alert.alert('Error de Validación', 'La fecha del evento es obligatoria');
+                return;
+            }
+            if (!formData.horaInicio.trim()) {
+                Alert.alert('Error de Validación', 'La hora de inicio es obligatoria');
+                return;
+            }
+            if (!formData.horaFin.trim()) {
+                Alert.alert('Error de Validación', 'La hora de fin es obligatoria');
+                return;
+            }
+            if (!formData.lugar.trim()) {
+                Alert.alert('Error de Validación', 'El lugar es obligatorio');
+                return;
+            }
+            if (!formData.categoria) {
+                Alert.alert('Error de Validación', 'La categoría es obligatoria');
+                return;
+            }
+            if (formData.cuposTotales <= 0) {
+                Alert.alert('Error de Validación', 'Los cupos totales deben ser mayor a 0');
                 return;
             }
 
             // Preparar datos para enviar
             const eventoData = {
-                ...formData,
-                imagen: selectedImages, // Incluir imágenes seleccionadas
+                nombre: formData.nombre.trim(),
+                descripcion: formData.descripcion.trim(),
+                precio: formData.precio || 0,
+                categoria: formData.categoria,
+                etiquetas: formData.etiquetas || [],
+                fechaEvento: new Date(formData.fechaEvento).toISOString(), // Enviar como string ISO
+                horaInicio: formData.horaInicio.trim(),
+                horaFin: formData.horaFin.trim(),
+                lugar: formData.lugar.trim(),
+                direccion: formData.direccion?.trim() || '',
+                cuposTotales: formData.cuposTotales,
                 cuposDisponibles: formData.cuposTotales, // Los cupos disponibles inicialmente son iguales a los totales
+                programa: formData.programa || [],
+                prioridad: formData.prioridad,
+                observaciones: formData.observaciones?.trim() || '',
+                imagen: selectedImages // Incluir imágenes seleccionadas
             };
+
+            console.log('📤 Datos del evento a enviar:', eventoData);
 
             let response;
             if (editingEvento) {
+                console.log('✏️ Actualizando evento existente...');
                 response = await eventosService.updateEvento(editingEvento._id, eventoData);
             } else {
+                console.log('➕ Creando nuevo evento...');
                 response = await eventosService.createEvento(eventoData);
             }
+
+            console.log('📥 Respuesta del servidor:', response);
 
             if (response.success) {
                 Alert.alert(
@@ -238,10 +346,11 @@ const EventosScreen: React.FC = () => {
                 setShowModal(false);
                 loadEventos(); // Recargar la lista
             } else {
+                console.error('❌ Error en respuesta:', response.message);
                 Alert.alert('Error', response.message || 'No se pudo guardar el evento');
             }
         } catch (error) {
-            console.error('Error saving evento:', error);
+            console.error('❌ Error saving evento:', error);
             Alert.alert('Error', 'Error de conexión');
         }
     };
@@ -274,7 +383,7 @@ const EventosScreen: React.FC = () => {
         // En una implementación real, aquí usarías React Native Image Picker
         const mockImageUri = `mock-image-${Date.now()}.jpg`;
         setSelectedImages(prev => [...prev, mockImageUri]);
-        
+
         Alert.alert('Imagen Seleccionada', 'La funcionalidad de imágenes será implementada con React Native Image Picker');
     };
 
@@ -293,16 +402,17 @@ const EventosScreen: React.FC = () => {
             precio: 0,
             categoria: '',
             etiquetas: [],
-            fechaEvento: new Date().toISOString().split('T')[0],
+            fechaEvento: '', // Se enviará como string ISO
             horaInicio: '',
             horaFin: '',
             lugar: '',
             direccion: '',
-            duracionDias: 1,
-            cuposTotales: 0,
-            programa: [],
+            cuposDisponibles: 50,
+            cuposTotales: 50,
+            programa: [], // ProgramaEvento[]
             prioridad: 'Media',
-            observaciones: ''
+            observaciones: '',
+            imagen: [] // Nuevo campo para imágenes
         });
         setSelectedImages([]);
     };
@@ -346,7 +456,7 @@ const EventosScreen: React.FC = () => {
     };
 
     return (
-    <View style={styles.container}>
+        <View style={styles.container}>
             {/* Header igual a Cabañas */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Eventos del Seminario</Text>
@@ -524,13 +634,13 @@ const EventosScreen: React.FC = () => {
                                         <Text style={styles.actionButtonText}>Editar</Text>
                                     </TouchableOpacity>
                                     {hasRole('admin') && (
-                                    <TouchableOpacity
-                                        style={styles.deleteButton}
-                                        onPress={() => handleEliminarEvento(evento)}
-                                    >
-                                        <Ionicons name="trash" size={16} color="#fff" />
-                                        <Text style={styles.actionButtonText}>Eliminar</Text>
-                                    </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.deleteButton}
+                                            onPress={() => handleEliminarEvento(evento)}
+                                        >
+                                            <Ionicons name="trash" size={16} color="#fff" />
+                                            <Text style={styles.actionButtonText}>Eliminar</Text>
+                                        </TouchableOpacity>
                                     )}
                                 </View>
                             )}
@@ -552,8 +662,6 @@ const EventosScreen: React.FC = () => {
                 <TouchableOpacity style={styles.fab} onPress={handleCrearEvento}>
                     <Ionicons name="add" size={20} color="#fff" />
                 </TouchableOpacity>
-
-
             )}
 
             {/* Modal para crear/editar evento */}
@@ -607,12 +715,32 @@ const EventosScreen: React.FC = () => {
                         {/* Fecha */}
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>Fecha del evento *</Text>
-                            <TextInput
+                            <TouchableOpacity
+                                onPress={() => setShowDatePicker(true)}
                                 style={styles.textInput}
-                                value={formData.fechaEvento}
-                                onChangeText={(text) => setFormData({ ...formData, fechaEvento: text })}
-                                placeholder="YYYY-MM-DD"
-                            />
+                                activeOpacity={0.7}
+                            >
+                                <Text style={{ color: formData.fechaEvento ? colors.text : colors.textSecondary }}>
+                                    {formData.fechaEvento ? formData.fechaEvento.toString() : 'Selecciona la fecha'}
+                                </Text>
+                            </TouchableOpacity>
+                            {showDatePicker && (
+                                <DateTimePicker
+                                    value={formData.fechaEvento ? new Date(formData.fechaEvento) : new Date()}
+                                    mode="date"
+                                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                    onChange={(event, selectedDate) => {
+                                        setShowDatePicker(false);
+                                        if (selectedDate) {
+                                            // Formatear a YYYY-MM-DD
+                                            const year = selectedDate.getFullYear();
+                                            const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+                                            const day = selectedDate.getDate().toString().padStart(2, '0');
+                                            setFormData({ ...formData, fechaEvento: `${year}-${month}-${day}` });
+                                        }
+                                    }}
+                                />
+                            )}
                         </View>
 
                         {/* Horarios */}
@@ -637,7 +765,7 @@ const EventosScreen: React.FC = () => {
                             </View>
                         </View>
 
-                        {/* Lugar */}
+                        {/* Lugar y Dirección */}
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>Lugar *</Text>
                             <TextInput
@@ -648,7 +776,17 @@ const EventosScreen: React.FC = () => {
                             />
                         </View>
 
-                        {/* Precio y Cupos */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Dirección</Text>
+                            <TextInput
+                                style={styles.textInput}
+                                value={formData.direccion}
+                                onChangeText={(text) => setFormData({ ...formData, direccion: text })}
+                                placeholder="Dirección específica (opcional)"
+                            />
+                        </View>
+
+                        {/* Precio, Cupos y Duración */}
                         <View style={styles.rowInputs}>
                             <View style={[styles.inputGroup, styles.halfWidth]}>
                                 <Text style={styles.inputLabel}>Precio</Text>
@@ -660,6 +798,9 @@ const EventosScreen: React.FC = () => {
                                     keyboardType="numeric"
                                 />
                             </View>
+                        </View>
+
+                        <View style={styles.rowInputs}>
                             <View style={[styles.inputGroup, styles.halfWidth]}>
                                 <Text style={styles.inputLabel}>Cupos totales *</Text>
                                 <TextInput
@@ -670,27 +811,57 @@ const EventosScreen: React.FC = () => {
                                     keyboardType="numeric"
                                 />
                             </View>
+                            <View style={[styles.inputGroup, styles.halfWidth]}>
+                                <Text style={styles.inputLabel}>Cupos disponibles</Text>
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={formData.cuposDisponibles.toString()}
+                                    onChangeText={(text) => setFormData({ ...formData, cuposDisponibles: parseInt(text) || 0 })}
+                                    placeholder="Se asignará automáticamente"
+                                    keyboardType="numeric"
+                                    editable={false}
+                                />
+                            </View>
                         </View>
 
                         {/* Categoría y Prioridad */}
                         <View style={styles.rowInputs}>
                             <View style={[styles.inputGroup, styles.halfWidth]}>
-                                <Text style={styles.inputLabel}>Categoría</Text>
-                                <View style={styles.pickerContainer}>
+                                <Text style={styles.inputLabel}>Categoría *</Text>                              
+                                {/* Alternativa con botones para seleccionar categoría */}
+                                <View style={{ marginTop: 10 }}>
                                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                        {categorias.map(cat => (
+                                        <TouchableOpacity
+                                            style={[
+                                                styles.pickerOption,
+                                                formData.categoria === '' && styles.pickerOptionSelected
+                                            ]}
+                                            onPress={() => {
+                                                setFormData({ ...formData, categoria: '' });
+                                                console.log('Seleccionado: Ninguna');
+                                            }}
+                                        >
+                                            <Text style={[
+                                                styles.pickerOptionText,
+                                                formData.categoria === '' && styles.pickerOptionTextSelected
+                                            ]}>Ninguna</Text>
+                                        </TouchableOpacity>
+                                        {categorias.map((categoria) => (
                                             <TouchableOpacity
-                                                key={cat._id}
+                                                key={categoria._id}
                                                 style={[
                                                     styles.pickerOption,
-                                                    formData.categoria === cat._id && styles.pickerOptionSelected
+                                                    formData.categoria === categoria._id && styles.pickerOptionSelected
                                                 ]}
-                                                onPress={() => setFormData({ ...formData, categoria: cat._id })}
+                                                onPress={() => {
+                                                    setFormData({ ...formData, categoria: categoria._id });
+                                                    console.log('Seleccionado:', categoria.nombre);
+                                                }}
                                             >
                                                 <Text style={[
                                                     styles.pickerOptionText,
-                                                    formData.categoria === cat._id && styles.pickerOptionTextSelected
-                                                ]}>{cat.nombre}</Text>
+                                                    formData.categoria === categoria._id && styles.pickerOptionTextSelected
+                                                ]}>{categoria.nombre}</Text>
                                             </TouchableOpacity>
                                         ))}
                                     </ScrollView>
@@ -720,16 +891,30 @@ const EventosScreen: React.FC = () => {
                             </View>
                         </View>
 
+                        {/* Etiquetas */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Etiquetas</Text>
+                            <TextInput
+                                style={styles.textInput}
+                                value={formData.etiquetas.join(', ')}
+                                onChangeText={(text) => {
+                                    const etiquetas = text.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+                                    setFormData({ ...formData, etiquetas });
+                                }}
+                                placeholder="Separadas por comas (ej: música, concierto, cultura)"
+                            />
+                        </View>
+
                         {/* Sección de Imágenes */}
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>Imágenes del Evento</Text>
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 style={styles.imageSelector}
                                 onPress={handleSelectImages}
                             >
                                 <Text style={styles.imageSelectorText}>+ Agregar Imagen</Text>
                             </TouchableOpacity>
-                            
+
                             {selectedImages.length > 0 && (
                                 <ScrollView horizontal style={styles.imagePreviewContainer}>
                                     {selectedImages.map((imageUri, index) => (
@@ -765,13 +950,13 @@ const EventosScreen: React.FC = () => {
                     
                     {/* Botones del Modal */}
                     <View style={styles.modalButtons}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={[styles.button, styles.buttonSecondary]}
                             onPress={handleCloseModal}
                         >
                             <Text style={styles.buttonSecondaryText}>Cancelar</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={[styles.button, styles.buttonPrimary]}
                             onPress={handleGuardarEvento}
                         >
@@ -1099,7 +1284,8 @@ const styles = StyleSheet.create({
         borderColor: '#d1d5db',
         borderRadius: 8,
         backgroundColor: colors.surface,
-        paddingVertical: 4,
+        paddingVertical: Platform.OS === 'ios' ? 4 : 0,
+        paddingHorizontal: Platform.OS === 'android' ? 10 : 0,
     },
     pickerOption: {
         paddingHorizontal: spacing.sm,

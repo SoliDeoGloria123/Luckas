@@ -453,9 +453,8 @@ body {
 }
 
 .modal-image-misinscripciones {
-    width: 100%;
-    height: 12rem;
-    object-fit: cover;
+    max-height: 160px;
+    border-radius: 10px;
 }
 
 .modal-close-misinscripciones {

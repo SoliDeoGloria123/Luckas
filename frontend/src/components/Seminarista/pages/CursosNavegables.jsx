@@ -5,7 +5,8 @@ import './CabanasSeminario.css'; // Estilos base reutilizados
 import Header from '../Shared/Header';
 import Footer from '../../footer/Footer';
 import { Heart, Star, BookOpen, Calendar, Users, Clock } from 'lucide-react';
-import { cursosService } from '../../../services/cursosService';
+import { programasAcademicosService } from '../../../services/programasAcademicosService';
+import FormularioInscripcion from '../pages/FormularioInscripcion';
 
 const CursosSeminario = () => {
   const { user } = useAuthCheck('seminarista');
@@ -13,56 +14,31 @@ const CursosSeminario = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [activeFilter, setActiveFilter] = useState('todos');
   const [favorites, setFavorites] = useState({});
   const [notification, setNotification] = useState({ show: false, message: '' });
   const [inscripcionLoading, setInscripcionLoading] = useState(false);
 
   useEffect(() => {
-    const cargarCursos = async () => {
-      try {
-        setLoading(true);
-        // Obtener cursos y programas técnicos reales de la base de datos
-        const response = await cursosService.obtenerCursosNavegables();
-        if (response.success) {
-          setCursos(response.data);
-        } else {
-          setError('No se pudieron cargar los cursos.');
-        }
-        setError(null);
-      } catch (err) {
-        console.error('Error al cargar cursos:', err);
-        setError('No se pudieron cargar los cursos.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    cargarCursos();
-  }, []);
-
-  useEffect(() => {
-    const cargarCursos = async () => {
-      try {
-        setLoading(true);
-        // Obtener cursos y programas técnicos reales de la base de datos
-        const response = await cursosService.obtenerCursosNavegables();
-        if (response.success) {
-          setCursos(response.data);
-        } else {
-          setError('No se pudieron cargar los cursos.');
-        }
-        setError(null);
-      } catch (err) {
-        console.error('Error al cargar cursos:', err);
-        setError('No se pudieron cargar los cursos.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    cargarCursos();
-  }, []);
+  const cargarCursos = async () => {
+    try {
+      setLoading(true);
+      // Obtener programas académicos reales de la base de datos
+      const response = await programasAcademicosService.getAllProgramas();
+      // Si la respuesta es un objeto con .data, usa .data, si es array, úsalo directo
+      const cursosArray = Array.isArray(response) ? response : response.data;
+      setCursos(Array.isArray(cursosArray) ? cursosArray : []);
+      setError(null);
+    } catch (err) {
+      console.error('Error al cargar programas:', err);
+      setError('No se pudieron cargar los programas.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  cargarCursos();
+}, []);
 
   const showNotification = (message) => {
     setNotification({ show: true, message });
@@ -260,11 +236,11 @@ const CursosSeminario = () => {
                   className={`cabin-favorite ${favorites[curso.id] ? 'active' : ''}`}
                   onClick={() => toggleFavorite(curso.id)}
                 >
-                  <Heart />
+                  <Heart/>
                 </div>
                 <div className="cabin-gallery">
                   <span className="gallery-count">
-                    {curso.tipo === 'curso' ? '📚 Curso' : '🎓 Programa'}
+                    {curso.categoria?.tipo === 'curso' ? '📚 Curso' : curso.categoria?.tipo === 'programa' ? '🎓 Programa Técnico' : '🗂 Otro'}
                   </span>
                 </div>
               </div>
@@ -272,7 +248,7 @@ const CursosSeminario = () => {
               <div className="cabin-content">
                 <div className="cabin-header">
                   <div className="cabin-category">
-                    {curso.categoria}
+                    {curso.categoria?.nombre}
                   </div>
                   <div className="cabin-rating">
                     <Star size={15} />
@@ -350,7 +326,10 @@ const CursosSeminario = () => {
                   </button>
                   <button 
                     className="cabin-btn primary"
-                    onClick={() => inscribirseEnCurso(curso.id)}
+                    onClick={() => {
+                      setCursoSeleccionado(curso);
+                      setMostrarFormulario(true);
+                    }}
                     disabled={inscripcionLoading || (curso.cupos?.disponibles || 0) === 0}
                   >
                     {inscripcionLoading ? 'Inscribiendo...' : 
@@ -371,58 +350,58 @@ const CursosSeminario = () => {
         )}
 
       {/* Modal de Detalles del Curso */}
-      {cursoSeleccionado && (
-        <div className="modal-overlay" onClick={() => setCursoSeleccionado(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-title-section">
+      {cursoSeleccionado && !mostrarFormulario && (
+        <div className="modal-overlay-programas" onClick={() => setCursoSeleccionado(null)}>
+          <div className="modal-content-programas" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-programas">
+              <div className="modal-title-section-programas">
                 <h2>{cursoSeleccionado.nombre}</h2>
-                <div className="modal-badges">
-                  <span className="modal-badge tipo">
+                <div className="modal-badges-programas">
+                  <span className="modal-badge-programas tipo">
                     {cursoSeleccionado.tipo === 'curso' ? '📚 Curso' : '🎓 Programa Técnico'}
                   </span>
-                  <span className="modal-badge categoria">
+                  <span className="modal-badge-programas categoria">
                     {cursoSeleccionado.categoria}
                   </span>
-                  <span className="modal-badge nivel">
+                  <span className="modal-badge-programas nivel">
                     {cursoSeleccionado.nivel}
                   </span>
                 </div>
               </div>
               <button
-                className="modal-close"
+                className="modal-close-programas"
                 onClick={() => setCursoSeleccionado(null)}
               >
                 ×
               </button>
             </div>
             
-            <div className="modal-body">
-              <div className="modal-image-container">
+            <div className="modal-body-programas">
+              <div className="modal-image-container-programas">
                 <img
                   src={cursoSeleccionado.imagen || '/api/placeholder/400/250'}
                   alt={cursoSeleccionado.nombre}
-                  className="modal-image"
+                  className="modal-image-programas"
                 />
-                <div className="modal-rating">
+                <div className="modal-rating-programas">
                   <Star size={20} fill="currentColor" />
                   <span>4.5</span>
                 </div>
               </div>
               
-              <div className="modal-info">
-                <div className="info-section">
+              <div className="modal-info-programas">
+                <div className="info-section-programas">
                   <h3>📝 Descripción</h3>
                   <p>{cursoSeleccionado.descripcion}</p>
                 </div>
 
-                <div className="info-grid">
-                  <div className="info-item">
+                <div className="info-grid-programas">
+                  <div className="info-item-programas">
                     <h4>👨‍🏫 Instructor</h4>
                     <p>{cursoSeleccionado.instructor}</p>
                   </div>
-                  
-                  <div className="info-item">
+
+                  <div className="info-item-programas">
                     <h4>⏱️ Duración</h4>
                     <p>
                       {cursoSeleccionado.tipo === 'curso' 
@@ -432,12 +411,12 @@ const CursosSeminario = () => {
                     </p>
                   </div>
 
-                  <div className="info-item">
+                  <div className="info-item-programas">
                     <h4>🎯 Modalidad</h4>
                     <p>{cursoSeleccionado.modalidad}</p>
                   </div>
 
-                  <div className="info-item">
+                  <div className="info-item-programas">
                     <h4>👥 Cupos</h4>
                     <p>
                       {cursoSeleccionado.cupos?.ocupados || 0} ocupados / {' '}
@@ -445,7 +424,7 @@ const CursosSeminario = () => {
                     </p>
                   </div>
 
-                  <div className="info-item">
+                  <div className="info-item-programas">
                     <h4>📅 Fechas</h4>
                     <p>
                       <strong>Inicio:</strong> {cursoSeleccionado.fechaInicio ? new Date(cursoSeleccionado.fechaInicio).toLocaleDateString() : 'N/A'}<br/>
@@ -453,7 +432,7 @@ const CursosSeminario = () => {
                     </p>
                   </div>
 
-                  <div className="info-item">
+                  <div className="info-item-programas">
                     <h4>💰 Precio</h4>
                     <p className="precio-modal">
                       {cursoSeleccionado.precio ? `$${cursoSeleccionado.precio}` : 'Gratis'}
@@ -470,17 +449,17 @@ const CursosSeminario = () => {
 
                 <div className="modal-actions">
                   <button
-                    className="btn-modal-secondary"
+                    className="btn-modal-secondary-programas"
                     onClick={() => toggleFavorite(cursoSeleccionado.id)}
                   >
                     <Heart size={16} />
                     {favorites[cursoSeleccionado.id] ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
                   </button>
                   <button
-                    className="btn-modal-primary"
+                    className="btn-modal-primary-programas"
                     onClick={() => {
-                      inscribirseEnCurso(cursoSeleccionado.id);
-                      setCursoSeleccionado(null);
+                      setCursoSeleccionado(cursoSeleccionado);
+                      setMostrarFormulario(true);
                     }}
                     disabled={inscripcionLoading || (cursoSeleccionado.cupos?.disponibles || 0) === 0}
                   >
@@ -492,6 +471,19 @@ const CursosSeminario = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Formulario de Inscripción */}
+      {mostrarFormulario && cursoSeleccionado && (
+        <FormularioInscripcion
+          evento={cursoSeleccionado}
+          usuario={user}
+          loading={inscripcionLoading}
+          onClose={() => {
+            setMostrarFormulario(false);
+            setCursoSeleccionado(null);
+          }}
+        />
       )}
 
       </main>

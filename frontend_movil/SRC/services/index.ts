@@ -2,12 +2,10 @@
 
 // Servicio de autenticación
 export * from './auth';
-
 // Servicios principales
 export * from './eventos';
 export * from './cabanas';
 export * from './cursos';
-
 // Servicios de gestión
 export * from './usuarios';
 export * from './categorizacion';
@@ -26,7 +24,6 @@ export { eventosService } from './eventos';
 export { cabanasService } from './cabanas';
 export { cursosService } from './cursos';
 export { usuariosService } from './usuarios';
-export { categorizacionService } from './categorizacion';
 export { tareasService } from './tareas';
 export { reportesService } from './reportes';
 export { inscripcionesService } from './inscripciones';

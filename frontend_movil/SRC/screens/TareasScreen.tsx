@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-    View, 
-    Text, 
-    FlatList, 
-    TouchableOpacity, 
-    StyleSheet, 
-    ActivityIndicator, 
+import {
+    View,
+    Text,
+    FlatList,
+    TouchableOpacity,
+    StyleSheet,
+    ActivityIndicator,
     Alert,
     Modal,
     TextInput,
@@ -22,6 +22,7 @@ import { colors, spacing, typography, shadows } from '../styles';
 import Icon from 'react-native-vector-icons/Ionicons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { tareasService } from '../services';
+import { userService } from '../services';
 
 
 
@@ -37,9 +38,13 @@ interface TareaFormData {
     descripcion: string;
     prioridad: string;
     asignadoA: string;
+    asignadoPor: string; // Nuevo campo requerido
     fechaLimite: Date;
-    categoria?: string;
-    etiquetas?: string[];
+    comentarios?: Array<{
+        texto: string;
+        autor: string;
+        fecha: Date;
+    }>; // Nuevo campo opcional
 }
 
 export const TareasScreen = () => {
@@ -52,23 +57,43 @@ export const TareasScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [showFilters, setShowFilters] = useState(false);
     const [filtros, setFiltros] = useState(INITIAL_FILTROS);
-    
+
     // Modal states
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [asignadoAOptions, setAsignadoAOptions] = useState<User[]>([]);
-    
+    const [loadingUsers, setLoadingUsers] = useState(false);
+
     // Form data
     const [nuevaTarea, setNuevaTarea] = useState<TareaFormData>({
         titulo: '',
         descripcion: '',
         prioridad: 'Media',
         asignadoA: '',
-        fechaLimite: new Date(),
-        categoria: '',
-        etiquetas: []
+        asignadoPor: user?._id || '', // Nuevo campo requerido
+        fechaLimite: new Date()
     });
     const [editingTarea, setEditingTarea] = useState<Tarea | null>(null);
+
+    // Helper para resetear el formulario
+    const resetFormData = (): TareaFormData => ({
+        titulo: '',
+        descripcion: '',
+        prioridad: 'Media',
+        asignadoA: '',
+        asignadoPor: user?._id || '', // Asignar automáticamente el usuario actual
+        fechaLimite: new Date()
+    });
+
+    // Helper para obtener el nombre de usuario
+    const getUserDisplayName = (userField: string | User): string => {
+        if (typeof userField === 'string') {
+            // Si es un ID, buscar el usuario en las opciones cargadas
+            const foundUser = asignadoAOptions.find(u => u._id === userField);
+            return foundUser ? `${foundUser.nombre} ${foundUser.apellido}` : 'Usuario';
+        }
+        return `${userField.nombre} ${userField.apellido}`;
+    };
 
     // Helper functions
     const getEstadoSiguiente = (estadoActual: string): string => {
@@ -99,18 +124,33 @@ export const TareasScreen = () => {
         }
     }, [user?._id]);
 
+    // Cargar usuarios disponibles para los pickers (asignadoA / asignadoPor)
     const cargarUsuarios = useCallback(async () => {
         try {
-            // Mock users data
-            const mockUsers = [
-                { _id: '1', nombre: 'Admin', apellido: 'User' },
-                { _id: '2', nombre: 'Tesorero', apellido: 'User' }
-            ] as any[];
-            setAsignadoAOptions(mockUsers);
+            setLoadingUsers(true);
+            console.log('🔄 cargando usuarios...');
+            const resp: any = await userService.getAllUsers();
+            if (resp && resp.success) {
+                // Resp puede venir como array o como { data: [...] }
+                const users = Array.isArray(resp.data) ? resp.data : (resp.data?.data || resp.data || []);
+                setAsignadoAOptions(users as User[]);
+                console.log(`✅ Usuarios cargados: ${users.length}`);
+
+                // Si el formulario no tiene asignadoPor, asignar el usuario actual por defecto
+                setNuevaTarea(prev => ({ ...prev, asignadoPor: prev.asignadoPor || user?._id || '' }));
+            } else {
+                console.warn('No se obtuvieron usuarios:', resp?.message);
+                setAsignadoAOptions([]);
+            }
         } catch (error) {
-            console.error('Error loading users:', error);
+            console.error('Error cargando usuarios:', error);
+            setAsignadoAOptions([]);
+        } finally {
+            setLoadingUsers(false);
         }
-    }, []);
+    }, [user?._id]);
+
+ 
 
     const handleCambioEstado = async (tareaId: string, nuevoEstado: string) => {
         try {
@@ -150,15 +190,7 @@ export const TareasScreen = () => {
                 Alert.alert('Éxito', 'Tarea actualizada correctamente');
                 setShowCreateModal(false);
                 setEditingTarea(null);
-                setNuevaTarea({
-                    titulo: '',
-                    descripcion: '',
-                    prioridad: 'Media',
-                    asignadoA: '',
-                    fechaLimite: new Date(),
-                    categoria: '',
-                    etiquetas: []
-                });
+                setNuevaTarea(resetFormData());
                 cargarTareas();
             } else {
                 Alert.alert('Error', response.message || 'No se pudo actualizar la tarea');
@@ -166,7 +198,7 @@ export const TareasScreen = () => {
         } else {
             // Crear nueva tarea
             try {
-                if (!nuevaTarea.titulo.trim() || !nuevaTarea.descripcion.trim() || !nuevaTarea.asignadoA) {
+                if (!nuevaTarea.titulo.trim() || !nuevaTarea.descripcion.trim() || !nuevaTarea.asignadoA || !nuevaTarea.asignadoPor) {
                     Alert.alert('Error', 'Por favor completa todos los campos requeridos');
                     return;
                 }
@@ -182,15 +214,7 @@ export const TareasScreen = () => {
                 if (response.success) {
                     Alert.alert('Éxito', 'Tarea creada correctamente');
                     setShowCreateModal(false);
-                    setNuevaTarea({
-                        titulo: '',
-                        descripcion: '',
-                        prioridad: 'Media',
-                        asignadoA: '',
-                        fechaLimite: new Date(),
-                        categoria: '',
-                        etiquetas: []
-                    });
+                    setNuevaTarea(resetFormData());
                     cargarTareas();
                 } else {
                     Alert.alert('Error', response.message || 'No se pudo crear la tarea');
@@ -214,9 +238,15 @@ export const TareasScreen = () => {
     // Load users when create modal is opened
     useEffect(() => {
         if (showCreateModal) {
+            console.log('✅ Modal abierto, cargando usuarios...');
             cargarUsuarios();
         }
     }, [showCreateModal, cargarUsuarios]);
+
+    // También cargar usuarios al montar la pantalla para que los pickers tengan datos
+    useEffect(() => {
+        cargarUsuarios();
+    }, [cargarUsuarios]);
 
     // Filter handling
     const aplicarFiltros = useCallback(() => {
@@ -231,7 +261,6 @@ export const TareasScreen = () => {
     const filteredTareas = tareas.filter(tarea => {
         if (filtros.estado && tarea.estado !== filtros.estado) return false;
         if (filtros.prioridad && tarea.prioridad !== filtros.prioridad) return false;
-        if (filtros.categoria && tarea.categoria !== filtros.categoria) return false;
         return true;
     });
 
@@ -248,15 +277,15 @@ export const TareasScreen = () => {
     const renderTareaCard = ({ item: tarea }: { item: Tarea }) => {
         const puedeEditarEstado = user &&
             (user.role === 'admin' ||
-             user.role === 'tesorero' ||
-             user._id === String(tarea.asignadoA));
+                user.role === 'tesorero' ||
+                user._id === String(tarea.asignadoA));
 
         return (
-            <View style={[styles.card, { borderLeftColor: tareasService.getPrioridadColor(tarea.prioridad) }]}> 
+            <View style={[styles.card, { borderLeftColor: tareasService.getPrioridadColor(tarea.prioridad) }]}>
                 <View style={styles.cardHeader}>
                     <View style={styles.titleContainer}>
                         <Text style={styles.title}>{tarea.titulo}</Text>
-                        <View style={[styles.estadoBadge, { backgroundColor: tareasService.getEstadoColor(tarea.estado) }]}> 
+                        <View style={[styles.estadoBadge, { backgroundColor: tareasService.getEstadoColor(tarea.estado) }]}>
                             <Text style={styles.estadoText}>{tarea.estado}</Text>
                         </View>
                     </View>
@@ -283,10 +312,10 @@ export const TareasScreen = () => {
                                         titulo: tarea.titulo,
                                         descripcion: tarea.descripcion,
                                         prioridad: tarea.prioridad,
-                                        asignadoA: tarea.asignadoA,
+                                        asignadoA: typeof tarea.asignadoA === 'string' ? tarea.asignadoA : tarea.asignadoA._id,
+                                        asignadoPor: typeof tarea.asignadoPor === 'string' ? tarea.asignadoPor : tarea.asignadoPor._id,
                                         fechaLimite: new Date(tarea.fechaLimite),
-                                        categoria: tarea.categoria || '',
-                                        etiquetas: tarea.etiquetas || []
+                                        comentarios: []
                                     });
                                     setShowCreateModal(true);
                                 }}
@@ -295,7 +324,7 @@ export const TareasScreen = () => {
                             </TouchableOpacity>
                         )}
                         {/* Botón eliminar */}
-                        {user?.role === 'admin'  && (
+                        {user?.role === 'admin' && (
                             <TouchableOpacity
                                 style={{ marginLeft: 8, padding: 6 }}
                                 onPress={() => {
@@ -331,7 +360,7 @@ export const TareasScreen = () => {
                     </View>
                 </View>
                 <Text style={styles.description}>{tarea.descripcion}</Text>
-    
+
                 <View style={styles.metaInfo}>
                     <View style={styles.metaItem}>
                         <Icon name="calendar-outline" size={16} color="#666" />
@@ -339,27 +368,13 @@ export const TareasScreen = () => {
                             Límite: {new Date(tarea.fechaLimite).toLocaleDateString()}
                         </Text>
                     </View>
-                    {tarea.categoria && (
-                        <View style={styles.metaItem}>
-                            <Icon name="bookmark-outline" size={16} color="#666" />
-                            <Text style={styles.metaText}>{tarea.categoria}</Text>
-                        </View>
-                    )}
-                </View>
-    
-                {tarea.etiquetas && tarea.etiquetas.length > 0 && (
-                    <View style={styles.tags}>
-                        {tarea.etiquetas.map((etiqueta: string, index: number) => (
-                            <View key={`tag-${index}`} style={styles.tag}>
-                                <Text style={styles.tagText}>{etiqueta}</Text>
-                            </View>
-                        ))}
+                    <View style={styles.metaItem}>
+                        <Icon name="person-outline" size={16} color="#666" />
+                        <Text style={styles.metaText}>
+                            {getUserDisplayName(tarea.asignadoA)}
+                        </Text>
                     </View>
-                )}
-    
-                {tarea.observaciones && (
-                    <Text style={styles.observaciones}>{tarea.observaciones}</Text>
-                )}
+                </View>
             </View>
         );
     };
@@ -372,7 +387,7 @@ export const TareasScreen = () => {
             { label: 'Completada', value: 'completada' },
             { label: 'Cancelada', value: 'cancelada' }
         ];
-        
+
         const prioridades = [
             { label: 'Alta', value: 'Alta' },
             { label: 'Media', value: 'Media' },
@@ -402,39 +417,38 @@ export const TareasScreen = () => {
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <View style={styles.filterHeader}>
-                            <Text style={styles.filterTitle}>Filtrar Tareas</Text>
-                            <TouchableOpacity onPress={() => setShowFilters(false)}>
-                                <Icon name="close" size={24} color={colors.text} />
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Estado</Text>
-                            <View style={styles.optionsContainer}>
-                                {estados.map((estado) => (
-                                    <TouchableOpacity
-                                        key={estado.value}
-                                        style={[
-                                            styles.filterChip,
-                                            filtros.estado === estado.value && styles.filterChipSelected
-                                        ]}
-                                        onPress={() => handleEstadoPress(estado.value)}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Asignado a * ({asignadoAOptions.length} opciones disponibles)</Text>
+                            {loadingUsers ? (
+                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}> 
+                                    <Text>Cargando usuarios...</Text>
+                                </View>
+                            ) : asignadoAOptions.length === 0 ? (
+                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}> 
+                                    <Text style={{ color: '#dc3545', textAlign: 'center' }}>No hay usuarios disponibles</Text>
+                                </View>
+                            ) : (
+                                <View style={[styles.pickerContainer, { minHeight: 60, maxHeight: 80 }]}> 
+                                    <Picker
+                                        selectedValue={nuevaTarea.asignadoA}
+                                        style={[styles.picker, { width: '100%' }]}
+                                        dropdownIconColor="#2D3748"
+                                        onValueChange={value => {
+                                            setNuevaTarea({ ...nuevaTarea, asignadoA: value });
+                                        }}
+                                        mode={Platform.OS === 'android' ? 'dropdown' : undefined}
                                     >
-                                        <Text style={[
-                                            styles.filterChipText,
-                                            filtros.estado === estado.value && styles.filterChipTextSelected
-                                        ]}>
-                                            {estado.label}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Prioridad</Text>
-                            <View style={styles.optionsContainer}>
+                                        <Picker.Item label="-- Seleccione un usuario --" value="" />
+                                        {asignadoAOptions.map((u, index) => (
+                                            <Picker.Item
+                                                key={`asignado-${u._id}`}
+                                                label={`${u.nombre} ${u.apellido} (${u.role})`}
+                                                value={u._id}
+                                            />
+                                        ))}
+                                    </Picker>
+                                </View>
+                            )}
                                 {prioridades.map((prioridad) => (
                                     <TouchableOpacity
                                         key={prioridad.value}
@@ -453,7 +467,7 @@ export const TareasScreen = () => {
                                     </TouchableOpacity>
                                 ))}
                             </View>
-                        </View>
+                    
 
                         <View style={styles.filterButtons}>
                             <TouchableOpacity
@@ -545,13 +559,8 @@ export const TareasScreen = () => {
                     onPress={() => {
                         setEditingTarea(null);
                         setNuevaTarea({
-                            titulo: '',
-                            descripcion: '',
-                            prioridad: 'Media',
-                            asignadoA: '',
-                            fechaLimite: new Date(),
-                            categoria: '',
-                            etiquetas: []
+                            ...resetFormData(),
+                            asignadoPor: user?._id || '' // Asegurar que se asigne el usuario actual
                         });
                         setShowCreateModal(true);
                     }}
@@ -571,15 +580,7 @@ export const TareasScreen = () => {
                 onRequestClose={() => {
                     setShowCreateModal(false);
                     setEditingTarea(null);
-                    setNuevaTarea({
-                        titulo: '',
-                        descripcion: '',
-                        prioridad: 'Media',
-                        asignadoA: '',
-                        fechaLimite: new Date(),
-                        categoria: '',
-                        etiquetas: []
-                    });
+                    setNuevaTarea(resetFormData());
                 }}
             >
                 <KeyboardAvoidingView
@@ -590,15 +591,7 @@ export const TareasScreen = () => {
                         <TouchableOpacity onPress={() => {
                             setShowCreateModal(false);
                             setEditingTarea(null);
-                            setNuevaTarea({
-                                titulo: '',
-                                descripcion: '',
-                                prioridad: 'Media',
-                                asignadoA: '',
-                                fechaLimite: new Date(),
-                                categoria: '',
-                                etiquetas: []
-                            });
+                            setNuevaTarea(resetFormData());
                         }}>
                             <Icon name="close" size={24} color={colors.text} />
                         </TouchableOpacity>
@@ -635,26 +628,82 @@ export const TareasScreen = () => {
                                 <Picker
                                     selectedValue={nuevaTarea.prioridad}
                                     onValueChange={value => setNuevaTarea({ ...nuevaTarea, prioridad: value })}
+                                    style={styles.picker}
+                                    itemStyle={{ color: '#2D3748', fontSize: 16 }} // Para iOS
+                                    mode="dropdown" // Para Android
                                 >
-                                    <Picker.Item label="Alta" value="Alta" />
-                                    <Picker.Item label="Media" value="Media" />
-                                    <Picker.Item label="Baja" value="Baja" />
+                                    <Picker.Item label="Alta" value="Alta" color="#2D3748" />
+                                    <Picker.Item label="Media" value="Media" color="#2D3748" />
+                                    <Picker.Item label="Baja" value="Baja" color="#2D3748" />
                                 </Picker>
                             </View>
                         </View>
                         <View style={styles.inputGroup}>
-                            <Text style={styles.inputLabel}>Asignado a *</Text>
-                            <View style={styles.pickerContainer}>
-                                <Picker
-                                    selectedValue={nuevaTarea.asignadoA}
-                                    onValueChange={value => setNuevaTarea({ ...nuevaTarea, asignadoA: value })}
-                                >
-                                    <Picker.Item label="Seleccione un usuario" value="" />
-                                    {asignadoAOptions.map(u => (
-                                        <Picker.Item key={u._id} label={`${u.nombre} ${u.apellido}`} value={u._id} />
-                                    ))}
-                                </Picker>
-                            </View>
+                            <Text style={styles.inputLabel}>Asignado a * ({asignadoAOptions.length} opciones disponibles)</Text>
+                            {/* Opciones de usuarios cargadas dinámicamente */}
+                            {loadingUsers ? (
+                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 50 }]}>
+                                    <Text>Cargando usuarios...</Text>
+                                </View>
+                            ) : (
+                                <View style={[styles.pickerContainer, { height: 50 }]}>
+                                    <Picker
+                                        selectedValue={nuevaTarea.asignadoA}
+                                        style={[styles.picker, { width: '100%' }]}
+                                        dropdownIconColor="#2D3748"
+                                        onValueChange={value => {
+                                            console.log('🔄 Cambiando asignadoA a:', value, 'de', asignadoAOptions.length, 'opciones');
+                                            setNuevaTarea({ ...nuevaTarea, asignadoA: value });
+                                        }}
+                                    >
+                                    
+                                        <Picker.Item label="-- Seleccione un usuario --" value="" />
+                                        {asignadoAOptions.map((u, index) => {
+                                            console.log(`Opción ${index}:`, u.nombre, u.apellido, u.role);
+                                            return (
+                                                <Picker.Item
+                                                    key={`asignado-${u._id}`}
+                                                    label={`${u.nombre} ${u.apellido} (${u.role})`}
+                                                    value={u._id}
+                                                />
+                                            );
+                                        })}
+                                    </Picker>
+                                </View>
+                            )}
+                        </View>
+
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Asignado por * ({asignadoAOptions.length} opciones disponibles)</Text>
+                            {loadingUsers ? (
+                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 50 }]}>
+                                    <Text>Cargando usuarios...</Text>
+                                </View>
+                            ) : (
+                                <View style={[styles.pickerContainer, { height: 50 }]}>
+                                    <Picker
+                                        selectedValue={nuevaTarea.asignadoPor}
+                                        style={[styles.picker, { width: '100%' }]}
+                                        dropdownIconColor="#2D3748"
+                                        onValueChange={value => {
+                                            console.log('🔄 Cambiando asignadoPor a:', value, 'de', asignadoAOptions.length, 'opciones');
+                                            setNuevaTarea({ ...nuevaTarea, asignadoPor: value });
+                                        }}
+                                    >
+                                        <Picker.Item label="-- Seleccione quien asigna --" value="" />
+                                        {asignadoAOptions.map((u, index) => {
+                                            console.log(`Opción por ${index}:`, u.nombre, u.apellido, u.role);
+                                            return (
+                                                <Picker.Item
+                                                    key={`asignador-${u._id}`}
+                                                    label={`${u.nombre} ${u.apellido} (${u.role})`}
+                                                    value={u._id}
+                                                />
+                                            );
+                                        })}
+                                    </Picker>
+                                </View>
+                            )}
                         </View>
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>Fecha límite *</Text>
@@ -666,25 +715,17 @@ export const TareasScreen = () => {
 
                     {/* Botones del Modal */}
                     <View style={styles.modalButtons}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={[styles.button, styles.buttonSecondary]}
                             onPress={() => {
                                 setShowCreateModal(false);
                                 setEditingTarea(null);
-                                setNuevaTarea({
-                                    titulo: '',
-                                    descripcion: '',
-                                    prioridad: 'Media',
-                                    asignadoA: '',
-                                    fechaLimite: new Date(),
-                                    categoria: '',
-                                    etiquetas: []
-                                });
+                                setNuevaTarea(resetFormData());
                             }}
                         >
                             <Text style={styles.buttonSecondaryText}>Cancelar</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={[styles.button, styles.buttonPrimary]}
                             onPress={handleCrearTarea}
                         >
@@ -775,23 +816,23 @@ const styles = StyleSheet.create({
     },
     headerTareas: {
         backgroundColor: colors.surface,
-            paddingVertical: spacing.lg + 40,
-            paddingHorizontal: spacing.md,
-            alignItems: 'center',
-            marginBottom: spacing.md,
-            borderBottomWidth: 1,
-            borderBottomColor: '#f1f5f9',
-            height: 170,
+        paddingVertical: spacing.lg + 40,
+        paddingHorizontal: spacing.md,
+        alignItems: 'center',
+        marginBottom: spacing.md,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f5f9',
+        height: 170,
     },
     headerTareasTitle: {
-       fontSize: typography.fontSize.xl + 4,
+        fontSize: typography.fontSize.xl + 4,
         fontWeight: typography.fontWeight.bold,
         color: colors.primary,
         marginBottom: spacing.xs,
         textAlign: 'center',
     },
     headerTareasSubtitle: {
-         fontSize: typography.fontSize.md,
+        fontSize: typography.fontSize.md,
         color: colors.textSecondary,
         marginBottom: spacing.xs,
         textAlign: 'center',
@@ -904,12 +945,17 @@ const styles = StyleSheet.create({
     pickerContainer: {
         backgroundColor: '#FFFFFF',
         borderWidth: 1,
-        borderColor: '#E0E0E0',
+        borderColor: '#E2E8F0',
         borderRadius: 8,
         marginBottom: 15,
+        minHeight: 50,
+        justifyContent: 'center',
     },
     picker: {
         height: 50,
+        color: '#2D3748',
+        fontSize: 16,
+        backgroundColor: 'transparent',
     },
     dateButton: {
         backgroundColor: '#FFFFFF',
@@ -1132,5 +1178,5 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: '600',
     },
-        
+
 });

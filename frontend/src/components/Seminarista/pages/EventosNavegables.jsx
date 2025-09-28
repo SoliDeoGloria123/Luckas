@@ -57,7 +57,11 @@ const EventosSeminario = () => {
   }, []);
 
   const estaInscrito = (eventoId) => {
-    return misInscripciones.some(insc => insc.evento === eventoId || insc.evento?._id === eventoId);
+    return misInscripciones.some(
+      insc =>
+        (insc.tipoReferencia === 'Eventos' &&
+         (insc.referencia === eventoId || insc.referencia?._id === eventoId))
+    );
   };
 
   const handleInscribir = (evento) => {
@@ -114,7 +118,7 @@ const EventosSeminario = () => {
   };
   return (
     <div className="eventos-seminario">
-      <Header></Header>
+      <Header />
       <main className="main-content-seminarista">
         <div className="breadcrumb-seminarista">
           <button className="back-btn-seminarista">
@@ -186,14 +190,7 @@ const EventosSeminario = () => {
                   key={ev._id}
                 >
                   <div className="event-image">
-                    {Array.isArray(ev.imagen) && ev.imagen.length > 0 ? (
-                      <img
-                        src={`http://localhost:3000/uploads/eventos/${ev.imagen[0]}`}
-                        alt="Imagen del evento"
-                      />
-                    ) : (
-                      <p>Sin imagen</p>
-                    )}
+                    <img src={ev.imagen && ev.imagen[0] ? ev.imagen[0] : "/placeholder.svg"} alt="Imagen del evento" />
                     <div className="event-badge priority-high">Prioridad {ev.prioridad} </div>
                     <div className="event-date">
                       <span className="day">{new Date(ev.fechaEvento).getDate()}</span>

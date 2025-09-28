@@ -28,37 +28,62 @@ const CategorizacionModal = ({
           </button>
         </div>
         <div className="modal-body-admin">
-           <div className="from-grid-admin">
-          <div className="form-grupo-admin">
-            <label>Nombre:</label>
-            <input
-              type="text"
-              value={modoEdicion ? categoriaSeleccionada?.nombre : nuevaCategoria.nombre}
-              onChange={e =>
-                modoEdicion
-                  ? setCategoriaSeleccionada({ ...categoriaSeleccionada, nombre: e.target.value })
-                  : setNuevaCategoria({ ...nuevaCategoria, nombre: e.target.value })
-              }
-              placeholder="Nombre de la categoría"
-              required
-            />
-          </div>
-          <div className="form-grupo-admin">
-            <label>Código:</label>
-            <input
-              type="text"
-              value={modoEdicion ? categoriaSeleccionada?.codigo : nuevaCategoria.codigo}
-              onChange={e =>
-                modoEdicion
-                  ? setCategoriaSeleccionada({ ...categoriaSeleccionada, codigo: e.target.value })
-                  : setNuevaCategoria({ ...nuevaCategoria, codigo: e.target.value })
-              }
-              placeholder="Código único"
-              required
-            />
-          </div>
-          </div>
-          <div className="form-grupo-admin">
+          <div className="from-grid-admin">
+            <div className="form-grupo-admin">
+              <label>Nombre:</label>
+              <input
+                type="text"
+                value={modoEdicion ? categoriaSeleccionada?.nombre : nuevaCategoria.nombre}
+                onChange={e =>
+                  modoEdicion
+                    ? setCategoriaSeleccionada({ ...categoriaSeleccionada, nombre: e.target.value })
+                    : setNuevaCategoria({ ...nuevaCategoria, nombre: e.target.value })
+                }
+                placeholder="Nombre de la categoría"
+                required
+              />
+            </div>
+            <div className="form-grupo-admin">
+              <label>Tipo Categoria:</label>
+              <select
+  
+                value={modoEdicion ? categoriaSeleccionada?.tipo : nuevaCategoria.tipo}
+                onChange={e =>
+                  modoEdicion
+                    ? setCategoriaSeleccionada({ ...categoriaSeleccionada, tipo: e.target.value })
+                    : setNuevaCategoria({ ...nuevaCategoria, tipo: e.target.value })
+                }
+  
+                required
+              >
+                <option value="curso">Cursos</option>
+                <option value="programa">Programas Técnicos</option>
+                <option value="evento">Eventos</option>
+                <option value="cabaña">Cabañas</option>
+                <option value="solicitud">Solicitudes</option>
+                <option value="tarea">Tareas</option>
+                <option value="inscripcion">Inscripcion</option>
+                <option value="reporte">Reportes</option>
+              </select>
+            </div>
+
+            <div className="form-grupo-admin">
+              <div className="form-grupo-admin">
+                <label>Código:</label>
+                <input
+                  type="text"
+                  value={modoEdicion ? categoriaSeleccionada?.codigo : nuevaCategoria.codigo}
+                  onChange={e =>
+                    modoEdicion
+                      ? setCategoriaSeleccionada({ ...categoriaSeleccionada, codigo: e.target.value })
+                      : setNuevaCategoria({ ...nuevaCategoria, codigo: e.target.value })
+                  }
+                  placeholder="Código único"
+                  required
+                />
+              </div>
+            </div>
+            <div className="form-grupo-admin">
             <label>Activo:</label>
             <select
               value={modoEdicion ? categoriaSeleccionada?.activo : nuevaCategoria.activo}
@@ -71,11 +96,12 @@ const CategorizacionModal = ({
               <option value="true">Activo</option>
               <option value="false">Desactivado</option>
             </select>
-        </div>
+            </div>
+          </div>
         </div>
         <div className="modal-action-admin">
           <button className="btn-admin secondary-admin" onClick={onClose}>
-             <i class="fas fa-times"></i>
+            <i class="fas fa-times"></i>
             Cancelar
           </button>
           <button className="btn-admin btn-primary" onClick={onSubmit}>

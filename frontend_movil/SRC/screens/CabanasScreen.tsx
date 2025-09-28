@@ -15,9 +15,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { cabanasService } from '../services/cabanas';
-
-//import * as categorizacionModule from '../services/categorizacion';
-import { Cabana, CabanaForm } from '../types';
+import categorizacionService from '../services/categorizacion';
+import { Cabana, CabanaForm, Categorizacion } from '../types';
 import { StyleSheet } from 'react-native';
 import { colors, spacing, typography } from '../styles';
 
@@ -37,6 +36,7 @@ const CabanasScreen: React.FC = () => {
     };
     const { canEdit, canDelete, user, hasRole } = useAuth();
     const [cabanas, setCabanas] = useState<Cabana[]>([]);
+    const [categorias, setCategorias] = useState<Categorizacion[]>([]);
     const [searchText, setSearchText] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -51,7 +51,8 @@ const CabanasScreen: React.FC = () => {
         categoria: '',
         precio: 0,
         ubicacion: '',
-        estado: 'disponible'
+        estado: 'disponible',
+        imagen: []
     });
 
     //const categorizacionService = categorizacionModule.categorizacionService;
@@ -62,10 +63,36 @@ const CabanasScreen: React.FC = () => {
             return;
         }
         loadCabanas();
+        loadCategorias(); // Cargar categorías una sola vez al inicio
     }, [user]);
 
-    // Estados disponibles para filtrar
-    // const estados = ['Todos', 'disponible', 'ocupada', 'mantenimiento']; // Eliminado para evitar duplicidad
+    // Cargar categorías
+    const loadCategorias = useCallback(async () => {
+        try {
+            const response = await categorizacionService.getAllCategorizaciones();
+            let categoriasArray: Categorizacion[] = [];
+            if (response.success && response.data) {
+              
+                // Si response.data es un array directamente
+                if (Array.isArray(response.data)) {
+                    categoriasArray = response.data;
+                }
+                // Si response.data es un objeto con .data
+                else if ((response.data as any).data && Array.isArray((response.data as any).data)) {
+                    categoriasArray = (response.data as any).data;
+                }
+                // Filtrar solo las activas
+                const activas = categoriasArray.filter(cat => cat.activo);
+                setCategorias(activas);
+            } else {
+                console.error('❌ Respuesta sin éxito o sin datos');
+                setCategorias([]);
+            }
+        } catch (error) {
+            console.error('❌ Error en loadCategorias:', error);
+            setCategorias([]);
+        }
+    }, []);
 
     // Cargar cabañas desde el servicio
     const loadCabanas = useCallback(async () => {
@@ -87,24 +114,7 @@ const CabanasScreen: React.FC = () => {
         }
     }, []);
 
-    // Cargar categorías
-    /*const loadCategorias = async () => {
-        try {
-            const categoriasResponse = await categorizacionService.getAllCategorizaciones();
-            if (Array.isArray(categoriasResponse)) {
-                setCategorias(categoriasResponse);
-            } else if (categoriasResponse?.data) {
-                setCategorias(categoriasResponse.data);
-            } else {
-                setCategorias([]);
-            }
-        } catch (error) {
-            console.error('Error loading categorias:', error);
-            setCategorias([]);
-        }
-    };*/
-
-    // Manejar refresh
+    // Manejar pull to refresh
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
         await loadCabanas();
@@ -126,13 +136,14 @@ const CabanasScreen: React.FC = () => {
     const handleCrearCabana = () => {
         setEditingCabana(null);
         setFormData({
-            nombre: '',
-            descripcion: '',
-            capacidad: 1,
-            categoria: '',
-            precio: 0,
-            ubicacion: '',
-            estado: 'disponible'
+      nombre: '',
+        descripcion: '',
+        capacidad: 1,
+        categoria: '',
+        precio: 0,
+        ubicacion: '',
+        estado: 'disponible',
+        imagen: []
         });
         setSelectedImages([]);
         setShowModal(true);
@@ -141,14 +152,24 @@ const CabanasScreen: React.FC = () => {
     // Manejar editar cabaña
     const handleEditarCabana = (cabana: Cabana) => {
         setEditingCabana(cabana);
+        
+        // Manejar categoria que puede venir como string (ObjectId) o como objeto poblado
+        let categoriaId = '';
+        if (typeof cabana.categoria === 'string') {
+            categoriaId = cabana.categoria;
+        } else if (cabana.categoria && typeof cabana.categoria === 'object' && '_id' in cabana.categoria) {
+            categoriaId = (cabana.categoria as any)._id;
+        }
+
         setFormData({
             nombre: cabana.nombre,
             descripcion: cabana.descripcion || '',
             capacidad: cabana.capacidad,
-            categoria: cabana.categoria || '',
+            categoria: categoriaId,
             precio: cabana.precio,
             ubicacion: cabana.ubicacion || '',
-            estado: cabana.estado
+            estado: cabana.estado,
+            imagen: cabana.imagen || []
         });
         setSelectedImages(cabana.imagen || []);
         setShowModal(true);
@@ -165,7 +186,8 @@ const CabanasScreen: React.FC = () => {
             categoria: '',
             precio: 0,
             ubicacion: '',
-            estado: 'disponible'
+            estado: 'disponible',
+            imagen: []
         });
         setSelectedImages([]);
     };
@@ -201,6 +223,22 @@ const CabanasScreen: React.FC = () => {
                 return;
             }
 
+            if (!formData.categoria.trim()) {
+                Alert.alert('Error', 'La categoría es requerida');
+                return;
+            }
+
+            if (formData.capacidad <= 0) {
+                Alert.alert('Error', 'La capacidad debe ser mayor a 0');
+                return;
+            }
+
+            if (formData.precio < 0) {
+                Alert.alert('Error', 'El precio no puede ser negativo');
+                return;
+            }
+
+        
             if (editingCabana) {
                 const response = await cabanasService.updateCabana(editingCabana._id, {
                     ...formData,
@@ -547,6 +585,48 @@ const CabanasScreen: React.FC = () => {
                                 onChangeText={(text) => setFormData({ ...formData, ubicacion: text })}
                                 placeholder="Ubicación de la cabaña"
                             />
+                        </View>
+
+                        {/* Categoría */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Categoría *</Text>
+                            <View style={styles.pickerContainer}>
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                    <TouchableOpacity
+                                        style={[
+                                            styles.pickerOption,
+                                            formData.categoria === '' && styles.pickerOptionSelected
+                                        ]}
+                                        onPress={() => {
+                                            setFormData({ ...formData, categoria: '' });
+                                            console.log('Seleccionado: Ninguna categoría');
+                                        }}
+                                    >
+                                        <Text style={[
+                                            styles.pickerOptionText,
+                                            formData.categoria === '' && styles.pickerOptionTextSelected
+                                        ]}>Ninguna</Text>
+                                    </TouchableOpacity>
+                                    {categorias.map((categoria) => (
+                                        <TouchableOpacity
+                                            key={categoria._id}
+                                            style={[
+                                                styles.pickerOption,
+                                                formData.categoria === categoria._id && styles.pickerOptionSelected
+                                            ]}
+                                            onPress={() => {
+                                                setFormData({ ...formData, categoria: categoria._id });
+                                                console.log('Seleccionado:', categoria.nombre);
+                                            }}
+                                        >
+                                            <Text style={[
+                                                styles.pickerOptionText,
+                                                formData.categoria === categoria._id && styles.pickerOptionTextSelected
+                                            ]}>{categoria.nombre}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                            </View>
                         </View>
 
                         {/* Estado */}

@@ -206,14 +206,19 @@ const ModalImageCarousel = ({ images }) => {
             <div className="inscripcion-card-misinscripciones" key={reserva.id}>
               <div className="inscripcion-content-misinscripciones">
                 {Array.isArray(reserva.cabana?.imagen) && reserva.cabana.imagen.length > 0 ? (
-                    <ModalImageCarousel images={reserva.cabana.imagen} />
-                  ) : (
-                    <img
-                      src={'https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg'}
-                      alt="Imagen del evento"
-                      className="modal-image-misinscripciones"
-                    />
-                  )}
+                  <img
+                    src={
+                      reserva.cabana.imagen[0].startsWith('http')
+                        ? reserva.cabana.imagen[0]
+                        : `http://localhost:3000/uploads/cabanas/${reserva.cabana.imagen[0]}`
+                    }
+                    alt={reserva.cabana?.nombre || 'Imagen de la cabaña'}
+                    className="modal-image-misinscripciones"
+                     
+                  />
+                ) : (
+                  <p>Imagen no disponible</p>
+                )}
                 <div className="inscripcion-body-misinscripciones">
                   <div className="header-misinscripciones">
                     <div className="inscripcion-title-section-misinscripciones">
@@ -236,7 +241,7 @@ const ModalImageCarousel = ({ images }) => {
                     </div>
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-clock"></i>
-                      <span>{reserva.horario} </span>
+                      <span>{reserva.cabana?.capacidad || 'No especificada'} </span>
                     </div>
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-map-marker-alt"></i>
@@ -266,13 +271,20 @@ const ModalImageCarousel = ({ images }) => {
           <div className="modal-overlay-misinscripciones show" onClick={closeModal}>
             <div className="modal-container-misinscripciones" onClick={e => e.stopPropagation()}>
               <div className="modal-header-misinscripciones">
-                <img
-                  src={currentInscripcion.cabana?.imagen?.[0]
-                    ? `/uploads/cabanas/${currentInscripcion.cabana.imagen[0]}`
-                    : "https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg"}
-                  alt="Imagen de la cabaña"
-                  className="modal-image-misinscripciones"
-                />
+                {Array.isArray(currentInscripcion.cabana?.imagen) && currentInscripcion.cabana.imagen.length > 0 ? (
+                  <img
+                    src={
+                      currentInscripcion.cabana.imagen[0].startsWith('http')
+                        ? currentInscripcion.cabana.imagen[0]
+                        : `http://localhost:3000/uploads/cabanas/${currentInscripcion.cabana.imagen[0]}`
+                    }
+                    alt={currentInscripcion.cabana?.nombre || 'Imagen de la cabaña'}
+                    className="modal-image-misinscripciones"
+                    style={{ maxHeight: '260px', borderRadius: '12px' }}
+                  />
+                ) : (
+                  <p>Imagen no disponible</p>
+                )}
                 <button className="modal-close-misinscripciones" onClick={closeModal}>
                   <FontAwesomeIcon icon={faTimes} />
                 </button>
@@ -286,7 +298,7 @@ const ModalImageCarousel = ({ images }) => {
                     {currentInscripcion.precio}
                   </span>
                 </div>
-                <h2 id="modalTitle" className="modal-title-misinscripciones">{currentInscripcion.cabana?.nombre || 'Cabaña'}</h2>
+                <h2 id="modalTitle" className="modal-title-misinscripciones">{currentInscripcion.cabana?.nombre}</h2>
                 <div className="modal-details-grid-misinscripciones">
                   <div className="modal-section-misinscripciones">
                     <h3 className="section-title-misinscripciones">Datos de la Cabaña</h3>

@@ -11,11 +11,9 @@ class CabanasService {
     
     async getAllCabanas(): Promise<{ success: boolean; data?: Cabana[]; message?: string }> {
         try {
-            console.log('Llamando a:', API_CONFIG.ENDPOINTS.CABANAS);
             const response = await authService.makeAuthenticatedRequest(API_CONFIG.ENDPOINTS.CABANAS, {
                 method: 'GET',
             });
-            console.log('Respuesta de la API:', JSON.stringify(response, null, 2));
             if (!response.success) {
                 return { success: false, message: response.message || 'Error al obtener cabañas' };
             }

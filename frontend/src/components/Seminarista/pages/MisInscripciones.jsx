@@ -26,7 +26,7 @@ const MisInscripciones = () => {
     canceladas: 0,
     total: 0
   });
-   const usuarioLogueado = (() => {
+  const usuarioLogueado = (() => {
     try {
       const usuarioStorage = localStorage.getItem('usuario');
       return usuarioStorage ? JSON.parse(usuarioStorage) : null;
@@ -38,12 +38,12 @@ const MisInscripciones = () => {
 
   // Datos de ejemplo (simulando API)
   useEffect(() => {
-        if (!userId) return;
-         inscripcionService.getIncripcionesPorUsuario(userId)
-          .then(data => {
-            // Si la respuesta viene como {success, data}, usa data
-            const inscripcionData = Array.isArray(data) ? data : data.data;
-            setInscripciones(inscripcionData);
+    if (!userId) return;
+    inscripcionService.getIncripcionesPorUsuario(userId)
+      .then(data => {
+        // Si la respuesta viene como {success, data}, usa data
+        const inscripcionData = Array.isArray(data) ? data : data.data;
+        setInscripciones(inscripcionData);
       })
       .catch(err => {
         console.error('Error al obtener las inscripciones:', err);
@@ -173,69 +173,78 @@ const MisInscripciones = () => {
           </div>
         </div>
         {/* Lista de inscripciones */}
-          {filteredInscripciones.length === 0 && (
-            <div className='no-data-container-misinscripciones'>
-              <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="Sin reservas" style={{width: '120px', marginBottom: '20px', opacity: 0.7}} />
-              <div>No tienes inscripciones registradas.</div>
-              <div style={{fontSize: '0.95em', color: '#888', marginTop: '8px'}}>¡Haz tu primera inscripción y disfruta la experiencia!</div>
-            </div>
-          )}
+        {filteredInscripciones.length === 0 && (
+          <div className='no-data-container-misinscripciones'>
+            <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="Sin reservas" style={{ width: '120px', marginBottom: '20px', opacity: 0.7 }} />
+            <div>No tienes inscripciones registradas.</div>
+            <div style={{ fontSize: '0.95em', color: '#888', marginTop: '8px' }}>¡Haz tu primera inscripción y disfruta la experiencia!</div>
+          </div>
+        )}
 
         {/* Lista de inscripciones */}
         {filteredInscripciones.map((inscripcion) => (
-        <div className="inscripciones-container-misinscripciones">
-          <div className="inscripcion-card-misinscripciones" key={inscripcion.id}>
-            <div className="inscripcion-content-misinscripciones">
-              {/* Carrusel de imágenes en la tarjeta */}
-              <div className="inscripcion-image-gallery">
-                <CardImageCarousel images={inscripcion.evento?.imagen} />
-              </div>
-              <div className="inscripcion-body-misinscripciones">
-                <div className="header-misinscripciones">
-                  <div className="inscripcion-title-section-misinscripciones">
-                    <div className="inscripcion-title-row-misinscripciones">
-                      <h3 className="inscripcion-title-misinscripciones">{inscripcion.evento?.nombre || 'Evento'}</h3>
-                      <span className={`status-badge-misinscripciones ${inscripcion.estado.toLowerCase()}`}>{inscripcion.estado}</span>
+          <div className="inscripciones-container-misinscripciones">
+            <div className="inscripcion-card-misinscripciones" key={inscripcion.id}>
+              <div className="inscripcion-content-misinscripciones">
+                {/* Carrusel de imágenes en la tarjeta */}
+                <div className="inscripcion-image-gallery">
+                  {inscripcion.tipoReferencia === 'Eventos' && Array.isArray(inscripcion.referencia?.imagen) && inscripcion.referencia.imagen.length > 0 ? (
+                    <img
+                      src={inscripcion.referencia.imagen[0]}
+                      alt={inscripcion.referencia?.nombre || 'Imagen del evento'}
+                      className="inscripcion-image-misinscripciones"
+                
+                    />
+                  ) : (
+                   <p>Imagen no disponible</p>
+                  )}
+                </div>
+                <div className="inscripcion-body-misinscripciones">
+                  <div className="header-misinscripciones">
+                    <div className="inscripcion-title-section-misinscripciones">
+                      <div className="inscripcion-title-row-misinscripciones">
+                        <h3 className="inscripcion-title-misinscripciones">{inscripcion.referencia?.nombre}</h3>
+                        <span className={`status-badge-misinscripciones ${inscripcion.estado.toLowerCase()}`}>{inscripcion.estado}</span>
+                      </div>
+                      {/* Si tienes categoría, puedes mostrarla aquí */}
+                      {/* <span className={`categoria-badge ${inscripcion.categoria?.toLowerCase()}`}>{inscripcion.categoria}</span> */}
                     </div>
-                    {/* Si tienes categoría, puedes mostrarla aquí */}
-                    {/* <span className={`categoria-badge ${inscripcion.categoria?.toLowerCase()}`}>{inscripcion.categoria}</span> */}
+                    <div className="inscripcion-price-section-misinscripciones">
+                      <div className="inscripcion-price-misinscripciones">{inscripcion.referencia?.precio || 'Precio no disponible'}</div>
+                      <div className="inscripcion-date-misinscripciones">Inscrito: {new Date(inscripcion.createdAt).toLocaleDateString()}</div>
+                    </div>
                   </div>
-                  <div className="inscripcion-price-section-misinscripciones">
-                    <div className="inscripcion-price-misinscripciones">{inscripcion.evento?.precio || 'Precio no disponible'}</div>
-                    <div className="inscripcion-date-misinscripciones">Inscrito: {new Date(inscripcion.createdAt).toLocaleDateString()}</div>
+                  <div className="inscripcion-details-misinscripciones">
+                    <div className="detail-row-misinscripciones">
+                      <i className="fas fa-calendar"></i>
+                      <span>{inscripcion.referencia?.fechaEvento ? new Date(inscripcion.referencia.fechaEvento).toLocaleDateString() : 'Sin fecha'}</span>
+                    </div>
+                    <div className="detail-row-misinscripciones">
+                      <i className="fas fa-clock"></i>
+                      <span>Hora Inicio: {inscripcion.referencia?.horaInicio || 'Horario no disponible'} - Hora Fin: {inscripcion.referencia?.horaFin || 'Horario no disponible'}</span>
+                    </div>
+                    <div className="detail-row-misinscripciones">
+                      <i className="fas fa-map-marker-alt"></i>
+                      <span>{inscripcion.referencia?.lugar || 'Ubicación no disponible'}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="inscripcion-details-misinscripciones">
-                  <div className="detail-row-misinscripciones">
-                    <i className="fas fa-calendar"></i>
-                    <span>{new Date(inscripcion.evento?.fechaEvento).toLocaleDateString()}</span>
-                  </div>
-                  <div className="detail-row-misinscripciones">
-                    <i className="fas fa-clock"></i>
-                    <span>Hora Inicio: {inscripcion.evento?.horaInicio || 'Horario no disponible'} - Hora Fin: {inscripcion.evento?.horaFin || 'Horario no disponible'}</span>
-                  </div>
-                  <div className="detail-row-misinscripciones">
-                    <i className="fas fa-map-marker-alt"></i>
-                    <span>{inscripcion.evento?.lugar || 'Ubicación no disponible'}</span>
-                  </div>
-                </div>
-                <div className="inscripcion-footer-misinscripciones">
-                  <div className="status-info-misinscripciones">
-                    <i className={`fas status-icon-misinscripciones ${inscripcion.estado.toLowerCase()}`}></i>
-                    <span className="status-text-misinscripciones">{inscripcion.estado}</span>
-                  </div>
-                  <div className="inscripcion-actions-misinscripciones">
-                    <button className="btn-outline-misinscripciones" onClick={() => openModal(inscripcion)}>
-                      <i className="fas fa-eye"></i>
-                      Ver Detalles
-                    </button>
-                    <button className="btn-danger-misinscripciones">Cancelar</button>
+                  <div className="inscripcion-footer-misinscripciones">
+                    <div className="status-info-misinscripciones">
+                      <i className={`fas status-icon-misinscripciones ${inscripcion.estado.toLowerCase()}`}></i>
+                      <span className="status-text-misinscripciones">{inscripcion.estado}</span>
+                    </div>
+                    <div className="inscripcion-actions-misinscripciones">
+                      <button className="btn-outline-misinscripciones" onClick={() => openModal(inscripcion)}>
+                        <i className="fas fa-eye"></i>
+                        Ver Detalles
+                      </button>
+                      <button className="btn-danger-misinscripciones">Cancelar</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         ))}
         {/* Modal de Detalles */}
         {isModalOpen && currentInscripcion && (
@@ -244,15 +253,22 @@ const MisInscripciones = () => {
               <div className="modal-header-misinscripciones">
                 {/* Carrusel de imágenes en el modal */}
                 <div className="modal-image-gallery">
-                  {Array.isArray(currentInscripcion.evento?.imagen) && currentInscripcion.evento.imagen.length > 0 ? (
-                    <ModalImageCarousel images={currentInscripcion.evento.imagen} />
-                  ) : (
+                  {currentInscripcion.tipoReferencia === 'Eventos' && Array.isArray(currentInscripcion.referencia?.imagen) && currentInscripcion.referencia.imagen.length > 0 && currentInscripcion.referencia.imagen[0] ? (
                     <img
-                      src={'https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg'}
-                      alt="Imagen del evento"
+                      src={
+                        currentInscripcion.referencia.imagen[0].startsWith('http')
+                          ? currentInscripcion.referencia.imagen[0]
+                          : `http://localhost:3000/uploads/eventos/${currentInscripcion.referencia.imagen[0]}`
+                      }
+                      alt={currentInscripcion.referencia?.nombre || 'Imagen del evento'}
                       className="modal-image-misinscripciones"
+
                     />
+                  ) : (
+                    <p>Imagen no disponible</p>
                   )}
+
+
                 </div>
                 <button className="modal-close-misinscripciones" onClick={closeModal}>
                   <FontAwesomeIcon icon={faTimes} />
@@ -276,15 +292,21 @@ const MisInscripciones = () => {
                     <h3 className="section-title-misinscripciones">Detalles del Evento</h3>
                     <div className="detail-item-misinscripciones">
                       <FontAwesomeIcon icon={faCalendar} className="detail-icon-misinscripciones" />
-                      <span id="modalFecha">{currentInscripcion.fecha}</span>
+                      <span id="modalFecha">{currentInscripcion.referencia?.nombre}</span>
+
+                    </div>
+                    <div className="detail-item-misinscripciones">
+                      <FontAwesomeIcon icon={faCalendar} className="detail-icon-misinscripciones" />
+                      <span id="modalFecha">{new Date(currentInscripcion.referencia?.fechaEvento).toLocaleDateString()}</span>
+
                     </div>
                     <div className="detail-item-misinscripciones">
                       <FontAwesomeIcon icon={faClock} className="detail-icon-misinscripciones" />
-                      <span id="modalHorario">{currentInscripcion.horario}</span>
+                      <span id="modalHorario">{currentInscripcion.referencia?.horaInicio}-{currentInscripcion.referencia?.horaFin}</span>
                     </div>
                     <div className="detail-item-misinscripciones">
                       <FontAwesomeIcon icon={faMapMarkerAlt} className="detail-icon-misinscripciones" />
-                      <span >{currentInscripcion.ubicacion}</span>
+                      <span >{currentInscripcion.referencia?.lugar}</span>
                     </div>
                   </div>
 
@@ -296,11 +318,11 @@ const MisInscripciones = () => {
                     </div>
                     <div className="detail-item-misinscripciones">
                       <FontAwesomeIcon icon={faCalendar} className="detail-icon-misinscripciones" />
-                      <span>Inscrito: <span id="modalFechaInscripcion">{currentInscripcion.fechaInscripcion}</span></span>
+                      <span>Inscrito: <span id="modalFechaInscripcion">{new Date(currentInscripcion.createdAt).toLocaleDateString()}</span></span>
                     </div>
                     <div className="detail-item-misinscripciones">
                       <span className="detail-icon-misinscripciones">💰</span>
-                      <span>Precio: <span id="modalPrecioText">{currentInscripcion.precio}</span></span>
+                      <span>Precio: <span id="modalPrecioText">{currentInscripcion.referencia?.precio}</span></span>
                     </div>
                   </div>
                 </div>
@@ -352,32 +374,4 @@ function ModalImageCarousel({ images }) {
 }
 
 // Carrusel para las imágenes en la tarjeta de inscripción
-function CardImageCarousel({ images }) {
-  const [index, setIndex] = useState(0);
-  if (!Array.isArray(images) || images.length === 0) {
-    return (
-      <img
-        src={'https://nupec.com/wp-content/uploads/2022/02/cat-watching-2021-08-26-15-42-24-utc.jpg'}
-        alt="Imagen del evento"
-        className="inscripcion-image-misinscripciones"
-      />
-    );
-  }
-  const prev = () => setIndex(i => (i === 0 ? images.length - 1 : i - 1));
-  const next = () => setIndex(i => (i === images.length - 1 ? 0 : i + 1));
-  return (
-    <div className="card-carousel-wrapper">
-      <button className="carousel-arrow left" onClick={prev}>&lt;</button>
-      <img
-        src={`http://localhost:3000/uploads/eventos/${images[index]}`}
-        alt={`Imagen ${index + 1}`}
-        className="inscripcion-image-misinscripciones"
-        style={{ maxHeight: '160px', borderRadius: '10px' }}
-      />
-      <button className="carousel-arrow right" onClick={next}>&gt;</button>
-      <div className="carousel-indicator">
-        {index + 1} / {images.length}
-      </div>
-    </div>
-  );
-}
+

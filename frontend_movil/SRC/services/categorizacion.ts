@@ -65,53 +65,48 @@ export class CategorizacionService {
 
     // Métodos de utilidad
     
-    // Filtrar categorizaciones por tipo
-    async getCategorizacionesByTipo(tipo: string): Promise<{ success: boolean; data?: Categorizacion[]; message?: string }> {
+    async getCategorizacionesActivas(): Promise<{ success: boolean; data?: string[]; message?: string }> {
         try {
+            console.log('🔄 Obteniendo categorías activas...');
             const response = await this.getAllCategorizaciones();
+            console.log('📥 Respuesta getAllCategorizaciones:', response);
+            
             if (response.success && response.data) {
-                const filtered = response.data.filter(cat => cat.tipo === tipo);
-                return { success: true, data: filtered };
+                // Verificar si response.data es un array directamente o está dentro de .data
+                let categorias = response.data;
+                
+                // Si la respuesta tiene una estructura anidada {data: {data: [...]}}, extraer el array
+                if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+                    categorias = (response.data as any).data;
+                }
+                
+                console.log('📋 Categorías extraídas:', categorias);
+                console.log('🔍 Tipo de categorías:', Array.isArray(categorias) ? 'array' : typeof categorias);
+                
+                // Verificar que sea un array antes de filtrar
+                if (Array.isArray(categorias)) {
+                    const nombres = categorias
+                        .filter(cat => cat && cat.activo)
+                        .map(cat => cat.nombre)
+                        .filter(nombre => nombre); // Filtrar nombres válidos
+                    
+                    console.log('✅ Nombres de categorías activas:', nombres);
+                    return { success: true, data: nombres };
+                } else {
+                    console.error('❌ Las categorías no son un array:', categorias);
+                    return { success: false, message: 'Formato de respuesta inválido' };
+                }
             }
-            return response;
+            
+            console.log('❌ Respuesta sin éxito o sin datos:', response);
+            return { success: false, message: response.message || 'No hay datos disponibles' };
         } catch (error) {
-            console.error('Error filtering categorizaciones by tipo:', error);
+            console.error('❌ Error getting categorizaciones activas:', error);
             return { success: false, message: 'Error de conexión' };
         }
     }
 
-    // Solo categorizaciones activas
-    async getCategorizacionesActivas(): Promise<{ success: boolean; data?: Categorizacion[]; message?: string }> {
-        try {
-            const response = await this.getAllCategorizaciones();
-            if (response.success && response.data) {
-                const activas = response.data.filter(cat => cat.activo);
-                return { success: true, data: activas };
-            }
-            return response;
-        } catch (error) {
-            console.error('Error getting categorizaciones activas:', error);
-            return { success: false, message: 'Error de conexión' };
-        }
-    }
-
-    // Validaciones
-    validateCategorizacion(categorizacion: Partial<Categorizacion>): { valid: boolean; errors: string[] } {
-        const errors: string[] = [];
-
-        if (!categorizacion.nombre || categorizacion.nombre.trim().length === 0) {
-            errors.push('El nombre de la categorización es requerido');
-        }
-
-        if (!categorizacion.tipo || categorizacion.tipo.trim().length === 0) {
-            errors.push('El tipo de categorización es requerido');
-        }
-
-        return {
-            valid: errors.length === 0,
-            errors
-        };
-    }
+    
 
     // Tipos de categorización comunes
     getTiposComunes(): string[] {
@@ -141,4 +136,5 @@ export class CategorizacionService {
     }
 }
 
-export const categorizacionService = new CategorizacionService();
+const categorizacionService = new CategorizacionService();
+export default categorizacionService;

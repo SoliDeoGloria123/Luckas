@@ -215,14 +215,7 @@ const CabanasSeminario = () => {
           {cabanas.map((cab) => (
             <div className="cabin-card" key={cab.id}>  {/*data-category={`${cabin.status === 'available' ? 'disponible ' : ''}${cabin.category}`}*/}
               <div className="cabin-image">
-                {Array.isArray(cab.imagen) && cab.imagen.length > 0 ? (
-                  <img
-                    src={`http://localhost:3000/uploads/cabanas/${cab.imagen[0]}`}
-                    alt="Imagen del evento"
-                  />
-                ) : (
-                  <p>Sin imagen</p>
-                )}
+                <img src={cab.imagen && cab.imagen[0] ? cab.imagen[0] : "/placeholder.svg"} alt="Imagen de la cabaña" />
                 <div className={`cabin-status ${cab.estado === 'available' ? 'available' : 'reserved'}`}>
                   {cab.estado === 'available' ? 'Disponible' : 'Reservada'}
                 </div>
@@ -230,8 +223,8 @@ const CabanasSeminario = () => {
                   className={`cabin-favorite ${favorites[cab.id] ? 'active' : ''}`}>
                   <Heart />
                 </div>
-                <div className="cabin-gallery">
-                  <span className="gallery-count">
+                <div className="cabin-gallery-cabana">
+                  <span className="gallery-count-cabana">
                     +{Math.floor(Math.random() * 10) + 5} fotos
                   </span>
                 </div>
@@ -409,11 +402,12 @@ const CabanasSeminario = () => {
                   id="currentImage"
                   src={
                     cabanaSeleccionada.imagen && cabanaSeleccionada.imagen[0]
-                      ? `http://localhost:3000/uploads/cabanas/${cabanaSeleccionada.imagen[0]}`
+                      ? cabanaSeleccionada.imagen[0]
                       : "/placeholder.svg"
                   }
                   alt={cabanaSeleccionada.nombre}
                   className="galleryImage-semianrio"
+                
                 />
                 <button className="galleryBtn-seminario prevBtn-seminario" onClick={() => { }}>
                   <i className="fas fa-chevron-left"></i>

@@ -98,7 +98,7 @@ exports.createEvent = async (req, res) => {
         return res.status(404).json({ success: false, message: 'El usuario categorizador no existe.' });
       }
     }
-    const imagen = req.files?.map(file => file.filename) || [];
+   const imagen = req.cloudinaryUrls || [];
     // Crear el evento
     const event = new Evento({
       nombre,
@@ -137,23 +137,28 @@ exports.updateEvent = async (req, res) => {
       console.log('[EVENTOS] updateEvent - Evento no encontrado');
       return res.status(404).json({ success: false, message: 'Evento no encontrado' });
     }
-    // Manejo de imagen nueva
-    if (req.files && req.files.length > 0) {
-      // Eliminar imágenes antiguas
-      if (Array.isArray(currentEvent.imagen)) {
-        currentEvent.imagen.forEach((nombreImagen) => {
-          const rutaImagen = path.join(__dirname, '../public/uploads/eventos', nombreImagen);
-          if (fs.existsSync(rutaImagen)) {
-            fs.unlinkSync(rutaImagen);
-          }
-        });
-      }
-
-      // Asignar nuevas imágenes
-      updateData.imagen = req.files.map(file => file.filename);
-    }
-    // Validar si el nombre cambió
+    const cloudinary = require('../config/cloudinary');
     const updateData = { ...req.body };
+    // Manejo de imagen nueva con Cloudinary
+    if (req.cloudinaryUrls && req.cloudinaryUrls.length > 0) {
+      // Eliminar imágenes antiguas de Cloudinary si son URLs de Cloudinary
+      if (Array.isArray(currentEvent.imagen)) {
+        for (const url of currentEvent.imagen) {
+          // Extraer public_id de la URL de Cloudinary
+          const matches = url.match(/\/Luckas\/eventos\/([^\.]+)\./);
+          if (matches && matches[1]) {
+            const publicId = `Luckas/eventos/${matches[1]}`;
+            try {
+              await cloudinary.uploader.destroy(publicId);
+            } catch (err) {
+              console.error('Error eliminando imagen de Cloudinary:', publicId, err);
+            }
+          }
+        }
+      }
+      // Asignar nuevas imágenes
+      updateData.imagen = req.cloudinaryUrls;
+    }
     if (updateData.nombre === currentEvent.nombre) {
       delete updateData.nombre;
       console.log('[EVENTOS] updateEvent - Nombre no cambió, excluyendo de actualización');
@@ -195,21 +200,37 @@ exports.deleteEvent = async (req, res) => {
     if (!deletedEvent){
       return res.status(404).json({ success: false, message: 'Evento no encontrado' });
     }
-    if (Array.isArray(deletedEvent.imagen)) {
-      deletedEvent.imagen.forEach((nombreImagen) => {
-        const rutaImagen = path.join(__dirname, '../public/uploads/eventos', nombreImagen);
-        if (fs.existsSync(rutaImagen)) {
-          fs.unlinkSync(rutaImagen);
-        }
-      });
-    } else if (typeof deletedEvent.imagen === 'string') {
+    // Eliminar inscripciones asociadas a este evento
+    const Inscripcion = require('../models/Inscripciones');
+    const result = await Inscripcion.deleteMany({ referencia: deletedEvent._id, tipoReferencia: 'Eventos' });
+    console.log(`[EVENTOS] Se eliminaron ${result.deletedCount} inscripciones asociadas al evento.`);
 
-      const rutaImagen = path.join(__dirname, '../public/uploads/eventos', deletedEvent.imagen);
-      if (fs.existsSync(rutaImagen)) {
-        fs.unlinkSync(rutaImagen);
+    const cloudinary = require('../config/cloudinary');
+    // Eliminar imágenes de Cloudinary si existen
+    if (Array.isArray(deletedEvent.imagen)) {
+      for (const url of deletedEvent.imagen) {
+        const matches = url.match(/\/Luckas\/eventos\/([^\.]+)\./);
+        if (matches && matches[1]) {
+          const publicId = `Luckas/eventos/${matches[1]}`;
+          try {
+            await cloudinary.uploader.destroy(publicId);
+          } catch (err) {
+            console.error('Error eliminando imagen de Cloudinary:', publicId, err);
+          }
+        }
+      }
+    } else if (typeof deletedEvent.imagen === 'string') {
+      const matches = deletedEvent.imagen.match(/\/Luckas\/eventos\/([^\.]+)\./);
+      if (matches && matches[1]) {
+        const publicId = `Luckas/eventos/${matches[1]}`;
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (err) {
+          console.error('Error eliminando imagen de Cloudinary:', publicId, err);
+        }
       }
     }
-    res.status(200).json({ success: true, message: 'Evento eliminado correctamente' });
+    res.status(200).json({ success: true, message: `Evento eliminado correctamente. Se eliminaron ${result.deletedCount} inscripciones asociadas.` });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al eliminar evento', error: error.message });
   }

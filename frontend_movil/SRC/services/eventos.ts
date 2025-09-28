@@ -143,10 +143,9 @@ class EventosService {
             errors.push('Los cupos totales deben ser mayor a 0');
         }
 
-        if (evento.fechaEvento && new Date(evento.fechaEvento) < new Date()) {
-            errors.push('La fecha del evento no puede ser en el pasado');
-        }
-
+      if (evento.fechaEvento && new Date(evento.fechaEvento) < new Date()) {
+    errors.push('La fecha del evento no puede ser en el pasado');
+}
         return {
             valid: errors.length === 0,
             errors

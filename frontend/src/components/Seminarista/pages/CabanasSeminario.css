@@ -320,7 +320,7 @@
   background: var(--color-white);
 }
 
-.cabin-gallery {
+.cabin-gallery-cabana {
   position: absolute;
   bottom: var(--spacing-md);
   right: var(--spacing-md);
@@ -333,7 +333,7 @@
   font-weight: 500;
 }
 
-.cabanas-seminario .gallery-count {
+.cabanas-seminario .gallery-count-cabana {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);

@@ -12,16 +12,16 @@ exports.crearInscripcion = async (req, res) => {
     console.log('Usuario autenticado:', req.userId);
     console.log('Rol del usuario:', req.userRole);
 
-    const { usuario, evento, categoria } = req.body;
+  const { usuario, referencia, tipoReferencia, categoria } = req.body;
 
     // 1. Validar que los IDs sean ObjectId válidos
     if (!mongoose.Types.ObjectId.isValid(usuario)) {
       console.log('Error: ID de usuario inválido:', usuario);
       return res.status(400).json({ success: false, message: 'ID de usuario inválido' });
     }
-    if (!mongoose.Types.ObjectId.isValid(evento)) {
-      console.log('Error: ID de evento inválido:', evento);
-      return res.status(400).json({ success: false, message: 'ID de evento inválido' });
+    if (!mongoose.Types.ObjectId.isValid(referencia)) {
+      console.log('Error: ID de referencia inválido:', referencia);
+      return res.status(400).json({ success: false, message: 'ID de referencia inválido' });
     }
     if (!mongoose.Types.ObjectId.isValid(categoria)) {
       console.log('Error: ID de categoría inválido:', categoria);
@@ -36,12 +36,24 @@ exports.crearInscripcion = async (req, res) => {
     }
     console.log('Usuario encontrado:', usuarioExiste.nombre, usuarioExiste.apellido);
 
-    const eventoExiste = await Evento.findById(evento);
-    if (!eventoExiste) {
-      console.log('Error: Evento no encontrado:', evento);
-      return res.status(404).json({ success: false, message: 'Evento no encontrado' });
+    // Validar referencia según tipoInscripcion
+    let referenciaExiste = null;
+    if (tipoReferencia === 'Eventos') {
+      referenciaExiste = await Evento.findById(referencia);
+      if (!referenciaExiste) {
+        console.log('Error: Evento no encontrado:', referencia);
+        return res.status(404).json({ success: false, message: 'Evento no encontrado' });
+      }
+      console.log('Evento encontrado:', referenciaExiste.nombre);
+      // Verificar si el usuario ya está inscrito en este evento
+      const yaInscrito = await Inscripcion.findOne({ usuario, referencia, tipoReferencia: 'Eventos' });
+      if (yaInscrito) {
+        return res.status(400).json({ success: false, message: 'Ya estás inscrito en este evento.' });
+      }
     }
-    console.log('Evento encontrado:', eventoExiste.nombre);
+    // Si tienes modelos Curso o ProgramaTecnico, aquí puedes validar igual
+    // Ejemplo:
+    // if (tipoReferencia === 'Curso') { ... }
 
     const categoriaExiste = await Categorizacion.findById(categoria);
     if (!categoriaExiste) {
@@ -71,7 +83,10 @@ exports.crearInscripcion = async (req, res) => {
     console.log('Validaciones pasadas, creando inscripción...');
 
     // 1. Crear la inscripción
-    const inscripcion = new Inscripcion(req.body);
+    const inscripcion = new Inscripcion({
+      ...req.body,
+      tipoReferencia // aseguramos que el campo sea el correcto
+    });
     await inscripcion.save();
     console.log('Inscripción creada:', inscripcion._id);
 
@@ -79,14 +94,21 @@ exports.crearInscripcion = async (req, res) => {
     const user = await Usuario.findById(req.body.usuario);
 
     // 2. Crear la solicitud asociada
+    let descripcionSolicitud = '';
+    if (tipoReferencia === 'Eventos' && referenciaExiste) {
+      descripcionSolicitud = `Inscripción al evento ${referenciaExiste.nombre}`;
+    }
+    // Si tienes cursos o programas, puedes personalizar la descripción
+
     const solicitud = new Solicitud({
       solicitante: user._id,
       responsable: user._id,
+      titulo: referenciaExiste?.nombre || 'Inscripción', // <-- agrega esto
       correo: user.correo,
       telefono: user.telefono,
       tipoSolicitud: 'Inscripción',
       categoria: req.body.categoria,
-      descripcion: `Inscripción al evento ${eventoExiste.nombre}`,
+      descripcion: descripcionSolicitud,
       estado: 'Nueva',
       prioridad: 'Media',
       origin: 'inscripcion',
@@ -99,6 +121,19 @@ exports.crearInscripcion = async (req, res) => {
     // 3. Enlazar la solicitud a la inscripción
     inscripcion.solicitud = solicitud._id;
     await inscripcion.save();
+    
+    if (tipoReferencia === 'Curso' || tipoReferencia === 'ProgramaTecnico') {
+      try {
+        const ProgramaAcademico = require('../models/ProgramaAcademico');
+        const programa = await ProgramaAcademico.findById(referencia);
+        if (programa && programa.cuposDisponibles > 0) {
+          programa.cuposDisponibles -= 1;
+          await programa.save();
+        }
+      } catch (err) {
+        console.error('Error al actualizar cuposDisponibles:', err.message);
+      }
+    }
 
     console.log('=== FIN DEBUG INSCRIPCION ===');
     res.status(201).json({ success: true, data: inscripcion });
@@ -120,11 +155,7 @@ exports.obtenerInscripciones = async (req, res) => {
     }
     const inscripciones = await Inscripcion.find(filtro)
       .populate('usuario', 'nombre apellido correo telefono numeroDocumento tipoDocumento')
-      .populate({
-        path: 'evento',
-        select: 'nombre descripcion imagen imagenUrl precio etiquetas fechaEvento horaInicio horaFin lugar direccion duracionDias cuposTotales cuposDisponibles programa prioridad observaciones categoria',
-        populate: { path: 'categoria', select: 'nombre descripcion codigo' }
-      })
+      .populate('referencia')
       .populate('categoria', 'nombre descripcion codigo')
       .sort({ createdAt: -1 });
     console.log('[INSCRIPCIONES] Encontradas:', inscripciones.length);
@@ -230,12 +261,11 @@ exports.obtenerInscripcionesPorUsuario = async (req, res) => {
     if (!userId) {
       return res.status(400).json({ success: false, message: 'Falta el parámetro userId' });
     }
+    // Buscar todas las inscripciones del usuario y popular referencia dinámicamente
+    // Usar populate dinámico con el nombre correcto del modelo
     const inscripciones = await Inscripcion.find({ usuario: userId })
       .populate('usuario', 'nombre apellido correo telefono numeroDocumento tipoDocumento')
-      .populate({
-        path: 'evento',
-        select: 'nombre fechaEvento lugar descripcion imagen imagenUrl precio etiquetas horaInicio horaFin cuposDisponibles cuposTotales direccion programa observaciones',
-      })
+      .populate('referencia')
       .populate('categoria', 'nombre descripcion codigo')
       .sort({ createdAt: -1 });
     res.json({ success: true, data: inscripciones });

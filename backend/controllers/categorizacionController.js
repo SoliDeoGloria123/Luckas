@@ -6,13 +6,13 @@ const Solicitud = require('../models/Solicitud');
 const crearCategoria = async (req, res) => {
   try {
     console.log('[CATEGORIA] Datos recibidos:', req.body);
-    const { nombre, codigo } = req.body;
+    const { nombre, codigo, tipo } = req.body;
 
-    if (!nombre || !codigo) {
+    if (!nombre || !codigo || !tipo) {
       return res.status(400).json({
         success: false,
-        message: 'Nombre y código son requeridos',
-        datos: { nombre, codigo }
+        message: 'Nombre, código y tipo son requeridos',
+        datos: { nombre, codigo, tipo }
       });
     }
 
@@ -35,6 +35,7 @@ const crearCategoria = async (req, res) => {
     const nuevaCategoria = new Categorizacion({
       nombre,
       codigo: codigo.toUpperCase(),
+      tipo,
       creadoPor: req.userId
     });
 
@@ -117,7 +118,7 @@ const obtenerCategoriaPorId = async (req, res) => {
 // ACTUALIZAR categoría
 const actualizarCategoria = async (req, res) => {
   try {
-    const { nombre, codigo, activo } = req.body;
+    const { nombre, codigo,tipo ,activo } = req.body;
     const id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -148,6 +149,7 @@ const actualizarCategoria = async (req, res) => {
         nombre,
         _id: { $ne: objectId }
       });
+      
 
       if (nombreExistente) {
         return res.status(400).json({
@@ -161,6 +163,7 @@ const actualizarCategoria = async (req, res) => {
     if (nombre) datosActualizacion.nombre = nombre;
     if (typeof activo === 'boolean') datosActualizacion.activo = activo;
     if (codigo) datosActualizacion.codigo = codigo.toUpperCase();
+    if (tipo) datosActualizacion.tipo = tipo;
 
     const categoriaActualizada = await Categorizacion.findByIdAndUpdate(
       objectId,
@@ -257,6 +260,7 @@ const categorizarSolicitud = async (req, res) => {
         categoria: {
           id: categoria._id,
           nombre: categoria.nombre,
+          tipo: categoria.tipo,
           codigo: categoria.codigo
         },
         estado: 'categorizada',

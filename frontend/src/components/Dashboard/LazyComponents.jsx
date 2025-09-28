@@ -4,8 +4,6 @@ import { lazy } from 'react';
 export const GestionSolicitudLazy = lazy(() => import('./GestionSolicitud'));
 export const ReportesLazy = lazy(() => import('./Reportes'));
 export const ProgramasAcademicosLazy = lazy(() => import('./ProgramasAcademicos'));
-export const CursosLazy = lazy(() => import('./Cursos'));
-export const ProgramasTecnicosLazy = lazy(() => import('./ProgramasTecnicos'));
 export const GestionCategorizacionLazy = lazy(() => import('./GestionCategorizacion'));
 export const GestionIscripcionLazy = lazy(() => import('./GestionIscripcion'));
 export const GestionEventosLazy = lazy(() => import('./GestionEventos'));

@@ -5,6 +5,8 @@ import { inscripcionService } from "../../../services/inscripcionService";
 
 const FormularioInscripcion = ({
   evento,
+  curso,
+  programa,
   usuario,
   loading,
   mensaje,
@@ -57,6 +59,34 @@ const FormularioInscripcion = ({
         return edad;
       };
       const edadCalculada = calcularEdad(usuarioLogueado?.fechaNacimiento);
+      // Detectar tipo de inscripción y obtener datos
+      let tipoReferencia = '';
+      let referencia = null;
+      let categoria = null;
+      let itemData = null;
+
+      if (evento) {
+        tipoReferencia = 'Eventos';
+        referencia = evento._id || evento.id;
+        categoria = evento.categoria?._id || evento.categoria;
+        itemData = evento;
+      } else if (curso) {
+        tipoReferencia = 'Curso';
+        referencia = curso._id || curso.id;
+        categoria = curso.categoria?._id || curso.categoria;
+        itemData = curso;
+      } else if (programa) {
+        tipoReferencia = 'ProgramaTecnico';
+        referencia = programa._id || programa.id;
+        categoria = programa.categoria?._id || programa.categoria;
+        itemData = programa;
+      }
+
+      if (!tipoReferencia) {
+        alert('Error: No se especificó el tipo de inscripción (evento, curso o programa).');
+        return;
+      }
+
       // Construir objeto inscripción para la API
       const inscripcionData = {
         usuario: userId,
@@ -64,11 +94,12 @@ const FormularioInscripcion = ({
         apellido: formData.apellido,
         tipoDocumento: formData.tipoDocumento,
         numeroDocumento: formData.numeroDocumento,
-        correo: formData.email,
+        correo: formData.correo,
         telefono: formData.telefono,
         edad: edadCalculada,
-        evento: evento?._id || evento?.id,
-        categoria: evento?.categoria?._id || evento?.categoria,
+        tipoReferencia: tipoReferencia,
+        referencia: referencia,
+        categoria: categoria,
         observaciones: formData.motivacion,
       };
       await inscripcionService.create(inscripcionData);
@@ -181,26 +212,39 @@ const FormularioInscripcion = ({
         updateProgress(25);
     }
   }, [currentStep]);
-  // Usa datos del evento si existen
-  const tituloEvento = evento?.nombre;
-  const descripcionEvento = evento?.descripcion;
-  const fechaEvento = evento?.fecha ? new Date(evento.fecha).toLocaleDateString() : "15 de Agosto, 2025";
-  const horaEvento = evento?.hora;
-  const lugarEvento = evento?.lugar;
-  const precioEvento = evento?.precio;
+  // Detectar tipo de item y obtener datos dinámicamente
+  const getItemData = () => {
+    if (evento) return { item: evento, tipo: 'Evento' };
+    if (curso) return { item: curso, tipo: 'Curso' };
+    if (programa) return { item: programa, tipo: 'Programa Técnico' };
+    return { item: null, tipo: 'Item' };
+  };
+
+  const { item, tipo } = getItemData();
+  
+  // Usa datos del item seleccionado
+  const tituloItem = item?.nombre || `${tipo} sin título`;
+  const descripcionItem = item?.descripcion || `Descripción del ${tipo.toLowerCase()}`;
+  const fechaItem = item?.fecha ? new Date(item.fecha).toLocaleDateString() : 
+                   item?.fechaEvento ? new Date(item.fechaEvento).toLocaleDateString() : 
+                   item?.fechaInicio ? new Date(item.fechaInicio).toLocaleDateString() : 
+                   "Fecha no especificada";
+  const horaItem = item?.hora || item?.horaInicio || "Hora no especificada";
+  const lugarItem = item?.lugar || item?.ubicacion || "Ubicación no especificada";
+  const precioItem = item?.precio || "Precio no especificado";
 
   return (
     <div className="modal-overlay-inscribirse-seminario active">
       <div className="modal-content-inscribirse-seminario">
         <div className="event-header-inscribirse-seminario">
           <div className="event-info-seminario">
-            <h1 className="event-title-inscribirse-seminario ">{tituloEvento}</h1>
-            <p className="event-description-inscribirse-seminario">{descripcionEvento}</p>
+            <h1 className="event-title-inscribirse-seminario ">{tituloItem}</h1>
+            <p className="event-description-inscribirse-seminario">{descripcionItem}</p>
             <div className="event-details-inscribirse-seminario">
-              <span> {fechaEvento}</span>
-              <span> {horaEvento}</span>
-              <span>{lugarEvento}</span>
-              <span className="price-inscribirse-inscribirse-seminario">{precioEvento}</span>
+              <span> {fechaItem}</span>
+              <span> {horaItem}</span>
+              <span>{lugarItem}</span>
+              <span className="price-inscribirse-inscribirse-seminario">{precioItem}</span>
             </div>
           </div>
           <button className="close-btn-inscribirse-seminario" onClick={onClose}>
@@ -494,10 +538,10 @@ const FormularioInscripcion = ({
                 <div className="summary-section-seminario">
                   <h4>Resumen del Evento</h4>
                   <div className="event-summary-seminario">
-                    <p><strong>Evento:</strong> {tituloEvento}</p>
-                    <p><strong>Fecha:</strong> {fechaEvento}</p>
-                    <p><strong>Horario:</strong> {horaEvento}</p>
-                    <p><strong>Lugar:</strong> {lugarEvento}</p>
+                    <p><strong>Evento:</strong> {tituloItem}</p>
+                    <p><strong>Fecha:</strong> {fechaItem}</p>
+                    <p><strong>Horario:</strong> {horaItem}</p>
+                    <p><strong>Lugar:</strong> {lugarItem}</p>
                   </div>
                 </div>
 
@@ -506,7 +550,7 @@ const FormularioInscripcion = ({
                   <div className="payment-breakdown-seminario">
                     <div className="payment-row-seminario">
                       <span>Costo del evento:</span>
-                      <span>{precioEvento}</span>
+                      <span>{precioItem}</span>
                     </div>
                     <div className="payment-row-seminario">
                       <span>Descuento seminarista:</span>
@@ -515,7 +559,7 @@ const FormularioInscripcion = ({
                     <hr />
                     <div className="payment-row-seminario total">
                       <span>Total a pagar:</span>
-                      <span>{precioEvento}</span>
+                      <span>{precioItem}</span>
                     </div>
                   </div>
                 </div>
@@ -561,7 +605,7 @@ const FormularioInscripcion = ({
                 <i className="fas fa-check-circle"></i>
               </div>
               <h2>¡Felicitaciones!</h2>
-              <p>Tu inscripción al evento "{tituloEvento}" ha sido completada exitosamente.</p>
+              <p>Tu inscripción al evento "{tituloItem}" ha sido completada exitosamente.</p>
 
               <div className="inscription-details-seminario">
                 <h4>Detalles de tu Inscripción</h4>
@@ -572,9 +616,9 @@ const FormularioInscripcion = ({
                     <p><strong>Email:</strong> {formData.email}</p>
                   </div>
                   <div className="detail-item-seminario">
-                    <p><strong>Evento:</strong> {tituloEvento}</p>
-                    <p><strong>Fecha:</strong> {fechaEvento}</p>
-                    <p><strong>Lugar:</strong> {lugarEvento}</p>
+                    <p><strong>Evento:</strong> {tituloItem}</p>
+                    <p><strong>Fecha:</strong> {fechaItem}</p>
+                    <p><strong>Lugar:</strong> {lugarItem}</p>
                   </div>
                 </div>
               </div>

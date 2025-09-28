@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const inscripcionSchema = new mongoose.Schema({
+ 
     usuario: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'usuarios', // Debe coincidir con User.js
@@ -37,10 +38,17 @@ const inscripcionSchema = new mongoose.Schema({
         required: true,
         min: 0,
     },
-    evento: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Eventos', // Debe coincidir con Eventos.js
+       // Indica si la inscripción es a un evento, curso o programa técnico
+    tipoReferencia: {
+        type: String,
+    enum: ['Eventos', 'Curso', 'ProgramaTecnico'],
         required: true,
+    },
+    // Referencia dinámica según tipoReferencia: Evento, Curso o ProgramaTecnico
+    referencia: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        refPath: 'tipoReferencia',
     },
     categoria: {
         type: mongoose.Schema.Types.ObjectId,

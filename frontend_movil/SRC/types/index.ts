@@ -106,13 +106,7 @@ export interface Tarea extends BaseModel {
     prioridad: 'alta' | 'media' | 'baja';
     asignadoA: string | User;
     asignadoPor: string | User;
-    categoria?: string;
-    etiquetas?: string[];
-    observaciones?: string;
-    fechaCompletada?: string;
     comentarios?: string[];
-    archivosAdjuntos?: string[];
-    fechaCreacion?: string;
 }
 
 // Estado de carga
@@ -261,11 +255,9 @@ export interface Curso {
 export interface Categorizacion {
     _id: string;
     nombre: string;
-    descripcion?: string;
-    tipo: string;
+    codigo: string;
     activo: boolean;
-    createdAt: string;
-    updatedAt: string;
+    creadoPor?: string;
 }
 
 // Tipo Reporte
@@ -283,21 +275,22 @@ export interface Reporte {
 
 // Formularios para crear/editar
 export interface EventoForm {
-    nombre: string;
-    descripcion: string;
-    precio: number;
-    categoria: string;
-    etiquetas: string[];
-    fechaEvento: string;
-    horaInicio: string;
-    horaFin: string;
-    lugar: string;
-    direccion?: string;
-    duracionDias: number;
-    cuposTotales: number;
-    programa: ProgramaEvento[];
-    prioridad: 'Alta' | 'Media' | 'Baja';
-    observaciones?: string;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  categoria: string; // ObjectId
+  etiquetas: string[];
+  fechaEvento: string | Date; // Enviar string ISO
+  horaInicio: string;
+  horaFin: string;
+  lugar: string;
+  direccion?: string;
+  cuposDisponibles: number;
+  cuposTotales: number;
+  programa: ProgramaEvento[];
+  prioridad: 'Alta' | 'Media' | 'Baja';
+  observaciones?: string;
+  imagen?: string[]; // Opcional, si usas imágenes
 }
 
 export interface CabanaForm {
@@ -308,6 +301,8 @@ export interface CabanaForm {
     precio: number;
     ubicacion?: string;
     estado: 'disponible' | 'ocupada' | 'mantenimiento';
+    creadoPor?: string; // ObjectId como string
+    imagen: string[];   // Requerido
 }
 
 export interface ReservaForm {

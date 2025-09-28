@@ -8,6 +8,11 @@ const categorizacionSchema = new mongoose.Schema({
     trim: true,
     unique: true
   },
+  tipo: {
+    type: String,
+    required: true,
+    enum: ['curso', 'programa', 'evento', 'cabaña', 'solicitud', 'tarea', 'inscripcion', 'reporte']
+  },
   codigo: {
     type: String,
     required: [true, 'El código es obligatorio'],
@@ -20,7 +25,7 @@ const categorizacionSchema = new mongoose.Schema({
     default: true
   },
   creadoPor: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId, 
     ref: 'usuarios'
   }
 }, {

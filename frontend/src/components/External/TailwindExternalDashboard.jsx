@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import cabanaService from '../../services/cabanaService';
 import eventService from '../../services/eventService';
-import cursosService from '../../services/courseService';
+//import cursosService from '../../services/courseService';
 import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 

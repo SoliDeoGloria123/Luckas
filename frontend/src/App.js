@@ -9,7 +9,6 @@ import DashboardAdmin from "./components/Dashboard/DashboardAdmin";
 import Dashboarduser from "./components/Dashboard/GestionUsuario";
 import GestionAcategorizacion from "./components/Dashboard/GestionCategorizacion";
 import GestionAprogramas from "./components/Dashboard/ProgramasAcademicos";
-import GestionAcursos from "./components/Dashboard/Cursos";
 import GestionAeventos from "./components/Dashboard/GestionEventos";
 import GestionAsolicitud from "./components/Dashboard/GestionSolicitud";
 import GestionAinscripcion from "./components/Dashboard/GestionIscripcion";
@@ -25,7 +24,6 @@ import GestionTsolicitudes from "./components/Tesorero/Tablas/Gestionsolicitud";
 import GestionTeventos from "./components/Tesorero/Tablas/Gestionevento";
 import GestionTcabanas from "./components/Tesorero/Tablas/Gestioncabana";
 import GestionTreservas from "./components/Tesorero/Tablas/Gestionreserva";
-import GestionTcursos from "./components/Tesorero/Tablas/Gestioncursos";
 import GestionTtarea from "./components/Tesorero/Tablas/Gestiontareas";
 import GestionTinscripcion from "./components/Tesorero/Tablas/Gestioninscripcion";
 import GestionTreportes from "./components/Tesorero/Tablas/Gestioreportes";
@@ -60,7 +58,6 @@ function App() {
         <Route path="/admin/usuarios" element={<Dashboarduser />}/>
         <Route path="/admin/categorizacion" element={<GestionAcategorizacion />}/>
         <Route path="/admin/programas-academicos" element={<GestionAprogramas />}/>
-        <Route path="/admin/cursos" element={<GestionAcursos />}/>
         <Route path="/admin/eventos" element={<GestionAeventos />}/>
         <Route path="/admin/solicitudes" element={<GestionAsolicitud />}/>
         <Route path="/admin/inscripciones" element={<GestionAinscripcion />}/>
@@ -77,7 +74,6 @@ function App() {
         <Route path="/tesorero/eventos" element={<GestionTeventos/>}/>
         <Route path="/tesorero/cabañas" element={<GestionTcabanas/>}/>
         <Route path="/tesorero/reservas" element={<GestionTreservas/>}/>
-        <Route path="/tesorero/cursos" element={<GestionTcursos/>}/>
         <Route path="/tesorero/tarea" element={<GestionTtarea/>}/>
         <Route path="/tesorero/inscripcion" element={<GestionTinscripcion/>}/>
         <Route path="/tesorero/reportes" element={<GestionTreportes/>}/>

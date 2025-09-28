@@ -92,6 +92,7 @@ exports.crearReserva = async (req, res) => {
     const solicitud = new Solicitud({
       solicitante: usuarioExiste._id,
       responsable: usuarioExiste._id,
+      titulo: cabanaExiste.nombre || 'Reserva de cabaña',
       correo: usuarioExiste.correo,
       telefono: usuarioExiste.telefono,
       tipoSolicitud: 'Hospedaje',
