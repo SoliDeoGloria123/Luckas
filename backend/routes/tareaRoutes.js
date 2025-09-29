@@ -15,6 +15,12 @@ router.get('/', tareaController.obtenerTareas);
 router.post('/', role.checkRole('admin', 'tesorero','seminarista'), tareaController.crearTarea);
 router.put('/:id', role.checkRole('admin', 'tesorero','seminarista'), tareaController.actualizarTarea);
 
+// Cambiar estado de tarea (admin, tesorero, seminarista)
+router.patch('/:id/estado', role.checkRole('admin', 'tesorero', 'seminarista'), tareaController.cambiarEstado);
+
+// Agregar comentario a tarea (todos los roles autenticados)
+router.post('/:id/comentario', tareaController.agregarComentario);
+
 // Rutas de eliminación (solo admin)
 router.delete('/:id', role.isAdmin, tareaController.eliminarTarea);
 

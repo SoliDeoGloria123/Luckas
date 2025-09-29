@@ -188,3 +188,97 @@ exports.eliminarTarea = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// Cambiar estado de tarea
+exports.cambiarEstado = async (req, res) => {
+    try {
+        const { estado } = req.body;
+        const { id } = req.params;
+
+        // Validar estado
+        const estadosValidos = ['pendiente', 'en_progreso', 'completada', 'cancelada'];
+        if (!estadosValidos.includes(estado)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Estado inválido. Valores válidos: ' + estadosValidos.join(', ')
+            });
+        }
+
+        const tarea = await Tarea.findByIdAndUpdate(
+            id,
+            { estado },
+            { new: true, runValidators: true }
+        ).populate('asignadoA', 'nombre apellido correo')
+         .populate('asignadoPor', 'nombre apellido correo');
+
+        if (!tarea) {
+            return res.status(404).json({
+                success: false,
+                message: 'Tarea no encontrada'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Estado actualizado correctamente',
+            data: tarea
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: 'Error al cambiar estado',
+            error: error.message
+        });
+    }
+};
+
+// Agregar comentario a tarea
+exports.agregarComentario = async (req, res) => {
+    try {
+        const { texto } = req.body;
+        const { id } = req.params;
+        const autorId = req.userId; // Usuario autenticado
+
+        if (!texto || texto.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'El comentario no puede estar vacío'
+            });
+        }
+
+        const tarea = await Tarea.findById(id);
+        if (!tarea) {
+            return res.status(404).json({
+                success: false,
+                message: 'Tarea no encontrada'
+            });
+        }
+
+        // Agregar comentario
+        tarea.comentarios.push({
+            texto: texto.trim(),
+            autor: autorId,
+            fecha: new Date()
+        });
+
+        await tarea.save();
+
+        // Obtener la tarea con populate para devolver datos completos
+        const tareaActualizada = await Tarea.findById(id)
+            .populate('asignadoA', 'nombre apellido correo')
+            .populate('asignadoPor', 'nombre apellido correo')
+            .populate('comentarios.autor', 'nombre apellido');
+
+        res.json({
+            success: true,
+            message: 'Comentario agregado correctamente',
+            data: tareaActualizada
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: 'Error al agregar comentario',
+            error: error.message
+        });
+    }
+};

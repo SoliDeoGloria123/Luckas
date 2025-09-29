@@ -14,16 +14,17 @@ const ProgramaModal = ({
 
   useEffect(() => {
     if (modoEdicion && programaSeleccionado) {
+      console.log('Modal - Programa seleccionado:', programaSeleccionado);
       setFormData({
-        titulo: programaSeleccionado.titulo || '',
+        titulo: programaSeleccionado.nombre || '', // backend usa 'nombre'
         descripcion: programaSeleccionado.descripcion || '',
-        tipo: programaSeleccionado.tipo || 'curso',
+        tipo: programaSeleccionado.tipo || 'curso', // este es para el select del frontend
         modalidad: programaSeleccionado.modalidad || 'presencial',
         duracion: programaSeleccionado.duracion || '',
         precio: programaSeleccionado.precio || '',
         fechaInicio: programaSeleccionado.fechaInicio ? programaSeleccionado.fechaInicio.split('T')[0] : '',
         fechaFin: programaSeleccionado.fechaFin ? programaSeleccionado.fechaFin.split('T')[0] : '',
-        cupos: programaSeleccionado.cupos || '',
+        cupos: programaSeleccionado.cuposDisponibles || '', // backend usa 'cuposDisponibles'
         profesor: programaSeleccionado.profesor || '',
         profesorBio: programaSeleccionado.profesorBio || '',
         requisitos: programaSeleccionado.requisitos || [''],
@@ -35,6 +36,7 @@ const ProgramaModal = ({
         imagen: programaSeleccionado.imagen || '',
         destacado: programaSeleccionado.destacado || false
       });
+      console.log('Modal - FormData actualizado');
     }
   }, [modoEdicion, programaSeleccionado, setFormData]);
 

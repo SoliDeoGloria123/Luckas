@@ -34,7 +34,7 @@ router.post(
   role.checkRole('admin', 'tesorero'),
   eventosController.createEvent
 );
-router.post(
+router.put(
   '/:id',
   (req, res, next) => { req.tipoImagen = 'eventos'; next(); }, // Carpeta dinámica
   uploadMultiple,

@@ -101,7 +101,7 @@ const GestionEventos = () => {
       setModoEdicion(false);
       obtenerEventos();
     } catch (error) {
-      mostrarAlerta("Error"`Error al actualizar el evento: ${error.message}`);
+      mostrarAlerta("Error", `Error al actualizar el evento: ${error.message}`);
     }
   };
 
@@ -118,7 +118,7 @@ const GestionEventos = () => {
       mostrarAlerta("¡Éxito!", "Evento eliminado exitosamente");
       obtenerEventos();
     } catch (error) {
-      mostrarAlerta("Error"`Error al eliminar el evento: ${error.message}`);
+      mostrarAlerta("Error", `Error al eliminar el evento: ${error.message}`);
     }
   };
 

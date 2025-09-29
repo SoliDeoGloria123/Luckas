@@ -4,10 +4,8 @@ import { categorizacionService } from '../../../services/categorizacionService';
 import { useNavigate } from "react-router-dom";
 import { mostrarAlerta } from '../../utils/alertas';
 import CabanaModal from '../modal/CabanaModal';
-import Header from '../Header/Header-tesorero'
-import Footer from '../../footer/Footer'
-
-
+import Header from '../Header/Header-tesorero';
+import Footer from '../../footer/Footer';
 
 const Gestioncabana = () => {
   const [cabanas, setCabanas] = useState([]);
@@ -17,8 +15,6 @@ const Gestioncabana = () => {
   const [modalMode, setModalCabana] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
   const [modalImagen, setModalImagen] = useState({ abierto: false, imagenes: [], actual: 0 });
-
-  
 
   const handleVerImagenes = (imagenes) => {
     if (Array.isArray(imagenes) && imagenes.length > 0) {
@@ -99,7 +95,17 @@ const Gestioncabana = () => {
     setShowModal(true);
   };
 
-
+  const handleDeleteCabana = async (id) => {
+    if (!id) return;
+    if (!window.confirm('¿Seguro que deseas eliminar esta cabaña?')) return;
+    try {
+      await cabanaService.delete(id);
+      mostrarAlerta('¡Éxito!', 'Cabaña eliminada exitosamente');
+      obtenerCabanas();
+    } catch (err) {
+      mostrarAlerta('Error', 'Error al eliminar cabaña: ' + err.message);
+    }
+  };
 
   return (
     <>
@@ -250,7 +256,10 @@ const Gestioncabana = () => {
                       setCurrentItem(caba);
                       setShowModal(true);
                     }}>
-                      <i class="fas fa-edit"></i>
+                      <i className="fas fa-edit"></i>
+                    </button>
+                    <button className='action-btn delete' onClick={() => handleDeleteCabana(caba._id)}>
+                      <i className="fas fa-trash"></i>
                     </button>
                   </td>
                 </tr>

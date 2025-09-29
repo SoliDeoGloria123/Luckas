@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { userService } from "../../../services/ObteneruserService";
 
 const InscripcionModal = ({
@@ -13,68 +13,138 @@ const InscripcionModal = ({
   onClose,
   onSubmit
 }) => {
-  // Autocompletar datos del usuario al escribir el ID
-  useEffect(() => {
-    const cargarDatosUsuario = async () => {
-      const idUsuario = modoEdicion
-        ? inscripcionSeleccionada?.usuario
-        : nuevaInscripcion.usuario;
-      if (idUsuario && idUsuario.length === 24) {
-        try {
-          const user = await userService.getById(idUsuario);
-          if (user) {
-            const datos = {
-              nombre: user.nombre || "",
-              apellido: user.apellido || "",
-              correo: user.correo || "",
-              telefono: user.telefono || "",
-              tipoDocumento: user.tipoDocumento || "",
-              numeroDocumento: user.numeroDocumento || ""
-            };
-            if (modoEdicion) {
-              setInscripcionSeleccionada((prev) => ({
-                ...prev,
-                ...datos
-              }));
-            } else {
-              setNuevaInscripcion((prev) => ({
-                ...prev,
-                ...datos
-              }));
-            }
-          }
-        } catch (error) {
-          // Si no encuentra el usuario, limpia los campos
-          if (modoEdicion) {
-            setInscripcionSeleccionada((prev) => ({
-              ...prev,
-              nombre: "",
-              apellido: "",
-              correo: "",
-              telefono: "",
-              tipoDocumento: "",
-              numeroDocumento: ""
-            }));
-          } else {
-            setNuevaInscripcion((prev) => ({
-              ...prev,
-              nombre: "",
-              apellido: "",
-              correo: "",
-              telefono: "",
-              tipoDocumento: "",
-              numeroDocumento: ""
-            }));
-          }
-        }
+  const [cedulaBusqueda, setCedulaBusqueda] = useState("");
+  const [cargandoUsuario, setCargandoUsuario] = useState(false);
+  const [usuarioEncontrado, setUsuarioEncontrado] = useState(null);
+  const [errorBackend, setErrorBackend] = useState(""); // Estado para el error del backend
+
+  // Función para buscar usuario por cédula
+  const buscarUsuarioPorCedula = async (cedula) => {
+    if (!cedula || cedula.length < 6) return;
+
+    setCargandoUsuario(true);
+    try {
+      const usuario = await userService.getByDocumento(cedula);
+      setUsuarioEncontrado(usuario);
+
+      // Llenar automáticamente los campos del formulario
+      const datosUsuario = {
+        usuario: usuario._id,
+        nombre: usuario.nombre || "",
+        apellido: usuario.apellido || "",
+        correo: usuario.correo || "",
+        telefono: usuario.telefono || "",
+        tipoDocumento: usuario.tipoDocumento || "",
+        numeroDocumento: usuario.numeroDocumento || ""
+      };
+
+      if (modoEdicion) {
+        setInscripcionSeleccionada(prev => ({
+          ...prev,
+          ...datosUsuario
+        }));
+      } else {
+        setNuevaInscripcion(prev => ({
+          ...prev,
+          ...datosUsuario
+        }));
       }
-    };
-    cargarDatosUsuario();
-    // eslint-disable-next-line
-  }, [modoEdicion ? inscripcionSeleccionada?.usuario : nuevaInscripcion.usuario, modoEdicion]);
+    } catch (error) {
+      console.error("Usuario no encontrado:", error);
+      setUsuarioEncontrado(null);
+      // Limpiar los campos si no se encuentra el usuario
+      const datosVacios = {
+        usuario: "",
+        nombre: "",
+        apellido: "",
+        correo: "",
+        telefono: "",
+        tipoDocumento: "",
+        numeroDocumento: ""
+      };
+
+      if (modoEdicion) {
+        setInscripcionSeleccionada(prev => ({
+          ...prev,
+          ...datosVacios
+        }));
+      } else {
+        setNuevaInscripcion(prev => ({
+          ...prev,
+          ...datosVacios
+        }));
+      }
+    } finally {
+      setCargandoUsuario(false);
+    }
+  };
+
+  // Inicializar cédula cuando se abre el modal en modo edición
+  useEffect(() => {
+    if (modoEdicion && inscripcionSeleccionada?.numeroDocumento) {
+      setCedulaBusqueda(inscripcionSeleccionada.numeroDocumento);
+    } else if (!modoEdicion) {
+      setCedulaBusqueda("");
+      setUsuarioEncontrado(null);
+    }
+  }, [modoEdicion, inscripcionSeleccionada, mostrar]);
+
+  // Detectar cambios en el campo de cédula
+  const handleCedulaChange = (e) => {
+    const cedula = e.target.value;
+    setCedulaBusqueda(cedula);
+    if (cedula.length >= 6) {
+      buscarUsuarioPorCedula(cedula);
+    }
+  };
+
+  // Detectar pegado en el campo de cédula
+  const handleCedulaPaste = (e) => {
+    setTimeout(() => {
+      const cedula = e.target.value;
+      if (cedula.length >= 6) {
+        buscarUsuarioPorCedula(cedula);
+      }
+    }, 100);
+  };
 
   if (!mostrar) return null;
 
+  // En el componente, modifica el handler de onSubmit para crear el objeto con los nombres correctos
+  const handleSubmit = async () => {
+    const insc = modoEdicion ? inscripcionSeleccionada : nuevaInscripcion;
+    const usuarioId = typeof insc.usuario === 'object' && insc.usuario._id ? insc.usuario._id : insc.usuario;
+    const payload = {
+      usuario: usuarioId,
+      referencia: insc.evento, // id del evento
+      tipoReferencia: 'Eventos',
+      categoria: insc.categoria,
+      estado: insc.estado,
+      observaciones: insc.observaciones,
+      nombre: insc.nombre,
+      tipoDocumento: insc.tipoDocumento,
+      numeroDocumento: insc.numeroDocumento,
+      telefono: insc.telefono,
+      edad: insc.edad,
+      correo: insc.correo,
+      apellido: insc.apellido,
+    };
+    try {
+      await onSubmit(payload);
+      setErrorBackend("");
+    } catch (err) {
+      setErrorBackend(err?.message || "Error desconocido");
+    }
+  };
+
+  // Handler único para todos los campos
+  const inscripcionActual = modoEdicion ? inscripcionSeleccionada : nuevaInscripcion;
+  const setInscripcion = modoEdicion ? setInscripcionSeleccionada : setNuevaInscripcion;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setInscripcion({ ...inscripcionActual, [name]: value });
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -89,17 +159,46 @@ const InscripcionModal = ({
             ✕
           </button>
         </div>
-        <form className="modal-body-admin">
+        <form className="modal-body-admin" onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
+          <div className="form-grupo-admin">
+            <label>Buscar por Cédula:</label>
+            <input
+              type="text"
+              value={cedulaBusqueda}
+              onChange={handleCedulaChange}
+              onPaste={handleCedulaPaste}
+              placeholder="Ingrese número de cédula"
+              className="form-control"
+              style={{ marginBottom: '5px' }}
+            />
+            {cargandoUsuario && (
+              <small style={{ color: '#007bff', display: 'block' }}>🔍 Buscando usuario...</small>
+            )}
+            {usuarioEncontrado && (
+              <small style={{ color: '#28a745', display: 'block' }}>
+                ✅ Usuario encontrado: {usuarioEncontrado.nombre} {usuarioEncontrado.apellido}
+              </small>
+            )}
+            {cedulaBusqueda.length >= 6 && !usuarioEncontrado && !cargandoUsuario && (
+              <small style={{ color: '#dc3545', display: 'block' }}>❌ Usuario no encontrado con cédula: {cedulaBusqueda}</small>
+            )}
+          </div>
+
+          {/* Campo oculto para el ID del usuario */}
+          <input
+            type="hidden"
+            value={modoEdicion ? inscripcionSeleccionada?.usuario || "" : nuevaInscripcion.usuario || ""}
+          />
 
           {!modoEdicion && (
-            <div className="form-grupo-admin">
-              <label>Usuario:</label>
+            <div className="form-grupo-admin" style={{ display: 'none' }}>
+              <label>Usuario (ID):</label>
               <input
                 type="text"
                 value={nuevaInscripcion.usuario}
-                onChange={e => setNuevaInscripcion({ ...nuevaInscripcion, usuario: e.target.value })}
-                placeholder="ID del Usuario"
-                required
+                readOnly
+                disabled
+                style={{ backgroundColor: '#f5f5f5' }}
               />
             </div>
           )}
@@ -108,12 +207,12 @@ const InscripcionModal = ({
               <label>Nombre:</label>
               <input
                 type="text"
-                value={modoEdicion ? inscripcionSeleccionada?.nombre : nuevaInscripcion.nombre}
-                onChange={e =>
-                  modoEdicion
-                    ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, nombre: e.target.value })
-                    : setNuevaInscripcion({ ...nuevaInscripcion, nombre: e.target.value })
-                }
+                name="nombre"
+                value={inscripcionActual.nombre}
+                onChange={handleChange}
+                readOnly={!modoEdicion && usuarioEncontrado}
+                style={{ backgroundColor: !modoEdicion && usuarioEncontrado ? '#f5f5f5' : 'white' }}
+                placeholder="Nombre"
               />
             </div>
 
@@ -121,12 +220,12 @@ const InscripcionModal = ({
               <label>Apellido:</label>
               <input
                 type="text"
-                value={modoEdicion ? inscripcionSeleccionada?.apellido : nuevaInscripcion.apellido}
-                onChange={e =>
-                  modoEdicion
-                    ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, apellido: e.target.value })
-                    : setNuevaInscripcion({ ...nuevaInscripcion, apellido: e.target.value })
-                }
+                name="apellido"
+                value={inscripcionActual.apellido}
+                onChange={handleChange}
+                readOnly={!modoEdicion && usuarioEncontrado}
+                style={{ backgroundColor: !modoEdicion && usuarioEncontrado ? '#f5f5f5' : 'white' }}
+                placeholder="Apellido"
               />
             </div>
           </div>
@@ -135,12 +234,9 @@ const InscripcionModal = ({
             <div className="form-grupo-admin">
               <label>Tipo de Documento:</label>
               <select
-                value={modoEdicion ? inscripcionSeleccionada?.tipoDocumento : nuevaInscripcion.tipoDocumento}
-                onChange={e =>
-                  modoEdicion
-                    ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, tipoDocumento: e.target.value })
-                    : setNuevaInscripcion({ ...nuevaInscripcion, tipoDocumento: e.target.value })
-                }
+                name="tipoDocumento"
+                value={inscripcionActual.tipoDocumento}
+                onChange={handleChange}
                 required
               >
                 <option value="">Seleccione...</option>
@@ -156,12 +252,12 @@ const InscripcionModal = ({
               <label>Número de Documento:</label>
               <input
                 type="text"
-                value={modoEdicion ? inscripcionSeleccionada?.numeroDocumento : nuevaInscripcion.numeroDocumento}
-                onChange={e =>
-                  modoEdicion
-                    ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, numeroDocumento: e.target.value })
-                    : setNuevaInscripcion({ ...nuevaInscripcion, numeroDocumento: e.target.value })
-                }
+                name="numeroDocumento"
+                value={inscripcionActual.numeroDocumento}
+                onChange={handleChange}
+                readOnly={!modoEdicion && usuarioEncontrado}
+                style={{ backgroundColor: !modoEdicion && usuarioEncontrado ? '#f5f5f5' : 'white' }}
+                placeholder="Número de documento"
                 required
               />
             </div>
@@ -176,20 +272,34 @@ const InscripcionModal = ({
                   onChange={e =>
                     setNuevaInscripcion({ ...nuevaInscripcion, correo: e.target.value })
                   }
+                  readOnly={usuarioEncontrado}
+                  style={{ backgroundColor: usuarioEncontrado ? '#f5f5f5' : 'white' }}
+                  placeholder="Correo electrónico"
                 />
               </div>
             )}
-
+            {modoEdicion && (
+              <div className="form-grupo-admin">
+                <label>Correo:</label>
+                <input
+                  type="email"
+                  name="correo"
+                  value={inscripcionActual.correo}
+                  onChange={handleChange}
+                  placeholder="Correo electrónico"
+                />
+              </div>
+            )}
             <div className="form-grupo-admin">
               <label>Teléfono:</label>
               <input
                 type="text"
-                value={modoEdicion ? inscripcionSeleccionada?.telefono : nuevaInscripcion.telefono}
-                onChange={e =>
-                  modoEdicion
-                    ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, telefono: e.target.value })
-                    : setNuevaInscripcion({ ...nuevaInscripcion, telefono: e.target.value })
-                }
+                name="telefono"
+                value={inscripcionActual.telefono}
+                onChange={handleChange}
+                readOnly={!modoEdicion && usuarioEncontrado}
+                style={{ backgroundColor: !modoEdicion && usuarioEncontrado ? '#f5f5f5' : 'white' }}
+                placeholder="Teléfono"
                 required
               />
             </div>
@@ -199,24 +309,18 @@ const InscripcionModal = ({
               <label>Edad:</label>
               <input
                 type="number"
-                value={modoEdicion ? inscripcionSeleccionada?.edad : nuevaInscripcion.edad}
-                onChange={e =>
-                  modoEdicion
-                    ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, edad: e.target.value })
-                    : setNuevaInscripcion({ ...nuevaInscripcion, edad: e.target.value })
-                }
+                name="edad"
+                value={inscripcionActual.edad}
+                onChange={handleChange}
                 required
               />
             </div>
             <div className="form-grupo-admin">
               <label>Evento:</label>
               <select
-                value={modoEdicion ? inscripcionSeleccionada?.evento : nuevaInscripcion.evento}
-                onChange={e =>
-                  modoEdicion
-                    ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, evento: e.target.value })
-                    : setNuevaInscripcion({ ...nuevaInscripcion, evento: e.target.value })
-                }
+                name="evento"
+                value={inscripcionActual.evento}
+                onChange={handleChange}
                 required
               >
                 <option value="">Seleccione...</option>
@@ -232,12 +336,9 @@ const InscripcionModal = ({
             <div className="form-grupo-admin">
               <label>Categoría:</label>
               <select
-                value={modoEdicion ? inscripcionSeleccionada?.categoria : nuevaInscripcion.categoria}
-                onChange={e =>
-                  modoEdicion
-                    ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, categoria: e.target.value })
-                    : setNuevaInscripcion({ ...nuevaInscripcion, categoria: e.target.value })
-                }
+                name="categoria"
+                value={inscripcionActual.categoria}
+                onChange={handleChange}
                 required
               >
                 <option value="">Seleccione...</option>
@@ -251,12 +352,9 @@ const InscripcionModal = ({
             <div className="form-grupo-admin">
               <label>Estado:</label>
               <select
-                value={modoEdicion ? inscripcionSeleccionada?.estado : nuevaInscripcion.estado}
-                onChange={e =>
-                  modoEdicion
-                    ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, estado: e.target.value })
-                    : setNuevaInscripcion({ ...nuevaInscripcion, estado: e.target.value })
-                }
+                name="estado"
+                value={inscripcionActual.estado}
+                onChange={handleChange}
               >
                 <option value="pendiente">Pendiente</option>
                 <option value="aprobada">Aprobada</option>
@@ -269,21 +367,23 @@ const InscripcionModal = ({
             <label>Observaciones:</label>
             <input
               type="text"
-              value={modoEdicion ? inscripcionSeleccionada?.observaciones : nuevaInscripcion.observaciones}
-              onChange={e =>
-                modoEdicion
-                  ? setInscripcionSeleccionada({ ...inscripcionSeleccionada, observaciones: e.target.value })
-                  : setNuevaInscripcion({ ...nuevaInscripcion, observaciones: e.target.value })
-              }
+              name="observaciones"
+              value={inscripcionActual.observaciones}
+              onChange={handleChange}
               placeholder="Observaciones"
             />
           </div>
+          {errorBackend && (
+            <div style={{ color: 'red', marginBottom: '10px' }}>
+              <b>Error:</b> {errorBackend}
+            </div>
+          )}
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" onClick={onClose}>
                 <i class="fas fa-times"></i>
               Cancelar
             </button>
-            <button className="btn-admin btn-primary" onClick={onSubmit}>
+            <button className="btn-admin btn-primary" type="submit">
                <i class="fas fa-save"></i>
               {modoEdicion ? "Guardar Cambios" : "Crear Inscripción"}
             </button>
@@ -292,7 +392,6 @@ const InscripcionModal = ({
       </div>
     </div>
   );
-
 };
 
 export default InscripcionModal;

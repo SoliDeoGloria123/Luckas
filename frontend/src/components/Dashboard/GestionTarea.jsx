@@ -20,7 +20,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
     titulo: "",
     descripcion: "",
     estado: "pendiente",
-    prioridad: "media",
+    prioridad: "Media",
     asignadoA: "",
     asignadoPor: "",
     fechaLimite: "",
@@ -36,8 +36,8 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
 
   const obtenerTareas = async () => {
     try {
-      const data = await tareaService.getAll();
-      setTareas(Array.isArray(data) ? data : []);
+      const response = await tareaService.getAll();
+      setTareas(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       setError("Error al obtener tareas: " + err.message);
     }
@@ -54,15 +54,19 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
 
   // CRUD operations
   const crearTarea = async () => {
+    if (!nuevaTarea.descripcion || nuevaTarea.descripcion.trim() === "") {
+      mostrarAlerta("Error", "La descripción es obligatoria");
+      return;
+    }
     try {
-      await tareaService.create(nuevaTarea);
+      await tareaService.create({ ...nuevaTarea, prioridad: "Media" });
       mostrarAlerta("¡Éxito!", "Tarea creada exitosamente");
       setMostrarModal(false);
       setNuevaTarea({
         titulo: "",
         descripcion: "",
         estado: "pendiente",
-        prioridad: "media",
+        prioridad: "Media",
         asignadoA: "",
         asignadoPor: "",
         fechaLimite: "",

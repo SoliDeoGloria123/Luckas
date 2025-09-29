@@ -12,6 +12,7 @@ import {
 
 const ProgramasAcademicos = () => {
     const [programas, setProgramas] = useState([]);
+    const [categorias, setCategorias] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sidebarAbierto, setSidebarAbierto] = useState(true);
     const [seccionActiva, setSeccionActiva] = useState("dashboard");
@@ -51,46 +52,117 @@ const ProgramasAcademicos = () => {
 
     useEffect(() => {
         cargarProgramas();
+        cargarCategorias();
     }, []); // Solo cargar una vez, no depende de filtros
 
     const cargarProgramas = async () => {
-       
+        setLoading(true);
+        try {
+            const response = await programasAcademicosService.getAllProgramas(filtros);
+            if (response.success) {
+                setProgramas(response.data);
+            }
+        } catch (error) {
+            console.error('Error al cargar programas:', error);
+            setError('Error al cargar los programas académicos');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const cargarCategorias = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/api/categorizacion', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setCategorias(data.data.filter(cat => cat.tipo === 'programa' || cat.tipo === 'curso'));
+            }
+        } catch (error) {
+            console.error('Error al cargar categorías:', error);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
+            setCargando(true);
+            setError('');
 
-            // Limpiar arrays vacíos
+            console.log('=== DEBUG PROGRAMA ACADÉMICO ===');
+            console.log('FormData original:', formData);
+            console.log('Categorías disponibles:', categorias);
+            console.log('Token disponible:', !!localStorage.getItem('token'));
+            
+            // Buscar la categoría correspondiente
+            let categoriaId = null;
+            if (formData.tipo && categorias.length > 0) {
+                const categoriaEncontrada = categorias.find(cat => 
+                    cat.tipo === 'programa' && formData.tipo.includes('programa') ||
+                    cat.tipo === 'curso' && formData.tipo === 'curso'
+                );
+                categoriaId = categoriaEncontrada ? categoriaEncontrada._id : categorias[0]._id;
+            } else if (categorias.length > 0) {
+                categoriaId = categorias[0]._id; // usar primera categoría como fallback
+            }
+
+            console.log('Categoria seleccionada:', categoriaId);
+
+            if (!categoriaId) {
+                setError('No hay categorías disponibles. Por favor, contacte al administrador.');
+                return;
+            }
+
+            // Mapear campos del frontend al backend
             const dataToSend = {
-                ...formData,
+                nombre: formData.titulo,
+                descripcion: formData.descripcion,
+                categoria: categoriaId,
+                modalidad: formData.modalidad,
+                duracion: formData.duracion,
+                precio: parseFloat(formData.precio) || 0,
+                fechaInicio: formData.fechaInicio,
+                fechaFin: formData.fechaFin,
+                cuposDisponibles: parseInt(formData.cupos) || 0,
+                profesor: formData.profesor,
+                nivel: formData.nivel || 'intermedio',
                 requisitos: formData.requisitos.filter(req => req.trim() !== ''),
                 objetivos: formData.objetivos.filter(obj => obj.trim() !== ''),
-                pensum: formData.pensum.filter(item => item.modulo.trim() !== ''),
-                precio: parseFloat(formData.precio),
-                cupos: parseInt(formData.cupos)
+                metodologia: formData.metodologia || '',
+                evaluacion: formData.evaluacion || '',
+                certificacion: formData.certificacion === 'si' || formData.certificacion === true,
+                destacado: formData.destacado || false,
+                estado: 'activo'
             };
 
-            if (modalEditar) {
-                await axios.put(`/api/programas-academicos/${programaSeleccionado._id}`, dataToSend, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+            console.log('Datos a enviar:', dataToSend);
+
+            let response;
+            if (modoEdicion && programaSeleccionado) {
+                console.log('Actualizando programa:', programaSeleccionado._id);
+                response = await programasAcademicosService.updatePrograma(programaSeleccionado._id, dataToSend);
             } else {
-                await axios.post('/api/programas-academicos', dataToSend, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+                console.log('Creando nuevo programa...');
+                response = await programasAcademicosService.createPrograma(dataToSend);
             }
-            cargarProgramas();
-            mostrarMensaje('Programa guardado exitosamente', 'success');
+
+            console.log('Respuesta del servidor:', response);
+
+            if (response.success) {
+                await cargarProgramas();
+                cerrarModal();
+                mostrarMensaje(modoEdicion ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente', 'success');
+            } else {
+                setError(response.message || 'Error al guardar el programa');
+            }
         } catch (error) {
-            setError(error.response?.data?.message || 'Error al guardar el programa');
+            console.error('Error al guardar programa:', error);
+            setError(error.response?.data?.message || error.message || 'Error al guardar el programa');
+        } finally {
+            setCargando(false);
         }
     };
 
@@ -98,12 +170,7 @@ const ProgramasAcademicos = () => {
         if (!window.confirm('¿Estás seguro de que deseas eliminar este programa?')) return;
 
         try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`/api/programas-academicos/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            await programasAcademicosService.deletePrograma(id);
             cargarProgramas();
             mostrarMensaje('Programa eliminado exitosamente', 'success');
         } catch (error) {
@@ -146,6 +213,9 @@ const ProgramasAcademicos = () => {
     };
 
     const abrirModalEditar = (programa) => {
+        console.log('=== ABRIR MODAL EDITAR ===');
+        console.log('Programa a editar:', programa);
+        
         setModoEdicion(true);
         setProgramaSeleccionado(programa);
         setMostrarModal(true);
@@ -162,46 +232,80 @@ const ProgramasAcademicos = () => {
         e.preventDefault();
         setCargando(true);
         try {
-            const token = localStorage.getItem('token');
+            console.log('=== DEBUG MODAL SUBMIT ===');
+            console.log('FormData del modal:', formData);
+            console.log('Categorías disponibles:', categorias);
 
-            // Limpiar arrays vacíos
+            // Buscar la categoría correspondiente
+            let categoriaId = null;
+            if (formData.tipo && categorias.length > 0) {
+                const categoriaEncontrada = categorias.find(cat => 
+                    cat.tipo === 'programa' && formData.tipo.includes('programa') ||
+                    cat.tipo === 'curso' && formData.tipo === 'curso'
+                );
+                categoriaId = categoriaEncontrada ? categoriaEncontrada._id : categorias[0]._id;
+            } else if (categorias.length > 0) {
+                categoriaId = categorias[0]._id; // usar primera categoría como fallback
+            }
+
+            if (!categoriaId) {
+                setError('No hay categorías disponibles. Por favor, contacte al administrador.');
+                return;
+            }
+
+            // Mapear campos del frontend al backend correctamente
             const dataToSend = {
-                ...formData,
-                requisitos: formData.requisitos.filter(req => req.trim() !== ''),
-                objetivos: formData.objetivos.filter(obj => obj.trim() !== ''),
-                pensum: formData.pensum.filter(item => item.modulo.trim() !== ''),
-                precio: parseFloat(formData.precio),
-                cupos: parseInt(formData.cupos)
+                nombre: formData.titulo,
+                descripcion: formData.descripcion,
+                categoria: categoriaId,
+                modalidad: formData.modalidad,
+                duracion: formData.duracion,
+                precio: parseFloat(formData.precio) || 0,
+                fechaInicio: formData.fechaInicio,
+                fechaFin: formData.fechaFin,
+                cuposDisponibles: parseInt(formData.cupos) || 0,
+                profesor: formData.profesor,
+                nivel: 'básico', // valor por defecto
+                requisitos: formData.requisitos ? formData.requisitos.filter(req => req.trim() !== '') : [],
+                objetivos: formData.objetivos ? formData.objetivos.filter(obj => obj.trim() !== '') : [],
+                metodologia: formData.metodologia || '',
+                evaluacion: formData.evaluacion || '',
+                certificacion: formData.certificacion === 'si' || formData.certificacion === true,
+                destacado: formData.destacado || false,
+                estado: 'activo'
             };
+
+            console.log('Datos mapeados para enviar:', dataToSend);
 
             let response;
             if (modoEdicion && programaSeleccionado) {
-                response = await axios.put(`/api/programas-academicos/${programaSeleccionado._id}`, dataToSend, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+                console.log('Actualizando programa:', programaSeleccionado._id);
+                response = await programasAcademicosService.updatePrograma(programaSeleccionado._id, dataToSend);
             } else {
-                response = await axios.post('/api/programas-academicos', dataToSend, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+                console.log('Creando nuevo programa...');
+                response = await programasAcademicosService.createPrograma(dataToSend);
             }
 
-            if (response.status === 200 || response.status === 201) {
-                cargarProgramas();
+            console.log('Respuesta del servidor:', response);
+
+            if (response.success) {
+                await cargarProgramas();
                 cerrarModal();
                 mostrarMensaje(
                     modoEdicion ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente', 
                     'success'
                 );
+            } else {
+                setError(response.message || 'Error al guardar el programa');
             }
         } catch (error) {
-            console.error('Error al guardar programa:', error);
-            setError(error.response?.data?.message || 'Error al guardar el programa');
+            console.error('Error completo al guardar programa:', error);
+            if (error.response) {
+                console.error('Respuesta de error:', error.response.data);
+                setError(error.response.data.message || 'Error del servidor');
+            } else {
+                setError(error.message || 'Error al guardar el programa');
+            }
         } finally {
             setCargando(false);
         }
@@ -396,6 +500,7 @@ const ProgramasAcademicos = () => {
                         formatearFecha={formatearFecha}
                         cargando={cargando}
                         abrirModalCrear={abrirModalCrear}
+                        abrirModalEditar={abrirModalEditar}
                     />
 
                 </div>

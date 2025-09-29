@@ -85,6 +85,31 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Validación de campos obligatorios
+    if (!formData.nombre.trim()) {
+      alert('El nombre es obligatorio');
+      return;
+    }
+    if (!formData.capacidad || isNaN(formData.capacidad)) {
+      alert('La capacidad es obligatoria y debe ser un número');
+      return;
+    }
+    if (!formData.categoria) {
+      alert('La categoría es obligatoria');
+      return;
+    }
+    if (!formData.precio || isNaN(formData.precio)) {
+      alert('El precio es obligatorio y debe ser un número');
+      return;
+    }
+    if (!formData.ubicacion.trim()) {
+      alert('La ubicación es obligatoria');
+      return;
+    }
+    if (!formData.estado) {
+      alert('El estado es obligatorio');
+      return;
+    }
     onSubmit(formData);
     onClose();
   };

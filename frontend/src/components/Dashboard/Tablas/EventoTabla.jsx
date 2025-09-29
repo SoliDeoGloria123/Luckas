@@ -75,7 +75,7 @@ const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, o
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => onEliminar(evento)}
+                    onClick={() => onEliminar(evento._id)}
                     className="p-2 bg-red-500/20 backdrop-blur text-white hover:bg-red-500/30 rounded-lg transition-colors"
                     title="Eliminar"
                   >

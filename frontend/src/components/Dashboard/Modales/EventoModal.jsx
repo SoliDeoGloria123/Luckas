@@ -105,18 +105,19 @@ const EventoModal = ({
               />
             </div>
 
-            {!modoEdicion && (
-              <div className="form-grupo-admin">
-                <label>Descripcion Evento:</label>
-                <input
-                  type="text"
-                  value={nuevoEvento.descripcion}
-                  onChange={e => setNuevoEvento({ ...nuevoEvento, descripcion: e.target.value })
-                  }
-                  placeholder="Nombre del Evento"
-                />
-              </div>
-            )}
+            <div className="form-grupo-admin">
+              <label>Descripcion Evento:</label>
+              <input
+                type="text"
+                value={modoEdicion ? eventoSeleccionado?.descripcion : nuevoEvento.descripcion}
+                onChange={e =>
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, descripcion: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, descripcion: e.target.value })
+                }
+                placeholder="Descripción del Evento"
+              />
+            </div>
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">

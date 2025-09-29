@@ -3,7 +3,8 @@ import { inscripcionService } from "../../services/inscripcionService";
 import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaInscripciones from "./Tablas/InscripcionTabla";
-import InscripcionModal from "./Modales/InscripsionModal";
+import InscripcionModalCrear from "./Modales/InscripcionModalCrear";
+import InscripcionModalEditar from "./Modales/InscripcionModalEditar";
 import useBusqueda from "./Busqueda/useBusqueda";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
@@ -37,22 +38,6 @@ const GestionIscripcion = () => {
       "categoria.nombre"
     ]
   );
-  const [nuevaInscripcion, setNuevaInscripcion] = useState({
-    usuario: "",
-    nombre: "",
-    apellido: "",
-    tipoDocumento: "",
-    numeroDocumento: "",
-    correo: "",
-    telefono: "",
-    edad: "",
-    evento: "",
-    categoria: "",
-    estado: "pendiente",
-    observaciones: "",
-    solicitud: ""
-  });
-
 
   // Obtener inscripciones
   const obtenerInscripciones = async () => {
@@ -91,31 +76,25 @@ const GestionIscripcion = () => {
   }, []);
 
   // Crear inscripción
-  const crearInscripcion = async () => {
+  const crearInscripcion = async (payload) => {
     try {
       // Elimina el campo solicitud si está vacío
-      const insc = { ...nuevaInscripcion };
+      const insc = { ...payload };
       if (!insc.solicitud || insc.solicitud === "") {
         delete insc.solicitud;
       }
+      // Convertir edad a número
+      if (insc.edad) insc.edad = Number(insc.edad);
+      // Corregir: enviar referencia en vez de evento
+      if (insc.evento) {
+        insc.referencia = insc.evento;
+        delete insc.evento;
+      }
+      // Agregar tipoReferencia requerido por el backend
+      insc.tipoReferencia = 'Eventos';
       await inscripcionService.create(insc);
       mostrarAlerta("¡Éxito!", "Inscripción creada exitosamente");
       setMostrarModal(false);
-      setNuevaInscripcion({
-        usuario: "",
-        nombre: "",
-        apellido: "",
-        tipoDocumento: "",
-        numeroDocumento: "",
-        correo: "",
-        telefono: "",
-        edad: "",
-        evento: "",
-        categoria: "",
-        estado: "pendiente",
-        observaciones: "",
-        solicitud: ""
-      });
       obtenerInscripciones();
     } catch (error) {
       mostrarAlerta("Error", `Error al crear la inscripción: ${error.message}`);
@@ -125,7 +104,24 @@ const GestionIscripcion = () => {
   // Actualizar inscripción
   const actualizarInscripcion = async () => {
     try {
-      await inscripcionService.update(inscripcionSeleccionada._id, inscripcionSeleccionada);
+      const insc = { ...inscripcionSeleccionada };
+      const usuarioId = typeof insc.usuario === 'object' && insc.usuario._id ? insc.usuario._id : insc.usuario;
+      const payload = {
+        usuario: usuarioId,
+        referencia: insc.evento,
+        tipoReferencia: 'Eventos',
+        categoria: insc.categoria,
+        estado: insc.estado,
+        observaciones: insc.observaciones,
+        nombre: insc.nombre,
+        tipoDocumento: insc.tipoDocumento,
+        numeroDocumento: insc.numeroDocumento,
+        telefono: insc.telefono,
+        edad: Number(insc.edad),
+        correo: insc.correo,
+        apellido: insc.apellido,
+      };
+      await inscripcionService.update(insc._id, payload);
       mostrarAlerta("¡Éxito!", "Inscripción actualizada exitosamente");
       setMostrarModal(false);
       setInscripcionSeleccionada(null);
@@ -156,21 +152,6 @@ const GestionIscripcion = () => {
   // Abrir modal para crear
   const abrirModalCrear = () => {
     setModoEdicion(false);
-    setNuevaInscripcion({
-      usuario: "",
-      nombre: "",
-      apellido: "",
-      tipoDocumento: "",
-      numeroDocumento: "",
-      correo: "",
-      telefono: "",
-      edad: "",
-      evento: "",
-      categoria: "",
-      estado: "pendiente",
-      observaciones: "",
-      solicitud: ""
-    });
     setMostrarModal(true);
   };
 
@@ -280,18 +261,25 @@ const GestionIscripcion = () => {
             onEditar={abrirModalEditar}
             onEliminar={eliminarInscripcion}
           />
-          <InscripcionModal
-            mostrar={mostrarModal}
-            modoEdicion={modoEdicion}
-            inscripcionSeleccionada={inscripcionSeleccionada}
-            setInscripcionSeleccionada={setInscripcionSeleccionada}
-            nuevaInscripcion={nuevaInscripcion}
-            setNuevaInscripcion={setNuevaInscripcion}
-            eventos={eventos}
-            categorias={categorias}
-            onClose={() => setMostrarModal(false)}
-            onSubmit={modoEdicion ? actualizarInscripcion : crearInscripcion}
-          />
+          {modoEdicion ? (
+            <InscripcionModalEditar
+              mostrar={mostrarModal}
+              inscripcion={inscripcionSeleccionada}
+              setInscripcion={setInscripcionSeleccionada}
+              eventos={eventos}
+              categorias={categorias}
+              onClose={() => setMostrarModal(false)}
+              onSubmit={actualizarInscripcion}
+            />
+          ) : (
+            <InscripcionModalCrear
+              mostrar={mostrarModal}
+              eventos={eventos}
+              categorias={categorias}
+              onClose={() => setMostrarModal(false)}
+              onSubmit={crearInscripcion}
+            />
+          )}
         </div>
       </div>
     </div>

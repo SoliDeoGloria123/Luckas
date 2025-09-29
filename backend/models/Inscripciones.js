@@ -41,7 +41,7 @@ const inscripcionSchema = new mongoose.Schema({
        // Indica si la inscripción es a un evento, curso o programa técnico
     tipoReferencia: {
         type: String,
-    enum: ['Eventos', 'Curso', 'ProgramaTecnico'],
+        enum: ['Eventos', 'ProgramaAcademico'],
         required: true,
     },
     // Referencia dinámica según tipoReferencia: Evento, Curso o ProgramaTecnico

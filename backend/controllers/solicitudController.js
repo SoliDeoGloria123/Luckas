@@ -200,10 +200,15 @@ exports.obtenerSolicitudes = async (req, res) => {
   exports.actualizarSolicitud = async (req, res) => {
     try {
       const { id } = req.params;
+      console.log('=== ACTUALIZANDO SOLICITUD ===');
+      console.log('ID:', id);
+      console.log('Datos recibidos:', req.body);
+      console.log('Usuario:', req.userId);
       
-      // Validar errores de entrada
+      // Validar errores de entrada (solo validaciones básicas)
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('Errores de validación:', errors.array());
         return res.status(400).json({
           success: false,
           message: 'Datos de entrada inválidos',
@@ -211,10 +216,23 @@ exports.obtenerSolicitudes = async (req, res) => {
         });
       }
 
+      // Construir datos de actualización sin campos que causan problemas
       const datosActualizacion = {
-        ...req.body,
-        modificadoPor: req.user?.id // Si tienes autenticación
+        ...req.body
       };
+      
+      // Asignar automáticamente el usuario actual como responsable
+      if (req.userId) {
+        datosActualizacion.responsable = req.userId;
+        datosActualizacion.modificadoPor = req.userId;
+        datosActualizacion.fechaRespuesta = new Date();
+      }
+
+      // Eliminar campos que no deben actualizarse
+      delete datosActualizacion.solicitante;
+      delete datosActualizacion.fechaSolicitud;
+
+      console.log('Datos finales a actualizar:', datosActualizacion);
 
       const solicitudActualizada = await Solicitud.findByIdAndUpdate(
         id,
@@ -226,12 +244,14 @@ exports.obtenerSolicitudes = async (req, res) => {
       );
 
       if (!solicitudActualizada) {
+        console.log('Solicitud no encontrada con ID:', id);
         return res.status(404).json({
           success: false,
           message: 'Solicitud no encontrada'
         });
       }
 
+      console.log('Solicitud actualizada exitosamente:', solicitudActualizada._id);
       res.status(200).json({
         success: true,
         message: 'Solicitud actualizada exitosamente',

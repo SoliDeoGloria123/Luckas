@@ -29,7 +29,7 @@ exports.crearInscripcion = async (req, res) => {
     }
 
     // 2. Validar que existan en la base de datos
-    const usuarioExiste = await Usuario.findById(usuario);
+  const usuarioExiste = await Usuario.findById(usuario);
     if (!usuarioExiste) {
       console.log('Error: Usuario no encontrado:', usuario);
       return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
@@ -91,7 +91,7 @@ exports.crearInscripcion = async (req, res) => {
     console.log('Inscripción creada:', inscripcion._id);
 
     // Buscar datos del usuario para la solicitud
-    const user = await Usuario.findById(req.body.usuario);
+  const user = await Usuario.findById(req.body.usuario);
 
     // 2. Crear la solicitud asociada
     let descripcionSolicitud = '';
@@ -147,18 +147,32 @@ exports.crearInscripcion = async (req, res) => {
 // Obtener todas las inscripciones
 exports.obtenerInscripciones = async (req, res) => {
   try {
+    console.log('=== OBTENER INSCRIPCIONES DEBUG ===');
     console.log('[INSCRIPCIONES] Usuario:', req.userId, 'Rol:', req.userRole);
+    console.log('[INSCRIPCIONES] Headers:', JSON.stringify(req.headers, null, 2));
+    
     let filtro = {};
     if (req.userRole === 'seminarista' || req.userRole === 'externo') {
       filtro.usuario = req.userId;
       console.log('[INSCRIPCIONES] Filtrando por usuario:', req.userId);
     }
+    
+    console.log('[INSCRIPCIONES] Filtro aplicado:', JSON.stringify(filtro, null, 2));
+    
     const inscripciones = await Inscripcion.find(filtro)
       .populate('usuario', 'nombre apellido correo telefono numeroDocumento tipoDocumento')
       .populate('referencia')
       .populate('categoria', 'nombre descripcion codigo')
       .sort({ createdAt: -1 });
+      
     console.log('[INSCRIPCIONES] Encontradas:', inscripciones.length);
+    console.log('[INSCRIPCIONES] Primera inscripción:', inscripciones[0] ? {
+      nombre: inscripciones[0].nombre,
+      apellido: inscripciones[0].apellido,
+      usuario: inscripciones[0].usuario?.nombre,
+      tipoReferencia: inscripciones[0].tipoReferencia
+    } : 'N/A');
+    
     res.json({ success: true, data: inscripciones });
   } catch (error) {
     console.error('[INSCRIPCIONES] Error:', error);
@@ -236,8 +250,70 @@ exports.obtenerInscripcionPorId = async (req, res) => {
 // Actualizar inscripción
 exports.actualizarInscripcion = async (req, res) => {
   try {
+    // Validar IDs
+    const { usuario, referencia, tipoReferencia, categoria } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(usuario)) {
+      return res.status(400).json({ success: false, message: 'ID de usuario inválido' });
+    }
+    if (!mongoose.Types.ObjectId.isValid(referencia)) {
+      return res.status(400).json({ success: false, message: 'ID de referencia inválido' });
+    }
+    if (!mongoose.Types.ObjectId.isValid(categoria)) {
+      return res.status(400).json({ success: false, message: 'ID de categoría inválido' });
+    }
+
+    // Validar existencia en BD
+    const usuarioExiste = await Usuario.findById(usuario);
+    if (!usuarioExiste) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+    let referenciaExiste = null;
+    if (tipoReferencia === 'Eventos') {
+      referenciaExiste = await Evento.findById(referencia);
+      if (!referenciaExiste) {
+        return res.status(404).json({ success: false, message: 'Evento no encontrado' });
+      }
+    }
+    const categoriaExiste = await Categorizacion.findById(categoria);
+    if (!categoriaExiste) {
+      return res.status(404).json({ success: false, message: 'Categoría no encontrada' });
+    }
+
+    // Validar campos requeridos
+    const camposRequeridos = ['nombre', 'tipoDocumento', 'numeroDocumento', 'telefono', 'edad'];
+    const camposFaltantes = [];
+    camposRequeridos.forEach(campo => {
+      if (!req.body[campo]) {
+        camposFaltantes.push(campo);
+      }
+    });
+    if (camposFaltantes.length > 0) {
+      return res.status(400).json({ success: false, message: `Campos requeridos faltantes: ${camposFaltantes.join(', ')}` });
+    }
+
+    // Actualizar inscripción
     const inscripcion = await Inscripcion.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!inscripcion) return res.status(404).json({ success: false, message: 'Inscripción no encontrada' });
+
+    // Actualizar solicitud asociada si existe
+    if (inscripcion.solicitud) {
+      let descripcionSolicitud = '';
+      if (tipoReferencia === 'Eventos' && referenciaExiste) {
+        descripcionSolicitud = `Inscripción al evento ${referenciaExiste.nombre}`;
+      }
+      // Si tienes cursos o programas, puedes personalizar la descripción
+      await Solicitud.findByIdAndUpdate(inscripcion.solicitud, {
+        solicitante: usuarioExiste._id,
+        responsable: usuarioExiste._id,
+        titulo: referenciaExiste?.nombre || 'Inscripción',
+        correo: usuarioExiste.correo,
+        telefono: usuarioExiste.telefono,
+        categoria: categoria,
+        descripcion: descripcionSolicitud,
+        referencia: inscripcion._id
+      });
+    }
+
     res.json({ success: true, data: inscripcion });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });

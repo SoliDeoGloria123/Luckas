@@ -50,9 +50,13 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
   // Obtener solicitudes
   const obtenerSolicitudes = async () => {
     try {
+      console.log('=== OBTENIENDO SOLICITUDES ===');
       const data = await solicitudService.getAll();
+      console.log('Datos recibidos:', data);
+      console.log('Array de solicitudes:', data.data);
       setSolicitudes(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
+      console.error('Error obteniendo solicitudes:', error);
       mostrarAlerta("Error", "Error al obtener solicitudes");
     }
   };
@@ -99,13 +103,21 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
   // Actualizar solicitud
   const actualizarSolicitud = async () => {
     try {
-      await solicitudService.update(solicitudSeleccionada._id, solicitudSeleccionada);
-      mostrarAlerta("¡Éxito!", "Solicitud actualizada exitosamente");
-      setMostrarModal(false);
-      setSolicitudSeleccionada(null);
-      setModoEdicionSolicitud(false);
-      obtenerSolicitudes();
+      console.log('Actualizando solicitud:', solicitudSeleccionada);
+      const resultado = await solicitudService.update(solicitudSeleccionada._id, solicitudSeleccionada);
+      console.log('Resultado actualización:', resultado);
+      
+      if (resultado.success) {
+        mostrarAlerta("¡Éxito!", "Solicitud actualizada exitosamente");
+        setMostrarModal(false);
+        setSolicitudSeleccionada(null);
+        setModoEdicionSolicitud(false);
+        obtenerSolicitudes();
+      } else {
+        mostrarAlerta("Error", resultado.message || "Error al actualizar la solicitud");
+      }
     } catch (error) {
+      console.error('Error actualizando solicitud:', error);
       mostrarAlerta("Error", `Error: ${error.message}`);
     }
   };
@@ -146,9 +158,17 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
 
   // Abrir modal para editar solicitud
   const abrirModalEditarSolicitud = (solicitud) => {
+    console.log('=== ABRIENDO MODAL EDITAR SOLICITUD ===');
+    console.log('Solicitud recibida:', solicitud);
+    console.log('canEdit:', canEdit);
+    console.log('readOnly:', readOnly);
+    
     setModoEdicionSolicitud(true);
     setSolicitudSeleccionada({ ...solicitud });
     setMostrarModal(true);
+    
+    console.log('Modal configurado - modoEdicion:', true);
+    console.log('Modal configurado - mostrar:', true);
   };
 
   return (

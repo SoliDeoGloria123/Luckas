@@ -147,7 +147,8 @@ const NuevaSolicitud = () => {
       cargarOpcionesReferencia(e.target.value);
       setFormData({
         ...formData,
-        category: '' // Limpiar categoría al cambiar modelo
+        category: '', // Limpiar categoría al cambiar modelo
+        modeloReferencia: e.target.value
       });
       return;
     }
@@ -160,10 +161,17 @@ const NuevaSolicitud = () => {
       if (refObj && refObj.categoria) {
         // Puede ser un objeto o solo el id
         categoriaId = typeof refObj.categoria === 'object' ? refObj.categoria._id : refObj.categoria;
+        // Mostrar mensaje informativo al usuario
+        const categoria = categories.find(cat => cat._id === categoriaId);
+        if (categoria) {
+          showToast('info', 'Categoría seleccionada automáticamente', 
+            `Se ha seleccionado la categoría "${categoria.nombre}" asociada a este evento.`);
+        }
       }
       setFormData({
         ...formData,
-        category: categoriaId
+        category: categoriaId,
+        referencia: e.target.value
       });
       return;
     }
@@ -275,10 +283,7 @@ const NuevaSolicitud = () => {
   };
 
   const submitRequest = async () => {
-
-    // DEBUG extra: mostrar tesoreroId
-    console.log('tesoreroId:', tesoreroId);
-    window.alert('tesoreroId: ' + tesoreroId);
+    console.log('=== INICIANDO ENVÍO DE SOLICITUD ===');
 
     if (!acceptTerms) {
       showToast('warning', 'Términos requeridos', 'Debes aceptar los términos y condiciones');
@@ -287,7 +292,6 @@ const NuevaSolicitud = () => {
 
     if (!tesoreroId) {
       showToast('error', 'Responsable no encontrado', 'No se pudo asignar el tesorero como responsable');
-      window.alert('No hay tesoreroId, no se puede enviar');
       return;
     }
 
@@ -296,48 +300,63 @@ const NuevaSolicitud = () => {
     // Obtener usuario logueado
     const usuarioStorage = localStorage.getItem('usuario');
     const usuario = usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    console.log('Usuario obtenido:', usuario);
+
     if (!usuario) {
       showToast('error', 'Usuario no encontrado', 'Debes iniciar sesión para enviar la solicitud');
+      return;
+    }
+
+    // Validar campos requeridos
+    if (!formData.requestTitle || !formData.requestDescription) {
+      showToast('error', 'Campos requeridos', 'El título y la descripción son obligatorios');
+      console.log('Validación falló - Título:', formData.requestTitle, 'Descripción:', formData.requestDescription);
       return;
     }
 
     // Construir objeto solicitud para la API
     const solicitudData = {
       solicitante: usuario._id || usuario.id,
-      titulo: formData.requestTitle || '',
-      correo: usuario.correo || usuario.correoElectronico || usuario.email,
-      telefono: usuario.telefono || '',
+      titulo: formData.requestTitle,
+      correo: formData.correo || usuario.correo || usuario.email,
+      telefono: formData.telefono || usuario.telefono || '',
       tipoSolicitud: selectedType,
-      modeloReferencia: modeloReferencia || null,
-      referencia: referencia || null,
-      categoria: formData.category || null,
-      descripcion: formData.requestDescription || '',
+      categoria: formData.category || categories[0]?._id,
+      descripcion: formData.requestDescription,
       prioridad: formData.requestPriority || 'Media',
-      observaciones: formData.requestJustification || '',
       responsable: tesoreroId,
-      fechaSolicitud: new Date(),
       origen: 'formulario'
     };
 
-    // DEBUG: Mostrar datos a enviar
-    console.log('Datos a enviar:', solicitudData);
-    window.alert('Datos a enviar: ' + JSON.stringify(solicitudData, null, 2));
+    // Solo agregar campos opcionales si existen
+    if (modeloReferencia) {
+      solicitudData.modeloReferencia = modeloReferencia;
+    }
+    if (referencia) {
+      solicitudData.referencia = referencia;
+    }
+    if (formData.requestJustification) {
+      solicitudData.observaciones = formData.requestJustification;
+    }
+
+    console.log('Datos finales a enviar:', solicitudData);
 
     try {
       const response = await solicitudService.create(solicitudData);
-      console.log('Respuesta backend:', response);
-      window.alert('Respuesta backend: ' + JSON.stringify(response, null, 2));
+      console.log('Respuesta del backend:', response);
+      
       if (response.success) {
         showToast('success', '¡Solicitud enviada!', 'Tu solicitud ha sido registrada correctamente.');
-        window.alert('Inscripción enviada correctamente');
-        // Aquí puedes redirigir o limpiar el formulario
+        // Limpiar formulario
+        setFormData({});
+        setSelectedType('');
+        setAcceptTerms(false);
       } else {
         showToast('error', 'Error al enviar', response.message || 'No se pudo enviar la solicitud');
-        window.alert('Error al enviar la inscripción: ' + (response.message || 'No se pudo enviar la solicitud'));
       }
     } catch (err) {
+      console.error('Error enviando solicitud:', err);
       showToast('error', 'Error al enviar', err.message || 'No se pudo enviar la solicitud');
-      window.alert('Error al enviar la inscripción: ' + (err.message || 'No se pudo enviar la solicitud'));
     }
   };
 
@@ -479,21 +498,46 @@ const NuevaSolicitud = () => {
         return (
           <>
             <div className="form-group-nuevasolicitud">
-              <label htmlFor="category">Categoría Específica</label>
+              <label htmlFor="category">
+                Categoría Específica
+                {referencia && formData.category && (
+                  <span style={{ color: '#28a745', fontSize: '12px', marginLeft: '5px' }}>
+                    (Seleccionada automáticamente según el evento)
+                  </span>
+                )}
+              </label>
               <select
                 id="category"
                 name="category"
                 value={formData.category || ''}
-                disabled // Deshabilitado para que no se pueda cambiar manualmente
+                onChange={handleInputChange}
                 required
+                disabled={!!referencia} // Solo deshabilitado si hay una referencia seleccionada
               >
-                <option value="">{formData.category ? 'Categoría asociada' : 'No hay categoría asociada'}</option>
-                {formData.category && categories
-                  .filter(cat => cat._id === formData.category)
+                <option value="">
+                  {referencia ? 'Categoría asociada al evento seleccionado' : 'Selecciona una categoría'}
+                </option>
+                {categories
+                  .filter(cat => {
+                    // Si hay referencia seleccionada, mostrar solo la categoría asociada
+                    if (referencia && formData.category) {
+                      return cat._id === formData.category;
+                    }
+                    // Si no hay referencia, mostrar todas las categorías del tipo correspondiente
+                    const tipoCategoria = modeloCategoriaMap[modeloReferencia] || 'general';
+                    return !modeloReferencia || cat.tipo === tipoCategoria || cat.tipo === 'general';
+                  })
                   .map(cat => (
-                    <option key={cat._id} value={cat._id}>{cat.nombre}</option>
+                    <option key={cat._id} value={cat._id}>
+                      {cat.nombre} {cat.codigo ? `(${cat.codigo})` : ''}
+                    </option>
                   ))}
               </select>
+              {referencia && formData.category && (
+                <small style={{ color: '#6c757d', fontSize: '12px' }}>
+                  Esta categoría se seleccionó automáticamente porque está asociada al evento elegido.
+                </small>
+              )}
             </div>
             <div className="form-group-nuevasolicitud">
               <label htmlFor="additionalInfo">Información Adicional</label>

@@ -52,6 +52,27 @@ const validarId = [
   param('id').isMongoId().withMessage('ID inválido')
 ];
 
+// Validaciones específicas para actualización
+const validarActualizacion = [
+  param('id').isMongoId().withMessage('ID inválido'),
+  body('estado')
+    .optional()
+    .isIn(['Nueva', 'En Revisión', 'Aprobada', 'Rechazada', 'Completada', 'Pendiente Info'])
+    .withMessage('Estado inválido'),
+  body('prioridad')
+    .optional()
+    .isIn(['Alta', 'Media', 'Baja'])
+    .withMessage('Prioridad inválida'),
+  body('observaciones')
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('Las observaciones no pueden exceder 500 caracteres'),
+  body('tipoSolicitud')
+    .optional()
+    .isIn(['Inscripción', 'Hospedaje', 'Alimentación', 'Otra'])
+    .withMessage('Tipo de solicitud inválido')
+];
+
 // Middleware de autenticación para todas las rutas
 router.use(authJwt.verifyToken);
 
@@ -97,7 +118,7 @@ router.get('/:id', validarId, solicitudController.obtenerSolicitudPorId);
 router.post('/', solicitudController.crearSolicitud);
 
 // Rutas de modificación - Solo admin y tesorero
-router.put('/:id', validarId, solicitudController.actualizarSolicitud);
+router.put('/:id', validarActualizacion, solicitudController.actualizarSolicitud);
 
 // Rutas de eliminación - Solo admin
 router.delete('/:id', role.isAdmin, validarId, solicitudController.eliminarSolicitud);
