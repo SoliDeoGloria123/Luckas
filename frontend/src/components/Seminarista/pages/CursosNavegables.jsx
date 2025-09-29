@@ -58,7 +58,7 @@ const CursosSeminario = () => {
     try {
       // Aquí se conectará con el servicio de inscripción
       // await inscripcionService.inscribirCurso(cursoId);
-      const curso = cursos.find(c => c.id === cursoId);
+      const curso = cursos.find(c => c._id === cursoId);
       showNotification(`Te has inscrito exitosamente en ${curso?.nombre || 'el curso'}`);
     } catch (error) {
       console.error('Error al inscribirse:', error);
@@ -78,7 +78,7 @@ const CursosSeminario = () => {
 
   const cursosFiltrados = activeFilter === 'todos' 
     ? cursos 
-    : cursos.filter(curso => curso.categoria === activeFilter);
+    : cursos.filter(curso => curso.categoria?.nombre?.toLowerCase().includes(activeFilter.toLowerCase()));
 
   const getNivelColor = (nivel) => {
     switch (nivel) {
@@ -154,12 +154,12 @@ const CursosSeminario = () => {
               <span className="stat-label-seminario">Cursos Totales</span>
             </div>
             <div className="stat-item-seminario">
-              <span className="stat-number-seminario">{cursos.filter(c => c.categoria === 'biblico').length}</span>
-              <span className="stat-label-seminario">Bíblico</span>
+              <span className="stat-number-seminario">{cursos.filter(c => c.categoria?.tipo === 'curso').length}</span>
+              <span className="stat-label-seminario">Cursos</span>
             </div>
             <div className="stat-item-seminario">
-              <span className="stat-number-seminario">{cursos.filter(c => c.categoria === 'ministerial').length}</span>
-              <span className="stat-label-seminario">Ministerial</span>
+              <span className="stat-number-seminario">{cursos.filter(c => c.categoria?.tipo === 'programa').length}</span>
+              <span className="stat-label-seminario">Programas</span>
             </div>
           </div>
         </div>
@@ -182,40 +182,34 @@ const CursosSeminario = () => {
               Todos
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'biblico' ? 'active' : ''}`}
-              onClick={() => filterCursos('biblico')}
-            >
-              Bíblico
-            </button>
-            <button
-              className={`filter-btn ${activeFilter === 'ministerial' ? 'active' : ''}`}
-              onClick={() => filterCursos('ministerial')}
-            >
-              Ministerial
-            </button>
-            <button
-              className={`filter-btn ${activeFilter === 'liderazgo' ? 'active' : ''}`}
-              onClick={() => filterCursos('liderazgo')}
-            >
-              Liderazgo
-            </button>
-            <button
-              className={`filter-btn ${activeFilter === 'pastoral' ? 'active' : ''}`}
-              onClick={() => filterCursos('pastoral')}
-            >
-              Pastoral
-            </button>
-            <button
               className={`filter-btn ${activeFilter === 'tecnologia' ? 'active' : ''}`}
               onClick={() => filterCursos('tecnologia')}
             >
               Tecnología
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'administracion' ? 'active' : ''}`}
-              onClick={() => filterCursos('administracion')}
+              className={`filter-btn ${activeFilter === 'idiomas' ? 'active' : ''}`}
+              onClick={() => filterCursos('idiomas')}
             >
-              Administración
+              Idiomas
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'negocios' ? 'active' : ''}`}
+              onClick={() => filterCursos('negocios')}
+            >
+              Negocios
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'arte' ? 'active' : ''}`}
+              onClick={() => filterCursos('arte')}
+            >
+              Arte
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'salud' ? 'active' : ''}`}
+              onClick={() => filterCursos('salud')}
+            >
+              Salud
             </button>
           </div>
         </div>
@@ -223,7 +217,7 @@ const CursosSeminario = () => {
         {/* Courses Grid */}
         <div className="cabins-grid">
           {cursosFiltrados.map((curso) => (
-            <div key={curso.id} className="cabin-card">
+            <div key={curso._id} className="cabin-card">
               <div className="cabin-image">
                 <img
                   src={curso.imagen || '/api/placeholder/300/200'}
@@ -233,8 +227,8 @@ const CursosSeminario = () => {
                   {curso.estado === 'activo' ? 'Disponible' : 'No Disponible'}
                 </div>
                 <div
-                  className={`cabin-favorite ${favorites[curso.id] ? 'active' : ''}`}
-                  onClick={() => toggleFavorite(curso.id)}
+                  className={`cabin-favorite ${favorites[curso._id] ? 'active' : ''}`}
+                  onClick={() => toggleFavorite(curso._id)}
                 >
                   <Heart/>
                 </div>
@@ -271,16 +265,11 @@ const CursosSeminario = () => {
                   </div>
                   <div className="feature-item">
                     <Users size={16} />
-                    <span>{curso.cupos?.disponibles || curso.cupos?.total || 'N/A'} cupos</span>
+                    <span>{curso.cuposDisponibles || 'N/A'} cupos</span>
                   </div>
                   <div className="feature-item">
                     <Clock size={16} />
-                    <span>
-                      {curso.tipo === 'curso' 
-                        ? `${curso.duracion?.semanas || curso.duracion?.horas || 'N/A'} ${curso.duracion?.semanas ? 'sem' : 'hrs'}` 
-                        : `${curso.duracion?.meses || 'N/A'} meses`
-                      }
-                    </span>
+                    <span>{curso.duracion || 'N/A'}</span>
                   </div>
                   <div className="feature-item">
                     <Calendar size={16} />
@@ -290,7 +279,7 @@ const CursosSeminario = () => {
 
                 <div className="cabin-amenities">
                   <div className="amenity-tag">
-                    👨‍🏫 {curso.instructor}
+                    👨‍🏫 {curso.profesor || 'No asignado'}
                   </div>
                   {curso.fechaInicio && (
                     <div className="amenity-tag">
@@ -307,8 +296,8 @@ const CursosSeminario = () => {
                     {curso.precio && <span className="price-period">/ curso</span>}
                   </div>
                   <div className="cabin-availability">
-                    <span className={`availability-text ${(curso.cupos?.disponibles || 0) === 0 ? 'reserved' : ''}`}>
-                      {(curso.cupos?.disponibles || curso.cupos?.total || 0) > 0 ? 'Disponible' : 'Lleno'}
+                    <span className={`availability-text ${(curso.cuposDisponibles || 0) === 0 ? 'reserved' : ''}`}>
+                      {(curso.cuposDisponibles || 0) > 0 ? 'Disponible' : 'Lleno'}
                     </span>
                   </div>
                 </div>
@@ -330,10 +319,10 @@ const CursosSeminario = () => {
                       setCursoSeleccionado(curso);
                       setMostrarFormulario(true);
                     }}
-                    disabled={inscripcionLoading || (curso.cupos?.disponibles || 0) === 0}
+                    disabled={inscripcionLoading || (curso.cuposDisponibles || 0) === 0}
                   >
                     {inscripcionLoading ? 'Inscribiendo...' : 
-                     (curso.cupos?.disponibles || 0) === 0 ? 'Lleno' : 'Inscribirse'}
+                     (curso.cuposDisponibles || 0) === 0 ? 'Lleno' : 'Inscribirse'}
                   </button>
                 </div>
               </div>
@@ -358,10 +347,10 @@ const CursosSeminario = () => {
                 <h2>{cursoSeleccionado.nombre}</h2>
                 <div className="modal-badges-programas">
                   <span className="modal-badge-programas tipo">
-                    {cursoSeleccionado.tipo === 'curso' ? '📚 Curso' : '🎓 Programa Técnico'}
+                    {cursoSeleccionado.categoria?.tipo === 'curso' ? '📚 Curso' : cursoSeleccionado.categoria?.tipo === 'programa' ? '🎓 Programa' : '🗂 Otro'}
                   </span>
                   <span className="modal-badge-programas categoria">
-                    {cursoSeleccionado.categoria}
+                    {cursoSeleccionado.categoria?.nombre || 'Sin categoría'}
                   </span>
                   <span className="modal-badge-programas nivel">
                     {cursoSeleccionado.nivel}
@@ -397,18 +386,13 @@ const CursosSeminario = () => {
 
                 <div className="info-grid-programas">
                   <div className="info-item-programas">
-                    <h4>👨‍🏫 Instructor</h4>
-                    <p>{cursoSeleccionado.instructor}</p>
+                    <h4>👨‍🏫 Profesor</h4>
+                    <p>{cursoSeleccionado.profesor || 'No asignado'}</p>
                   </div>
 
                   <div className="info-item-programas">
                     <h4>⏱️ Duración</h4>
-                    <p>
-                      {cursoSeleccionado.tipo === 'curso' 
-                        ? `${cursoSeleccionado.duracion?.horas || 'N/A'} horas (${cursoSeleccionado.duracion?.semanas || 'N/A'} semanas)`
-                        : `${cursoSeleccionado.duracion?.meses || 'N/A'} meses (${cursoSeleccionado.duracion?.horas || 'N/A'} horas)`
-                      }
-                    </p>
+                    <p>{cursoSeleccionado.duracion || 'No especificada'}</p>
                   </div>
 
                   <div className="info-item-programas">
@@ -419,8 +403,8 @@ const CursosSeminario = () => {
                   <div className="info-item-programas">
                     <h4>👥 Cupos</h4>
                     <p>
-                      {cursoSeleccionado.cupos?.ocupados || 0} ocupados / {' '}
-                      {cursoSeleccionado.cupos?.total || cursoSeleccionado.cupos?.disponibles || 'N/A'} totales
+                      {cursoSeleccionado.cuposOcupados || 0} ocupados / {' '}
+                      {cursoSeleccionado.cuposDisponibles || 'N/A'} disponibles
                     </p>
                   </div>
 
@@ -450,10 +434,10 @@ const CursosSeminario = () => {
                 <div className="modal-actions">
                   <button
                     className="btn-modal-secondary-programas"
-                    onClick={() => toggleFavorite(cursoSeleccionado.id)}
+                    onClick={() => toggleFavorite(cursoSeleccionado._id)}
                   >
                     <Heart size={16} />
-                    {favorites[cursoSeleccionado.id] ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
+                    {favorites[cursoSeleccionado._id] ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
                   </button>
                   <button
                     className="btn-modal-primary-programas"
@@ -461,10 +445,10 @@ const CursosSeminario = () => {
                       setCursoSeleccionado(cursoSeleccionado);
                       setMostrarFormulario(true);
                     }}
-                    disabled={inscripcionLoading || (cursoSeleccionado.cupos?.disponibles || 0) === 0}
+                    disabled={inscripcionLoading || (cursoSeleccionado.cuposDisponibles || 0) === 0}
                   >
                     {inscripcionLoading ? 'Inscribiendo...' : 
-                     (cursoSeleccionado.cupos?.disponibles || 0) === 0 ? 'Sin Cupos' : 'Inscribirse Ahora'}
+                     (cursoSeleccionado.cuposDisponibles || 0) === 0 ? 'Sin Cupos' : 'Inscribirse Ahora'}
                   </button>
                 </div>
               </div>
