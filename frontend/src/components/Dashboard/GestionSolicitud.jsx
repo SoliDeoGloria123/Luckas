@@ -261,11 +261,13 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
               </select>
             </div>
           </section>
+          <div className="p-6 glass-card rounded-2xl border border-white/20 shadow-lg overflow-hidden user-card">
           <TablaUnificadaSolicitudes
             datosUnificados={{ solicitudes: solicitudesFiltradas, inscripciones: [], reservas: [] }}
             abrirModalEditarSolicitud={(canEdit && !readOnly) ? abrirModalEditarSolicitud : null}
             eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
           />
+          </div>
           <SolicitudModal
             mostrar={mostrarModal}
             modoEdicion={modoEdicionSolicitud}
