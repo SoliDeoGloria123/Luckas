@@ -1,0 +1,145 @@
+/* Estilos personalizados para el calendario tipo planner mensual */
+.external-calendar {
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  font-family: 'Figtree', 'Inter', sans-serif;
+  color: #fff;
+}
+.external-calendar .react-calendar__navigation {
+  background: none;
+  border: none;
+  margin-bottom: 0.5rem;
+}
+.external-calendar .react-calendar__navigation button {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  background: none;
+  border: none;
+  margin: 0 0.5rem;
+  transition: color 0.2s;
+}
+.external-calendar .react-calendar__navigation button:enabled:hover {
+  color: #60a5fa;
+}
+.external-calendar .react-calendar__month-view {
+  background: none;
+}
+.external-calendar .react-calendar__month-view__weekdays {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #60a5fa;
+  background: none;
+  border-bottom: 1px solid #2226;
+}
+.external-calendar .react-calendar__month-view__weekdays__weekday {
+  padding: 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.external-calendar .react-calendar__tile {
+  background: none;
+  border-radius: 0.75rem;
+  font-size: 1.1rem;
+  color: #fff;
+  min-height: 3.5rem;
+  transition: background 0.2s, color 0.2s;
+  border: none;
+}
+.external-calendar .react-calendar__tile:enabled:hover,
+.external-calendar .react-calendar__tile--active {
+  background: #2563ebcc;
+  color: #fff;
+}
+.external-calendar .external-calendar-event-day {
+  background: #2563eb99 !important;
+  color: #fff !important;
+  font-weight: bold;
+  border-radius: 0.75rem;
+  border: 2px solid #60a5fa;
+}
+.external-calendar .external-calendar-event-day-warm {
+  background: #fff !important;
+  color: #b97a1a !important;
+  border-radius: 8px !important;
+  font-weight: 600;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.07);
+  border: 2px solid #ffe0a3 !important;
+  transition: background 0.2s, color 0.2s;
+}
+.external-calendar .external-calendar-event-day-warm:hover, .external-calendar .external-calendar-event-day-warm:focus {
+  background: #f3f4f6 !important;
+  color: #a05d00 !important;
+  outline: 2px solid #ffd580 !important;
+}
+.external-calendar .react-calendar__tile--now {
+  background: #fff2 !important;
+  color: #60a5fa !important;
+  border-radius: 0.75rem;
+}
+.external-calendar .react-calendar__month-view__days__day--neighboringMonth {
+  color: #888a !important;
+}
+/* Dark mode */
+.dark .external-calendar {
+  color: #fff;
+}
+.dark .external-calendar .react-calendar__tile {
+  color: #fff;
+}
+.dark .external-calendar .react-calendar__month-view__weekdays {
+  color: #60a5fa;
+  border-bottom: 1px solid #334155;
+}
+.dark .external-calendar .react-calendar__tile--now {
+  background: #334155 !important;
+  color: #60a5fa !important;
+}
+
+/* Comentarios más modernos */
+.comentario-externo {
+  background: #23272f;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.07);
+  border: 1px solid #2d3748;
+}
+.comentario-externo .autor {
+  color: #fbbf24;
+  font-weight: 600;
+}
+.comentario-externo .fecha {
+  color: #a0aec0;
+  font-size: 0.85em;
+  margin-left: 0.5em;
+}
+.comentario-externo .texto {
+  color: #f1f5f9;
+  margin: 0.5em 0 0.7em 0;
+}
+.comentario-externo .acciones {
+  display: flex;
+  gap: 1.5em;
+  margin-bottom: 0.3em;
+}
+.comentario-externo .respuestas {
+  margin-left: 2em;
+  margin-top: 0.5em;
+}
+.comentario-externo .respuesta {
+  background: #1a1d23;
+  border-radius: 8px;
+  padding: 0.7em 1em;
+  margin-bottom: 0.5em;
+  color: #fbbf24;
+}
+.comentario-externo .input-respuesta {
+  background: #23272f;
+  border: 1px solid #2d3748;
+  color: #f1f5f9;
+  border-radius: 8px;
+  padding: 0.5em 1em;
+}
