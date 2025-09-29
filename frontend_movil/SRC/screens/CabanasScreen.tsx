@@ -13,6 +13,7 @@ import {
     Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../context/AuthContext';
 import { cabanasService } from '../services/cabanas';
 import categorizacionService from '../services/categorizacion';
@@ -44,6 +45,9 @@ const CabanasScreen: React.FC = () => {
     const [filterEstado, setFilterEstado] = useState<string>('Todos');
     const [editingCabana, setEditingCabana] = useState<Cabana | null>(null);
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
+    // Estado para modal de detalle
+    const [detalleCabana, setDetalleCabana] = useState<Cabana | null>(null);
+    const [showDetalleModal, setShowDetalleModal] = useState(false);
     const [formData, setFormData] = useState<CabanaForm>({
         nombre: '',
         descripcion: '',
@@ -59,7 +63,7 @@ const CabanasScreen: React.FC = () => {
 
     // Verificar si el usuario tiene permisos para ver cabañas
     useEffect(() => {
-        if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista'))) {
+        if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista') && !hasRole('externo'))) {
             return;
         }
         loadCabanas();
@@ -69,20 +73,35 @@ const CabanasScreen: React.FC = () => {
     // Cargar categorías
     const loadCategorias = useCallback(async () => {
         try {
+            console.log('🔄 Iniciando carga de categorías...');
             const response = await categorizacionService.getAllCategorizaciones();
+            console.log('📥 Respuesta completa del servicio:', JSON.stringify(response, null, 2));
+
             let categoriasArray: Categorizacion[] = [];
             if (response.success && response.data) {
-              
+                console.log('✅ Respuesta exitosa, procesando datos...');
+                console.log('📊 Tipo de response.data:', Array.isArray(response.data) ? 'array' : typeof response.data);
+                console.log('📊 Contenido de response.data:', response.data);
+
                 // Si response.data es un array directamente
                 if (Array.isArray(response.data)) {
+                    console.log('📋 Datos son array directo');
                     categoriasArray = response.data;
                 }
                 // Si response.data es un objeto con .data
                 else if ((response.data as any).data && Array.isArray((response.data as any).data)) {
+                    console.log('📋 Datos están en response.data.data');
                     categoriasArray = (response.data as any).data;
                 }
+
+                console.log('📋 Array de categorías extraído:', categoriasArray);
+                console.log('📊 Cantidad de categorías:', categoriasArray.length);
+
                 // Filtrar solo las activas
                 const activas = categoriasArray.filter(cat => cat.activo);
+                console.log('✅ Categorías activas filtradas:', activas);
+                console.log('📊 Cantidad de activas:', activas.length);
+
                 setCategorias(activas);
             } else {
                 console.error('❌ Respuesta sin éxito o sin datos');
@@ -136,14 +155,14 @@ const CabanasScreen: React.FC = () => {
     const handleCrearCabana = () => {
         setEditingCabana(null);
         setFormData({
-      nombre: '',
-        descripcion: '',
-        capacidad: 1,
-        categoria: '',
-        precio: 0,
-        ubicacion: '',
-        estado: 'disponible',
-        imagen: []
+            nombre: '',
+            descripcion: '',
+            capacidad: 1,
+            categoria: '',
+            precio: 0,
+            ubicacion: '',
+            estado: 'disponible',
+            imagen: []
         });
         setSelectedImages([]);
         setShowModal(true);
@@ -152,7 +171,7 @@ const CabanasScreen: React.FC = () => {
     // Manejar editar cabaña
     const handleEditarCabana = (cabana: Cabana) => {
         setEditingCabana(cabana);
-        
+
         // Manejar categoria que puede venir como string (ObjectId) o como objeto poblado
         let categoriaId = '';
         if (typeof cabana.categoria === 'string') {
@@ -216,6 +235,11 @@ const CabanasScreen: React.FC = () => {
     };
 
     // Guardar cabaña (crear o actualizar)
+    // Abrir modal de detalle
+    const handleVerDetalles = (cabana: Cabana) => {
+        setDetalleCabana(cabana);
+        setShowDetalleModal(true);
+    };
     const handleGuardarCabana = async () => {
         try {
             if (!formData.nombre.trim()) {
@@ -238,7 +262,7 @@ const CabanasScreen: React.FC = () => {
                 return;
             }
 
-        
+
             if (editingCabana) {
                 const response = await cabanasService.updateCabana(editingCabana._id, {
                     ...formData,
@@ -459,6 +483,43 @@ const CabanasScreen: React.FC = () => {
                                     </View>
                                 )}
                             </View>
+                            <TouchableOpacity
+                                style={styles.eyeButton}
+                                onPress={() => handleVerDetalles(cabana)}
+                            >
+                                <Ionicons name="eye-outline" size={20} color={colors.primary} />
+                                <Text style={styles.actionTextWeb}>Ver</Text>
+                            </TouchableOpacity>
+                            {/* Modal de detalle de cabaña */}
+                            <Modal
+                                visible={showDetalleModal}
+                                animationType="slide"
+                                transparent={true}
+                                onRequestClose={() => setShowDetalleModal(false)}
+                            >
+                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+                                    <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 24, width: '90%', maxWidth: 400 }}>
+                                        <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 8 }}>{detalleCabana?.nombre}</Text>
+                                        <Text style={{ fontSize: 16, color: '#334155', marginBottom: 8 }}>{detalleCabana?.descripcion}</Text>
+                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>Capacidad: {detalleCabana?.capacidad} personas</Text>
+                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>Precio: ${detalleCabana?.precio}/noche</Text>
+                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>Ubicación: {detalleCabana?.ubicacion}</Text>
+                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>Estado: {detalleCabana?.estado}</Text>
+                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>
+                                            Categoría: {
+                                                typeof detalleCabana?.categoria === 'string'
+                                                    ? detalleCabana?.categoria
+                                                    : (detalleCabana?.categoria && typeof detalleCabana.categoria === 'object' && 'nombre' in detalleCabana.categoria)
+                                                        ? (detalleCabana.categoria as any).nombre
+                                                        : ''
+                                            }
+                                        </Text>
+                                        <TouchableOpacity style={{ marginTop: 18, alignSelf: 'flex-end' }} onPress={() => setShowDetalleModal(false)}>
+                                            <Text style={{ color: colors.primary, fontWeight: 'bold', fontSize: 16 }}>Cerrar</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </Modal>
 
                             {/* Acciones de admin */}
                             {(hasRole('admin') || hasRole('tesorero')) && (
@@ -588,74 +649,60 @@ const CabanasScreen: React.FC = () => {
                         </View>
 
                         {/* Categoría */}
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.inputLabel}>Categoría *</Text>
-                            <View style={styles.pickerContainer}>
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                    <TouchableOpacity
-                                        style={[
-                                            styles.pickerOption,
-                                            formData.categoria === '' && styles.pickerOptionSelected
-                                        ]}
-                                        onPress={() => {
-                                            setFormData({ ...formData, categoria: '' });
-                                            console.log('Seleccionado: Ninguna categoría');
-                                        }}
-                                    >
-                                        <Text style={[
-                                            styles.pickerOptionText,
-                                            formData.categoria === '' && styles.pickerOptionTextSelected
-                                        ]}>Ninguna</Text>
-                                    </TouchableOpacity>
-                                    {categorias.map((categoria) => (
-                                        <TouchableOpacity
-                                            key={categoria._id}
-                                            style={[
-                                                styles.pickerOption,
-                                                formData.categoria === categoria._id && styles.pickerOptionSelected
-                                            ]}
-                                            onPress={() => {
-                                                setFormData({ ...formData, categoria: categoria._id });
-                                                console.log('Seleccionado:', categoria.nombre);
-                                            }}
-                                        >
-                                            <Text style={[
-                                                styles.pickerOptionText,
-                                                formData.categoria === categoria._id && styles.pickerOptionTextSelected
-                                            ]}>{categoria.nombre}</Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </ScrollView>
-                            </View>
-                        </View>
-
-                        {/* Estado */}
                         <View style={styles.rowInputs}>
                             <View style={[styles.inputGroup, styles.halfWidth]}>
+                                <Text style={styles.inputLabel}>Categoría *</Text>
+                                {categorias.length === 0 ? (
+                                    <View style={styles.noCategoriesContainer}>
+                                        <Text style={styles.noCategoriesText}>No hay categorías disponibles</Text>
+                                    </View>
+                                ) : (
+                                    <View style={styles.pickerWrapper}>
+                                        <Picker
+                                            selectedValue={formData.categoria}
+                                            onValueChange={(itemValue) => setFormData({ ...formData, categoria: itemValue })}
+                                            style={styles.picker}
+                                            dropdownIconColor={colors.primary}
+                                        >
+                                            <Picker.Item
+                                                label="Selecciona una categoría"
+                                                value=""
+                                                color={colors.textSecondary}
+                                            />
+                                            {categorias.map((cat) => (
+                                                <Picker.Item
+                                                    key={cat._id}
+                                                    label={`${cat.nombre}${cat.tipo ? ` (${cat.tipo})` : ''}`}
+                                                    value={cat._id}
+                                                    color={colors.text}
+                                                />
+                                            ))}
+                                        </Picker>
+                                    </View>
+                                )}
+                            </View>
+
+                            {/* Estado */}
+                            <View style={[styles.inputGroup, styles.halfWidth]}>
                                 <Text style={styles.inputLabel}>Estado</Text>
-                                <View style={styles.pickerContainer}>
-                                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                        {['disponible', 'ocupada', 'mantenimiento'].map(estado => (
-                                            <TouchableOpacity
-                                                key={estado}
-                                                style={[
-                                                    styles.pickerOption,
-                                                    formData.estado === estado && styles.pickerOptionSelected
-                                                ]}
-                                                onPress={() => setFormData({ ...formData, estado: estado as 'disponible' | 'ocupada' | 'mantenimiento' })}
-                                            >
-                                                <Text style={[
-                                                    styles.pickerOptionText,
-                                                    formData.estado === estado && styles.pickerOptionTextSelected
-                                                ]}>{estado.charAt(0).toUpperCase() + estado.slice(1)}</Text>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </ScrollView>
+                                <View style={styles.pickerWrapper}>
+                                    <Picker
+                                        selectedValue={formData.estado}
+                                        onValueChange={(itemValue) => setFormData({ ...formData, estado: itemValue })}
+                                        style={styles.picker}
+                                        dropdownIconColor={colors.primary}
+                                    >
+                                        <Picker.Item label="Selecciona un estado" value="" color={colors.textSecondary} />
+                                        <Picker.Item label="Disponible" value="disponible" color={colors.text} />
+                                        <Picker.Item label="Ocupada" value="ocupada" color={colors.text} />
+                                        <Picker.Item label="Mantenimiento" value="mantenimiento" color={colors.text} />
+                                    </Picker>
                                 </View>
                             </View>
-                            <View style={[styles.inputGroup, styles.halfWidth]}>
-                                {/* Espacio vacío para mantener el layout */}
-                            </View>
+
+                        </View>
+                        <View style={[styles.inputGroup, styles.halfWidth]}>
+                            {/* Espacio vacío para mantener el layout */}
                         </View>
 
                         {/* Imágenes */}
@@ -730,6 +777,18 @@ const estados = [
 
 const styles = StyleSheet.create({
     // Estilos de filtro igual a tareas
+    eyeButton: {
+        flexDirection: 'row',
+        paddingHorizontal: spacing.sm,
+        paddingVertical: spacing.xs,
+        marginLeft: spacing.sm,
+        alignSelf: 'flex-end',
+    },
+    actionTextWeb: {
+        marginLeft: spacing.xs,
+        fontSize: typography.fontSize.sm,
+        color: colors.textSecondary,
+    },
     modalContainerTareas: {
         flex: 1,
         justifyContent: 'flex-end',
@@ -927,7 +986,7 @@ const styles = StyleSheet.create({
         marginRight: 0,
     },
     cabanaImage: {
-        width: 280,
+        width: 348,
         height: 180,
         borderRadius: 8,
         backgroundColor: '#E2E8F0',
@@ -1098,6 +1157,7 @@ const styles = StyleSheet.create({
     },
     inputGroup: {
         marginBottom: 20,
+        flex: 2,
     },
     inputLabel: {
         fontSize: 14,
@@ -1121,35 +1181,39 @@ const styles = StyleSheet.create({
     rowInputs: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        marginBottom: 16,
     },
     halfWidth: {
-        width: '48%',
+        flex: 1,
+        marginRight: 8,
     },
-    pickerContainer: {
+
+    pickerWrapper: {
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: '#d1d5db',
         borderRadius: 8,
         backgroundColor: '#fff',
-        padding: 5,
+        marginTop: 4,
+        overflow: 'hidden',
     },
-    pickerOption: {
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        marginRight: 8,
-        borderRadius: 6,
-        backgroundColor: '#F7FAFC',
+    picker: {
+        height: 50,
+        width: '100%',
     },
-    pickerOptionSelected: {
-        backgroundColor: colors.primary,
+    noCategoriesContainer: {
+        padding: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#d1d5db',
+        alignItems: 'center',
+        backgroundColor: '#f9f9f9',
+        marginTop: 4,
     },
-    pickerOptionText: {
-        fontSize: 14,
-        color: '#4A5568',
+    noCategoriesText: {
+        color: '#888',
+        fontSize: typography.fontSize.md,
     },
-    pickerOptionTextSelected: {
-        color: '#fff',
-        fontWeight: '600',
-    },
+
     imageSelector: {
         borderWidth: 2,
         borderColor: colors.primary,

@@ -43,12 +43,28 @@ class AuthService {
                 ...(options.headers as Record<string, string>)
             };
 
+            // Determinar si el endpoint requiere autenticación
+            const isProtectedEndpoint = ![
+                API_CONFIG.ENDPOINTS.LOGIN,
+                API_CONFIG.ENDPOINTS.REGISTER,
+                API_CONFIG.ENDPOINTS.VERIFY_TOKEN
+            ].includes(endpoint);
+
+            // Si el endpoint es protegido y no hay token, retornar error claro
+            if (isProtectedEndpoint && !this.token) {
+                console.warn('Intento de petición protegida sin token:', endpoint);
+                return {
+                    success: false,
+                    message: 'No hay sesión activa. Por favor inicia sesión.',
+                    error: 'Token no proporcionado'
+                };
+            }
+
             // Agregar token si existe
             if (this.token) {
-                // Usar solo Authorization: Bearer <token> como estándar
                 headers['Authorization'] = `Bearer ${this.token}`;
             }
-            
+
             // Debug de la petición
             console.log('🔄 [API Request]:', {
                 url: url,
@@ -63,8 +79,32 @@ class AuthService {
                 headers
             });
 
-            const data = await response.json();
-            
+            let data;
+            let alreadyRead = false;
+            try {
+                data = await response.json();
+            } catch (jsonError) {
+                // Si la respuesta no es JSON, probablemente es HTML de error (por ejemplo, sesión expirada)
+                try {
+                    const text = await response.text();
+                    alreadyRead = true;
+                    console.error('Respuesta no JSON recibida:', text);
+                    return {
+                        success: false,
+                        message: 'Respuesta inesperada del servidor. ¿Sesión expirada?',
+                        error: text
+                    };
+                } catch (readError) {
+                    // Si ya fue leída, evitar el error 'Already read'
+                    console.error('La respuesta ya fue leída, no se puede leer de nuevo.');
+                    return {
+                        success: false,
+                        message: 'Error de lectura de respuesta. La respuesta ya fue leída.',
+                        error: 'Already read'
+                    };
+                }
+            }
+
             console.log('Respuesta del servidor:', data);
 
             // Transformar la respuesta al formato esperado

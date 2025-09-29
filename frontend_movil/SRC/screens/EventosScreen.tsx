@@ -90,7 +90,7 @@ const EventosScreen: React.FC = () => {
 
     // Verificar si el usuario tiene permisos para ver eventos
     useEffect(() => {
-        if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista'))) {
+        if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista') && !hasRole('externo'))) {
             return;
         }
         loadEventos();
@@ -141,19 +141,6 @@ const EventosScreen: React.FC = () => {
         }
     }, []);
 
-    // Debug: Mostrar las categorías cuando cambien
-    useEffect(() => {
-        console.log('🎯 Estado de categorías actualizado:', categorias);
-        console.log('🎯 Cantidad de categorías:', categorias.length);
-        if (categorias.length > 0) {
-            console.log('🎯 Primera categoría:', categorias[0]);
-            console.log('🎯 Todas las categorías:', categorias.map(cat => ({
-                id: cat._id,
-                nombre: cat.nombre,
-                activo: cat.activo
-            })));
-        }
-    }, [categorias]);
 
     // Cargar eventos
     const loadEventos = useCallback(async () => {
@@ -570,32 +557,43 @@ const EventosScreen: React.FC = () => {
                     </View>
                 ) : filteredEventos.length > 0 ? (
                     filteredEventos.map(evento => (
-                        <TouchableOpacity
+                        <View
                             key={evento._id}
                             style={styles.eventoCardWeb}
-                            onPress={() => handleVerDetalles(evento)}
                         >
-                            {Array.isArray(evento.imagen) && evento.imagen.length > 0 ? (
-                                <Image
-                                    source={{ uri: `http://localhost:3000/uploads/eventos/${evento.imagen[0]}` }}
-                                    style={{
-                                        width: '100%',
-                                        height: 160,
-                                        borderRadius: 10,
-                                        backgroundColor: '#e5e7eb',
-                                        marginBottom: 12
-                                    }}
-                                    resizeMode="cover"
-                                />
-                            ) : (
-                                <View style={styles.noImageContainer}>
-                                    <Ionicons name="image-outline" size={40} color={colors.textSecondary} />
-                                    <Text style={styles.noImageText}>Sin imagen</Text>
+                            {evento.imagen && evento.imagen.length > 0 && (
+                                <View style={styles.imageContainer}>
+                                    <ScrollView
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                        pagingEnabled
+                                        style={styles.imageScrollView}
+                                    >
+                                        {evento.imagen.map((imageUri, index) => (
+                                            <View key={index} style={styles.imageWrapper}>
+                                                {imageUri.startsWith('mock-image') ? (
+                                                    <View style={[styles.cabanaImage, styles.mockImagePlaceholder]}>
+                                                        <Ionicons name="image" size={40} color="#718096" />
+                                                        <Text style={styles.mockImageText}>Imagen {index + 1}</Text>
+                                                    </View>
+                                                ) : (
+                                                    <Image source={{ uri: imageUri }} style={styles.cabanaImage} />
+                                                )}
+                                            </View>
+                                        ))}
+                                    </ScrollView>
+                                    {evento.imagen.length > 1 && (
+                                        <View style={styles.imageIndicator}>
+                                            <Text style={styles.imageIndicatorText}>
+                                                1/{evento.imagen.length}
+                                            </Text>
+                                        </View>
+                                    )}
                                 </View>
                             )}
+
                             {/* Prioridad y fecha etiqueta */}
                             <View style={styles.cardHeaderWeb}>
-
                                 {evento.prioridad && (
                                     <View style={[styles.prioridadTag, styles[`prioridad${evento.prioridad}`]]}>
                                         <Text style={styles.prioridadText}>{`Prioridad ${evento.prioridad}`}</Text>
@@ -622,6 +620,14 @@ const EventosScreen: React.FC = () => {
                                 <Ionicons name="location-outline" size={16} color={colors.primary} />
                                 <Text style={styles.infoTextWeb}>{evento.lugar}</Text>
                             </View>
+                        
+                            <TouchableOpacity
+                                style={styles.eyeButton}
+                                onPress={() => handleVerDetalles(evento)}
+                            >
+                                <Ionicons name="eye-outline" size={20} color={colors.primary} />
+                                <Text style={styles.actionTextWeb}>Ver</Text>
+                            </TouchableOpacity>
 
                             {/* Botones de administración solo para admins */}
                             {(hasRole('admin') || hasRole('tesorero')) && (
@@ -633,6 +639,7 @@ const EventosScreen: React.FC = () => {
                                         <Ionicons name="pencil" size={16} color="#fff" />
                                         <Text style={styles.actionButtonText}>Editar</Text>
                                     </TouchableOpacity>
+
                                     {hasRole('admin') && (
                                         <TouchableOpacity
                                             style={styles.deleteButton}
@@ -644,7 +651,7 @@ const EventosScreen: React.FC = () => {
                                     )}
                                 </View>
                             )}
-                        </TouchableOpacity>
+                        </View>
                     ))
                 ) : (
                     <View style={styles.emptyContainer}>
@@ -825,68 +832,54 @@ const EventosScreen: React.FC = () => {
                         </View>
 
                         {/* Categoría y Prioridad */}
+
                         <View style={styles.rowInputs}>
                             <View style={[styles.inputGroup, styles.halfWidth]}>
-                                <Text style={styles.inputLabel}>Categoría *</Text>                              
-                                {/* Alternativa con botones para seleccionar categoría */}
-                                <View style={{ marginTop: 10 }}>
-                                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                        <TouchableOpacity
-                                            style={[
-                                                styles.pickerOption,
-                                                formData.categoria === '' && styles.pickerOptionSelected
-                                            ]}
-                                            onPress={() => {
-                                                setFormData({ ...formData, categoria: '' });
-                                                console.log('Seleccionado: Ninguna');
-                                            }}
+                                <Text style={styles.inputLabel}>Categoría *</Text>
+                                {categorias.length === 0 ? (
+                                    <View style={styles.noCategoriesContainer}>
+                                        <Text style={styles.noCategoriesText}>No hay categorías disponibles</Text>
+                                    </View>
+                                ) : (
+                                    <View style={styles.pickerWrapper}>
+                                        <Picker
+                                            selectedValue={formData.categoria}
+                                            onValueChange={(itemValue) => setFormData({ ...formData, categoria: itemValue })}
+                                            style={styles.picker}
+                                            dropdownIconColor={colors.primary}
                                         >
-                                            <Text style={[
-                                                styles.pickerOptionText,
-                                                formData.categoria === '' && styles.pickerOptionTextSelected
-                                            ]}>Ninguna</Text>
-                                        </TouchableOpacity>
-                                        {categorias.map((categoria) => (
-                                            <TouchableOpacity
-                                                key={categoria._id}
-                                                style={[
-                                                    styles.pickerOption,
-                                                    formData.categoria === categoria._id && styles.pickerOptionSelected
-                                                ]}
-                                                onPress={() => {
-                                                    setFormData({ ...formData, categoria: categoria._id });
-                                                    console.log('Seleccionado:', categoria.nombre);
-                                                }}
-                                            >
-                                                <Text style={[
-                                                    styles.pickerOptionText,
-                                                    formData.categoria === categoria._id && styles.pickerOptionTextSelected
-                                                ]}>{categoria.nombre}</Text>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </ScrollView>
-                                </View>
+                                            <Picker.Item
+                                                label="Selecciona una categoría"
+                                                value=""
+                                                color={colors.textSecondary}
+                                            />
+                                            {categorias.map((cat) => (
+                                                <Picker.Item
+                                                    key={cat._id}
+                                                    label={`${cat.nombre}${cat.tipo ? ` (${cat.tipo})` : ''}`}
+                                                    value={cat._id}
+                                                    color={colors.text}
+                                                />
+                                            ))}
+                                        </Picker>
+                                    </View>
+                                )}
                             </View>
+
+                            {/* Prioridad */}
                             <View style={[styles.inputGroup, styles.halfWidth]}>
                                 <Text style={styles.inputLabel}>Prioridad</Text>
-                                <View style={styles.pickerContainer}>
-                                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                        {['Alta', 'Media', 'Baja'].map(prioridad => (
-                                            <TouchableOpacity
-                                                key={prioridad}
-                                                style={[
-                                                    styles.pickerOption,
-                                                    formData.prioridad === prioridad && styles.pickerOptionSelected
-                                                ]}
-                                                onPress={() => setFormData({ ...formData, prioridad: prioridad as 'Alta' | 'Media' | 'Baja' })}
-                                            >
-                                                <Text style={[
-                                                    styles.pickerOptionText,
-                                                    formData.prioridad === prioridad && styles.pickerOptionTextSelected
-                                                ]}>{prioridad}</Text>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </ScrollView>
+                                <View style={styles.pickerWrapper}>
+                                    <Picker
+                                        selectedValue={formData.prioridad}
+                                        onValueChange={(itemValue) => setFormData({ ...formData, prioridad: itemValue })}
+                                        style={styles.picker}
+                                        dropdownIconColor={colors.primary}
+                                    >
+                                        <Picker.Item label="Media" value="Media" color={colors.text} />
+                                        <Picker.Item label="Alta" value="Alta" color={colors.text} />
+                                        <Picker.Item label="Baja" value="Baja" color={colors.text} />
+                                    </Picker>
                                 </View>
                             </View>
                         </View>
@@ -947,7 +940,7 @@ const EventosScreen: React.FC = () => {
                             />
                         </View>
                     </ScrollView>
-                    
+
                     {/* Botones del Modal */}
                     <View style={styles.modalButtons}>
                         <TouchableOpacity
@@ -972,6 +965,18 @@ const EventosScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+    eyeButton: {
+      flexDirection: 'row',
+        paddingHorizontal: spacing.sm,
+        paddingVertical: spacing.xs,
+        marginLeft: spacing.sm,
+        alignSelf: 'flex-end',
+    },
+      actionTextWeb: {
+        marginLeft: spacing.xs,
+        fontSize: typography.fontSize.sm,
+        color: colors.textSecondary,
+    },
     // Header y lista igual a Cabañas
     header: {
         backgroundColor: colors.surface,
@@ -1161,22 +1166,45 @@ const styles = StyleSheet.create({
         marginTop: spacing.md,
         ...shadows.small,
     },
-
-    noImageContainer: {
-        width: '100%',
-        height: 160,
-        backgroundColor: '#f8f9fa',
-        borderRadius: 10,
+    imageContainer: {
+        marginBottom: spacing.sm,
+        position: 'relative',
+    },
+    imageScrollView: {
+        borderRadius: 8,
+    },
+    imageWrapper: {
+        marginRight: 0,
+    },
+    cabanaImage: {
+        width: 348,
+        height: 180,
+        borderRadius: 8,
+        backgroundColor: '#E2E8F0',
+    },
+    mockImagePlaceholder: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: '#e9ecef',
     },
-    noImageText: {
-        color: colors.textSecondary,
-        fontSize: typography.fontSize.sm,
-        marginTop: spacing.xs,
+    mockImageText: {
+        color: '#718096',
+        fontSize: 12,
+        fontWeight: '600',
+        marginTop: 4,
+    },
+    imageIndicator: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+    },
+    imageIndicatorText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: '600',
     },
     adminActions: {
         flexDirection: 'row',
@@ -1236,7 +1264,8 @@ const styles = StyleSheet.create({
         padding: spacing.lg,
     },
     inputGroup: {
-        marginBottom: spacing.lg,
+        marginBottom: 16,
+        flex: 1,
     },
     inputLabel: {
         fontSize: typography.fontSize.md,
@@ -1274,39 +1303,40 @@ const styles = StyleSheet.create({
     },
     rowInputs: {
         flexDirection: 'row',
-        gap: spacing.md,
+        justifyContent: 'space-between',
+        marginBottom: 16,
     },
     halfWidth: {
         flex: 1,
+        marginRight: 8,
     },
-    pickerContainer: {
+
+    pickerWrapper: {
         borderWidth: 1,
         borderColor: '#d1d5db',
         borderRadius: 8,
-        backgroundColor: colors.surface,
-        paddingVertical: Platform.OS === 'ios' ? 4 : 0,
-        paddingHorizontal: Platform.OS === 'android' ? 10 : 0,
+        backgroundColor: '#fff',
+        marginTop: 4,
+        overflow: 'hidden',
     },
-    pickerOption: {
-        paddingHorizontal: spacing.sm,
-        paddingVertical: 6,
-        marginHorizontal: 2,
-        borderRadius: 6,
-        backgroundColor: 'transparent',
-        minWidth: 60,
+    picker: {
+        height: 50,
+        width: '100%',
+    },
+    noCategoriesContainer: {
+        padding: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#d1d5db',
         alignItems: 'center',
+        backgroundColor: '#f9f9f9',
+        marginTop: 4,
     },
-    pickerOptionSelected: {
-        backgroundColor: colors.primary,
+    noCategoriesText: {
+        color: '#888',
+        fontSize: typography.fontSize.md,
     },
-    pickerOptionText: {
-        fontSize: typography.fontSize.sm,
-        color: colors.text,
-    },
-    pickerOptionTextSelected: {
-        color: '#fff',
-        fontWeight: '600',
-    },
+
     filtrosContainer: {
         marginBottom: spacing.sm,
         marginHorizontal: spacing.md,

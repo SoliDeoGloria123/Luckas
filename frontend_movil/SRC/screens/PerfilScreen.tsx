@@ -4,7 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { colors } from '../styles/colors';
-import { usePerfilForm } from '../hooks/usePerfilForm';
+import { usePerfilForm } from '../hooks/usePerfilForms';
 
 export const PerfilScreen = () => {
     const { user } = useAuth();

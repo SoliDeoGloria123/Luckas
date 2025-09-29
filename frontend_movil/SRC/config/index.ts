@@ -28,7 +28,7 @@ export const API_CONFIG = {
         // Otros endpoints que tengas en tu backend
         CURSOS: '/api/cursos',
         EVENTOS: '/api/eventos',
-        PROGRAMAS: '/api/programas-tecnicos',
+        PROGRAMAS: '/api/programas-academicos',
         RESERVAS: '/api/reservas',
         CABANAS: '/api/cabanas',
         REPORTES: '/api/reportes',

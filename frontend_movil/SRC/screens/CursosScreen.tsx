@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
-import { cursosService } from '../services/cursos';
+import { programasService } from '../services/programas';
 import { colors, spacing, typography, shadows } from '../styles';
 
 const CursosScreen: React.FC = () => {
@@ -28,7 +28,7 @@ const CursosScreen: React.FC = () => {
 
     // Verificar si el usuario tiene permisos para ver cursos
     useEffect(() => {
-        if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista'))) {
+        if (!user || (!hasRole('admin') && !hasRole('tesorero') && !hasRole('seminarista') && !hasRole('externo'))) {
             // Aquí podrías redirigir al usuario a otra pantalla si lo deseas
             return;
         }
@@ -39,7 +39,7 @@ const CursosScreen: React.FC = () => {
     const loadCursos = useCallback(async () => {
         try {
             setIsLoading(true);
-            const response = await cursosService.getAllCursos();
+            const response = await programasService.getAllProgramas();
             if (response.success && response.data) {
                 // Forzar el tipo de la respuesta para evitar errores de tipado
                 const cursosArray = Array.isArray(response.data)
@@ -89,15 +89,40 @@ const CursosScreen: React.FC = () => {
                 </View>
             </View>
             <Text style={styles.cursoTitleWeb}>{curso.nombre}</Text>
-            <Text style={styles.cursoInstructorWeb}>Por: {curso.instructor}</Text>
+            <Text style={styles.cursoInstructorWeb}>Por: {curso.profesor || curso.instructor}</Text>
             <Text style={styles.cursoDuracionWeb}>
-                Duración: {curso.duracion?.horas ? `${curso.duracion.horas} horas` : ''} {curso.duracion?.semanas ? `/ ${curso.duracion.semanas} semanas` : ''}
+                Duración: {curso.duracion}
             </Text>
             <Text style={styles.cursoDescripcionWeb} numberOfLines={2}>{curso.descripcion}</Text>
+            {/* Información adicional */}
+            <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Nivel:</Text> <Text style={styles.cursoInfoValue}>{curso.nivel}</Text></Text>
+            <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Precio:</Text> <Text style={[styles.cursoInfoValue, curso.precio ? styles.cursoPrecio : styles.cursoGratis]}>{curso.precio ? `$${curso.precio}` : 'Gratuito'}</Text></Text>
+            <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Cupos disponibles:</Text> <Text style={styles.cursoInfoValue}>{curso.cuposDisponibles}</Text></Text>
+            <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Cupos ocupados:</Text> <Text style={styles.cursoInfoValue}>{curso.cuposOcupados}</Text></Text>
+            <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Fecha inicio:</Text> <Text style={styles.cursoInfoValue}>{curso.fechaInicio ? new Date(curso.fechaInicio).toLocaleDateString() : '-'}</Text></Text>
+            <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Fecha fin:</Text> <Text style={styles.cursoInfoValue}>{curso.fechaFin ? new Date(curso.fechaFin).toLocaleDateString() : '-'}</Text></Text>
+            {curso.certificacion && (
+                <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Certificación:</Text> <Text style={[styles.cursoInfoValue, styles.cursoCertificado]}>Sí</Text></Text>
+            )}
+            {curso.destacado && (
+                <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Destacado</Text></Text>
+            )}
+            {Array.isArray(curso.requisitos) && curso.requisitos.length > 0 && (
+                <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Requisitos:</Text> <Text style={styles.cursoInfoValue}>{curso.requisitos.join(', ')}</Text></Text>
+            )}
+            {Array.isArray(curso.objetivos) && curso.objetivos.length > 0 && (
+                <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Objetivos:</Text> <Text style={styles.cursoInfoValue}>{curso.objetivos.join(', ')}</Text></Text>
+            )}
+            {curso.metodologia && (
+                <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Metodología:</Text> <Text style={styles.cursoInfoValue}>{curso.metodologia}</Text></Text>
+            )}
+            {curso.evaluacion && (
+                <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Evaluación:</Text> <Text style={styles.cursoInfoValue}>{curso.evaluacion}</Text></Text>
+            )}
             <View style={styles.cursoActionsWeb}>
                 <TouchableOpacity 
                     style={styles.actionButtonWeb}
-                    onPress={() => Alert.alert('Información', `Nombre: ${curso.nombre}\nInstructor: ${curso.instructor}\nModalidad: ${curso.modalidad}\nDuración: ${curso.duracion?.horas || ''} horas / ${curso.duracion?.semanas || ''} semanas\nDescripción: ${curso.descripcion}`)}
+                    onPress={() => Alert.alert('Información', `Nombre: ${curso.nombre}\nProfesor: ${curso.profesor || curso.instructor}\nModalidad: ${curso.modalidad}\nDuración: ${curso.duracion}\nNivel: ${curso.nivel}\nPrecio: ${curso.precio ? `$${curso.precio}` : 'Gratuito'}\nCupos disponibles: ${curso.cuposDisponibles}\nCupos ocupados: ${curso.cuposOcupados}\nFecha inicio: ${curso.fechaInicio ? new Date(curso.fechaInicio).toLocaleDateString() : '-'}\nFecha fin: ${curso.fechaFin ? new Date(curso.fechaFin).toLocaleDateString() : '-'}\nCertificación: ${curso.certificacion ? 'Sí' : 'No'}\nDestacado: ${curso.destacado ? 'Sí' : 'No'}\nRequisitos: ${Array.isArray(curso.requisitos) ? curso.requisitos.join(', ') : ''}\nObjetivos: ${Array.isArray(curso.objetivos) ? curso.objetivos.join(', ') : ''}\nMetodología: ${curso.metodologia || ''}\nEvaluación: ${curso.evaluacion || ''}\nDescripción: ${curso.descripcion}`)}
                 >
                     <Ionicons name="eye-outline" size={20} color={colors.primary} />
                     <Text style={styles.actionTextWeb}>Ver</Text>
@@ -337,6 +362,33 @@ const styles = StyleSheet.create({
         fontSize: typography.fontSize.md,
         color: colors.textSecondary,
         marginBottom: spacing.xs,
+    },
+    cursoInfoLabel: {
+        fontSize: typography.fontSize.sm,
+        color: colors.textSecondary,
+        marginBottom: 2,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    cursoInfoTitle: {
+        fontWeight: 'bold',
+        color: colors.primary,
+    },
+    cursoInfoValue: {
+        color: colors.text,
+        fontWeight: '600',
+    },
+    cursoPrecio: {
+        color: '#059669',
+        fontWeight: 'bold',
+    },
+    cursoGratis: {
+        color: '#2563eb',
+        fontWeight: 'bold',
+    },
+    cursoCertificado: {
+        color: '#f59e42',
+        fontWeight: 'bold',
     },
     cursoActionsWeb: {
         flexDirection: 'row',

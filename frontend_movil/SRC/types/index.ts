@@ -255,6 +255,7 @@ export interface Curso {
 export interface Categorizacion {
     _id: string;
     nombre: string;
+    tipo: string;
     codigo: string;
     activo: boolean;
     creadoPor?: string;

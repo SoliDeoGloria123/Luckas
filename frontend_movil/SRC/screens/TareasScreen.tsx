@@ -22,7 +22,7 @@ import { colors, spacing, typography, shadows } from '../styles';
 import Icon from 'react-native-vector-icons/Ionicons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { tareasService } from '../services';
-import { userService } from '../services';
+import { usuariosService } from '../services/usuarios';
 
 
 
@@ -36,6 +36,7 @@ const INITIAL_FILTROS = {
 interface TareaFormData {
     titulo: string;
     descripcion: string;
+    estado: string;
     prioridad: string;
     asignadoA: string;
     asignadoPor: string; // Nuevo campo requerido
@@ -69,6 +70,7 @@ export const TareasScreen = () => {
         titulo: '',
         descripcion: '',
         prioridad: 'Media',
+        estado: 'pendiente',
         asignadoA: '',
         asignadoPor: user?._id || '', // Nuevo campo requerido
         fechaLimite: new Date()
@@ -80,6 +82,7 @@ export const TareasScreen = () => {
         titulo: '',
         descripcion: '',
         prioridad: 'Media',
+        estado: 'pendiente',
         asignadoA: '',
         asignadoPor: user?._id || '', // Asignar automáticamente el usuario actual
         fechaLimite: new Date()
@@ -90,9 +93,9 @@ export const TareasScreen = () => {
         if (typeof userField === 'string') {
             // Si es un ID, buscar el usuario en las opciones cargadas
             const foundUser = asignadoAOptions.find(u => u._id === userField);
-            return foundUser ? `${foundUser.nombre} ${foundUser.apellido}` : 'Usuario';
+            return foundUser ? `${foundUser.nombre} ${foundUser.apellido} (${foundUser.role})` : 'Usuario';
         }
-        return `${userField.nombre} ${userField.apellido}`;
+        return `${userField.nombre}  (${userField.role})`;
     };
 
     // Helper functions
@@ -126,31 +129,30 @@ export const TareasScreen = () => {
 
     // Cargar usuarios disponibles para los pickers (asignadoA / asignadoPor)
     const cargarUsuarios = useCallback(async () => {
+        if (!user || !user._id) {
+            setAsignadoAOptions([]);
+            return;
+        }
         try {
             setLoadingUsers(true);
-            console.log('🔄 cargando usuarios...');
-            const resp: any = await userService.getAllUsers();
+            const resp: any = await usuariosService.getAllUsers();
             if (resp && resp.success) {
-                // Resp puede venir como array o como { data: [...] }
                 const users = Array.isArray(resp.data) ? resp.data : (resp.data?.data || resp.data || []);
                 setAsignadoAOptions(users as User[]);
-                console.log(`✅ Usuarios cargados: ${users.length}`);
-
-                // Si el formulario no tiene asignadoPor, asignar el usuario actual por defecto
                 setNuevaTarea(prev => ({ ...prev, asignadoPor: prev.asignadoPor || user?._id || '' }));
             } else {
-                console.warn('No se obtuvieron usuarios:', resp?.message);
+                console.warn('[USUARIOS] No se obtuvieron usuarios:', resp?.message);
                 setAsignadoAOptions([]);
             }
         } catch (error) {
-            console.error('Error cargando usuarios:', error);
+            console.error('[USUARIOS] Error cargando usuarios:', error);
             setAsignadoAOptions([]);
         } finally {
             setLoadingUsers(false);
         }
     }, [user?._id]);
 
- 
+
 
     const handleCambioEstado = async (tareaId: string, nuevoEstado: string) => {
         try {
@@ -312,6 +314,7 @@ export const TareasScreen = () => {
                                         titulo: tarea.titulo,
                                         descripcion: tarea.descripcion,
                                         prioridad: tarea.prioridad,
+                                        estado: tarea.estado,
                                         asignadoA: typeof tarea.asignadoA === 'string' ? tarea.asignadoA : tarea.asignadoA._id,
                                         asignadoPor: typeof tarea.asignadoPor === 'string' ? tarea.asignadoPor : tarea.asignadoPor._id,
                                         fechaLimite: new Date(tarea.fechaLimite),
@@ -420,15 +423,15 @@ export const TareasScreen = () => {
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>Asignado a * ({asignadoAOptions.length} opciones disponibles)</Text>
                             {loadingUsers ? (
-                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}> 
+                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}>
                                     <Text>Cargando usuarios...</Text>
                                 </View>
                             ) : asignadoAOptions.length === 0 ? (
-                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}> 
+                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}>
                                     <Text style={{ color: '#dc3545', textAlign: 'center' }}>No hay usuarios disponibles</Text>
                                 </View>
                             ) : (
-                                <View style={[styles.pickerContainer, { minHeight: 60, maxHeight: 80 }]}> 
+                                <View style={[styles.pickerContainer, { minHeight: 60, maxHeight: 80 }]}>
                                     <Picker
                                         selectedValue={nuevaTarea.asignadoA}
                                         style={[styles.picker, { width: '100%' }]}
@@ -441,7 +444,7 @@ export const TareasScreen = () => {
                                         <Picker.Item label="-- Seleccione un usuario --" value="" />
                                         {asignadoAOptions.map((u, index) => (
                                             <Picker.Item
-                                                key={`asignado-${u._id}`}
+                                                key={u._id}
                                                 label={`${u.nombre} ${u.apellido} (${u.role})`}
                                                 value={u._id}
                                             />
@@ -449,25 +452,25 @@ export const TareasScreen = () => {
                                     </Picker>
                                 </View>
                             )}
-                                {prioridades.map((prioridad) => (
-                                    <TouchableOpacity
-                                        key={prioridad.value}
-                                        style={[
-                                            styles.filterChip,
-                                            filtros.prioridad === prioridad.value && styles.filterChipSelected
-                                        ]}
-                                        onPress={() => handlePrioridadPress(prioridad.value)}
-                                    >
-                                        <Text style={[
-                                            styles.filterChipText,
-                                            filtros.prioridad === prioridad.value && styles.filterChipTextSelected
-                                        ]}>
-                                            {prioridad.label}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                    
+                            {prioridades.map((prioridad) => (
+                                <TouchableOpacity
+                                    key={prioridad.value}
+                                    style={[
+                                        styles.filterChip,
+                                        filtros.prioridad === prioridad.value && styles.filterChipSelected
+                                    ]}
+                                    onPress={() => handlePrioridadPress(prioridad.value)}
+                                >
+                                    <Text style={[
+                                        styles.filterChipText,
+                                        filtros.prioridad === prioridad.value && styles.filterChipTextSelected
+                                    ]}>
+                                        {prioridad.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
 
                         <View style={styles.filterButtons}>
                             <TouchableOpacity
@@ -611,16 +614,23 @@ export const TareasScreen = () => {
                                 placeholder="Ingrese el título de la tarea"
                             />
                         </View>
+
                         <View style={styles.inputGroup}>
-                            <Text style={styles.inputLabel}>Descripción *</Text>
-                            <TextInput
-                                style={[styles.textInput, styles.textArea]}
-                                value={nuevaTarea.descripcion}
-                                onChangeText={text => setNuevaTarea({ ...nuevaTarea, descripcion: text })}
-                                placeholder="Ingrese la descripción"
-                                multiline
-                                numberOfLines={4}
-                            />
+                            <Text style={styles.inputLabel}>Estado *</Text>
+                            <View style={styles.pickerContainer}>
+                                <Picker
+                                    selectedValue={nuevaTarea.estado}
+                                    onValueChange={value => setNuevaTarea({ ...nuevaTarea, estado: value })}
+                                    style={styles.picker}
+                                    itemStyle={{ color: '#2D3748', fontSize: 16 }} // Para iOS
+                                    mode="dropdown" // Para Android
+                                >
+                                    <Picker.Item label="Pendiente" value="pendiente" color="#2D3748" />
+                                    <Picker.Item label="En progreso" value="en_progreso" color="#2D3748" />
+                                    <Picker.Item label="Completada" value="completada" color="#2D3748" />
+                                    <Picker.Item label="Cancelada" value="cancelada" color="#2D3748" />
+                                </Picker>
+                            </View>
                         </View>
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>Prioridad *</Text>
@@ -639,77 +649,51 @@ export const TareasScreen = () => {
                             </View>
                         </View>
                         <View style={styles.inputGroup}>
-                            <Text style={styles.inputLabel}>Asignado a * ({asignadoAOptions.length} opciones disponibles)</Text>
-                            {/* Opciones de usuarios cargadas dinámicamente */}
-                            {loadingUsers ? (
-                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 50 }]}>
-                                    <Text>Cargando usuarios...</Text>
-                                </View>
-                            ) : (
-                                <View style={[styles.pickerContainer, { height: 50 }]}>
-                                    <Picker
-                                        selectedValue={nuevaTarea.asignadoA}
-                                        style={[styles.picker, { width: '100%' }]}
-                                        dropdownIconColor="#2D3748"
-                                        onValueChange={value => {
-                                            console.log('🔄 Cambiando asignadoA a:', value, 'de', asignadoAOptions.length, 'opciones');
-                                            setNuevaTarea({ ...nuevaTarea, asignadoA: value });
-                                        }}
-                                    >
-                                    
-                                        <Picker.Item label="-- Seleccione un usuario --" value="" />
-                                        {asignadoAOptions.map((u, index) => {
-                                            console.log(`Opción ${index}:`, u.nombre, u.apellido, u.role);
-                                            return (
-                                                <Picker.Item
-                                                    key={`asignado-${u._id}`}
-                                                    label={`${u.nombre} ${u.apellido} (${u.role})`}
-                                                    value={u._id}
-                                                />
-                                            );
-                                        })}
-                                    </Picker>
-                                </View>
-                            )}
+                            <Text style={styles.inputLabel}>Asignar a</Text>
+                            <View style={styles.pickerContainer}>
+                                <Picker
+                                    selectedValue={nuevaTarea.asignadoA}
+                                    style={styles.picker}
+                                    onValueChange={(itemValue) =>
+                                        setNuevaTarea({ ...nuevaTarea, asignadoA: itemValue })
+                                    }
+                                >
+                                    <Picker.Item label="Selecciona un usuario" value="" />
+                                    {asignadoAOptions.map((user) => (
+                                        <Picker.Item
+                                            key={user._id}
+                                            label={`${user.nombre} ${user.apellido} (${user.role})`}
+                                            value={user._id}
+                                        />
+                                    ))}
+                                </Picker>
+                            </View>
                         </View>
 
                         <View style={styles.inputGroup}>
-                            <Text style={styles.inputLabel}>Asignado por * ({asignadoAOptions.length} opciones disponibles)</Text>
-                            {loadingUsers ? (
-                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 50 }]}>
-                                    <Text>Cargando usuarios...</Text>
-                                </View>
-                            ) : (
-                                <View style={[styles.pickerContainer, { height: 50 }]}>
-                                    <Picker
-                                        selectedValue={nuevaTarea.asignadoPor}
-                                        style={[styles.picker, { width: '100%' }]}
-                                        dropdownIconColor="#2D3748"
-                                        onValueChange={value => {
-                                            console.log('🔄 Cambiando asignadoPor a:', value, 'de', asignadoAOptions.length, 'opciones');
-                                            setNuevaTarea({ ...nuevaTarea, asignadoPor: value });
-                                        }}
-                                    >
-                                        <Picker.Item label="-- Seleccione quien asigna --" value="" />
-                                        {asignadoAOptions.map((u, index) => {
-                                            console.log(`Opción por ${index}:`, u.nombre, u.apellido, u.role);
-                                            return (
-                                                <Picker.Item
-                                                    key={`asignador-${u._id}`}
-                                                    label={`${u.nombre} ${u.apellido} (${u.role})`}
-                                                    value={u._id}
-                                                />
-                                            );
-                                        })}
-                                    </Picker>
-                                </View>
-                            )}
+                            <Text style={styles.inputLabel}>Asignado por *</Text>
+                            <View style={[styles.textInput, { backgroundColor: '#F5F5F5', justifyContent: 'center' }]}>
+                                <Text style={{ color: '#2D3748', fontSize: 16 }}>
+                                    {user ? `${user.nombre} ${user.apellido} (${user.role})` : 'Usuario actual'}
+                                </Text>
+                            </View>
                         </View>
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>Fecha límite *</Text>
                             <TouchableOpacity style={styles.textInput} onPress={() => setShowDatePicker(true)}>
                                 <Text>{nuevaTarea.fechaLimite ? nuevaTarea.fechaLimite.toLocaleDateString() : 'Seleccionar fecha'}</Text>
                             </TouchableOpacity>
+                        </View>
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Descripción *</Text>
+                            <TextInput
+                                style={[styles.textInput, styles.textArea]}
+                                value={nuevaTarea.descripcion}
+                                onChangeText={text => setNuevaTarea({ ...nuevaTarea, descripcion: text })}
+                                placeholder="Ingrese la descripción"
+                                multiline
+                                numberOfLines={4}
+                            />
                         </View>
                     </ScrollView>
 

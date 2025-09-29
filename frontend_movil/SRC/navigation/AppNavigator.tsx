@@ -34,7 +34,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // Navegador principal con tabs
 const MainTabNavigator: React.FC = () => {
-    const { isAdmin, isTesorero } = useAuth();
+    const { isAdmin, isTesorero, isSeminarista, user } = useAuth();
 
     return (
         <Tab.Navigator
@@ -117,21 +117,23 @@ const MainTabNavigator: React.FC = () => {
                 }} 
             />
 
-            {/* Tab de tareas */}
-            <Tab.Screen 
-                name="Tasks" 
-                component={TareasScreen} 
-                options={{
-                    tabBarLabel: 'Tareas',
-                    tabBarIcon: ({ focused, color, size }: any) => (
-                        <Ionicons
-                            name={focused ? 'checkbox' : 'checkbox-outline'}
-                            size={size}
-                            color={color}
-                        />
-                    ),
-                }} 
-            />
+            {/* Tab de tareas solo para seminarista, tesorero o admin */}
+            {(isAdmin() || isTesorero() || isSeminarista()) && (
+                <Tab.Screen 
+                    name="Tasks" 
+                    component={TareasScreen} 
+                    options={{
+                        tabBarLabel: 'Tareas',
+                        tabBarIcon: ({ focused, color, size }: any) => (
+                            <Ionicons
+                                name={focused ? 'checkbox' : 'checkbox-outline'}
+                                size={size}
+                                color={color}
+                            />
+                        ),
+                    }} 
+                />
+            )}
 
             {/* Tab de perfil - disponible para todos */}
             <Tab.Screen 
@@ -154,9 +156,9 @@ const MainTabNavigator: React.FC = () => {
 
 // Navegador principal de la aplicación
 const AppNavigator: React.FC = () => {
-    const { isAuthenticated, isLoading } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
     
-    if (isLoading) {
+    if (loading) {
         return <LoadingScreen />;
     }
 

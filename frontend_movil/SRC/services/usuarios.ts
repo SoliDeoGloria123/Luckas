@@ -42,7 +42,13 @@ export class UsuariosService {
 
     async updateUser(id: string, userData: Partial<User>): Promise<{ success: boolean; data?: User; message?: string }> {
         try {
-            return await authService.makeAuthenticatedRequest(`${API_CONFIG.ENDPOINTS.USERS}/${id}`, {
+            // Si el usuario edita su propio perfil, usar /profile/update
+            const currentUser = authService.getUser();
+            const isOwnProfile = currentUser && currentUser._id === id;
+            const endpoint = isOwnProfile
+                ? '/api/users/profile/update'
+                : `${API_CONFIG.ENDPOINTS.USERS}/${id}`;
+            return await authService.makeAuthenticatedRequest(endpoint, {
                 method: 'PUT',
                 body: JSON.stringify(userData),
             });
@@ -229,4 +235,17 @@ export class UsuariosService {
     }
 }
 
+// Exportar la instancia del servicio
 export const usuariosService = new UsuariosService();
+
+// Exportar tipos adicionales para evitar errores de módulo
+export type { User, SignupData } from '../types';
+
+// Re-exportar funciones útiles
+export const createUsuarioValidator = (userData: Partial<SignupData>) => {
+    return new UsuariosService().validateUser(userData);
+};
+
+export const searchUsuarios = (users: User[], term: string) => {
+    return new UsuariosService().searchUsers(users, term);
+};

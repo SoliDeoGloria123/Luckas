@@ -7,7 +7,6 @@ export * from './eventos';
 export * from './cabanas';
 export * from './cursos';
 // Servicios de gestión
-export * from './usuarios';
 export * from './categorizacion';
 export * from './tareas';
 export * from './reportes';
@@ -23,14 +22,13 @@ export { authService } from './auth';
 export { eventosService } from './eventos';
 export { cabanasService } from './cabanas';
 export { cursosService } from './cursos';
-export { usuariosService } from './usuarios';
 export { tareasService } from './tareas';
 export { reportesService } from './reportes';
 export { inscripcionesService } from './inscripciones';
 export { solicitudesService } from './solicitudes';
-export { programasTecnicosService } from './programas';
+export { programasService } from './programas';
 export { reservasService } from './reservas';
-export { userService } from './userService';
+
 
 // Tipos comunes para servicios
 export interface ServiceResponse<T = any> {

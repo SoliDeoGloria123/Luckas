@@ -26,7 +26,7 @@ interface ProgramaTecnicoForm {
     competencias: string[];
 }
 
-class ProgramasTecnicosService {
+class ProgramasService {
     private baseUrl = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROGRAMAS}`;
 
     // Realizar petición HTTP con autenticación
@@ -143,5 +143,4 @@ class ProgramasTecnicosService {
     }
 }
 
-export const programasTecnicosService = new ProgramasTecnicosService();
-export default programasTecnicosService;
+export const programasService = new ProgramasService();
