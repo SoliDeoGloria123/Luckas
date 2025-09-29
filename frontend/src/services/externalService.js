@@ -18,22 +18,61 @@ api.interceptors.request.use((config) => {
 });
 
 const externalService = {
-  // Obtener cursos disponibles (usar ruta pública)
-  getCursos: async () => {
+
+  // Obtener programas académicos disponibles
+  getProgramasAcademicos: async () => {
     try {
-      console.log('Making request to /cursos/publicos...');
-      // Usar fetch sin headers de autorización para endpoint público
-      const response = await api.get('/cursos');
-      console.log('Cursos API response:', response.data);
-      if (response.data && response.data.success && response.data.data) {
-        console.log('Returning courses:', response.data.data);
+      const response = await api.get('/programas-academicos');
+      // El backend responde con { data: [...] }
+      if (response.data && response.data.data) {
         return response.data.data;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
       } else {
-        console.log('No data found in response, returning empty array');
         return [];
       }
     } catch (error) {
-      console.error('Error al obtener cursos:', error);
+      console.error('Error al obtener programas académicos:', error);
+      return [];
+    }
+  },
+
+  // Obtener cabañas disponibles
+  // (definido más abajo, eliminar duplicado)
+
+  // Obtener cursos disponibles (legacy, para compatibilidad)
+  // Obtener programas académicos (cursos y técnicos)
+  getCursos: async () => {
+    try {
+      console.log('Making request to /programas-academicos...');
+      const response = await api.get('/programas-academicos');
+      console.log('Programas Académicos API response:', response.data);
+      if (response.data && response.data.success && response.data.data) {
+        return response.data.data;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error('Error al obtener programas académicos:', error);
+      return [];
+    }
+  },
+  getCabanas: async () => {
+    try {
+      console.log('Making request to /cabanas...');
+      const response = await api.get('/cabanas');
+      console.log('Cabañas API response:', response.data);
+      if (response.data && response.data.success && response.data.data) {
+        return response.data.data;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error('Error al obtener cabañas:', error);
       return [];
     }
   },

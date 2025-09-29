@@ -8,8 +8,9 @@ import './ExternalDashboard.css';
 
 const ExternalDashboard = () => {
   const [user, setUser] = useState(null);
-  const [cursos, setCursos] = useState([]);
+  const [programas, setProgramas] = useState([]);
   const [eventos, setEventos] = useState([]);
+  const [cabanas, setCabanas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSeminaristaForm, setShowSeminaristaForm] = useState(false);
@@ -39,15 +40,17 @@ const ExternalDashboard = () => {
       try {
         setLoading(true);
         
-        const [cursosResponse, eventosResponse, inscripcionesResponse] = await Promise.all([
-          externalService.getCursos(),
+        const [programasResponse, eventosResponse, cabanasResponse, inscripcionesResponse] = await Promise.all([
+          externalService.getProgramasAcademicos(),
           externalService.getEventos(),
+          externalService.getCabanas(),
           externalService.getMisInscripciones()
         ]);
 
-        setCursos(cursosResponse.data || []);
-        setEventos(eventosResponse.data || []);
-        setInscripciones(inscripcionesResponse.data || []);
+        setProgramas(programasResponse || []);
+        setEventos(eventosResponse.data || eventosResponse || []);
+        setCabanas(cabanasResponse || []);
+        setInscripciones(inscripcionesResponse.data || inscripcionesResponse || []);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -97,6 +100,7 @@ const ExternalDashboard = () => {
 
   const isInscrito = (itemId, tipo) => {
     return inscripciones.some(inscripcion => 
+      (tipo === 'programa' && inscripcion.programaAcademicoId === itemId) ||
       (tipo === 'curso' && inscripcion.cursoId === itemId) ||
       (tipo === 'evento' && inscripcion.eventoId === itemId)
     );
@@ -113,29 +117,40 @@ const ExternalDashboard = () => {
 
   const renderCard = (item, tipo) => {
     const inscrito = isInscrito(item._id, tipo);
-    
+    let badge = '📚 CURSO';
+    if (tipo === 'evento') badge = '🎯 EVENTO';
+    if (tipo === 'cabana') badge = '🏡 CABAÑA';
+    if (tipo === 'programa') badge = '🎓 PROGRAMA';
     return (
       <div key={item._id} className="content-card">
         <div className="card-header">
+          <div className="card-badge">{badge}</div>
           <h3>{item.titulo || item.nombre}</h3>
           <div className="card-meta">
-            {tipo === 'evento' && (
+            {tipo === 'evento' && item.fechaInicio && (
               <span className="date">
                 📅 {new Date(item.fechaInicio).toLocaleDateString()}
               </span>
             )}
-            {item.precio && (
-              <span className="price">💰 ${item.precio}</span>
+            {(item.precio || item.costo) && (
+              <span className="price">💰 ${item.precio || item.costo}</span>
+            )}
+            {tipo === 'cabana' && item.capacidad && (
+              <span className="meta-item">
+                <span className="meta-icon">👥</span>
+                {item.capacidad} personas
+              </span>
             )}
           </div>
         </div>
-        
         <div className="card-body">
           <p>{item.descripcion}</p>
           {item.duracion && <p><strong>Duración:</strong> {item.duracion}</p>}
           {item.modalidad && <p><strong>Modalidad:</strong> {item.modalidad}</p>}
+          {tipo === 'cabana' && item.ubicacion && (
+            <p><strong>Ubicación:</strong> {item.ubicacion}</p>
+          )}
         </div>
-        
         <div className="card-footer">
           {inscrito ? (
             <span className="inscrito-badge">✓ Inscrito</span>
@@ -264,20 +279,39 @@ const ExternalDashboard = () => {
       {/* Sección de Contenido */}
       <section className="content-section">
         <div className="content-container">
-          {/* Cursos Disponibles */}
-          <div id="cursos" className="section">
+          {/* Programas Académicos */}
+          <div id="programas" className="section">
             <div className="section-header">
-              <h2>Cursos Disponibles</h2>
+              <h2>Programas Académicos</h2>
               <p>Programas de formación diseñados para desarrollarte profesionalmente</p>
             </div>
             <div className="cards-grid">
-              {cursos.length > 0 ? (
-                cursos.map(curso => renderCard(curso, 'curso'))
+              {programas.length > 0 ? (
+                programas.map(programa => renderCard(programa, 'programa'))
               ) : (
                 <div className="empty-state">
-                  <div className="empty-icon">📚</div>
-                  <h3>No hay cursos disponibles</h3>
-                  <p>Pronto tendremos nuevos cursos para ti</p>
+                  <div className="empty-icon">🎓</div>
+                  <h3>No hay programas académicos disponibles</h3>
+                  <p>Pronto tendremos nuevos programas para ti</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Cabañas Disponibles */}
+          <div id="cabanas" className="section">
+            <div className="section-header">
+              <h2>Cabañas Disponibles</h2>
+              <p>Alojamientos para participantes y visitantes</p>
+            </div>
+            <div className="cards-grid">
+              {cabanas.length > 0 ? (
+                cabanas.map(cabana => renderCard(cabana, 'cabana'))
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-icon">🏡</div>
+                  <h3>No hay cabañas disponibles</h3>
+                  <p>Pronto tendremos nuevos alojamientos para ti</p>
                 </div>
               )}
             </div>

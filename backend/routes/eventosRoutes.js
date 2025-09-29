@@ -17,10 +17,10 @@ const validarEvento = [
 // Middleware de autenticación para todas las rutas
 router.use(authJwt.verifyToken);
 
-// Rutas de consulta (todos los roles autenticados)
-router.get('/', eventosController.getAllEvents);
-router.get('/:id', eventosController.getEventById);
-router.get('/categoria', eventosController.getEventosPorCategoria);
+// Rutas de consulta (admin, tesorero, seminarista, externo)
+router.get('/', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), eventosController.getAllEvents);
+router.get('/:id', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), eventosController.getEventById);
+router.get('/categoria', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), eventosController.getEventosPorCategoria);
 
 // Ruta temporal para activar todos los eventos (solo admin)
 router.patch('/activar-todos', role.isAdmin, eventosController.activarTodosLosEventos);

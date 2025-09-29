@@ -3,13 +3,13 @@ import cabanaService from '../../services/cabanaService';
 import eventService from '../../services/eventService';
 //import cursosService from '../../services/courseService';
 import { useNavigate } from 'react-router-dom';
-import { 
-  BookOpen, 
-  Calendar, 
-  Home, 
-  User, 
-  HelpCircle, 
-  Moon, 
+import {
+  BookOpen,
+  Calendar,
+  Home,
+  User,
+  HelpCircle,
+  Moon,
   Sun,
   Bell,
   Search,
@@ -46,14 +46,27 @@ const TailwindExternalDashboard = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [inscripciones, setInscripciones] = useState([]);
   const [reservaStatus, setReservaStatus] = useState(null);
-  
+  const [showReservaModal, setShowReservaModal] = useState(false);
+  const [reservaForm, setReservaForm] = useState({
+    nombre: '',
+    apellido: '',
+    tipoDocumento: '',
+    numeroDocumento: '',
+    correoElectronico: '',
+    telefono: '',
+    numeroPersonas: 1,
+    propositoEstadia: '',
+    solicitudesEspeciales: ''
+  });
+  const [cabanaSeleccionada, setCabanaSeleccionada] = useState(null);
+
   // Estados para el buscador
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCursos, setFilteredCursos] = useState([]);
   const [filteredEventos, setFilteredEventos] = useState([]);
   const [filteredCabanas, setFilteredCabanas] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  
+
   const navigate = useNavigate();
 
   const menuItems = [
@@ -70,52 +83,52 @@ const TailwindExternalDashboard = () => {
     const query = e.target.value;
     console.log('Search query:', query);
     console.log('Datos disponibles:', { cursos: cursos.length, eventos: eventos.length, cabanas: cabanas.length });
-    
+
     setSearchQuery(query);
-    
+
     if (query.trim() === '') {
       setShowSearchResults(false);
       return;
     }
-    
+
     // Filtrar resultados de búsqueda con verificación de datos
     const queryLower = query.toLowerCase();
-    
+
     // Verificar que los arrays existen y tienen datos
     console.log('Cursos data sample:', cursos.slice(0, 2));
     console.log('Eventos data sample:', eventos.slice(0, 2));
     console.log('Cabanas data sample:', cabanas.slice(0, 2));
-    
+
     const filteredC = cursos.filter(curso => {
       const match = curso.nombre?.toLowerCase().includes(queryLower) ||
-                   curso.descripcion?.toLowerCase().includes(queryLower) ||
-                   curso.instructor?.toLowerCase().includes(queryLower);
+        curso.descripcion?.toLowerCase().includes(queryLower) ||
+        curso.instructor?.toLowerCase().includes(queryLower);
       if (match) console.log('Curso match found:', curso.nombre);
       return match;
     });
-    
+
     const filteredE = eventos.filter(evento => {
       const match = evento.nombre?.toLowerCase().includes(queryLower) ||
-                   evento.descripcion?.toLowerCase().includes(queryLower) ||
-                   evento.lugar?.toLowerCase().includes(queryLower);
+        evento.descripcion?.toLowerCase().includes(queryLower) ||
+        evento.lugar?.toLowerCase().includes(queryLower);
       if (match) console.log('Evento match found:', evento.nombre);
       return match;
     });
-    
+
     const filteredCab = cabanas.filter(cabana => {
       const match = cabana.nombre?.toLowerCase().includes(queryLower) ||
-                   cabana.descripcion?.toLowerCase().includes(queryLower) ||
-                   cabana.ubicacion?.toLowerCase().includes(queryLower);
+        cabana.descripcion?.toLowerCase().includes(queryLower) ||
+        cabana.ubicacion?.toLowerCase().includes(queryLower);
       if (match) console.log('Cabana match found:', cabana.nombre);
       return match;
     });
-    
-    console.log('Resultados filtrados:', { 
-      cursos: filteredC.length, 
-      eventos: filteredE.length, 
-      cabanas: filteredCab.length 
+
+    console.log('Resultados filtrados:', {
+      cursos: filteredC.length,
+      eventos: filteredE.length,
+      cabanas: filteredCab.length
     });
-    
+
     setFilteredCursos(filteredC);
     setFilteredEventos(filteredE);
     setFilteredCabanas(filteredCab);
@@ -138,7 +151,7 @@ const TailwindExternalDashboard = () => {
   };
 
   const goToSearchResult = (item, type) => {
-    switch(type) {
+    switch (type) {
       case 'curso':
         setActiveSection('courses');
         setSelectedItem(item);
@@ -185,10 +198,10 @@ const TailwindExternalDashboard = () => {
     const loadUserData = () => {
       let userData = null;
       try {
-        userData = localStorage.getItem('usuario') ? 
-          JSON.parse(localStorage.getItem('usuario')) : 
-          (localStorage.getItem('externalUser') ? 
-           JSON.parse(localStorage.getItem('externalUser')) : null);
+        userData = localStorage.getItem('usuario') ?
+          JSON.parse(localStorage.getItem('usuario')) :
+          (localStorage.getItem('externalUser') ?
+            JSON.parse(localStorage.getItem('externalUser')) : null);
       } catch (e) {
         userData = null;
       }
@@ -207,14 +220,14 @@ const TailwindExternalDashboard = () => {
         const [cursosResponse, eventosResponse, cabanasResponse, inscripcionesResponse] = await Promise.all([
           externalService.getCursos(),
           externalService.getEventos(),
-          fetch('http://localhost:3000/api/cabanas/publicas').then(res => res.json()),
+          externalService.getCabanas(),
           userData && userData._id ? externalService.getMisInscripciones(userData._id) : Promise.resolve({ success: true, data: [] })
         ]);
-        
+
         const cursosData = Array.isArray(cursosResponse) ? cursosResponse : (cursosResponse.data || []);
         const eventosData = Array.isArray(eventosResponse) ? eventosResponse : (eventosResponse.data || []);
         const cabanasData = Array.isArray(cabanasResponse) ? cabanasResponse : (cabanasResponse.data || []);
-        
+
         setCursos(cursosData);
         setEventos(eventosData);
         setCabanas(cabanasData);
@@ -248,18 +261,44 @@ const TailwindExternalDashboard = () => {
     setShowPaymentModal(true);
   };
 
-  const handleReservarCabana = async (cabana) => {
+  const handleReservarCabana = (cabana) => {
+    setCabanaSeleccionada(cabana);
+    // Si el usuario tiene datos en el perfil, autocompletar
+    setReservaForm({
+      nombre: user?.nombre || '',
+      apellido: user?.apellido || '',
+      tipoDocumento: user?.tipoDocumento || '',
+      numeroDocumento: user?.numeroDocumento || '',
+      correoElectronico: user?.correo || '',
+      telefono: user?.telefono || '',
+      numeroPersonas: 1,
+      propositoEstadia: '',
+      solicitudesEspeciales: ''
+    });
+    setShowReservaModal(true);
+    setReservaStatus(null);
+  };
+
+  const handleReservaFormChange = (e) => {
+    const { name, value } = e.target;
+    setReservaForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleReservaSubmit = async (e) => {
+    e.preventDefault();
     setReservaStatus(null);
     try {
       const reserva = {
-        cabana: cabana._id,
+        cabana: cabanaSeleccionada._id,
         usuario: user?._id,
         fechaInicio: new Date(),
         fechaFin: new Date(Date.now() + 86400000),
+        ...reservaForm
       };
       const response = await reservaService.create(reserva);
       if (response.success) {
         setReservaStatus('Reserva realizada con éxito');
+        setShowReservaModal(false);
       } else {
         setReservaStatus('No se pudo realizar la reserva');
       }
@@ -272,8 +311,8 @@ const TailwindExternalDashboard = () => {
     if (!inscripciones || inscripciones.length === 0) {
       return false;
     }
-    
-    return inscripciones.some(inscripcion => 
+
+    return inscripciones.some(inscripcion =>
       (tipo === 'curso' && inscripcion.cursoId === itemId) ||
       (tipo === 'evento' && inscripcion.eventoId === itemId)
     );
@@ -287,11 +326,10 @@ const TailwindExternalDashboard = () => {
   // Shader Background Component
   const ShaderBackground = () => (
     <div className="fixed inset-0 -z-10">
-      <div className={`absolute inset-0 transition-all duration-1000 ${
-        darkMode 
-          ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900' 
+      <div className={`absolute inset-0 transition-all duration-1000 ${darkMode
+          ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900'
           : 'bg-gradient-to-br from-blue-500 via-purple-500 to-blue-600'
-      }`}>
+        }`}>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(120,20,120,0.2),transparent_50%)]" />
         <div className="absolute inset-0 animate-pulse-slow">
@@ -303,7 +341,7 @@ const TailwindExternalDashboard = () => {
 
   // Card Component
   const Card = ({ children, className = '', onClick }) => (
-    <div 
+    <div
       className={`
         backdrop-blur-md bg-black/20 border border-white/20 rounded-xl
         hover:bg-black/30 transition-all duration-200 cursor-pointer
@@ -322,7 +360,7 @@ const TailwindExternalDashboard = () => {
       secondary: 'bg-white/10 text-white hover:bg-white/20',
       ghost: 'text-white hover:bg-white/10'
     };
-    
+
     const sizes = {
       sm: 'px-3 py-1.5 text-sm',
       md: 'px-6 py-2 text-sm',
@@ -379,9 +417,8 @@ const TailwindExternalDashboard = () => {
     <div className="min-h-screen bg-background font-figtree">
       <ShaderBackground />
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ${
-        sidebarCollapsed ? 'w-20' : 'w-80'
-      }`}>
+      <div className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-80'
+        }`}>
         <div className="h-full backdrop-blur-md bg-black/20 border-r border-white/20 flex flex-col">
           {/* Header */}
           <div className="p-6 border-b border-white/20">
@@ -409,11 +446,10 @@ const TailwindExternalDashboard = () => {
               return (
                 <button
                   key={item.id}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
                       ? 'bg-blue-500/20 text-white border border-blue-500/30'
                       : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  } ${sidebarCollapsed ? 'justify-center' : 'justify-start'}`}
+                    } ${sidebarCollapsed ? 'justify-center' : 'justify-start'}`}
                   onClick={() => setActiveSection(item.id)}
                 >
                   <Icon className="h-5 w-5 flex-shrink-0" />
@@ -427,7 +463,7 @@ const TailwindExternalDashboard = () => {
           <div className="p-6 border-t border-white/20">
             {user && (
               <div className={`flex items-center gap-3 ${sidebarCollapsed ? 'justify-center' : ''}`}>
-                <div 
+                <div
                   className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold cursor-pointer"
                   onClick={() => setShowProfilePanel(true)}
                 >
@@ -489,7 +525,7 @@ const TailwindExternalDashboard = () => {
                   </button>
                 )}
               </form>
-              
+
               {/* Resultados de búsqueda */}
               {showSearchResults && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-card/95 backdrop-blur-lg border border-border rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto search-results-scroll search-results-enter">
@@ -505,7 +541,7 @@ const TailwindExternalDashboard = () => {
                         <X className="w-4 h-4" />
                       </button>
                     </div>
-                    
+
                     {/* Cursos encontrados */}
                     {filteredCursos.length > 0 && (
                       <div className="mb-4">
@@ -531,7 +567,7 @@ const TailwindExternalDashboard = () => {
                         ))}
                       </div>
                     )}
-                    
+
                     {/* Eventos encontrados */}
                     {filteredEventos.length > 0 && (
                       <div className="mb-4">
@@ -559,7 +595,7 @@ const TailwindExternalDashboard = () => {
                         ))}
                       </div>
                     )}
-                    
+
                     {/* Cabañas encontradas */}
                     {filteredCabanas.length > 0 && (
                       <div className="mb-4">
@@ -593,7 +629,7 @@ const TailwindExternalDashboard = () => {
                         ))}
                       </div>
                     )}
-                    
+
                     {/* Sin resultados */}
                     {filteredCursos.length === 0 && filteredEventos.length === 0 && filteredCabanas.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground">
@@ -603,19 +639,19 @@ const TailwindExternalDashboard = () => {
                         <div className="mt-4 text-xs">
                           <p>Sugerencias:</p>
                           <div className="flex flex-wrap justify-center gap-2 mt-2">
-                            <button 
+                            <button
                               onClick={() => setSearchQuery('bíblico')}
                               className="px-2 py-1 bg-accent/10 rounded text-primary hover:bg-accent/20 transition-colors"
                             >
                               bíblico
                             </button>
-                            <button 
+                            <button
                               onClick={() => setSearchQuery('seminario')}
                               className="px-2 py-1 bg-accent/10 rounded text-primary hover:bg-accent/20 transition-colors"
                             >
                               seminario
                             </button>
-                            <button 
+                            <button
                               onClick={() => setSearchQuery('retiro')}
                               className="px-2 py-1 bg-accent/10 rounded text-primary hover:bg-accent/20 transition-colors"
                             >
@@ -640,7 +676,7 @@ const TailwindExternalDashboard = () => {
               <button className="text-foreground hover:bg-accent/10 p-2 rounded-lg transition-colors">
                 <Bell className="w-5 h-5" />
               </button>
-              <button 
+              <button
                 className="text-foreground hover:bg-accent/10 p-2 rounded-lg transition-colors"
                 onClick={() => setShowProfilePanel(true)}
               >
@@ -715,11 +751,11 @@ const TailwindExternalDashboard = () => {
                         </div>
                         <h3 className="text-white font-semibold text-lg mb-2">{curso.nombre}</h3>
                         <p className="text-white/60 text-sm mb-4">{curso.descripcion}</p>
-                        
+
                         <div className="flex justify-between text-sm text-white/60 mb-4">
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
-                            {typeof curso.duracion === 'object' 
+                            {typeof curso.duracion === 'object'
                               ? `${curso.duracion.semanas} semanas`
                               : curso.duracion
                             }
@@ -766,7 +802,7 @@ const TailwindExternalDashboard = () => {
                       <Badge className="mb-3">Próximamente</Badge>
                       <h3 className="text-white font-semibold text-lg mb-2">{evento.nombre}</h3>
                       <p className="text-white/60 text-sm mb-4">{evento.descripcion}</p>
-                      
+
                       <div className="space-y-2 text-sm text-white/60 mb-4">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4" />
@@ -815,7 +851,7 @@ const TailwindExternalDashboard = () => {
                       </div>
                       <h3 className="text-white font-semibold text-lg mb-2">{cabana.nombre}</h3>
                       <p className="text-white/60 text-sm mb-4">{cabana.descripcion}</p>
-                      
+
                       <div className="flex items-center gap-2 text-sm text-white/60 mb-4">
                         <Users className="h-4 w-4" />
                         {cabana.capacidad} personas
@@ -828,6 +864,58 @@ const TailwindExternalDashboard = () => {
                         <Button onClick={() => handleReservarCabana(cabana)}>
                           Reservar
                         </Button>
+                        {/* Modal de reserva de cabaña */}
+                        {showReservaModal && cabanaSeleccionada && (
+                          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                            <form onSubmit={handleReservaSubmit} className="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative">
+                              <button type="button" onClick={() => setShowReservaModal(false)} className="absolute top-4 right-4 text-gray-500 hover:text-black"><X /></button>
+                              <h2 className="text-2xl font-bold mb-4 text-gray-800">Reserva de Cabaña</h2>
+                              <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                                <input name="nombre" value={reservaForm.nombre} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2" />
+                              </div>
+                              <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700">Apellido</label>
+                                <input name="apellido" value={reservaForm.apellido} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2" />
+                              </div>
+                              <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700">Tipo de Documento</label>
+                                <select name="tipoDocumento" value={reservaForm.tipoDocumento} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2">
+                                  <option value="">Seleccione...</option>
+                                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
+                                  <option value="Cédula de extranjería">Cédula de extranjería</option>
+                                  <option value="Pasaporte">Pasaporte</option>
+                                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
+                                </select>
+                              </div>
+                              <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700">Número de Documento</label>
+                                <input name="numeroDocumento" value={reservaForm.numeroDocumento} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2" />
+                              </div>
+                              <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                                <input name="correoElectronico" type="email" value={reservaForm.correoElectronico} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2" />
+                              </div>
+                              <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700">Teléfono</label>
+                                <input name="telefono" value={reservaForm.telefono} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2" />
+                              </div>
+                              <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700">Número de Personas</label>
+                                <input name="numeroPersonas" type="number" min="1" value={reservaForm.numeroPersonas} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2" />
+                              </div>
+                              <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700">Propósito de la estadía (opcional)</label>
+                                <input name="propositoEstadia" value={reservaForm.propositoEstadia} onChange={handleReservaFormChange} className="w-full border rounded px-3 py-2" />
+                              </div>
+                              <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700">Solicitudes Especiales (opcional)</label>
+                                <input name="solicitudesEspeciales" value={reservaForm.solicitudesEspeciales} onChange={handleReservaFormChange} className="w-full border rounded px-3 py-2" />
+                              </div>
+                              <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition">Confirmar Reserva</button>
+                            </form>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </Card>
@@ -844,7 +932,7 @@ const TailwindExternalDashboard = () => {
           <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
             <CheckCircle className="h-5 w-5" />
             {reservaStatus}
-            <button 
+            <button
               onClick={() => setReservaStatus(null)}
               className="ml-2 text-white/80 hover:text-white"
             >

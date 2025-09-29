@@ -5,11 +5,16 @@ const programaAcademicoController = require('../controllers/programaAcademicoCon
 // Crear programa académico
 router.post('/', programaAcademicoController.crearProgramaAcademico);
 
-// Obtener todos los programas académicos
-router.get('/', programaAcademicoController.obtenerProgramasAcademicos);
+const { authJwt, role } = require('../middlewares');
 
-// Obtener programa académico por ID
-router.get('/:id', programaAcademicoController.obtenerProgramaAcademicoPorId);
+// Middleware de autenticación para todas las rutas
+router.use(authJwt.verifyToken);
+
+// Obtener todos los programas académicos (admin, tesorero, seminarista, externo)
+router.get('/', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), programaAcademicoController.obtenerProgramasAcademicos);
+
+// Obtener programa académico por ID (admin, tesorero, seminarista, externo)
+router.get('/:id', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), programaAcademicoController.obtenerProgramaAcademicoPorId);
 
 // Actualizar programa académico
 router.put('/:id', programaAcademicoController.actualizarProgramaAcademico);

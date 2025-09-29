@@ -13,7 +13,7 @@ import { reservaService } from '../../services/reservaService';
 const ExternalDashboardV0 = () => {
   const [reservaStatus, setReservaStatus] = useState(null);
   const [user, setUser] = useState(null);
-  const [cursos, setCursos] = useState([]);
+  const [programas, setProgramas] = useState([]);
   const [eventos, setEventos] = useState([]);
   const [cabanas, setCabanas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,36 +49,21 @@ const ExternalDashboardV0 = () => {
     const loadData = async (userData) => {
       try {
         setLoading(true);
-        console.log('🔄 Cargando datos...');
-        
-        const [cursosResponse, eventosResponse, cabanasResponse, inscripcionesResponse] = await Promise.all([
-          externalService.getCursos(),
+        const [programasResponse, eventosResponse, cabanasResponse, inscripcionesResponse] = await Promise.all([
+          externalService.getProgramasAcademicos(),
           externalService.getEventos(),
-          fetch('http://localhost:3000/api/cabanas/publicas').then(res => res.json()),
+          externalService.getCabanas(),
           userData && userData._id ? externalService.getMisInscripciones(userData._id) : Promise.resolve({ success: true, data: [] })
         ]);
-        
-        console.log('📚 Cursos response:', cursosResponse);
-        console.log('🎯 Eventos response:', eventosResponse);
-        console.log('🏡 Cabañas response:', cabanasResponse);
-        
-        const cursosData = Array.isArray(cursosResponse) ? cursosResponse : (cursosResponse.data || []);
+        const programasData = Array.isArray(programasResponse) ? programasResponse : (programasResponse.data || []);
         const eventosData = Array.isArray(eventosResponse) ? eventosResponse : (eventosResponse.data || []);
         const cabanasData = Array.isArray(cabanasResponse) ? cabanasResponse : (cabanasResponse.data || []);
-        
-        console.log('📊 Datos procesados:', {
-          cursos: cursosData.length,
-          eventos: eventosData.length, 
-          cabanas: cabanasData.length
-        });
-        
-        setCursos(cursosData);
+        setProgramas(programasData);
         setEventos(eventosData);
         setCabanas(cabanasData);
         setInscripciones(inscripcionesResponse.data || inscripcionesResponse || []);
       } catch (error) {
-        console.error('❌ Error loading data:', error);
-        setCursos([]);
+        setProgramas([]);
         setEventos([]);
         setCabanas([]);
         setInscripciones([]);
@@ -167,20 +152,14 @@ const ExternalDashboardV0 = () => {
   };
 
   const isInscrito = (itemId, tipo) => {
-    console.log('🔍 Verificando inscripción para:', itemId, tipo);
-    console.log('📋 Inscripciones disponibles:', inscripciones);
-    
     if (!inscripciones || inscripciones.length === 0) {
       return false;
     }
-    
-    const result = inscripciones.some(inscripcion => 
+    return inscripciones.some(inscripcion => 
+      (tipo === 'programa' && inscripcion.programaAcademicoId === itemId) ||
       (tipo === 'curso' && inscripcion.cursoId === itemId) ||
       (tipo === 'evento' && inscripcion.eventoId === itemId)
     );
-    
-    console.log('✓ Usuario inscrito:', result);
-    return result;
   };
 
   const handleAvatarClick = () => {
@@ -199,6 +178,7 @@ const ExternalDashboardV0 = () => {
     let badge = '📚 CURSO';
     if (tipo === 'evento') badge = '🎯 EVENTO';
     if (tipo === 'cabana') badge = '🏡 CABAÑA';
+    if (tipo === 'programa') badge = '🎓 PROGRAMA';
     return (
       <div key={item._id} className="premium-card">
         <div className="card-glow"></div>
@@ -386,26 +366,26 @@ const ExternalDashboardV0 = () => {
       {/* Sección de Contenido */}
       <section className="content-section">
         <div className="content-container">
-          {/* Cursos */}
-          <div id="cursos" className="content-section-block">
+          {/* Programas Académicos */}
+          <div id="programas" className="content-section-block">
             <div className="section-header">
               <div className="section-badge">
-                <span className="badge-icon">📚</span>
-                Formación Premium
+                <span className="badge-icon">🎓</span>
+                Programas Académicos
               </div>
-              <h2 className="section-title">Cursos Disponibles</h2>
+              <h2 className="section-title">Programas Académicos</h2>
               <p className="section-subtitle">
                 Programas de formación diseñados para desarrollarte profesionalmente
               </p>
             </div>
             <div className="cards-container">
-              {cursos.length > 0 ? (
-                cursos.map(curso => renderCard(curso, 'curso'))
+              {programas.length > 0 ? (
+                programas.map(programa => renderCard(programa, 'programa'))
               ) : (
                 <div className="empty-state">
-                  <div className="empty-icon">📚</div>
-                  <h3 className="empty-title">No hay cursos disponibles</h3>
-                  <p className="empty-subtitle">Pronto tendremos nuevos cursos para ti</p>
+                  <div className="empty-icon">🎓</div>
+                  <h3 className="empty-title">No hay programas académicos disponibles</h3>
+                  <p className="empty-subtitle">Pronto tendremos nuevos programas para ti</p>
                 </div>
               )}
             </div>
