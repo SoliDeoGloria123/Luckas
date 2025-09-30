@@ -41,7 +41,7 @@ exports.crearInscripcion = async (req, res) => {
     if (tipoReferencia === 'Eventos') {
       referenciaExiste = await Evento.findById(referencia);
       if (!referenciaExiste) {
-  
+        console.log('Error: Evento no encontrado:', referencia);
         return res.status(404).json({ success: false, message: 'Evento no encontrado' });
       }
   
@@ -50,10 +50,28 @@ exports.crearInscripcion = async (req, res) => {
       if (yaInscrito) {
         return res.status(400).json({ success: false, message: 'Ya estás inscrito en este evento.' });
       }
+    } else if (tipoReferencia === 'ProgramaAcademico') {
+      const ProgramaAcademico = require('../models/ProgramaAcademico');
+      referenciaExiste = await ProgramaAcademico.findById(referencia);
+      if (!referenciaExiste) {
+        console.log('Error: Programa/Curso no encontrado:', referencia);
+        return res.status(404).json({ success: false, message: 'Programa académico no encontrado' });
+      }
+      
+      // Verificar si el usuario ya está inscrito en este programa/curso
+      const yaInscrito = await Inscripcion.findOne({ usuario, referencia, tipoReferencia });
+      if (yaInscrito) {
+        return res.status(400).json({ success: false, message: 'Ya estás inscrito en este programa/curso.' });
+      }
+      
+      // Verificar cupos disponibles
+      if (referenciaExiste.cuposDisponibles <= 0) {
+        return res.status(400).json({ success: false, message: 'No hay cupos disponibles en este programa/curso.' });
+      }
+    } else {
+      console.log('Error: Tipo de referencia no válido:', tipoReferencia);
+      return res.status(400).json({ success: false, message: 'Tipo de referencia no válido' });
     }
-    // Si tienes modelos Curso o ProgramaTecnico, aquí puedes validar igual
-    // Ejemplo:
-    // if (tipoReferencia === 'Curso') { ... }
     try {
       const categoriaExiste = await Categorizacion.findById(categoria);
      
@@ -127,8 +145,9 @@ exports.crearInscripcion = async (req, res) => {
     let descripcionSolicitud = '';
     if (tipoReferencia === 'Eventos' && referenciaExiste) {
       descripcionSolicitud = `Inscripción al evento ${referenciaExiste.nombre}`;
+    } else if (tipoReferencia === 'ProgramaAcademico' && referenciaExiste) {
+      descripcionSolicitud = `Inscripción al programa académico ${referenciaExiste.nombre}`;
     }
-    // Si tienes cursos o programas, puedes personalizar la descripción
 
     const solicitud = new Solicitud({
       solicitante: user._id,
@@ -152,7 +171,7 @@ exports.crearInscripcion = async (req, res) => {
     inscripcion.solicitud = solicitud._id;
     await inscripcion.save();
     
-    if (tipoReferencia === 'Curso' || tipoReferencia === 'ProgramaTecnico') {
+    if (tipoReferencia === 'ProgramaAcademico') {
       try {
         const ProgramaAcademico = require('../models/ProgramaAcademico');
         const programa = await ProgramaAcademico.findById(referencia);

@@ -460,7 +460,7 @@ const CursosSeminario = () => {
       {/* Formulario de Inscripción */}
       {mostrarFormulario && cursoSeleccionado && (
         <FormularioInscripcion
-          evento={cursoSeleccionado}
+          programa={cursoSeleccionado}
           usuario={user}
           loading={inscripcionLoading}
           onClose={() => {
