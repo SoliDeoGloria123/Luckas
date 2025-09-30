@@ -22,6 +22,10 @@ const GestionEventos = () => {
   const [cargando, setCargando] = useState(false);
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
+  const [eventoDetalle, setEventoDetalle] = useState(null);
+  const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
+
+
   const [nuevoEvento, setNuevoEvento] = useState({
     nombre: "",
     descripcion: "",
@@ -122,6 +126,10 @@ const GestionEventos = () => {
     }
   };
 
+  const abrirModalVer = (evento) => {
+    setEventoDetalle(evento);
+    setMostrarModalDetalle(true);
+  };
   // Abrir modal para crear
   const abrirModalCrear = () => {
     setModoEdicion(false);
@@ -143,30 +151,9 @@ const GestionEventos = () => {
     setMostrarModal(true);
   };
 
-  const [modalImagen, setModalImagen] = useState({ abierto: false, imagenes: [], actual: 0 });
 
-  const handleVerImagenes = (imagenes) => {
-    if (Array.isArray(imagenes) && imagenes.length > 0) {
-      setModalImagen({ abierto: true, imagenes, actual: 0 });
-    }
-  };
-  const handleNext = () => {
-    setModalImagen(prev => ({
-      ...prev,
-      actual: (prev.actual + 1) % prev.imagenes.length
-    }));
-  };
 
-  const handlePrev = () => {
-    setModalImagen(prev => ({
-      ...prev,
-      actual: (prev.actual - 1 + prev.imagenes.length) % prev.imagenes.length
-    }));
-  };
 
-  const cerrarModalImagen = () => {
-    setModalImagen({ abierto: false, imagenes: [], actual: 0 });
-  };
 
   // Abrir modal para editar
   const abrirModalEditar = (evento) => {
@@ -298,28 +285,61 @@ const GestionEventos = () => {
           </div>
 
           {/* Lista de Eventos */}
-
-          {modalImagen.abierto && (
-            <div className="modal-overlay-admin" onClick={cerrarModalImagen}>
-              <div className="modal-imagines modal-imagines" onClick={(e) => e.stopPropagation()}>
-                <button className="btn-cerrar" onClick={cerrarModalImagen}>✖</button>
-                <button className="btn-flecha izquierda" onClick={handlePrev}>◀</button>
-                <img
-                  src={`http://localhost:3000/uploads/eventos/${modalImagen.imagenes[modalImagen.actual]}`}
-                  alt="Imagen del evento"
-                  className="imagen-modal"
-                />
-                <button className="btn-flecha derecha" onClick={handleNext}>▶</button>
+          {mostrarModalDetalle && eventoDetalle && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8">
+                <h2 className="text-2xl font-bold mb-4">{eventoDetalle.nombre}</h2>
+                <p className="mb-2"><strong>Descripción:</strong> {eventoDetalle.descripcion}</p>
+                <p className="mb-2"><strong>Categoría:</strong> {eventoDetalle.categoria?.nombre || eventoDetalle.categoria}</p>
+                <p className="mb-2"><strong>Etiquetas:</strong> {eventoDetalle.etiquetas?.join(', ')}</p>
+                <p className="mb-2"><strong>Fecha:</strong> {eventoDetalle.fechaEvento ? new Date(eventoDetalle.fechaEvento).toLocaleDateString() : ''}</p>
+                <p className="mb-2"><strong>Hora:</strong> {eventoDetalle.horaInicio} - {eventoDetalle.horaFin}</p>
+                <p className="mb-2"><strong>Lugar:</strong> {eventoDetalle.lugar}</p>
+                <p className="mb-2"><strong>Dirección:</strong> {eventoDetalle.direccion}</p>
+                <p className="mb-2"><strong>Duración (días):</strong> {eventoDetalle.duracionDias}</p>
+                <p className="mb-2"><strong>Cupos totales:</strong> {eventoDetalle.cuposTotales}</p>
+                <p className="mb-2"><strong>Cupos disponibles:</strong> {eventoDetalle.cuposDisponibles}</p>
+                <p className="mb-2"><strong>Precio:</strong> ${eventoDetalle.precio}</p>
+                <p className="mb-2"><strong>Prioridad:</strong> {eventoDetalle.prioridad}</p>
+                <p className="mb-2"><strong>Observaciones:</strong> {eventoDetalle.observaciones}</p>
+                <p className="mb-2"><strong>Coordinador:</strong> {eventoDetalle.categorizadoPor?.nombre || eventoDetalle.categorizadoPor}</p>
+                <p className="mb-2"><strong>Fecha categorización:</strong> {eventoDetalle.fechaCategorizacion ? new Date(eventoDetalle.fechaCategorizacion).toLocaleDateString() : ''}</p>
+                <p className="mb-2"><strong>Activo:</strong> {eventoDetalle.active ? 'Sí' : 'No'}</p>
+                <p className="mb-2"><strong>Programa:</strong> {eventoDetalle.programa && eventoDetalle.programa.length > 0 ? (
+                  <ul className="list-disc ml-6">
+                    {eventoDetalle.programa.map((mod, i) => (
+                      <li key={i}>
+                        <strong>{mod.tema}</strong> ({mod.horaInicio} - {mod.horaFin}): {mod.descripcion}
+                      </li>
+                    ))}
+                  </ul>
+                ) : 'No definido'}
+                </p>
+                <div className="flex flex-wrap gap-2 my-4">
+                  {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`Imagen ${idx + 1}`}
+                      className="w-32 h-32 object-cover rounded-lg border"
+                    />
+                  ))}
+                </div>
+                <button
+                  onClick={() => setMostrarModalDetalle(false)}
+                  className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           )}
-
           <TablaEventos
             eventos={eventos}
             cargando={cargando}
             onEditar={abrirModalEditar}
             onEliminar={eliminarEvento}
-            onVerImagen={handleVerImagenes}
+            onVerDetalle={abrirModalVer}
             eventosFiltrados={eventosFiltrados}
           />
           <EventoModal

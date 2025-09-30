@@ -27,6 +27,10 @@ const ProgramasAcademicos = () => {
     const [modalEditar, setModalEditar] = useState(false);
     const [modoEdicion, setModoEdicion] = useState(false);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
+    const [programaDetalle, setProgramaDetalle] = useState(null);
+    const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
+
+
     const [formData, setFormData] = useState({
         titulo: '',
         descripcion: '',
@@ -54,6 +58,11 @@ const ProgramasAcademicos = () => {
         cargarProgramas();
         cargarCategorias();
     }, []); // Solo cargar una vez, no depende de filtros
+
+    const abrirModalVer = (programa) => {
+        setProgramaDetalle(programa);
+        setMostrarModalDetalle(true);
+    };
 
     const cargarProgramas = async () => {
         setLoading(true);
@@ -96,11 +105,11 @@ const ProgramasAcademicos = () => {
             console.log('FormData original:', formData);
             console.log('Categorías disponibles:', categorias);
             console.log('Token disponible:', !!localStorage.getItem('token'));
-            
+
             // Buscar la categoría correspondiente
             let categoriaId = null;
             if (formData.tipo && categorias.length > 0) {
-                const categoriaEncontrada = categorias.find(cat => 
+                const categoriaEncontrada = categorias.find(cat =>
                     cat.tipo === 'programa' && formData.tipo.includes('programa') ||
                     cat.tipo === 'curso' && formData.tipo === 'curso'
                 );
@@ -215,7 +224,7 @@ const ProgramasAcademicos = () => {
     const abrirModalEditar = (programa) => {
         console.log('=== ABRIR MODAL EDITAR ===');
         console.log('Programa a editar:', programa);
-        
+
         setModoEdicion(true);
         setProgramaSeleccionado(programa);
         setMostrarModal(true);
@@ -239,7 +248,7 @@ const ProgramasAcademicos = () => {
             // Buscar la categoría correspondiente
             let categoriaId = null;
             if (formData.tipo && categorias.length > 0) {
-                const categoriaEncontrada = categorias.find(cat => 
+                const categoriaEncontrada = categorias.find(cat =>
                     cat.tipo === 'programa' && formData.tipo.includes('programa') ||
                     cat.tipo === 'curso' && formData.tipo === 'curso'
                 );
@@ -292,7 +301,7 @@ const ProgramasAcademicos = () => {
                 await cargarProgramas();
                 cerrarModal();
                 mostrarMensaje(
-                    modoEdicion ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente', 
+                    modoEdicion ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente',
                     'success'
                 );
             } else {
@@ -411,7 +420,7 @@ const ProgramasAcademicos = () => {
                             <span>Nuevo Programa</span>
                         </button>
                     </div>
-                    
+
                     <div className="dashboard-grid-reporte-admin">
                         <div className="stat-card-reporte-admin">
                             <div className="stat-icon-reporte-admin-admin users">
@@ -491,7 +500,57 @@ const ProgramasAcademicos = () => {
                         </div>
                     </div>
 
-
+                    {mostrarModalDetalle && programaDetalle && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8">
+                                <h2 className="text-2xl font-bold mb-4">{programaDetalle.nombre}</h2>
+                                <p className="mb-2"><strong>Descripción:</strong> {programaDetalle.descripcion}</p>
+                                <p className="mb-2"><strong>Categoría:</strong> {programaDetalle.categoria?.nombre || programaDetalle.categoria}</p>
+                                <p className="mb-2"><strong>Modalidad:</strong> {programaDetalle.modalidad}</p>
+                                <p className="mb-2"><strong>Duración:</strong> {programaDetalle.duracion}</p>
+                                <p className="mb-2"><strong>Precio:</strong> {formatearPrecio(programaDetalle.precio)}</p>
+                                <p className="mb-2"><strong>Fecha de inicio:</strong> {programaDetalle.fechaInicio ? new Date(programaDetalle.fechaInicio).toLocaleDateString() : 'Por definir'}</p>
+                                <p className="mb-2"><strong>Fecha de fin:</strong> {programaDetalle.fechaFin ? new Date(programaDetalle.fechaFin).toLocaleDateString() : 'Por definir'}</p>
+                                <p className="mb-2"><strong>Cupos disponibles:</strong> {programaDetalle.cuposDisponibles}</p>
+                                <p className="mb-2"><strong>Cupos ocupados:</strong> {programaDetalle.cuposOcupados}</p>
+                                <p className="mb-2"><strong>Profesor:</strong> {programaDetalle.profesor}</p>
+                                <p className="mb-2"><strong>Nivel:</strong> {programaDetalle.nivel}</p>
+                                <p className="mb-2"><strong>Requisitos:</strong> {programaDetalle.requisitos && programaDetalle.requisitos.length > 0 ? (
+                                    <ul className="list-disc ml-6">
+                                        {programaDetalle.requisitos.map((req, i) => <li key={i}>{req}</li>)}
+                                    </ul>
+                                ) : 'Ninguno'}</p>
+                                <p className="mb-2"><strong>Objetivos:</strong> {programaDetalle.objetivos && programaDetalle.objetivos.length > 0 ? (
+                                    <ul className="list-disc ml-6">
+                                        {programaDetalle.objetivos.map((obj, i) => <li key={i}>{obj}</li>)}
+                                    </ul>
+                                ) : 'Ninguno'}</p>
+                                <p className="mb-2"><strong>Metodología:</strong> {programaDetalle.metodologia}</p>
+                                <p className="mb-2"><strong>Evaluación:</strong> {programaDetalle.evaluacion}</p>
+                                <p className="mb-2"><strong>Certificación:</strong> {programaDetalle.certificacion ? 'Sí' : 'No'}</p>
+                                <p className="mb-2"><strong>Destacado:</strong> {programaDetalle.destacado ? 'Sí' : 'No'}</p>
+                                <p className="mb-2"><strong>Estado:</strong> {programaDetalle.estado}</p>
+                                <p className="mb-2"><strong>Fecha de creación:</strong> {programaDetalle.createdAt ? new Date(programaDetalle.createdAt).toLocaleDateString() : ''}</p>
+                                <p className="mb-2"><strong>Fecha de actualización:</strong> {programaDetalle.updatedAt ? new Date(programaDetalle.updatedAt).toLocaleDateString() : ''}</p>
+                                <p className="mb-2"><strong>Inscripciones:</strong> {programaDetalle.inscripciones && programaDetalle.inscripciones.length > 0 ? (
+                                    <ul className="list-disc ml-6">
+                                        {programaDetalle.inscripciones.map((insc, i) => (
+                                            <li key={i}>
+                                                Usuario: {insc.usuario?.nombre || insc.usuario} | Estado: {insc.estado} | Fecha: {insc.fechaInscripcion ? new Date(insc.fechaInscripcion).toLocaleDateString() : ''}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : 'Ninguna'}
+                                </p>
+                                <button
+                                    onClick={() => setMostrarModalDetalle(false)}
+                                    className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    )}
                     {/* Tabla de programas */}
                     <ProgramasTabla
                         programas={programas}
@@ -501,6 +560,7 @@ const ProgramasAcademicos = () => {
                         cargando={cargando}
                         abrirModalCrear={abrirModalCrear}
                         abrirModalEditar={abrirModalEditar}
+                        abrirModalVer={abrirModalVer}
                     />
 
                 </div>

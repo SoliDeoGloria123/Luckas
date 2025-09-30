@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Plus,
   Edit,
+  Eye,
   Trash2,
   GraduationCap,
   BookOpen,
@@ -17,6 +18,7 @@ const ProgramasTabla = ({
   eliminarPrograma,
   formatearPrecio,
   formatearFecha,
+  abrirModalVer,
   cargando,
   abrirModalCrear
 }) => {
@@ -62,6 +64,13 @@ const ProgramasTabla = ({
               </div>
 
               <div className="flex space-x-2">
+                <button
+                  onClick={() => abrirModalVer(programa)}
+                  className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                  title="Ver detalles"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
                 <button
                   onClick={() => abrirModalEditar(programa)}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

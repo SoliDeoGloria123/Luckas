@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { inscripcionService } from "../../services/inscripcionService";
 import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
+import { programasAcademicosService } from "../../services/programasAcademicosService";
 import TablaInscripciones from "./Tablas/InscripcionTabla";
 import InscripcionModalCrear from "./Modales/InscripcionModalCrear";
 import InscripcionModalEditar from "./Modales/InscripcionModalEditar";
@@ -9,6 +10,7 @@ import useBusqueda from "./Busqueda/useBusqueda";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
+
 
 const GestionIscripcion = () => {
   const [eventos, setEventos] = useState([]);
@@ -18,6 +20,7 @@ const GestionIscripcion = () => {
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
+  const [programas, setProgramas] = useState([]); // 1. Estado para programas
   const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
   const {
     busqueda: busquedaInscripciones,
@@ -27,7 +30,7 @@ const GestionIscripcion = () => {
     inscripciones,
     [
       "nombre",
-      "apellido", 
+      "apellido",
       "numeroDocumento", // Búsqueda por cédula desde inscripción
       "usuario.numeroDocumento", // Búsqueda por cédula desde usuario poblado
       "correo",
@@ -38,6 +41,7 @@ const GestionIscripcion = () => {
       "categoria.nombre"
     ]
   );
+
 
   // Obtener inscripciones
   const obtenerInscripciones = async () => {
@@ -68,11 +72,21 @@ const GestionIscripcion = () => {
       setCategorias([]);
     }
   };
+  // 2. Obtener programas académicos
+  const obtenerProgramas = async () => {
+    try {
+      const res = await programasAcademicosService.getAllProgramas();
+      setProgramas(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      setProgramas([]);
+    }
+  };
 
   useEffect(() => {
     obtenerInscripciones();
     obtenerEventos();
     obtenerCategorias();
+    obtenerProgramas();
   }, []);
 
   // Crear inscripción
@@ -90,8 +104,6 @@ const GestionIscripcion = () => {
         insc.referencia = insc.evento;
         delete insc.evento;
       }
-      // Agregar tipoReferencia requerido por el backend
-      insc.tipoReferencia = 'Eventos';
       await inscripcionService.create(insc);
       mostrarAlerta("¡Éxito!", "Inscripción creada exitosamente");
       setMostrarModal(false);
@@ -108,8 +120,8 @@ const GestionIscripcion = () => {
       const usuarioId = typeof insc.usuario === 'object' && insc.usuario._id ? insc.usuario._id : insc.usuario;
       const payload = {
         usuario: usuarioId,
-        referencia: insc.evento,
-        tipoReferencia: 'Eventos',
+        tipoReferencia: insc.tipoReferencia,
+        referencia: insc.referencia,
         categoria: insc.categoria,
         estado: insc.estado,
         observaciones: insc.observaciones,
@@ -276,6 +288,7 @@ const GestionIscripcion = () => {
               mostrar={mostrarModal}
               eventos={eventos}
               categorias={categorias}
+              programas={programas}
               onClose={() => setMostrarModal(false)}
               onSubmit={crearInscripcion}
             />

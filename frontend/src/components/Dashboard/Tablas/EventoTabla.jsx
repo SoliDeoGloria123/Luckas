@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   Plus,
   Edit,
   Trash2,
   Calendar,
+  Eye,
   MapPin,
   Users,
   Clock,
@@ -12,9 +13,27 @@ import {
   Star
 } from 'lucide-react';
 
-const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, onDeshabilitar, onVerImagen }) => {
-  return (
+const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, onDeshabilitar, onVerDetalle }) => {
 
+ // Estado para manejar el índice de imagen de cada evento
+  const [imgIndices, setImgIndices] = useState({});
+
+  // Funciones para navegar en el carrusel
+  const prevImg = (eventoId, totalImages) => {
+    setImgIndices(prev => ({
+      ...prev,
+      [eventoId]: prev[eventoId] > 0 ? prev[eventoId] - 1 : totalImages - 1
+    }));
+  };
+
+  const nextImg = (eventoId, totalImages) => {
+    setImgIndices(prev => ({
+      ...prev,
+      [eventoId]: prev[eventoId] < totalImages - 1 ? prev[eventoId] + 1 : 0
+    }));
+  };
+
+  return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {cargando ? (
         <div className="col-span-full text-center py-12">
@@ -23,25 +42,53 @@ const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, o
         </div>
       ) : eventosFiltrados.length > 0 ? (
         eventosFiltrados.map((evento) => {
+          const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
+          const imgIndex = imgIndices[evento._id] || 0;
           return (
             <div key={evento._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
               {/* Imagen del evento */}
-              <div className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-600">
-                {evento.imagen ? (
-                  <img
-                    src={evento.imagen}
-                    alt={evento.nombre}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                ) : null}
-                <div className={`absolute inset-0 flex items-center justify-center text-white text-4xl ${evento.imagen ? 'hidden' : 'flex'}`}>
-                  <span>{/*tipoEvento.icon*/}</span>
-                </div>
-
+              <div className="relative h-64 bg-gradient-to-r from-blue-500 to-purple-600">
+              
+                 {imagenes.length > 0 ? (
+                  <>
+                    <img
+                      src={imagenes[imgIndex]}
+                      alt={evento.nombre}
+                      className="w-full h-64 object-cover"
+                      style={{ borderRadius: '1rem' }}
+                    />
+                    {imagenes.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => prevImg(evento._id, imagenes.length)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
+                          style={{ zIndex: 2 }}
+                        >
+                          {"<"}
+                        </button>
+                        <button
+                          onClick={() => nextImg(evento._id, imagenes.length)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
+                          style={{ zIndex: 2 }}
+                        >
+                          {">"}
+                        </button>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                          {imagenes.map((_, idx) => (
+                            <span
+                              key={idx}
+                              className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                 <div className="flex items-center justify-center w-full h-64 text-white text-4xl">
+                    <span>📅</span>
+                  </div>
+                )}
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-wrap gap-2">
                   <span className="px-3 py-1 bg-white/90 text-slate-800 text-xs font-medium rounded-full">
@@ -66,17 +113,25 @@ const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, o
                 </div>
 
                 {/* Botones de acción */}
-                <div className="absolute top-4 right-4 flex space-x-2">
+                <div className="flex  justify-end  gap-2  px-6 py-3 ">
+                  <button
+                  onClick={() => onVerDetalle(evento)}
+                   className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                  title="Ver detalles"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
+
                   <button
                     onClick={() => onEditar(evento)}
-                    className="p-2 bg-white/20 backdrop-blur text-white hover:bg-white/30 rounded-lg transition-colors"
+                    className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors "
                     title="Editar"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => onEliminar(evento._id)}
-                    className="p-2 bg-red-500/20 backdrop-blur text-white hover:bg-red-500/30 rounded-lg transition-colors"
+                     className="p-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
                     title="Eliminar"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -96,7 +151,7 @@ const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, o
                   <div className="flex items-center space-x-2 text-sm">
                     <Calendar className="w-4 h-4 text-blue-600" />
                     <span className="text-slate-600">
-                    
+
                     </span>
                   </div>
 
@@ -169,7 +224,7 @@ const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, o
           <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay eventos</h3>
           <p className="text-slate-500 mb-6">Comienza creando tu primer eventos o actividad</p>
           <button
-           /* onClick={abrirModalCrear}*/
+            /* onClick={abrirModalCrear}*/
             className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
           >
             <Plus className="w-5 h-5 mr-2 inline" />
