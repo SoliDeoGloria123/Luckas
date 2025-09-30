@@ -10,9 +10,8 @@ const defaultForm = {
   correo: "",
   telefono: "",
   edad: "",
-  tipoReferencia: "", // <-- nuevo
-  referencia: "",     // <-- nuevo
-  evento: "",
+  tipoReferencia: "",
+  referencia: "",
   categoria: "",
   estado: "pendiente",
   observaciones: ""
@@ -107,11 +106,33 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
 
   const handleSubmit = e => {
     e.preventDefault();
-    // Asegurar que todos los valores sean string
-    const payload = {};
-    Object.keys(form).forEach(key => {
-      payload[key] = String(form[key] || "");
+    // Limpiar datos antes de enviar
+    const payload = {
+      usuario: form.usuario,
+      nombre: form.nombre,
+      apellido: form.apellido,
+      tipoDocumento: form.tipoDocumento,
+      numeroDocumento: form.numeroDocumento,
+      correo: form.correo,
+      telefono: form.telefono,
+      edad: parseInt(form.edad) || 0,
+      tipoReferencia: form.tipoReferencia,
+      referencia: form.referencia,
+      categoria: form.categoria,
+      estado: form.estado || 'pendiente',
+      observaciones: form.observaciones || ''
+    };
+    
+    // Remover campos vacíos o undefined
+    Object.keys(payload).forEach(key => {
+      if (payload[key] === '' || payload[key] === undefined || payload[key] === null) {
+        if (key !== 'observaciones') { // observaciones puede estar vacío
+          delete payload[key];
+        }
+      }
     });
+    
+    console.log('Enviando payload limpio:', payload);
     onSubmit(payload);
     setForm(defaultForm);
     setCedulaBusqueda("");

@@ -156,6 +156,16 @@ const SolicitudModal = ({
                     style={{ backgroundColor: usuarioEncontrado ? '#f8f9fa' : 'white', cursor: usuarioEncontrado ? 'not-allowed' : 'text' }}
                   />
                 </div>
+                <div className="form-grupo-admin">
+                  <label>Título de la Solicitud:</label>
+                  <input
+                    type="text"
+                    value={nuevaSolicitud.titulo}
+                    onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, titulo: e.target.value })}
+                    placeholder="Título descriptivo de la solicitud"
+                    required
+                  />
+                </div>
               </>
             ) : (
               <>
@@ -166,6 +176,16 @@ const SolicitudModal = ({
                     value={solicitudSeleccionada?.solicitante || ''}
                     onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, solicitante: e.target.value })}
                     placeholder="ID del solicitante"
+                  />
+                </div>
+                <div className="form-grupo-admin">
+                  <label>Título de la Solicitud:</label>
+                  <input
+                    type="text"
+                    value={solicitudSeleccionada?.titulo || ''}
+                    onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, titulo: e.target.value })}
+                    placeholder="Título descriptivo de la solicitud"
+                    required
                   />
                 </div>
               </>

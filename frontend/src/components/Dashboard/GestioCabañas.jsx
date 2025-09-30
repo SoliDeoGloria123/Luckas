@@ -29,7 +29,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     categoria: "",
     precio: "",
     estado: "disponible",
-    imagen: "",
+    imagen: [],
     ubicacion: ""
   });
   const [error, setError] = useState("");
@@ -139,7 +139,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       categoria: "",
       precio: "",
       estado: "disponible",
-      imagen: "",
+      imagen: [],
       ubicacion: ""
     });
     setMostrarModal(true);

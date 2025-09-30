@@ -35,12 +35,13 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
   );
   const [nuevaSolicitud, setNuevaSolicitud] = useState({
     solicitante: "",
+    titulo: "",
     correo: "",
     telefono: "",
     tipoSolicitud: "",
     categoria: "",
     descripcion: "",
-    estado: "Nuevo",
+    estado: "Nueva",
     prioridad: "Media",
     responsable: "",
     observaciones: ""
@@ -84,12 +85,13 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       setMostrarModal(false);
       setNuevaSolicitud({
         solicitante: "",
+        titulo: "",
         correo: "",
         telefono: "",
         tipoSolicitud: "",
         categoria: "",
         descripcion: "",
-        estado: "Nuevo",
+        estado: "Nueva",
         prioridad: "Media",
         responsable: "",
         observaciones: ""
@@ -144,11 +146,13 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
     setModoEdicionSolicitud(false);
     setNuevaSolicitud({
       solicitante: "",
+      titulo: "",
       correo: "",
       telefono: "",
       tipoSolicitud: "",
       categoria: "",
       descripcion: "",
+      estado: "Nueva",
       prioridad: "Media",
       responsable: "",
       observaciones: ""

@@ -309,19 +309,7 @@ const EventoModal = ({
                 <option value="false">Inactivo</option>
               </select>
             </div>
-             {!modoEdicion && (
-              <div className="form-grupo-admin">
-                <label>Imagen:</label>
-                <input
-                  type="file"
-                  value={nuevoEvento.imagen}
-                  onChange={e =>
-                    setNuevoEvento({ ...nuevoEvento, imagen: e.target.value })
-                  }
-                  placeholder="Imagen del evento"
-                />
-              </div>
-            )}
+         
 
             <div className="form-group-tesorero full-width">
               <label>Imagen</label>

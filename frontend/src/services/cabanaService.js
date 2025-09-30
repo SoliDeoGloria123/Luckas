@@ -24,13 +24,20 @@ export const cabanaService = {
   },
 
   create: async (cabana) => {
+    // Si es FormData (para imágenes), no agregamos Content-Type
+    const headers = {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    };
+    
+    // Solo agregar Content-Type si no es FormData
+    if (!(cabana instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(cabana),
+      headers: headers,
+      body: cabana instanceof FormData ? cabana : JSON.stringify(cabana),
     });
     if (!res.ok) throw new Error("Error al crear cabaña");
     return await res.json();

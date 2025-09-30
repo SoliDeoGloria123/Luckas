@@ -41,10 +41,10 @@ exports.crearInscripcion = async (req, res) => {
     if (tipoReferencia === 'Eventos') {
       referenciaExiste = await Evento.findById(referencia);
       if (!referenciaExiste) {
-        console.log('Error: Evento no encontrado:', referencia);
+  
         return res.status(404).json({ success: false, message: 'Evento no encontrado' });
       }
-      console.log('Evento encontrado:', referenciaExiste.nombre);
+  
       // Verificar si el usuario ya está inscrito en este evento
       const yaInscrito = await Inscripcion.findOne({ usuario, referencia, tipoReferencia: 'Eventos' });
       if (yaInscrito) {
@@ -54,13 +54,18 @@ exports.crearInscripcion = async (req, res) => {
     // Si tienes modelos Curso o ProgramaTecnico, aquí puedes validar igual
     // Ejemplo:
     // if (tipoReferencia === 'Curso') { ... }
-
-    const categoriaExiste = await Categorizacion.findById(categoria);
-    if (!categoriaExiste) {
-      console.log('Error: Categoría no encontrada:', categoria);
-      return res.status(404).json({ success: false, message: 'Categoría no encontrada' });
+    try {
+      const categoriaExiste = await Categorizacion.findById(categoria);
+     
+      if (!categoriaExiste) {
+        console.log('Error: Categoría no encontrada:', categoria);
+        return res.status(404).json({ success: false, message: 'Categoría no encontrada' });
+      }
+      
+    } catch (categoriaError) {
+    
+      return res.status(400).json({ success: false, message: 'Error al validar categoría: ' + categoriaError.message });
     }
-    console.log('Categoría encontrada:', categoriaExiste.nombre);
 
     // Validar campos requeridos del modelo
     const camposRequeridos = ['nombre', 'tipoDocumento', 'numeroDocumento', 'telefono', 'edad'];
@@ -80,15 +85,40 @@ exports.crearInscripcion = async (req, res) => {
       });
     }
 
-    console.log('Validaciones pasadas, creando inscripción...');
+  
 
     // 1. Crear la inscripción
-    const inscripcion = new Inscripcion({
-      ...req.body,
-      tipoReferencia // aseguramos que el campo sea el correcto
-    });
-    await inscripcion.save();
-    console.log('Inscripción creada:', inscripcion._id);
+    // Limpiar datos - remover campos que no están en el modelo
+    const datosInscripcion = {
+      usuario: req.body.usuario,
+      nombre: req.body.nombre,
+      apellido: req.body.apellido,
+      tipoDocumento: req.body.tipoDocumento,
+      numeroDocumento: req.body.numeroDocumento,
+      correo: req.body.correo,
+      telefono: req.body.telefono,
+      edad: parseInt(req.body.edad),
+      tipoReferencia: req.body.tipoReferencia,
+      referencia: req.body.referencia,
+      categoria: req.body.categoria,
+      estado: req.body.estado || 'pendiente',
+      observaciones: req.body.observaciones
+    };
+
+    console.log('Datos limpios para inscripción:', datosInscripcion);
+
+    let inscripcion;
+    try {
+      inscripcion = new Inscripcion(datosInscripcion);
+      await inscripcion.save();
+      console.log('Inscripción creada exitosamente:', inscripcion._id);
+    } catch (inscripcionError) {
+      console.error('Error al crear inscripción:', inscripcionError);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Error al crear inscripción: ' + inscripcionError.message 
+      });
+    }
 
     // Buscar datos del usuario para la solicitud
   const user = await Usuario.findById(req.body.usuario);
@@ -103,7 +133,7 @@ exports.crearInscripcion = async (req, res) => {
     const solicitud = new Solicitud({
       solicitante: user._id,
       responsable: user._id,
-      titulo: referenciaExiste?.nombre || 'Inscripción', // <-- agrega esto
+      titulo: referenciaExiste?.nombre || 'Inscripción',
       correo: user.correo,
       telefono: user.telefono,
       tipoSolicitud: 'Inscripción',
@@ -111,7 +141,7 @@ exports.crearInscripcion = async (req, res) => {
       descripcion: descripcionSolicitud,
       estado: 'Nueva',
       prioridad: 'Media',
-      origin: 'inscripcion',
+      origen: 'inscripcion',
       modeloReferencia: 'Inscripcion',
       referencia: inscripcion._id
     });
@@ -138,9 +168,13 @@ exports.crearInscripcion = async (req, res) => {
     console.log('=== FIN DEBUG INSCRIPCION ===');
     res.status(201).json({ success: true, data: inscripcion });
   } catch (error) {
-    console.log('Error en crearInscripcion:', error.message);
-    console.log('Stack:', error.stack);
-    res.status(400).json({ success: false, message: error.message });
+    console.error('=== ERROR GENERAL EN CREAR INSCRIPCIÓN ===');
+    console.error('Error completo:', error);
+    console.error('Mensaje:', error.message);
+    console.error('Stack:', error.stack);
+    console.error('Nombre del error:', error.name);
+    console.error('Código de error:', error.code);
+    res.status(400).json({ success: false, message: 'Error interno: ' + error.message });
   }
 };
 

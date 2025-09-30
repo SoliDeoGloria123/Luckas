@@ -96,7 +96,7 @@ const CabanaModal = ({
             ✕
           </button>
         </div>
-        <form className="modal-body-admin">
+        <form className="modal-body-admin" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
               <label>Nombre:</label>
@@ -208,24 +208,7 @@ const CabanaModal = ({
                 <option value="mantenimiento">Mantenimiento</option>
               </select>
             </div>
-            <div className="form-grupo-admin">
-              <label>Imagenes De La Cabaña:</label>
-              <input
-                type="file"
-                name="imagen"
-                multiple
-                accept="image/*"
-                className="input-imagen-multiple"
-                onChange={e => {
-                  const files = Array.from(e.target.files);
-                  if (modoEdicion) {
-                    setCabanaSeleccionada({ ...cabanaSeleccionada, imagenes: files });
-                  } else {
-                    setNuevaCabana({ ...nuevaCabana, imagenes: files });
-                  }
-                }}
-              />
-            </div>
+        
             <div className="form-group-tesorero full-width">
               <label>Imagen</label>
               <div className="image-upload-container">
@@ -265,11 +248,11 @@ const CabanaModal = ({
             Puedes seleccionar varias imágenes manteniendo presionada la tecla Ctrl o Shift
           </small>
           <div className="modal-action-admin">
-            <button className="btn-admin secondary-admin" onClick={onClose}>
+            <button className="btn-admin secondary-admin" type="button" onClick={onClose}>
               <i class="fas fa-times"></i>
               Cancelar
             </button>
-            <button className="btn-admin btn-primary" onClick={onSubmit}>
+            <button className="btn-admin btn-primary" type="submit">
               <i class="fas fa-save"></i>
               {modoEdicion ? "Guardar Cambios" : "Crear Cabaña"}
             </button>

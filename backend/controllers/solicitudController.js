@@ -124,9 +124,15 @@ exports.obtenerSolicitudes = async (req, res) => {
   // Crear nueva solicitud
   exports.crearSolicitud = async (req, res) => {
     try {
+      console.log('=== INICIO CREAR SOLICITUD ===');
+      console.log('req.body:', req.body);
+      console.log('req.userId:', req.userId);
+      
       // Validar errores de entrada
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('=== ERRORES DE VALIDACIÓN ===');
+        console.log('Errores:', errors.array());
         return res.status(400).json({
           success: false,
           message: 'Datos de entrada inválidos',
@@ -160,9 +166,37 @@ exports.obtenerSolicitudes = async (req, res) => {
         }
       }
 
+      // Debug información
+      console.log('=== DEBUG CREAR SOLICITUD ===');
+      console.log('req.userId:', req.userId);
+      console.log('req.body.responsable:', req.body.responsable);
+      console.log('req.body:', req.body);
+
+      // Generar título automáticamente si no viene
+      const titulo = req.body.titulo || `Solicitud de ${req.body.tipoSolicitud} - ${new Date().toLocaleDateString()}`;
+      
+      // El responsable será el usuario que crea la solicitud si no se especifica
+      let responsable = req.body.responsable;
+      if (!responsable || responsable === "" || responsable === null || responsable === undefined) {
+        responsable = req.userId || req.user?.id || req.user?._id;
+      }
+
+      console.log('responsable final:', responsable);
+      
+      // Validar que el responsable sea válido
+      if (!responsable) {
+        console.error('ERROR: No se pudo determinar el responsable');
+        console.error('req.userId:', req.userId);
+        console.error('req.user:', req.user);
+        return res.status(400).json({
+          success: false,
+          message: 'No se pudo determinar el responsable de la solicitud. Verifica tu autenticación.'
+        });
+      }
+
       const nuevaSolicitud = new Solicitud({
         solicitante: req.body.solicitante,
-        titulo: req.body.titulo,
+        titulo: titulo,
         correo: req.body.correo,
         telefono: req.body.telefono,
         tipoSolicitud: req.body.tipoSolicitud,
@@ -171,10 +205,11 @@ exports.obtenerSolicitudes = async (req, res) => {
         categoria: req.body.categoria,
         descripcion: req.body.descripcion,
         estado: req.body.estado || 'Nueva',
-        prioridad: req.body.prioridad,
+        prioridad: req.body.prioridad || 'Media',
         observaciones: req.body.observaciones,
         fechaSolicitud: req.body.fechaSolicitud,
-        responsable: req.body.responsable,
+        responsable: responsable,
+        creadoPor: req.userId,
         origen: req.body.origen || 'formulario'
       });
 

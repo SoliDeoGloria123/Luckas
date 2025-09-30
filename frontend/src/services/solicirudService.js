@@ -9,13 +9,26 @@ export const solicitudService = {
     return await res.json();
   },
   create: async (solicitud) => {
+    // Limpiar datos antes de enviar
+    const solicitudLimpia = { ...solicitud };
+    
+    // Remover responsable si está vacío (se asigna automáticamente en el backend)
+    if (!solicitudLimpia.responsable || solicitudLimpia.responsable === "") {
+      delete solicitudLimpia.responsable;
+    }
+    
+    // Generar título automático si no existe
+    if (!solicitudLimpia.titulo || solicitudLimpia.titulo.trim() === "") {
+      solicitudLimpia.titulo = `Solicitud de ${solicitudLimpia.tipoSolicitud} - ${new Date().toLocaleDateString()}`;
+    }
+    
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`
       },
-      body: JSON.stringify(solicitud)
+      body: JSON.stringify(solicitudLimpia)
     });
     return await res.json();
   },

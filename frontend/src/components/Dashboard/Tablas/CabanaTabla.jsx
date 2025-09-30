@@ -266,7 +266,7 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => onEliminar(cabana)}
+                      onClick={() => onEliminar(cabana._id)}
                       className="p-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
                       title="Eliminar"
                     >
