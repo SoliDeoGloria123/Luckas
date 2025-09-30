@@ -15,13 +15,24 @@ const FormularioInscripcion = ({
   onClose
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  // Obtener usuario logueado desde localStorage o prop
+  const usuarioLogueado = (() => {
+    if (usuario) return usuario;
+    try {
+      const usuarioStorage = localStorage.getItem('usuario');
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  })();
+
   const [formData, setFormData] = useState({
-    nombre: usuario?.nombre || '',
-    apellido: usuario?.apellido || '',
-    tipoDocumento: usuario?.tipoDocumento || '',
-    numeroDocumento: usuario?.numeroDocumento || '',
-    correo: usuario?.correo || '',
-    telefono: usuario?.telefono || '',
+    nombre: usuarioLogueado?.nombre || '',
+    apellido: usuarioLogueado?.apellido || '',
+    tipoDocumento: usuarioLogueado?.tipoDocumento || '',
+    numeroDocumento: usuarioLogueado?.numeroDocumento || '',
+    correo: usuarioLogueado?.correo || '',
+    telefono: usuarioLogueado?.telefono || '',
     edad: '',
     motivacion: '',
     experiencia: ''
@@ -71,12 +82,12 @@ const FormularioInscripcion = ({
         categoria = evento.categoria?._id || evento.categoria;
         itemData = evento;
       } else if (curso) {
-        tipoReferencia = 'Curso';
+        tipoReferencia = 'ProgramaAcademico';
         referencia = curso._id || curso.id;
         categoria = curso.categoria?._id || curso.categoria;
         itemData = curso;
       } else if (programa) {
-        tipoReferencia = 'ProgramaTecnico';
+        tipoReferencia = 'ProgramaAcademico';
         referencia = programa._id || programa.id;
         categoria = programa.categoria?._id || programa.categoria;
         itemData = programa;
@@ -126,7 +137,7 @@ const FormularioInscripcion = ({
             const usuarioLocal = JSON.parse(usuarioStorage);
             fechaNacimiento = usuarioLocal?.fechaNacimiento;
           }
-        } catch {}
+        } catch { }
       }
       if (fechaNacimiento) {
         const nacimiento = new Date(fechaNacimiento);
@@ -221,14 +232,14 @@ const FormularioInscripcion = ({
   };
 
   const { item, tipo } = getItemData();
-  
+
   // Usa datos del item seleccionado
   const tituloItem = item?.nombre || `${tipo} sin título`;
   const descripcionItem = item?.descripcion || `Descripción del ${tipo.toLowerCase()}`;
-  const fechaItem = item?.fecha ? new Date(item.fecha).toLocaleDateString() : 
-                   item?.fechaEvento ? new Date(item.fechaEvento).toLocaleDateString() : 
-                   item?.fechaInicio ? new Date(item.fechaInicio).toLocaleDateString() : 
-                   "Fecha no especificada";
+  const fechaItem = item?.fecha ? new Date(item.fecha).toLocaleDateString() :
+    item?.fechaEvento ? new Date(item.fechaEvento).toLocaleDateString() :
+      item?.fechaInicio ? new Date(item.fechaInicio).toLocaleDateString() :
+        "Fecha no especificada";
   const horaItem = item?.hora || item?.horaInicio || "Hora no especificada";
   const lugarItem = item?.lugar || item?.ubicacion || "Ubicación no especificada";
   const precioItem = item?.precio || "Precio no especificado";
@@ -248,7 +259,7 @@ const FormularioInscripcion = ({
             </div>
           </div>
           <button className="close-btn-inscribirse-seminario" onClick={onClose}>
-
+          <i className="fas fa-times"></i>
           </button>
         </div>
 
@@ -390,19 +401,17 @@ const FormularioInscripcion = ({
                   />
                 </div>
               </div>
-              <div className="form-group-semianrio">
-                <label htmlFor="email">Correo Electrónico</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-
+                <div className="form-group-semianrio">
+                  <label htmlFor="correo">Correo Electrónico</label>
+                  <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    value={usuarioLogueado?.correo || formData.correo}
+                    readOnly
+                    required
+                  />
+                </div>
               <div className="form-group-semianrio">
                 <label htmlFor="motivacion">Motivación para participar</label>
                 <textarea
@@ -452,7 +461,7 @@ const FormularioInscripcion = ({
                     if (usuarioStorage) {
                       usuarioLogueado = JSON.parse(usuarioStorage);
                     }
-                  } catch {}
+                  } catch { }
                 }
                 const advertencias = [];
                 if (usuarioLogueado) {
@@ -468,7 +477,7 @@ const FormularioInscripcion = ({
                   if (formData.numeroDocumento !== usuarioLogueado.numeroDocumento) {
                     advertencias.push('El número de documento no coincide con el registrado.');
                   }
-                  if (formData.email !== usuarioLogueado.correo) {
+                  if (formData.correo !== usuarioLogueado.correo) {
                     advertencias.push('El correo electrónico no coincide con el registrado.');
                   }
                   if (formData.telefono !== usuarioLogueado.telefono) {
@@ -490,14 +499,14 @@ const FormularioInscripcion = ({
                   }
                 }
                 return advertencias.length > 0 ? (
-                  <div style={{color: 'red', marginBottom: '1em'}}>
+                  <div style={{ color: 'red', marginBottom: '1em' }}>
                     <strong>Advertencias de validación:</strong>
                     <ul>
                       {advertencias.map((adv, idx) => <li key={idx}>{adv}</li>)}
                     </ul>
                   </div>
                 ) : (
-                  <div style={{color: 'green', marginBottom: '1em'}}>
+                  <div style={{ color: 'green', marginBottom: '1em' }}>
                     Todos los datos coinciden con el usuario registrado.
                   </div>
                 );
@@ -510,7 +519,7 @@ const FormularioInscripcion = ({
                   <p><strong>Apellido:</strong> {formData.apellido}</p>
                   <p><strong>Tipo de Documento:</strong> {formData.tipoDocumento}</p>
                   <p><strong>Número de Documento:</strong> {formData.numeroDocumento}</p>
-                  <p><strong>Email:</strong> {formData.email}</p>
+                  <p><strong>Email:</strong> {formData.correo}</p>
                   <p><strong>Teléfono:</strong> {formData.telefono}</p>
                   <p><strong>Edad:</strong> {formData.edad}</p>
                   <p><strong>Motivación:</strong> {formData.motivacion}</p>
@@ -613,7 +622,7 @@ const FormularioInscripcion = ({
                   <div className="detail-item-seminario">
                     <p><strong>Número de Inscripción:</strong> #INS-2025-001</p>
                     <p><strong>Participante:</strong> {formData.nombre}</p>
-                    <p><strong>Email:</strong> {formData.email}</p>
+                    <p><strong>Email:</strong> {formData.correo}</p>
                   </div>
                   <div className="detail-item-seminario">
                     <p><strong>Evento:</strong> {tituloItem}</p>
