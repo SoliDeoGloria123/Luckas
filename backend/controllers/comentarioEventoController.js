@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const ComentarioEvento = require('../models/ComentarioEvento');
 const Evento = require('../models/Eventos');
-const User = mongoose.model('User');
+const User = require('../models/User');
 
 // Obtener comentarios de un evento
 exports.getComentariosByEvento = async (req, res) => {

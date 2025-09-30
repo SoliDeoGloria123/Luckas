@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { FaEye } from "react-icons/fa";
 import {
   Plus,
   Edit,
