@@ -124,7 +124,7 @@ exports.crearReserva = async (req, res) => {
 exports.obtenerReservas = async (req, res) => {
   try {
     const reservas = await Reserva.find()
-      .populate('usuario', 'nombre apellido correo')
+      .populate('usuario', 'nombre apellido correo numeroDocumento tipoDocumento')
       .populate('cabana', 'nombre descripcion capacidad categoria estado');
     res.json({ success: true, data: reservas });
   } catch (error) {

@@ -5,6 +5,7 @@ const CategorizacionModal = ({ mode = 'create', initialData = {}, onClose, onSub
 
 const [formData, setFormData] = useState({
     nombre: '',
+    tipo: '',
     codigo: '',
     activo: 'Activo'
   });
@@ -12,6 +13,7 @@ const [formData, setFormData] = useState({
   useEffect(() => {
     setFormData({
       nombre: initialData.nombre || '',
+      tipo: initialData.tipo || '',
       codigo: initialData.codigo || '',
       activo: initialData.activo || 'Activo'
     });
@@ -50,6 +52,25 @@ const [formData, setFormData] = useState({
                   placeholder="Nombre"
                   required
                 />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Tipo</label>
+                <select
+                  name="tipo"
+                  value={formData.tipo}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccione tipo...</option>
+                  <option value="curso">Curso</option>
+                  <option value="programa">Programa</option>
+                  <option value="evento">Evento</option>
+                  <option value="cabaña">Cabaña</option>
+                  <option value="solicitud">Solicitud</option>
+                  <option value="tarea">Tarea</option>
+                  <option value="inscripcion">Inscripción</option>
+                  <option value="reporte">Reporte</option>
+                </select>
               </div>
               
               <div className="form-group-tesorero">

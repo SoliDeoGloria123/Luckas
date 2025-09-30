@@ -1,9 +1,12 @@
+
 import React, { useState,useEffect } from 'react';
+import './ProgramasModa.css';
 
 
 const ProgramaModal = ({ 
   mostrar,
   modoEdicion,
+  modoVista = false,
   programaSeleccionado,
   formData,
   setFormData,
@@ -116,334 +119,76 @@ const ProgramaModal = ({
     <div className="modal-overlay-tesorero">
       <div className="tesorero-modal">
         <div className="modal-header-tesorero">
-          <h2>{modoEdicion ? 'Editar Programa' : 'Crear Nuevo Programa'}</h2>
+          {modoVista ? (
+            <h2>Detalle del Programa</h2>
+          ) : (
+            <h2>{modoEdicion ? 'Editar Programa' : 'Crear Nuevo Programa'}</h2>
+          )}
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
-
         <div className="modal-body-tesorero">
-          <form onSubmit={handleSubmit}>
-            <div className="form-grid-tesorero">
-              {/* Información Básica */}
-              <div className="form-group-tesorero">
-                <label>Título del Programa *</label>
-                <input
-                  type="text"
-                  name="titulo"
-                  value={formData.titulo || ''}
-                  onChange={handleChange}
-                  placeholder="Nombre del programa"
-                  required
-                />
-                {errors.titulo && <span className="error-text">{errors.titulo}</span>}
-              </div>
-
-              <div className="form-group-tesorero">
-                <label>Tipo de Programa</label>
-                <select
-                  name="tipo"
-                  value={formData.tipo || 'curso'}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="curso">Curso</option>
-                  <option value="programa">Programa Técnico</option>
-                </select>
-              </div>
-
-              <div className="form-group-tesorero full-width">
-                <label>Descripción *</label>
-                <textarea
-                  name="descripcion"
-                  value={formData.descripcion || ''}
-                  onChange={handleChange}
-                  placeholder="Descripción detallada del programa"
-                  rows="4"
-                  required
-                />
-                {errors.descripcion && <span className="error-text">{errors.descripcion}</span>}
-              </div>
-
-              {/* Modalidad y Duración */}
-              <div className="form-group-tesorero">
-                <label>Modalidad *</label>
-                <select
-                  name="modalidad"
-                  value={formData.modalidad || 'presencial'}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="presencial">Presencial</option>
-                  <option value="virtual">Virtual</option>
-                  <option value="semipresencial">Semipresencial</option>
-                </select>
-              </div>
-
-              <div className="form-group-tesorero">
-                <label>Duración *</label>
-                <input
-                  type="text"
-                  name="duracion"
-                  value={formData.duracion || ''}
-                  onChange={handleChange}
-                  placeholder="Ej: 6 meses, 120 horas"
-                  required
-                />
-                {errors.duracion && <span className="error-text">{errors.duracion}</span>}
-              </div>
-
-              {/* Fechas */}
-              <div className="form-group-tesorero">
-                <label>Fecha de Inicio *</label>
-                <input
-                  type="date"
-                  name="fechaInicio"
-                  value={formData.fechaInicio || ''}
-                  onChange={handleChange}
-                  required
-                />
-                {errors.fechaInicio && <span className="error-text">{errors.fechaInicio}</span>}
-              </div>
-
-              <div className="form-group-tesorero">
-                <label>Fecha de Fin *</label>
-                <input
-                  type="date"
-                  name="fechaFin"
-                  value={formData.fechaFin || ''}
-                  onChange={handleChange}
-                  required
-                />
-                {errors.fechaFin && <span className="error-text">{errors.fechaFin}</span>}
-              </div>
-
-              {/* Precio y Cupos */}
-              <div className="form-group-tesorero">
-                <label>Precio *</label>
-                <input
-                  type="number"
-                  name="precio"
-                  value={formData.precio || ''}
-                  onChange={handleChange}
-                  placeholder="Precio del programa"
-                  min="0"
-                  required
-                />
-                {errors.precio && <span className="error-text">{errors.precio}</span>}
-              </div>
-
-              <div className="form-group-tesorero">
-                <label>Cupos Disponibles *</label>
-                <input
-                  type="number"
-                  name="cupos"
-                  value={formData.cupos || ''}
-                  onChange={handleChange}
-                  placeholder="Número de cupos"
-                  min="1"
-                  required
-                />
-                {errors.cupos && <span className="error-text">{errors.cupos}</span>}
-              </div>
-
-              {/* Profesor */}
-              <div className="form-group-tesorero">
-                <label>Profesor *</label>
-                <input
-                  type="text"
-                  name="profesor"
-                  value={formData.profesor || ''}
-                  onChange={handleChange}
-                  placeholder="Nombre del profesor"
-                  required
-                />
-                {errors.profesor && <span className="error-text">{errors.profesor}</span>}
-              </div>
-
-              <div className="form-group-tesorero">
-                <label>Biografía del Profesor</label>
-                <textarea
-                  name="profesorBio"
-                  value={formData.profesorBio || ''}
-                  onChange={handleChange}
-                  placeholder="Experiencia y formación del profesor"
-                  rows="3"
-                />
-              </div>
-
-              {/* Metodología y Evaluación */}
-              <div className="form-group-tesorero full-width">
-                <label>Metodología</label>
-                <textarea
-                  name="metodologia"
-                  value={formData.metodologia || ''}
-                  onChange={handleChange}
-                  placeholder="Metodología de enseñanza"
-                  rows="3"
-                />
-              </div>
-
-              <div className="form-group-tesorero full-width">
-                <label>Sistema de Evaluación</label>
-                <textarea
-                  name="evaluacion"
-                  value={formData.evaluacion || ''}
-                  onChange={handleChange}
-                  placeholder="Cómo se evaluará a los estudiantes"
-                  rows="3"
-                />
-              </div>
-
-              {/* Requisitos */}
-              <div className="form-group-tesorero full-width">
-                <label>Requisitos</label>
-                {(formData.requisitos || ['']).map((requisito, index) => (
-                  <div key={index} className="array-input-group">
-                    <input
-                      type="text"
-                      value={requisito}
-                      onChange={(e) => handleArrayInputChange(index, e.target.value, 'requisitos')}
-                      placeholder={`Requisito ${index + 1}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem(index, 'requisitos')}
-                      className="remove-btn"
-                      disabled={(formData.requisitos || []).length <= 1}
-                    >
-                      -
-                    </button>
+          {modoVista ? (
+            <div className="programa-detalle-card">
+              {formData.imagen && (
+                <div className="programa-detalle-imagen">
+                  <img src={formData.imagen} alt="Imagen del programa" style={{maxWidth:'100%',borderRadius:'8px',marginBottom:'1rem'}} />
+                </div>
+              )}
+              <div className="programa-detalle-info">
+                <div className="detalle-row"><span className="detalle-label">Título:</span> <span>{formData.titulo}</span></div>
+                <div className="detalle-row"><span className="detalle-label">Tipo:</span> <span>{formData.tipo === 'curso' ? 'Curso' : 'Programa Técnico'}</span></div>
+                <div className="detalle-row"><span className="detalle-label">Descripción:</span> <span>{formData.descripcion}</span></div>
+                <div className="detalle-row"><span className="detalle-label">Modalidad:</span> <span>{formData.modalidad}</span></div>
+                <div className="detalle-row"><span className="detalle-label">Duración:</span> <span>{formData.duracion}</span></div>
+                <div className="detalle-row"><span className="detalle-label">Fecha de Inicio:</span> <span>{formData.fechaInicio}</span></div>
+                <div className="detalle-row"><span className="detalle-label">Fecha de Fin:</span> <span>{formData.fechaFin}</span></div>
+                <div className="detalle-row"><span className="detalle-label">Precio:</span> <span>${formData.precio}</span></div>
+                <div className="detalle-row"><span className="detalle-label">Cupos Disponibles:</span> <span>{formData.cupos}</span></div>
+                <div className="detalle-row"><span className="detalle-label">Profesor:</span> <span>{formData.profesor}</span></div>
+                {formData.profesorBio && <div className="detalle-row"><span className="detalle-label">Biografía del Profesor:</span> <span>{formData.profesorBio}</span></div>}
+                {formData.metodologia && <div className="detalle-row"><span className="detalle-label">Metodología:</span> <span>{formData.metodologia}</span></div>}
+                {formData.evaluacion && <div className="detalle-row"><span className="detalle-label">Sistema de Evaluación:</span> <span>{formData.evaluacion}</span></div>}
+                {formData.certificacion && <div className="detalle-row"><span className="detalle-label">Certificación:</span> <span>{formData.certificacion}</span></div>}
+                <div className="detalle-row"><span className="detalle-label">Programa Destacado:</span> <span>{formData.destacado ? 'Sí' : 'No'}</span></div>
+                {formData.requisitos && formData.requisitos.length > 0 && (
+                  <div className="detalle-row">
+                    <span className="detalle-label">Requisitos:</span>
+                    <ul style={{margin:0,paddingLeft:'1.2em'}}>
+                      {formData.requisitos.map((req, i) => req && <li key={i}>{req}</li>)}
+                    </ul>
                   </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addArrayItem('requisitos', '')}
-                  className="add-btn"
-                >
-                  + Agregar Requisito
-                </button>
-              </div>
-
-              {/* Objetivos */}
-              <div className="form-group-tesorero full-width">
-                <label>Objetivos del Programa</label>
-                {(formData.objetivos || ['']).map((objetivo, index) => (
-                  <div key={index} className="array-input-group">
-                    <input
-                      type="text"
-                      value={objetivo}
-                      onChange={(e) => handleArrayInputChange(index, e.target.value, 'objetivos')}
-                      placeholder={`Objetivo ${index + 1}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem(index, 'objetivos')}
-                      className="remove-btn"
-                      disabled={(formData.objetivos || []).length <= 1}
-                    >
-                      -
-                    </button>
+                )}
+                {formData.objetivos && formData.objetivos.length > 0 && (
+                  <div className="detalle-row">
+                    <span className="detalle-label">Objetivos:</span>
+                    <ul style={{margin:0,paddingLeft:'1.2em'}}>
+                      {formData.objetivos.map((obj, i) => obj && <li key={i}>{obj}</li>)}
+                    </ul>
                   </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addArrayItem('objetivos', '')}
-                  className="add-btn"
-                >
-                  + Agregar Objetivo
-                </button>
-              </div>
-
-              {/* Pensum */}
-              <div className="form-group-tesorero full-width">
-                <label>Pensum Académico</label>
-                {(formData.pensum || [{ modulo: '', descripcion: '', horas: '' }]).map((modulo, index) => (
-                  <div key={index} className="pensum-group">
-                    <input
-                      type="text"
-                      value={modulo.modulo}
-                      onChange={(e) => handlePensumChange(index, 'modulo', e.target.value)}
-                      placeholder="Nombre del módulo"
-                    />
-                    <input
-                      type="text"
-                      value={modulo.descripcion}
-                      onChange={(e) => handlePensumChange(index, 'descripcion', e.target.value)}
-                      placeholder="Descripción"
-                    />
-                    <input
-                      type="number"
-                      value={modulo.horas}
-                      onChange={(e) => handlePensumChange(index, 'horas', e.target.value)}
-                      placeholder="Horas"
-                      min="0"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem(index, 'pensum')}
-                      className="remove-btn"
-                      disabled={(formData.pensum || []).length <= 1}
-                    >
-                      -
-                    </button>
+                )}
+                {formData.pensum && formData.pensum.length > 0 && (
+                  <div className="detalle-row">
+                    <span className="detalle-label">Pensum Académico:</span>
+                    <ul style={{margin:0,paddingLeft:'1.2em'}}>
+                      {formData.pensum.map((mod, i) => (
+                        <li key={i}><b>{mod.modulo}</b>: {mod.descripcion} ({mod.horas} horas)</li>
+                      ))}
+                    </ul>
                   </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addArrayItem('pensum', { modulo: '', descripcion: '', horas: '' })}
-                  className="add-btn"
-                >
-                  + Agregar Módulo
-                </button>
+                )}
               </div>
-
-              {/* Opciones adicionales */}
-              <div className="form-group-tesorero">
-                <label>URL de Imagen</label>
-                <input
-                  type="url"
-                  name="imagen"
-                  value={formData.imagen || ''}
-                  onChange={handleChange}
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                />
-              </div>
-
-              <div className="form-group-tesorero">
-                <label>Certificación</label>
-                <input
-                  type="text"
-                  name="certificacion"
-                  value={formData.certificacion || ''}
-                  onChange={handleChange}
-                  placeholder="Tipo de certificación que se otorga"
-                />
-              </div>
-
-              <div className="form-group-tesorero checkbox-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="destacado"
-                    checked={formData.destacado || false}
-                    onChange={handleChange}
-                  />
-                  Programa Destacado
-                </label>
+              <div className="modal-footer-tesorero" style={{marginTop:'2rem'}}>
+                <button type="button" className="cancel-btn" onClick={onClose}>Cerrar</button>
               </div>
             </div>
-
-            <div className="modal-footer-tesorero">
-              <button type="button" className="cancel-btn" onClick={onClose}>
-                Cancelar
-              </button>
-              <button type="submit" className="submit-btn">
-                {modoEdicion ? 'Guardar Cambios' : 'Crear Programa'}
-              </button>
-            </div>
-          </form>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              {/* ...existing code... */}
+            </form>
+          )}
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 };
 

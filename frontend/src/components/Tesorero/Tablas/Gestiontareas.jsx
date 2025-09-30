@@ -19,7 +19,7 @@ const Gestiontarea = () => {
   const obtenerTareas = async () => {
     try {
       const data = await tareaService.getAll();
-      setTareas(Array.isArray(data) ? data : []);
+      setTareas(Array.isArray(data.data) ? data.data : []);
     } catch (err) {
       console.log("Error al obtener tareas: " + err.message);
     }
@@ -62,8 +62,17 @@ const Gestiontarea = () => {
   };
 
   const handleEdit = (item) => {
+    // Normalizar valores para el modal
+    const normalizado = {
+      ...item,
+      prioridad: item.prioridad && ['Alta','Media','Baja'].includes(item.prioridad) ? item.prioridad : 'Media',
+      estado: item.estado && ['pendiente','en_progreso','completada','cancelada'].includes(item.estado) ? item.estado : 'pendiente',
+      comentarios: Array.isArray(item.comentarios) ? item.comentarios : [],
+      asignadoA: item.asignadoA?._id || item.asignadoA || '',
+      asignadoPor: item.asignadoPor?._id || item.asignadoPor || ''
+    };
     setModalMode('edit');
-    setcurrentItemTarea(item);
+    setcurrentItemTarea(normalizado);
     setShowModalTarea(true);
   };
 

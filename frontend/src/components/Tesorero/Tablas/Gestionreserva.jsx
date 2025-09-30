@@ -177,6 +177,7 @@ const Gestionreserva = () => {
               </th>
               <th>ID</th>
               <th>USUARIOS</th>
+              <th>CÉDULA</th>
               <th>CABAÑA</th>
               <th>FECHA INCIO</th>
               <th>FECHA FIN</th>
@@ -202,6 +203,11 @@ const Gestionreserva = () => {
                     {typeof reser.usuario === "object"
                       ? reser.usuario?.username || reser.usuario?.nombre || reser.usuario?.correo || reser.usuario?._id || "N/A"
                       : reser.usuario || "N/A"}
+                  </td>
+                  <td>
+                    {typeof reser.usuario === "object"
+                      ? reser.usuario?.numeroDocumento || "N/A"
+                      : "N/A"}
                   </td>
                   <td>
                     {typeof reser.cabana === "object"

@@ -50,6 +50,21 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
     if (typeof evento === 'object' && evento._id) return String(evento._id);
     return String(evento);
   }
+  const [usuarioNoEncontrado, setUsuarioNoEncontrado] = useState(false);
+  // Normaliza el tipo de documento a los valores válidos del select/backend
+  function normalizaTipoDocumento(tipo) {
+    if (!tipo) return '';
+    const map = {
+      'Cédula de ciudadanía': 'Cédula de ciudadanía',
+      'Cédula de Ciudadanía': 'Cédula de ciudadanía',
+      'Cédula de extranjería': 'Cédula de extranjería',
+      'Cédula de Extranjería': 'Cédula de extranjería',
+      'Pasaporte': 'Pasaporte',
+      'Tarjeta de identidad': 'Tarjeta de identidad',
+      'Tarjeta de Identidad': 'Tarjeta de identidad',
+    };
+    return map[tipo] || tipo;
+  }
   const buscarUsuarioPorDocumento = async (numeroDocumento) => {
     if (!numeroDocumento) return;
     try {
@@ -61,11 +76,15 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
           apellido: usuario.apellido || "",
           correo: usuario.correo || "",
           telefono: usuario.telefono || "",
-          tipoDocumento: usuario.tipoDocumento || "",
+          tipoDocumento: normalizaTipoDocumento(usuario.tipoDocumento) || "",
           numeroDocumento: usuario.numeroDocumento || numeroDocumento,
         }));
+        setUsuarioNoEncontrado(false);
+      } else {
+        setUsuarioNoEncontrado(true);
       }
     } catch (error) {
+      setUsuarioNoEncontrado(true);
       console.warn("No se encontró usuario con ese documento");
     }
   };
@@ -84,7 +103,14 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
   const handleSubmit = (e) => {
     e.preventDefault();
     const usuarioId = getResponsableId();
-    onSubmit({ ...formData,usuario: usuarioId});
+    // Para inscripciones a eventos
+    const payload = {
+      ...formData,
+      usuario: usuarioId,
+      tipoReferencia: 'Eventos',
+      referencia: formData.evento,
+    };
+    onSubmit(payload);
     onClose();
   };
 
@@ -109,6 +135,9 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
                   placeholder="Número de documento"
                   required
                 />
+                {usuarioNoEncontrado && (
+                  <span style={{ color: 'red', fontSize: '0.95em' }}>No se encontró usuario con esa cédula.</span>
+                )}
               </div>
 
               <div className="form-group-tesorero">

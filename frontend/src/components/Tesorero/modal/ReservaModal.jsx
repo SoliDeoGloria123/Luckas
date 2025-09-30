@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { userService } from '../../../services/userService';
 
 
 const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usuarios, cabanas }) => {
@@ -28,17 +29,47 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
   const [formData, setFormData] = useState({
     usuario: initialData.usuario || '',
     cabana: initialData.cabana || '',
-    fechaInicio:normalizeFecha( initialData.fechaInicio),
-    fechaFin: normalizeFecha (initialData.fechaFin),
+    fechaInicio: normalizeFecha(initialData.fechaInicio),
+    fechaFin: normalizeFecha(initialData.fechaFin),
     precio: initialData.precio || '',
     estado: initialData.estado || '',
     observaciones: initialData.observaciones || '',
-    activo: initialData.activo || 'Activo'
+    activo: initialData.activo || 'Activo',
+    nombre: initialData.nombre || '',
+    apellido: initialData.apellido || '',
+    tipoDocumento: initialData.tipoDocumento || '',
+    numeroDocumento: initialData.numeroDocumento || '',
+    correoElectronico: initialData.correoElectronico || '',
+    telefono: initialData.telefono || '',
+    numeroPersonas: initialData.numeroPersonas || 1,
+    propositoEstadia: initialData.propositoEstadia || '',
+    solicitudesEspeciales: initialData.solicitudesEspeciales || ''
   });
 
-  const handleChange = (e) => {
+
+  const handleChange = async (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Si el campo es numeroDocumento y tiene al menos 6 caracteres, buscar usuario
+    if (name === 'numeroDocumento' && value.length >= 6) {
+      try {
+        const usuario = await userService.getByDocumento(value);
+        if (usuario) {
+          setFormData(prev => ({
+            ...prev,
+            usuario: usuario._id || '',
+            nombre: usuario.nombre || '',
+            apellido: usuario.apellido || '',
+            tipoDocumento: usuario.tipoDocumento || '',
+            correoElectronico: usuario.correo || '',
+            telefono: usuario.telefono || '',
+          }));
+        }
+      } catch (err) {
+        // Si no se encuentra usuario, no hacer nada especial
+      }
+    }
   };
 
   const handleSubmit = (e) => {
@@ -78,10 +109,9 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
               <div className="form-group-tesorero">
                 <label>Cabañas</label>
                 <select
-                  name="cabaña"
+                  name="cabana"
                   value={formData.cabana}
                   onChange={handleChange}
-           
                 >
                   <option value="">Seleccione...</option>
                   {cabanas && cabanas.map(cab => (
@@ -93,13 +123,114 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
               </div>
 
               <div className="form-group-tesorero">
+                <label>Nombre</label>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  placeholder="Nombre del responsable"
+                  required
+                />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Apellido</label>
+                <input
+                  type="text"
+                  name="apellido"
+                  value={formData.apellido}
+                  onChange={handleChange}
+                  placeholder="Apellido del responsable"
+                  required
+                />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Tipo de Documento</label>
+                <select
+                  name="tipoDocumento"
+                  value={formData.tipoDocumento}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccione...</option>
+                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
+                  <option value="Cédula de extranjería">Cédula de extranjería</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
+                </select>
+              </div>
+              <div className="form-group-tesorero">
+                <label>Número de Documento</label>
+                <input
+                  type="text"
+                  name="numeroDocumento"
+                  value={formData.numeroDocumento}
+                  onChange={handleChange}
+                  placeholder="Número de documento"
+                  required
+                />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Correo Electrónico</label>
+                <input
+                  type="email"
+                  name="correoElectronico"
+                  value={formData.correoElectronico}
+                  onChange={handleChange}
+                  placeholder="Correo electrónico"
+                  required
+                />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Teléfono</label>
+                <input
+                  type="text"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  placeholder="Teléfono de contacto"
+                  required
+                />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Número de Personas</label>
+                <input
+                  type="number"
+                  name="numeroPersonas"
+                  value={formData.numeroPersonas}
+                  onChange={handleChange}
+                  min={1}
+                  required
+                />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Propósito de la Estadia</label>
+                <input
+                  type="text"
+                  name="propositoEstadia"
+                  value={formData.propositoEstadia}
+                  onChange={handleChange}
+                  placeholder="Motivo de la estadía"
+                />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Solicitudes Especiales</label>
+                <input
+                  type="text"
+                  name="solicitudesEspeciales"
+                  value={formData.solicitudesEspeciales}
+                  onChange={handleChange}
+                  placeholder="Solicitudes especiales (opcional)"
+                />
+              </div>
+              <div className="form-group-tesorero">
                 <label>Precio</label>
                 <input
                   type="number"
                   name="precio"
                   value={formData.precio}
                   onChange={handleChange}
-                  placeholder="Precion de la reserva"
+                  placeholder="Precio de la reserva"
                   required
                 />
               </div>

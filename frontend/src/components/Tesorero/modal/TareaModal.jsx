@@ -22,12 +22,12 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
   const [formData, setFormData] = useState({
     titulo: initialData.titulo || '',
     descripcion: initialData.descripcion || '',
-    estado: initialData.estado || '',
-    prioridad: initialData.prioridad || '',
-    asignadoA: initialData.asignadoA ? String(initialData.asignadoA) :'',
+    estado: initialData.estado || 'pendiente',
+    prioridad: initialData.prioridad || 'Media',
+    asignadoA: initialData.asignadoA ? String(initialData.asignadoA) : '',
     asignadoPor: initialData.asignadoPor || '',
-    fechaLimite: normalizeFecha (initialData.fechaLimite ),
-    comentarios: initialData.comentarios || ''
+    fechaLimite: normalizeFecha(initialData.fechaLimite),
+    comentarios: Array.isArray(initialData.comentarios) ? initialData.comentarios : []
   });
 
   const handleChange = (e) => {
@@ -129,10 +129,10 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
                   onChange={handleChange}
                   required
                 >
-                  <option>Seleccione...</option>
-                  <option value="media">Media</option>
-                  <option value="alta">Alta</option>
-                  <option value="baja">Baja</option>
+                  <option value="">Seleccione...</option>
+                  <option value="Alta">Alta</option>
+                  <option value="Media">Media</option>
+                  <option value="Baja">Baja</option>
                 </select>
               </div>
 
@@ -144,9 +144,9 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
                   onChange={handleChange}
                   required
                 >
-                  <option>Seleccione...</option>
+                  <option value="">Seleccione...</option>
                   <option value="pendiente">Pendiente</option>
-                  <option value="en progreso">En Progreso</option>
+                  <option value="en_progreso">En Progreso</option>
                   <option value="completada">Completada</option>
                   <option value="cancelada">Cancelada</option>
                 </select>

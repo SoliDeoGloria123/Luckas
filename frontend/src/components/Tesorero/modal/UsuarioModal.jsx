@@ -9,6 +9,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
     telefono: initialData.telefono || '',
     tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
     numeroDocumento: initialData.numeroDocumento || '',
+    fechaNacimiento: initialData.fechaNacimiento || '',
     role: initialData.role || '',
     estado: initialData.estado || 'Activo',
     password: initialData.password || ''
@@ -114,8 +115,18 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                   type="email"
                   name="correo"
                   value={formData.correo}
-                 onChange={e => setFormData(prev => ({ ...prev, correo: e.target.value.trim().toLowerCase() }))}
+                  onChange={e => setFormData(prev => ({ ...prev, correo: e.target.value.trim().toLowerCase() }))}
                   placeholder="correo@ejemplo.com"
+                  required
+                />
+              </div>
+              <div className="form-group-tesorero">
+                <label>Fecha de Nacimiento</label>
+                <input
+                  type="date"
+                  name="fechaNacimiento"
+                  value={formData.fechaNacimiento}
+                  onChange={handleChange}
                   required
                 />
               </div>

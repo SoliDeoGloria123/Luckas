@@ -31,6 +31,7 @@ import GestionTreportes from "./components/Tesorero/Tablas/Gestioreportes";
 import GestionTesorero from './components/Tesorero/Gestion';
 import GestionTperfil from './components/Tesorero/perfil';
 import DashboardSeminarista from "./components/Seminarista/DashboardSeminarista";
+import GestionTareasSeminarista from "./components/Seminarista/pages/GestionTareas";
 import EventosNavegables from "./components/Seminarista/pages/EventosNavegables";
 import CabanasNavegables from "./components/Seminarista/pages/CabanasNavegables";
 import CursosNavegables from "./components/Seminarista/pages/CursosNavegables";
@@ -81,8 +82,9 @@ function App() {
         <Route path="/tesorero/reportes" element={<GestionTreportes/>}/>
         <Route path="/tesorero/perfil" element={<GestionTperfil/>}/>
         <Route path='/tesorero-Gestiones' element={<GestionTesorero/>}/>
-        {/* Rutas para Seminarista */}
-        <Route path="/seminarista" element={<DashboardSeminarista />} />
+  {/* Rutas para Seminarista */}
+  <Route path="/seminarista" element={<DashboardSeminarista />} />
+  <Route path="/seminarista/tareas" element={<GestionTareasSeminarista />} />
         <Route path="/dashboard/seminarista/eventos" element={<EventosNavegables />} />
         <Route path="/dashboard/seminarista/cabanas" element={<CabanasNavegables />} />
         <Route path="/dashboard/seminarista/cursos" element={<CursosNavegables />} />

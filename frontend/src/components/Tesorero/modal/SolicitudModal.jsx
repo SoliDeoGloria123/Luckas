@@ -37,7 +37,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
     categoria: initialData.categoria?._id?.toString() || initialData.categoria?._id || initialData.categoria?.toString() || initialData.categoria || "",
     categoriaNombre: initialData.categoria?.nombre || "",
     descripcion: initialData.descripcion || "",
-    estado: initialData.estado ? String(initialData.estado) : "Nuevo",
+  estado: initialData.estado ? String(initialData.estado) : "Nueva",
     prioridad: initialData.prioridad ? String(initialData.prioridad) : "Media",
     responsable: mode === 'create' && usuarioSesion ? getResponsableId() : (initialData.responsable?._id?.toString() || initialData.responsable?._id || initialData.responsable?.toString() || initialData.responsable || ""),
     responsableNombre: mode === 'create' && usuarioSesion ? getNombreUsuarioSesion() : (initialData.responsable?.nombre || ""),
@@ -193,15 +193,15 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
                   value={formData.modeloReferencia ? String(formData.modeloReferencia) : ''}
                   onChange={handleChange}
                   required
+                  disabled={!formData.tipoSolicitud}
                 >
                   <option value="">Seleccione...</option>
-                  <option value="Eventos">Eventos</option>
-                  <option value="Cabana">Cabaña</option>
-                  <option value="Inscripcion">Inscripcion</option>
-                  <option value="Reserva">Reserva</option>
-                  <option value="Curso">Curso</option>
-                  <option value="ProgramaTecnico">ProgramaTecnico</option>
-                  <option value="Comedor">Comedor</option>
+                  {formData.tipoSolicitud === 'Inscripción' && <option value="Eventos">Eventos</option>}
+                  {formData.tipoSolicitud === 'Inscripción' && <option value="Curso">Curso</option>}
+                  {formData.tipoSolicitud === 'Inscripción' && <option value="ProgramaTecnico">Programa Tecnico</option>}
+                  {formData.tipoSolicitud === 'Hospedaje' && <option value="Cabana">Cabaña</option>}
+                  {formData.tipoSolicitud === 'Hospedaje' && <option value="Reserva">Reserva</option>}
+                  {formData.tipoSolicitud === 'Alimentación' && <option value="Comedor">Comedor</option>}
                 </select>
               </div>
               <div className="form-group-tesorero">

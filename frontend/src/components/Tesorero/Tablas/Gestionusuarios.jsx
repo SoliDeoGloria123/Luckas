@@ -206,13 +206,13 @@ const Gestionusuarios = () => {
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Apellido</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
+                <th>Tipo de Documento</th>
                 <th>Número de Documento</th>
                 <th>Fecha de Nacimiento</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
                 <th>Rol</th>
                 <th>Estado</th>
-                <th>Fecha Registro</th>
                 <th>Acciones</th>
               </tr>
             </thead>

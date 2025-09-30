@@ -107,7 +107,32 @@ const Gestioncursos = () => {
   });
 
   // Funciones del modal
-  const abrirModalVer = (programa) => mostrarAlerta('Ver', `Programa: ${programa.nombre}`);
+  const abrirModalVer = (programa) => {
+    setModalMode('view');
+    setCurrentItem(programa);
+    setFormData({
+      titulo: programa.nombre || '',
+      descripcion: programa.descripcion || '',
+      tipo: programa.tipo || 'curso',
+      modalidad: programa.modalidad || 'presencial',
+      duracion: programa.duracion || '',
+      precio: programa.precio || '',
+      fechaInicio: programa.fechaInicio ? programa.fechaInicio.split('T')[0] : '',
+      fechaFin: programa.fechaFin ? programa.fechaFin.split('T')[0] : '',
+      cupos: programa.cuposDisponibles || '',
+      profesor: programa.profesor || '',
+      profesorBio: programa.profesorBio || '',
+      requisitos: programa.requisitos || [''],
+      pensum: programa.pensum || [{ modulo: '', descripcion: '', horas: '' }],
+      objetivos: programa.objetivos || [''],
+      metodologia: programa.metodologia || '',
+      evaluacion: programa.evaluacion || '',
+      certificacion: programa.certificacion || '',
+      imagen: programa.imagen || '',
+      destacado: programa.destacado || false
+    });
+    setShowModal(true);
+  };
   
   const abrirModalEditar = (programa) => { 
     setModalMode('edit'); 
@@ -461,6 +486,7 @@ const Gestioncursos = () => {
           <ProgramaModal
             mostrar={showModal}
             modoEdicion={modalMode === 'edit'}
+            modoVista={modalMode === 'view'}
             programaSeleccionado={currentItem}
             formData={formData}
             setFormData={setFormData}
