@@ -196,12 +196,14 @@ const TailwindExternalDashboard = () => {
     setLoadingComments((prev) => ({ ...prev, [eventoId]: true }));
     try {
       const res = await comentarioEventoService.getComentarios(eventoId);
+      console.log('Comentarios recibidos:', res);
       if (res.success) {
         setCommentsByEvento((prev) => ({ ...prev, [eventoId]: res.comentarios }));
       } else {
         setCommentsByEvento((prev) => ({ ...prev, [eventoId]: [] }));
       }
-    } catch {
+    } catch (err) {
+      console.error('Error al cargar comentarios:', err);
       setCommentsByEvento((prev) => ({ ...prev, [eventoId]: [] }));
     } finally {
       setLoadingComments((prev) => ({ ...prev, [eventoId]: false }));
@@ -900,37 +902,165 @@ const TailwindExternalDashboard = () => {
                   {selectedEvents.length > 0 ? (
                     <ul className="space-y-6">
                       {selectedEvents.map((evento) => (
-                        <li key={evento._id} className="p-4 bg-white/80 dark:bg-gray-900 rounded-lg shadow border border-blue-200 dark:border-blue-700">
-                          <div className="font-bold text-blue-700 dark:text-blue-300">{evento.nombre}</div>
-                          <div className="text-sm text-gray-700 dark:text-slate-200">{evento.descripcion}</div>
-                          <div className="text-xs text-gray-500 dark:text-slate-400 mt-1 flex items-center gap-2">
-                            <MapPin className="w-3 h-3 dark:text-blue-300" /> {evento.lugar}
-                            <Clock className="w-3 h-3 dark:text-blue-300" /> {new Date(evento.fechaEvento || evento.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <li key={evento._id} className={`p-4 bg-white/80 dark:bg-gray-900 rounded-lg shadow border border-blue-200 dark:border-blue-700 ${showCommentSection[evento._id] ? 'flex flex-col md:flex-row gap-6' : ''}`}>
+                          {/* Layout de 3 columnas: info, comentarios, comentar */}
+                          <div className="flex-1 min-w-[200px] md:pr-4 flex flex-col justify-center">
+                            <div className="font-bold text-blue-700 dark:text-blue-300">{evento.nombre}</div>
+                            <div className="text-sm text-gray-700 dark:text-slate-200">{evento.descripcion}</div>
+                            <div className="text-xs text-gray-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                              <MapPin className="w-3 h-3 dark:text-blue-300" /> {evento.lugar}
+                              <Clock className="w-3 h-3 dark:text-blue-300" /> {new Date(evento.fechaEvento || evento.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                            {isEventoAbiertoAComentarios(evento) && (
+                              <button
+                                className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition dark:bg-blue-700 dark:hover:bg-blue-800 w-fit min-w-[180px]"
+                                style={{ minWidth: '180px', maxWidth: '220px' }}
+                                onClick={() => toggleCommentSection(evento._id)}
+                              >
+                                {showCommentSection[evento._id] ? 'Ocultar comentarios' : 'Comentar sobre este evento'}
+                              </button>
+                            )}
+                            {!isEventoAbiertoAComentarios(evento) && (
+                              <div className="mt-4 text-xs text-gray-500 dark:text-slate-400">La ventana de comentarios aún no está abierta para este evento.</div>
+                            )}
                           </div>
-                          {/* Botón comentar solo si el evento está abierto a comentarios */}
-                          {isEventoAbiertoAComentarios(evento) && (
-                            <button
-                              className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition dark:bg-blue-700 dark:hover:bg-blue-800"
-                              onClick={() => toggleCommentSection(evento._id)}
-                            >
-                              {showCommentSection[evento._id] ? 'Ocultar comentarios' : 'Comentar sobre este evento'}
-                            </button>
-                          )}
-                          {/* Si la ventana de comentarios está cerrada, mostrar mensaje */}
-                          {!isEventoAbiertoAComentarios(evento) && (
-                            <div className="mt-4 text-xs text-gray-500 dark:text-slate-400">La ventana de comentarios aún no está abierta para este evento.</div>
-                          )}
-                          {/* Sección de comentarios */}
                           {showCommentSection[evento._id] && (
-                            <div className="mt-6 w-full max-w-2xl">
-                              <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                                  Comentarios
-                                  <span className="ml-2 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs dark:bg-blue-900 dark:text-blue-200">
+                            <div className="flex-1 flex flex-col md:flex-row gap-10 w-full px-2 md:px-6 py-4">
+                              {/* Comentarios centrados en el card, con más aire y más largo en X */}
+                              <div className="flex-[2.5] flex flex-col justify-center items-center px-2 md:px-6">
+                                <div className="w-full max-w-4xl mx-auto">
+                                  {loadingComments[evento._id] ? (
+                                    <div className="text-gray-500 dark:text-slate-400">Cargando comentarios...</div>
+                                  ) : (
+                                    <div className="mb-4 max-h-60 overflow-y-auto flex flex-col items-center">
+                                      {(commentsByEvento[evento._id]?.length === 0) ? (
+                                        <div className="text-gray-500 dark:text-slate-400">Aún no hay comentarios.</div>
+                                      ) : (
+                                        commentsByEvento[evento._id]
+                                          ?.slice(0, (commentPageByEvento[evento._id] || 1) * COMMENTS_PER_PAGE)
+                                          .sort((a, b) => {
+                                            if (commentOrderBy[evento._id] === 'relevantes') {
+                                              return (b.likes?.length || 0) - (a.likes?.length || 0);
+                                            } else {
+                                              return new Date(b.createdAt) - new Date(a.createdAt);
+                                            }
+                                          })
+                                          .map((comment) => (
+                                            <div key={comment._id} className="mb-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 w-full max-w-5xl min-w-[340px]">
+                                              <div className="flex items-center gap-2 mb-1">
+                                                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold dark:bg-blue-700">
+                                                  {(comment.user?.nombre || comment.nombreUsuario || 'U')[0].toUpperCase()}
+                                                </div>
+                                                <span className="font-semibold text-gray-800 dark:text-white">{comment.user?.nombre || comment.nombreUsuario || 'Usuario'}</span>
+                                                <span className="text-xs text-gray-500 dark:text-slate-400 ml-2">{new Date(comment.createdAt).toLocaleString()}</span>
+                                                {(comment.user?._id === user?._id || comment.nombreUsuario === user?.nombre) && (
+                                                  <>
+                                                    <button
+                                                      className="ml-2 text-xs text-yellow-600 hover:underline dark:text-yellow-400"
+                                                      onClick={() => setEditingCommentId(comment._id)}
+                                                    >Editar</button>
+                                                    <button
+                                                      className="ml-2 text-xs text-red-600 hover:underline dark:text-red-400"
+                                                      onClick={() => handleDeleteComment(evento._id, comment._id)}
+                                                    >Eliminar</button>
+                                                  </>
+                                                )}
+                                                {user?.rol === 'admin' && (
+                                                  <button
+                                                    className="ml-2 text-xs text-red-600 hover:underline dark:text-red-400"
+                                                    onClick={() => handleModerateComment(evento._id, comment._id)}
+                                                  >Marcar como inapropiado</button>
+                                                )}
+                                              </div>
+                                              {editingCommentId === comment._id ? (
+                                                <form onSubmit={e => handleEditCommentSubmit(e, evento._id, comment._id)} className="flex gap-2 mt-1">
+                                                  <input type="text" value={editCommentText} onChange={e => setEditCommentText(e.target.value)} className="input-respuesta flex-1" required autoFocus />
+                                                  <button type="submit" className="bg-blue-500 text-white px-2 py-1 rounded">Guardar</button>
+                                                  <button type="button" className="bg-gray-300 text-black px-2 py-1 rounded" onClick={() => setEditingCommentId(null)}>Cancelar</button>
+                                                </form>
+                                              ) : (
+                                                <div className="text-gray-800 dark:text-white mb-2 whitespace-pre-line">{comment.texto}</div>
+                                              )}
+                                              {/* Feedback visual tras editar/eliminar/moderar */}
+                                              {showEditFeedback[comment._id] && (
+                                                <div className="text-green-600 dark:text-green-400 text-xs mb-1">¡Comentario actualizado!</div>
+                                              )}
+                                              {showDeleteFeedback[comment._id] && (
+                                                <div className="text-red-600 dark:text-red-400 text-xs mb-1">Comentario eliminado.</div>
+                                              )}
+                                              {showModerateFeedback[comment._id] && (
+                                                <div className="text-yellow-600 dark:text-yellow-400 text-xs mb-1">Comentario marcado como inapropiado.</div>
+                                              )}
+                                              <div className="flex items-center gap-3 text-xs">
+                                                <button
+                                                  className={`flex items-center gap-1 ${comment.likes?.includes(user?._id) ? 'text-blue-600 dark:text-blue-300 font-bold' : 'text-gray-600 dark:text-slate-300'}`}
+                                                  onClick={() => handleLike(evento._id, comment._id)}
+                                                >
+                                                  👍 {comment.likes?.length || 0}
+                                                </button>
+                                                <button
+                                                  className={`flex items-center gap-1 ${comment.dislikes?.includes(user?._id) ? 'text-red-600 dark:text-red-300 font-bold' : 'text-gray-600 dark:text-slate-300'}`}
+                                                  onClick={() => handleDislike(evento._id, comment._id)}
+                                                >
+                                                  👎 {comment.dislikes?.length || 0}
+                                                </button>
+                                                <button
+                                                  className="text-blue-600 hover:underline dark:text-blue-300"
+                                                  onClick={() => setReplyToByEvento(prev => ({ ...prev, [evento._id]: comment._id }))}
+                                                >
+                                                  Responder
+                                                </button>
+                                              </div>
+                                              {/* Respuestas */}
+                                              {comment.respuestas && comment.respuestas.length > 0 && (
+                                                <div className="ml-8 mt-2 space-y-2">
+                                                  {comment.respuestas.map((resp) => (
+                                                    <div key={resp._id} className="p-2 rounded bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+                                                      <div className="flex items-center gap-2 mb-1">
+                                                        <div className="w-6 h-6 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold dark:bg-blue-800">
+                                                          {(resp.user?.nombre || resp.nombreUsuario || 'U')[0].toUpperCase()}
+                                                        </div>
+                                                        <span className="font-semibold text-gray-700 dark:text-white text-xs">{resp.user?.nombre || resp.nombreUsuario || 'Usuario'}</span>
+                                                        <span className="text-xs text-gray-400 dark:text-slate-400 ml-2">{new Date(resp.createdAt).toLocaleString()}</span>
+                                                      </div>
+                                                      <div className="text-gray-700 dark:text-white text-xs">{resp.texto}</div>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              )}
+                                              {/* Responder */}
+                                              {replyToByEvento[evento._id] === comment._id && (
+                                                <form onSubmit={e => handleReplySubmit(e, evento._id, comment._id)} className="flex gap-2 mt-2 ml-8">
+                                                  <input type="text" value={replyTextByEvento[evento._id] || ''} onChange={e => setReplyTextByEvento(prev => ({ ...prev, [evento._id]: e.target.value }))} className="input-respuesta flex-1" placeholder="Escribe una respuesta..." required />
+                                                  <button type="submit" className="bg-yellow-400 text-black px-2 py-1 rounded font-bold">Responder</button>
+                                                  <button type="button" className="bg-gray-300 text-black px-2 py-1 rounded" onClick={() => setReplyToByEvento(prev => ({ ...prev, [evento._id]: null }))}>Cancelar</button>
+                                                </form>
+                                              )}
+                                            </div>
+                                          ))
+                                      )}
+                                      {/* Paginación */}
+                                      {commentsByEvento[evento._id]?.length > commentPageByEvento[evento._id] * COMMENTS_PER_PAGE && (
+                                        <button
+                                          className="mt-2 text-blue-600 hover:underline dark:text-blue-300"
+                                          onClick={() => setCommentPageByEvento(prev => ({ ...prev, [evento._id]: (prev[evento._id] || 1) + 1 }))}
+                                        >
+                                          Ver más comentarios
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              {/* Columna derecha: título, input y botón */}
+                              <div className="w-full md:w-96 flex flex-col items-end justify-start gap-4 pr-2 md:pr-6">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Comentarios</h2>
+                                  <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs dark:bg-blue-900 dark:text-blue-200">
                                     {commentsByEvento[evento._id]?.length || 0}
                                   </span>
-                                </h2>
-                                <div className="flex gap-2">
+                                </div>
+                                <div className="flex gap-2 mb-2">
                                   <button
                                     className={`text-xs px-2 py-1 rounded ${commentOrderBy[evento._id] === 'recientes' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-white'}`}
                                     onClick={() => setCommentOrderBy(prev => ({ ...prev, [evento._id]: 'recientes' }))}
@@ -944,144 +1074,27 @@ const TailwindExternalDashboard = () => {
                                     Más relevantes
                                   </button>
                                 </div>
+                                <form onSubmit={e => handleCommentSubmit(e, evento._id)} className="flex flex-row gap-2 w-full items-center">
+                                  <textarea
+                                    value={commentTextByEvento[evento._id] || ''}
+                                    onChange={e => setCommentTextByEvento(prev => ({ ...prev, [evento._id]: e.target.value }))}
+                                    className="flex-1 border-2 border-blue-400 bg-white text-black px-3 py-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none min-h-[44px]"
+                                    placeholder="Escribe un comentario..."
+                                    required
+                                    disabled={false}
+                                    rows={2}
+                                    style={{ marginRight: 0 }}
+                                  />
+                                  <button type="submit" className="bg-yellow-400 text-black px-4 py-2 rounded font-bold w-fit h-[44px] align-middle">Comentar</button>
+                                </form>
+                                {/* Notificaciones y feedback visual */}
+                                {showReplyNotification[evento._id] && (
+                                  <div className="text-green-600 dark:text-green-400 text-xs mb-2">¡Respuesta enviada!</div>
+                                )}
+                                {showCommentFeedback[evento._id] && (
+                                  <div className="text-green-600 dark:text-green-400 text-xs mb-2">¡Comentario enviado!</div>
+                                )}
                               </div>
-                              {loadingComments[evento._id] ? (
-                                <div className="text-gray-500 dark:text-slate-400">Cargando comentarios...</div>
-                              ) : (
-                                <div className="mb-4 max-h-60 overflow-y-auto">
-                                  {(commentsByEvento[evento._id]?.length === 0) ? (
-                                    <div className="text-gray-500 dark:text-slate-400">Aún no hay comentarios.</div>
-                                  ) : (
-                                    commentsByEvento[evento._id]
-                                      ?.slice(0, commentPageByEvento[evento._id] * COMMENTS_PER_PAGE)
-                                      .sort((a, b) => {
-                                        if (commentOrderBy[evento._id] === 'relevantes') {
-                                          return (b.likes?.length || 0) - (a.likes?.length || 0);
-                                        } else {
-                                          return new Date(b.createdAt) - new Date(a.createdAt);
-                                        }
-                                      })
-                                      .map((comment) => (
-                                        <div key={comment._id} className="mb-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                                          <div className="flex items-center gap-2 mb-1">
-                                            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold dark:bg-blue-700">
-                                              {comment.user?.nombre ? comment.user.nombre.charAt(0).toUpperCase() : 'U'}
-                                            </div>
-                                            <span className="font-semibold text-gray-800 dark:text-white">{comment.user?.nombre || 'Usuario'}</span>
-                                            <span className="text-xs text-gray-500 dark:text-slate-400 ml-2">{new Date(comment.createdAt).toLocaleString()}</span>
-                                            {comment.user?._id === user?._id && (
-                                              <>
-                                                <button
-                                                  className="ml-2 text-xs text-yellow-600 hover:underline dark:text-yellow-400"
-                                                  onClick={() => setEditingCommentId(comment._id)}
-                                                >Editar</button>
-                                                <button
-                                                  className="ml-2 text-xs text-red-600 hover:underline dark:text-red-400"
-                                                  onClick={() => handleDeleteComment(evento._id, comment._id)}
-                                                >Eliminar</button>
-                                              </>
-                                            )}
-                                            {user?.rol === 'admin' && (
-                                              <button
-                                                className="ml-2 text-xs text-red-600 hover:underline dark:text-red-400"
-                                                onClick={() => handleModerateComment(evento._id, comment._id)}
-                                              >Marcar como inapropiado</button>
-                                            )}
-                                          </div>
-                                          {editingCommentId === comment._id ? (
-                                            <form onSubmit={e => handleEditCommentSubmit(e, evento._id, comment._id)} className="flex gap-2 mt-1">
-                                              <input type="text" value={editCommentText} onChange={e => setEditCommentText(e.target.value)} className="input-respuesta flex-1" required autoFocus />
-                                              <button type="submit" className="bg-blue-500 text-white px-2 py-1 rounded">Guardar</button>
-                                              <button type="button" className="bg-gray-300 text-black px-2 py-1 rounded" onClick={() => setEditingCommentId(null)}>Cancelar</button>
-                                            </form>
-                                          ) : (
-                                            <div className="text-gray-800 dark:text-white mb-2 whitespace-pre-line">{comment.texto}</div>
-                                          )}
-                                          {/* Feedback visual tras editar/eliminar/moderar */}
-                                          {showEditFeedback[comment._id] && (
-                                            <div className="text-green-600 dark:text-green-400 text-xs mb-1">¡Comentario actualizado!</div>
-                                          )}
-                                          {showDeleteFeedback[comment._id] && (
-                                            <div className="text-red-600 dark:text-red-400 text-xs mb-1">Comentario eliminado.</div>
-                                          )}
-                                          {showModerateFeedback[comment._id] && (
-                                            <div className="text-yellow-600 dark:text-yellow-400 text-xs mb-1">Comentario marcado como inapropiado.</div>
-                                          )}
-                                          <div className="flex items-center gap-3 text-xs">
-                                            <button
-                                              className={`flex items-center gap-1 ${comment.likes?.includes(user?._id) ? 'text-blue-600 dark:text-blue-300 font-bold' : 'text-gray-600 dark:text-slate-300'}`}
-                                              onClick={() => handleLike(evento._id, comment._id)}
-                                            >
-                                              👍 {comment.likes?.length || 0}
-                                            </button>
-                                            <button
-                                              className={`flex items-center gap-1 ${comment.dislikes?.includes(user?._id) ? 'text-red-600 dark:text-red-300 font-bold' : 'text-gray-600 dark:text-slate-300'}`}
-                                              onClick={() => handleDislike(evento._id, comment._id)}
-                                            >
-                                              👎 {comment.dislikes?.length || 0}
-                                            </button>
-                                            <button
-                                              className="text-blue-600 hover:underline dark:text-blue-300"
-                                              onClick={() => setReplyToByEvento(prev => ({ ...prev, [evento._id]: comment._id }))}
-                                            >
-                                              Responder
-                                            </button>
-                                          </div>
-                                          {/* Respuestas */}
-                                          {comment.respuestas && comment.respuestas.length > 0 && (
-                                            <div className="ml-8 mt-2 space-y-2">
-                                              {comment.respuestas.map((resp) => (
-                                                <div key={resp._id} className="p-2 rounded bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
-                                                  <div className="flex items-center gap-2 mb-1">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold dark:bg-blue-800">
-                                                      {resp.user?.nombre ? resp.user.nombre.charAt(0).toUpperCase() : 'U'}
-                                                    </div>
-                                                    <span className="font-semibold text-gray-700 dark:text-white text-xs">{resp.user?.nombre || 'Usuario'}</span>
-                                                    <span className="text-xs text-gray-400 dark:text-slate-400 ml-2">{new Date(resp.createdAt).toLocaleString()}</span>
-                                                  </div>
-                                                  <div className="text-gray-700 dark:text-white text-xs">{resp.texto}</div>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          )}
-                                          {/* Responder */}
-                                          {replyToByEvento[evento._id] === comment._id && (
-                                            <form onSubmit={e => handleReplySubmit(e, evento._id, comment._id)} className="flex gap-2 mt-2 ml-8">
-                                              <input type="text" value={replyTextByEvento[evento._id] || ''} onChange={e => setReplyTextByEvento(prev => ({ ...prev, [evento._id]: e.target.value }))} className="input-respuesta flex-1" placeholder="Escribe una respuesta..." required />
-                                              <button type="submit" className="bg-yellow-400 text-black px-2 py-1 rounded font-bold">Responder</button>
-                                              <button type="button" className="bg-gray-300 text-black px-2 py-1 rounded" onClick={() => setReplyToByEvento(prev => ({ ...prev, [evento._id]: null }))}>Cancelar</button>
-                                            </form>
-                                          )}
-                                        </div>
-                                      ))
-                                  )}
-                                  {/* Paginación */}
-                                  {commentsByEvento[evento._id]?.length > commentPageByEvento[evento._id] * COMMENTS_PER_PAGE && (
-                                    <button
-                                      className="mt-2 text-blue-600 hover:underline dark:text-blue-300"
-                                      onClick={() => setCommentPageByEvento(prev => ({ ...prev, [evento._id]: (prev[evento._id] || 1) + 1 }))}
-                                    >
-                                      Ver más comentarios
-                                    </button>
-                                  )}
-                                </div>
-                              )}
-                              {/* Indicador de ventana de comentarios */}
-                              {!isEventoAbiertoAComentarios(evento) && (
-                                <div className="text-xs text-gray-500 dark:text-slate-400 mb-2">La ventana de comentarios aún no está abierta para este evento.</div>
-                              )}
-                              {/* Notificación visual al responder */}
-                              {showReplyNotification[evento._id] && (
-                                <div className="text-green-600 dark:text-green-400 text-xs mb-2">¡Respuesta enviada!</div>
-                              )}
-                              {/* Feedback visual tras comentar/like/dislike */}
-                              {showCommentFeedback[evento._id] && (
-                                <div className="text-green-600 dark:text-green-400 text-xs mb-2">¡Comentario enviado!</div>
-                              )}
-                              <form onSubmit={e => handleCommentSubmit(e, evento._id)} className="flex gap-2 mt-2">
-                                <input type="text" value={commentTextByEvento[evento._id] || ''} onChange={e => setCommentTextByEvento(prev => ({ ...prev, [evento._id]: e.target.value }))} className="input-respuesta flex-1" placeholder="Escribe un comentario..." required disabled={!isEventoAbiertoAComentarios(evento)} />
-                                <button type="submit" className="bg-yellow-400 text-black px-3 py-1 rounded font-bold" disabled={!isEventoAbiertoAComentarios(evento)}>Comentar</button>
-                              </form>
                             </div>
                           )}
                         </li>

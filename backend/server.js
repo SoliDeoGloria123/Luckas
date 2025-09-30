@@ -1,4 +1,6 @@
 require('dotenv').config();
+// Registrar todos los modelos para evitar MissingSchemaError en populate
+require('./models');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');

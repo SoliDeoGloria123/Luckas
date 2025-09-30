@@ -1,19 +1,34 @@
+const mongoose = require('mongoose');
 const ComentarioEvento = require('../models/ComentarioEvento');
 const Evento = require('../models/Eventos');
-const User = require('../models/User');
+const User = mongoose.model('User');
 
 // Obtener comentarios de un evento
 exports.getComentariosByEvento = async (req, res) => {
   try {
     const { eventoId } = req.params;
-    const comentarios = await ComentarioEvento.find({ evento: eventoId })
+    let comentarios = await ComentarioEvento.find({ evento: eventoId })
       .populate('usuario', 'nombre')
       .populate('likes', 'nombre')
       .populate('dislikes', 'nombre')
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: 1 })
+      .lean();
+    comentarios = comentarios.map(comentario => {
+      comentario.user = comentario.usuario;
+      delete comentario.usuario;
+      if (comentario.respuestas && Array.isArray(comentario.respuestas)) {
+        comentario.respuestas = comentario.respuestas.map(resp => {
+          resp.user = resp.usuario;
+          delete resp.usuario;
+          return resp;
+        });
+      }
+      return comentario;
+    });
     res.json({ success: true, comentarios });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('[ERROR getComentariosByEvento]', error);
+    res.status(500).json({ success: false, message: error.message, stack: error.stack });
   }
 };
 

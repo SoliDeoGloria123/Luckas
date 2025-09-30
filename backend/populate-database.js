@@ -658,6 +658,10 @@ async function main() {
     const cabanas = await createCabanas(categorias);
     const eventos = await createEventos(categorias);
     console.log('DEBUG - Eventos creados:', eventos ? eventos.length : 'undefined');
+    // Crear comentarios de ejemplo
+    const createComentariosDeEjemplo = require('./create-comentarios-ejemplo');
+    const comentarios = await createComentariosDeEjemplo(usuarios, eventos);
+
     const tareas = await createTareas(usuarios);
     const inscripciones = await createInscripciones(usuarios, programas, eventos, categorias);
     const reservas = await createReservas(usuarios, cabanas);
