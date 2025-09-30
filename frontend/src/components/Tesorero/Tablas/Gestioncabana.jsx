@@ -29,6 +29,8 @@ const Gestioncabana = () => {
 
   // Carrusel de imágenes: un índice por cabaña
   const [imgIndices, setImgIndices] = useState({});
+  const [eventoDetalle, setEventoDetalle] = useState(null);
+   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
 
   // Función para obtener el tipo de cabaña (dummy)
   const obtenerTipoCabana = (tipo) => ({ label: tipo || 'Cabaña', icon: <Home className="w-6 h-6" /> });
@@ -51,15 +53,11 @@ const Gestioncabana = () => {
     setShowModal(true);
   };
 
-  // Modal de detalle (puedes implementar si lo necesitas)
-  const onVerDetalle = (cabana) => {
-    mostrarAlerta('Detalle', `Cabaña: ${cabana.nombre}`);
+   const abrirModalVer = (evento) => {
+    setEventoDetalle(evento);
+    setMostrarModalDetalle(true);
   };
 
-  // Eliminar cabaña (puedes implementar lógica real)
-  const onEliminar = (cabana) => {
-    mostrarAlerta('Eliminar', `¿Seguro que deseas eliminar la cabaña?`);
-  };
 
   // Insertar cabaña desde el botón vacío
   const onInsertar = () => {
@@ -133,18 +131,6 @@ const Gestioncabana = () => {
     setModalCabana('create');
     setCurrentItem(null);
     setShowModal(true);
-  };
-
-  const handleDeleteCabana = async (id) => {
-    if (!id) return;
-    if (!window.confirm('¿Seguro que deseas eliminar esta cabaña?')) return;
-    try {
-      await cabanaService.delete(id);
-      mostrarAlerta('¡Éxito!', 'Cabaña eliminada exitosamente');
-      obtenerCabanas();
-    } catch (err) {
-      mostrarAlerta('Error', 'Error al eliminar cabaña: ' + err.message);
-    }
   };
 
   return (
@@ -334,7 +320,7 @@ const Gestioncabana = () => {
                   {/* Botones de acción */}
                   <div className="flex  justify-end  gap-2  px-6 py-3 ">
                     <button
-                    onClick={() => onVerDetalle(cabana)}
+                      onClick={() => abrirModalVer(cabana)}
                       className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                       title="Ver detalles"
                     >
@@ -347,13 +333,7 @@ const Gestioncabana = () => {
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={() => onEliminar(cabana)}
-                      className="p-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
-                      title="Eliminar"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+            
                   </div>
                 </div>
 
@@ -458,6 +438,51 @@ const Gestioncabana = () => {
           </div>
         )}
       </div>
+       {mostrarModalDetalle && eventoDetalle && (
+                  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8">
+                      <button
+                        className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
+                        onClick={() => setMostrarModalDetalle(false)}
+                      >
+                        <X size={24} />
+                      </button>
+                      <h2 className="text-2xl font-bold mb-4">{eventoDetalle.nombre}</h2>
+                      <p className="mb-2"><strong>Descripción:</strong> {eventoDetalle.descripcion}</p>
+                      <p className="mb-2"><strong>Categoría:</strong> {eventoDetalle.categoria?.nombre || eventoDetalle.categoria}</p>
+                      <p className="mb-2"><strong>Capacidad:</strong> {eventoDetalle.capacidad}</p>
+                      <p className="mb-2"><strong>Precio:</strong> ${eventoDetalle.precio}</p>
+                      <p className="mb-2"><strong>Ubicación:</strong> {eventoDetalle.ubicacion}</p>
+                      <p className="mb-2"><strong>Estado:</strong> {eventoDetalle.estado}</p>
+                      <p className="mb-2"><strong>Creado por:</strong> {eventoDetalle.creadoPor?.nombre || eventoDetalle.creadoPor}</p>
+                      <div className="flex flex-wrap gap-2 my-4">
+                        {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.length > 0 ? (
+                          eventoDetalle.imagen.map((img, idx) => (
+                            <img
+                              key={idx}
+                              src={img}
+                              alt={`Imagen ${idx + 1}`}
+                              className="w-32 h-32 object-cover rounded-lg border"
+                            />
+                          ))
+                        ) : (
+                          <span className="text-gray-400">Sin imágenes</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        <span>Creado: {eventoDetalle.createdAt ? new Date(eventoDetalle.createdAt).toLocaleString() : "N/A"}</span>
+                        <span className="ml-4">Actualizado: {eventoDetalle.updatedAt ? new Date(eventoDetalle.updatedAt).toLocaleString() : "N/A"}</span>
+                      </div>
+                      <button
+                        onClick={() => setMostrarModalDetalle(false)}
+                        className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Cerrar
+                      </button>
+                    </div>
+                  </div>
+                )}
+      
       {showModal && (
         <CabanaModal
           mode={modalMode}

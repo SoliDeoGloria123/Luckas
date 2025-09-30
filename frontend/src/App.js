@@ -23,6 +23,7 @@ import GestionTcategorias from "./components/Tesorero/Tablas/Gestioncategorizar"
 import GestionTsolicitudes from "./components/Tesorero/Tablas/Gestionsolicitud";
 import GestionTeventos from "./components/Tesorero/Tablas/Gestionevento";
 import GestionTcabanas from "./components/Tesorero/Tablas/Gestioncabana";
+import GestionTprogramas from "./components/Tesorero/Tablas/Gestionprogramas";
 import GestionTreservas from "./components/Tesorero/Tablas/Gestionreserva";
 import GestionTtarea from "./components/Tesorero/Tablas/Gestiontareas";
 import GestionTinscripcion from "./components/Tesorero/Tablas/Gestioninscripcion";
@@ -72,6 +73,7 @@ function App() {
         <Route path="/tesorero/categorias" element={<GestionTcategorias />}/>
         <Route path="/tesorero/solicitudes" element={<GestionTsolicitudes />}/>
         <Route path="/tesorero/eventos" element={<GestionTeventos/>}/>
+        <Route path="/tesorero/programas" element={<GestionTprogramas/>}/>
         <Route path="/tesorero/cabañas" element={<GestionTcabanas/>}/>
         <Route path="/tesorero/reservas" element={<GestionTreservas/>}/>
         <Route path="/tesorero/tarea" element={<GestionTtarea/>}/>

@@ -30,7 +30,7 @@ const DashboardTesorero = () => {
     navigate('/tesorero/reservas')
   };
   const handleGcursosClick =() =>{
-    navigate('/tesorero/cursos')
+    navigate('/tesorero/programas')
   };
   const handleGinscripcionClick =() =>{
     navigate('/tesorero/inscripcion')
@@ -264,7 +264,7 @@ const DashboardTesorero = () => {
                         <span className="stat-detail">245 inscritos</span>
                       </div>
                       <div className="function-info">
-                        <h3>Gestionar Cursos</h3>
+                        <h3>Gestionar Programas</h3>
                         <p>Administrar programas académicos</p>
                       </div>
                       <button className="function-action" onClick={handleGcursosClick}>
