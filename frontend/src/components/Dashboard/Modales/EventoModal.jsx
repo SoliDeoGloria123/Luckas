@@ -10,9 +10,10 @@ const EventoModal = ({
   setNuevoEvento,
   categorias,
   onClose,
-  onSubmit
+  onSubmit,
+  selectedImages,
+  setSelectedImages
 }) => {
-    const [selectedImages, setSelectedImages] = useState([]);
      const [progress, setProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
  
@@ -89,7 +90,7 @@ const EventoModal = ({
             ✕
           </button>
         </div>
-        <form className="modal-body-admin">
+  <form className="modal-body-admin" onSubmit={e => { e.preventDefault(); onSubmit(); }}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
               <label>Nombre Evento:</label>
@@ -348,10 +349,10 @@ const EventoModal = ({
 
         
           <div className="modal-action-admin">
-            <button className="btn-admin secondary-admin" onClick={onClose}>
+            <button type="button" className="btn-admin secondary-admin" onClick={onClose}>
               Cancelar
             </button>
-            <button className="btn-admin btn-primary" onClick={onSubmit}>
+            <button type="submit" className="btn-admin btn-primary">
               {modoEdicion ? "Guardar Cambios" : "Crear Evento"}
             </button>
           </div>

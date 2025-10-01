@@ -25,22 +25,34 @@ export const eventService = {
   },
 
   // Crear nuevo evento
-  createEvent: async (eventData) => {
+  createEvent: async (eventData, isFormData = false) => {
+    const headers = isFormData 
+      ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      : getHeaders();
+    
+    const body = isFormData ? eventData : JSON.stringify(eventData);
+    
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify(eventData)
+      headers,
+      body
     });
     if (!res.ok) throw new Error("Error al crear evento");
     return await res.json();
   },
 
   // Actualizar evento
-  updateEvent: async (id, eventData) => {
+  updateEvent: async (id, eventData, isFormData = false) => {
+    const headers = isFormData 
+      ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      : getHeaders();
+    
+    const body = isFormData ? eventData : JSON.stringify(eventData);
+    
     const res = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
-      headers: getHeaders(),
-      body: JSON.stringify(eventData)
+      headers,
+      body
     });
     if (!res.ok) throw new Error("Error al actualizar evento");
     return await res.json();

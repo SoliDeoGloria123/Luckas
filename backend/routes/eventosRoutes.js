@@ -6,14 +6,6 @@ const { body } = require('express-validator');
 // INCORRECTO
 const { uploadMultiple, uploadMultipleToCloudinary } = require('../middlewares/uploadCloudinary');
 
-// Validaciones para el evento
-const validarEvento = [
-  body('name').notEmpty().withMessage('El nombre es obligatorio'),
-  body('description').notEmpty().withMessage('La descripción es obligatoria'),
-  body('price').isNumeric().withMessage('El precio debe ser numérico'),
-  body('categoria').isMongoId().withMessage('ID de categoría inválido')
-];
-
 // Middleware de autenticación para todas las rutas
 router.use(authJwt.verifyToken);
 

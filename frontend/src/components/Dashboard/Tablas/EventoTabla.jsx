@@ -13,7 +13,7 @@ import {
   Star
 } from 'lucide-react';
 
-const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, onDeshabilitar, onVerDetalle }) => {
+const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabilitar, onVerDetalle }) => {
 
  // Estado para manejar el índice de imagen de cada evento
   const [imgIndices, setImgIndices] = useState({});
@@ -40,8 +40,8 @@ const TablaEventos = ({ cargando, eventosFiltrados = [], onEditar, onEliminar, o
           <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600">Cargando eventos...</p>
         </div>
-      ) : eventosFiltrados.length > 0 ? (
-        eventosFiltrados.map((evento) => {
+      ) : eventos.length > 0 ? (
+        eventos.map((evento) => {
           const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
           const imgIndex = imgIndices[evento._id] || 0;
           return (

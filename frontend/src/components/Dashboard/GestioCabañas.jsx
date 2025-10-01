@@ -22,6 +22,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   const [cabanaSeleccionada, setCabanaSeleccionada] = useState(null);
   const [eventoDetalle, setEventoDetalle] = useState(null);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
+  const [selectedImages, setSelectedImages] = useState([]);
   const [nuevaCabana, setNuevaCabana] = useState({
     nombre: "",
     descripcion: "",
@@ -72,11 +73,11 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       formData.append("estado", nuevaCabana.estado);
       formData.append("ubicacion", nuevaCabana.ubicacion);
 
-      if (Array.isArray(nuevaCabana.imagen)) {
-        nuevaCabana.imagen.forEach(imagen => {
-          formData.append("imagen", imagen);
-        });
-      }
+      // Agregar imágenes seleccionadas
+      selectedImages.forEach(imgObj => {
+        if (imgObj.file) formData.append('imagen', imgObj.file);
+      });
+
       await cabanaService.create(formData);
       mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente");
       setMostrarModal(false);
@@ -90,6 +91,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
         imagen: [],
         ubicacion: ""
       });
+      setSelectedImages([]);
       obtenerCabanas();
     } catch (error) {
       mostrarAlerta("Error", "Error al crear la cabaña: " + error.message, "error");
@@ -142,6 +144,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       imagen: [],
       ubicacion: ""
     });
+    setSelectedImages([]);
     setMostrarModal(true);
   };
 
@@ -157,7 +160,14 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     return texto.includes(busqueda.toLowerCase());
   });
 
-  const [modalImagen, setModalImagen] = useState({ abierto: false, imagenes: [], actual: 0 });
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 6;
+  const totalPaginas = Math.ceil(cabanasFiltradas.length / registrosPorPagina);
+  const cabanasPaginadas = cabanasFiltradas.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+
 
 
   return (
@@ -175,10 +185,10 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
           seccionActiva={seccionActiva}
         />
         <div className="seccion-usuarios">
-          <div className="p-9 flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-800">Gestión de Cabañas</h1>
-              <p className="text-slate-600">Administra las cabañas y alojamientos del seminario</p>
+          <div  className="page-header-Academicos">
+            <div className="page-title-admin">
+              <h1>Gestión de Cabañas</h1>
+              <p >Administra las cabañas y alojamientos del seminario</p>
             </div>
             <button
               onClick={abrirModalCrear}
@@ -273,7 +283,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
 
 
           <CabanaTabla
-            cabanas={cabanasFiltradas}
+            cabanas={cabanasPaginadas}
             onEditar={canEdit && !readOnly ? abrirModalEditar : null}
             onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarCabana : null}
             onVerDetalle={abrirModalVer}
@@ -291,7 +301,29 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
             onClose={() => setMostrarModal(false)}
             onSubmit={modoEdicion ? actualizarCabana : crearCabana}
             categorias={categorias}
+            selectedImages={selectedImages}
+            setSelectedImages={setSelectedImages}
           />
+
+          <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+              disabled={paginaActual === 1}
+            >
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <span className="pagination-info-admin">
+              Página {paginaActual} de {totalPaginas}
+            </span>
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+              disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            >
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>

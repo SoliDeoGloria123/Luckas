@@ -108,7 +108,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       console.log('Actualizando solicitud:', solicitudSeleccionada);
       const resultado = await solicitudService.update(solicitudSeleccionada._id, solicitudSeleccionada);
       console.log('Resultado actualización:', resultado);
-      
+
       if (resultado.success) {
         mostrarAlerta("¡Éxito!", "Solicitud actualizada exitosamente");
         setMostrarModal(false);
@@ -166,14 +166,28 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
     console.log('Solicitud recibida:', solicitud);
     console.log('canEdit:', canEdit);
     console.log('readOnly:', readOnly);
-    
+
     setModoEdicionSolicitud(true);
     setSolicitudSeleccionada({ ...solicitud });
     setMostrarModal(true);
-    
+
     console.log('Modal configurado - modoEdicion:', true);
     console.log('Modal configurado - mostrar:', true);
   };
+
+  // Paginación para solicitudes filtradas
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
+  const totalPaginas = Math.ceil(solicitudesFiltradas.length / registrosPorPagina);
+  const solicitudesPaginadas = solicitudesFiltradas.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+
+  // Resetear página al cambiar búsqueda
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [busquedaSolicitudes]);
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
@@ -266,11 +280,11 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
             </div>
           </section>
           <div className="p-6 glass-card rounded-2xl border border-white/20 shadow-lg overflow-hidden user-card">
-          <TablaUnificadaSolicitudes
-            datosUnificados={{ solicitudes: solicitudesFiltradas, inscripciones: [], reservas: [] }}
-            abrirModalEditarSolicitud={(canEdit && !readOnly) ? abrirModalEditarSolicitud : null}
-            eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
-          />
+            <TablaUnificadaSolicitudes
+             datosUnificados={{ solicitudes: solicitudesPaginadas, inscripciones: [], reservas: [] }}
+              abrirModalEditarSolicitud={(canEdit && !readOnly) ? abrirModalEditarSolicitud : null}
+              eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
+            />
           </div>
           <SolicitudModal
             mostrar={mostrarModal}
@@ -283,6 +297,26 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
             onSubmit={modoEdicionSolicitud ? actualizarSolicitud : crearSolicitud}
             categorias={categorias}
           />
+
+          <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+              disabled={paginaActual === 1}
+            >
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <span className="pagination-info-admin">
+              Página {paginaActual} de {totalPaginas}
+            </span>
+            <button
+              className="pagination-btn-admin"
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+             disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            >
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>

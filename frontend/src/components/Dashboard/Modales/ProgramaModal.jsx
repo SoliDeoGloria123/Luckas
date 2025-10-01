@@ -106,17 +106,17 @@ const ProgramaModal = ({
   if (!mostrar) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
         {/* Header */}
-         <div
+           <div
           className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
           style={{
             background: 'linear-gradient(90deg, var(--color-blue-principal), var(--color-blue-oscuro))',
             color: 'white'
           }}
         >
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2>
             {modoEdicion ? 'Editar Programa' : 'Crear Nuevo Programa'}
           </h2>
           <button
@@ -287,7 +287,6 @@ const ProgramaModal = ({
           </div>
 
           {/* Información del Profesor */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Profesor/Instructor *
@@ -304,22 +303,6 @@ const ProgramaModal = ({
               />
               {errors.profesor && <p className="text-red-500 text-xs mt-1">{errors.profesor}</p>}
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                URL de Imagen
-              </label>
-              <input
-                type="url"
-                name="imagen"
-                value={formData.imagen}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://ejemplo.com/imagen.jpg"
-              />
-            </div>
-          </div>
-
           {/* Biografía del Profesor */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -101,10 +101,10 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
     };
 
     // Crear usuario
-    const crearUsuario = async () => {
+    const crearUsuario = async (e) => {
+        if (e) e.preventDefault();
         try {
-             console.log("Datos enviados al backend:", nuevoUsuario); // <-- Agrega esto
-            if (window.event) window.event.preventDefault();
+            console.log("Datos enviados al backend:", nuevoUsuario); // <-- Agrega esto
             await userService.createUser(nuevoUsuario);
             mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
             setMostrarModal(false);
@@ -127,7 +127,8 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
     };
 
     // Actualizar usuario
-    const actualizarUsuario = async () => {
+    const actualizarUsuario = async (e) => {
+        if (e) e.preventDefault();
         try {
             await userService.updateUser(usuarioSeleccionado._id, {
                 nombre: usuarioSeleccionado.nombre,

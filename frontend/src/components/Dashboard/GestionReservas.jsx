@@ -158,6 +158,14 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
     return texto.includes(busqueda.toLowerCase());
   });
 
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
+  const totalPaginas = Math.ceil(reservasFiltradas.length / registrosPorPagina);
+  const reservasPaginadas = reservasFiltradas.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
       <Sidebar
@@ -251,7 +259,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
           </section>
           {error && <div className="error-message">{error}</div>}
           <TablaReservas
-            reservas={reservasFiltradas}
+            reservas={reservasPaginadas}
             onEditar={canEdit && !readOnly ? abrirModalEditar : null}
             onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarReserva : null}
           />
@@ -267,6 +275,26 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
             onClose={() => setMostrarModal(false)}
             onSubmit={modoEdicion ? actualizarReserva : crearReserva}
           />
+
+          <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+            <button
+              className="pagination-btn-admin"
+            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+            disabled={paginaActual === 1}
+            >
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <span className="pagination-info-admin">
+              Página {paginaActual} de {totalPaginas}
+            </span>
+            <button
+              className="pagination-btn-admin"
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+             disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            >
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>

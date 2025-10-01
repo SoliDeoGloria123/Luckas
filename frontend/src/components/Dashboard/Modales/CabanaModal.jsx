@@ -11,9 +11,10 @@ const CabanaModal = ({
   setNuevaCabana,
   onClose,
   onSubmit,
-  categorias
+  categorias,
+  selectedImages,
+  setSelectedImages
 }) => {
-    const [selectedImages, setSelectedImages] = useState([]);
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 

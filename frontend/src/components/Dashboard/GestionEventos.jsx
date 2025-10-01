@@ -3,6 +3,7 @@ import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaEventos from "./Tablas/EventoTabla";
 import EventoModal from "./Modales/EventoModal";
+// Estado para imágenes seleccionadas
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
@@ -23,6 +24,7 @@ const GestionEventos = () => {
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [eventoDetalle, setEventoDetalle] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
 
 
@@ -71,7 +73,20 @@ const GestionEventos = () => {
   // Crear evento
   const crearEvento = async () => {
     try {
-      await eventService.createEvent(nuevoEvento);
+      const formData = new window.FormData();
+      Object.entries(nuevoEvento).forEach(([key, value]) => {
+        // Si es etiquetas y es string, separa por coma
+        if (key === 'etiquetas' && typeof value === 'string') {
+          value.split(',').map(et => formData.append('etiquetas', et.trim()));
+        } else {
+          formData.append(key, value);
+        }
+      });
+      // Agregar imágenes
+      selectedImages.forEach(imgObj => {
+        if (imgObj.file) formData.append('imagen', imgObj.file);
+      });
+      await eventService.createEvent(formData, true); // true: indica FormData
       mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
       setMostrarModal(false);
       setNuevoEvento({
@@ -83,12 +98,13 @@ const GestionEventos = () => {
         horaFin: "",
         lugar: "",
         prioridad: "Media",
-        precio: Number(nuevoEvento.precio),
-        cuposTotales: Number(nuevoEvento.cuposTotales),
-        cuposDisponibles: Number(nuevoEvento.cuposDisponibles),
-        active: nuevoEvento.active === "true" || nuevoEvento.active === true,
+        precio: 0,
+        cuposTotales: 0,
+        cuposDisponibles: 0,
+        active: true,
         imagen: ""
       });
+      setSelectedImages([]);
       obtenerEventos();
     } catch (error) {
       mostrarAlerta("Error", `Error al crear el evento: ${error.message}`);
@@ -151,28 +167,30 @@ const GestionEventos = () => {
     setMostrarModal(true);
   };
 
-
-
-
-
-  // Abrir modal para editar
-  const abrirModalEditar = (evento) => {
-    setModoEdicion(true);
-    setEventoSeleccionado({ ...evento });
-    setMostrarModal(true);
-  };
-
+  // Filtrar eventos antes de la paginación
   const eventosFiltrados = eventos.filter(evento => {
     const cumpleBusqueda = evento.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
       evento.ubicacion?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
       evento.coordinador?.toLowerCase().includes(filtros.busqueda.toLowerCase());
     const cumpleTipo = filtros.tipo === 'todos' || evento.tipo === filtros.tipo;
     const cumpleEstado = filtros.estado === 'todos' || evento.estado === filtros.estado;
-
     return cumpleBusqueda && cumpleTipo && cumpleEstado;
   });
 
-
+  // Paginación para eventos
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 6;
+  const totalPaginas = Math.ceil(eventosFiltrados.length / registrosPorPagina);
+  const eventosPaginados = eventosFiltrados.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+  // Abrir modal para editar
+  const abrirModalEditar = (evento) => {
+    setModoEdicion(true);
+    setEventoSeleccionado({ ...evento });
+    setMostrarModal(true);
+  };
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
       <Sidebar
@@ -189,10 +207,10 @@ const GestionEventos = () => {
         />
         <div className="space-y-7 fade-in-up p-9">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-800">Gestión de Eventos</h1>
-              <p className="text-slate-600">Administra campamentos, retiros y actividades del seminario</p>
+          <div  className="page-header-Academicos">
+            <div className="page-title-admin">
+              <h1 >Gestión de Eventos</h1>
+              <p>Administra campamentos, retiros y actividades del seminario</p>
             </div>
             <button
               onClick={abrirModalCrear}
@@ -335,7 +353,7 @@ const GestionEventos = () => {
             </div>
           )}
           <TablaEventos
-            eventos={eventos}
+            eventos={eventosPaginados}
             cargando={cargando}
             onEditar={abrirModalEditar}
             onEliminar={eliminarEvento}
@@ -352,7 +370,28 @@ const GestionEventos = () => {
             categorias={categorias}
             onClose={() => setMostrarModal(false)}
             onSubmit={modoEdicion ? actualizarEvento : crearEvento}
+            selectedImages={selectedImages}
+            setSelectedImages={setSelectedImages}
           />
+          <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+              disabled={paginaActual === 1}
+            >
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <span className="pagination-info-admin">
+              Página {paginaActual} de {totalPaginas || 1}
+            </span>
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+              disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            >
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>

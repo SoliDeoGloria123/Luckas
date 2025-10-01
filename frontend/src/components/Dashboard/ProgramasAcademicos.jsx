@@ -320,53 +320,16 @@ const ProgramasAcademicos = () => {
         }
     };
 
-    const agregarRequisito = () => {
-        setFormData({
-            ...formData,
-            requisitos: [...formData.requisitos, '']
-        });
-    };
 
-    const removerRequisito = (index) => {
-        const nuevosRequisitos = formData.requisitos.filter((_, i) => i !== index);
-        setFormData({
-            ...formData,
-            requisitos: nuevosRequisitos.length > 0 ? nuevosRequisitos : ['']
-        });
-    };
+    // Paginación para programas académicos
+    const [paginaActual, setPaginaActual] = useState(1);
+    const registrosPorPagina = 8;
+    const totalPaginas = Math.ceil(programas.length / registrosPorPagina);
+    const programasPaginados = programas.slice(
+        (paginaActual - 1) * registrosPorPagina,
+        paginaActual * registrosPorPagina
+    );
 
-    const actualizarRequisito = (index, valor) => {
-        const nuevosRequisitos = [...formData.requisitos];
-        nuevosRequisitos[index] = valor;
-        setFormData({
-            ...formData,
-            requisitos: nuevosRequisitos
-        });
-    };
-
-    const agregarModuloPensum = () => {
-        setFormData({
-            ...formData,
-            pensum: [...formData.pensum, { modulo: '', descripcion: '', horas: '' }]
-        });
-    };
-
-    const removerModuloPensum = (index) => {
-        const nuevoPensum = formData.pensum.filter((_, i) => i !== index);
-        setFormData({
-            ...formData,
-            pensum: nuevoPensum.length > 0 ? nuevoPensum : [{ modulo: '', descripcion: '', horas: '' }]
-        });
-    };
-
-    const actualizarModuloPensum = (index, campo, valor) => {
-        const nuevoPensum = [...formData.pensum];
-        nuevoPensum[index][campo] = valor;
-        setFormData({
-            ...formData,
-            pensum: nuevoPensum
-        });
-    };
 
     const formatearPrecio = (precio) => {
         return new Intl.NumberFormat('es-CO', {
@@ -390,7 +353,6 @@ const ProgramasAcademicos = () => {
             </div>
         );
     }
-
     return (
         <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
             <Sidebar
@@ -407,10 +369,10 @@ const ProgramasAcademicos = () => {
                 />
                 <div className="space-y-7 fade-in-up p-9">
                     {/* Header */}
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-slate-800">Gestión de Programas Académicos</h1>
-                            <p className="text-slate-600">Administra cursos y programas técnicos del seminario</p>
+                    <div  className="page-header-Academicos">
+                        <div className="page-title-admin">
+                            <h1>Gestión de Programas Académicos</h1>
+                            <p>Administra cursos y programas técnicos del seminario</p>
                         </div>
                         <button
                             onClick={abrirModalCrear}
@@ -553,7 +515,7 @@ const ProgramasAcademicos = () => {
                     )}
                     {/* Tabla de programas */}
                     <ProgramasTabla
-                        programas={programas}
+                        programas={programasPaginados}
                         eliminarPrograma={eliminarPrograma}
                         formatearPrecio={formatearPrecio}
                         formatearFecha={formatearFecha}
@@ -562,6 +524,25 @@ const ProgramasAcademicos = () => {
                         abrirModalEditar={abrirModalEditar}
                         abrirModalVer={abrirModalVer}
                     />
+                    <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+                        <button
+                            className="pagination-btn-admin"
+                        onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+                    disabled={paginaActual === 1}
+                        >
+                            <i className="fas fa-chevron-left"></i>
+                        </button>
+                        <span className="pagination-info-admin">
+                            Página {paginaActual} de {totalPaginas || 1}
+                        </span>
+                        <button
+                            className="pagination-btn-admin"
+                        onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+                        disabled={paginaActual === totalPaginas || totalPaginas === 0}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
 
                 </div>
             </div>

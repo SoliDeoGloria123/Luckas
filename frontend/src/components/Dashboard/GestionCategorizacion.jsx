@@ -85,6 +85,15 @@ const GestionCategorizacion = () => {
         setMostrarModal(true);
     };
 
+    // Paginación para categorías
+    const [paginaActual, setPaginaActual] = useState(1);
+    const registrosPorPagina = 10;
+    const totalPaginas = Math.ceil(categorias.length / registrosPorPagina);
+    const categoriasPaginadas = categorias.slice(
+        (paginaActual - 1) * registrosPorPagina,
+        paginaActual * registrosPorPagina
+    );
+
     return (
         <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
             <Sidebar
@@ -175,7 +184,7 @@ const GestionCategorizacion = () => {
                         </div>
                     </section>
                     <TablaCategorias
-                        categorias={categorias}
+                        categorias={categoriasPaginadas}
                         onEditar={abrirModalEditar}
                         onEliminar={eliminarCategoria}
                     />
@@ -189,6 +198,26 @@ const GestionCategorizacion = () => {
                         onClose={() => setMostrarModal(false)}
                         onSubmit={modoEdicion ? actualizarCategoria : crearCategoria}
                     />
+
+                    <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+                        <button
+                            className="pagination-btn-admin"
+                            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+                            disabled={paginaActual === 1}
+                        >
+                            <i className="fas fa-chevron-left"></i>
+                        </button>
+                        <span className="pagination-info-admin">
+                            Página {paginaActual} de {totalPaginas || 1}
+                        </span>
+                        <button
+                            className="pagination-btn-admin"
+                            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+                            disabled={paginaActual === totalPaginas || totalPaginas === 0}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 

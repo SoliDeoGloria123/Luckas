@@ -7,6 +7,11 @@ const path = require('path');
 // CRUD básico
 exports.crearCabana = async (req, res) => {
   try {
+    console.log('[CABANAS] crearCabana - Iniciando creación');
+    console.log('[CABANAS] req.body:', req.body);
+    console.log('[CABANAS] req.files:', req.files ? req.files.length : 'No files');
+    console.log('[CABANAS] req.cloudinaryUrls:', req.cloudinaryUrls);
+    
     const { categoria } = req.body;
 
     // Validar que el ID de categoría sea válido

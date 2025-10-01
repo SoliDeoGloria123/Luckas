@@ -55,6 +55,11 @@ exports.getEventById = async (req, res) => {
 // Crear nuevo evento
 exports.createEvent = async (req, res) => {
   try {
+    console.log('[EVENTOS] createEvent - Iniciando creación de evento');
+    console.log('[EVENTOS] req.body:', req.body);
+    console.log('[EVENTOS] req.files:', req.files);
+    console.log('[EVENTOS] req.cloudinaryUrls:', req.cloudinaryUrls);
+    
     const {
       nombre,
       descripcion,
@@ -125,6 +130,8 @@ exports.createEvent = async (req, res) => {
     const savedEvent = await event.save();
     res.status(201).json({ success: true, data: savedEvent });
   } catch (error) {
+    console.error('[EVENTOS] Error completo al crear evento:', error);
+    console.error('[EVENTOS] Stack trace:', error.stack);
     res.status(500).json({ success: false, message: 'Error al crear evento', error: error.message });
   }
 };

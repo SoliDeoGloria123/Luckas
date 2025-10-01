@@ -38,7 +38,12 @@ const uploadToCloudinary = async (req, res, next) => {
 
 // Middleware para subir varias imágenes a Cloudinary
 const uploadMultipleToCloudinary = async (req, res, next) => {
-  if (!req.files || req.files.length === 0) return next();
+  console.log('[UPLOAD] uploadMultipleToCloudinary - Iniciando');
+  console.log('[UPLOAD] req.files:', req.files ? req.files.length : 'No files');
+  if (!req.files || req.files.length === 0) {
+    console.log('[UPLOAD] No hay archivos para subir, continuando...');
+    return next();
+  }
   try {
     const urls = [];
     // Carpeta dinámica según tipoImagen (ej: 'eventos', 'cabanas', 'usuarios')
@@ -65,8 +70,9 @@ const uploadMultipleToCloudinary = async (req, res, next) => {
     req.cloudinaryUrls = urls;
     next();
   } catch (error) {
-    console.error('Error en uploadMultipleToCloudinary:', error);
-    return res.status(500).json({ error: 'Error al subir imágenes a Cloudinary', details: error });
+    console.error('[UPLOAD] Error en uploadMultipleToCloudinary:', error);
+    console.error('[UPLOAD] Stack trace:', error.stack);
+    return res.status(500).json({ error: 'Error al subir imágenes a Cloudinary', details: error.message });
   }
 };
 

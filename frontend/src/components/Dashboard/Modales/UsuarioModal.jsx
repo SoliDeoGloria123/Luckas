@@ -27,7 +27,7 @@ const UsuarioModal = ({
             ✕
           </button>
         </div>
-        <form className="modal-body-admin" onSubmit={onSubmit}>
+  <form className="modal-body-admin" onSubmit={e => onSubmit(e)}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
               <label><i class="fas fa-user"></i>Nombre</label>
@@ -128,7 +128,13 @@ const UsuarioModal = ({
               <label><i class="fas fa-hashtag"></i> Fecha de Nacimiento</label>
               <input
                 type="date"
-                value={modoEdicion ? usuarioSeleccionado?.fechaNacimiento : nuevoUsuario.fechaNacimiento}
+                value={
+                  modoEdicion
+                    ? (usuarioSeleccionado?.fechaNacimiento
+                        ? new Date(usuarioSeleccionado.fechaNacimiento).toISOString().split('T')[0]
+                        : '')
+                    : nuevoUsuario.fechaNacimiento
+                }
                 onChange={e =>
                   modoEdicion
                     ? setUsuarioSeleccionado({ ...usuarioSeleccionado, fechaNacimiento: e.target.value })

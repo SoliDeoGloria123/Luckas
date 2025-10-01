@@ -143,8 +143,14 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
-        <div className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin">
-          <h3>Nueva Inscripción</h3>
+         <div
+          className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
+          style={{
+            background: 'linear-gradient(90deg, var(--color-blue-principal), var(--color-blue-oscuro))',
+            color: 'white'
+          }}
+        >
+          <h2>Nueva Inscripción</h2>
           <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
         <form className="modal-body-admin" onSubmit={handleSubmit}>

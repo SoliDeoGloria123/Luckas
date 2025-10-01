@@ -174,6 +174,15 @@ const GestionIscripcion = () => {
     setMostrarModal(true);
   };
 
+
+  // Paginación para programas académicos
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
+  const totalPaginas = Math.ceil(inscripcionesFiltradas.length / registrosPorPagina);
+  const inscripcionesPaginadas = inscripcionesFiltradas.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
       <Sidebar
@@ -269,7 +278,7 @@ const GestionIscripcion = () => {
           </section>
 
           <TablaInscripciones
-            inscripciones={inscripcionesFiltradas}
+            inscripciones={inscripcionesPaginadas}
             onEditar={abrirModalEditar}
             onEliminar={eliminarInscripcion}
           />
@@ -293,6 +302,27 @@ const GestionIscripcion = () => {
               onSubmit={crearInscripcion}
             />
           )}
+
+
+          <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+              disabled={paginaActual === 1}
+            >
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <span className="pagination-info-admin">
+              Página {paginaActual} de {totalPaginas}
+            </span>
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+              disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            >
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
