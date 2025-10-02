@@ -120,15 +120,43 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
           <div
             ref={gestionesDropdownRef}
             className={`dropdown-menu-seminario${showGestionesDropdown ? ' show' : ''}`}
-
           >
-
+             <div className="dropdown-container-seminario">
+              <a href="/dashboard/seminarista/mis-inscripciones" className="dropdown-item-seminario"> <span className="dropdown-icon">📋</span>Mis Inscripciones</a>
+              <a href="/dashboard/seminarista/mis-reservas" className="dropdown-item-seminario">  <span className="dropdown-icon">🏠</span>Mis Reservas</a>
+              <a href="/dashboard/seminarista/mis-solicitudes" className="dropdown-item-seminario"> <span className="dropdown-icon">📄</span>Mis Solicitudes</a>
+              <a href="/dashboard/seminarista/nueva-solicitud" className="dropdown-item-seminario"><span className="dropdown-icon">📄</span>Nueva Solicitud</a>
+            </div>
           </div>
         </nav>
 
         <div className="header-right-seminario">
-    
-
+          <div className="header-icons-seminario">
+            <button className="icon-btn-seminario">
+              <span className="notification-icon-seminario">🔔</span>
+              <span className="notification-badge-seminario">3</span>
+            </button>
+          </div>
+          <div className="user-profile-seminario" onClick={toggleDropdown}>
+            <span className="user-avatar-seminario">S</span>
+            <div className="user-info-seminario">
+              <span className="user-name-seminario">{usuarioLogueado && usuarioLogueado.nombre ? usuarioLogueado.nombre : 'Usuario'}</span>
+              <span className="user-role-seminario">{usuarioLogueado?.role || "Rol"}</span>
+            </div>
+            <div className={`user-dropdown-header ${showUserDropdown ? "show" : ""}`}>
+              <a href="/dashboard/seminarista/Mi-Perfil" className="dropdown-item">
+                <span>Mi Perfil</span>
+              </a>
+              <a href="/dashboard/seminarista/Configuracion" className="dropdown-item">
+                <span>Configuración</span>
+              </a>
+              <hr className="dropdown-divider" />
+              <a href="" className="dropdown-item" onClick={handleLogout}>
+                <span>Cerrar Sesión</span>
+              </a>
+            </div>
+            <span className="dropdown-arrow">▼</span>
+          </div>
         </div>
       </div>
     </header>

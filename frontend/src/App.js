@@ -12,6 +12,7 @@ import GestionAprogramas from "./components/Dashboard/ProgramasAcademicos";
 import GestionAeventos from "./components/Dashboard/GestionEventos";
 import GestionAsolicitud from "./components/Dashboard/GestionSolicitud";
 import GestionAinscripcion from "./components/Dashboard/GestionIscripcion";
+import GestionCertificacion from "./components/Dashboard/GestionCertificacion";
 import GestionAtareas from "./components/Dashboard/GestionTarea";
 import GestionAcabanas from "./components/Dashboard/GestioCabañas";
 import GestionAreservas from "./components/Dashboard/GestionReservas";
@@ -53,38 +54,39 @@ function App() {
         <Route path="/" element={<Index to="/index" replace />} />
         <Route path="/external" element={<ExternalDashboard />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup/registro" element={<Registro />}/>
-        <Route path="/Olvidar-Contraseña" element={<OlvidoPassw />}/>
+        <Route path="/signup/registro" element={<Registro />} />
+        <Route path="/Olvidar-Contraseña" element={<OlvidoPassw />} />
         {/* Rutas para Admin */}
-        <Route path="/admin/Dashboard" element={<DashboardAdmin />}/>
-        <Route path="/admin/usuarios" element={<Dashboarduser />}/>
-        <Route path="/admin/categorizacion" element={<GestionAcategorizacion />}/>
-        <Route path="/admin/programas-academicos" element={<GestionAprogramas />}/>
-        <Route path="/admin/eventos" element={<GestionAeventos />}/>
-        <Route path="/admin/solicitudes" element={<GestionAsolicitud />}/>
-        <Route path="/admin/inscripciones" element={<GestionAinscripcion />}/>
-        <Route path="/admin/tareas" element={<GestionAtareas />}/>
-        <Route path="/admin/cabanas" element={<GestionAcabanas />}/>
-        <Route path="/admin/reservas" element={<GestionAreservas />}/>
-        <Route path="/admin/reportes" element={<GestionAreportes />}/>
-        <Route path="/admin/perfil" element={<MiPerfil/>} />
+        <Route path="/admin/Dashboard" element={<DashboardAdmin />} />
+        <Route path="/admin/usuarios" element={<Dashboarduser />} />
+        <Route path="/admin/categorizacion" element={<GestionAcategorizacion />} />
+        <Route path="/admin/programas-academicos" element={<GestionAprogramas />} />
+        <Route path="/admin/eventos" element={<GestionAeventos />} />
+        <Route path="/admin/solicitudes" element={<GestionAsolicitud />} />
+        <Route path="/admin/inscripciones" element={<GestionAinscripcion />} />
+        <Route path="/admin/certificaciones" element={<GestionCertificacion />} />
+        <Route path="/admin/tareas" element={<GestionAtareas />} />
+        <Route path="/admin/cabanas" element={<GestionAcabanas />} />
+        <Route path="/admin/reservas" element={<GestionAreservas />} />
+        <Route path="/admin/reportes" element={<GestionAreportes />} />
+        <Route path="/admin/perfil" element={<MiPerfil />} />
         {/* Rutas para Tesorero */}
-        <Route path="/tesorero" element={<DashboardTesorero />}/>
-        <Route path="/tesorero/usuarios" element={<GestionTusuarios />}/>
-        <Route path="/tesorero/categorias" element={<GestionTcategorias />}/>
-        <Route path="/tesorero/solicitudes" element={<GestionTsolicitudes />}/>
-        <Route path="/tesorero/eventos" element={<GestionTeventos/>}/>
-        <Route path="/tesorero/programas" element={<GestionTprogramas/>}/>
-        <Route path="/tesorero/cabañas" element={<GestionTcabanas/>}/>
-        <Route path="/tesorero/reservas" element={<GestionTreservas/>}/>
-        <Route path="/tesorero/tarea" element={<GestionTtarea/>}/>
-        <Route path="/tesorero/inscripcion" element={<GestionTinscripcion/>}/>
-        <Route path="/tesorero/reportes" element={<GestionTreportes/>}/>
-        <Route path="/tesorero/perfil" element={<GestionTperfil/>}/>
-        <Route path='/tesorero-Gestiones' element={<GestionTesorero/>}/>
-  {/* Rutas para Seminarista */}
-  <Route path="/seminarista" element={<DashboardSeminarista />} />
-  <Route path="/seminarista/tareas" element={<GestionTareasSeminarista />} />
+        <Route path="/tesorero" element={<DashboardTesorero />} />
+        <Route path="/tesorero/usuarios" element={<GestionTusuarios />} />
+        <Route path="/tesorero/categorias" element={<GestionTcategorias />} />
+        <Route path="/tesorero/solicitudes" element={<GestionTsolicitudes />} />
+        <Route path="/tesorero/eventos" element={<GestionTeventos />} />
+        <Route path="/tesorero/programas" element={<GestionTprogramas />} />
+        <Route path="/tesorero/cabañas" element={<GestionTcabanas />} />
+        <Route path="/tesorero/reservas" element={<GestionTreservas />} />
+        <Route path="/tesorero/tarea" element={<GestionTtarea />} />
+        <Route path="/tesorero/inscripcion" element={<GestionTinscripcion />} />
+        <Route path="/tesorero/reportes" element={<GestionTreportes />} />
+        <Route path="/tesorero/perfil" element={<GestionTperfil />} />
+        <Route path='/tesorero-Gestiones' element={<GestionTesorero />} />
+        {/* Rutas para Seminarista */}
+        <Route path="/seminarista" element={<DashboardSeminarista />} />
+        <Route path="/seminarista/tareas" element={<GestionTareasSeminarista />} />
         <Route path="/dashboard/seminarista/eventos" element={<EventosNavegables />} />
         <Route path="/dashboard/seminarista/cabanas" element={<CabanasNavegables />} />
         <Route path="/dashboard/seminarista/cursos" element={<CursosNavegables />} />

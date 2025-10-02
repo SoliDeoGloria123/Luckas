@@ -42,6 +42,7 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
             items: [
                 { id: "solicitudes", icon: Mail, label: "Solicitudes", color: "text-rose-500" },
                 { id: "inscripciones", icon: UserPlus, label: "Inscripciones", color: "text-cyan-500" },
+                { id: "certificaciones", icon: GraduationCap, label: "Certificaciones", color: "text-yellow-500" },
                 { id: "tareas", icon: CheckSquare, label: "Tareas", color: "text-green-500" },
             ]
         },
@@ -93,7 +94,7 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
                                                 <button
                                                     onClick={() => {
                                                         setSeccionActiva(item.id);
-                                                        if (["dashboard", "usuarios", "categorizacion", "programas-academicos", "solicitudes", "inscripciones", "tareas", "cabanas", "reservas", "reportes", "eventos"].includes(item.id)) {
+                                                        if (["dashboard", "usuarios", "categorizacion", "programas-academicos", "solicitudes", "inscripciones", "certificaciones", "tareas", "cabanas", "reservas", "reportes", "eventos"].includes(item.id)) {
                                                             navigate(`/admin/${item.id}`);
                                                         }
                                                     }}

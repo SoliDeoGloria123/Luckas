@@ -5,6 +5,8 @@ import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
 
+import { Search, Download, Share2, Edit, ChevronLeft, ChevronRight } from "lucide-react"
+
 
 
 const Gestionusuarios = () => {
@@ -147,131 +149,191 @@ const Gestionusuarios = () => {
             </div>
           </div>
         </div>
+        <div className="space-y-4">
+          <div className="filters-section-tesorero">
+            <div className="search-filters-tesorero">
+              <div className="search-input-container-tesorero">
+                <i className="fas fa-search"></i>
+                <input
+                  type="text"
+                  placeholder="Buscar por cédula, nombre, apellido o correo..."
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+              </div>
+              <select className="filter-select">
+                <option value="">Todos los roles</option>
+                <option value="administrador">Administrador</option>
+                <option value="tesorero">Tesorero</option>
+                <option value="seminarista">Seminarista</option>
+              </select>
+              <select id="statusFilter" className="filter-select">
+                <option value="">Todos los estados</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
+            <div className="export-actions">
+              <button className="btn-outline-tesorero" >
+                <i className="fas fa-download"></i>
+              </button>
+              <button className="btn-outline-tesorero" >
+                <i class="fas fa-share"></i>
+              </button>
+            </div>
+          </div>
 
-        <div className="filters-section-tesorero">
-          <div className="search-filters-tesorero">
-            <div className="search-input-container-tesorero">
-              <i className="fas fa-search"></i>
+
+          {/* Filters and search */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative flex-1 max-w-md">
+              {/* <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#334155]/40" /> */}
               <input
                 type="text"
-                placeholder="Buscar por cédula, nombre, apellido o correo..."
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Buscar por ID, nombre, correo..."
+
+
+                className="h-10 w-full rounded-lg border border-[#334155]/10 bg-white pl-10 pr-4 text-sm text-[#334155] placeholder:text-[#334155]/40 focus:border-[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20"
               />
             </div>
-            <select className="filter-select">
-              <option value="">Todos los roles</option>
-              <option value="administrador">Administrador</option>
-              <option value="tesorero">Tesorero</option>
-              <option value="seminarista">Seminarista</option>
-            </select>
-            <select id="statusFilter" className="filter-select">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-          </div>
-          <div className="export-actions">
-            <button className="btn-outline-tesorero" >
-              <i className="fas fa-download"></i>
-            </button>
-            <button className="btn-outline-tesorero" >
-              <i class="fas fa-share"></i>
-            </button>
-          </div>
-        </div>
 
-        <div className="table-container-tesorero">
-          {searchTerm && (
-            <div className="search-results-info" style={{
-              padding: '10px 15px',
-              backgroundColor: '#f8f9fa',
-              borderRadius: '6px',
-              marginBottom: '15px',
-              fontSize: '14px',
-              color: '#666'
-            }}>
-              {usuariosFiltrados.length === 0
-                ? `No se encontraron usuarios que coincidan con "${searchTerm}"`
-                : `Se encontraron ${usuariosFiltrados.length} usuario${usuariosFiltrados.length === 1 ? '' : 's'} que coinciden con "${searchTerm}"`
-              }
+            <div className="flex items-center gap-2">
+
             </div>
-          )}
-          <table className="users-table-tesorero">
-            <thead>
-              <tr>
-                <th>
-                  <input type="checkbox" id="selectAll"></input>
-                </th>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Tipo de Documento</th>
-                <th>Número de Documento</th>
-                <th>Fecha de Nacimiento</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="usersTableBody">
-              {usuariosFiltrados.length === 0 ? (
-                <tr>
-                  <td colSpan={11}>
-                    {searchTerm ? 'No se encontraron usuarios con ese número de cédula' : 'No hay usuarios para mostrar'}
-                  </td>
-                </tr>
-              ) : (
-                usuariosFiltrados.map((user) => (
-                  <tr hey={user._id}>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>{user._id}</td>
-                    <td>{user.nombre}</td>
-                    <td>{user.apellido}</td>
-                    <td>{user.tipoDocumento}</td>
-                    <td>{user.numeroDocumento}</td>
-                    <td>{user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : "N/A"}</td>
-                    <td>{user.correo}</td>
-                    <td>{user.telefono}</td>
-                    <td>
-                      <span
-                        className={`role-badge ${user.role === "admin"
-                          ? "role-administrador"
-                          : user.role === "tesorero"
-                            ? "role-tesorero"
-                            : "role-seminarista"
-                          }`}
-                      >
-                        {user.role}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`badge-tesorero badge-tesorero-${user.estado}`}>
-                        {user.estado}
-                      </span>
-                    </td>
-                    <td className='actions-cell'>
-                      <button className='action-btn edit'
-                        onClick={() => {
-                          setModalMode('edit');
-                          setCurrentItem(user);
-                          setShowModalUsuario(true);
-                        }}>
-                        <i class="fas fa-edit"></i>
-                      </button>
-                    </td>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-hidden rounded-xl border border-[#334155]/10 bg-white shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      ID
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Nombre
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Apellido
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Tipo de Documento
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Número de Documento
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Fecha de Nacimiento
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Correo
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Teléfono
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Rol
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Estado
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                      Acciones
+                    </th>
                   </tr>
+                </thead>
+                <tbody className="divide-y divide-[#334155]/10">
+                  {usuariosFiltrados.length === 0 ? (
+                    <tr>
+                      <td colSpan={11}>
+                        {searchTerm ? 'No se encontraron usuarios con ese número de cédula' : 'No hay usuarios para mostrar'}
+                      </td>
+                    </tr>
+                  ) : (
+                    usuariosFiltrados.map((user) => (
+                      <tr key={user.id} className="transition-colors hover:bg-[#f1f5f9]/50">
+                        <td className="whitespace-nowrap px-6 py-4 text-base font-medium text-[#334155]">{user._id}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.nombre}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.apellido}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.tipoDocumento}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.numeroDocumento}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]/60">{user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : "N/A"}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#2563eb]">{user.correo}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.telefono}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.role}</td>
+                        <td className="whitespace-nowrap px-6 py-4">
+                          <span
+                            className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold`}
+                          >
+                            {user.estado}
+                          </span>
+                        </td>
+                        <td className="whitespace-nowrap px-6 py-4">
+                          <button
+                            onClick={() => {
+                              setModalMode('edit');
+                              setCurrentItem(user);
+                              setShowModalUsuario(true);
+                            }}
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]"
+                          >
+                            <Edit className="h-4 w-4" />
+                            <span className="sr-only">Editar registro</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-                ))
-              )}
+            {/* Pagination */}
+            <div className="flex items-center justify-between border-t border-[#334155]/10 bg-[#f1f5f9] px-6 py-4">
+              <div className="text-sm text-[#334155]/60">
 
-            </tbody>
-          </table>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  variant="outline"
+                  size="sm"
+
+
+                  className="border-[#334155]/10 text-[#334155] hover:bg-white hover:text-[#2563eb] disabled:opacity-50"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Anterior
+                </button>
+                <div className="flex items-center gap-1">
+                </div>
+                <button
+                  variant="outline"
+                  size="sm"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Anterior
+                </button>
+                <div className="flex items-center gap-1">
+
+                </div>
+                <button
+                  variant="outline"
+                  size="sm"
+
+
+                  className="border-[#334155]/10 text-[#334155] hover:bg-white hover:text-[#2563eb] disabled:opacity-50"
+                >
+                  Siguiente
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+
 
         {showModal && (
           <UsuarioModal
@@ -281,7 +343,7 @@ const Gestionusuarios = () => {
             onSubmit={handleSubmit}
           />
         )}
-      </main>
+      </main >
       <Footer />
     </>
 

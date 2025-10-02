@@ -1,19 +1,63 @@
 import React, { useState } from 'react';
 
 
+
+function toInputDateFormat(fecha) {
+  if (!fecha) return '';
+  
+  // Si es un objeto Date, convertirlo a string ISO
+  if (fecha instanceof Date) {
+    return fecha.toISOString().split('T')[0];
+  }
+  
+  // Si es un string de fecha ISO, extraer solo la parte de fecha
+  if (typeof fecha === 'string' && fecha.includes('T')) {
+    return fecha.split('T')[0];
+  }
+  
+  // Si ya está en formato YYYY-MM-DD, retorna igual
+  if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
+  
+  // Si viene en formato DD/MM/YYYY, lo convierte
+  if (typeof fecha === 'string' && fecha.includes('/')) {
+    const partes = fecha.split('/');
+    if (partes.length === 3) {
+      return `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
+    }
+  }
+  
+  return '';
+}
+
 const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
-    nombre: initialData.nombre || '',
-    apellido: initialData.apellido || '',
-    correo: initialData.correo || '',
-    telefono: initialData.telefono || '',
-    tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
-    numeroDocumento: initialData.numeroDocumento || '',
-    fechaNacimiento: initialData.fechaNacimiento || '',
-    role: initialData.role || '',
-    estado: initialData.estado || 'Activo',
-    password: initialData.password || ''
+    nombre: '',
+    apellido: '',
+    correo: '',
+    telefono: '',
+    tipoDocumento: 'Cédula de ciudadanía',
+    numeroDocumento: '',
+    fechaNacimiento: '',
+    role: '',
+    estado: 'Activo',
+    password: ''
   });
+
+  // useEffect para actualizar formData cuando cambien los initialData
+  React.useEffect(() => {
+    setFormData({
+      nombre: initialData.nombre || '',
+      apellido: initialData.apellido || '',
+      correo: initialData.correo || '',
+      telefono: initialData.telefono || '',
+      tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
+      numeroDocumento: initialData.numeroDocumento || '',
+      fechaNacimiento: toInputDateFormat(initialData.fechaNacimiento) || '',
+      role: initialData.role || '',
+      estado: initialData.estado || 'Activo',
+      password: initialData.password || ''
+    });
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,6 +78,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
     onSubmit(dataToSend);
     onClose();
   };
+
 
   return (
     <div className="modal-overlay-tesorero">
@@ -70,7 +115,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                 />
               </div>
 
-              
+
               <div className="form-group-tesorero">
                 <label>Teléfono</label>
                 <input
@@ -137,7 +182,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                     type="password"
                     name="password"
                     value={formData.password}
-                   onChange={e => setFormData(prev => ({ ...prev, password: e.target.value.trim() }))}
+                    onChange={e => setFormData(prev => ({ ...prev, password: e.target.value.trim() }))}
                     placeholder="Contraseña"
                     required
                   />

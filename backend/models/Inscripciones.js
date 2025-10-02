@@ -61,8 +61,8 @@ const inscripcionSchema = new mongoose.Schema({
     },
     estado: {
         type: String,
-        enum: ['pendiente', 'aprobada', 'rechazada', 'cancelada'],
-        default: 'pendiente',
+      enum: ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'],
+        default: 'preinscrito',
     },
     observaciones: {
         type: String,

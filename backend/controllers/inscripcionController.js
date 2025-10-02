@@ -119,7 +119,7 @@ exports.crearInscripcion = async (req, res) => {
       tipoReferencia: req.body.tipoReferencia,
       referencia: req.body.referencia,
       categoria: req.body.categoria,
-      estado: req.body.estado || 'pendiente',
+      estado: req.body.estado || 'preinscrito',
       observaciones: req.body.observaciones
     };
 

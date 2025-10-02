@@ -22,6 +22,7 @@ const ReportesRoutes = require('./routes/reportesRoutes');
 const programasAcademicosRoutes = require('./routes/programaAcademicoRoutes');
 const reporteguardarRoutes = require('./routes/reporteRoutes');
 const comentarioEventoRoutes = require('./routes/comentarioEventoRoutes');
+const certificadoRoutes = require('./routes/certificadoRoutes');
 
 // Inicializar Express
 const app = express();
@@ -57,6 +58,7 @@ app.use('/api/reportes', ReportesRoutes);
 app.use('/api/programas-academicos', programasAcademicosRoutes);
 app.use('/api/reporte', reporteguardarRoutes);
 app.use('/api/comentarios-evento', comentarioEventoRoutes);
+app.use('/api/certificados', certificadoRoutes);
 
 // Ruta para el login/admin - redirigir al frontend React
 app.get('/admin', (req, res) => {

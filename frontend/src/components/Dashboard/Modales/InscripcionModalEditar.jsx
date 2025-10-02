@@ -154,10 +154,15 @@ const InscripcionModalEditar = ({ mostrar, inscripcion, setInscripcion, onClose,
               <label>Estado:</label>
               <select name="estado" value={inscripcion.estado || ""} onChange={handleChange} required>
                 <option value="">Seleccione estado</option>
-                <option value="pendiente">Pendiente</option>
-                <option value="aprobada">Aprobada</option>
+                <option value="preinscrito">Preinscrito</option>
+                <option value="matriculado">Matriculado</option>
+                <option value="en_curso">En Curso</option>
+                <option value="finalizado">Finalizado</option>
+                <option value="certificado">Certificado</option>
                 <option value="rechazada">Rechazada</option>
-                <option value="cancelada">Cancelada</option>
+                <option value="cancelada academico">Cancelada Académico</option>
+
+
               </select>
             </div>
             <div className="form-grupo-admin">

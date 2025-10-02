@@ -4,8 +4,9 @@ import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import { programasAcademicosService } from "../../services/programasAcademicosService";
 import TablaInscripciones from "./Tablas/InscripcionTabla";
-import InscripcionModalCrear from "./Modales/InscripcionModalCrear";
-import InscripcionModalEditar from "./Modales/InscripcionModalEditar";
+//import InscripcionModalCrear from "./Modales/InscripcionModalCrear";
+//import InscripcionModalEditar from "./Modales/InscripcionModalEditar";
+import InscripcionModal from "./Modales/InscripcionModa";
 import useBusqueda from "./Busqueda/useBusqueda";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
@@ -109,38 +110,41 @@ const GestionIscripcion = () => {
       setMostrarModal(false);
       obtenerInscripciones();
     } catch (error) {
-      mostrarAlerta("Error", `Error al crear la inscripción: ${error.message}`);
+      // Mostrar el error exacto del backend
+      console.error("Error al crear inscripción:", error.response?.data || error.message);
+      mostrarAlerta("Error", `Error al crear la inscripción: ${error.response?.data?.message || error.message}`);
     }
   };
 
   // Actualizar inscripción
-  const actualizarInscripcion = async () => {
+  const actualizarInscripcion = async (form) => {
     try {
-      const insc = { ...inscripcionSeleccionada };
-      const usuarioId = typeof insc.usuario === 'object' && insc.usuario._id ? insc.usuario._id : insc.usuario;
+      const usuarioId = typeof form.usuario === 'object' && form.usuario._id ? form.usuario._id : form.usuario;
       const payload = {
         usuario: usuarioId,
-        tipoReferencia: insc.tipoReferencia,
-        referencia: insc.referencia,
-        categoria: insc.categoria,
-        estado: insc.estado,
-        observaciones: insc.observaciones,
-        nombre: insc.nombre,
-        tipoDocumento: insc.tipoDocumento,
-        numeroDocumento: insc.numeroDocumento,
-        telefono: insc.telefono,
-        edad: Number(insc.edad),
-        correo: insc.correo,
-        apellido: insc.apellido,
+        tipoReferencia: form.tipoReferencia,
+        referencia: form.referencia,
+        categoria: form.categoria,
+        estado: form.estado,
+        observaciones: form.observaciones,
+        nombre: form.nombre,
+        tipoDocumento: form.tipoDocumento,
+        numeroDocumento: form.numeroDocumento,
+        telefono: form.telefono,
+        edad: Number(form.edad),
+        correo: form.correo,
+        apellido: form.apellido,
       };
-      await inscripcionService.update(insc._id, payload);
+      await inscripcionService.update(inscripcionSeleccionada._id, payload);
       mostrarAlerta("¡Éxito!", "Inscripción actualizada exitosamente");
       setMostrarModal(false);
       setInscripcionSeleccionada(null);
       setModoEdicion(false);
       obtenerInscripciones();
     } catch (error) {
-      mostrarAlerta("Error", `Error al actualizar la inscripción: ${error.message}`);
+      // Mostrar el error exacto del backend
+      console.error("Error al actualizar inscripción:", error.response?.data || error.message);
+      mostrarAlerta("Error", `Error al actualizar la inscripción: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -282,26 +286,16 @@ const GestionIscripcion = () => {
             onEditar={abrirModalEditar}
             onEliminar={eliminarInscripcion}
           />
-          {modoEdicion ? (
-            <InscripcionModalEditar
-              mostrar={mostrarModal}
-              inscripcion={inscripcionSeleccionada}
-              setInscripcion={setInscripcionSeleccionada}
-              eventos={eventos}
-              categorias={categorias}
-              onClose={() => setMostrarModal(false)}
-              onSubmit={actualizarInscripcion}
-            />
-          ) : (
-            <InscripcionModalCrear
-              mostrar={mostrarModal}
-              eventos={eventos}
-              categorias={categorias}
-              programas={programas}
-              onClose={() => setMostrarModal(false)}
-              onSubmit={crearInscripcion}
-            />
-          )}
+          <InscripcionModal
+            mostrar={mostrarModal}
+            modo={modoEdicion ? "editar" : "crear"}
+            inscripcion={modoEdicion ? inscripcionSeleccionada : null}
+            eventos={eventos}
+            categorias={categorias}
+            programas={programas}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarInscripcion : crearInscripcion}
+          />
 
 
           <div className="pagination-admin flex items-center justify-center gap-4 mt-6">

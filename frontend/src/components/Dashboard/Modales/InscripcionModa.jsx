@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { userService } from "../../../services/ObteneruserService";
 
 const defaultForm = {
@@ -17,11 +17,47 @@ const defaultForm = {
   observaciones: ""
 };
 
-const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas, categorias }) => {
+const InscripcionModal = ({
+  mostrar,
+  onClose,
+  onSubmit,
+  eventos,
+  programas,
+  categorias,
+  modo = "crear", // "crear" o "editar"
+  inscripcion // objeto de inscripción para editar
+}) => {
   const [form, setForm] = useState(defaultForm);
   const [cedulaBusqueda, setCedulaBusqueda] = useState("");
   const [cargandoUsuario, setCargandoUsuario] = useState(false);
   const [usuarioEncontrado, setUsuarioEncontrado] = useState(null);
+
+  // Inicializar formulario en modo editar
+  useEffect(() => {
+    if (modo === "editar" && inscripcion) {
+      setForm({
+        usuario: inscripcion.usuario?._id || inscripcion.usuario || "",
+        nombre: inscripcion.nombre || "",
+        apellido: inscripcion.apellido || "",
+        tipoDocumento: inscripcion.tipoDocumento || "",
+        numeroDocumento: inscripcion.numeroDocumento || "",
+        correo: inscripcion.correo || "",
+        telefono: inscripcion.telefono || "",
+        edad: inscripcion.edad ? String(inscripcion.edad) : "",
+        tipoReferencia: inscripcion.tipoReferencia || "",
+        referencia: inscripcion.referencia?._id || inscripcion.referencia || "",
+        categoria: inscripcion.categoria?._id || inscripcion.categoria || "",
+        estado: inscripcion.estado || "preinscrito",
+        observaciones: inscripcion.observaciones || ""
+      });
+      setCedulaBusqueda(inscripcion.numeroDocumento || "");
+      setUsuarioEncontrado({}); // Para evitar mostrar alerta de usuario no encontrado
+    } else if (modo === "crear") {
+      setForm(defaultForm);
+      setCedulaBusqueda("");
+      setUsuarioEncontrado(null);
+    }
+  }, [modo, inscripcion]);
 
   // Buscar usuario por cédula
   const buscarUsuarioPorCedula = async (cedula) => {
@@ -58,6 +94,7 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
   };
 
   const handlePasteCedula = (e) => {
+    if (modo === "editar") return;
     setTimeout(() => {
       const valorPegado = e.target.value;
       setCedulaBusqueda(valorPegado);
@@ -66,6 +103,7 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
   };
 
   const handleChangeCedula = (e) => {
+    if (modo === "editar") return;
     const valor = e.target.value;
     setCedulaBusqueda(valor);
     if (valor.length >= 6) {
@@ -77,7 +115,12 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
 
   const handleChange = e => {
     const { name, value } = e.target;
-    // Si cambia el evento, y el tipoReferencia es Eventos, busca la categoría del evento seleccionado
+    // En modo editar, no permitir modificar campos personales
+    if (modo === "editar" && [
+      "usuario", "nombre", "apellido", "tipoDocumento", "numeroDocumento", "correo", "telefono", "edad", "categoria"
+    ].includes(name)) {
+      return;
+    }
     if (name === "referencia") {
       if (form.tipoReferencia === "Eventos") {
         const eventoSel = eventos.find(ev => String(ev._id) === String(value));
@@ -106,7 +149,6 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
 
   const handleSubmit = e => {
     e.preventDefault();
-    // Limpiar datos antes de enviar
     const payload = {
       usuario: form.usuario,
       nombre: form.nombre,
@@ -122,21 +164,19 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
       estado: form.estado || 'pendiente',
       observaciones: form.observaciones || ''
     };
-
-    // Remover campos vacíos o undefined
     Object.keys(payload).forEach(key => {
       if (payload[key] === '' || payload[key] === undefined || payload[key] === null) {
-        if (key !== 'observaciones') { // observaciones puede estar vacío
+        if (key !== 'observaciones') {
           delete payload[key];
         }
       }
     });
-
-    console.log('Enviando payload limpio:', payload);
     onSubmit(payload);
-    setForm(defaultForm);
-    setCedulaBusqueda("");
-    setUsuarioEncontrado(null);
+    if (modo === "crear") {
+      setForm(defaultForm);
+      setCedulaBusqueda("");
+      setUsuarioEncontrado(null);
+    }
   };
 
   if (!mostrar) return null;
@@ -150,7 +190,7 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
             color: 'white'
           }}
         >
-          <h2>Nueva Inscripción</h2>
+          <h2>{modo === "crear" ? "Nueva Inscripción" : "Editar Inscripción"}</h2>
           <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
         <form className="modal-body-admin" onSubmit={handleSubmit}>
@@ -164,16 +204,17 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
                 onPaste={handlePasteCedula}
                 placeholder="Ingrese o pegue la cédula"
                 style={{ paddingRight: cargandoUsuario ? '40px' : '10px' }}
+                disabled={true}
               />
-              {cargandoUsuario && (
+              {modo === "crear" && cargandoUsuario && (
                 <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: '#666' }}>🔄</div>
               )}
-              {usuarioEncontrado && (
+              {modo === "crear" && usuarioEncontrado && (
                 <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#d4edda', border: '1px solid #c3e6cb', borderRadius: '4px', fontSize: '14px', color: '#155724' }}>
                   ✅ Usuario encontrado: {usuarioEncontrado.nombre} {usuarioEncontrado.apellido} - {usuarioEncontrado.correo}
                 </div>
               )}
-              {cedulaBusqueda && !usuarioEncontrado && !cargandoUsuario && (
+              {modo === "crear" && cedulaBusqueda && !usuarioEncontrado && !cargandoUsuario && (
                 <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
                   ❌ Usuario no encontrado con esta cédula
                 </div>
@@ -181,31 +222,31 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
             </div>
             <div className="form-grupo-admin">
               <label>Nombre:</label>
-              <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" />
+              <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" disabled={true} />
             </div>
             <div className="form-grupo-admin">
               <label>Apellido:</label>
-              <input name="apellido" value={form.apellido} onChange={handleChange} placeholder="Apellido" />
+              <input name="apellido" value={form.apellido} onChange={handleChange} placeholder="Apellido" disabled={true} />
             </div>
             <div className="form-grupo-admin">
               <label>Tipo de Documento:</label>
-              <input name="tipoDocumento" value={form.tipoDocumento} onChange={handleChange} placeholder="Tipo de Documento" />
+              <input name="tipoDocumento" value={form.tipoDocumento} onChange={handleChange} placeholder="Tipo de Documento" disabled={true} />
             </div>
             <div className="form-grupo-admin">
               <label>Número de Documento:</label>
-              <input name="numeroDocumento" value={form.numeroDocumento} onChange={handleChange} placeholder="Número de Documento" />
+              <input name="numeroDocumento" value={form.numeroDocumento} onChange={handleChange} placeholder="Número de Documento" disabled={true} />
             </div>
             <div className="form-grupo-admin">
               <label>Correo:</label>
-              <input name="correo" value={form.correo} onChange={handleChange} placeholder="Correo" />
+              <input name="correo" value={form.correo} onChange={handleChange} placeholder="Correo" disabled={true} />
             </div>
             <div className="form-grupo-admin">
               <label>Teléfono:</label>
-              <input name="telefono" value={form.telefono} onChange={handleChange} placeholder="Teléfono" />
+              <input name="telefono" value={form.telefono} onChange={handleChange} placeholder="Teléfono" disabled={true} />
             </div>
             <div className="form-grupo-admin">
               <label>Edad:</label>
-              <input name="edad" value={form.edad} onChange={handleChange} placeholder="Edad" />
+              <input name="edad" value={form.edad} onChange={handleChange} placeholder="Edad" disabled={true} />
             </div>
             <div className="form-grupo-admin">
               <label>Tipo de inscripción:</label>
@@ -214,13 +255,13 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
                 value={form.tipoReferencia}
                 onChange={handleChange}
                 required
+                disabled={false}
               >
                 <option value="">Seleccione tipo</option>
                 <option value="Eventos">Evento</option>
                 <option value="ProgramaAcademico">Programa académico</option>
               </select>
             </div>
-
             {form.tipoReferencia === "Eventos" && (
               <div className="form-grupo-admin">
                 <label>Evento:</label>
@@ -229,6 +270,7 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
                   value={form.referencia}
                   onChange={handleChange}
                   required
+                  disabled={false}
                 >
                   <option value="">Seleccione evento</option>
                   {eventos.map(ev => (
@@ -237,7 +279,6 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
                 </select>
               </div>
             )}
-
             {form.tipoReferencia === "ProgramaAcademico" && (
               <div className="form-grupo-admin">
                 <label>Programa académico:</label>
@@ -246,6 +287,7 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
                   value={form.referencia}
                   onChange={handleChange}
                   required
+                  disabled={false}
                 >
                   <option value="">Seleccione programa</option>
                   {programas.map(pr => (
@@ -254,7 +296,6 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
                 </select>
               </div>
             )}
-
             <div className="form-grupo-admin">
               <label>Categoría:</label>
               <select
@@ -262,6 +303,7 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
                 value={form.categoria}
                 onChange={handleChange}
                 required
+                disabled={true}
               >
                 <option value="">Seleccione categoría</option>
                 {categorias.map(cat => (
@@ -271,7 +313,6 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
             </div>
             <div className="form-grupo-admin">
               <label>Estado:</label>
-
               <select name="estado" value={form.estado} onChange={handleChange} placeholder="Estado" >
                 <option value="">Seleccione estado</option>
                 <option value="preinscrito">Preinscrito</option>
@@ -280,7 +321,7 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
                 <option value="finalizado">Finalizado</option>
                 <option value="certificado">Certificado</option>
                 <option value="rechazada">Rechazada</option>
-                <option value="cancelada academico">Cancelada Académico</option>
+                <option value="cancelada">Cancelada Académico</option>
               </select>
             </div>
             <div className="form-grupo-admin">
@@ -293,7 +334,9 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
               <i className="fas fa-times"></i>
               Cancelar
             </button>
-            <button type="submit" className="btn-admin btn-primary">Crear Inscripción</button>
+            <button type="submit" className="btn-admin btn-primary">
+              {modo === "crear" ? "Crear Inscripción" : "Guardar Cambios"}
+            </button>
           </div>
         </form>
       </div>
@@ -301,4 +344,4 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
   );
 };
 
-export default InscripcionModalCrear;
+export default InscripcionModal;
