@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
 
 const inscripcionSchema = new mongoose.Schema({
- 
+
     usuario: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'usuarios', // Debe coincidir con User.js
         required: true,
     },
-    nombre:{
+    nombre: {
         type: String,
         required: true,
         trim: true,
     },
     apellido: {
-        type: String, 
+        type: String,
     },
     tipoDocumento: {
         type: String,
@@ -26,7 +26,7 @@ const inscripcionSchema = new mongoose.Schema({
         trim: true,
     },
     correo: {
-        type: String,  
+            type: String,
     },
     telefono: {
         type: String,
@@ -38,7 +38,7 @@ const inscripcionSchema = new mongoose.Schema({
         required: true,
         min: 0,
     },
-       // Indica si la inscripción es a un evento, curso o programa técnico
+    // Indica si la inscripción es a un evento, curso o programa técnico
     tipoReferencia: {
         type: String,
         enum: ['Eventos', 'ProgramaAcademico'],
@@ -61,7 +61,7 @@ const inscripcionSchema = new mongoose.Schema({
     },
     estado: {
         type: String,
-      enum: ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'],
+        enum: ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'],
         default: 'preinscrito',
     },
     observaciones: {
