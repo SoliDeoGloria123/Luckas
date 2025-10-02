@@ -18,7 +18,7 @@ const TareasManagement = () => {
   const [formData, setFormData] = useState({
     titulo: "",
     descripcion: "",
-    estado: "PENDIENTE",
+    estado: "pendiente",
     prioridad: "Media",
     asignadoA: "",
     asignadoARol: "seminarista",
@@ -50,10 +50,10 @@ const TareasManagement = () => {
   }, []);
 
   const estadoColors = {
-    EN_PROGRESO: "bg-blue-100 text-blue-700 border-blue-200",
-    PENDIENTE: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    COMPLETADA: "bg-green-100 text-green-700 border-green-200",
-    CANCELADA: "bg-red-100 text-red-700 border-red-200",
+    en_progreso: "bg-blue-100 text-blue-700 border-blue-200",
+    pendiente: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    completada: "bg-green-100 text-green-700 border-green-200",
+    cancelada: "bg-red-100 text-red-700 border-red-200",
   }
 
   const prioridadColors = {
@@ -62,12 +62,22 @@ const TareasManagement = () => {
     Baja: "bg-gray-100 text-gray-700 border-gray-200",
   }
 
+  const traducirEstado = (estado) => {
+    const traducciones = {
+      pendiente: "Pendiente",
+      en_progreso: "En Progreso",
+      completada: "Completada",
+      cancelada: "Cancelada"
+    };
+    return traducciones[estado] || estado;
+  }
+
   const handleNewTask = () => {
     setEditingTask(null)
     setFormData({
       titulo: "",
       descripcion: "",
-      estado: "PENDIENTE",
+      estado: "pendiente",
       prioridad: "Media",
       asignadoA: "",
       asignadoARol: "seminarista",
@@ -76,7 +86,7 @@ const TareasManagement = () => {
     setShowModal(true)
   }
 
-  const handleEditTask = (task: Task) => {
+  const handleEditTask = (task) => {
     setEditingTask(task)
     setFormData({
       titulo: task.titulo,
@@ -90,14 +100,64 @@ const TareasManagement = () => {
     setShowModal(true)
   }
 
-  const handleSaveTask = () => {
+  const handleSaveTask = async () => {
     if (!formData.titulo || !formData.asignadoA || !formData.fechaLimite) {
       alert("Por favor completa todos los campos requeridos")
       return
     }
 
+    try {
+      // Obtener el usuario actual del token
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('No estás autenticado');
+        return;
+      }
 
-    setShowModal(false)
+      // Preparar los datos de la tarea
+      const tareaData = {
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        estado: formData.estado,
+        prioridad: formData.prioridad,
+        asignadoA: formData.asignadoA,
+        asignadoPor: JSON.parse(atob(token.split('.')[1])).userId, // Obtener userId del token
+        fechaLimite: formData.fechaLimite
+      };
+
+      console.log('Datos a enviar:', tareaData);
+
+      if (editingTask) {
+        // Actualizar tarea existente
+        await tareaService.update(editingTask._id, tareaData);
+        alert('Tarea actualizada exitosamente');
+      } else {
+        // Crear nueva tarea
+        await tareaService.create(tareaData);
+        alert('Tarea creada exitosamente');
+      }
+
+      // Recargar las tareas
+      await obtenerTareas();
+      
+      setShowModal(false);
+      setEditingTask(null);
+      
+      // Resetear el formulario
+      setFormData({
+        titulo: "",
+        descripcion: "",
+        estado: "pendiente",
+        prioridad: "Media",
+        asignadoA: "",
+        asignadoARol: "seminarista",
+        fechaLimite: "",
+      });
+
+    } catch (error) {
+      console.error('Error al guardar tarea:', error);
+      alert('Error al guardar la tarea: ' + error.message);
+    }
   }
 
 
@@ -112,9 +172,9 @@ const TareasManagement = () => {
 
   const stats = {
     total: tareas.length,
-    enProgreso: tareas.filter((t) => t.estado === "EN_PROGRESO").length,
-    pendientes: tareas.filter((t) => t.estado === "PENDIENTE").length,
-    completadas: tareas.filter((t) => t.estado === "COMPLETADA").length,
+    enProgreso: tareas.filter((t) => t.estado === "en_progreso").length,
+    pendientes: tareas.filter((t) => t.estado === "pendiente").length,
+    completadas: tareas.filter((t) => t.estado === "completada").length,
   }
 
   return (
@@ -211,10 +271,10 @@ const TareasManagement = () => {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="todos">Todos los Estados</option>
-              <option value="PENDIENTE">Pendiente</option>
-              <option value="EN_PROGRESO">En Progreso</option>
-              <option value="COMPLETADA">Completada</option>
-              <option value="CANCELADA">Cancelada</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="en_progreso">En Progreso</option>
+              <option value="completada">Completada</option>
+              <option value="cancelada">Cancelada</option>
             </select>
 
             <select
@@ -273,7 +333,7 @@ const TareasManagement = () => {
                       <span
                         className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${estadoColors[tarea.estado]}`}
                       >
-                        {tarea.estado.replace("_", " ")}
+                        {traducirEstado(tarea.estado)}
                       </span>
                     </td>
                     <td className="px-4 py-4">
@@ -369,13 +429,13 @@ const TareasManagement = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Estado</label>
                   <select
                     value={formData.estado}
-
+                    onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="PENDIENTE">Pendiente</option>
-                    <option value="EN_PROGRESO">En Progreso</option>
-                    <option value="COMPLETADA">Completada</option>
-                    <option value="CANCELADA">Cancelada</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="en_progreso">En Progreso</option>
+                    <option value="completada">Completada</option>
+                    <option value="cancelada">Cancelada</option>
                   </select>
                 </div>
 
@@ -393,32 +453,25 @@ const TareasManagement = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Asignar a <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.asignadoA}
-                    onChange={(e) => setFormData({ ...formData, asignadoA: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Nombre del usuario"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Rol</label>
-                  <select
-                    value={formData.asignadoARol}
-                    onChange={(e) => setFormData({ ...formData, asignadoARol: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="seminarista">Seminarista</option>
-                    <option value="admin">Administrador</option>
-                    <option value="tesorero">Tesorero</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Asignar a <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.asignadoA}
+                  onChange={(e) => setFormData({ ...formData, asignadoA: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Selecciona un seminarista</option>
+                  {usuarios
+                    .filter(usuario => usuario.role === 'seminarista')
+                    .map((usuario) => (
+                      <option key={usuario._id} value={usuario._id}>
+                        {usuario.nombre} {usuario.apellido}
+                      </option>
+                    ))
+                  }
+                </select>
               </div>
 
               <div>

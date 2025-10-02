@@ -61,8 +61,26 @@ const inscripcionSchema = new mongoose.Schema({
     },
     estado: {
         type: String,
-        enum: ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'],
-        default: 'preinscrito',
+        required: true,
+        validate: {
+            validator: function(valor) {
+                // Validar estados según el tipo de referencia
+                if (this.tipoReferencia === 'Eventos') {
+                    return ['inscrito', 'finalizado'].includes(valor);
+                } else if (this.tipoReferencia === 'ProgramaAcademico') {
+                    return ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'].includes(valor);
+                }
+                return false;
+            },
+            message: function(props) {
+                if (this.tipoReferencia === 'Eventos') {
+                    return `Para eventos, el estado debe ser: inscrito o finalizado. Recibido: ${props.value}`;
+                } else if (this.tipoReferencia === 'ProgramaAcademico') {
+                    return `Para programas académicos, el estado debe ser: preinscrito, matriculado, en_curso, finalizado, certificado, rechazada o cancelada academico. Recibido: ${props.value}`;
+                }
+                return `Tipo de referencia no válido: ${this.tipoReferencia}`;
+            }
+        }
     },
     observaciones: {
         type: String,
@@ -74,6 +92,21 @@ const inscripcionSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true,
+});
+
+// Middleware pre-save para establecer estado por defecto según tipo de referencia
+inscripcionSchema.pre('save', function(next) {
+    // Solo establecer estado por defecto si no se ha establecido uno
+    if (!this.estado || this.estado === '') {
+        if (this.tipoReferencia === 'Eventos') {
+            this.estado = 'inscrito';
+        } else if (this.tipoReferencia === 'ProgramaAcademico') {
+            this.estado = 'preinscrito';
+        }
+    }
+    
+    console.log(`📋 PRE-SAVE INSCRIPCIÓN: Tipo=${this.tipoReferencia}, Estado=${this.estado}`);
+    next();
 });
 
 module.exports = mongoose.model('Inscripcion', inscripcionSchema);

@@ -82,12 +82,23 @@ exports.getUserById = async(req, res)=>{
 exports.getUserByDocumento = async (req, res) => {
     try {
         const { numeroDocumento } = req.params;
+        console.log('Buscando usuario con documento:', numeroDocumento);
         const user = await User.findOne({ numeroDocumento: numeroDocumento }).select('-password');
         if (!user) {
+            console.log('Usuario no encontrado para documento:', numeroDocumento);
             return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
         }
+        console.log('Usuario encontrado:', {
+            id: user._id,
+            nombre: user.nombre,
+            apellido: user.apellido,
+            fechaNacimiento: user.fechaNacimiento,
+            tieneFechaNacimiento: !!user.fechaNacimiento
+        });
+        console.log('🔍 ID exacto del usuario encontrado:', String(user._id));
         res.status(200).json({ success: true, user });
     } catch (error) {
+        console.log('Error buscando usuario:', error.message);
         res.status(500).json({ success: false, message: 'Error al buscar usuario por documento', error: error.message });
     }
 };

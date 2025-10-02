@@ -39,17 +39,29 @@ exports.crearInscripcion = async (req, res) => {
     // Validar referencia según tipoInscripcion
     let referenciaExiste = null;
     if (tipoReferencia === 'Eventos') {
+      console.log('🎪 VALIDANDO EVENTO - ID:', referencia);
       referenciaExiste = await Evento.findById(referencia);
+      console.log('🎪 EVENTO ENCONTRADO:', referenciaExiste ? {
+        _id: referenciaExiste._id,
+        nombre: referenciaExiste.nombre,
+        categoria: referenciaExiste.categoria
+      } : null);
+      
       if (!referenciaExiste) {
-        console.log('Error: Evento no encontrado:', referencia);
+        console.log('❌ Error: Evento no encontrado:', referencia);
         return res.status(404).json({ success: false, message: 'Evento no encontrado' });
       }
   
       // Verificar si el usuario ya está inscrito en este evento
+      console.log('🔍 VERIFICANDO SI YA ESTÁ INSCRITO - Usuario:', usuario, 'Referencia:', referencia);
       const yaInscrito = await Inscripcion.findOne({ usuario, referencia, tipoReferencia: 'Eventos' });
+      console.log('🔍 YA INSCRITO RESULTADO:', yaInscrito ? 'SÍ' : 'NO');
+      
       if (yaInscrito) {
+        console.log('⚠️ USUARIO YA INSCRITO EN EVENTO');
         return res.status(400).json({ success: false, message: 'Ya estás inscrito en este evento.' });
       }
+      console.log('✅ USUARIO NO INSCRITO PREVIAMENTE EN EVENTO');
     } else if (tipoReferencia === 'ProgramaAcademico') {
       const ProgramaAcademico = require('../models/ProgramaAcademico');
       referenciaExiste = await ProgramaAcademico.findById(referencia);
@@ -89,9 +101,22 @@ exports.crearInscripcion = async (req, res) => {
     const camposRequeridos = ['nombre', 'tipoDocumento', 'numeroDocumento', 'telefono', 'edad'];
     const camposFaltantes = [];
     
+    console.log('Validando campos requeridos...');
     camposRequeridos.forEach(campo => {
-      if (!req.body[campo]) {
-        camposFaltantes.push(campo);
+      const valor = req.body[campo];
+      console.log(`Campo ${campo}:`, valor, typeof valor);
+      
+      // Para edad, validar que sea un número >= 0, para otros campos validar que no estén vacíos
+      if (campo === 'edad') {
+        const edad = parseInt(valor);
+        console.log(`Edad parseada: ${edad}, es válida: ${!isNaN(edad) && edad >= 0}`);
+        if (isNaN(edad) || edad < 0) {
+          camposFaltantes.push(`${campo} (recibido: ${valor}, parseado: ${edad})`);
+        }
+      } else {
+        if (!valor) {
+          camposFaltantes.push(`${campo} (recibido: "${valor}")`);
+        }
       }
     });
 
@@ -103,9 +128,49 @@ exports.crearInscripcion = async (req, res) => {
       });
     }
 
-  
+    console.log('✅ Todos los campos requeridos están presentes');
+
+    // Validar estado según tipo de referencia
+    console.log('🔍 VALIDANDO ESTADO SEGÚN TIPO DE REFERENCIA');
+    console.log(`Tipo de referencia: ${tipoReferencia}, Estado recibido: ${req.body.estado}`);
+    
+    const validarEstado = (tipoRef, estado) => {
+      if (tipoRef === 'Eventos') {
+        const estadosValidos = ['inscrito', 'finalizado'];
+        if (!estadosValidos.includes(estado)) {
+          return `Para eventos, el estado debe ser: ${estadosValidos.join(' o ')}. Recibido: ${estado}`;
+        }
+      } else if (tipoRef === 'ProgramaAcademico') {
+        const estadosValidos = ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'];
+        if (!estadosValidos.includes(estado)) {
+          return `Para programas académicos, el estado debe ser: ${estadosValidos.join(', ')}. Recibido: ${estado}`;
+        }
+      } else {
+        return `Tipo de referencia no válido: ${tipoRef}`;
+      }
+      return null;
+    };
+
+    // Establecer estado por defecto si no se proporciona
+    let estadoFinal = req.body.estado;
+    if (!estadoFinal) {
+      estadoFinal = tipoReferencia === 'Eventos' ? 'inscrito' : 'preinscrito';
+      console.log(`📋 Estado no proporcionado, usando por defecto: ${estadoFinal}`);
+    }
+
+    // Validar el estado
+    const errorEstado = validarEstado(tipoReferencia, estadoFinal);
+    if (errorEstado) {
+      console.log('❌ Error de validación de estado:', errorEstado);
+      return res.status(400).json({ 
+        success: false, 
+        message: errorEstado 
+      });
+    }
+    console.log(`✅ Estado válido para ${tipoReferencia}: ${estadoFinal}`);
 
     // 1. Crear la inscripción
+    console.log('🔄 Iniciando creación de inscripción...');
     // Limpiar datos - remover campos que no están en el modelo
     const datosInscripcion = {
       usuario: req.body.usuario,
@@ -119,7 +184,7 @@ exports.crearInscripcion = async (req, res) => {
       tipoReferencia: req.body.tipoReferencia,
       referencia: req.body.referencia,
       categoria: req.body.categoria,
-      estado: req.body.estado || 'preinscrito',
+      estado: estadoFinal,
       observaciones: req.body.observaciones
     };
 
@@ -145,8 +210,10 @@ exports.crearInscripcion = async (req, res) => {
     let descripcionSolicitud = '';
     if (tipoReferencia === 'Eventos' && referenciaExiste) {
       descripcionSolicitud = `Inscripción al evento ${referenciaExiste.nombre}`;
+      console.log('📝 CREANDO SOLICITUD PARA EVENTO:', descripcionSolicitud);
     } else if (tipoReferencia === 'ProgramaAcademico' && referenciaExiste) {
       descripcionSolicitud = `Inscripción al programa académico ${referenciaExiste.nombre}`;
+      console.log('📝 CREANDO SOLICITUD PARA PROGRAMA:', descripcionSolicitud);
     }
 
     const solicitud = new Solicitud({
@@ -344,8 +411,42 @@ exports.actualizarInscripcion = async (req, res) => {
       return res.status(400).json({ success: false, message: `Campos requeridos faltantes: ${camposFaltantes.join(', ')}` });
     }
 
+    // Validar estado según tipo de referencia (si se está actualizando)
+    if (req.body.estado || req.body.tipoReferencia) {
+      console.log('🔍 VALIDANDO ESTADO EN ACTUALIZACIÓN');
+      const estadoActualizar = req.body.estado;
+      const tipoRef = req.body.tipoReferencia || tipoReferencia;
+      
+      if (estadoActualizar) {
+        const validarEstado = (tipoRef, estado) => {
+          if (tipoRef === 'Eventos') {
+            const estadosValidos = ['inscrito', 'finalizado'];
+            if (!estadosValidos.includes(estado)) {
+              return `Para eventos, el estado debe ser: ${estadosValidos.join(' o ')}. Recibido: ${estado}`;
+            }
+          } else if (tipoRef === 'ProgramaAcademico') {
+            const estadosValidos = ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'];
+            if (!estadosValidos.includes(estado)) {
+              return `Para programas académicos, el estado debe ser: ${estadosValidos.join(', ')}. Recibido: ${estado}`;
+            }
+          }
+          return null;
+        };
+
+        const errorEstado = validarEstado(tipoRef, estadoActualizar);
+        if (errorEstado) {
+          console.log('❌ Error de validación de estado en actualización:', errorEstado);
+          return res.status(400).json({ 
+            success: false, 
+            message: errorEstado 
+          });
+        }
+        console.log(`✅ Estado válido para actualización ${tipoRef}: ${estadoActualizar}`);
+      }
+    }
+
     // Actualizar inscripción
-    const inscripcion = await Inscripcion.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const inscripcion = await Inscripcion.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!inscripcion) return res.status(404).json({ success: false, message: 'Inscripción no encontrada' });
 
     // Actualizar solicitud asociada si existe

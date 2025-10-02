@@ -9,24 +9,24 @@ exports.crearTarea = async (req, res) => {
         const userRole = req.userRole;
         const userId = req.userId;
 
-        // Si es seminarista, solo puede asignar tareas a sí mismo
-        if (userRole === 'seminarista' && asignadoA !== userId) {
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Como seminarista, solo puedes crear tareas asignadas a ti mismo' 
-            });
-        }
+        console.log('Datos recibidos:', req.body);
+        console.log('User ID:', userId, 'Role:', userRole);
 
         // Para seminaristas, asignadoPor debe ser ellos mismos
         if (userRole === 'seminarista') {
             req.body.asignadoPor = userId;
         }
 
+        // Usar el valor actualizado de asignadoPor
+        const finalAsignadoPor = req.body.asignadoPor;
+
         // Validar que los IDs sean ObjectId válidos
         if (!mongoose.Types.ObjectId.isValid(asignadoA)) {
+            console.log('Error: ID asignadoA inválido:', asignadoA);
             return res.status(400).json({ success: false, message: 'ID de usuario asignado inválido' });
         }
-        if (!mongoose.Types.ObjectId.isValid(asignadoPor)) {
+        if (!mongoose.Types.ObjectId.isValid(finalAsignadoPor)) {
+            console.log('Error: ID asignadoPor inválido:', finalAsignadoPor);
             return res.status(400).json({ success: false, message: 'ID de usuario que asigna inválido' });
         }
 
@@ -35,7 +35,17 @@ exports.crearTarea = async (req, res) => {
         if (!usuarioAsignado) {
             return res.status(404).json({ success: false, message: 'El usuario asignado no existe' });
         }
-        const usuarioAsignador = await Usuario.findById(asignadoPor);
+
+        // Si es seminarista, verificar que puede asignar tareas a otros seminaristas
+        if (userRole === 'seminarista' && asignadoA !== userId) {
+            if (usuarioAsignado.role !== 'seminarista') {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: 'Como seminarista, solo puedes asignar tareas a otros seminaristas' 
+                });
+            }
+        }
+        const usuarioAsignador = await Usuario.findById(finalAsignadoPor);
         if (!usuarioAsignador) {
             return res.status(404).json({ success: false, message: 'El usuario que asigna no existe' });
         }

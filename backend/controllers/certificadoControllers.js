@@ -38,9 +38,39 @@ exports.generarCertificado = async (req, res) => {
     return res.status(400).json({ message: 'El usuario no ha finalizado o no ha sido aprobado en el curso.' });
   }
 
-  // 2. Busca usuario y curso
+  // VALIDACIÓN: Solo permitir certificados para programas académicos
+  if (inscripcion.tipoReferencia !== 'ProgramaAcademico') {
+    console.log('❌ INTENTO DE GENERAR CERTIFICADO PARA EVENTO - Rechazado');
+    console.log('Tipo de referencia de la inscripción:', inscripcion.tipoReferencia);
+    return res.status(400).json({ 
+      success: false,
+      message: 'Los certificados solo se pueden generar para programas académicos, no para eventos.' 
+    });
+  }
+
+  console.log('✅ CERTIFICADO VÁLIDO - Programa Académico confirmado');
+
+  // 2. Busca usuario
   const usuario = await User.findById(userId);
+  
+  if (!usuario) {
+    return res.status(404).json({ message: 'Usuario no encontrado.' });
+  }
+  
+  // 3. Busca el programa académico (ya validamos que es ProgramaAcademico)
   const curso = await ProgramaAcademico.findById(cursoId);
+  
+  console.log('DEBUG - Usuario encontrado:', usuario ? 'Sí' : 'No');
+  console.log('DEBUG - Programa académico encontrado:', curso ? 'Sí' : 'No');
+  console.log('DEBUG - cursoId recibido:', cursoId);
+  
+  if (!curso) {
+    return res.status(404).json({ 
+      success: false,
+      message: 'Programa académico no encontrado.' 
+    });
+  }
+  
   const logoPath = path.join(__dirname, '../public/logo-luckas.png');
 
 
@@ -98,17 +128,25 @@ exports.generarCertificado = async (req, res) => {
   doc.moveDown(0.5);
   doc.fontSize(12).font('Helvetica').fillColor('black').text(`Con Cédula de Ciudadanía No. ${usuario.numeroDocumento}`, { align: 'center' });
 
-  // Texto del curso
+  // Texto del curso/evento
   doc.moveDown(1);
-  doc.fontSize(14).font('Helvetica').text('Ha completado satisfactoriamente el curso:', { align: 'center' });
+  const tipoActividad = inscripcion.tipoReferencia === 'ProgramaAcademico' ? 'curso' : 'evento';
+  doc.fontSize(14).font('Helvetica').text(`Ha completado satisfactoriamente el ${tipoActividad}:`, { align: 'center' });
 
-  // Nombre del curso destacado
+  // Nombre del curso/evento destacado
   doc.moveDown(0.5);
   doc.fontSize(18).font('Helvetica-Bold').fillColor('#003366').text(`${curso.nombre.toUpperCase()}`, { align: 'center' });
 
-  // Duración (puedes obtenerla del modelo si la tienes)
+  // Duración (según el tipo)
   doc.moveDown(0.5);
-  doc.fontSize(12).font('Helvetica').fillColor('black').text('Con una intensidad horaria académica de [XX] horas', { align: 'center' });
+  if (inscripcion.tipoReferencia === 'ProgramaAcademico') {
+    const duracion = curso.duracion || '[XX] horas';
+    doc.fontSize(12).font('Helvetica').fillColor('black').text(`Con una intensidad horaria académica de ${duracion}`, { align: 'center' });
+  } else {
+    // Para eventos, mostrar la fecha del evento
+    const fechaEvento = curso.fechaEvento ? new Date(curso.fechaEvento).toLocaleDateString('es-CO') : '[Fecha del evento]';
+    doc.fontSize(12).font('Helvetica').fillColor('black').text(`Realizado el ${fechaEvento}`, { align: 'center' });
+  }
 
   // Fecha y lugar
   doc.moveDown(1.5);
