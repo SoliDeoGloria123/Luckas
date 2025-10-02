@@ -97,6 +97,32 @@ async function createUsers() {
                 fechaNacimiento: new Date('1988-12-10'),
                 direccion: 'Transversal 22 #33-44',
                 estado: 'activo'
+            },
+            {
+                nombre: 'Ana',
+                apellido: 'García',
+                correo: 'ana.garcia@email.com',
+                password: await bcrypt.hash('usuario123', 12),
+                role: 'externo',
+                telefono: '3001234567',
+                tipoDocumento: 'Cédula de ciudadanía',
+                numeroDocumento: '11223344',
+                fechaNacimiento: new Date('1995-03-15'),
+                direccion: 'Calle 80 #25-30',
+                estado: 'activo'
+            },
+            {
+                nombre: 'Pedro',
+                apellido: 'Martínez',
+                correo: 'pedro.martinez@email.com',
+                password: await bcrypt.hash('usuario123', 12),
+                role: 'externo',
+                telefono: '3007654321',
+                tipoDocumento: 'Cédula de ciudadanía',
+                numeroDocumento: '87654321',
+                fechaNacimiento: new Date('1987-07-22'),
+                direccion: 'Carrera 50 #15-20',
+                estado: 'activo'
             }
         ];
 
@@ -300,33 +326,42 @@ async function createCabanas(categorias) {
         const cabanas = [
             {
                 nombre: 'Cabaña Los Pinos',
-                descripcion: 'Cabaña rústica con vista al lago',
+                descripcion: 'Cabaña rústica con vista al lago, perfecta para escapadas familiares. Cuenta con chimenea, cocina equipada y terraza con vista panorámica.',
                 capacidad: 6,
                 precio: 80000,
                 ubicacion: 'Sector Norte',
                 categoria: catFamiliar._id,
                 estado: 'disponible',
-                imagen: ['/images/cabana1.jpg']
+                imagen: [
+                    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop',
+                    'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop'
+                ]
             },
             {
                 nombre: 'Cabaña El Roble',
-                descripcion: 'Cabaña familiar con todas las comodidades',
+                descripcion: 'Cabaña familiar con todas las comodidades modernas. Incluye jacuzzi, sala de juegos y amplio jardín para actividades al aire libre.',
                 capacidad: 8,
                 precio: 120000,
                 ubicacion: 'Sector Central',
                 categoria: catFamiliar._id,
                 estado: 'disponible',
-                imagen: ['/images/cabana2.jpg']
+                imagen: [
+                    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+                    'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&h=600&fit=crop'
+                ]
             },
             {
                 nombre: 'Cabaña La Montaña',
-                descripcion: 'Cabaña con vista panorámica a las montañas',
+                descripcion: 'Cabaña ejecutiva con vista panorámica a las montañas. Ideal para retiros corporativos o escapadas románticas. WiFi de alta velocidad incluido.',
                 capacidad: 4,
                 precio: 60000,
                 ubicacion: 'Sector Sur',
                 categoria: catEjecutiva._id,
                 estado: 'disponible',
-                imagen: ['/images/cabana3.jpg']
+                imagen: [
+                    'https://images.unsplash.com/photo-1542718610-a1d656d1884c?w=800&h=600&fit=crop',
+                    'https://images.unsplash.com/photo-1520637836862-4d197d17c55a?w=800&h=600&fit=crop'
+                ]
             }
         ];
 
@@ -348,49 +383,61 @@ async function createEventos(categorias) {
         const eventos = [
             {
                 nombre: 'Conferencia de Tecnología 2025',
-                descripcion: 'Conferencia anual sobre las últimas tendencias tecnológicas',
+                descripcion: 'Conferencia anual sobre las últimas tendencias tecnológicas, incluyendo Inteligencia Artificial, Blockchain y Desarrollo Sostenible. Conferenciantes internacionales y networking premium.',
                 fechaEvento: new Date('2025-11-15'),
                 horaInicio: '09:00',
                 horaFin: '17:00',
                 lugar: 'Auditorio Principal',
+                direccion: 'Carrera 15 #85-23, Auditorio Luckas',
                 precio: 25000,
                 categoria: catConferencia._id,
                 cuposTotales: 200,
                 cuposDisponibles: 200,
-                imagen: ['/images/evento1.jpg'],
-                etiquetas: ['tecnología', 'innovación', 'conferencia'],
+                imagen: [
+                    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=600&fit=crop',
+                    'https://images.unsplash.com/photo-1559223607-b4d0555ae227?w=800&h=600&fit=crop'
+                ],
+                etiquetas: ['tecnología', 'innovación', 'conferencia', 'AI', 'blockchain'],
                 prioridad: 'Alta',
                 active: true
             },
             {
-                nombre: 'Taller de Emprendimiento',
-                descripcion: 'Taller práctico para desarrollar ideas de negocio',
+                nombre: 'Taller de Emprendimiento Digital',
+                descripcion: 'Taller práctico intensivo para desarrollar ideas de negocio digitales. Incluye metodología Lean Startup, validación de mercado y pitch de inversión.',
                 fechaEvento: new Date('2025-10-30'),
                 horaInicio: '14:00',
                 horaFin: '18:00',
-                lugar: 'Sala de Conferencias',
+                lugar: 'Sala de Conferencias A',
+                direccion: 'Calle 72 #11-45, Centro de Innovación Luckas',
                 precio: 15000,
                 categoria: catTaller._id,
                 cuposTotales: 30,
                 cuposDisponibles: 30,
-                imagen: ['/images/evento2.jpg'],
-                etiquetas: ['emprendimiento', 'negocios', 'taller'],
+                imagen: [
+                    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop',
+                    'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&h=600&fit=crop'
+                ],
+                etiquetas: ['emprendimiento', 'negocios', 'taller', 'startup', 'digital'],
                 prioridad: 'Media',
                 active: true
             },
             {
-                nombre: 'Festival Cultural',
-                descripcion: 'Celebración de la diversidad cultural',
+                nombre: 'Festival Cultural Internacional',
+                descripcion: 'Celebración multicultural con presentaciones artísticas, gastronomía internacional, exposiciones de arte y espectáculos en vivo. Entrada libre para toda la familia.',
                 fechaEvento: new Date('2025-12-05'),
                 horaInicio: '18:00',
                 horaFin: '22:00',
-                lugar: 'Plaza Central',
+                lugar: 'Plaza Central Luckas',
+                direccion: 'Plaza Principal, Centro Cultural Luckas',
                 precio: 0,
                 categoria: catConferencia._id,
                 cuposTotales: 500,
                 cuposDisponibles: 500,
-                imagen: ['/images/evento3.jpg'],
-                etiquetas: ['cultura', 'festival', 'arte'],
+                imagen: [
+                    'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&h=600&fit=crop',
+                    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop'
+                ],
+                etiquetas: ['cultura', 'festival', 'arte', 'internacional', 'familia'],
                 prioridad: 'Alta',
                 active: true
             }
@@ -460,55 +507,112 @@ async function createInscripciones(usuarios, programas, eventos, categorias) {
         
         // Agregar inscripciones a programas si existen
         if (programas && programas.length > 0) {
+            // Inscripción 1: Usuario externo certificado en JavaScript
             inscripciones.push({
-                usuario: usuarios[3]._id, // Usuario externo
-                nombre: 'Juan Carlos',
-                apellido: 'Pérez',
+                usuario: usuarios[4]._id, // Ana García
+                nombre: 'Ana',
+                apellido: 'García',
                 tipoDocumento: 'Cédula de ciudadanía',
-                numeroDocumento: '12345678',
-                correo: 'juan.perez@email.com',
+                numeroDocumento: '11223344',
+                correo: 'ana.garcia@email.com',
                 telefono: '3001234567',
-                edad: 25,
+                edad: 29,
                 tipoReferencia: 'ProgramaAcademico',
                 referencia: programas[0]._id, // JavaScript
-                categoria: categorias[0]._id,
-                estado: 'aprobada'
+                categoria: categorias[0]._id, // Tecnología
+                estado: 'certificado'
             });
             
+            // Inscripción 2: Usuario externo finalizado en Inglés
             if (programas.length > 1) {
                 inscripciones.push({
-                    usuario: usuarios[3]._id, // Usuario externo
-                    nombre: 'Ana Sofía',
-                    apellido: 'Rodríguez',
+                    usuario: usuarios[5]._id, // Pedro Martínez
+                    nombre: 'Pedro',
+                    apellido: 'Martínez',
                     tipoDocumento: 'Cédula de ciudadanía',
-                    numeroDocumento: '11223344',
-                    correo: 'ana.rodriguez@email.com',
-                    telefono: '3009876543',
-                    edad: 22,
+                    numeroDocumento: '87654321',
+                    correo: 'pedro.martinez@email.com',
+                    telefono: '3007654321',
+                    edad: 37,
                     tipoReferencia: 'ProgramaAcademico',
-                    referencia: programas[1]._id, // Segundo programa
-                    categoria: categorias[2] ? categorias[2]._id : categorias[0]._id,
-                    estado: 'aprobada'
+                    referencia: programas[1]._id, // Inglés
+                    categoria: categorias[1]._id, // Idiomas
+                    estado: 'finalizado'
+                });
+            }
+
+            // Inscripción 3: Usuario en curso de Administración
+            if (programas.length > 2) {
+                inscripciones.push({
+                    usuario: usuarios[3]._id, // María Externa
+                    nombre: 'María',
+                    apellido: 'Externa',
+                    tipoDocumento: 'Cédula de ciudadanía',
+                    numeroDocumento: '12345681',
+                    correo: 'externa@luckas.com',
+                    telefono: '1234567893',
+                    edad: 36,
+                    tipoReferencia: 'ProgramaAcademico',
+                    referencia: programas[2]._id, // Administración
+                    categoria: categorias[2]._id, // Negocios
+                    estado: 'matriculado'
                 });
             }
         }
         
         // Agregar inscripciones a eventos si existen
         if (eventos && eventos.length > 0) {
+            // Inscripción 1: Seminarista inscrito en Conferencia de Tecnología
             inscripciones.push({
-                usuario: usuarios[2]._id, // Seminarista
-                nombre: 'María Elena',
-                apellido: 'González',
+                usuario: usuarios[2]._id, // Juan Seminarista
+                nombre: 'Juan',
+                apellido: 'Seminarista',
                 tipoDocumento: 'Cédula de ciudadanía',
-                numeroDocumento: '87654321',
-                correo: 'maria.gonzalez@email.com',
-                telefono: '3007654321',
-                edad: 28,
+                numeroDocumento: '12345680',
+                correo: 'seminarista@luckas.com',
+                telefono: '1234567892',
+                edad: 32,
                 tipoReferencia: 'Eventos',
-                referencia: eventos[0]._id, // Primer evento
-                categoria: categorias[1] ? categorias[1]._id : categorias[0]._id,
-                estado: 'pendiente'
+                referencia: eventos[0]._id, // Conferencia de Tecnología
+                categoria: categorias[5] ? categorias[5]._id : categorias[0]._id, // Conferencias
+                estado: 'inscrito'
             });
+
+            // Inscripción 2: Usuario externo en Taller de Emprendimiento
+            if (eventos.length > 1) {
+                inscripciones.push({
+                    usuario: usuarios[4]._id, // Ana García
+                    nombre: 'Ana',
+                    apellido: 'García',
+                    tipoDocumento: 'Cédula de ciudadanía',
+                    numeroDocumento: '11223344',
+                    correo: 'ana.garcia@email.com',
+                    telefono: '3001234567',
+                    edad: 29,
+                    tipoReferencia: 'Eventos',
+                    referencia: eventos[1]._id, // Taller de Emprendimiento
+                    categoria: categorias[6] ? categorias[6]._id : categorias[0]._id, // Talleres
+                    estado: 'finalizado'
+                });
+            }
+
+            // Inscripción 3: Usuario externo en Festival Cultural
+            if (eventos.length > 2) {
+                inscripciones.push({
+                    usuario: usuarios[5]._id, // Pedro Martínez
+                    nombre: 'Pedro',
+                    apellido: 'Martínez',
+                    tipoDocumento: 'Cédula de ciudadanía',
+                    numeroDocumento: '87654321',
+                    correo: 'pedro.martinez@email.com',
+                    telefono: '3007654321',
+                    edad: 37,
+                    tipoReferencia: 'Eventos',
+                    referencia: eventos[2]._id, // Festival Cultural
+                    categoria: categorias[5] ? categorias[5]._id : categorias[0]._id, // Conferencias
+                    estado: 'inscrito'
+                });
+            }
         }
 
         await Inscripciones.insertMany(inscripciones);
@@ -674,15 +778,33 @@ async function main() {
     console.log('   • tesorero@luckas.com / tesorero123 (Tesorero)');
     console.log('   • seminarista@luckas.com / seminarista123 (Seminarista)');
     console.log('   • externa@luckas.com / externa123 (Usuario Externo)');
+    console.log('   • ana.garcia@email.com / usuario123 (Usuario Externo)');
+    console.log('   • pedro.martinez@email.com / usuario123 (Usuario Externo)');
     
     console.log('\n🎓 Programas académicos: 5 programas creados');
-    console.log('🏠 Cabañas: 3 cabañas creadas');
-    console.log('🎉 Eventos: 3 eventos creados');
-    console.log('📋 Tareas: 3 tareas creadas');
-    console.log('📝 Inscripciones: 2 inscripciones creadas');
-    console.log('🏨 Reservas: 2 reservas creadas');
-    console.log('📄 Solicitudes: 2 solicitudes creadas');
-    console.log('📊 Reportes: 2 reportes creados');
+    console.log('   • JavaScript Avanzado (con certificación)');
+    console.log('   • Inglés Conversacional (certificación)');
+    console.log('   • Administración de Empresas (certificación)');
+    console.log('   • Pintura al Óleo');
+    console.log('   • Yoga y Meditación');
+    
+    console.log('\n🏠 Cabañas: 3 cabañas con imágenes reales');
+    console.log('   • Cabaña Los Pinos (6 personas, vista al lago)');
+    console.log('   • Cabaña El Roble (8 personas, con jacuzzi)');
+    console.log('   • Cabaña La Montaña (4 personas, ejecutiva)');
+    
+    console.log('\n🎉 Eventos: 3 eventos con imágenes reales');
+    console.log('   • Conferencia de Tecnología 2025');
+    console.log('   • Taller de Emprendimiento Digital');
+    console.log('   • Festival Cultural Internacional');
+    
+    console.log('\n📋 Tareas: 3 tareas asignadas');
+    console.log('📝 Inscripciones: 6 inscripciones (3 programas, 3 eventos)');
+    console.log('   • Estados válidos según tipo (certificado/finalizado/matriculado para programas)');
+    console.log('   • Estados válidos para eventos (inscrito/finalizado)');
+    console.log('🏨 Reservas: 2 reservas de cabañas');
+    console.log('📄 Solicitudes: 2 solicitudes de ejemplo');
+    console.log('📊 Reportes: 2 reportes de gestión');
     
     await mongoose.connection.close();
     console.log('\n🔌 Conexión a base de datos cerrada');

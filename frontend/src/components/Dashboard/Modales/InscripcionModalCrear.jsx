@@ -9,7 +9,7 @@ const defaultForm = {
   numeroDocumento: "",
   correo: "",
   telefono: "",
-  edad: "",
+  edad: "0",
   tipoReferencia: "",
   referencia: "",
   categoria: "",
@@ -18,28 +18,106 @@ const defaultForm = {
 };
 
 const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas, categorias }) => {
+  console.log('🚀 COMPONENTE InscripcionModalCrear CARGADO - VERSION CON LOGS DE EDAD');
+  
   const [form, setForm] = useState(defaultForm);
   const [cedulaBusqueda, setCedulaBusqueda] = useState("");
   const [cargandoUsuario, setCargandoUsuario] = useState(false);
   const [usuarioEncontrado, setUsuarioEncontrado] = useState(null);
 
+  // Obtener opciones de estado según el tipo de referencia
+  const getOpcionesEstado = () => {
+    if (form.tipoReferencia === 'Eventos') {
+      return [
+        { value: 'inscrito', label: 'Inscrito' },
+        { value: 'finalizado', label: 'Finalizado' }
+      ];
+    } else if (form.tipoReferencia === 'ProgramaAcademico') {
+      return [
+        { value: 'preinscrito', label: 'Preinscrito' },
+        { value: 'matriculado', label: 'Matriculado' },
+        { value: 'en_curso', label: 'En Curso' },
+        { value: 'finalizado', label: 'Finalizado' },
+        { value: 'certificado', label: 'Certificado' },
+        { value: 'rechazada', label: 'Rechazada' },
+        { value: 'cancelada academico', label: 'Cancelada Académico' }
+      ];
+    } else {
+      return [];
+    }
+  };
+
   // Buscar usuario por cédula
   const buscarUsuarioPorCedula = async (cedula) => {
-    if (!cedula || cedula.length < 6) return;
+    console.log('🔍 INICIANDO buscarUsuarioPorCedula con:', cedula);
+    if (!cedula || cedula.length < 6) {
+      console.log('❌ Cédula muy corta o vacía');
+      return;
+    }
     setCargandoUsuario(true);
     try {
+      console.log('🌐 Llamando al servicio...');
       const usuario = await userService.getByDocumento(cedula);
-      setUsuarioEncontrado(usuario);
-      setForm(prev => ({
-        ...prev,
-        usuario: String(usuario._id || ""),
-        nombre: String(usuario.nombre || ""),
-        apellido: String(usuario.apellido || ""),
-        correo: String(usuario.correo || ""),
-        telefono: String(usuario.telefono || ""),
-        tipoDocumento: String(usuario.tipoDocumento || ""),
-        numeroDocumento: String(usuario.numeroDocumento || cedula)
-      }));
+      console.log('✅ Usuario recibido del servicio:', usuario);
+      console.log('📋 Tipo de usuario:', typeof usuario);
+      console.log('🔑 Propiedades del usuario:', usuario ? Object.keys(usuario) : 'NULL');
+      
+      if (usuario) {
+        setUsuarioEncontrado(usuario);
+      } else {
+        console.log('❌ Usuario es null o undefined');
+        setUsuarioEncontrado(null);
+      }
+      
+      // Calcular edad a partir de la fecha de nacimiento
+      let edadCalculada = 25; // Edad por defecto si no se puede calcular
+      
+      console.log('Datos del usuario completo:', usuario);
+      
+      if (usuario.fechaNacimiento) {
+        try {
+          const hoy = new Date();
+          const fechaNac = new Date(usuario.fechaNacimiento);
+          if (!isNaN(fechaNac.getTime())) {
+            edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
+            const mes = hoy.getMonth() - fechaNac.getMonth();
+            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+              edadCalculada--;
+            }
+            console.log('✅ Fecha nacimiento encontrada:', usuario.fechaNacimiento);
+            console.log('✅ Edad calculada correctamente:', edadCalculada);
+          } else {
+            console.log('❌ Fecha de nacimiento inválida:', usuario.fechaNacimiento);
+            edadCalculada = 25; // Fallback
+          }
+        } catch (error) {
+          console.log('❌ Error calculando edad:', error);
+          edadCalculada = 25; // Fallback
+        }
+      } else {
+        console.log('⚠️ Usuario sin fecha de nacimiento, usando edad por defecto:', edadCalculada);
+        // Verificar otras posibles propiedades de fecha
+        console.log('Propiedades del usuario:', Object.keys(usuario));
+      }
+      
+      console.log('🎯 Edad final a establecer:', edadCalculada);
+      
+      setForm(prev => {
+        const nuevoForm = {
+          ...prev,
+          usuario: String(usuario._id || ""),
+          nombre: String(usuario.nombre || ""),
+          apellido: String(usuario.apellido || ""),
+          correo: String(usuario.correo || ""),
+          telefono: String(usuario.telefono || ""),
+          tipoDocumento: String(usuario.tipoDocumento || ""),
+          numeroDocumento: String(usuario.numeroDocumento || cedula),
+          edad: String(edadCalculada)
+        };
+        
+        console.log('Actualizando formulario con:', nuevoForm);
+        return nuevoForm;
+      });
     } catch (error) {
       setUsuarioEncontrado(null);
       setForm(prev => ({
@@ -50,7 +128,8 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
         correo: "",
         telefono: "",
         tipoDocumento: "",
-        numeroDocumento: String(cedula)
+        numeroDocumento: String(cedula),
+        edad: "0"
       }));
     } finally {
       setCargandoUsuario(false);
@@ -67,16 +146,39 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
 
   const handleChangeCedula = (e) => {
     const valor = e.target.value;
+    console.log('📝 handleChangeCedula - Valor ingresado:', valor);
     setCedulaBusqueda(valor);
     if (valor.length >= 6) {
+      console.log('✅ Valor >= 6, llamando buscarUsuarioPorCedula');
       buscarUsuarioPorCedula(valor);
     } else {
+      console.log('❌ Valor < 6, limpiando usuario');
       setUsuarioEncontrado(null);
     }
   };
 
   const handleChange = e => {
     const { name, value } = e.target;
+    
+    // Si cambia el tipo de referencia, establecer el estado por defecto apropiado
+    if (name === "tipoReferencia") {
+      let estadoPorDefecto = "";
+      if (value === "Eventos") {
+        estadoPorDefecto = "inscrito"; // Estado por defecto para eventos
+      } else if (value === "ProgramaAcademico") {
+        estadoPorDefecto = "preinscrito"; // Estado por defecto para programas académicos
+      }
+      
+      setForm({
+        ...form,
+        [name]: String(value),
+        estado: estadoPorDefecto,
+        referencia: "", // Limpiar referencia al cambiar tipo
+        categoria: "" // Limpiar categoría al cambiar tipo
+      });
+      return;
+    }
+    
     // Si cambia el evento, y el tipoReferencia es Eventos, busca la categoría del evento seleccionado
     if (name === "referencia") {
       if (form.tipoReferencia === "Eventos") {
@@ -160,10 +262,14 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
               <input
                 type="text"
                 value={cedulaBusqueda}
-                onChange={handleChangeCedula}
+                onChange={(e) => {
+                  console.log('📝 Input cédula cambió:', e.target.value);
+                  handleChangeCedula(e);
+                }}
                 onPaste={handlePasteCedula}
                 placeholder="Ingrese o pegue la cédula"
                 style={{ paddingRight: cargandoUsuario ? '40px' : '10px' }}
+                onFocus={() => console.log('🎯 Campo cédula tiene foco')}
               />
               {cargandoUsuario && (
                 <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: '#666' }}>🔄</div>
@@ -205,7 +311,31 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
             </div>
             <div className="form-grupo-admin">
               <label>Edad:</label>
-              <input name="edad" value={form.edad} onChange={handleChange} placeholder="Edad" />
+              <input 
+                type="number" 
+                name="edad" 
+                value={form.edad || "25"} 
+                onChange={handleChange} 
+                placeholder="Ingrese edad" 
+                min="0" 
+                max="120"
+                style={{ 
+                  backgroundColor: usuarioEncontrado ? '#e8f5e8' : 'white',
+                  border: '2px solid #ccc',
+                  padding: '8px',
+                  fontSize: '14px'
+                }}
+              />
+              {usuarioEncontrado && form.edad && (
+                <small style={{ color: '#28a745', fontSize: '12px', fontWeight: 'bold' }}>
+                  ✓ Edad calculada automáticamente: {form.edad} años
+                </small>
+              )}
+              {!usuarioEncontrado && (
+                <small style={{ color: '#666', fontSize: '12px' }}>
+                  Ingrese la edad manualmente
+                </small>
+              )}
             </div>
             <div className="form-grupo-admin">
               <label>Tipo de inscripción:</label>
@@ -274,13 +404,11 @@ const InscripcionModalCrear = ({ mostrar, onClose, onSubmit, eventos, programas,
 
               <select name="estado" value={form.estado} onChange={handleChange} placeholder="Estado" >
                 <option value="">Seleccione estado</option>
-                <option value="preinscrito">Preinscrito</option>
-                <option value="matriculado">Matriculado</option>
-                <option value="en_curso">En Curso</option>
-                <option value="finalizado">Finalizado</option>
-                <option value="certificado">Certificado</option>
-                <option value="rechazada">Rechazada</option>
-                <option value="cancelada academico">Cancelada Académico</option>
+                {getOpcionesEstado().map(opcion => (
+                  <option key={opcion.value} value={opcion.value}>
+                    {opcion.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="form-grupo-admin">
