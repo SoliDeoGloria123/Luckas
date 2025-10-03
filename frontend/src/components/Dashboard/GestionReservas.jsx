@@ -26,7 +26,14 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
     fechaFin: "",
     precio: "",
     estado: "Pendiente",
-    observaciones: ""
+    observaciones: "",
+    nombre: "",
+    apellido: "",
+    tipoDocumento: "",
+    numeroDocumento: "",
+    correoElectronico: "",
+    telefono: "",
+    numeroPersonas: 1
   });
   const [error, setError] = useState("");
 
@@ -87,7 +94,14 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
         precio: "",
         estado: "Pendiente",
         observaciones: "",
-        activo: true
+        activo: true,
+        nombre: "",
+        apellido: "",
+        tipoDocumento: "",
+        numeroDocumento: "",
+        correoElectronico: "",
+        telefono: "",
+        numeroPersonas: 1
       });
       obtenerReservas();
     } catch (err) {
@@ -141,7 +155,14 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
       fechaFin: "",
       precio: "",
       estado: "Pendiente",
-      observaciones: ""
+      observaciones: "",
+      nombre: "",
+      apellido: "",
+      tipoDocumento: "",
+      numeroDocumento: "",
+      correoElectronico: "",
+      telefono: "",
+      numeroPersonas: 1
     });
     setMostrarModal(true);
   };

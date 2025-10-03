@@ -14,22 +14,25 @@ exports.crearReserva = async (req, res) => {
 
     const { usuario, cabana, fechaInicio, fechaFin, estado, observaciones } = req.body;
 
-    // Validar campos requeridos
-    if (!usuario) {
-      console.log('Error: Falta campo usuario');
-      return res.status(400).json({ success: false, message: 'El campo usuario es requerido' });
-    }
-    if (!cabana) {
-      console.log('Error: Falta campo cabana');
-      return res.status(400).json({ success: false, message: 'El campo cabana es requerido' });
-    }
-    if (!fechaInicio) {
-      console.log('Error: Falta campo fechaInicio');
-      return res.status(400).json({ success: false, message: 'El campo fechaInicio es requerido' });
-    }
-    if (!fechaFin) {
-      console.log('Error: Falta campo fechaFin');
-      return res.status(400).json({ success: false, message: 'El campo fechaFin es requerido' });
+    // Validar campos requeridos según el modelo
+    const camposRequeridos = [
+      'usuario', 'cabana', 'fechaInicio', 'fechaFin', 'nombre', 'apellido', 
+      'tipoDocumento', 'numeroDocumento', 'correoElectronico', 'telefono', 'numeroPersonas'
+    ];
+    
+    const camposFaltantes = [];
+    camposRequeridos.forEach(campo => {
+      if (!req.body[campo]) {
+        camposFaltantes.push(campo);
+      }
+    });
+    
+    if (camposFaltantes.length > 0) {
+      console.log('❌ CAMPOS FALTANTES:', camposFaltantes);
+      return res.status(400).json({ 
+        success: false, 
+        message: `Campos requeridos faltantes: ${camposFaltantes.join(', ')}` 
+      });
     }
 
     // Validar IDs
@@ -57,7 +60,27 @@ exports.crearReserva = async (req, res) => {
     }
     console.log('Cabaña encontrada:', cabanaExiste.nombre);
 
-    console.log('Validaciones pasadas, creando reserva...');
+    // Validar enum de tipoDocumento
+    const tiposValidos = ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad'];
+    if (!tiposValidos.includes(req.body.tipoDocumento)) {
+      console.log('❌ TIPO DE DOCUMENTO INVÁLIDO:', req.body.tipoDocumento);
+      return res.status(400).json({ 
+        success: false, 
+        message: `Tipo de documento inválido. Debe ser: ${tiposValidos.join(', ')}` 
+      });
+    }
+
+    // Validar estado si se proporciona
+    const estadosValidos = ['Pendiente', 'Confirmada', 'Cancelada', 'finalizada'];
+    if (req.body.estado && !estadosValidos.includes(req.body.estado)) {
+      console.log('❌ ESTADO INVÁLIDO:', req.body.estado);
+      return res.status(400).json({ 
+        success: false, 
+        message: `Estado inválido. Debe ser: ${estadosValidos.join(', ')}` 
+      });
+    }
+
+    console.log('✅ Validaciones pasadas, creando reserva...');
 
     // Forzar el campo activo a booleano
     let activo = req.body.activo;
@@ -85,8 +108,20 @@ exports.crearReserva = async (req, res) => {
       observaciones: req.body.observaciones,
       activo
     });
-    await reserva.save();
-    console.log('Reserva creada:', reserva._id);
+    
+    console.log('🔄 GUARDANDO RESERVA:', JSON.stringify(reserva.toObject(), null, 2));
+    
+    try {
+      await reserva.save();
+      console.log('✅ Reserva creada exitosamente:', reserva._id);
+    } catch (saveError) {
+      console.log('❌ ERROR AL GUARDAR RESERVA:', saveError.message);
+      console.log('❌ DETALLES DEL ERROR:', saveError);
+      return res.status(400).json({ 
+        success: false, 
+        message: `Error al guardar reserva: ${saveError.message}` 
+      });
+    }
 
     // Crear solicitud asociada (opcional)
     const solicitud = new Solicitud({

@@ -172,6 +172,17 @@ const InscripcionModal = ({
     ].includes(name)) {
       return;
     }
+    
+    // Si es el campo numeroDocumento, actualizar también la búsqueda de cédula
+    if (name === "numeroDocumento") {
+      setCedulaBusqueda(value);
+      // Buscar automáticamente si tiene 6 o más caracteres
+      if (value.length >= 6) {
+        buscarUsuarioPorCedula(value);
+      } else {
+        setUsuarioEncontrado(null);
+      }
+    }
     if (name === "tipoReferencia") {
       // Cuando cambia el tipo de referencia, establecer un estado por defecto
       const opcionesEstado = getOpcionesEstado(value);
@@ -268,7 +279,7 @@ const InscripcionModal = ({
                 onPaste={handlePasteCedula}
                 placeholder="Ingrese o pegue la cédula"
                 style={{ paddingRight: cargandoUsuario ? '40px' : '10px' }}
-                disabled={true}
+                disabled={modo === "editar"}
               />
               {modo === "crear" && cargandoUsuario && (
                 <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: '#666' }}>🔄</div>
@@ -279,34 +290,70 @@ const InscripcionModal = ({
                 </div>
               )}
               {modo === "crear" && cedulaBusqueda && !usuarioEncontrado && !cargandoUsuario && (
-                <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
-                  ❌ Usuario no encontrado con esta cédula
-                </div>
+                <>
+                  <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
+                    ❌ Usuario no encontrado con esta cédula
+                  </div>
+                  <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '4px', fontSize: '14px', color: '#856404' }}>
+                    💡 Puede llenar los campos manualmente para crear una nueva inscripción
+                  </div>
+                </>
               )}
             </div>
             <div className="form-grupo-admin">
-              <label>Nombre:</label>
-              <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" disabled={true} />
+              <label>
+                Nombre:
+                {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
+                  <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
+                )}
+              </label>
+              <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" disabled={modo === "editar"} />
             </div>
             <div className="form-grupo-admin">
-              <label>Apellido:</label>
-              <input name="apellido" value={form.apellido} onChange={handleChange} placeholder="Apellido" disabled={true} />
+              <label>
+                Apellido:
+                {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
+                  <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
+                )}
+              </label>
+              <input name="apellido" value={form.apellido} onChange={handleChange} placeholder="Apellido" disabled={modo === "editar"} />
             </div>
             <div className="form-grupo-admin">
-              <label>Tipo de Documento:</label>
-              <input name="tipoDocumento" value={form.tipoDocumento} onChange={handleChange} placeholder="Tipo de Documento" disabled={true} />
+              <label>
+                Tipo de Documento:
+                {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
+                  <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
+                )}
+              </label>
+              <select name="tipoDocumento" value={form.tipoDocumento} onChange={handleChange} disabled={modo === "editar"} required>
+                <option value="">Seleccione tipo de documento</option>
+                <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
+                <option value="Cédula de extranjería">Cédula de extranjería</option>
+                <option value="Pasaporte">Pasaporte</option>
+                <option value="Tarjeta de identidad">Tarjeta de identidad</option>
+              </select>
             </div>
             <div className="form-grupo-admin">
               <label>Número de Documento:</label>
-              <input name="numeroDocumento" value={form.numeroDocumento} onChange={handleChange} placeholder="Número de Documento" disabled={true} />
+              <input name="numeroDocumento" value={form.numeroDocumento} onChange={handleChange} placeholder="Número de Documento" disabled={modo === "editar"} required />
             </div>
             <div className="form-grupo-admin">
-              <label>Correo:</label>
-              <input name="correo" value={form.correo} onChange={handleChange} placeholder="Correo" disabled={true} />
+              <label>
+                Correo:
+                {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
+                  <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
+                )}
+              </label>
+              <input name="correo" type="email" value={form.correo} onChange={handleChange} placeholder="Correo" disabled={modo === "editar"} />
             </div>
             <div className="form-grupo-admin">
-              <label>Teléfono:</label>
-              <input name="telefono" value={form.telefono} onChange={handleChange} placeholder="Teléfono" disabled={true} />
+              <label>
+                Teléfono:
+                {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
+                  <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
+                )}
+              </label>
+              <input name="telefono" type="tel" value={form.telefono} onChange={handleChange} placeholder="Teléfono" disabled={modo === "editar"} required />
             </div>
             <div className="form-grupo-admin">
               <label>Edad:</label>

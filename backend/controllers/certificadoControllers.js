@@ -8,8 +8,19 @@ const ProgramaAcademico = require('../models/ProgramaAcademico');
 const Inscripcion = require('../models/Inscripciones');
 
 exports.generarCertificado = async (req, res) => {
+  try {
+    console.log('🎓 INICIANDO GENERACIÓN DE CERTIFICADO');
+    console.log('📋 DATOS RECIBIDOS:', JSON.stringify(req.body, null, 2));
+    
+    const { userId, cursoId } = req.body;
 
-  const { userId, cursoId } = req.body;
+    if (!userId || !cursoId) {
+      console.log('❌ ERROR: Faltan parámetros userId o cursoId');
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Se requieren userId y cursoId' 
+      });
+    }
 
 
   // Convertir a ObjectId si es necesario
@@ -23,19 +34,38 @@ exports.generarCertificado = async (req, res) => {
   }
 
   // 1. Busca la inscripción aprobada del usuario al curso (acepta string o ObjectId)
+  console.log('🔍 BUSCANDO INSCRIPCIÓN CERTIFICADO');
+  console.log('🆔 UserID:', userId, 'CursoID:', cursoId);
+  
   const inscripcion = await Inscripcion.findOne({
     $or: [
       { usuario: userId, referencia: cursoId },
       { usuario: userObjectId, referencia: cursoObjectId }
     ],
-    estado: 'certificado'
+    estado: { $in: ['certificado', 'finalizado'] }
   });
 
+  console.log('📋 INSCRIPCIÓN ENCONTRADA:', inscripcion ? 'SÍ' : 'NO');
+  if (inscripcion) {
+    console.log('✅ INSCRIPCIÓN VÁLIDA ENCONTRADA:');
+    console.log(`   - Usuario: ${inscripcion.usuario}`);
+    console.log(`   - Referencia: ${inscripcion.referencia}`);  
+    console.log(`   - Tipo: ${inscripcion.tipoReferencia}`);
+    console.log(`   - Estado: ${inscripcion.estado}`);
+  }
+  
   if (!inscripcion) {
     // Mostrar todas las inscripciones del usuario para depuración
     const inscripcionesDebug = await Inscripcion.find({ usuario: userId });
+    console.log('🔍 INSCRIPCIONES DEL USUARIO PARA DEBUG:', inscripcionesDebug.length);
+    inscripcionesDebug.forEach(ins => {
+      console.log(`  - Estado: ${ins.estado}, Tipo: ${ins.tipoReferencia}, Ref: ${ins.referencia}`);
+    });
 
-    return res.status(400).json({ message: 'El usuario no ha finalizado o no ha sido aprobado en el curso.' });
+    return res.status(400).json({ 
+      success: false,
+      message: 'El usuario no tiene una inscripción con estado "certificado" o "finalizado" para este curso.' 
+    });
   }
 
   // VALIDACIÓN: Solo permitir certificados para programas académicos
@@ -182,4 +212,13 @@ exports.generarCertificado = async (req, res) => {
 
   // ¡IMPORTANTE! Finalizar el documento PDF
   doc.end();
+  
+  } catch (error) {
+    console.log('❌ ERROR EN GENERACIÓN DE CERTIFICADO:', error.message);
+    console.log('❌ ERROR COMPLETO:', error);
+    res.status(400).json({ 
+      success: false, 
+      message: `Error al generar certificado: ${error.message}` 
+    });
+  }
 };

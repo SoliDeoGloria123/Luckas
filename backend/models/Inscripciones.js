@@ -64,21 +64,33 @@ const inscripcionSchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: function(valor) {
+                // Durante findByIdAndUpdate, this.tipoReferencia puede ser undefined
+                // Necesitamos acceder al tipoReferencia del documento actual o del update
+                const tipoRef = this.tipoReferencia || this.getUpdate?.$set?.tipoReferencia || this._update?.tipoReferencia;
+                
+                // Si no podemos determinar el tipo, permitir la validación (se validará en el controller)
+                if (!tipoRef) {
+                    console.log('⚠️ VALIDADOR: No se pudo determinar tipoReferencia, permitiendo validación');
+                    return true;
+                }
+                
                 // Validar estados según el tipo de referencia
-                if (this.tipoReferencia === 'Eventos') {
+                if (tipoRef === 'Eventos') {
                     return ['inscrito', 'finalizado'].includes(valor);
-                } else if (this.tipoReferencia === 'ProgramaAcademico') {
+                } else if (tipoRef === 'ProgramaAcademico') {
                     return ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'].includes(valor);
                 }
                 return false;
             },
             message: function(props) {
-                if (this.tipoReferencia === 'Eventos') {
+                const tipoRef = this.tipoReferencia || this.getUpdate?.$set?.tipoReferencia || this._update?.tipoReferencia;
+                
+                if (tipoRef === 'Eventos') {
                     return `Para eventos, el estado debe ser: inscrito o finalizado. Recibido: ${props.value}`;
-                } else if (this.tipoReferencia === 'ProgramaAcademico') {
+                } else if (tipoRef === 'ProgramaAcademico') {
                     return `Para programas académicos, el estado debe ser: preinscrito, matriculado, en_curso, finalizado, certificado, rechazada o cancelada academico. Recibido: ${props.value}`;
                 }
-                return `Tipo de referencia no válido: ${this.tipoReferencia}`;
+                return `Tipo de referencia no determinado durante validación: ${tipoRef}`;
             }
         }
     },

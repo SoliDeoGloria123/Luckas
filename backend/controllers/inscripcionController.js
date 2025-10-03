@@ -411,42 +411,59 @@ exports.actualizarInscripcion = async (req, res) => {
       return res.status(400).json({ success: false, message: `Campos requeridos faltantes: ${camposFaltantes.join(', ')}` });
     }
 
-    // Validar estado según tipo de referencia (si se está actualizando)
-    if (req.body.estado || req.body.tipoReferencia) {
-      console.log('🔍 VALIDANDO ESTADO EN ACTUALIZACIÓN');
-      const estadoActualizar = req.body.estado;
-      const tipoRef = req.body.tipoReferencia || tipoReferencia;
-      
-      if (estadoActualizar) {
-        const validarEstado = (tipoRef, estado) => {
-          if (tipoRef === 'Eventos') {
-            const estadosValidos = ['inscrito', 'finalizado'];
-            if (!estadosValidos.includes(estado)) {
-              return `Para eventos, el estado debe ser: ${estadosValidos.join(' o ')}. Recibido: ${estado}`;
-            }
-          } else if (tipoRef === 'ProgramaAcademico') {
-            const estadosValidos = ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'];
-            if (!estadosValidos.includes(estado)) {
-              return `Para programas académicos, el estado debe ser: ${estadosValidos.join(', ')}. Recibido: ${estado}`;
-            }
-          }
-          return null;
-        };
+    // La validación de estado se realiza más abajo con el documento actual
 
-        const errorEstado = validarEstado(tipoRef, estadoActualizar);
-        if (errorEstado) {
-          console.log('❌ Error de validación de estado en actualización:', errorEstado);
-          return res.status(400).json({ 
-            success: false, 
-            message: errorEstado 
-          });
+    // Obtener la inscripción actual para validaciones
+    const inscripcionActual = await Inscripcion.findById(req.params.id);
+    if (!inscripcionActual) {
+      return res.status(404).json({ success: false, message: 'Inscripción no encontrada' });
+    }
+
+    // Determinar el tipoReferencia final (actual o nuevo)
+    const tipoReferenciaFinal = req.body.tipoReferencia || inscripcionActual.tipoReferencia;
+
+    // Validación adicional de estado si se está cambiando
+    if (req.body.estado) {
+      const validarEstadoFinal = (tipoRef, estado) => {
+        if (tipoRef === 'Eventos') {
+          const estadosValidos = ['inscrito', 'finalizado'];
+          if (!estadosValidos.includes(estado)) {
+            return `Para eventos, el estado debe ser: ${estadosValidos.join(' o ')}. Recibido: ${estado}`;
+          }
+        } else if (tipoRef === 'ProgramaAcademico') {
+          const estadosValidos = ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'];
+          if (!estadosValidos.includes(estado)) {
+            return `Para programas académicos, el estado debe ser: ${estadosValidos.join(', ')}. Recibido: ${estado}`;
+          }
         }
-        console.log(`✅ Estado válido para actualización ${tipoRef}: ${estadoActualizar}`);
+        return null;
+      };
+
+      const errorEstadoFinal = validarEstadoFinal(tipoReferenciaFinal, req.body.estado);
+      if (errorEstadoFinal) {
+        console.log('❌ Error de validación final de estado:', errorEstadoFinal);
+        return res.status(400).json({ 
+          success: false, 
+          message: errorEstadoFinal 
+        });
       }
     }
 
     // Actualizar inscripción
-    const inscripcion = await Inscripcion.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    console.log('🔄 DATOS PARA ACTUALIZACIÓN:', JSON.stringify(req.body, null, 2));
+    console.log('🔄 ID A ACTUALIZAR:', req.params.id);
+    console.log('🔄 TIPO REFERENCIA FINAL:', tipoReferenciaFinal);
+    
+    let inscripcion;
+    try {
+      // Usar runValidators: false para evitar problemas con el contexto del validador
+      inscripcion = await Inscripcion.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: false });
+    } catch (updateError) {
+      console.log('❌ ERROR EN ACTUALIZACIÓN DE INSCRIPCIÓN:', updateError.message);
+      console.log('❌ ERROR COMPLETO:', updateError);
+      return res.status(400).json({ success: false, message: `Error al actualizar: ${updateError.message}` });
+    }
+    
     if (!inscripcion) return res.status(404).json({ success: false, message: 'Inscripción no encontrada' });
 
     // Actualizar solicitud asociada si existe

@@ -52,17 +52,40 @@ const ReservasModal = ({
           <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
 
-        <form className="modal-body-admin">
+        <form className="modal-body-admin" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {/* Usuario */}
           <div className="form-grupo-admin">
             <label>Usuario:</label>
             <select
               value={modoEdicion ? reservaSeleccionada?.usuario : nuevaReserva.usuario}
-              onChange={e =>
-                modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, usuario: e.target.value })
-                  : setNuevaReserva({ ...nuevaReserva, usuario: e.target.value })
-              }
+              onChange={e => {
+                const userId = e.target.value;
+                const usuarioSeleccionado = usuarios.find(u => u._id === userId);
+                
+                if (modoEdicion) {
+                  setReservaSeleccionada({ 
+                    ...reservaSeleccionada, 
+                    usuario: userId,
+                    nombre: usuarioSeleccionado?.nombre || '',
+                    apellido: usuarioSeleccionado?.apellido || '',
+                    correoElectronico: usuarioSeleccionado?.correo || '',
+                    telefono: usuarioSeleccionado?.telefono || '',
+                    tipoDocumento: usuarioSeleccionado?.tipoDocumento || '',
+                    numeroDocumento: usuarioSeleccionado?.numeroDocumento || ''
+                  });
+                } else {
+                  setNuevaReserva({ 
+                    ...nuevaReserva, 
+                    usuario: userId,
+                    nombre: usuarioSeleccionado?.nombre || '',
+                    apellido: usuarioSeleccionado?.apellido || '',
+                    correoElectronico: usuarioSeleccionado?.correo || '',
+                    telefono: usuarioSeleccionado?.telefono || '',
+                    tipoDocumento: usuarioSeleccionado?.tipoDocumento || '',
+                    numeroDocumento: usuarioSeleccionado?.numeroDocumento || ''
+                  });
+                }
+              }}
               required
             >
               <option value="">Seleccione...</option>
@@ -194,18 +217,115 @@ const ReservasModal = ({
           </div>
           </div>
 
+          {/* Datos Personales */}
+          <div className="form-section-admin">
+            <h3 style={{ color: 'var(--primary-blue)', marginBottom: '1rem' }}>Datos del Huésped</h3>
+            
+            <div className="from-grid-admin">
+              <div className="form-grupo-admin">
+                <label>Nombre:</label>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={modoEdicion ? reservaSeleccionada?.nombre : nuevaReserva.nombre}
+                  onChange={handleChange}
+                  placeholder="Nombre del huésped"
+                  required
+                />
+              </div>
+              
+              <div className="form-grupo-admin">
+                <label>Apellido:</label>
+                <input
+                  type="text"
+                  name="apellido"
+                  value={modoEdicion ? reservaSeleccionada?.apellido : nuevaReserva.apellido}
+                  onChange={handleChange}
+                  placeholder="Apellido del huésped"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="from-grid-admin">
+              <div className="form-grupo-admin">
+                <label>Tipo de Documento:</label>
+                <select
+                  name="tipoDocumento"
+                  value={modoEdicion ? reservaSeleccionada?.tipoDocumento : nuevaReserva.tipoDocumento}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccionar tipo</option>
+                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
+                  <option value="Cédula de extranjería">Cédula de extranjería</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
+                </select>
+              </div>
+              
+              <div className="form-grupo-admin">
+                <label>Número de Documento:</label>
+                <input
+                  type="text"
+                  name="numeroDocumento"
+                  value={modoEdicion ? reservaSeleccionada?.numeroDocumento : nuevaReserva.numeroDocumento}
+                  onChange={handleChange}
+                  placeholder="Número de documento"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="from-grid-admin">
+              <div className="form-grupo-admin">
+                <label>Correo Electrónico:</label>
+                <input
+                  type="email"
+                  name="correoElectronico"
+                  value={modoEdicion ? reservaSeleccionada?.correoElectronico : nuevaReserva.correoElectronico}
+                  onChange={handleChange}
+                  placeholder="correo@ejemplo.com"
+                  required
+                />
+              </div>
+              
+              <div className="form-grupo-admin">
+                <label>Teléfono:</label>
+                <input
+                  type="tel"
+                  name="telefono"
+                  value={modoEdicion ? reservaSeleccionada?.telefono : nuevaReserva.telefono}
+                  onChange={handleChange}
+                  placeholder="Número de teléfono"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-grupo-admin">
+              <label>Número de Personas:</label>
+              <input
+                type="number"
+                name="numeroPersonas"
+                value={modoEdicion ? reservaSeleccionada?.numeroPersonas : nuevaReserva.numeroPersonas}
+                onChange={handleChange}
+                min="1"
+                max="20"
+                required
+              />
+            </div>
+          </div>
+
           {/* Observaciones */}
           <div className="form-grupo-admin">
             <label>Observaciones:</label>
-            <input
-              type="text"
+            <textarea
+              name="observaciones"
               value={modoEdicion ? reservaSeleccionada?.observaciones : nuevaReserva.observaciones}
-              onChange={e =>
-                modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, observaciones: e.target.value })
-                  : setNuevaReserva({ ...nuevaReserva, observaciones: e.target.value })
-              }
-              placeholder="Observaciones"
+              onChange={handleChange}
+              placeholder="Observaciones adicionales"
+              rows="3"
             />
           </div>
 
