@@ -9,7 +9,7 @@ const defaultForm = {
   numeroDocumento: "",
   correo: "",
   telefono: "",
-  edad: "",
+  edad: "25",
   tipoReferencia: "",
   referencia: "",
   categoria: "",
@@ -59,13 +59,63 @@ const InscripcionModal = ({
     }
   }, [modo, inscripcion]);
 
+  // Obtener opciones de estado según el tipo de referencia
+  const getOpcionesEstado = (tipoReferencia = form.tipoReferencia) => {
+    if (tipoReferencia === 'Eventos') {
+      return [
+        { value: 'inscrito', label: 'Inscrito' },
+        { value: 'finalizado', label: 'Finalizado' }
+      ];
+    } else if (tipoReferencia === 'ProgramaAcademico') {
+      return [
+        { value: 'preinscrito', label: 'Preinscrito' },
+        { value: 'matriculado', label: 'Matriculado' },
+        { value: 'en_curso', label: 'En Curso' },
+        { value: 'finalizado', label: 'Finalizado' },
+        { value: 'certificado', label: 'Certificado' },
+        { value: 'rechazada', label: 'Rechazada' },
+        { value: 'cancelada', label: 'Cancelada Académico' }
+      ];
+    } else {
+      return [];
+    }
+  };
+
   // Buscar usuario por cédula
   const buscarUsuarioPorCedula = async (cedula) => {
     if (!cedula || cedula.length < 6) return;
     setCargandoUsuario(true);
     try {
       const usuario = await userService.getByDocumento(cedula);
+      console.log('🔍 Usuario obtenido del API:', {
+        _id: usuario._id,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        numeroDocumento: usuario.numeroDocumento
+      });
       setUsuarioEncontrado(usuario);
+      
+      // Calcular edad a partir de la fecha de nacimiento
+      let edadCalculada = 25; // Edad por defecto
+      if (usuario.fechaNacimiento) {
+        try {
+          const hoy = new Date();
+          const fechaNac = new Date(usuario.fechaNacimiento);
+          if (!isNaN(fechaNac.getTime())) {
+            edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
+            const mes = hoy.getMonth() - fechaNac.getMonth();
+            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+              edadCalculada--;
+            }
+            console.log('✅ Edad calculada desde fecha nacimiento:', edadCalculada);
+          }
+        } catch (error) {
+          console.log('❌ Error calculando edad:', error);
+        }
+      } else {
+        console.log('⚠️ Usuario sin fecha de nacimiento, usando edad por defecto');
+      }
+      
       setForm(prev => ({
         ...prev,
         usuario: String(usuario._id || ""),
@@ -74,7 +124,8 @@ const InscripcionModal = ({
         correo: String(usuario.correo || ""),
         telefono: String(usuario.telefono || ""),
         tipoDocumento: String(usuario.tipoDocumento || ""),
-        numeroDocumento: String(usuario.numeroDocumento || cedula)
+        numeroDocumento: String(usuario.numeroDocumento || cedula),
+        edad: String(edadCalculada)
       }));
     } catch (error) {
       setUsuarioEncontrado(null);
@@ -117,8 +168,21 @@ const InscripcionModal = ({
     const { name, value } = e.target;
     // En modo editar, no permitir modificar campos personales
     if (modo === "editar" && [
-      "usuario", "nombre", "apellido", "tipoDocumento", "numeroDocumento", "correo", "telefono", "edad", "categoria"
+      "usuario", "nombre", "apellido", "tipoDocumento", "numeroDocumento", "correo", "telefono", "categoria"
     ].includes(name)) {
+      return;
+    }
+    if (name === "tipoReferencia") {
+      // Cuando cambia el tipo de referencia, establecer un estado por defecto
+      const opcionesEstado = getOpcionesEstado(value);
+      const estadoDefecto = opcionesEstado.length > 0 ? opcionesEstado[0].value : 'pendiente';
+      setForm({ 
+        ...form, 
+        [name]: String(value),
+        estado: estadoDefecto,
+        referencia: "", // Limpiar referencia cuando cambia el tipo
+        categoria: "" // Limpiar categoría cuando cambia el tipo
+      });
       return;
     }
     if (name === "referencia") {
@@ -246,7 +310,25 @@ const InscripcionModal = ({
             </div>
             <div className="form-grupo-admin">
               <label>Edad:</label>
-              <input name="edad" value={form.edad} onChange={handleChange} placeholder="Edad" disabled={true} />
+              <input 
+                name="edad" 
+                value={form.edad} 
+                onChange={handleChange} 
+                placeholder="Edad" 
+                type="number" 
+                min="1"
+                max="120"
+                style={{
+                  borderColor: !form.edad || parseInt(form.edad) < 1 ? '#dc3545' : '#28a745',
+                  backgroundColor: !form.edad || parseInt(form.edad) < 1 ? '#f8d7da' : '#d4edda'
+                }}
+                title="La edad es calculada automáticamente desde la fecha de nacimiento, pero puede editarse si es necesario"
+              />
+              {form.edad && parseInt(form.edad) > 0 && (
+                <small style={{ marginTop: '5px', fontSize: '12px', color: '#28a745', display: 'block' }}>
+                  ✅ Edad válida
+                </small>
+              )}
             </div>
             <div className="form-grupo-admin">
               <label>Tipo de inscripción:</label>
@@ -315,13 +397,11 @@ const InscripcionModal = ({
               <label>Estado:</label>
               <select name="estado" value={form.estado} onChange={handleChange} placeholder="Estado" >
                 <option value="">Seleccione estado</option>
-                <option value="preinscrito">Preinscrito</option>
-                <option value="matriculado">Matriculado</option>
-                <option value="en_curso">En Curso</option>
-                <option value="finalizado">Finalizado</option>
-                <option value="certificado">Certificado</option>
-                <option value="rechazada">Rechazada</option>
-                <option value="cancelada">Cancelada Académico</option>
+                {getOpcionesEstado(form.tipoReferencia).map(opcion => (
+                  <option key={opcion.value} value={opcion.value}>
+                    {opcion.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="form-grupo-admin">

@@ -95,11 +95,9 @@ const NuevaSolicitud = () => {
       case 'Cabana':
         endpoint = 'http://localhost:3000/api/cabanas';
         break;
-      case 'Curso':
-        endpoint = 'http://localhost:3000/api/cursos';
-        break;
-      case 'ProgramaTecnico':
-        endpoint = 'http://localhost:3000/api/programas-tecnicos';
+
+      case 'ProgramaAcademico':
+        endpoint = 'http://localhost:3000/api/programas-academicos';
         break;
       case 'Inscripcion':
         endpoint = 'http://localhost:3000/api/inscripciones';
@@ -133,8 +131,7 @@ const NuevaSolicitud = () => {
   const modeloCategoriaMap = {
     'Eventos': 'evento',
     'Cabana': 'cabana',
-    'Curso': 'curso',
-    'ProgramaTecnico': 'programa_tecnico',
+    'ProgramaAcademico': 'programa_academico',
     'Inscripcion': 'inscripcion',
     'Reserva': 'reserva',
     'Comedor': 'comedor'
@@ -678,8 +675,8 @@ const NuevaSolicitud = () => {
                         <option value="">Selecciona el modelo</option>
                         <option value="Eventos">Evento</option>
                         <option value="Cabana">Cabaña</option>
-                        <option value="Curso">Curso</option>
-                        <option value="ProgramaTecnico">Programa Técnico</option>
+
+                        <option value="ProgramaAcademico">Programa Académico</option>
                         <option value="Inscripcion">Inscripción</option>
                         <option value="Reserva">Reserva</option>
                         <option value="Comedor">Comedor</option>

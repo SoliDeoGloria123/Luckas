@@ -197,8 +197,8 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
                 >
                   <option value="">Seleccione...</option>
                   {formData.tipoSolicitud === 'Inscripción' && <option value="Eventos">Eventos</option>}
-                  {formData.tipoSolicitud === 'Inscripción' && <option value="Curso">Curso</option>}
-                  {formData.tipoSolicitud === 'Inscripción' && <option value="ProgramaTecnico">Programa Tecnico</option>}
+
+                  {formData.tipoSolicitud === 'Inscripción' && <option value="ProgramaAcademico">Programa Académico</option>}
                   {formData.tipoSolicitud === 'Hospedaje' && <option value="Cabana">Cabaña</option>}
                   {formData.tipoSolicitud === 'Hospedaje' && <option value="Reserva">Reserva</option>}
                   {formData.tipoSolicitud === 'Alimentación' && <option value="Comedor">Comedor</option>}

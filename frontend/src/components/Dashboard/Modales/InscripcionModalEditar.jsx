@@ -23,8 +23,46 @@ const InscripcionModalEditar = ({ mostrar, inscripcion, setInscripcion, onClose,
       }
     }
   }, [inscripcion, setInscripcion]);
+
+  // Obtener opciones de estado según el tipo de referencia
+  const getOpcionesEstado = (tipoReferencia = inscripcion?.tipoReferencia) => {
+    if (tipoReferencia === 'Eventos') {
+      return [
+        { value: 'inscrito', label: 'Inscrito' },
+        { value: 'finalizado', label: 'Finalizado' }
+      ];
+    } else if (tipoReferencia === 'ProgramaAcademico') {
+      return [
+        { value: 'preinscrito', label: 'Preinscrito' },
+        { value: 'matriculado', label: 'Matriculado' },
+        { value: 'en_curso', label: 'En Curso' },
+        { value: 'finalizado', label: 'Finalizado' },
+        { value: 'certificado', label: 'Certificado' },
+        { value: 'rechazada', label: 'Rechazada' },
+        { value: 'cancelada', label: 'Cancelada Académico' }
+      ];
+    } else {
+      return [];
+    }
+  };
+
   const handleChange = e => {
     const { name, value } = e.target;
+    
+    // Si cambia el tipo de referencia, establecer un estado por defecto
+    if (name === "tipoReferencia") {
+      const opcionesEstado = getOpcionesEstado(value);
+      const estadoDefecto = opcionesEstado.length > 0 ? opcionesEstado[0].value : 'preinscrito';
+      setInscripcion({
+        ...inscripcion,
+        [name]: String(value),
+        estado: estadoDefecto,
+        referencia: "", // Limpiar referencia cuando cambia el tipo
+        categoria: "" // Limpiar categoría cuando cambia el tipo
+      });
+      return;
+    }
+    
     // Si cambia la referencia, actualiza la categoría automáticamente
     if (name === "referencia") {
       if (inscripcion.tipoReferencia === "Eventos") {
@@ -154,15 +192,11 @@ const InscripcionModalEditar = ({ mostrar, inscripcion, setInscripcion, onClose,
               <label>Estado:</label>
               <select name="estado" value={inscripcion.estado || ""} onChange={handleChange} required>
                 <option value="">Seleccione estado</option>
-                <option value="preinscrito">Preinscrito</option>
-                <option value="matriculado">Matriculado</option>
-                <option value="en_curso">En Curso</option>
-                <option value="finalizado">Finalizado</option>
-                <option value="certificado">Certificado</option>
-                <option value="rechazada">Rechazada</option>
-                <option value="cancelada academico">Cancelada Académico</option>
-
-
+                {getOpcionesEstado(inscripcion?.tipoReferencia).map(opcion => (
+                  <option key={opcion.value} value={opcion.value}>
+                    {opcion.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="form-grupo-admin">

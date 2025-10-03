@@ -151,10 +151,10 @@ exports.obtenerSolicitudes = async (req, res) => {
           });
         }
         
-        if (tipoSolicitud === 'Inscripción' && modeloReferencia !== 'Eventos') {
+        if (tipoSolicitud === 'Inscripción' && !['Eventos', 'ProgramaAcademico'].includes(modeloReferencia)) {
           return res.status(400).json({
             success: false,
-            message: 'Para solicitudes de Inscripción, modeloReferencia debe ser "Eventos"'
+            message: 'Para solicitudes de Inscripción, modeloReferencia debe ser "Eventos" o "ProgramaAcademico"'
           });
         }
         

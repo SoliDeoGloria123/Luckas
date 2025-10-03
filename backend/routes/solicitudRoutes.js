@@ -26,8 +26,8 @@ const validarSolicitud = [
     .withMessage('Tipo de solicitud inválido'),
   body('modeloReferencia')
     .optional()
-    .isIn(['Eventos', 'Cabana', 'Inscripcion', 'Reserva'])
-    .withMessage('Modelo de referencia debe ser Eventos, Cabana, Inscripcion o Reserva'),
+    .isIn(['Eventos', 'Cabana', 'Inscripcion', 'Reserva', 'ProgramaAcademico', 'Comedor'])
+    .withMessage('Modelo de referencia debe ser Eventos, Cabana, Inscripcion, Reserva, ProgramaAcademico o Comedor'),
   body('referencia')
     .optional()
     .isMongoId()

@@ -271,7 +271,7 @@ const SolicitudModal = ({
                     >
                       <option value="">Seleccione...</option>
                       {nuevaSolicitud.tipoSolicitud === 'Inscripción' && <option value="Eventos">Eventos</option>}
-                      {nuevaSolicitud.tipoSolicitud === 'Inscripción' && <option value="Curso">Curso</option>}
+
                       {nuevaSolicitud.tipoSolicitud === 'Inscripción' && <option value="ProgramaTecnico">Programa Tecnico </option>}
                       {nuevaSolicitud.tipoSolicitud === 'Hospedaje' && <option value="Cabana">Cabaña</option>}
                       {nuevaSolicitud.tipoSolicitud === 'Hospedaje' && <option value="Reserva">Reservas</option>}
