@@ -4,6 +4,7 @@ import { categorizacionService } from '../../../services/categorizacionService';
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
+import { Edit } from "lucide-react"
 
 
 const Gestioncategorizacion = () => {
@@ -54,6 +55,22 @@ const Gestioncategorizacion = () => {
     setCurrentItem(categoria);
     setShowModal(true);
   };
+
+  
+    // Paginación
+    const [paginaActual, setPaginaActual] = useState(1);
+    const registrosPorPagina = 10;
+    const totalPaginas = Math.ceil(categorias.length / registrosPorPagina);
+    const categorizacionPaginados = categorias.slice(
+      (paginaActual - 1) * registrosPorPagina,
+      paginaActual * registrosPorPagina
+    );
+  
+    // Reiniciar a la página 1 si cambia el filtro de usuarios
+    useEffect(() => {
+      setPaginaActual(1);
+    }, [categorias]);
+
   return (
     <>
       <Header />
@@ -147,54 +164,74 @@ const Gestioncategorizacion = () => {
         </div>
 
 
-        <div className="table-container-tesorero">
-          <table className="users-table-tesorero">
-            <thead>
-              <tr>
-                <th>
-                  <input type="checkbox" id="selectAll"></input>
-                </th>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Tipo de categoria</th>
-                <th>Codigo</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="usersTableBody">
-              {categorias.length === 0 ? (
-                <tr>
-                  <td colSpan={5}>no hay categorias para mostrar</td>
-                </tr>
-              ) : (
-                categorias.map((cate) => (
-                  <tr key={cate._id}>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>{cate._id}</td>
-                    <td>{cate.nombre}</td>
-                    <td>{cate.tipo}</td>
-                    <td>{cate.codigo}</td>
-                    <td>
-                      <span className={`badge-tesorero badge-tesorero-${cate.activo ? 'activo' : 'desactivado'}`}>
-                        {cate.activo ? 'activo' : 'desactivado'}
-                      </span>
-                    </td>
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-[#334155]/10 bg-white shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="users-table-tesorero">
+                <thead>
+                  <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
 
-                    <td className='actions-cell'>
-                      <button className='action-btn edit' onClick={() => handleEdit(cate)}>
-                        <i class="fas fa-edit"></i>
-                      </button>
-                    </td>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">ID</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">Nombre</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">Tipo de categoria</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">Codigo</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">Estado</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">Acciones</th>
                   </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  {categorias.length === 0 ? (
+                    <tr>
+                      <td colSpan={5}>no hay categorias para mostrar</td>
+                    </tr>
+                  ) : (
+                    categorizacionPaginados.map((cate) => (
+                      <tr key={cate._id}>
 
-                ))
-              )}
-            </tbody>
-          </table>
+                        <td>{cate._id}</td>
+                        <td>{cate.nombre}</td>
+                        <td>{cate.tipo}</td>
+                        <td>{cate.codigo}</td>
+                        <td>
+                          <span className={`badge-tesorero badge-tesorero-${cate.activo ? 'activo' : 'desactivado'}`}>
+                            {cate.activo ? 'activo' : 'desactivado'}
+                          </span>
+                        </td>
+
+                        <td className="whitespace-nowrap px-6 py-4">
+                          <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(cate)} size="icon">
+                            <Edit className="h-4 w-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
         </div>
+        <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+            <button
+              className="pagination-btn-admin"
+            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+            disabled={paginaActual === 1}
+            >
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <span className="pagination-info-admin">
+              Página {paginaActual} de {totalPaginas}
+            </span>
+          
+            <button
+              className="pagination-btn-admin"
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+          disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            >
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
         {showModal && (
           <CategorizacionModal
             mode={modalMode}

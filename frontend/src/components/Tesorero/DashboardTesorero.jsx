@@ -38,6 +38,9 @@ const DashboardTesorero = () => {
   const handleGreporteClick =() =>{
     navigate('/tesorero/reportes')
   };
+  const handlecertificadosClick =() =>{
+    navigate('/tesorero/certificados')
+  };
   const handleGtareaClick =() =>{
     navigate('/tesorero/tarea')
   };
@@ -78,9 +81,9 @@ const DashboardTesorero = () => {
         {seccionActiva === "dashboard" && (
           <>
             <div className="dashboard-header-tesorero">
-              <div className="dashboard-title-tesorero">
-                <h1>Dashboard Principal</h1>
-                <p>Gestiona recursos y administra el sistema eficientemente</p>
+              <div>
+                <h1 className="font-bold text-3xl text-gray-900 mb-2">Dashboard Principal</h1>
+                  <p className="text-gray-600">Gestiona recursos y administra el sistema eficientemente</p>
               </div>
               <button className="quick-action-btn-tesorero">
                 <i className="fas fa-plus"></i>
@@ -133,7 +136,7 @@ const DashboardTesorero = () => {
               </section>
 
               <section className="admin-functions">
-                <h2>Funciones Administrativas</h2>
+                <h2 className="mb-6 font-bold text-xl text-gray-900">Funciones Administrativas</h2>
                 <div className="functions-grid">
                   <div className={ seccionActiva === "usuarios-tesorero" ? "activo" : "function-card"} data-function="usuarios-tesorero">
                     <div className="function-icon">
@@ -308,6 +311,25 @@ const DashboardTesorero = () => {
                         <p>Procesar inscripciones y categorizar</p>
                       </div>
                       <button className="function-action" onClick={handleGinscripcionClick}>
+                        Gestionar →
+                      </button>
+                    </div>
+                  </div>
+                  <div className={ seccionActiva === "inscripcion-certificados" ? "activo" : "function-card"} data-function="inscripcion-certificados">
+                    <div className="function-icon">
+                      <i className="fas fa-user-plus"></i>
+                    </div>
+                    <div className="function-content">
+                      <div className="function-stats">
+                        <span className="stat-number">67</span>
+                        <span className="stat-label">nuevas</span>
+                        <span className="stat-detail">+18 esta semana</span>
+                      </div>
+                      <div className="function-info">
+                        <h3>Gestionar Certificados</h3>
+                        <p>Procesar inscripciones y categorizar</p>
+                      </div>
+                      <button className="function-action" onClick={handlecertificadosClick}>
                         Gestionar →
                       </button>
                     </div>

@@ -38,39 +38,9 @@ exports.generarCertificado = async (req, res) => {
     return res.status(400).json({ message: 'El usuario no ha finalizado o no ha sido aprobado en el curso.' });
   }
 
-  // VALIDACIÓN: Solo permitir certificados para programas académicos
-  if (inscripcion.tipoReferencia !== 'ProgramaAcademico') {
-    console.log('❌ INTENTO DE GENERAR CERTIFICADO PARA EVENTO - Rechazado');
-    console.log('Tipo de referencia de la inscripción:', inscripcion.tipoReferencia);
-    return res.status(400).json({ 
-      success: false,
-      message: 'Los certificados solo se pueden generar para programas académicos, no para eventos.' 
-    });
-  }
-
-  console.log('✅ CERTIFICADO VÁLIDO - Programa Académico confirmado');
-
-  // 2. Busca usuario
+  // 2. Busca usuario y curso
   const usuario = await User.findById(userId);
-  
-  if (!usuario) {
-    return res.status(404).json({ message: 'Usuario no encontrado.' });
-  }
-  
-  // 3. Busca el programa académico (ya validamos que es ProgramaAcademico)
   const curso = await ProgramaAcademico.findById(cursoId);
-  
-  console.log('DEBUG - Usuario encontrado:', usuario ? 'Sí' : 'No');
-  console.log('DEBUG - Programa académico encontrado:', curso ? 'Sí' : 'No');
-  console.log('DEBUG - cursoId recibido:', cursoId);
-  
-  if (!curso) {
-    return res.status(404).json({ 
-      success: false,
-      message: 'Programa académico no encontrado.' 
-    });
-  }
-  
   const logoPath = path.join(__dirname, '../public/logo-luckas.png');
 
 
@@ -97,11 +67,15 @@ exports.generarCertificado = async (req, res) => {
   doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).stroke();
   doc.rect(30, 30, doc.page.width - 60, doc.page.height - 60).stroke();
 
-  // Logo centrado en la parte superior
-  doc.image(logoPath, doc.page.width / 2 - 40, 50, { width: 80 });
+  // Logo centrado en la parte superior (ajustado)
+  const logoWidth = 60;
+  const logoHeight = 60;
+  const logoX = (doc.page.width - logoWidth) / 2;
+  const logoY = 40;
+  doc.image(logoPath, logoX, logoY, { width: logoWidth, height: logoHeight });
 
   // Agregar espacio suficiente después del logo
-  doc.y = 110; // Posición fija para evitar superposición
+  doc.y = logoY + logoHeight + 10; // Posición fija para evitar superposición
 
   // Título principal
   doc.fontSize(18).font('Helvetica-Bold').fillColor('#003366').text('SEMINARIO BAUTISTA DE COLOMBIA', { align: 'center' });
@@ -128,25 +102,17 @@ exports.generarCertificado = async (req, res) => {
   doc.moveDown(0.5);
   doc.fontSize(12).font('Helvetica').fillColor('black').text(`Con Cédula de Ciudadanía No. ${usuario.numeroDocumento}`, { align: 'center' });
 
-  // Texto del curso/evento
+  // Texto del curso
   doc.moveDown(1);
-  const tipoActividad = inscripcion.tipoReferencia === 'ProgramaAcademico' ? 'curso' : 'evento';
-  doc.fontSize(14).font('Helvetica').text(`Ha completado satisfactoriamente el ${tipoActividad}:`, { align: 'center' });
+  doc.fontSize(14).font('Helvetica').text('Ha completado satisfactoriamente el curso:', { align: 'center' });
 
-  // Nombre del curso/evento destacado
+  // Nombre del curso destacado
   doc.moveDown(0.5);
   doc.fontSize(18).font('Helvetica-Bold').fillColor('#003366').text(`${curso.nombre.toUpperCase()}`, { align: 'center' });
 
-  // Duración (según el tipo)
+  // Duración (puedes obtenerla del modelo si la tienes)
   doc.moveDown(0.5);
-  if (inscripcion.tipoReferencia === 'ProgramaAcademico') {
-    const duracion = curso.duracion || '[XX] horas';
-    doc.fontSize(12).font('Helvetica').fillColor('black').text(`Con una intensidad horaria académica de ${duracion}`, { align: 'center' });
-  } else {
-    // Para eventos, mostrar la fecha del evento
-    const fechaEvento = curso.fechaEvento ? new Date(curso.fechaEvento).toLocaleDateString('es-CO') : '[Fecha del evento]';
-    doc.fontSize(12).font('Helvetica').fillColor('black').text(`Realizado el ${fechaEvento}`, { align: 'center' });
-  }
+  doc.fontSize(12).font('Helvetica').fillColor('black').text('Con una intensidad horaria académica de [XX] horas', { align: 'center' });
 
   // Fecha y lugar
   doc.moveDown(1.5);

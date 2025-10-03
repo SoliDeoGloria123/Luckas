@@ -5,7 +5,7 @@ import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
 
-import { Search, Download, Share2, Edit, ChevronLeft, ChevronRight } from "lucide-react"
+import { Edit, ChevronLeft, ChevronRight } from "lucide-react"
 
 
 
@@ -90,6 +90,20 @@ const Gestionusuarios = () => {
       mostrarAlerta('Error', 'Error al procesar el usuario', 'error');
     };
   };
+
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
+  const totalPaginas = Math.ceil(usuariosFiltrados.length / registrosPorPagina);
+  const usuariosPaginados = usuariosFiltrados.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+
+  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [usuariosFiltrados]);
 
   return (
     <>
@@ -183,157 +197,118 @@ const Gestionusuarios = () => {
             </div>
           </div>
 
-
-          {/* Filters and search */}
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="relative flex-1 max-w-md">
-              {/* <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#334155]/40" /> */}
-              <input
-                type="text"
-                placeholder="Buscar por ID, nombre, correo..."
-
-
-                className="h-10 w-full rounded-lg border border-[#334155]/10 bg-white pl-10 pr-4 text-sm text-[#334155] placeholder:text-[#334155]/40 focus:border-[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20"
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="overflow-hidden rounded-xl border border-[#334155]/10 bg-white shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      ID
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Nombre
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Apellido
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Tipo de Documento
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Número de Documento
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Fecha de Nacimiento
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Correo
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Teléfono
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Rol
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Estado
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                      Acciones
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#334155]/10">
-                  {usuariosFiltrados.length === 0 ? (
-                    <tr>
-                      <td colSpan={11}>
-                        {searchTerm ? 'No se encontraron usuarios con ese número de cédula' : 'No hay usuarios para mostrar'}
-                      </td>
+          <div className="rounded-xl bg-white p-6 shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-[#334155]/10 bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        ID
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Nombre
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Apellido
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Tipo de Documento
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Número de Documento
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Fecha de Nacimiento
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Correo
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Teléfono
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Rol
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Estado
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
+                        Acciones
+                      </th>
                     </tr>
-                  ) : (
-                    usuariosFiltrados.map((user) => (
-                      <tr key={user.id} className="transition-colors hover:bg-[#f1f5f9]/50">
-                        <td className="whitespace-nowrap px-6 py-4 text-base font-medium text-[#334155]">{user._id}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.nombre}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.apellido}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.tipoDocumento}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.numeroDocumento}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]/60">{user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : "N/A"}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#2563eb]">{user.correo}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.telefono}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.role}</td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          <span
-                            className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold`}
-                          >
-                            {user.estado}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          <button
-                            onClick={() => {
-                              setModalMode('edit');
-                              setCurrentItem(user);
-                              setShowModalUsuario(true);
-                            }}
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]"
-                          >
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Editar registro</span>
-                          </button>
+                  </thead>
+                  <tbody className="divide-y divide-[#334155]/10">
+                    {usuariosFiltrados.length === 0 ? (
+                      <tr>
+                        <td colSpan={11}>
+                          {searchTerm ? 'No se encontraron usuarios con ese número de cédula' : 'No hay usuarios para mostrar'}
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      usuariosPaginados.map((user) => (
+                        <tr key={user.id} className="transition-colors hover:bg-[#f1f5f9]/50">
+                          <td className="whitespace-nowrap px-6 py-4 text-base font-medium text-[#334155]">{user._id}</td>
+                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.nombre}</td>
+                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.apellido}</td>
+                          <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.tipoDocumento}</td>
+                          <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.numeroDocumento}</td>
+                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]/60">{user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : "N/A"}</td>
+                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#2563eb]">{user.correo}</td>
+                          <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.telefono}</td>
+                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.role}</td>
+                          <td className="whitespace-nowrap px-6 py-4">
+                            <span
+                              className={`badge-tesorero badge-tesorero-${user.estado}`}
+                            >
+                              {user.estado}
+                            </span>
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4">
+                            <button
+                              onClick={() => {
+                                setModalMode('edit');
+                                setCurrentItem(user);
+                                setShowModalUsuario(true);
+                              }}
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]"
+                            >
+                              <Edit className="h-4 w-4" />
+                              <span className="sr-only">Editar registro</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-[#334155]/10 bg-[#f1f5f9] px-6 py-4">
-              <div className="text-sm text-[#334155]/60">
-
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  variant="outline"
-                  size="sm"
-
-
-                  className="border-[#334155]/10 text-[#334155] hover:bg-white hover:text-[#2563eb] disabled:opacity-50"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Anterior
-                </button>
-                <div className="flex items-center gap-1">
-                </div>
-                <button
-                  variant="outline"
-                  size="sm"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Anterior
-                </button>
-                <div className="flex items-center gap-1">
-
-                </div>
-                <button
-                  variant="outline"
-                  size="sm"
-
-
-                  className="border-[#334155]/10 text-[#334155] hover:bg-white hover:text-[#2563eb] disabled:opacity-50"
-                >
-                  Siguiente
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+          </div>
+          <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+              disabled={paginaActual === 1}
+            >
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <span className="pagination-info-admin text-base text-[#334155]">
+              Página {paginaActual} de {totalPaginas}
+            </span>
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+              disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            >
+              <i className="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
-
 
         {showModal && (
           <UsuarioModal

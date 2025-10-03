@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import CertificacionTabla from './Tablas/CertificacionTabla';
-
 import { generarCertificado } from '../../services/certificadoService';
 import { inscripcionService } from '../../services/inscripcionService';
 
@@ -21,15 +20,9 @@ const GestionCertificacion = () => {
             try {
                 const data = await inscripcionService.getAll();
                 if (data.success && Array.isArray(data.data)) {
-                    console.log('📋 Todas las inscripciones recibidas:', data.data.length);
-                    console.log('📋 Inscripciones con estado certificado/finalizado:', data.data.filter(insc => insc.estado === 'certificado' || insc.estado === 'finalizado').length);
-                    
                     const filtrados = data.data.filter(
-                        insc => (insc.estado === 'certificado' || insc.estado === 'finalizado') 
-                                && insc.tipoReferencia === 'ProgramaAcademico'  // Solo programas académicos
+                        insc => insc.estado === 'certificado' || insc.estado === 'finalizado'
                     );
-                    
-                    console.log('✅ Inscripciones válidas para certificación (solo programas académicos):', filtrados.length);
                     setCertificados(filtrados);
                 } else {
                     setCertificados([]);
@@ -45,12 +38,6 @@ const GestionCertificacion = () => {
     // Descargar certificado PDF
     const handleDescargar = async (cert) => {
         try {
-            // Validar que sea un programa académico
-            if (cert.tipoReferencia !== 'ProgramaAcademico') {
-                alert('Los certificados solo se pueden generar para programas académicos, no para eventos.');
-                return;
-            }
-
             const userId = cert.usuario?._id || cert.usuario;
             const cursoId = cert.referencia?._id || cert.referencia;
             const nombre = cert.nombre;
@@ -86,10 +73,7 @@ const GestionCertificacion = () => {
                     <div className="page-header-Academicos">
                         <div className="page-title-admin">
                             <h1>Gestión de Certificaciones</h1>
-                            <p>Administra los certificados de los programas académicos</p>
-                            <div className="mt-2 p-3 bg-blue-100 border-l-4 border-blue-500 text-blue-700 text-sm">
-                                <strong>Nota:</strong> Los certificados solo se pueden generar para programas académicos, no para eventos.
-                            </div>
+                            <p>Administra los certificados de los programas</p>
                         </div>
 
                     </div>

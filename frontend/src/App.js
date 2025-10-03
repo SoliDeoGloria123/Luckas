@@ -28,6 +28,7 @@ import GestionTprogramas from "./components/Tesorero/Tablas/Gestionprogramas";
 import GestionTreservas from "./components/Tesorero/Tablas/Gestionreserva";
 import GestionTtarea from "./components/Tesorero/Tablas/Gestiontareas";
 import GestionTinscripcion from "./components/Tesorero/Tablas/Gestioninscripcion";
+import GestionTcertificados from "./components/Tesorero/Tablas/Gestioncertificados";
 import GestionTreportes from "./components/Tesorero/Tablas/Gestioreportes";
 import GestionTesorero from './components/Tesorero/Gestion';
 import GestionTperfil from './components/Tesorero/perfil';
@@ -81,6 +82,7 @@ function App() {
         <Route path="/tesorero/reservas" element={<GestionTreservas />} />
         <Route path="/tesorero/tarea" element={<GestionTtarea />} />
         <Route path="/tesorero/inscripcion" element={<GestionTinscripcion />} />
+        <Route path="/tesorero/certificados" element={<GestionTcertificados />} />
         <Route path="/tesorero/reportes" element={<GestionTreportes />} />
         <Route path="/tesorero/perfil" element={<GestionTperfil />} />
         <Route path='/tesorero-Gestiones' element={<GestionTesorero />} />

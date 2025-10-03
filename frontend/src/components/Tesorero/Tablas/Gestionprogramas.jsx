@@ -63,9 +63,9 @@ const Gestioncursos = () => {
       setCargando(false);
     }
   };
-  
+
   const [error, setError] = useState(null);
-  const obtenerCursos = () => {};
+  const obtenerCursos = () => { };
   const formatearPrecio = (precio) => `$${precio}`;
   const [loading, setLoading] = useState(true);
   const [filtros, setFiltros] = useState({
@@ -133,9 +133,9 @@ const Gestioncursos = () => {
     });
     setShowModal(true);
   };
-  
-  const abrirModalEditar = (programa) => { 
-    setModalMode('edit'); 
+
+  const abrirModalEditar = (programa) => {
+    setModalMode('edit');
     setCurrentItem(programa);
     // Llenar formData con datos del programa seleccionado
     setFormData({
@@ -159,11 +159,11 @@ const Gestioncursos = () => {
       imagen: programa.imagen || '',
       destacado: programa.destacado || false
     });
-    setShowModal(true); 
+    setShowModal(true);
   };
-  
-  const abrirModalCrear = () => { 
-    setModalMode('create'); 
+
+  const abrirModalCrear = () => {
+    setModalMode('create');
     setCurrentItem(null);
     // Limpiar formData para crear nuevo
     setFormData({
@@ -187,7 +187,7 @@ const Gestioncursos = () => {
       imagen: '',
       destacado: false
     });
-    setShowModal(true); 
+    setShowModal(true);
   };
 
   // Función para manejar el submit del modal
@@ -223,7 +223,7 @@ const Gestioncursos = () => {
   };
   useEffect(() => {
     cargarProgramas();
-  },[]);
+  }, []);
 
   // Función de búsqueda por nombre, instructor o categoría
   const handleSearch = (searchValue) => {
@@ -257,6 +257,20 @@ const Gestioncursos = () => {
       setCursosFiltrados(cursos);
     }
   }, [cursos]);
+
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 6;
+  const totalPaginas = Math.ceil(cursosFiltrados.length / registrosPorPagina);
+  const cursosPaginados = cursosFiltrados.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+
+  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [cursosFiltrados]);
 
   return (
     <>
@@ -368,7 +382,7 @@ const Gestioncursos = () => {
               <p className="text-slate-600">Cargando programas académicos...</p>
             </div>
           ) : programas.length > 0 ? (
-            programas.map((programa) => (
+            cursosPaginados.map((programa) => (
               <div key={programa._id} className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
                 {/* Header del programa */}
                 <div className="flex items-start justify-between mb-4">
@@ -416,7 +430,7 @@ const Gestioncursos = () => {
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                  
+
                   </div>
                 </div>
 
@@ -494,6 +508,25 @@ const Gestioncursos = () => {
             onSubmit={handleSubmitModal}
           />
         )}
+        <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+          <button
+            className="pagination-btn-admin"
+          onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+          disabled={paginaActual === 1}
+          >
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          <span className="pagination-info-admin">
+            Página {paginaActual} de {totalPaginas || 1}
+          </span>
+          <button
+            className="pagination-btn-admin"
+          onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+          disabled={paginaActual === totalPaginas || totalPaginas === 0}
+          >
+            <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
       </main>
       <Footer />
     </>

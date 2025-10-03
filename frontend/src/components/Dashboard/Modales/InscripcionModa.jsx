@@ -9,7 +9,7 @@ const defaultForm = {
   numeroDocumento: "",
   correo: "",
   telefono: "",
-  edad: "25",
+  edad: "",
   tipoReferencia: "",
   referencia: "",
   categoria: "",
@@ -59,63 +59,13 @@ const InscripcionModal = ({
     }
   }, [modo, inscripcion]);
 
-  // Obtener opciones de estado según el tipo de referencia
-  const getOpcionesEstado = () => {
-    if (form.tipoReferencia === 'Eventos') {
-      return [
-        { value: 'inscrito', label: 'Inscrito' },
-        { value: 'finalizado', label: 'Finalizado' }
-      ];
-    } else if (form.tipoReferencia === 'ProgramaAcademico') {
-      return [
-        { value: 'preinscrito', label: 'Preinscrito' },
-        { value: 'matriculado', label: 'Matriculado' },
-        { value: 'en_curso', label: 'En Curso' },
-        { value: 'finalizado', label: 'Finalizado' },
-        { value: 'certificado', label: 'Certificado' },
-        { value: 'rechazada', label: 'Rechazada' },
-        { value: 'cancelada', label: 'Cancelada Académico' }
-      ];
-    } else {
-      return [];
-    }
-  };
-
   // Buscar usuario por cédula
   const buscarUsuarioPorCedula = async (cedula) => {
     if (!cedula || cedula.length < 6) return;
     setCargandoUsuario(true);
     try {
       const usuario = await userService.getByDocumento(cedula);
-      console.log('🔍 Usuario obtenido del API:', {
-        _id: usuario._id,
-        nombre: usuario.nombre,
-        apellido: usuario.apellido,
-        numeroDocumento: usuario.numeroDocumento
-      });
       setUsuarioEncontrado(usuario);
-      
-      // Calcular edad a partir de la fecha de nacimiento
-      let edadCalculada = 25; // Edad por defecto
-      if (usuario.fechaNacimiento) {
-        try {
-          const hoy = new Date();
-          const fechaNac = new Date(usuario.fechaNacimiento);
-          if (!isNaN(fechaNac.getTime())) {
-            edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
-            const mes = hoy.getMonth() - fechaNac.getMonth();
-            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
-              edadCalculada--;
-            }
-            console.log('✅ Edad calculada desde fecha nacimiento:', edadCalculada);
-          }
-        } catch (error) {
-          console.log('❌ Error calculando edad:', error);
-        }
-      } else {
-        console.log('⚠️ Usuario sin fecha de nacimiento, usando edad por defecto');
-      }
-      
       setForm(prev => ({
         ...prev,
         usuario: String(usuario._id || ""),
@@ -124,8 +74,7 @@ const InscripcionModal = ({
         correo: String(usuario.correo || ""),
         telefono: String(usuario.telefono || ""),
         tipoDocumento: String(usuario.tipoDocumento || ""),
-        numeroDocumento: String(usuario.numeroDocumento || cedula),
-        edad: String(edadCalculada)
+        numeroDocumento: String(usuario.numeroDocumento || cedula)
       }));
     } catch (error) {
       setUsuarioEncontrado(null);
@@ -172,26 +121,6 @@ const InscripcionModal = ({
     ].includes(name)) {
       return;
     }
-
-    // Si cambia el tipo de referencia, establecer el estado por defecto apropiado
-    if (name === "tipoReferencia") {
-      let estadoPorDefecto = "";
-      if (value === "Eventos") {
-        estadoPorDefecto = "inscrito"; // Estado por defecto para eventos
-      } else if (value === "ProgramaAcademico") {
-        estadoPorDefecto = "preinscrito"; // Estado por defecto para programas académicos
-      }
-      
-      setForm({
-        ...form,
-        [name]: String(value),
-        estado: estadoPorDefecto,
-        referencia: "", // Limpiar referencia al cambiar tipo
-        categoria: "" // Limpiar categoría al cambiar tipo
-      });
-      return;
-    }
-    
     if (name === "referencia") {
       if (form.tipoReferencia === "Eventos") {
         const eventoSel = eventos.find(ev => String(ev._id) === String(value));
@@ -275,7 +204,7 @@ const InscripcionModal = ({
                 onPaste={handlePasteCedula}
                 placeholder="Ingrese o pegue la cédula"
                 style={{ paddingRight: cargandoUsuario ? '40px' : '10px' }}
-                disabled={modo === "editar"}
+                disabled={true}
               />
               {modo === "crear" && cargandoUsuario && (
                 <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: '#666' }}>🔄</div>
@@ -317,26 +246,7 @@ const InscripcionModal = ({
             </div>
             <div className="form-grupo-admin">
               <label>Edad:</label>
-              <input 
-                type="number"
-                name="edad" 
-                value={form.edad || "25"} 
-                onChange={handleChange} 
-                placeholder="Ingrese edad" 
-                disabled={false}
-                min="0" 
-                max="120"
-                style={{ 
-                  backgroundColor: usuarioEncontrado ? '#e8f5e8' : 'white',
-                  border: '2px solid #ccc',
-                  padding: '8px'
-                }}
-              />
-              {usuarioEncontrado && form.edad && (
-                <small style={{ color: '#28a745', fontSize: '12px', fontWeight: 'bold' }}>
-                  ✓ Edad: {form.edad} años
-                </small>
-              )}
+              <input name="edad" value={form.edad} onChange={handleChange} placeholder="Edad" disabled={true} />
             </div>
             <div className="form-grupo-admin">
               <label>Tipo de inscripción:</label>
@@ -405,11 +315,13 @@ const InscripcionModal = ({
               <label>Estado:</label>
               <select name="estado" value={form.estado} onChange={handleChange} placeholder="Estado" >
                 <option value="">Seleccione estado</option>
-                {getOpcionesEstado().map(opcion => (
-                  <option key={opcion.value} value={opcion.value}>
-                    {opcion.label}
-                  </option>
-                ))}
+                <option value="preinscrito">Preinscrito</option>
+                <option value="matriculado">Matriculado</option>
+                <option value="en_curso">En Curso</option>
+                <option value="finalizado">Finalizado</option>
+                <option value="certificado">Certificado</option>
+                <option value="rechazada">Rechazada</option>
+                <option value="cancelada">Cancelada Académico</option>
               </select>
             </div>
             <div className="form-grupo-admin">
