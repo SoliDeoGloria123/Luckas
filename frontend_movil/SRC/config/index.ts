@@ -10,7 +10,7 @@ export const API_CONFIG = {
     // Para desarrollo local con dispositivo físico: 'http://TU_IP_LOCAL:3000'
     // Para producción: 'https://tu-dominio.com'
    // BASE_URL: (typeof __DEV__ !== 'undefined' && __DEV__) ? 'http://10.0.2.2:3000' : 'https://tu-dominio.com',
-    BASE_URL: 'http://192.168.80.22:3000',
+    BASE_URL: 'http://192.168.1.6:3000',
     
     ENDPOINTS: {
         // Auth endpoints

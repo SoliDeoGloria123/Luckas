@@ -544,7 +544,135 @@ const EventosScreen: React.FC = () => {
                     onChangeText={setSearchText}
                 />
             </View>
-            <Modal
+         
+
+            {/* Lista de eventos */}
+            <ScrollView
+                style={styles.scrollContainer}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
+                {isLoading ? (
+                    <View style={styles.loadingContainer}>
+                        <Text style={styles.loadingText}>Cargando eventos...</Text>
+                    </View>
+                ) : filteredEventos.length > 0 ? (
+                    filteredEventos.map(evento => (
+                        <View
+                            key={evento._id}
+                            style={styles.eventoCardWeb}
+                        >
+                            {evento.imagen && evento.imagen.length > 0 && (
+                                <View style={styles.imageContainer}>
+                                    <ScrollView
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                        pagingEnabled
+                                        style={styles.imageScrollView}
+                                    >
+                                        {evento.imagen.map((imageUri, index) => (
+                                            <View key={index} style={styles.imageWrapper}>
+                                                {imageUri.startsWith('mock-image') ? (
+                                                    <View style={[styles.cabanaImage, styles.mockImagePlaceholder]}>
+                                                        <Ionicons name="image" size={40} color="#718096" />
+                                                        <Text style={styles.mockImageText}>Imagen {index + 1}</Text>
+                                                    </View>
+                                                ) : (
+                                                    <Image source={{ uri: imageUri }} style={styles.cabanaImage} />
+                                                )}
+                                            </View>
+                                        ))}
+                                    </ScrollView>
+                                    {evento.imagen.length > 1 && (
+                                        <View style={styles.imageIndicator}>
+                                            <Text style={styles.imageIndicatorText}>
+                                                1/{evento.imagen.length}
+                                            </Text>
+                                        </View>
+                                    )}
+                                </View>
+                            )}
+
+                            {/* Prioridad y fecha etiqueta */}
+                            <View style={styles.cardHeaderWeb}>
+                                {evento.prioridad && (
+                                    <View style={[styles.prioridadTag, styles[`prioridad${evento.prioridad}`]]}>
+                                        <Text style={styles.prioridadText}>{`Prioridad ${evento.prioridad}`}</Text>
+                                    </View>
+                                )}
+                                <View style={styles.fechaTag}>
+                                    <Text style={styles.fechaText}>{eventosService.formatDate(new Date(evento.fechaEvento))}</Text>
+                                </View>
+                            </View>
+
+
+                            {/* Título */}
+                            <Text style={styles.eventoTitleWeb}>{evento.nombre}</Text>
+                            {/* Descripción */}
+                            <Text style={styles.eventoDescripcionWeb} numberOfLines={2}>{evento.descripcion}</Text>
+                            {/* Info principal */}
+                            <View style={styles.infoRowWeb}>
+                                <Ionicons name="calendar-outline" size={16} color={colors.primary} />
+                                <Text style={styles.infoTextWeb}>{eventosService.formatDate(new Date(evento.fechaEvento))}</Text>
+                                <Ionicons name="time-outline" size={16} color={colors.primary} style={{ marginLeft: 8 }} />
+                                <Text style={styles.infoTextWeb}>{evento.horaInicio} - {evento.horaFin}</Text>
+                            </View>
+                            <View style={styles.infoRowWeb}>
+                                <Ionicons name="location-outline" size={16} color={colors.primary} />
+                                <Text style={styles.infoTextWeb}>{evento.lugar}</Text>
+                            </View>
+
+                            <TouchableOpacity
+                                style={styles.eyeButton}
+                                onPress={() => handleVerDetalles(evento)}
+                            >
+                                <Ionicons name="eye-outline" size={20} color={colors.primary} />
+                                <Text style={styles.actionTextWeb}>Ver</Text>
+                            </TouchableOpacity>
+
+                            {/* Botones de administración solo para admins */}
+                            {(hasRole('admin') || hasRole('tesorero')) && (
+                                <View style={styles.adminActions}>
+                                    <TouchableOpacity
+                                        style={styles.editButton}
+                                        onPress={() => handleEditarEvento(evento)}
+                                    >
+                                        <Ionicons name="pencil" size={16} color="#fff" />
+                                        <Text style={styles.actionButtonText}>Editar</Text>
+                                    </TouchableOpacity>
+
+                                    {hasRole('admin') && (
+                                        <TouchableOpacity
+                                            style={styles.deleteButton}
+                                            onPress={() => handleEliminarEvento(evento)}
+                                        >
+                                            <Ionicons name="trash" size={16} color="#fff" />
+                                            <Text style={styles.actionButtonText}>Eliminar</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                            )}
+                        </View>
+                    ))
+                ) : (
+                    <View style={styles.emptyContainer}>
+                        <Ionicons name="calendar-outline" size={64} color={colors.textSecondary} />
+                        <Text style={styles.emptyText}>No se encontraron eventos</Text>
+                        <Text style={styles.emptySubtext}>
+                            {searchText ? 'Intenta con otros términos de búsqueda' : 'Aún no hay eventos registrados'}
+                        </Text>
+                    </View>
+                )}
+
+            </ScrollView>
+            {/* Botón crear evento solo para admins */}
+            {(hasRole('admin') || hasRole('tesorero')) && (
+                <TouchableOpacity style={styles.fab} onPress={handleCrearEvento}>
+                    <Ionicons name="add" size={20} color="#fff" />
+                </TouchableOpacity>
+            )}
+               <Modal
                 animationType="slide"
                 transparent={true}
                 visible={modalVisible}
@@ -685,134 +813,6 @@ const EventosScreen: React.FC = () => {
                     </View>
                 </View>
             </Modal>
-
-            {/* Lista de eventos */}
-            <ScrollView
-                style={styles.scrollContainer}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                }
-            >
-                {isLoading ? (
-                    <View style={styles.loadingContainer}>
-                        <Text style={styles.loadingText}>Cargando eventos...</Text>
-                    </View>
-                ) : filteredEventos.length > 0 ? (
-                    filteredEventos.map(evento => (
-                        <View
-                            key={evento._id}
-                            style={styles.eventoCardWeb}
-                        >
-                            {evento.imagen && evento.imagen.length > 0 && (
-                                <View style={styles.imageContainer}>
-                                    <ScrollView
-                                        horizontal
-                                        showsHorizontalScrollIndicator={false}
-                                        pagingEnabled
-                                        style={styles.imageScrollView}
-                                    >
-                                        {evento.imagen.map((imageUri, index) => (
-                                            <View key={index} style={styles.imageWrapper}>
-                                                {imageUri.startsWith('mock-image') ? (
-                                                    <View style={[styles.cabanaImage, styles.mockImagePlaceholder]}>
-                                                        <Ionicons name="image" size={40} color="#718096" />
-                                                        <Text style={styles.mockImageText}>Imagen {index + 1}</Text>
-                                                    </View>
-                                                ) : (
-                                                    <Image source={{ uri: imageUri }} style={styles.cabanaImage} />
-                                                )}
-                                            </View>
-                                        ))}
-                                    </ScrollView>
-                                    {evento.imagen.length > 1 && (
-                                        <View style={styles.imageIndicator}>
-                                            <Text style={styles.imageIndicatorText}>
-                                                1/{evento.imagen.length}
-                                            </Text>
-                                        </View>
-                                    )}
-                                </View>
-                            )}
-
-                            {/* Prioridad y fecha etiqueta */}
-                            <View style={styles.cardHeaderWeb}>
-                                {evento.prioridad && (
-                                    <View style={[styles.prioridadTag, styles[`prioridad${evento.prioridad}`]]}>
-                                        <Text style={styles.prioridadText}>{`Prioridad ${evento.prioridad}`}</Text>
-                                    </View>
-                                )}
-                                <View style={styles.fechaTag}>
-                                    <Text style={styles.fechaText}>{eventosService.formatDate(new Date(evento.fechaEvento))}</Text>
-                                </View>
-                            </View>
-
-
-                            {/* Título */}
-                            <Text style={styles.eventoTitleWeb}>{evento.nombre}</Text>
-                            {/* Descripción */}
-                            <Text style={styles.eventoDescripcionWeb} numberOfLines={2}>{evento.descripcion}</Text>
-                            {/* Info principal */}
-                            <View style={styles.infoRowWeb}>
-                                <Ionicons name="calendar-outline" size={16} color={colors.primary} />
-                                <Text style={styles.infoTextWeb}>{eventosService.formatDate(new Date(evento.fechaEvento))}</Text>
-                                <Ionicons name="time-outline" size={16} color={colors.primary} style={{ marginLeft: 8 }} />
-                                <Text style={styles.infoTextWeb}>{evento.horaInicio} - {evento.horaFin}</Text>
-                            </View>
-                            <View style={styles.infoRowWeb}>
-                                <Ionicons name="location-outline" size={16} color={colors.primary} />
-                                <Text style={styles.infoTextWeb}>{evento.lugar}</Text>
-                            </View>
-
-                            <TouchableOpacity
-                                style={styles.eyeButton}
-                                onPress={() => handleVerDetalles(evento)}
-                            >
-                                <Ionicons name="eye-outline" size={20} color={colors.primary} />
-                                <Text style={styles.actionTextWeb}>Ver</Text>
-                            </TouchableOpacity>
-
-                            {/* Botones de administración solo para admins */}
-                            {(hasRole('admin') || hasRole('tesorero')) && (
-                                <View style={styles.adminActions}>
-                                    <TouchableOpacity
-                                        style={styles.editButton}
-                                        onPress={() => handleEditarEvento(evento)}
-                                    >
-                                        <Ionicons name="pencil" size={16} color="#fff" />
-                                        <Text style={styles.actionButtonText}>Editar</Text>
-                                    </TouchableOpacity>
-
-                                    {hasRole('admin') && (
-                                        <TouchableOpacity
-                                            style={styles.deleteButton}
-                                            onPress={() => handleEliminarEvento(evento)}
-                                        >
-                                            <Ionicons name="trash" size={16} color="#fff" />
-                                            <Text style={styles.actionButtonText}>Eliminar</Text>
-                                        </TouchableOpacity>
-                                    )}
-                                </View>
-                            )}
-                        </View>
-                    ))
-                ) : (
-                    <View style={styles.emptyContainer}>
-                        <Ionicons name="calendar-outline" size={64} color={colors.textSecondary} />
-                        <Text style={styles.emptyText}>No se encontraron eventos</Text>
-                        <Text style={styles.emptySubtext}>
-                            {searchText ? 'Intenta con otros términos de búsqueda' : 'Aún no hay eventos registrados'}
-                        </Text>
-                    </View>
-                )}
-
-            </ScrollView>
-            {/* Botón crear evento solo para admins */}
-            {(hasRole('admin') || hasRole('tesorero')) && (
-                <TouchableOpacity style={styles.fab} onPress={handleCrearEvento}>
-                    <Ionicons name="add" size={20} color="#fff" />
-                </TouchableOpacity>
-            )}
-
             {/* Modal para crear/editar evento */}
             <Modal
                 visible={showModal}
@@ -1788,7 +1788,8 @@ const styles = StyleSheet.create({
         marginVertical: spacing.md,
         borderRadius: 16,
         maxHeight: '96%',
-       
+        width: '95%',
+        height: '95%',
         alignSelf: 'center',
         ...shadows.medium,
     },

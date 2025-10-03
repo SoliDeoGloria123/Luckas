@@ -1430,6 +1430,8 @@ const styles = StyleSheet.create({
         marginVertical: spacing.md,
         borderRadius: 16,
         maxHeight: '96%',
+        width: '95%',
+        height: '95%',
         alignSelf: 'center',
         ...shadows.medium,
     },
