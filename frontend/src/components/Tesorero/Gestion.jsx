@@ -1,4 +1,14 @@
 import React, { useState } from "react";
+import { userService } from '../../services/userService';
+import { categorizacionService } from '../../services/categorizacionService';
+import { solicitudService } from '../../services/solicirudService';
+import { eventService } from '../../services/eventService';
+import { cabanaService } from '../../services/cabanaService';
+import { reservaService } from '../../services/reservaService';
+import { cursosService } from '../../services/cursosService';
+import { tareaService } from '../../services/tareaService';
+import { inscripcionService } from '../../services/inscripcionService';
+import { reporteService } from '../../services/reporteService';
 import HeaderTesorero from "./Header/Header-tesorero";
 import Footer from '../footer/Footer';
 import './Gestion.css';
@@ -14,6 +24,42 @@ import Gestionreporte from './Tablas/Gestioreportes';
 
 const Gestion = ({ }) => {
     const [seccionActiva, setSeccionActiva] = useState("gestion");
+            // Estados para los conteos
+            const [stats, setStats] = useState({
+                usuarios: 0,
+                categorias: 0,
+                solicitudes: 0,
+                eventos: 0,
+                cabanas: 0,
+                reservas: 0,
+                cursos: 0,
+                tareas: 0,
+                inscripciones: 0,
+                reportes: 0
+            });
+
+            React.useEffect(() => {
+                // Usuarios
+                userService.getAllUsers().then(res => setStats(s => ({ ...s, usuarios: Array.isArray(res.data) ? res.data.length : 0 }))).catch(()=>{});
+                // Categorías
+                categorizacionService.getAll().then(res => setStats(s => ({ ...s, categorias: Array.isArray(res.data) ? res.data.length : 0 }))).catch(()=>{});
+                // Solicitudes
+                solicitudService.getAll().then(res => setStats(s => ({ ...s, solicitudes: Array.isArray(res.data) ? res.data.length : 0 }))).catch(()=>{});
+                // Eventos
+                eventService.getAllEvents().then(res => setStats(s => ({ ...s, eventos: Array.isArray(res.data) ? res.data.length : 0 }))).catch(()=>{});
+                // Cabañas
+                cabanaService.getAll().then(res => setStats(s => ({ ...s, cabanas: Array.isArray(res.data) ? res.data.length : 0 }))).catch(()=>{});
+                // Reservas
+                reservaService.getAll().then(res => setStats(s => ({ ...s, reservas: Array.isArray(res.data) ? res.data.length : 0 }))).catch(()=>{});
+                // Cursos
+                cursosService.obtenerCursos().then(res => setStats(s => ({ ...s, cursos: Array.isArray(res) ? res.length : 0 }))).catch(()=>{});
+                // Tareas
+                tareaService.getAll().then(res => setStats(s => ({ ...s, tareas: Array.isArray(res.data) ? res.data.length : 0 }))).catch(()=>{});
+                // Inscripciones
+                inscripcionService.getAll().then(res => setStats(s => ({ ...s, inscripciones: Array.isArray(res.data) ? res.data.length : 0 }))).catch(()=>{});
+                // Reportes
+                reporteService.getDashboard().then(res => setStats(s => ({ ...s, reportes: Array.isArray(res.data) ? res.data.length : 0 }))).catch(()=>{});
+            }, []);
 
     // Función para cambiar la sección activa
     const handleGestionar = (seccion) => {
@@ -36,7 +82,7 @@ const Gestion = ({ }) => {
                         </div>
                         <div className="card-content">
                             <div className="card-stats">
-                                <span className="stat-number">156</span>
+                                <span className="stat-number">{stats.usuarios}</span>
                                 <span className="stat-label">usuarios</span>
                                 <span className="stat-change positive">+12 este mes</span>
                             </div>
@@ -53,7 +99,7 @@ const Gestion = ({ }) => {
                         </div>
                         <div className="card-content">
                             <div className="card-stats">
-                                <span className="stat-number">23</span>
+                                <span className="stat-number">{stats.solicitudes}</span>
                                 <span className="stat-label">pendientes</span>
                                 <span className="stat-change neutral">5 nuevas hoy</span>
                             </div>
@@ -72,7 +118,7 @@ const Gestion = ({ }) => {
                         </div>
                         <div className="card-content">
                             <div className="card-stats">
-                                <span className="stat-number">8</span>
+                                <span className="stat-number">{stats.eventos}</span>
                                 <span className="stat-label">próximos</span>
                                 <span className="stat-change neutral">2 esta semana</span>
                             </div>
@@ -91,7 +137,7 @@ const Gestion = ({ }) => {
                         </div>
                         <div className="card-content">
                             <div className="card-stats">
-                                <span className="stat-number">12</span>
+                                <span className="stat-number">{stats.cabanas}</span>
                                 <span className="stat-label">disponibles</span>
                                 <span className="stat-change positive">85% ocupación</span>
                             </div>
@@ -109,7 +155,7 @@ const Gestion = ({ }) => {
                         </div>
                         <div className="card-content">
                             <div className="card-stats">
-                                <span className="stat-number">15</span>
+                                <span className="stat-number">{stats.cursos}</span>
                                 <span className="stat-label">activos</span>
                                 <span className="stat-change neutral">245 inscritos</span>
                             </div>
@@ -128,7 +174,7 @@ const Gestion = ({ }) => {
                         </div>
                         <div className="card-content">
                             <div className="card-stats">
-                                <span className="stat-number">34</span>
+                                <span className="stat-number">{stats.tareas}</span>
                                 <span className="stat-label">activas</span>
                                 <span className="stat-change neutral">12 completadas</span>
                             </div>
@@ -147,7 +193,7 @@ const Gestion = ({ }) => {
                         </div>
                         <div className="card-content">
                             <div className="card-stats">
-                                <span className="stat-number">67</span>
+                                <span className="stat-number">{stats.inscripciones}</span>
                                 <span className="stat-label">nuevas</span>
                                 <span className="stat-change positive">+18 esta semana</span>
                             </div>
@@ -166,7 +212,7 @@ const Gestion = ({ }) => {
                         </div>
                         <div className="card-content">
                             <div className="card-stats">
-                                <span className="stat-number">25</span>
+                                <span className="stat-number">{stats.reportes}</span>
                                 <span className="stat-label">reportes</span>
                                 <span className="stat-change neutral">Actualizado hoy</span>
                             </div>

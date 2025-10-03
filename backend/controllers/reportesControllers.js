@@ -11,6 +11,13 @@ const Tarea = require('../models/Tarea');
 // Reporte general del dashboard
 exports.getDashboardReport = async (req, res) => {
   try {
+    console.log('[DASHBOARD] getDashboardReport llamado');
+    console.log('[DASHBOARD] req.method:', req.method);
+    console.log('[DASHBOARD] req.originalUrl:', req.originalUrl);
+    console.log('[DASHBOARD] req.query:', req.query);
+    console.log('[DASHBOARD] req.body:', req.body);
+    console.log('[DASHBOARD] req.userId:', req.userId, 'req.userRole:', req.userRole);
+
     const [
       totalUsuarios,
       totalReservas,
@@ -24,14 +31,14 @@ exports.getDashboardReport = async (req, res) => {
       eventosProximos
     ] = await Promise.all([
       Usuario.countDocuments(),
-      Reserva.countDocuments({}), // Total de reservas sin filtro de fecha
+      Reserva.countDocuments({}),
       Inscripcion.countDocuments(),
       Evento.countDocuments({ active: true }),
       Cabana.countDocuments(),
       Solicitud.countDocuments(),
       Tarea.countDocuments(),
       Solicitud.countDocuments({ estado: { $in: ['Nueva', 'En Revisión', 'Pendiente Info'] } }),
-      Reserva.countDocuments({ estado: { $in: ['Pendiente', 'Confirmada'] }, $or: [{ activo: true }, { activo: "true" }] }),// Activas por estado y activo
+      Reserva.countDocuments({ estado: { $in: ['Pendiente', 'Confirmada'] }, $or: [{ activo: true }, { activo: "true" }] }),
       Evento.countDocuments({
         fechaEvento: { $gte: new Date() },
         active: true
@@ -54,9 +61,10 @@ exports.getDashboardReport = async (req, res) => {
       fechaGeneracion: new Date()
     };
 
+    console.log('[DASHBOARD] Respuesta:', dashboard);
     res.json({ success: true, data: dashboard });
   } catch (error) {
-      console.error('Error en getDashboardReport:', error);
+    console.error('[DASHBOARD] Error en getDashboardReport:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

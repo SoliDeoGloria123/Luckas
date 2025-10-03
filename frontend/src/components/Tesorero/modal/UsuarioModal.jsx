@@ -3,15 +3,16 @@ import React, { useState } from 'react';
 
 const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
-    nombre: initialData.nombre || '',
-    apellido: initialData.apellido || '',
-    correo: initialData.correo || '',
-    telefono: initialData.telefono || '',
-    tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
-    numeroDocumento: initialData.numeroDocumento || '',
-    role: initialData.role || '',
-    estado: initialData.estado || 'Activo',
-    password: initialData.password || ''
+  nombre: initialData.nombre || '',
+  apellido: initialData.apellido || '',
+  correo: initialData.correo || '',
+  telefono: initialData.telefono || '',
+  tipoDocumento: initialData.tipoDocumento || 'Cédula de ciudadanía',
+  numeroDocumento: initialData.numeroDocumento || '',
+  fechaNacimiento: initialData.fechaNacimiento || '',
+  role: initialData.role || '',
+  estado: initialData.estado || 'Activo',
+  password: initialData.password || ''
   });
 
   const handleChange = (e) => {
@@ -46,6 +47,14 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
+              <label>Fecha de Nacimiento</label>
+              <input
+                type="date"
+                name="fechaNacimiento"
+                value={formData.fechaNacimiento}
+                onChange={handleChange}
+                required
+              />
                 <label>Nombre</label>
                 <input
                   type="text"
@@ -142,7 +151,6 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                   onChange={handleChange}
                   required
                 >
-                  <option value="admin">Administrador</option>
                   <option value="tesorero">Tesorero</option>
                   <option value="seminarista">Seminarista</option>
                   <option value="externo">Externo</option>
