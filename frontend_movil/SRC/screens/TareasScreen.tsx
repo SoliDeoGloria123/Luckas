@@ -88,15 +88,14 @@ export const TareasScreen = () => {
         fechaLimite: new Date()
     });
 
-    // Helper para obtener el nombre de usuario
-    const getUserDisplayName = (userField: string | User): string => {
-        if (typeof userField === 'string') {
-            // Si es un ID, buscar el usuario en las opciones cargadas
-            const foundUser = asignadoAOptions.find(u => u._id === userField);
-            return foundUser ? `${foundUser.nombre} ${foundUser.apellido} (${foundUser.role})` : 'Usuario';
-        }
-        return `${userField.nombre}  (${userField.role})`;
-    };
+const getUserDisplayName = (userField: string | User): string => {
+    if (!userField) return 'Sin asignar';
+    if (typeof userField === 'string') {
+        const foundUser = asignadoAOptions.find(u => u._id === userField);
+        return foundUser ? `${foundUser.nombre} ${foundUser.apellido} (${foundUser.role})` : 'Usuario';
+    }
+    return userField?.nombre ? `${userField.nombre} (${userField.role})` : 'Usuario';
+};
 
     // Helper functions
     const getEstadoSiguiente = (estadoActual: string): string => {
