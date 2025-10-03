@@ -88,14 +88,25 @@ const TareasManagement = () => {
 
   const handleEditTask = (task) => {
     setEditingTask(task)
+    
+    // Extraer el ID del usuario asignado correctamente
+    const asignadoAId = typeof task.asignadoA === 'object' && task.asignadoA?._id 
+      ? task.asignadoA._id 
+      : task.asignadoA;
+    
+    // Formatear la fecha para el input date
+    const fechaFormateada = task.fechaLimite 
+      ? new Date(task.fechaLimite).toISOString().split('T')[0] 
+      : '';
+    
     setFormData({
       titulo: task.titulo,
       descripcion: task.descripcion,
       estado: task.estado,
       prioridad: task.prioridad,
-      asignadoA: task.asignadoA,
-      asignadoARol: task.asignadoARol,
-      fechaLimite: task.fechaLimite,
+      asignadoA: asignadoAId,
+      asignadoARol: task.asignadoARol || (typeof task.asignadoA === 'object' ? task.asignadoA?.role : ''),
+      fechaLimite: fechaFormateada,
     })
     setShowModal(true)
   }
@@ -139,10 +150,10 @@ const TareasManagement = () => {
 
       // Recargar las tareas
       await obtenerTareas();
-      
+
       setShowModal(false);
       setEditingTask(null);
-      
+
       // Resetear el formulario
       setFormData({
         titulo: "",
@@ -178,7 +189,7 @@ const TareasManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 w-full">
       <Header />
 
       {/* Main Content */}
@@ -201,51 +212,50 @@ const TareasManagement = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Total Tareas</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.total}</p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <AlertCircle className="text-blue-600" size={24} />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Pendientes</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.pendientes}</p>
-              </div>
-              <div className="bg-yellow-100 p-3 rounded-lg">
-                <Clock className="text-yellow-600" size={24} />
+        <div className="w-screen px-6 -mx-5 mb-10">
+          <div className="flex gap-8 overflow-x-auto">
+            <div className="bg-white rounded-xl shadow-md p-8 border-l-4 border-blue-500 min-w-[280px]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm">Total Tareas</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">{stats.total}</p>
+                </div>
+                <div className="bg-blue-100 p-3 rounded-lg">
+                  <AlertCircle className="text-blue-600" size={28} />
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-600">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">En Progreso</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.enProgreso}</p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <Clock className="text-blue-600" size={24} />
+            <div className="bg-white rounded-xl shadow-md p-8 border-l-4 border-yellow-500 min-w-[280px]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm">Pendientes</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">{stats.pendientes}</p>
+                </div>
+                <div className="bg-yellow-100 p-3 rounded-lg">
+                  <Clock className="text-yellow-600" size={28} />
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Completadas</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{stats.completadas}</p>
+            <div className="bg-white rounded-xl shadow-md p-8 border-l-4 border-blue-600 min-w-[280px]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm">En Progreso</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">{stats.enProgreso}</p>
+                </div>
+                <div className="bg-blue-100 p-3 rounded-lg">
+                  <Clock className="text-blue-600" size={28} />
+                </div>
               </div>
-              <div className="bg-green-100 p-3 rounded-lg">
-                <CheckCircle className="text-green-600" size={24} />
+            </div>
+            <div className="bg-white rounded-xl shadow-md p-8 border-l-4 border-green-500 min-w-[280px]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm">Completadas</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">{stats.completadas}</p>
+                </div>
+                <div className="bg-green-100 p-3 rounded-lg">
+                  <CheckCircle className="text-green-600" size={28} />
+                </div>
               </div>
             </div>
           </div>
@@ -367,7 +377,7 @@ const TareasManagement = () => {
                         >
                           <Edit2 size={18} />
                         </button>
-                       
+
                       </div>
                     </td>
                   </tr>

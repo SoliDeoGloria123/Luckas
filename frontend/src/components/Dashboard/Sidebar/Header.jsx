@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Menu, Search, Sun, Moon, Bell } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +13,23 @@ const Header = ({sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard",
   // Fallback para evitar error si no se pasa la función
   const safeSetSidebarAbierto = typeof setSidebarAbierto === 'function' ? setSidebarAbierto : () => {};
 
+  // Cerrar menú al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMostrarMenu(false);
+      }
+    };
+
+    if (mostrarMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [mostrarMenu]);
+
   // Obtener usuario logueado desde localStorage
   const usuarioLogueado = (() => {
     try {
@@ -23,13 +40,19 @@ const Header = ({sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard",
     }
   })();
   const handleCerrarSesion = () => {
-    if (onCerrarSesionProp) {
-      onCerrarSesionProp();
-    } else {
-      localStorage.removeItem('token');
-      localStorage.removeItem('usuario');
-      window.location.href = '/login';
-    }
+    // Cerrar el menú desplegable primero
+    setMostrarMenu(false);
+    
+    // Pequeño delay para permitir que la animación del menú termine
+    setTimeout(() => {
+      if (onCerrarSesionProp) {
+        onCerrarSesionProp();
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        window.location.href = '/login';
+      }
+    }, 100);
   };
   const perfil = () => {
     navigate('/admin/perfil');

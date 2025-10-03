@@ -314,8 +314,8 @@ const getUserDisplayName = (userField: string | User): string => {
                                         descripcion: tarea.descripcion,
                                         prioridad: tarea.prioridad,
                                         estado: tarea.estado,
-                                        asignadoA: typeof tarea.asignadoA === 'string' ? tarea.asignadoA : tarea.asignadoA._id,
-                                        asignadoPor: typeof tarea.asignadoPor === 'string' ? tarea.asignadoPor : tarea.asignadoPor._id,
+                                        asignadoA: typeof tarea.asignadoA === 'string' ? tarea.asignadoA : (tarea.asignadoA?._id || ''),
+                                        asignadoPor: typeof tarea.asignadoPor === 'string' ? tarea.asignadoPor : (tarea.asignadoPor?._id || user?._id || ''),
                                         fechaLimite: new Date(tarea.fechaLimite),
                                         comentarios: []
                                     });
