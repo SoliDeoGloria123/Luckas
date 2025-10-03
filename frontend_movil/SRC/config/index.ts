@@ -106,8 +106,8 @@ export const MESSAGES = {
 export const getApiBaseUrl = (): string => {
     if (typeof __DEV__ !== 'undefined' && __DEV__) {
         // En desarrollo, puedes cambiar esto según tu configuración
-        return 'http://10.0.2.2:3000/api'; // Para emulador Android
-        // return 'http://192.168.1.100:3000/api'; // Para dispositivo físico (cambiar IP)
+        // return 'http://10.0.2.2:3000/api'; // Para emulador Android
+        return 'http://192.168.80.22:3000/api'; // Para dispositivo físico (cambiar IP)
     }
     return 'https://tu-dominio.com/api'; // Para producción
 };
