@@ -1794,3 +1794,162 @@ body {
         font-size: 1.125rem;
     }
 }
+
+/* =================== REPORTES SECTION =================== */
+.reports-section-tesorero {
+    margin-bottom: var(--spacing-xl);
+}
+
+.reports-grid-tesorero {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-md);
+}
+
+.report-card-tesorero {
+    background: var(--color-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: all 0.3s ease;
+    border: 1px solid var(--color-gray-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.report-card-tesorero:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.report-card-tesorero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--color-blue), var(--color-purple));
+}
+
+.report-card-tesorero.generate-new::before {
+    background: linear-gradient(135deg, var(--color-green), var(--color-blue));
+}
+
+.report-icon-tesorero {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--color-white);
+    flex-shrink: 0;
+}
+
+.report-icon-tesorero.financial {
+    background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.report-icon-tesorero.occupancy {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.report-icon-tesorero.inscriptions {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+}
+
+.report-icon-tesorero.generate {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.report-content-tesorero {
+    flex: 1;
+}
+
+.report-content-tesorero h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-gray-dark);
+    margin-bottom: var(--spacing-xs);
+}
+
+.report-content-tesorero p {
+    color: var(--color-gray-medium);
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.report-stats-tesorero {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.report-period {
+    font-size: 0.75rem;
+    color: var(--color-gray-medium);
+    font-weight: 500;
+}
+
+.report-status {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    align-self: flex-start;
+}
+
+.report-status.completed {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.report-status.in-progress {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.report-status.new {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+.report-action-tesorero {
+    color: var(--color-blue);
+    font-size: 1.25rem;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.report-card-tesorero:hover .report-action-tesorero {
+    opacity: 1;
+    transform: translateX(4px);
+}
+
+/* Responsive para reportes */
+@media (max-width: 768px) {
+    .reports-grid-tesorero {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .report-card-tesorero {
+        padding: var(--spacing-md);
+    }
+    
+    .report-icon-tesorero {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .report-content-tesorero h3 {
+        font-size: 1rem;
+    }
+}

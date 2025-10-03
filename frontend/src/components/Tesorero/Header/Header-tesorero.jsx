@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import './header.css'
 import { Search, Bell, ChevronDown } from "lucide-react";
 
 
 const HeaderTesorero = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
     const [openmenu, setOpenMenu] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false)
     const [usuario, setUsuario] = useState({});
@@ -19,6 +22,26 @@ const HeaderTesorero = () => {
             return null;
         }
     })();
+
+    // Funciones de navegación
+    const handleDashboardClick = () => navigate('/tesorero');
+    const handleGestionesClick = () => navigate('/tesorero-Gestiones');
+    const handleFinanzasClick = () => navigate('/tesorero/reportes');
+    const handleReportesClick = () => navigate('/tesorero/reportes');
+
+    // Función para determinar si un botón está activo
+    const isActive = (path) => {
+        if (path === '/tesorero') {
+            return location.pathname === '/tesorero';
+        }
+        if (path === '/tesorero-Gestiones') {
+            return location.pathname === '/tesorero-Gestiones';
+        }
+        if (path === '/tesorero/reportes') {
+            return location.pathname === '/tesorero/reportes' || location.pathname.includes('/tesorero/reportes');
+        }
+        return false;
+    };
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("usuario");
@@ -42,18 +65,38 @@ const HeaderTesorero = () => {
 
                     {/* Navigation */}
                     <nav className="hidden md:flex items-center gap-8">
-                        <a href="/tesorero" className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                        <button 
+                            onClick={handleDashboardClick} 
+                            className={`text-sm font-medium hover:text-blue-600 transition-colors ${
+                                isActive('/tesorero') ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-600'
+                            }`}
+                        >
                             Dashboard
-                        </a>
-                        <a href="/tesorero-Gestiones" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
+                        </button>
+                        <button 
+                            onClick={handleGestionesClick} 
+                            className={`text-sm font-medium hover:text-blue-600 transition-colors ${
+                                isActive('/tesorero-Gestiones') ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-600'
+                            }`}
+                        >
                             Gestiones
-                        </a>
-                        <a href="#" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
+                        </button>
+                        <button 
+                            onClick={handleFinanzasClick} 
+                            className={`text-sm font-medium hover:text-blue-600 transition-colors ${
+                                isActive('/tesorero/reportes') ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-600'
+                            }`}
+                        >
                             Finanzas
-                        </a>
-                        <a href="#" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
+                        </button>
+                        <button 
+                            onClick={handleReportesClick} 
+                            className={`text-sm font-medium hover:text-blue-600 transition-colors ${
+                                isActive('/tesorero/reportes') ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-600'
+                            }`}
+                        >
                             Reportes
-                        </a>
+                        </button>
                     </nav>
                 </div>
 

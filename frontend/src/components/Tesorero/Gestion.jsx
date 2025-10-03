@@ -1,23 +1,47 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from 'react-router-dom';
 import HeaderTesorero from "./Header/Header-tesorero";
 import Footer from '../footer/Footer';
 import './Gestion.css';
-// Importa los componentes de gestión
-import Gestionusuarios from './Tablas/Gestionusuarios';
-import Gestionsolicitud from './Tablas/Gestionsolicitud';
-import Gestionevento from './Tablas/Gestionevento';
-import Gestioncabana from './Tablas/Gestioncabana';
-import Gestioninscripcion from './Tablas/Gestioninscripcion';
-import Gestiontarea from './Tablas/Gestiontareas';
-import Gestioncategorizacion from './Tablas/Gestioncategorizar';
-import Gestionreporte from './Tablas/Gestioreportes';
 
 const Gestion = ({ }) => {
-    const [seccionActiva, setSeccionActiva] = useState("gestion");
+    const navigate = useNavigate();
 
-    // Función para cambiar la sección activa
-    const handleGestionar = (seccion) => {
-        setSeccionActiva(seccion);
+    // Funciones de navegación a páginas específicas
+    const handleGestionarUsuarios = () => {
+        navigate('/tesorero/usuarios');
+    };
+
+    const handleGestionarSolicitudes = () => {
+        navigate('/tesorero/solicitudes');
+    };
+
+    const handleGestionarEventos = () => {
+        navigate('/tesorero/eventos');
+    };
+
+    const handleGestionarCabanas = () => {
+        navigate('/tesorero/cabañas');
+    };
+
+    const handleGestionarProgramas = () => {
+        navigate('/tesorero/programas');
+    };
+
+    const handleGestionarTareas = () => {
+        navigate('/tesorero/tarea');
+    };
+
+    const handleGestionarInscripciones = () => {
+        navigate('/tesorero/inscripcion');
+    };
+
+    const handleGestionarCategorias = () => {
+        navigate('/tesorero/categorias');
+    };
+
+    const handleGestionarReportes = () => {
+        navigate('/tesorero/reportes');
     };
 
     return (
@@ -42,7 +66,7 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Usuarios</h3>
                             <p className="card-description">Administrar cuentas de usuarios del sistema</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionar("tesorero-usuarios"); }}>
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarUsuarios(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -59,7 +83,7 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Solicitudes</h3>
                             <p className="card-description">Revisar y categorizar solicitudes</p>
-                            <a href="#" className="card-action">
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarSolicitudes(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -78,7 +102,7 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Eventos</h3>
                             <p className="card-description">Organizar y categorizar eventos</p>
-                            <a href="#" className="card-action">
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarEventos(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -97,7 +121,7 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Cabañas</h3>
                             <p className="card-description">Administrar reservas de cabañas</p>
-                            <a href="#" className="card-action">
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarCabanas(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -115,7 +139,7 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Cursos</h3>
                             <p className="card-description">Administrar programas académicos</p>
-                            <a href="#" className="card-action">
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarProgramas(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -134,7 +158,7 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Tareas</h3>
                             <p className="card-description">Asignar y supervisar tareas</p>
-                            <a href="#" className="card-action">
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarTareas(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -153,7 +177,7 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Inscripciones</h3>
                             <p className="card-description">Procesar inscripciones y categorizar</p>
-                            <a href="#" className="card-action">
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarInscripciones(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -172,21 +196,31 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Reportes</h3>
                             <p className="card-description">Generar informes del sistema</p>
-                            <a href="#" className="card-action">
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarReportes(); }}>
+                                Gestionar <i className="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className="management-card" data-module="categorias">
+                        <div className="card-icon categories">
+                            <i className="fas fa-tags"></i>
+                        </div>
+                        <div className="card-content">
+                            <div className="card-stats">
+                                <span className="stat-number">9</span>
+                                <span className="stat-label">categorías</span>
+                                <span className="stat-change positive">Activas</span>
+                            </div>
+                            <h3 className="card-title">Gestionar Categorías</h3>
+                            <p className="card-description">Administrar clasificaciones del sistema</p>
+                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarCategorias(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
                             </a>
                         </div>
                     </div>
                 </div>
-                {seccionActiva === "usuarios" && <Gestionusuarios />}
-                {seccionActiva === "solicitudes" && <Gestionsolicitud />}
-                {seccionActiva === "eventos" && <Gestionevento />}
-                {seccionActiva === "cabanas" && <Gestioncabana />}
-                {seccionActiva === "cursos" && <Gestioninscripcion />}
-                {seccionActiva === "tareas" && <Gestiontarea />}
-                {seccionActiva === "inscripciones" && <Gestioninscripcion />}
-                {seccionActiva === "categorias" && <Gestioncategorizacion />}
-                {seccionActiva === "reportes" && <Gestionreporte />}
+
             </main>
             <Footer />
         </>

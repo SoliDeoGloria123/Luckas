@@ -9,7 +9,7 @@ export const API_CONFIG = {
     // Para desarrollo local con emulador: 'http://10.0.2.2:3000'
     // Para desarrollo local con dispositivo físico: 'http://TU_IP_LOCAL:3000'
     // Para producción: 'https://tu-dominio.com'
-    BASE_URL: (typeof __DEV__ !== 'undefined' && __DEV__) ? 'http://10.0.2.2:3000' : 'https://tu-dominio.com',
+    BASE_URL: (typeof __DEV__ !== 'undefined' && __DEV__) ? 'http://192.168.80.22:3000' : 'https://tu-dominio.com',
     
     ENDPOINTS: {
         // Auth endpoints
@@ -105,8 +105,8 @@ export const MESSAGES = {
 export const getApiBaseUrl = (): string => {
     if (typeof __DEV__ !== 'undefined' && __DEV__) {
         // En desarrollo, puedes cambiar esto según tu configuración
-        return 'http://10.0.2.2:3000/api'; // Para emulador Android
-        // return 'http://192.168.1.100:3000/api'; // Para dispositivo físico (cambiar IP)
+        // return 'http://10.0.2.2:3000/api'; // Para emulador Android
+        return 'http://192.168.80.22:3000/api'; // Para dispositivo físico (cambiar IP)
     }
     return 'https://tu-dominio.com/api'; // Para producción
 };

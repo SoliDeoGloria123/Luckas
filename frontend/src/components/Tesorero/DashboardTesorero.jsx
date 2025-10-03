@@ -44,6 +44,9 @@ const DashboardTesorero = () => {
   const handleGtareaClick =() =>{
     navigate('/tesorero/tarea')
   };
+  const handleGestionesClick =() =>{
+    navigate('/tesorero-Gestiones')
+  };
 
 
   const toggleSidebar = () => {
@@ -85,9 +88,9 @@ const DashboardTesorero = () => {
                 <h1 className="font-bold text-3xl text-gray-900 mb-2">Dashboard Principal</h1>
                   <p className="text-gray-600">Gestiona recursos y administra el sistema eficientemente</p>
               </div>
-              <button className="quick-action-btn-tesorero">
-                <i className="fas fa-plus"></i>
-                Acción Rápida
+              <button className="quick-action-btn-tesorero" onClick={handleGestionesClick}>
+                <i className="fas fa-cog"></i>
+                Ver Todas las Gestiones
               </button>
             </div>
             <div className="dashboard-content">
@@ -135,10 +138,83 @@ const DashboardTesorero = () => {
                 </div>
               </section>
 
+              <section className="reports-section-tesorero">
+                <h2 className="mb-6 font-bold text-xl text-gray-900">Reportes Financieros</h2>
+                <div className="reports-grid-tesorero">
+                  <div className="report-card-tesorero" onClick={handleGreporteClick} style={{cursor: 'pointer'}}>
+                    <div className="report-icon-tesorero financial">
+                      <i className="fas fa-chart-pie"></i>
+                    </div>
+                    <div className="report-content-tesorero">
+                      <h3>Reporte Mensual</h3>
+                      <p>Ingresos, gastos y balance del mes</p>
+                      <div className="report-stats-tesorero">
+                        <span className="report-period">Septiembre 2025</span>
+                        <span className="report-status completed">Completado</span>
+                      </div>
+                    </div>
+                    <div className="report-action-tesorero">
+                      <i className="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+
+                  <div className="report-card-tesorero" onClick={handleGreporteClick} style={{cursor: 'pointer'}}>
+                    <div className="report-icon-tesorero occupancy">
+                      <i className="fas fa-chart-bar"></i>
+                    </div>
+                    <div className="report-content-tesorero">
+                      <h3>Ocupación Cabañas</h3>
+                      <p>Análisis de ocupación y rentabilidad</p>
+                      <div className="report-stats-tesorero">
+                        <span className="report-period">Q3 2025</span>
+                        <span className="report-status completed">75% ocupación</span>
+                      </div>
+                    </div>
+                    <div className="report-action-tesorero">
+                      <i className="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+
+                  <div className="report-card-tesorero" onClick={handleGreporteClick} style={{cursor: 'pointer'}}>
+                    <div className="report-icon-tesorero inscriptions">
+                      <i className="fas fa-chart-line"></i>
+                    </div>
+                    <div className="report-content-tesorero">
+                      <h3>Inscripciones</h3>
+                      <p>Análisis de inscripciones y programas</p>
+                      <div className="report-stats-tesorero">
+                        <span className="report-period">Octubre 2025</span>
+                        <span className="report-status in-progress">En proceso</span>
+                      </div>
+                    </div>
+                    <div className="report-action-tesorero">
+                      <i className="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+
+                  <div className="report-card-tesorero generate-new" onClick={handleGreporteClick} style={{cursor: 'pointer'}}>
+                    <div className="report-icon-tesorero generate">
+                      <i className="fas fa-plus-circle"></i>
+                    </div>
+                    <div className="report-content-tesorero">
+                      <h3>Generar Nuevo</h3>
+                      <p>Crear reporte personalizado</p>
+                      <div className="report-stats-tesorero">
+                        <span className="report-period">Personalizado</span>
+                        <span className="report-status new">Nuevo</span>
+                      </div>
+                    </div>
+                    <div className="report-action-tesorero">
+                      <i className="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
               <section className="admin-functions">
                 <h2 className="mb-6 font-bold text-xl text-gray-900">Funciones Administrativas</h2>
                 <div className="functions-grid">
-                  <div className={ seccionActiva === "usuarios-tesorero" ? "activo" : "function-card"} data-function="usuarios-tesorero">
+                  <div className={ seccionActiva === "usuarios-tesorero" ? "activo" : "function-card"} data-function="usuarios-tesorero" onClick={handleGusuariosClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-users"></i>
                     </div>
@@ -157,7 +233,7 @@ const DashboardTesorero = () => {
                       </button>
                     </div>
                   </div>
-                  <div className={ seccionActiva === "categorias-tesorero" ? "activo" : "function-card"} data-function="categorias-tesorero">
+                  <div className={ seccionActiva === "categorias-tesorero" ? "activo" : "function-card"} data-function="categorias-tesorero" onClick={handleGcategoriasClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-users"></i>
                     </div>
@@ -177,7 +253,7 @@ const DashboardTesorero = () => {
                     </div>
                   </div>
 
-                  <div className= { seccionActiva === "solicitud-tesorero" ? "activo" : "function-card"} data-function="solicitud-tesorero">
+                  <div className= { seccionActiva === "solicitud-tesorero" ? "activo" : "function-card"} data-function="solicitud-tesorero" onClick={handleGsolicitudesClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-file-alt"></i>
                     </div>
@@ -197,7 +273,7 @@ const DashboardTesorero = () => {
                     </div>
                   </div>
 
-                  <div className={ seccionActiva === "evento-tesorero" ? "activo" : "function-card"} data-function="evento-tesorero" >
+                  <div className={ seccionActiva === "evento-tesorero" ? "activo" : "function-card"} data-function="evento-tesorero" onClick={handleEventosClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-calendar"></i>
                     </div>
@@ -217,7 +293,7 @@ const DashboardTesorero = () => {
                     </div>
                   </div>
 
-                  <div className={ seccionActiva === "cabana-tesorero" ? "activo" : "function-card"} data-function="cabana-tesorero">
+                  <div className={ seccionActiva === "cabana-tesorero" ? "activo" : "function-card"} data-function="cabana-tesorero" onClick={handleGcabanaClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-home"></i>
                     </div>
@@ -236,7 +312,7 @@ const DashboardTesorero = () => {
                       </button>
                     </div>
                   </div>
-                  <div className={ seccionActiva === "reserva-tesorero" ? "activo" : "function-card"} data-function="reserva-tesorero">
+                  <div className={ seccionActiva === "reserva-tesorero" ? "activo" : "function-card"} data-function="reserva-tesorero" onClick={handleGreservasClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-home"></i>
                     </div>
@@ -256,7 +332,7 @@ const DashboardTesorero = () => {
                     </div>
                   </div>
 
-                  <div className={ seccionActiva === "curso-tesorero" ? "activo" : "function-card"} data-function="curso-tesorero">
+                  <div className={ seccionActiva === "curso-tesorero" ? "activo" : "function-card"} data-function="curso-tesorero" onClick={handleGcursosClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-book"></i>
                     </div>
@@ -276,7 +352,7 @@ const DashboardTesorero = () => {
                     </div>
                   </div>
 
-                  <div  className={ seccionActiva === "tarea-tesorero" ? "activo" : "function-card"} data-function="tarea-tesorero">
+                  <div className={ seccionActiva === "tarea-tesorero" ? "activo" : "function-card"} data-function="tarea-tesorero" onClick={handleGtareaClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-tasks"></i>
                     </div>
@@ -296,7 +372,7 @@ const DashboardTesorero = () => {
                     </div>
                   </div>
 
-                  <div className={ seccionActiva === "inscripcion-tesorero" ? "activo" : "function-card"} data-function="inscripcion-tesorero">
+                  <div className={ seccionActiva === "inscripcion-tesorero" ? "activo" : "function-card"} data-function="inscripcion-tesorero" onClick={handleGinscripcionClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-user-plus"></i>
                     </div>
@@ -315,7 +391,7 @@ const DashboardTesorero = () => {
                       </button>
                     </div>
                   </div>
-                  <div className={ seccionActiva === "inscripcion-certificados" ? "activo" : "function-card"} data-function="inscripcion-certificados">
+                  <div className={ seccionActiva === "inscripcion-certificados" ? "activo" : "function-card"} data-function="inscripcion-certificados" onClick={handlecertificadosClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-user-plus"></i>
                     </div>
@@ -335,7 +411,7 @@ const DashboardTesorero = () => {
                     </div>
                   </div>
 
-                  <div  className={ seccionActiva === "reportes-tesorero" ? "activo" : "function-card"} data-function="reportes-tesorero">
+                  <div className={ seccionActiva === "reportes-tesorero" ? "activo" : "function-card"} data-function="reportes-tesorero" onClick={handleGreporteClick} style={{cursor: 'pointer'}}>
                     <div className="function-icon">
                       <i className="fas fa-chart-bar"></i>
                     </div>

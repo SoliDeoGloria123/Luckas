@@ -34,7 +34,6 @@ const CabanasSeminario = () => {
 
   const verDetalles = (cabana) => {
     setCabanaSeleccionada(cabana);
-    // Aquí iría la lógica para mostrar detalles
   };
 
 
@@ -345,9 +344,8 @@ const CabanasSeminario = () => {
                   <button
                     className="cabin-btn primary"
                     onClick={() => {
-                      abrirReserva(cabanaSeleccionada);
+                      abrirReserva(cab);
                       setMostrarFormularioReserva(true);
-                      setCabanaSeleccionada(null);
                     }}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
