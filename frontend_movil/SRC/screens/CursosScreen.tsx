@@ -8,7 +8,8 @@ import {
     TouchableOpacity,
     TextInput,
     Alert,
-    RefreshControl
+    RefreshControl,
+    Modal
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -23,6 +24,8 @@ const CursosScreen: React.FC = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [selectedModalidad, setSelectedModalidad] = useState('Todas');
     const [selectedEstado, setSelectedEstado] = useState('Todos');
+    const [selectedCurso, setSelectedCurso] = useState<any>(null);
+    const [modalVisible, setModalVisible] = useState(false);
     const modalidades = ['Todas', 'Presencial', 'Virtual', 'Semipresencial'];
     const estados = ['Todos', 'Activo', 'Inactivo', 'Finalizado', 'Suspendido'];
 
@@ -78,6 +81,179 @@ const CursosScreen: React.FC = () => {
         Alert.alert('Solo Visualización', 'La funcionalidad de eliminación no está disponible en la versión móvil');
     };
 
+    const handleVerCurso = (curso: any) => {
+        setSelectedCurso(curso);
+        setModalVisible(true);
+    };
+
+    const renderModalContent = () => {
+        if (!selectedCurso) return null;
+
+        return (
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Información del Curso</Text>
+                            <TouchableOpacity
+                                style={styles.closeButton}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Ionicons name="close" size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+                            <View style={styles.modalSection}>
+                                <Text style={styles.modalSectionTitle}>Información General</Text>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Nombre:</Text>
+                                    <Text style={styles.modalValue}>{selectedCurso.nombre}</Text>
+                                </View>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Profesor:</Text>
+                                    <Text style={styles.modalValue}>{selectedCurso.profesor || selectedCurso.instructor}</Text>
+                                </View>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Modalidad:</Text>
+                                    <View style={[styles.modalidadTag, styles[`modalidad${selectedCurso.modalidad}`]]}>
+                                        <Text style={styles.modalidadText}>{selectedCurso.modalidad}</Text>
+                                    </View>
+                                </View>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Duración:</Text>
+                                    <Text style={styles.modalValue}>{selectedCurso.duracion}</Text>
+                                </View>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Nivel:</Text>
+                                    <Text style={styles.modalValue}>{selectedCurso.nivel}</Text>
+                                </View>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Precio:</Text>
+                                    <Text style={[styles.modalValue, selectedCurso.precio ? styles.cursoPrecio : styles.cursoGratis]}>
+                                        {selectedCurso.precio ? `$${selectedCurso.precio}` : 'Gratuito'}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View style={styles.modalSection}>
+                                <Text style={styles.modalSectionTitle}>Cupos y Fechas</Text>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Cupos disponibles:</Text>
+                                    <Text style={styles.modalValue}>{selectedCurso.cuposDisponibles}</Text>
+                                </View>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Cupos ocupados:</Text>
+                                    <Text style={styles.modalValue}>{selectedCurso.cuposOcupados}</Text>
+                                </View>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Fecha inicio:</Text>
+                                    <Text style={styles.modalValue}>
+                                        {selectedCurso.fechaInicio ? new Date(selectedCurso.fechaInicio).toLocaleDateString() : '-'}
+                                    </Text>
+                                </View>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Fecha fin:</Text>
+                                    <Text style={styles.modalValue}>
+                                        {selectedCurso.fechaFin ? new Date(selectedCurso.fechaFin).toLocaleDateString() : '-'}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            {selectedCurso.descripcion && (
+                                <View style={styles.modalSection}>
+                                    <Text style={styles.modalSectionTitle}>Descripción</Text>
+                                    <Text style={styles.modalDescription}>{selectedCurso.descripcion}</Text>
+                                </View>
+                            )}
+
+                            {Array.isArray(selectedCurso.requisitos) && selectedCurso.requisitos.length > 0 && (
+                                <View style={styles.modalSection}>
+                                    <Text style={styles.modalSectionTitle}>Requisitos</Text>
+                                    {selectedCurso.requisitos.map((req: string, index: number) => (
+                                        <Text key={index} style={styles.modalListItem}>• {req}</Text>
+                                    ))}
+                                </View>
+                            )}
+
+                            {Array.isArray(selectedCurso.objetivos) && selectedCurso.objetivos.length > 0 && (
+                                <View style={styles.modalSection}>
+                                    <Text style={styles.modalSectionTitle}>Objetivos</Text>
+                                    {selectedCurso.objetivos.map((obj: string, index: number) => (
+                                        <Text key={index} style={styles.modalListItem}>• {obj}</Text>
+                                    ))}
+                                </View>
+                            )}
+
+                            {selectedCurso.metodologia && (
+                                <View style={styles.modalSection}>
+                                    <Text style={styles.modalSectionTitle}>Metodología</Text>
+                                    <Text style={styles.modalDescription}>{selectedCurso.metodologia}</Text>
+                                </View>
+                            )}
+
+                            {selectedCurso.evaluacion && (
+                                <View style={styles.modalSection}>
+                                    <Text style={styles.modalSectionTitle}>Evaluación</Text>
+                                    <Text style={styles.modalDescription}>{selectedCurso.evaluacion}</Text>
+                                </View>
+                            )}
+
+                            <View style={styles.modalSection}>
+                                <Text style={styles.modalSectionTitle}>Estado y Certificación</Text>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Estado:</Text>
+                                    <View style={[styles.estadoTag, styles[`estado${selectedCurso.estado}`]]}>
+                                        <Text style={styles.estadoText}>{selectedCurso.estado}</Text>
+                                    </View>
+                                </View>
+
+                                <View style={styles.modalInfoRow}>
+                                    <Text style={styles.modalLabel}>Certificación:</Text>
+                                    <Text style={[styles.modalValue, selectedCurso.certificacion ? styles.cursoCertificado : null]}>
+                                        {selectedCurso.certificacion ? 'Sí' : 'No'}
+                                    </Text>
+                                </View>
+
+                                {selectedCurso.destacado && (
+                                    <View style={styles.modalInfoRow}>
+                                        <Text style={styles.modalLabel}>Destacado:</Text>
+                                        <Ionicons name="star" size={20} color="#f59e42" />
+                                    </View>
+                                )}
+                            </View>
+                        </ScrollView>
+
+                        <View style={styles.modalFooter}>
+                            <TouchableOpacity
+                                style={styles.modalCloseButton}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={styles.modalCloseButtonText}>Cerrar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+        );
+    };
+
     const renderCursoCard = (curso: any) => (
         <View key={curso._id || curso.id} style={styles.cursoCardWeb}>
             <View style={styles.cardHeaderWeb}>
@@ -120,9 +296,9 @@ const CursosScreen: React.FC = () => {
                 <Text style={styles.cursoInfoLabel}><Text style={styles.cursoInfoTitle}>Evaluación:</Text> <Text style={styles.cursoInfoValue}>{curso.evaluacion}</Text></Text>
             )}
             <View style={styles.cursoActionsWeb}>
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={styles.actionButtonWeb}
-                    onPress={() => Alert.alert('Información', `Nombre: ${curso.nombre}\nProfesor: ${curso.profesor || curso.instructor}\nModalidad: ${curso.modalidad}\nDuración: ${curso.duracion}\nNivel: ${curso.nivel}\nPrecio: ${curso.precio ? `$${curso.precio}` : 'Gratuito'}\nCupos disponibles: ${curso.cuposDisponibles}\nCupos ocupados: ${curso.cuposOcupados}\nFecha inicio: ${curso.fechaInicio ? new Date(curso.fechaInicio).toLocaleDateString() : '-'}\nFecha fin: ${curso.fechaFin ? new Date(curso.fechaFin).toLocaleDateString() : '-'}\nCertificación: ${curso.certificacion ? 'Sí' : 'No'}\nDestacado: ${curso.destacado ? 'Sí' : 'No'}\nRequisitos: ${Array.isArray(curso.requisitos) ? curso.requisitos.join(', ') : ''}\nObjetivos: ${Array.isArray(curso.objetivos) ? curso.objetivos.join(', ') : ''}\nMetodología: ${curso.metodologia || ''}\nEvaluación: ${curso.evaluacion || ''}\nDescripción: ${curso.descripcion}`)}
+                    onPress={() => handleVerCurso(curso)}
                 >
                     <Ionicons name="eye-outline" size={20} color={colors.primary} />
                     <Text style={styles.actionTextWeb}>Ver</Text>
@@ -176,7 +352,7 @@ const CursosScreen: React.FC = () => {
             </View>
 
             {/* Lista de cursos */}
-            <ScrollView style={styles.scrollContainer}>
+            <ScrollView style={styles.listContainer}>
                 {filteredCursos.length > 0 ? (
                     filteredCursos.map(renderCursoCard)
                 ) : (
@@ -189,6 +365,9 @@ const CursosScreen: React.FC = () => {
                     </View>
                 )}
             </ScrollView>
+
+            {/* Modal de información */}
+            {renderModalContent()}
         </View>
     );
 };
@@ -427,6 +606,109 @@ const styles = StyleSheet.create({
         color: colors.textSecondary,
         textAlign: 'center',
         paddingHorizontal: spacing.lg,
+    },
+    listContainer: {
+        flex: 1,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: colors.surface,
+        marginHorizontal: 0,
+        marginVertical: spacing.md,
+        borderRadius: 16,
+        maxHeight: '96%',
+       
+        alignSelf: 'center',
+        ...shadows.medium,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: spacing.lg,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+    },
+    modalTitle: {
+        fontSize: typography.fontSize.xl,
+        fontWeight: typography.fontWeight.bold,
+        color: colors.text,
+    },
+    closeButton: {
+        padding: spacing.xs,
+        borderRadius: 20,
+        backgroundColor: '#f1f5f9',
+    },
+    modalBody: {
+        flex: 1,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.lg,
+    },
+    modalSection: {
+        marginBottom: spacing.lg,
+    },
+    modalSectionTitle: {
+        fontSize: typography.fontSize.lg,
+        fontWeight: typography.fontWeight.semiBold,
+        color: colors.primary,
+        marginBottom: spacing.md,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+        paddingBottom: spacing.xs,
+    },
+    modalInfoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing.sm,
+        flexWrap: 'wrap',
+    },
+    modalLabel: {
+        fontSize: typography.fontSize.md,
+        fontWeight: typography.fontWeight.semiBold,
+        color: colors.textSecondary,
+        flex: 1,
+        minWidth: 100,
+    },
+    modalValue: {
+        fontSize: typography.fontSize.md,
+        color: colors.text,
+        flex: 2,
+        textAlign: 'right',
+    },
+    modalDescription: {
+        fontSize: typography.fontSize.md,
+        color: colors.text,
+        lineHeight: 20,
+        textAlign: 'justify',
+    },
+    modalListItem: {
+        fontSize: typography.fontSize.md,
+        color: colors.text,
+        marginBottom: spacing.xs,
+        paddingLeft: spacing.sm,
+    },
+    modalFooter: {
+        padding: spacing.lg,
+        borderTopWidth: 1,
+        borderTopColor: '#e5e7eb',
+    },
+    modalCloseButton: {
+        backgroundColor: colors.primary,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.lg,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    modalCloseButtonText: {
+        color: colors.surface,
+        fontSize: typography.fontSize.md,
+        fontWeight: typography.fontWeight.semiBold,
     },
 });
 

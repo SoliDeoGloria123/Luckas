@@ -59,6 +59,8 @@ const EventosScreen: React.FC = () => {
     const [categorias, setCategorias] = useState<Categorizacion[]>([]);
     const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
+    const [selectedEventos, setSelectedEventos] = useState<any>(null);
+    const [modalVisible, setModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -192,11 +194,9 @@ const EventosScreen: React.FC = () => {
     const categoriasParaFiltros = ['Todos', ...categorias.map(cat => cat.nombre)];
 
     // Manejar ver detalles del evento
-    const handleVerDetalles = (evento: Evento) => {
-        Alert.alert(
-            evento.nombre,
-            `Fecha: ${evento.fechaEvento}\nHora: ${evento.horaInicio} - ${evento.horaFin}\nLugar: ${evento.lugar}\n\n${evento.descripcion}`
-        );
+    const handleVerDetalles = (evento: any) => {
+        setSelectedEventos(evento);
+        setModalVisible(true);
     };
 
     // Abrir modal para crear evento
@@ -443,6 +443,7 @@ const EventosScreen: React.FC = () => {
     };
 
     return (
+
         <View style={styles.container}>
             {/* Header igual a Cabañas */}
             <View style={styles.header}>
@@ -543,6 +544,147 @@ const EventosScreen: React.FC = () => {
                     onChangeText={setSearchText}
                 />
             </View>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent_detalle}>
+                        <View style={styles.modalHeader_detalle}>
+                            <Text style={styles.modalTitle_detalle}>Información del Evento</Text>
+                            <TouchableOpacity
+                                style={styles.closeButton}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Ionicons name="close" size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+                            {selectedEventos && (
+                                <>
+                                    <View style={styles.modalSection}>
+                                        <Text style={styles.modalSectionTitle}>Información General</Text>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Nombre:</Text>
+                                            <Text style={styles.modalValue}>{selectedEventos.nombre}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Descripción:</Text>
+                                            <Text style={styles.modalValue}>{selectedEventos.descripcion}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Categoría:</Text>
+                                            <Text style={styles.modalValue}>
+                                                {typeof selectedEventos.categoria === 'object' && selectedEventos.categoria?.nombre 
+                                                    ? selectedEventos.categoria.nombre 
+                                                    : selectedEventos.categoria || '-'}
+                                            </Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Prioridad:</Text>
+                                            <Text style={styles.modalValue}>{selectedEventos.prioridad}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Lugar:</Text>
+                                            <Text style={styles.modalValue}>{selectedEventos.lugar}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Dirección:</Text>
+                                            <Text style={styles.modalValue}>{selectedEventos.direccion || '-'}</Text>
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.modalSection}>
+                                        <Text style={styles.modalSectionTitle}>Fechas y Horarios</Text>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Fecha:</Text>
+                                            <Text style={styles.modalValue}>
+                                                {selectedEventos.fechaEvento ? new Date(selectedEventos.fechaEvento).toLocaleDateString() : '-'}
+                                            </Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Hora Inicio:</Text>
+                                            <Text style={styles.modalValue}>{selectedEventos.horaInicio}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Hora Fin:</Text>
+                                            <Text style={styles.modalValue}>{selectedEventos.horaFin}</Text>
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.modalSection}>
+                                        <Text style={styles.modalSectionTitle}>Cupos y Precio</Text>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Cupos Totales:</Text>
+                                            <Text style={styles.modalValue}>{selectedEventos.cuposTotales}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Cupos Disponibles:</Text>
+                                            <Text style={styles.modalValue}>{selectedEventos.cuposDisponibles}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Precio:</Text>
+                                            <Text style={styles.modalValue}>
+                                                {selectedEventos.precio ? `$${selectedEventos.precio}` : 'Gratuito'}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    {selectedEventos.observaciones && (
+                                        <View style={styles.modalSection}>
+                                            <Text style={styles.modalSectionTitle}>Observaciones</Text>
+                                            <Text style={styles.modalDescription}>{selectedEventos.observaciones}</Text>
+                                        </View>
+                                    )}
+
+                                    {Array.isArray(selectedEventos.etiquetas) && selectedEventos.etiquetas.length > 0 && (
+                                        <View style={styles.modalSection}>
+                                            <Text style={styles.modalSectionTitle}>Etiquetas</Text>
+                                            <Text style={styles.modalDescription}>{selectedEventos.etiquetas.join(', ')}</Text>
+                                        </View>
+                                    )}
+
+                                    {Array.isArray(selectedEventos.programa) && selectedEventos.programa.length > 0 && (
+                                        <View style={styles.modalSection}>
+                                            <Text style={styles.modalSectionTitle}>Programa del Evento</Text>
+                                            {selectedEventos.programa.map((item: any, idx: number) => (
+                                                <Text key={idx} style={styles.modalListItem}>
+                                                    • {item.horaInicio} - {item.horaFin}: {item.tema} 
+                                                    {item.descripcion && ` (${item.descripcion})`}
+                                                </Text>
+                                            ))}
+                                        </View>
+                                    )}
+                                </>
+                            )}
+                        </ScrollView>
+
+                        <View style={styles.modalFooter}>
+                            <TouchableOpacity
+                                style={styles.modalCloseButton}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={styles.modalCloseButtonText}>Cerrar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
             {/* Lista de eventos */}
             <ScrollView
@@ -620,7 +762,7 @@ const EventosScreen: React.FC = () => {
                                 <Ionicons name="location-outline" size={16} color={colors.primary} />
                                 <Text style={styles.infoTextWeb}>{evento.lugar}</Text>
                             </View>
-                        
+
                             <TouchableOpacity
                                 style={styles.eyeButton}
                                 onPress={() => handleVerDetalles(evento)}
@@ -966,13 +1108,13 @@ const EventosScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
     eyeButton: {
-      flexDirection: 'row',
+        flexDirection: 'row',
         paddingHorizontal: spacing.sm,
         paddingVertical: spacing.xs,
         marginLeft: spacing.sm,
         alignSelf: 'flex-end',
     },
-      actionTextWeb: {
+    actionTextWeb: {
         marginLeft: spacing.xs,
         fontSize: typography.fontSize.sm,
         color: colors.textSecondary,
@@ -1627,6 +1769,109 @@ const styles = StyleSheet.create({
         fontWeight: typography.fontWeight.medium,
     },
     buttonPrimaryText: {
+        color: colors.surface,
+        fontSize: typography.fontSize.md,
+        fontWeight: typography.fontWeight.semiBold,
+    },
+        listContainer: {
+        flex: 1,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent_detalle: {
+        backgroundColor: colors.surface,
+        marginHorizontal: 0,
+        marginVertical: spacing.md,
+        borderRadius: 16,
+        maxHeight: '96%',
+       
+        alignSelf: 'center',
+        ...shadows.medium,
+    },
+    modalHeader_detalle: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: spacing.lg,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+    },
+    modalTitle_detalle: {
+        fontSize: typography.fontSize.xl,
+        fontWeight: typography.fontWeight.bold,
+        color: colors.text,
+    },
+    closeButton: {
+        padding: spacing.xs,
+        borderRadius: 20,
+        backgroundColor: '#f1f5f9',
+    },
+    modalBody: {
+        flex: 1,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.lg,
+    },
+    modalSection: {
+        marginBottom: spacing.lg,
+    },
+    modalSectionTitle: {
+        fontSize: typography.fontSize.lg,
+        fontWeight: typography.fontWeight.semiBold,
+        color: colors.primary,
+        marginBottom: spacing.md,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+        paddingBottom: spacing.xs,
+    },
+    modalInfoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing.sm,
+        flexWrap: 'wrap',
+    },
+    modalLabel: {
+        fontSize: typography.fontSize.md,
+        fontWeight: typography.fontWeight.semiBold,
+        color: colors.textSecondary,
+        flex: 1,
+        minWidth: 100,
+    },
+    modalValue: {
+        fontSize: typography.fontSize.md,
+        color: colors.text,
+        flex: 2,
+        textAlign: 'right',
+    },
+    modalDescription: {
+        fontSize: typography.fontSize.md,
+        color: colors.text,
+        lineHeight: 20,
+        textAlign: 'justify',
+    },
+    modalListItem: {
+        fontSize: typography.fontSize.md,
+        color: colors.text,
+        marginBottom: spacing.xs,
+        paddingLeft: spacing.sm,
+    },
+    modalFooter: {
+        padding: spacing.lg,
+        borderTopWidth: 1,
+        borderTopColor: '#e5e7eb',
+    },
+    modalCloseButton: {
+        backgroundColor: colors.primary,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.lg,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    modalCloseButtonText: {
         color: colors.surface,
         fontSize: typography.fontSize.md,
         fontWeight: typography.fontWeight.semiBold,

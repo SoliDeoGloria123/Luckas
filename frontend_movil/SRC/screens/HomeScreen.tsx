@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 import { seminaristaStyles } from '../styles/SeminaristaMovil';
 
 
@@ -16,6 +17,7 @@ import { seminaristaStyles } from '../styles/SeminaristaMovil';
 const HomeScreen: React.FC = () => {
     const { user, logout } = useAuth();
     const { isAdmin, isTesorero, isSeminarista } = useAuth();
+    const navigation = useNavigation();
     
     // Estados para estadísticas (simuladas por ahora)
     const [stats, setStats] = useState({
@@ -86,6 +88,29 @@ const HomeScreen: React.FC = () => {
             return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
         }
         return name[0].toUpperCase();
+    };
+
+    // Funciones de navegación para acceso rápido
+    const navigateToCursos = () => {
+        navigation.navigate('Cursos' as never);
+    };
+
+    const navigateToEventos = () => {
+        navigation.navigate('Eventos' as never);
+    };
+
+    const navigateToReservas = () => {
+        navigation.navigate('Cabanas' as never);
+    };
+
+    const navigateToProfile = () => {
+        navigation.navigate('Profile' as never);
+    };
+
+    const navigateToProgramas = () => {
+        // Si hay una screen específica de programas, navegar allí
+        // Por ahora, mostrar un alert indicando que está en desarrollo
+        Alert.alert('Programas', 'Funcionalidad en desarrollo');
     };
 
     return (
@@ -160,7 +185,10 @@ const HomeScreen: React.FC = () => {
             
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                 {/* Card Cursos */}
-                <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                <TouchableOpacity 
+                    style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}
+                    onPress={navigateToCursos}
+                >
                     <View style={{ alignItems: 'center', marginBottom: 10 }}>
                         <Ionicons name="school-outline" size={32} color="#2563eb" />
                     </View>
@@ -169,7 +197,10 @@ const HomeScreen: React.FC = () => {
                 </TouchableOpacity>
 
                 {/* Card Eventos */}
-                <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                <TouchableOpacity 
+                    style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}
+                    onPress={navigateToEventos}
+                >
                     <View style={{ alignItems: 'center', marginBottom: 10 }}>
                         <Ionicons name="calendar-outline" size={32} color="#059669" />
                     </View>
@@ -178,7 +209,10 @@ const HomeScreen: React.FC = () => {
                 </TouchableOpacity>
 
                 {/* Card Reservas */}
-                <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                <TouchableOpacity 
+                    style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}
+                    onPress={navigateToReservas}
+                >
                     <View style={{ alignItems: 'center', marginBottom: 10 }}>
                         <Ionicons name="bed-outline" size={32} color="#8b5cf6" />
                     </View>
@@ -187,7 +221,10 @@ const HomeScreen: React.FC = () => {
                 </TouchableOpacity>
 
                 {/* Card Perfil */}
-                <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                <TouchableOpacity 
+                    style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}
+                    onPress={navigateToProfile}
+                >
                     <View style={{ alignItems: 'center', marginBottom: 10 }}>
                         <Ionicons name="person-outline" size={32} color="#198754" />
                     </View>
@@ -196,7 +233,10 @@ const HomeScreen: React.FC = () => {
                 </TouchableOpacity>
                 {/* Card Programas (solo admin y tesorero) */}
                 {(isAdmin() || isTesorero()) && (
-                    <TouchableOpacity style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}>
+                    <TouchableOpacity 
+                        style={[seminaristaStyles.card, { width: '48%', marginBottom: 10 }]}
+                        onPress={navigateToProgramas}
+                    >
                         <View style={{ alignItems: 'center', marginBottom: 10 }}>
                             <Ionicons name="library-outline" size={32} color="#334155" />
                         </View>

@@ -19,7 +19,7 @@ import { cabanasService } from '../services/cabanas';
 import categorizacionService from '../services/categorizacion';
 import { Cabana, CabanaForm, Categorizacion } from '../types';
 import { StyleSheet } from 'react-native';
-import { colors, spacing, typography } from '../styles';
+import { colors, spacing, typography, shadows } from '../styles';
 
 const CabanasScreen: React.FC = () => {
     // Filtros modal tipo tareas
@@ -490,36 +490,6 @@ const CabanasScreen: React.FC = () => {
                                 <Ionicons name="eye-outline" size={20} color={colors.primary} />
                                 <Text style={styles.actionTextWeb}>Ver</Text>
                             </TouchableOpacity>
-                            {/* Modal de detalle de cabaña */}
-                            <Modal
-                                visible={showDetalleModal}
-                                animationType="slide"
-                                transparent={true}
-                                onRequestClose={() => setShowDetalleModal(false)}
-                            >
-                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
-                                    <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 24, width: '90%', maxWidth: 400 }}>
-                                        <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 8 }}>{detalleCabana?.nombre}</Text>
-                                        <Text style={{ fontSize: 16, color: '#334155', marginBottom: 8 }}>{detalleCabana?.descripcion}</Text>
-                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>Capacidad: {detalleCabana?.capacidad} personas</Text>
-                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>Precio: ${detalleCabana?.precio}/noche</Text>
-                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>Ubicación: {detalleCabana?.ubicacion}</Text>
-                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>Estado: {detalleCabana?.estado}</Text>
-                                        <Text style={{ fontSize: 15, marginBottom: 4 }}>
-                                            Categoría: {
-                                                typeof detalleCabana?.categoria === 'string'
-                                                    ? detalleCabana?.categoria
-                                                    : (detalleCabana?.categoria && typeof detalleCabana.categoria === 'object' && 'nombre' in detalleCabana.categoria)
-                                                        ? (detalleCabana.categoria as any).nombre
-                                                        : ''
-                                            }
-                                        </Text>
-                                        <TouchableOpacity style={{ marginTop: 18, alignSelf: 'flex-end' }} onPress={() => setShowDetalleModal(false)}>
-                                            <Text style={{ color: colors.primary, fontWeight: 'bold', fontSize: 16 }}>Cerrar</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                            </Modal>
 
                             {/* Acciones de admin */}
                             {(hasRole('admin') || hasRole('tesorero')) && (
@@ -556,14 +526,109 @@ const CabanasScreen: React.FC = () => {
                         </Text>
                     </View>
                 )}
-            </ScrollView>
+            </ScrollView >
 
             {/* Botón flotante para crear cabaña */}
-            {(hasRole('admin') || hasRole('tesorero')) && (
-                <TouchableOpacity style={styles.fab} onPress={handleCrearCabana}>
-                    <Ionicons name="add" size={24} color="#fff" />
-                </TouchableOpacity>
-            )}
+            {
+                (hasRole('admin') || hasRole('tesorero')) && (
+                    <TouchableOpacity style={styles.fab} onPress={handleCrearCabana}>
+                        <Ionicons name="add" size={24} color="#fff" />
+                    </TouchableOpacity>
+                )
+            }
+
+            {/* Modal de detalle de cabaña */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showDetalleModal}
+                onRequestClose={() => setShowDetalleModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent_detalle}>
+                        <View style={styles.modalHeader_detalle}>
+                            <Text style={styles.modalTitle_detalle}>Información de la Cabaña</Text>
+                            <TouchableOpacity
+                                style={styles.closeButton}
+                                onPress={() => setShowDetalleModal(false)}
+                            >
+                                <Ionicons name="close" size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+                            {detalleCabana && (
+                                <>
+                                    <View style={styles.modalSection}>
+                                        <Text style={styles.modalSectionTitle}>Información General</Text>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Nombre:</Text>
+                                            <Text style={styles.modalValue}>{detalleCabana.nombre}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Descripción:</Text>
+                                            <Text style={styles.modalValue}>{detalleCabana.descripcion || '-'}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Categoría:</Text>
+                                            <Text style={styles.modalValue}>
+                                                {typeof detalleCabana.categoria === 'object' && detalleCabana.categoria && 'nombre' in detalleCabana.categoria
+                                                    ? (detalleCabana.categoria as any).nombre
+                                                    : detalleCabana.categoria || '-'}
+                                            </Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Estado:</Text>
+                                            <Text style={styles.modalValue}>{detalleCabana.estado}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Ubicación:</Text>
+                                            <Text style={styles.modalValue}>{detalleCabana.ubicacion || '-'}</Text>
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.modalSection}>
+                                        <Text style={styles.modalSectionTitle}>Capacidad y Precio</Text>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Capacidad:</Text>
+                                            <Text style={styles.modalValue}>{detalleCabana.capacidad} persona{detalleCabana.capacidad !== 1 ? 's' : ''}</Text>
+                                        </View>
+
+                                        <View style={styles.modalInfoRow}>
+                                            <Text style={styles.modalLabel}>Precio por noche:</Text>
+                                            <Text style={styles.modalValue}>${detalleCabana.precio}</Text>
+                                        </View>
+                                    </View>
+
+                                    {Array.isArray(detalleCabana.imagen) && detalleCabana.imagen.length > 0 && (
+                                        <View style={styles.modalSection}>
+                                            <Text style={styles.modalSectionTitle}>Imágenes</Text>
+                                            <Text style={styles.modalDescription}>
+                                                Esta cabaña tiene {detalleCabana.imagen.length} imagen{detalleCabana.imagen.length !== 1 ? 'es' : ''} disponible{detalleCabana.imagen.length !== 1 ? 's' : ''}
+                                            </Text>
+                                        </View>
+                                    )}
+                                </>
+                            )}
+                        </ScrollView>
+
+                        <View style={styles.modalFooter}>
+                            <TouchableOpacity
+                                style={styles.modalCloseButton}
+                                onPress={() => setShowDetalleModal(false)}
+                            >
+                                <Text style={styles.modalCloseButtonText}>Cerrar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
             {/* Modal para crear/editar cabaña */}
             <Modal
@@ -754,7 +819,7 @@ const CabanasScreen: React.FC = () => {
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
-        </View>
+        </View >
     );
 };
 
@@ -1349,6 +1414,108 @@ const styles = StyleSheet.create({
     description: {
         color: colors.textSecondary,
         marginBottom: 12,
+    },
+    listContainer: {
+        flex: 1,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent_detalle: {
+        backgroundColor: colors.surface,
+        marginHorizontal: 20,
+        marginVertical: spacing.md,
+        borderRadius: 16,
+        maxHeight: '96%',
+        alignSelf: 'center',
+        ...shadows.medium,
+    },
+    modalHeader_detalle: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: spacing.lg,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+    },
+    modalTitle_detalle: {
+        fontSize: typography.fontSize.xl,
+        fontWeight: typography.fontWeight.bold,
+        color: colors.text,
+    },
+    closeButton: {
+        padding: spacing.xs,
+        borderRadius: 20,
+        backgroundColor: '#f1f5f9',
+    },
+    modalBody: {
+        flex: 1,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.lg,
+    },
+    modalSection: {
+        marginBottom: spacing.lg,
+    },
+    modalSectionTitle: {
+        fontSize: typography.fontSize.lg,
+        fontWeight: typography.fontWeight.semiBold,
+        color: colors.primary,
+        marginBottom: spacing.md,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+        paddingBottom: spacing.xs,
+    },
+    modalInfoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing.sm,
+        flexWrap: 'wrap',
+    },
+    modalLabel: {
+        fontSize: typography.fontSize.md,
+        fontWeight: typography.fontWeight.semiBold,
+        color: colors.textSecondary,
+        flex: 1,
+        minWidth: 100,
+    },
+    modalValue: {
+        fontSize: typography.fontSize.md,
+        color: colors.text,
+        flex: 2,
+        textAlign: 'right',
+    },
+    modalDescription: {
+        fontSize: typography.fontSize.md,
+        color: colors.text,
+        lineHeight: 20,
+        textAlign: 'justify',
+    },
+    modalListItem: {
+        fontSize: typography.fontSize.md,
+        color: colors.text,
+        marginBottom: spacing.xs,
+        paddingLeft: spacing.sm,
+    },
+    modalFooter: {
+        padding: spacing.lg,
+        borderTopWidth: 1,
+        borderTopColor: '#e5e7eb',
+    },
+    modalCloseButton: {
+        backgroundColor: colors.primary,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.lg,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    modalCloseButtonText: {
+        color: colors.surface,
+        fontSize: typography.fontSize.md,
+        fontWeight: typography.fontWeight.semiBold,
     },
 });
 
