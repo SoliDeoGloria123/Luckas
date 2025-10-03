@@ -63,6 +63,7 @@ const InscripcionModal = ({
   const getOpcionesEstado = (tipoReferencia = form.tipoReferencia) => {
     if (tipoReferencia === 'Eventos') {
       return [
+        { value: 'no inscrito', label: 'No inscrito' },
         { value: 'inscrito', label: 'Inscrito' },
         { value: 'finalizado', label: 'Finalizado' }
       ];
@@ -186,13 +187,21 @@ const InscripcionModal = ({
     if (name === "tipoReferencia") {
       // Cuando cambia el tipo de referencia, establecer un estado por defecto
       const opcionesEstado = getOpcionesEstado(value);
-      const estadoDefecto = opcionesEstado.length > 0 ? opcionesEstado[0].value : 'pendiente';
-      setForm({ 
-        ...form, 
+      // Para eventos, el estado por defecto será 'no inscrito', para programas 'preinscrito'
+      let estadoDefecto = '';
+      if (value === 'Eventos') {
+        estadoDefecto = 'no inscrito';
+      } else if (value === 'ProgramaAcademico') {
+        estadoDefecto = 'preinscrito';
+      } else if (opcionesEstado.length > 0) {
+        estadoDefecto = opcionesEstado[0].value;
+      }
+      setForm({
+        ...form,
         [name]: String(value),
         estado: estadoDefecto,
-        referencia: "", // Limpiar referencia cuando cambia el tipo
-        categoria: "" // Limpiar categoría cuando cambia el tipo
+        referencia: "",
+        categoria: ""
       });
       return;
     }

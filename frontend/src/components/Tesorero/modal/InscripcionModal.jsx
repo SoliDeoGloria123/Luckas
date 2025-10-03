@@ -3,7 +3,7 @@ import { userService } from '../../../services/userService';
 import { jwtDecode } from "jwt-decode";
 
 
-const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = {}, onClose, onSubmit }) => {
+const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, initialData = {}, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     usuario: initialData.usuario?._id?.toString() || initialData.usuario?.toString() || initialData.usuario || "",
     nombre: initialData.nombre || '',
@@ -13,9 +13,10 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
     correo: initialData.correo || '',
     telefono: initialData.telefono || '',
     edad: initialData.edad || '',
-    evento: normalizeEvento(initialData.evento) || '',
+    tipoReferencia: initialData.tipoReferencia || 'Eventos',
+    referencia: initialData.referencia?._id || initialData.referencia || '',
     categoria: normalizeCategoria(initialData.categoria) || '',
-    estado: initialData.estado || '',
+    estado: initialData.estado || 'no inscrito',
     observaciones: initialData.observaciones || '',
   });
   const getUsuarioSesion = () => {
@@ -45,11 +46,28 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
     if (typeof categoria === 'object' && categoria._id) return String(categoria._id);
     return String(categoria);
   }
-  function normalizeEvento(evento) {
-    if (!evento) return '';
-    if (typeof evento === 'object' && evento._id) return String(evento._id);
-    return String(evento);
-  }
+  // Obtener opciones de estado según el tipo de referencia
+  const getOpcionesEstado = (tipoReferencia = formData.tipoReferencia) => {
+    if (tipoReferencia === 'Eventos') {
+      return [
+        { value: 'no inscrito', label: 'No inscrito' },
+        { value: 'inscrito', label: 'Inscrito' },
+        { value: 'finalizado', label: 'Finalizado' }
+      ];
+    } else if (tipoReferencia === 'ProgramaAcademico') {
+      return [
+        { value: 'preinscrito', label: 'Preinscrito' },
+        { value: 'matriculado', label: 'Matriculado' },
+        { value: 'en_curso', label: 'En Curso' },
+        { value: 'finalizado', label: 'Finalizado' },
+        { value: 'certificado', label: 'Certificado' },
+        { value: 'rechazada', label: 'Rechazada' },
+        { value: 'cancelada', label: 'Cancelada Académico' }
+      ];
+    } else {
+      return [];
+    }
+  };
   const [usuarioNoEncontrado, setUsuarioNoEncontrado] = useState(false);
   // Normaliza el tipo de documento a los valores válidos del select/backend
   function normalizaTipoDocumento(tipo) {
@@ -70,14 +88,34 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
     try {
       const usuario = await userService.getByDocumento(numeroDocumento);
       if (usuario) {
+        // Calcular edad a partir de la fecha de nacimiento
+        let edadCalculada = 25; // Edad por defecto
+        if (usuario.fechaNacimiento) {
+          try {
+            const hoy = new Date();
+            const fechaNac = new Date(usuario.fechaNacimiento);
+            if (!isNaN(fechaNac.getTime())) {
+              edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
+              const mes = hoy.getMonth() - fechaNac.getMonth();
+              if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+                edadCalculada--;
+              }
+            }
+          } catch (error) {
+            console.log('❌ Error calculando edad:', error);
+          }
+        }
+
         setFormData(prev => ({
           ...prev,
+          usuario: String(usuario._id || ""),
           nombre: usuario.nombre || "",
           apellido: usuario.apellido || "",
           correo: usuario.correo || "",
           telefono: usuario.telefono || "",
           tipoDocumento: normalizaTipoDocumento(usuario.tipoDocumento) || "",
           numeroDocumento: usuario.numeroDocumento || numeroDocumento,
+          edad: String(edadCalculada)
         }));
         setUsuarioNoEncontrado(false);
       } else {
@@ -91,24 +129,75 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
 
   const handleChange = async (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
 
     // Si el campo es numeroDocumento, busca el usuario
     if (name === "numeroDocumento" && value.length > 5) {
       await buscarUsuarioPorDocumento(value);
     }
+
+    if (name === "tipoReferencia") {
+      // Cuando cambia el tipo de referencia, establecer un estado por defecto
+      let estadoDefecto = '';
+      if (value === 'Eventos') {
+        estadoDefecto = 'no inscrito';
+      } else if (value === 'ProgramaAcademico') {
+        estadoDefecto = 'preinscrito';
+      }
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        estado: estadoDefecto,
+        referencia: "",
+        categoria: ""
+      }));
+      return;
+    }
+
+    if (name === "referencia") {
+      if (formData.tipoReferencia === "Eventos") {
+        const eventoSel = eventos.find(ev => String(ev._id) === String(value));
+        if (eventoSel && eventoSel.categoria) {
+          setFormData(prev => ({
+            ...prev,
+            [name]: value,
+            categoria: String(eventoSel.categoria._id || eventoSel.categoria)
+          }));
+          return;
+        }
+      } else if (formData.tipoReferencia === "ProgramaAcademico") {
+        const progSel = programas.find(pr => String(pr._id) === String(value));
+        if (progSel && progSel.categoria) {
+          setFormData(prev => ({
+            ...prev,
+            [name]: value,
+            categoria: String(progSel.categoria._id || progSel.categoria)
+          }));
+          return;
+        }
+      }
+    }
+
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const usuarioId = getResponsableId();
-    // Para inscripciones a eventos
     const payload = {
-      ...formData,
-      usuario: usuarioId,
-      tipoReferencia: 'Eventos',
-      referencia: formData.evento,
+      usuario: formData.usuario || usuarioId,
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      tipoDocumento: formData.tipoDocumento,
+      numeroDocumento: formData.numeroDocumento,
+      correo: formData.correo,
+      telefono: formData.telefono,
+      edad: parseInt(formData.edad) || 0,
+      tipoReferencia: formData.tipoReferencia,
+      referencia: formData.referencia,
+      categoria: formData.categoria,
+      estado: formData.estado || 'no inscrito',
+      observaciones: formData.observaciones || ''
     };
     onSubmit(payload);
     onClose();
@@ -222,21 +311,56 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
               </div>
 
               <div className="form-group-tesorero">
-                <label>Evento</label>
+                <label>Tipo de inscripción</label>
                 <select
-                  name="evento"
-                  value={formData.evento}
+                  name="tipoReferencia"
+                  value={formData.tipoReferencia}
                   onChange={handleChange}
                   required
                 >
-                  <option value="">Seleccione...</option>
-                  {eventos && eventos.map(ev => (
-                    <option key={ev._id} value={ev._id}>
-                      {ev.nombre}
-                    </option>
-                  ))}
+                  <option value="">Seleccione tipo</option>
+                  <option value="Eventos">Evento</option>
+                  <option value="ProgramaAcademico">Programa académico</option>
                 </select>
               </div>
+
+              {formData.tipoReferencia === "Eventos" && (
+                <div className="form-group-tesorero">
+                  <label>Evento</label>
+                  <select
+                    name="referencia"
+                    value={formData.referencia}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Seleccione evento</option>
+                    {eventos && eventos.map(ev => (
+                      <option key={ev._id} value={ev._id}>
+                        {ev.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {formData.tipoReferencia === "ProgramaAcademico" && (
+                <div className="form-group-tesorero">
+                  <label>Programa académico</label>
+                  <select
+                    name="referencia"
+                    value={formData.referencia}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Seleccione programa</option>
+                    {programas && programas.map(pr => (
+                      <option key={pr._id} value={pr._id}>
+                        {pr.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div className="form-group-tesorero">
                 <label>Categoría</label>
                 <select
@@ -244,6 +368,7 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
                   value={formData.categoria}
                   onChange={handleChange}
                   required
+                  disabled={true}
                 >
                   <option value="">Seleccione...</option>
                   {categorias && categorias.map(cat => (
@@ -261,10 +386,12 @@ const InscripcionModal = ({ mode = 'create', eventos, categorias, initialData = 
                   onChange={handleChange}
                   required
                 >
-                  <option value="pendiente">Pendiente</option>
-                  <option value="aprobada">Aprobada</option>
-                  <option value="rechazada">Rechazada</option>
-                  <option value="cancelada">Cancelada</option>
+                  <option value="">Seleccione estado</option>
+                  {getOpcionesEstado(formData.tipoReferencia).map(opcion => (
+                    <option key={opcion.value} value={opcion.value}>
+                      {opcion.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 

@@ -18,8 +18,9 @@ const CertificadosPage = () => {
             try {
                 const data = await inscripcionService.getAll();
                 if (data.success && Array.isArray(data.data)) {
+                    // Solo mostrar certificados de programas académicos (cursos)
                     const filtrados = data.data.filter(
-                        insc => insc.estado === 'certificado' || insc.estado === 'finalizado'
+                        insc => (insc.tipoReferencia === 'ProgramaAcademico') && (insc.estado === 'certificado' || insc.estado === 'finalizado')
                     );
                     setCertificados(filtrados);
                 } else {

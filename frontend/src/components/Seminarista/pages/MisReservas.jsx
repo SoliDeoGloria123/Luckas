@@ -258,7 +258,7 @@ const ModalImageCarousel = ({ images }) => {
                         <i className="fas fa-eye"></i>
                         Ver Detalles
                       </button>
-                      <button className="btn-danger-misinscripciones">Cancelar</button>
+                      {/*<button className="btn-danger-misinscripciones">Cancelar</button>*/}
                     </div>
                   </div>
                 </div>

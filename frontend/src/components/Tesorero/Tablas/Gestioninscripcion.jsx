@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { inscripcionService } from '../../../services/inscripcionService';
 import { eventService } from '../../../services/eventService';
 import { categorizacionService } from '../../../services/categorizacionService';
+import { programasAcademicosService } from '../../../services/programasAcademicosService';
 import InscripcionModal from '../modal/InscripcionModal';
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
@@ -11,6 +12,7 @@ import { Edit } from "lucide-react"
 const Gestioninscripcion = () => {
 
   const [eventos, setEventos] = useState([]);
+  const [programas, setProgramas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [inscripciones, setInscripciones] = useState([]);
   const [showModal, setShowModalnscribir] = useState(false);
@@ -40,6 +42,15 @@ const Gestioninscripcion = () => {
   };
 
 
+  const obtenerProgramas = async () => {
+    try {
+      const data = await programasAcademicosService.getAllProgramas();
+      setProgramas(Array.isArray(data.data) ? data.data : []);
+    } catch (error) {
+      setProgramas([]);
+    }
+  };
+
   const obtenerCategorias = async () => {
     try {
       const res = await categorizacionService.getAll();
@@ -52,6 +63,7 @@ const Gestioninscripcion = () => {
   useEffect(() => {
     obtenerInscripciones();
     obtenerEventos();
+    obtenerProgramas();
     obtenerCategorias();
   }, []);
 
@@ -277,6 +289,7 @@ const Gestioninscripcion = () => {
             onSubmit={handleSubmit}
             categorias={categorias}
             eventos={eventos}
+            programas={programas}
           />
         )}
       </main>

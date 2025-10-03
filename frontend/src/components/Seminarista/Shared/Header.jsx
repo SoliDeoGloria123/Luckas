@@ -151,7 +151,7 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
                 <span>Configuración</span>
               </a>
               <hr className="dropdown-divider" />
-              <a href="" className="dropdown-item" onClick={handleLogout}>
+              <a href="#" className="dropdown-item" onClick={e => { e.preventDefault(); handleLogout(); }}>
                 <span>Cerrar Sesión</span>
               </a>
             </div>

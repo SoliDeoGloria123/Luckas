@@ -76,7 +76,8 @@ const inscripcionSchema = new mongoose.Schema({
                 
                 // Validar estados según el tipo de referencia
                 if (tipoRef === 'Eventos') {
-                    return ['inscrito', 'finalizado'].includes(valor);
+                    // Ahora permitimos 'no inscrito' como estado válido para eventos
+                    return ['no inscrito', 'inscrito', 'finalizado'].includes(valor);
                 } else if (tipoRef === 'ProgramaAcademico') {
                     return ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'].includes(valor);
                 }
@@ -86,7 +87,7 @@ const inscripcionSchema = new mongoose.Schema({
                 const tipoRef = this.tipoReferencia || this.getUpdate?.$set?.tipoReferencia || this._update?.tipoReferencia;
                 
                 if (tipoRef === 'Eventos') {
-                    return `Para eventos, el estado debe ser: inscrito o finalizado. Recibido: ${props.value}`;
+                    return `Para eventos, el estado debe ser: no inscrito, inscrito o finalizado. Recibido: ${props.value}`;
                 } else if (tipoRef === 'ProgramaAcademico') {
                     return `Para programas académicos, el estado debe ser: preinscrito, matriculado, en_curso, finalizado, certificado, rechazada o cancelada academico. Recibido: ${props.value}`;
                 }
@@ -111,12 +112,11 @@ inscripcionSchema.pre('save', function(next) {
     // Solo establecer estado por defecto si no se ha establecido uno
     if (!this.estado || this.estado === '') {
         if (this.tipoReferencia === 'Eventos') {
-            this.estado = 'inscrito';
+            this.estado = 'no inscrito';
         } else if (this.tipoReferencia === 'ProgramaAcademico') {
             this.estado = 'preinscrito';
         }
     }
-    
     console.log(`📋 PRE-SAVE INSCRIPCIÓN: Tipo=${this.tipoReferencia}, Estado=${this.estado}`);
     next();
 });

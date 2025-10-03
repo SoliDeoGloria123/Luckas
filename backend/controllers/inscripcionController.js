@@ -136,9 +136,9 @@ exports.crearInscripcion = async (req, res) => {
     
     const validarEstado = (tipoRef, estado) => {
       if (tipoRef === 'Eventos') {
-        const estadosValidos = ['inscrito', 'finalizado'];
+        const estadosValidos = ['no inscrito', 'inscrito', 'finalizado'];
         if (!estadosValidos.includes(estado)) {
-          return `Para eventos, el estado debe ser: ${estadosValidos.join(' o ')}. Recibido: ${estado}`;
+          return `Para eventos, el estado debe ser: ${estadosValidos.join(', ')}. Recibido: ${estado}`;
         }
       } else if (tipoRef === 'ProgramaAcademico') {
         const estadosValidos = ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'];
@@ -154,7 +154,7 @@ exports.crearInscripcion = async (req, res) => {
     // Establecer estado por defecto si no se proporciona
     let estadoFinal = req.body.estado;
     if (!estadoFinal) {
-      estadoFinal = tipoReferencia === 'Eventos' ? 'inscrito' : 'preinscrito';
+      estadoFinal = tipoReferencia === 'Eventos' ? 'no inscrito' : 'preinscrito';
       console.log(`📋 Estado no proporcionado, usando por defecto: ${estadoFinal}`);
     }
 
@@ -426,9 +426,9 @@ exports.actualizarInscripcion = async (req, res) => {
     if (req.body.estado) {
       const validarEstadoFinal = (tipoRef, estado) => {
         if (tipoRef === 'Eventos') {
-          const estadosValidos = ['inscrito', 'finalizado'];
+          const estadosValidos = ['no inscrito', 'inscrito', 'finalizado'];
           if (!estadosValidos.includes(estado)) {
-            return `Para eventos, el estado debe ser: ${estadosValidos.join(' o ')}. Recibido: ${estado}`;
+            return `Para eventos, el estado debe ser: ${estadosValidos.join(', ')}. Recibido: ${estado}`;
           }
         } else if (tipoRef === 'ProgramaAcademico') {
           const estadosValidos = ['preinscrito', 'matriculado', 'en_curso', 'finalizado', 'certificado', 'rechazada', 'cancelada academico'];
