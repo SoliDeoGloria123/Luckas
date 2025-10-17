@@ -142,55 +142,56 @@ async function createCategorizaciones() {
                 nombre: 'Tecnología',
                 tipo: 'programa',
                 codigo: 'TECH',
-                activo: true
+                estado: 'activo'
             },
             {
                 nombre: 'Idiomas',
                 tipo: 'curso',
                 codigo: 'LANG',
-                activo: true
+                estado: 'activo'
+            
             },
             {
                 nombre: 'Negocios',
                 tipo: 'programa',
                 codigo: 'BIZ',
-                activo: true
+                estado: 'activo'
             },
             {
                 nombre: 'Arte',
                 tipo: 'curso',
                 codigo: 'ART',
-                activo: true
+                estado: 'activo'
             },
             {
                 nombre: 'Salud',
                 tipo: 'programa',
                 codigo: 'HEALTH',
-                activo: true
+                estado: 'activo'
             },
             {
                 nombre: 'Conferencias',
                 tipo: 'evento',
                 codigo: 'CONF',
-                activo: true
+                estado: 'activo'
             },
             {
                 nombre: 'Talleres',
                 tipo: 'evento',
                 codigo: 'WORK',
-                activo: true
+                estado: 'activo'
             },
             {
                 nombre: 'Familiares',
                 tipo: 'cabaña',
                 codigo: 'FAM',
-                activo: true
+                estado: 'activo'
             },
             {
                 nombre: 'Ejecutivas',
                 tipo: 'cabaña',
                 codigo: 'EXEC',
-                activo: true
+                estado: 'activo'
             }
         ];
 

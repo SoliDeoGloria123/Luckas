@@ -14,66 +14,84 @@ const EventoModal = ({
   selectedImages,
   setSelectedImages
 }) => {
-     const [progress, setProgress] = useState(0);
-    const [isUploading, setIsUploading] = useState(false);
- 
-  
-    // Manejo de archivos seleccionados
-    const handleFileSelection = (files) => {
-      const validFiles = [];
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-  
-      Array.from(files).forEach(file => {
-        if (!allowedTypes.includes(file.type)) return;
-        if (file.size > maxSize) return;
-        validFiles.push(file);
-      });
-  
-      if (validFiles.length > 0) {
-        uploadImages(validFiles);
-      }
-    };
-  
-    // Simulación de carga de imágenes
-    const uploadImages = (files) => {
-      if (isUploading) return;
-      setIsUploading(true);
-      setProgress(0);
-  
-      let uploadedCount = 0;
-      const totalFiles = files.length;
-  
-      files.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const imageData = {
-            id: Date.now() + index,
-            file,
-            url: e.target.result,
-            name: file.name
-          };
-  
-          setSelectedImages(prev => [...prev, imageData]);
-  
-          uploadedCount++;
-          const progressValue = (uploadedCount / totalFiles) * 100;
-          setProgress(progressValue);
-  
-          if (uploadedCount === totalFiles) {
-            setTimeout(() => {
-              setIsUploading(false);
-            }, 500);
-          }
+  // Obtener la fecha de hoy en formato YYYY-MM-DD
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+  const [progress, setProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+
+  // Manejo de archivos seleccionados
+  const handleFileSelection = (files) => {
+    const validFiles = [];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+    Array.from(files).forEach(file => {
+      if (!allowedTypes.includes(file.type)) return;
+      if (file.size > maxSize) return;
+      validFiles.push(file);
+    });
+
+    if (validFiles.length > 0) {
+      uploadImages(validFiles);
+    }
+  };
+
+  // Simulación de carga de imágenes
+  const uploadImages = (files) => {
+    if (isUploading) return;
+    setIsUploading(true);
+    setProgress(0);
+
+    let uploadedCount = 0;
+    const totalFiles = files.length;
+
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = {
+          id: Date.now() + index,
+          file,
+          url: e.target.result,
+          name: file.name
         };
-        reader.readAsDataURL(file);
-      });
-    };
-  
-    const removeImage = (id) => {
-      setSelectedImages(prev => prev.filter(img => img.id !== id));
-    }; 
-     if (!mostrar) return null;
+
+        setSelectedImages(prev => [...prev, imageData]);
+
+        uploadedCount++;
+        const progressValue = (uploadedCount / totalFiles) * 100;
+        setProgress(progressValue);
+
+        if (uploadedCount === totalFiles) {
+          setTimeout(() => {
+            setIsUploading(false);
+          }, 500);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (id) => {
+    setSelectedImages(prev => prev.filter(img => img.id !== id));
+  };
+
+  const handleSubmit = (e) => {
+  e.preventDefault();
+  const fecha = modoEdicion
+    ? eventoSeleccionado?.fechaEvento
+    : nuevoEvento.fechaEvento;
+  if (fecha && fecha < todayStr) {
+    alert('La fecha del evento no puede ser anterior a hoy');
+    return;
+  }
+  onSubmit();
+};
+  if (!mostrar) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -90,7 +108,7 @@ const EventoModal = ({
             ✕
           </button>
         </div>
-  <form className="modal-body-admin" onSubmit={e => { e.preventDefault(); onSubmit(); }}>
+        <form className="modal-body-admin" onSubmit={e => { e.preventDefault(); onSubmit(); handleSubmit(); }}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
               <label>Nombre Evento:</label>
@@ -178,6 +196,7 @@ const EventoModal = ({
                     ? setEventoSeleccionado({ ...eventoSeleccionado, fechaEvento: e.target.value })
                     : setNuevoEvento({ ...nuevoEvento, fechaEvento: e.target.value })
                 }
+                min={todayStr}
               />
             </div>
           </div>
@@ -294,60 +313,60 @@ const EventoModal = ({
               </div>
             )}
           </div>
-       
-            <div className="form-grupo-admin">
-              <label>Estado:</label>
-              <select
-                value={modoEdicion ? eventoSeleccionado?.active : nuevoEvento.active}
-                onChange={e =>
-                  modoEdicion
-                    ? setEventoSeleccionado({ ...eventoSeleccionado, active: e.target.value })
-                    : setNuevoEvento({ ...nuevoEvento, active: e.target.value })
-                }
-              >
-                <option value="">Seleccione...</option>
-                <option value="true">Activo</option>
-                <option value="false">Inactivo</option>
-              </select>
-            </div>
-         
 
-            <div className="form-group-tesorero full-width">
-              <label>Imagen</label>
-              <div className="image-upload-container">
-                <div className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    handleFileSelection(e.dataTransfer.files);
-                  }}>
-                  <div className="upload-content">
-                    <i className="fas fa-cloud-upload-alt upload-icon"></i>
-                    <h3>Arrastra y suelta tus imágenes aquí</h3>
-                    <p>o <span className="browse-text">haz clic para seleccionar</span></p>
-                    <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
-                  </div>
-                  <input type="file" id='imageInput' multiple accept="image/*" hidden onChange={(e) => handleFileSelection(e.target.files)} />
+          <div className="form-grupo-admin">
+            <label>Estado:</label>
+            <select
+              value={modoEdicion ? eventoSeleccionado?.active : nuevoEvento.active}
+              onChange={e =>
+                modoEdicion
+                  ? setEventoSeleccionado({ ...eventoSeleccionado, active: e.target.value })
+                  : setNuevoEvento({ ...nuevoEvento, active: e.target.value })
+              }
+            >
+              <option value="">Seleccione...</option>
+              <option value="true">Activo</option>
+              <option value="false">Inactivo</option>
+            </select>
+          </div>
+
+
+          <div className="form-group-tesorero full-width">
+            <label>Imagen</label>
+            <div className="image-upload-container">
+              <div className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  handleFileSelection(e.dataTransfer.files);
+                }}>
+                <div className="upload-content">
+                  <i className="fas fa-cloud-upload-alt upload-icon"></i>
+                  <h3>Arrastra y suelta tus imágenes aquí</h3>
+                  <p>o <span className="browse-text">haz clic para seleccionar</span></p>
+                  <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
                 </div>
+                <input type="file" id='imageInput' multiple accept="image/*" hidden onChange={(e) => handleFileSelection(e.target.files)} />
+              </div>
 
 
-                <div className="image-preview-grid" id="imagePreviewGrid">
-                  {selectedImages.map(img => (
-                    <div key={img.id} className="image-preview">
-                      <img src={img.url} alt={img.name} />
-                      <div className="image-overlay">
-                        <button type="button" className="remove-btn" onClick={() => removeImage(img.id)}>
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
+              <div className="image-preview-grid" id="imagePreviewGrid">
+                {selectedImages.map(img => (
+                  <div key={img.id} className="image-preview">
+                    <img src={img.url} alt={img.name} />
+                    <div className="image-overlay">
+                      <button type="button" className="remove-btn" onClick={() => removeImage(img.id)}>
+                        <i className="fas fa-trash"></i>
+                      </button>
                     </div>
-                  ))}
+                  </div>
+                ))}
 
-                </div>
               </div>
             </div>
+          </div>
 
-        
+
           <div className="modal-action-admin">
             <button type="button" className="btn-admin secondary-admin" onClick={onClose}>
               Cancelar

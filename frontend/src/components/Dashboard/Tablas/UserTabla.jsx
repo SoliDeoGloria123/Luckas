@@ -1,6 +1,6 @@
 import React from "react";
 
-const TablaUsuarios = ({ usuarios, onEditar, onEliminar }) => (
+const TablaUsuarios = ({ usuarios, onEditar, onEliminar, onToggleEstado }) => (
   
   <div className="tabla-contenedor-admin">
     <table className="tabla-usuarios-admin">
@@ -26,7 +26,7 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar }) => (
           </tr>
         ) : (
           usuarios.map((user) => (
-            <tr key={user._id}>
+            <tr key={user._id} className={user.estado === 'inactivo' ? 'usuario-inactivo-blur' : ''}>
               <td>{user._id}</td>
               <td>
                 <div className="user-info-admin">
@@ -49,17 +49,27 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar }) => (
                 <span className={`badge-rol rol-${user.role}`}>{user.role}</span>
               </td>
               <td>
-                <span className={`badge-estado estado-${user.status || "active"}`}>
-                  {user.status || "activo"}
+                <span className={`badge-estado estado-${user.estado || "activo"}`}>
+                  {user.estado || "activo"}
                 </span>
               </td>
               <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</td>
               <td>
                 <div className="acciones-botones">
-                  <button className="btn-action editar" onClick={() => onEditar(user)}><i class="fas fa-edit"></i></button>
+                  <button className="btn-action editar" onClick={() => onEditar(user)}><i className="fas fa-edit"></i></button>
                   {onEliminar && (
-                    <button className="btn-action eliminar" onClick={() => onEliminar(user._id)}><i class="fas fa-trash"></i></button>
+                    <button className="btn-action eliminar" onClick={() => onEliminar(user._id)}><i className="fas fa-trash"></i></button>
                   )}
+                   <button
+                    className={`btn-action ${user.estado === "activo" ? "desactivar" : "activar"}`}
+                    onClick={() => onToggleEstado(user)}
+                  >
+                    {user.estado === "activo" ? (
+                      <i className="fas fa-ban"></i> // ícono para desactivar
+                    ) : (
+                      <i className="fas fa-check"></i> // ícono para activar
+                    )}
+                  </button>
                 </div>
               </td>
             </tr>

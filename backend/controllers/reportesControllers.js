@@ -1,3 +1,5 @@
+
+
 const mongoose = require('mongoose');
 const Reserva = require('../models/Reservas');
 const Inscripcion = require('../models/Inscripciones');
@@ -7,6 +9,7 @@ const Evento = require('../models/Eventos');
 const Cabana = require('../models/Cabana');
 const Categorizacion = require('../models/categorizacion');
 const Tarea = require('../models/Tarea');
+const Reporte = require('../models/Reportes');
 
 // Reporte general del dashboard
 exports.getDashboardReport = async (req, res) => {
@@ -56,7 +59,7 @@ exports.getDashboardReport = async (req, res) => {
 
     res.json({ success: true, data: dashboard });
   } catch (error) {
-      console.error('Error en getDashboardReport:', error);
+    console.error('Error en getDashboardReport:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -490,3 +493,250 @@ exports.getActividadUsuarios = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Obtener todos los reportes guardados
+exports.getReportesGuardados = async (req, res) => {
+  try {
+    const reportes = await Reporte.find().populate('creadoPor', 'username email');
+    res.json(reportes);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Guardar un reporte generado en la base de datos
+exports.guardarReporte = async (req, res) => {
+  try {
+    const { nombre, descripcion, tipo, filtros, formatoExportacion } = req.body;
+    const creadoPor = req.user?._id || null; // Si usas autenticación
+
+    if (!nombre || !descripcion || !tipo) {
+      return res.status(400).json({ success: false, message: 'Faltan campos obligatorios' });
+    }
+
+    // Normalizar filtros para guardado según el esquema Reportes.js
+    const filtrosInput = filtros || {};
+    const filtrosToSave = {
+      fechaInicio: filtrosInput.fechaInicio ? new Date(filtrosInput.fechaInicio) : null,
+      fechaFin: filtrosInput.fechaFin ? new Date(filtrosInput.fechaFin) : null,
+      estado: typeof filtrosInput.estado === 'string' ? filtrosInput.estado : '',
+      categoria: '', // guardaremos como string (nombre) para coincidir con el schema
+      usuario: '', // guardaremos como string (username/email) para coincidir con el schema
+      otros: filtrosInput.otros || {}
+    };
+
+    // Variables de consulta (pueden ser ObjectId o strings según lo que acepten las colecciones)
+    let queryCategoriaForDB = null;
+    let queryUsuarioForDB = null;
+
+    // Resolver categoria (para consultas usar ObjectId si corresponde, para guardado usar nombre string)
+    if (filtrosInput.categoria) {
+      const cat = filtrosInput.categoria;
+      if (mongoose.Types.ObjectId.isValid(cat)) {
+        // buscar nombre para guardarlo como string
+        const categoriaObjById = await Categorizacion.findById(cat).select('nombre');
+        if (categoriaObjById) {
+          filtrosToSave.categoria = categoriaObjById.nombre || String(cat);
+          queryCategoriaForDB = categoriaObjById._id;
+        } else {
+          // si no existe, guardar el id como string (fallback)
+          filtrosToSave.categoria = String(cat);
+          queryCategoriaForDB = cat;
+        }
+      } else {
+        // si viene como nombre, usarlo para guardar y buscar su id para la query
+        filtrosToSave.categoria = String(cat).trim();
+        const categoriaObj = await Categorizacion.findOne({ nombre: { $regex: `^${String(cat).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
+        if (categoriaObj) queryCategoriaForDB = categoriaObj._id;
+      }
+    }
+
+    // Resolver usuario (para consultas usar ObjectId si corresponde, para guardado usar username/email string)
+    if (filtrosInput.usuario) {
+      const u = filtrosInput.usuario;
+      if (mongoose.Types.ObjectId.isValid(u)) {
+        const usuarioObjById = await Usuario.findById(u).select('username email');
+        if (usuarioObjById) {
+          filtrosToSave.usuario = usuarioObjById.username || usuarioObjById.email || String(u);
+          queryUsuarioForDB = usuarioObjById._id;
+        } else {
+          filtrosToSave.usuario = String(u);
+          queryUsuarioForDB = u;
+        }
+      } else {
+        filtrosToSave.usuario = String(u).trim();
+        const usuarioObj = await Usuario.findOne({ $or: [{ username: u }, { email: u }] }).select('_id');
+        if (usuarioObj) queryUsuarioForDB = usuarioObj._id;
+      }
+    }
+
+    // Generar los datos del reporte según el tipo y filtros
+    const startedAt = Date.now();
+    let datos = {};
+    if (tipo === 'reservas') {
+      let query = {};
+      if (filtrosInput?.fechaInicio && filtrosInput?.fechaFin) {
+        query.fechaInicio = { $gte: new Date(filtrosInput.fechaInicio) };
+        query.fechaFin = { $lte: new Date(filtrosInput.fechaFin) };
+      }
+      if (filtrosInput?.estado) query.estado = filtrosInput.estado;
+      if (queryCategoriaForDB) query.categoria = queryCategoriaForDB;
+      if (queryUsuarioForDB) query.usuario = queryUsuarioForDB;
+      const reservas = await Reserva.find(query)
+        .populate('usuario', 'username email phone')
+        .populate('cabana', 'nombre descripcion capacidad categoria estado')
+        .sort({ fechaInicio: -1 });
+      // Forzar tipo de activo a booleano
+      const reservasNorm = reservas.map(r => {
+        r.activo = typeof r.activo === 'string' ? r.activo === 'true' : Boolean(r.activo);
+        return r;
+      });
+      datos = { reservas: reservasNorm };
+      // Agregar resumen mínimo
+      datos.estadisticas = {
+        total: reservasNorm.length,
+        activos: reservasNorm.filter(r => r.activo).length,
+        inactivos: reservasNorm.filter(r => !r.activo).length
+      };
+    } else if (tipo === 'inscripciones') {
+      let query = {};
+      if (filtrosInput?.fechaInicio && filtrosInput?.fechaFin) {
+        query.createdAt = { $gte: new Date(filtrosInput.fechaInicio), $lte: new Date(filtrosInput.fechaFin) };
+      }
+      if (queryCategoriaForDB) query.categoria = queryCategoriaForDB;
+      if (queryUsuarioForDB) query.usuario = queryUsuarioForDB;
+      const inscripciones = await Inscripcion.find(query)
+        .populate('usuario', 'username email phone')
+        .populate('evento', 'name description price fecha')
+        .populate('categoria', 'nombre descripcion codigo')
+        .sort({ createdAt: -1 });
+      datos = { inscripciones };
+      datos.estadisticas = { total: inscripciones.length };
+    } else if (tipo === 'usuarios') {
+      let query = {};
+      if (filtrosInput?.fechaInicio && filtrosInput?.fechaFin) {
+        query.createdAt = { $gte: new Date(filtrosInput.fechaInicio), $lte: new Date(filtrosInput.fechaFin) };
+      }
+      if (filtrosInput?.estado) query.active = filtrosInput.estado === 'activo';
+      if (queryUsuarioForDB) query._id = queryUsuarioForDB;
+      const usuarios = await Usuario.find(query).select('-password').sort({ createdAt: -1 });
+      datos = { usuarios };
+      datos.estadisticas = { total: usuarios.length };
+    } else if (tipo === 'eventos') {
+      let query = {};
+      if (filtrosInput?.fechaInicio && filtrosInput?.fechaFin) {
+        query.fechaEvento = { $gte: new Date(filtrosInput.fechaInicio), $lte: new Date(filtrosInput.fechaFin) };
+      }
+      if (queryCategoriaForDB) query.categoria = queryCategoriaForDB;
+      if (filtrosInput?.estado) query.active = filtrosInput.estado === 'activo';
+      const eventos = await Evento.find(query)
+        .populate('categoria', 'nombre descripcion codigo')
+        .sort({ fechaEvento: -1 });
+      datos = { eventos };
+      datos.estadisticas = { total: eventos.length };
+    } else if (tipo === 'financiero') {
+      // Reusar la lógica de getReporteFinanciero para cálculos avanzados si se desea
+      const fechaInicio = filtrosInput.fechaInicio;
+      const fechaFin = filtrosInput.fechaFin;
+      let filtrosFecha = {};
+      if (fechaInicio && fechaFin) {
+        filtrosFecha = { createdAt: { $gte: new Date(fechaInicio), $lte: new Date(fechaFin) } };
+      }
+      const ingresosCabanas = await Reserva.aggregate([
+        { $match: filtrosFecha },
+        { $lookup: { from: 'cabanas', localField: 'cabana', foreignField: '_id', as: 'cabanaInfo' } },
+        { $unwind: { path: '$cabanaInfo', preserveNullAndEmptyArrays: true } },
+        { $group: { _id: null, totalReservas: { $sum: 1 }, ingresoTotal: { $sum: { $ifNull: ['$cabanaInfo.precio', 0] } }, promedioPorReserva: { $avg: '$cabanaInfo.precio' } } }
+      ]);
+      const ingresosEventos = await Inscripcion.aggregate([
+        { $match: filtrosFecha },
+        { $lookup: { from: 'eventos', localField: 'evento', foreignField: '_id', as: 'eventoInfo' } },
+        { $unwind: { path: '$eventoInfo', preserveNullAndEmptyArrays: true } },
+        { $group: { _id: null, totalInscripciones: { $sum: 1 }, ingresoTotal: { $sum: { $ifNull: ['$eventoInfo.price', 0] } }, promedioPorInscripcion: { $avg: '$eventoInfo.price' } } }
+      ]);
+      datos = {
+        cabanas: ingresosCabanas[0] || { totalReservas: 0, ingresoTotal: 0, promedioPorReserva: 0 },
+        eventos: ingresosEventos[0] || { totalInscripciones: 0, ingresoTotal: 0, promedioPorInscripcion: 0 }
+      };
+    } else if (tipo === 'dashboard') {
+      // Reusar getDashboardReport
+      const dashboard = await exports.getDashboardReport ? null : null; // placeholder si se quiere reutilizar
+      datos = { mensaje: 'Reporte dashboard generado' };
+    } else {
+      datos = { mensaje: 'Tipo de reporte no soportado' };
+    }
+
+    const tiempoGeneracion = Date.now() - startedAt;
+    // Version y formato
+    const version = '1.0';
+    const formatosAceptados = ['pdf', 'excel', 'csv', 'json'];
+    const formatos = Array.isArray(formatoExportacion) && formatoExportacion.length > 0
+      ? formatoExportacion.filter(f => formatosAceptados.includes(f))
+      : ['json'];
+
+    // Preparar objeto final conforme al modelo
+    const reporteToSave = new Reporte({
+      nombre,
+      descripcion,
+      tipo,
+      filtros: filtrosToSave,
+      datos: datos || {},
+      creadoPor,
+      fechaGeneracion: new Date(),
+      estado: (datos && Object.keys(datos).length > 0) ? 'generado' : 'error',
+      metadatos: {
+        tiempoGeneracion,
+        version,
+        formatoExportacion: formatos
+      }
+    });
+
+    await reporteToSave.save();
+    res.status(201).json({ success: true, message: 'Reporte guardado correctamente', data: reporteToSave });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+// Editar un reporte guardado por ID
+exports.editarReporteGuardado = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    if (!updateData || Object.keys(updateData).length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'No se proporcionaron datos para actualizar' 
+      });
+    }
+    
+    const reporteActualizado = await Reporte.findOneAndUpdate(
+      { _id: id },
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+    
+    if (!reporteActualizado) {
+      return res.status(404).json({ success: false, message: 'Reporte no encontrado' });
+    }
+    
+    res.json({ success: true, message: 'Reporte actualizado correctamente', data: reporteActualizado });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Eliminar un reporte guardado por ID
+exports.eliminarReporteGuardado = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reporte = await Reporte.findByIdAndDelete(id);
+    if (!reporte) {
+      return res.status(404).json({ success: false, message: 'Reporte no encontrado' });
+    }
+    res.json({ success: true, message: 'Reporte eliminado correctamente' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

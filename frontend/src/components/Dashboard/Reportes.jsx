@@ -3,11 +3,17 @@ import { reporteService } from '../../services/reporteService';
 import './Dashboard.css'
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
+import ReportesTabla from './Tablas/ReportesTabla';
+import ReporteModal from './Modales/ReporteModal';
+import { mostrarAlerta } from '../utils/alertas';
+import { Download, FileSpreadsheet } from "lucide-react"
 
 const Reportes = () => {
   const [tipoReporte, setTipoReporte] = useState('dashboard');
   const [datosReporte, setDatosReporte] = useState(null);
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
+  const [reportesGuardados, setReportesGuardados] = useState([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [filtros, setFiltros] = useState({
     fechaInicio: '',
@@ -102,8 +108,74 @@ const Reportes = () => {
     }
   };
 
+  // Obtener los reportes desde la base de datos
+  const cargarReportesGuardados = async () => {
+    try {
+      const reportes = await reporteService.getReportesGuardados();
+      setReportesGuardados(reportes);
+    } catch (error) {
+      console.error("Error al cargar reportes guardados", error);
+    }
+  };
+  useEffect(() => {
+    cargarReportesGuardados();
+  }, []);
+
+  // Función centralizada para crear el reporte
+  const crearReporte = async (data) => {
+    try {
+      await reporteService.guardarReporte(data);
+      setMostrarModal(false);
+      mostrarAlerta('¡Éxito!', 'Reporte guardado exitosamente');
+
+    } catch (err) {
+      mostrarAlerta('Error al guardar el reporte: ' + err.message, 'error');
+      setError(err.message || "Error al guardar el reporte");
+    }
+  };
+
+  // Estado para edición
+  const [reporteEditando, setReporteEditando] = useState(null);
+  const [modoEdicion, setModoEdicion] = useState(false);
+
+  // Editar un reporte guardado
+  const editarReporte = async (id, datosActualizados) => {
+    try {
+      await reporteService.editarReporte(id, datosActualizados);
+      mostrarAlerta('Reporte editado correctamente', 'success');
+      setMostrarModal(false);
+      setReporteEditando(null);
+      setModoEdicion(false);
+      cargarReportesGuardados();
+    } catch (err) {
+      mostrarAlerta('Error al editar el reporte: ' + err.message, 'error');
+    }
+  };
+  // Eliminar un reporte guardado
+  const eliminarReporte = async (id) => {
+    try {
+      await reporteService.eliminarReporte(id);
+      mostrarAlerta('Reporte eliminado correctamente', 'success');
+      cargarReportesGuardados();
+    } catch (err) {
+      mostrarAlerta('Error al eliminar el reporte: ' + err.message, 'error');
+    }
+  };
+  // Abrir modal para editar
+  const abrirModalEditar = (reporte) => {
+    setReporteEditando(reporte);
+    setModoEdicion(true);
+    setMostrarModal(true);
+  };
+  // Cerrar modal y limpiar edición
+  const cerrarModal = () => {
+    setMostrarModal(false);
+    setReporteEditando(null);
+    setModoEdicion(false);
+  };
   const renderDashboard = () => {
     if (!datosReporte?.resumen) return null;
+
 
     const { resumen } = datosReporte;
 
@@ -193,13 +265,16 @@ const Reportes = () => {
               </span>
             </div>
           </div>
+
         </div>
+
 
         <div className="report-info-reporte-admin">
           <div className="report-meta-reporte-admin">
             <i className="fas fa-clock"></i>
             <span>Fecha de generación: 2/9/2025, 10:38:05 p. m.</span>
           </div>
+
           <div className="report-actions-reporte-admin">
             <button className="btn-reportea btn-sm-reportea btn-outline-reportea">
               <i className="fas fa-refresh"></i>
@@ -212,56 +287,52 @@ const Reportes = () => {
           </div>
         </div>
 
-        <div className="charts-section-reportes-admin">
-          <div className="chart-card-reportes-admin">
-            <div className="chart-header-reportes-admin">
-              <h3>Tendencia de Usuarios</h3>
-              <div className="chart-controls">
-                <select className="form-select-reportes-admin">
-                  <option>Últimos 7 días</option>
-                  <option>Último mes</option>
-                  <option>Últimos 3 meses</option>
-                </select>
-              </div>
-            </div>
-            <div className="chart-placeholder-reportes-admin">
-              <i className="fas fa-chart-line"></i>
-              <p>Gráfico de tendencia de usuarios</p>
-            </div>
-          </div>
+        <div class="reports-table-container-reporte">
 
-          <div className="chart-card-reportes-admin">
-            <div className="chart-header-reportes-admin">
-              <h3>Distribución por Categorías</h3>
+          <div class="table-filters-reporte">
+            <div class="search-container-reporte">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="Buscar reportes..." id="reportSearch" />
             </div>
-            <div className="chart-placeholder-reportes-admin">
-              <i className="fas fa-chart-pie"></i>
-              <p>Gráfico de distribución</p>
-            </div>
+            <select >
+              <option value="">Todos los tipos</option>
+              <option value="financiero">Financiero</option>
+              <option value="usuarios">Usuarios</option>
+              <option value="eventos">Eventos</option>
+              <option value="reservas">Reservas</option>
+            </select>
+            <select >
+              <option value="">Todos los estados</option>
+              <option value="generado">Generado</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="archivado">Archivado</option>
+            </select>
           </div>
+          <ReportesTabla 
+            reportesGuardados={reportesGuardados} 
+            editarReporte={abrirModalEditar}
+            eliminarReporte={eliminarReporte}
+          />
         </div>
+        <ReporteModal
+          mostrar={mostrarModal}
+          onClose={cerrarModal}
+          onSubmit={(data) => {
+            if (modoEdicion && reporteEditando) {
+              editarReporte(reporteEditando._id || reporteEditando.id, data);
+            } else {
+              crearReporte(data);
+            }
+          }}
+          datosIniciales={reporteEditando}
+          modoEdicion={modoEdicion}
+        />
 
       </>
     );
   };
-  const handleGuardarReporte = async () => {
-    try {
-      await reporteService.guardarReporte({
-        nombre: 'Reporte  Julio',
-        descripcion: 'Reporte generado desde el sistema',
-        tipo: tipoReporte, // o el tipo que corresponda
-        filtros,           // los filtros usados
-        datos: datosReporte // el JSON del reporte mostrado
-      });
-      alert('¡Reporte guardado correctamente!');
-    } catch (err) {
-      alert('Error al guardar el reporte: ' + err.message);
-    }
-  };
-
   const renderTablaReporte = () => {
     if (!datosReporte) return null;
-
     switch (tipoReporte) {
       case 'reservas':
         // Calcular reservas activas (estados: 'Pendiente', 'Confirmada', 'Activa')
@@ -412,13 +483,13 @@ const Reportes = () => {
         setSeccionActiva={setSeccionActiva}
       />
       <div className={`transition-all duration-300 ${sidebarAbierto ? 'ml-72' : 'ml-20'}`}>
-    <Header
+        <Header
           sidebarAbierto={sidebarAbierto}
           setSidebarAbierto={setSidebarAbierto}
           seccionActiva={seccionActiva}
         />
         <div className="reportes-container">
-          <div className="reportes-header">
+          {/*<div className="reportes-header">
             <div className='page-title-reporte'>
               <h1>Sistema de Reportes</h1>
               <p>Genera y administra reportes del sistema</p>
@@ -450,13 +521,41 @@ const Reportes = () => {
                 <i class="fas fa-file-excel"></i>
                 Exportar Excel
               </button>
-              <button onClick={handleGuardarReporte} className='btn-reportea btn-primary-reportea'>
+              <button className='btn-reportea btn-primary-reportea'>
                 <i class="fas fa-save"></i>
                 Guardar Reporte
               </button>
             </div>
+          </div>*/}
+          {/* Page Header */}
+          <div className="mb-6 flex items-start justify-between">
+            <div>
+              <h1 className="font-bold text-3xl text-gray-900 mb-2">Sistema de Reportes</h1>
+              <p className="text-gray-600">Genera y administra reportes del sistema</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                //onClick={handleExportPDF}
+                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <Download className="h-4 w-4" />
+                Exportar PDF
+              </button>
+              <button
+                //onClick={handleExportExcel}
+                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <FileSpreadsheet className="h-4 w-4" />
+                Exportar Excel
+              </button>
+              <button
+                onClick={() => setMostrarModal(true)}
+                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
+              >
+                + Nuevo Reporte
+              </button>
+            </div>
           </div>
-
           {tipoReporte !== 'dashboard' && (
             <div className="filtros-section">
               <h3>Filtros</h3>
@@ -498,6 +597,7 @@ const Reportes = () => {
               </div>
             </div>
           )}
+
 
           <div className="reporte-content">
             {loading && <div className="loading">Cargando reporte...</div>}

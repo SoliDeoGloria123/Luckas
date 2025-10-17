@@ -9,11 +9,7 @@ import Header from './Sidebar/Header';
 import "./Dashboard.css";
 
 import {
-
     Search,
-
-    Plus,
-
     Calendar as CalendarIcon,
 
 } from 'lucide-react';
@@ -46,17 +42,6 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
         }
     }, [usuarioProp]);
 
-    /*const handleCerrarSesion = () => {
-        if (onCerrarSesionProp) {
-            onCerrarSesionProp();
-        } else {
-            localStorage.removeItem('token');
-            localStorage.removeItem('usuario');
-            window.location.href = '/login';
-        }
-    };*/
-
-
     const [nuevoUsuario, setNuevoUsuario] = useState({
         nombre: "",
         apellido: "",
@@ -69,15 +54,13 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
         role: "externo",
         estado: "activo"
     });
-
-    //----------------------------------------------------------------------------------------------------------
     // Obtener usuarios
     const obtenerUsuarios = async () => {
         try {
             const data = await userService.getAllUsers();
             const usuariosData = Array.isArray(data.data) ? data.data : [];
             setUsuarios(usuariosData);
-            calcularEstadisticas(usuariosData);
+            obtenerEstadisticas();
         } catch (error) {
             console.error("Error al obtener usuarios:", error.message);
             if (error.message === "Unauthorized") {
@@ -90,15 +73,15 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
     };
 
     // Calcular estadísticas
-    const calcularEstadisticas = (usuariosData) => {
-        const hoy = new Date().toDateString();
-        setEstadisticas({
-            totalUsuarios: usuariosData.length,
-            usuariosActivos: usuariosData.filter((user) => user.status === "active").length,
-            administradores: usuariosData.filter((user) => user.role === "admin").length,
-            nuevosHoy: usuariosData.filter((user) => new Date(user.createdAt).toDateString() === hoy).length,
-        });
-    };
+    
+        const obtenerEstadisticas = async () => {
+            try {
+                const stats = await userService.getUserStats();
+                setEstadisticas(stats);
+            } catch (error) {
+                console.error("Error al obtener estadísticas de usuarios:", error);
+            }
+        };
 
     // Crear usuario
     const crearUsuario = async (e) => {
@@ -223,63 +206,20 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
         (paginaActual - 1) * registrosPorPagina,
         paginaActual * registrosPorPagina
     );
-    /*-----------------------------------------------------------------------------------------------------------*/
-    const [datosUnificados, setDatosUnificados] = useState({
-        solicitudes: [],
-        inscripciones: [],
-        reservas: []
-    });
 
-    useEffect(() => {
-        if (seccionActiva === "solicitudes") {
-            obtenerDatosUnificados();
-        }
-        // eslint-disable-next-line
-    }, [seccionActiva]);
-
-    const obtenerDatosUnificados = async () => {
-        try {
-            const res = await fetch("http://localhost:3000/api/solicitudes/unificado", {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-            if (!res.ok) throw new Error("Error al obtener datos unificados");
-            const data = await res.json();
-            setDatosUnificados({
-                solicitudes: data.data.solicitudes || [],
-                inscripciones: data.data.inscripciones || [],
-                reservas: data.data.reservas || [],
-            });
-        } catch (error) {
-            alert("Error al obtener datos unificados: " + error.message);
-        }
+    //desactivar usuario o activarlo
+    const onToggleEstado = async (usuario) => {
+        const nuevoEstado = usuario.estado === "activo" ? "inactivo" : "activo";
+       try {
+        await userService.toggleUserEstado(usuario._id, nuevoEstado);
+        mostrarAlerta("¡Éxito!", `Usuario ${nuevoEstado === "activo" ? "activado" : "desactivado"} exitosamente`);
+        obtenerUsuarios(); // <-- Esto refresca la lista
+    } catch (error) {
+        mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`);
+    }
     };
 
-    const [mostrarMenu, setMostrarMenu] = useState(false);
-    const menuRef = useRef(null);
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setMostrarMenu(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    if (cargando) {
-        return (
-            <div className="cargando-contenedor">
-                <div className="spinner"></div>
-                <p>Cargando dashboard...</p>
-            </div>
-        );
-    }
 
     // Si no hay usuario y no se está pasando como prop, mostrar loading
     if (!usuarioActual && !usuarioProp) {
@@ -322,7 +262,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                                 <i className="fas fa-users"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>5</h3>
+                                <h3>{estadisticas.totalUsuarios}</h3>
                                 <p>Total Usuarios</p>
                             </div>
                         </div>
@@ -331,7 +271,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                                 <i className="fas fa-user-check"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>4</h3>
+                                <h3>{estadisticas.usuariosActivos}</h3>
                                 <p>Usuarios Activos</p>
                             </div>
                         </div>
@@ -340,7 +280,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                                 <i className="fas fa-user-shield"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>1</h3>
+                                <h3>{estadisticas.administradores}</h3>
                                 <p>Administradores</p>
                             </div>
                         </div>
@@ -349,7 +289,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                                 <i className="fas fa-user-plus"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>12</h3>
+                                <h3>{estadisticas.nuevosEsteMes}</h3>
                                 <p>Nuevos Este Mes</p>
                             </div>
                         </div>
@@ -394,6 +334,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                             usuarios={usuariosPaginados}
                             onEditar={abrirModalEditar}
                             onEliminar={eliminarUsuario}
+                            onToggleEstado={onToggleEstado}
                         />
                     </div>
 

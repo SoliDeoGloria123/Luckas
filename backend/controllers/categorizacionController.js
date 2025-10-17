@@ -36,6 +36,7 @@ const crearCategoria = async (req, res) => {
       nombre,
       codigo: codigo.toUpperCase(),
       tipo,
+      estado: 'activo', // Por defecto, nueva categoría está activa
       creadoPor: req.userId
     });
 
@@ -118,7 +119,7 @@ const obtenerCategoriaPorId = async (req, res) => {
 // ACTUALIZAR categoría
 const actualizarCategoria = async (req, res) => {
   try {
-    const { nombre, codigo,tipo ,activo } = req.body;
+  const { nombre, codigo, tipo, estado } = req.body;
     const id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -159,11 +160,11 @@ const actualizarCategoria = async (req, res) => {
       }
     }
 
-    const datosActualizacion = {};
-    if (nombre) datosActualizacion.nombre = nombre;
-    if (typeof activo === 'boolean') datosActualizacion.activo = activo;
-    if (codigo) datosActualizacion.codigo = codigo.toUpperCase();
-    if (tipo) datosActualizacion.tipo = tipo;
+  const datosActualizacion = {};
+  if (nombre) datosActualizacion.nombre = nombre;
+  if (estado && ['activo', 'inactivo'].includes(estado)) datosActualizacion.estado = estado;
+  if (codigo) datosActualizacion.codigo = codigo.toUpperCase();
+  if (tipo) datosActualizacion.tipo = tipo;
 
     const categoriaActualizada = await Categorizacion.findByIdAndUpdate(
       objectId,
@@ -284,6 +285,49 @@ const categorizarSolicitud = async (req, res) => {
       error: error.message
     });
   }
+
+};
+
+// ACTIVAR/DESACTIVAR categoría (usando campo 'estado')
+const activarDesactivarCategoria = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body; // 'activo' o 'inactivo'
+    if (!['activo', 'inactivo'].includes(estado)) {
+      return res.status(400).json({ success: false, message: 'El campo "estado" debe ser "activo" o "inactivo".' });
+    }
+    const categoria = await Categorizacion.findByIdAndUpdate(id, { estado }, { new: true });
+    if (!categoria) {
+      return res.status(404).json({ success: false, message: 'Categoría no encontrada' });
+    }
+    res.json({ success: true, message: `Categoría actualizada a ${estado}`, data: categoria });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error al actualizar estado', error: error.message });
+  }
+};
+
+// ESTADÍSTICAS de categorías
+const estadisticasCategorias = async (req, res) => {
+  try {
+    const total = await Categorizacion.countDocuments();
+    const activo = await Categorizacion.countDocuments({ estado: 'activo' });
+    const inactivo = await Categorizacion.countDocuments({ estado: 'inactivo' });
+    // Nuevas este mes
+    const now = new Date();
+    const primerDiaMes = new Date(now.getFullYear(), now.getMonth(), 1);
+    const nuevasEsteMes = await Categorizacion.countDocuments({ createdAt: { $gte: primerDiaMes } });
+    res.json({
+      success: true,
+      stats: {
+        totalCategorias: total,
+        categoriasActivas: activo,
+        categoriasInactivas: inactivo,
+        nuevasEsteMes
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error al obtener estadísticas', error: error.message });
+  }
 };
 
 module.exports = {
@@ -292,5 +336,7 @@ module.exports = {
   obtenerCategoriaPorId,
   actualizarCategoria,
   eliminarCategoria,
-  categorizarSolicitud
+  categorizarSolicitud,
+  activarDesactivarCategoria,
+  estadisticasCategorias
 };

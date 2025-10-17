@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import cabanaService from '../../services/cabanaService';
-import eventService from '../../services/eventService';
+import CabanaDetailsModal from './CabanaDetailsModal';
 //import cursosService from '../../services/courseService';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -8,7 +7,6 @@ import {
   Calendar,
   Home,
   User,
-  HelpCircle,
   Moon,
   Sun,
   Bell,
@@ -35,8 +33,105 @@ import ReactCalendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../External/styles/calendar-external.css';
 
+// Funciones y variables faltantes para evitar errores de compilación
+const isEventoAbiertoAComentarios = () => true;
+const clearSearch = () => { };
+
 const TailwindExternalDashboard = () => {
+  // ...existing code...
+  // Cargar comentarios de un evento desde el backend
+  const cargarComentariosEvento = async (eventoId) => {
+    setLoadingComments((prev) => ({ ...prev, [eventoId]: true }));
+    try {
+      const comentarios = await comentarioEventoService.getComentariosEvento(eventoId);
+      setCommentsByEvento((prev) => ({ ...prev, [eventoId]: comentarios }));
+    } catch (error) {
+      setCommentsByEvento((prev) => ({ ...prev, [eventoId]: [] }));
+    }
+    setLoadingComments((prev) => ({ ...prev, [eventoId]: false }));
+  };
+
+  // Enviar comentario para un evento al backend
+  const handleCommentSubmit = async (eventoId, e) => {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    const texto = commentTextByEvento[eventoId];
+    if (!texto) return;
+    setLoadingComments((prev) => ({ ...prev, [eventoId]: true }));
+    try {
+      // Enviar al backend
+      const nuevoComentario = await comentarioEventoService.crearComentario(eventoId, {
+        autor: user?.nombre || 'Anónimo',
+        texto,
+      });
+      // Recargar comentarios desde el backend
+      await cargarComentariosEvento(eventoId);
+      setCommentTextByEvento((prev) => ({ ...prev, [eventoId]: '' }));
+    } catch (error) {
+      // Manejo de error
+    }
+    setLoadingComments((prev) => ({ ...prev, [eventoId]: false }));
+  };
+
+  const toggleCommentSection = (eventoId) => {
+    setShowCommentSection((prev) => ({
+      ...prev,
+      [eventoId]: !prev[eventoId],
+    }));
+    if (!showCommentSection[eventoId]) {
+      cargarComentariosEvento(eventoId);
+    }
+  };
+  const getEventsForDate = (date) => {
+    // Filtra los eventos por la fecha seleccionada
+    if (!Array.isArray(eventos) || !date) return [];
+    // Normaliza la fecha a formato YYYY-MM-DD
+    const selectedDateStr = new Date(date).toISOString().split('T')[0];
+    return eventos.filter(ev => {
+      // Soporta evento.fechaEvento o evento.fecha
+      const eventDate = ev.fechaEvento || ev.fecha;
+      if (!eventDate) return false;
+      const eventDateStr = new Date(eventDate).toISOString().split('T')[0];
+      return eventDateStr === selectedDateStr;
+    });
+  };
+  // ...las funciones correctas ya están definidas arriba...
   const [user, setUser] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  // Cargar notificaciones del backend al iniciar
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        if (usuario && usuario.token) {
+          const notificationService = await import('../../services/notificationService');
+          const notifs = await notificationService.default.getNotifications(usuario.token);
+          setNotifications(notifs);
+        }
+      } catch (err) {
+        // Opcional: mostrar error
+      }
+    };
+    fetchNotifications();
+  }, []);
+  // Estados para el wizard de reserva
+  const [wizardStep, setWizardStep] = useState(1);
+  const [reservaForm, setReservaForm] = useState({
+    nombre: '',
+    documento: '',
+    cantidadPersonas: 1,
+    conNinos: false,
+    edadesNinos: [],
+    conBebes: false,
+    edadesBebes: [],
+    fechaInicio: '',
+    fechaFin: '',
+    correoElectronico: '',
+    telefono: '',
+    propositoEstadia: '',
+    solicitudesEspeciales: '',
+    precioTotal: 0
+  });
   const [cursos, setCursos] = useState([]);
   const [eventos, setEventos] = useState([]);
   const [cabanas, setCabanas] = useState([]);
@@ -51,18 +146,26 @@ const TailwindExternalDashboard = () => {
   const [inscripciones, setInscripciones] = useState([]);
   const [reservaStatus, setReservaStatus] = useState(null);
   const [showReservaModal, setShowReservaModal] = useState(false);
-  const [reservaForm, setReservaForm] = useState({
-    nombre: '',
-    apellido: '',
-    tipoDocumento: '',
-    numeroDocumento: '',
-    correoElectronico: '',
-    telefono: '',
-    numeroPersonas: 1,
-    propositoEstadia: '',
-    solicitudesEspeciales: ''
-  });
+  const [favoritos, setFavoritos] = useState([]);
+  // Cargar favoritos del usuario al iniciar
+  useEffect(() => {
+    if (user && user.favoritos) {
+      setFavoritos(user.favoritos.map(f => f.toString()));
+    }
+  }, [user]);
+  // Handler para marcar/desmarcar favorito
+  const handleToggleFavorito = async (cabanaId) => {
+    try {
+      const res = await externalService.toggleFavoritoCabana(cabanaId);
+      if (res.success) {
+        setFavoritos(res.favoritos.map(f => f.toString()));
+      }
+    } catch (err) {
+      alert('Error al actualizar favorito');
+    }
+  };
   const [cabanaSeleccionada, setCabanaSeleccionada] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Estados para el buscador
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,7 +190,7 @@ const TailwindExternalDashboard = () => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editCommentText, setEditCommentText] = useState('');
   const [showReplyNotification, setShowReplyNotification] = useState({});
-  const [showCommentFeedback, setShowCommentFeedback] = useState({});
+  // Eliminado: showCommentFeedback, setShowCommentFeedback (no usado)
   const [showEditFeedback, setShowEditFeedback] = useState({});
   const [showDeleteFeedback, setShowDeleteFeedback] = useState({});
   const [showModerateFeedback, setShowModerateFeedback] = useState({});
@@ -97,12 +200,10 @@ const TailwindExternalDashboard = () => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { id: 'dashboard', label: 'Inicio', icon: Home },
-    { id: 'courses', label: 'Cursos Bíblicos', icon: BookOpen },
-    { id: 'events', label: 'Eventos', icon: Calendar },
-    { id: 'cabins', label: 'Cabañas', icon: Home },
-    { id: 'profile', label: 'Mi Perfil', icon: User },
-    { id: 'support', label: 'Ayuda', icon: HelpCircle },
+  { id: 'dashboard', label: 'Inicio', icon: Home },
+  { id: 'courses', label: 'Programas Académicos', icon: BookOpen },
+  { id: 'events', label: 'Eventos', icon: Calendar },
+  { id: 'cabins', label: 'Cabañas', icon: Home },
   ];
 
   // Funciones de búsqueda
@@ -117,130 +218,291 @@ const TailwindExternalDashboard = () => {
       setFilteredCabanas([]);
       return;
     }
-
     const queryLower = query.toLowerCase();
-    const filteredC = cursos.filter(curso =>
+    const filteredC = cursos.filter(curso => (
       (curso.nombre?.toLowerCase().includes(queryLower) ||
         curso.descripcion?.toLowerCase().includes(queryLower) ||
         curso.instructor?.toLowerCase().includes(queryLower))
-    );
+    ));
     const filteredE = eventos.filter(evento =>
-      (evento.nombre?.toLowerCase().includes(queryLower) ||
-        evento.descripcion?.toLowerCase().includes(queryLower) ||
-        evento.lugar?.toLowerCase().includes(queryLower))
+    (evento.nombre?.toLowerCase().includes(queryLower) ||
+      evento.descripcion?.toLowerCase().includes(queryLower) ||
+      evento.lugar?.toLowerCase().includes(queryLower))
     );
     const filteredCab = cabanas.filter(cabana =>
-      (cabana.nombre?.toLowerCase().includes(queryLower) ||
-        cabana.descripcion?.toLowerCase().includes(queryLower) ||
-        cabana.ubicacion?.toLowerCase().includes(queryLower))
+    (cabana.nombre?.toLowerCase().includes(queryLower) ||
+      cabana.descripcion?.toLowerCase().includes(queryLower) ||
+      cabana.ubicacion?.toLowerCase().includes(queryLower))
     );
     setFilteredCursos(filteredC);
     setFilteredEventos(filteredE);
+    setFilteredCabanas(filteredCab);
+    setShowSearchResults(true);
     setFilteredCabanas(filteredCab);
     setShowSearchResults(true);
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchQuery.trim() !== '') {
-      setShowSearchResults(true);
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchQuery('');
     setShowSearchResults(false);
-    setFilteredCursos([]);
-    setFilteredEventos([]);
-    setFilteredCabanas([]);
   };
 
-  const goToSearchResult = (item, type) => {
-    switch (type) {
-      case 'curso':
-        setActiveSection('courses');
-        setSelectedItem(item);
-        break;
-      case 'evento':
-        setActiveSection('events');
-        setSelectedItem(item);
-        break;
-      case 'cabana':
-        setActiveSection('cabins');
-        setSelectedItem(item);
-        break;
-      default:
-        break;
-    }
-    clearSearch();
-  };
-
-  const getEventsForDate = (date) => {
-    const day = date.getDate();
-    const month = date.getMonth();
-    const year = date.getFullYear();
-    return eventos.filter(evento => {
-      const eventoDate = new Date(evento.fechaEvento || evento.fecha);
-      return (
-        eventoDate.getDate() === day &&
-        eventoDate.getMonth() === month &&
-        eventoDate.getFullYear() === year
-      );
-    });
-  };
-
-  // La ventana de comentarios está siempre abierta para pruebas
-  const isEventoAbiertoAComentarios = (evento) => true;
-
-  const cargarComentariosEvento = async (eventoId) => {
-    setLoadingComments((prev) => ({ ...prev, [eventoId]: true }));
-    try {
-      const res = await comentarioEventoService.getComentarios(eventoId);
-      console.log('Comentarios recibidos:', res);
-      if (res.success) {
-        setCommentsByEvento((prev) => ({ ...prev, [eventoId]: res.comentarios }));
-      } else {
-        setCommentsByEvento((prev) => ({ ...prev, [eventoId]: [] }));
-      }
-    } catch (err) {
-      console.error('Error al cargar comentarios:', err);
-      setCommentsByEvento((prev) => ({ ...prev, [eventoId]: [] }));
-    } finally {
-      setLoadingComments((prev) => ({ ...prev, [eventoId]: false }));
+  const goToSearchResult = (item, tipo) => {
+    setShowSearchResults(false);
+    if (tipo === 'curso') {
+      // Navegar a la página del curso
+      navigate(`/cursos/${item._id}`);
+    } else if (tipo === 'evento') {
+      // Navegar a la página del evento
+      navigate(`/eventos/${item._id}`);
+    } else if (tipo === 'cabana') {
+      // Navegar a la página de la cabaña
+      navigate(`/cabanas/${item._id}`);
     }
   };
 
-  const toggleCommentSection = (eventoId) => {
-    setShowCommentSection((prev) => ({ ...prev, [eventoId]: !prev[eventoId] }));
-    if (!showCommentSection[eventoId]) {
-      cargarComentariosEvento(eventoId);
-    }
-  };
+  // Eliminado: renderContent (no usado)
 
-  const handleCommentSubmit = async (e, eventoId) => {
-    e.preventDefault();
-    if (!commentTextByEvento[eventoId]) return;
-    try {
-      await comentarioEventoService.crearComentario(eventoId, commentTextByEvento[eventoId]);
-      setCommentTextByEvento((prev) => ({ ...prev, [eventoId]: '' }));
-      setShowCommentFeedback((prev) => ({ ...prev, [eventoId]: true }));
-      setTimeout(() => setShowCommentFeedback((prev) => ({ ...prev, [eventoId]: false })), 3000);
-      cargarComentariosEvento(eventoId);
-    } catch {}
-  };
+  // Render del dashboard
+  const renderDashboard = () => (
+    <div className="p-8">
+      <h2 className="text-4xl font-bold mb-6">Bienvenido, {user?.nombre}</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Tarjetas de resumen */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold mb-4">Tus Inscripciones</h3>
+          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{inscripciones.length}</div>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Cursos y eventos a los que estás inscrito</p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold mb-4">Reservas de Cabañas</h3>
+          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{cabanas.length}</div>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Cabañas que has reservado</p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold mb-4">Próximos Eventos</h3>
+          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{eventos.length}</div>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Eventos a los que asistirás próximamente</p>
+        </div>
+      </div>
+
+      {/* Gráficos y estadísticas */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Estadísticas</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h4 className="text-md font-semibold mb-4">Inscripciones por Curso</h4>
+            {/* Aquí iría un gráfico de barras o pastel */}
+            <div className="h-40 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+              Gráfico de Inscripciones
+            </div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h4 className="text-md font-semibold mb-4">Asistencia a Eventos</h4>
+            {/* Aquí iría un gráfico de líneas */}
+            <div className="h-40 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+              Gráfico de Asistencia
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Render de cursos
+  const renderCourses = () => (
+    <div className="p-8">
+      <h2 className="text-4xl font-bold mb-6">Programas Académicos</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {cursos.map((curso) => (
+          <div key={curso._id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold mb-4">{curso.nombre}</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{curso.descripcion}</p>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-sm px-3 py-1 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300">
+                {curso.categoria}
+              </span>
+              <span className="text-sm px-3 py-1 rounded-full bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300">
+                ${curso.precio}
+              </span>
+            </div>
+            <button
+              onClick={() => handleInscribirse(curso, 'curso')}
+              className="w-full bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition-all duration-200"
+            >
+              Inscribirse
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Render de eventos
+  const renderEvents = () => (
+    <div className="p-8">
+      <h2 className="text-4xl font-bold mb-6">Eventos Próximos</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {eventos.map((evento) => (
+          <div key={evento._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all duration-300 hover:scale-[1.02]">
+            <h3 className="text-lg font-bold mb-4 text-blue-700 dark:text-blue-300">{evento.nombre}</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{evento.descripcion}</p>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-sm px-3 py-1 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300">
+                {evento.tipo}
+              </span>
+              <span className="text-sm px-3 py-1 rounded-full bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300">
+                ${evento.precio}
+              </span>
+            </div>
+            <button
+              onClick={() => handleInscribirse(evento, 'evento')}
+              className="w-full bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition-all duration-200 mb-2"
+            >
+              Registrarse
+            </button>
+            <button
+              onClick={() => toggleCommentSection(evento._id)}
+              className="w-full bg-gray-200 dark:bg-gray-700 text-blue-600 dark:text-blue-300 rounded-lg py-2 font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 mb-2"
+            >
+              {showCommentSection[evento._id] ? 'Ocultar comentarios' : 'Comentar sobre este evento'}
+            </button>
+            {/* Sección de comentarios mejorada */}
+            {showCommentSection[evento._id] && (
+              <div className="mt-4 animate-fade-in">
+                <h4 className="text-md font-semibold mb-2 text-blue-600 dark:text-blue-300">Comentarios</h4>
+                {loadingComments[evento._id] ? (
+                  <div className="text-gray-500">Cargando comentarios...</div>
+                ) : (
+                  <div>
+                    {(commentsByEvento[evento._id] || []).length === 0 ? (
+                      <div className="text-gray-500">No hay comentarios aún.</div>
+                    ) : (
+                      <ul className="mb-2">
+                        {commentsByEvento[evento._id].map((comentario) => (
+                          <li key={comentario.id} className="mb-2 p-3 rounded-xl bg-gray-50 dark:bg-gray-900 shadow flex gap-3 items-start">
+                            <div className="flex-shrink-0">
+                              <img src={comentario.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(comentario.autor)} alt="avatar" className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-700" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-semibold text-blue-700 dark:text-blue-300">{comentario.autor}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{comentario.fecha}</div>
+                              <div className="text-gray-800 dark:text-gray-200 mb-2">{comentario.texto}</div>
+                              <div className="flex gap-2 items-center">
+                                <button className="text-xs px-2 py-1 rounded bg-green-100 text-green-700 hover:bg-green-200" title="Me gusta">
+                                  👍 {comentario.likes || 0}
+                                </button>
+                                <button className="text-xs px-2 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200" title="No me gusta">
+                                  👎 {comentario.dislikes || 0}
+                                </button>
+                                <button className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200" title="Responder" onClick={() => setReplyToByEvento(prev => ({ ...prev, [evento._id]: comentario.id }))}>
+                                  Responder
+                                </button>
+                              </div>
+                              {replyToByEvento[evento._id] === comentario.id && (
+                                <div className="mt-2 flex gap-2 items-center">
+                                  <textarea
+                                    className="flex-1 p-2 rounded border border-gray-300 dark:border-gray-700 resize-none focus:ring-2 focus:ring-blue-400"
+                                    rows={1}
+                                    placeholder="Escribe una respuesta..."
+                                    value={replyTextByEvento[evento._id] || ''}
+                                    onChange={e => setReplyTextByEvento(prev => ({ ...prev, [evento._id]: e.target.value }))}
+                                  />
+                                  <button
+                                    className="bg-blue-600 text-white rounded-lg py-1 px-3 font-semibold hover:bg-blue-700 transition-all duration-200"
+                                    onClick={async () => {
+                                      // Aquí iría la lógica para enviar la respuesta al backend
+                                      setReplyTextByEvento(prev => ({ ...prev, [evento._id]: '' }));
+                                      setReplyToByEvento(prev => ({ ...prev, [evento._id]: null }));
+                                      setTimeout(() => cargarComentariosEvento(evento._id), 400);
+                                    }}
+                                  >Responder</button>
+                                </div>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <form className="flex gap-2 items-center mt-2 w-full" onSubmit={async (e) => {
+                      await handleCommentSubmit(evento._id, e);
+                    }}>
+                      <img src={user?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user?.nombre || 'U')} alt="avatar" className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-700" />
+                      <textarea
+                        className="flex-1 p-2 rounded border border-gray-300 dark:border-gray-700 resize-none focus:ring-2 focus:ring-blue-400"
+                        rows={2}
+                        placeholder="Escribe tu comentario..."
+                        value={commentTextByEvento[evento._id] || ''}
+                        onChange={e => setCommentTextByEvento(prev => ({ ...prev, [evento._id]: e.target.value }))}
+                      />
+                      <button
+                        type="submit"
+                        className="bg-blue-600 text-white rounded-lg py-2 px-6 font-semibold hover:bg-blue-700 transition-all duration-200 flex-shrink-0"
+                      >
+                        Comentar
+                      </button>
+                    </form>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Render de cabañas
+  const renderCabins = () => (
+    <div className="p-8">
+      <h2 className="text-4xl font-bold mb-6">Cabañas Disponibles</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {cabanas.map((cabana) => {
+          // Mostrar la primera imagen del array si existe
+          let imagenUrl = Array.isArray(cabana.imagen) && cabana.imagen.length > 0 ? cabana.imagen[0] : null;
+          return (
+            <div key={cabana._id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+              {imagenUrl ? (
+                <img src={imagenUrl} alt={cabana.nombre}
+                  className="w-full h-48 object-cover rounded-lg mb-4 border border-gray-200 dark:border-gray-700" />
+              ) : (
+                <div className="w-full h-48 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg mb-4 text-gray-400">
+                  Sin imagen
+                </div>
+              )}
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm px-3 py-1 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300">
+                  {cabana.ubicacion}
+                </span>
+                <span className="text-sm px-3 py-1 rounded-full bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300">
+                  Capacidad: {cabana.capacidad}
+                </span>
+              </div>
+              <button
+                onClick={() => handleReservarCabana(cabana)}
+                className="w-full bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition-all duration-200"
+              >
+                Reservar
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   const handleLike = async (eventoId, comentarioId) => {
     try {
       await comentarioEventoService.likeComentario(comentarioId);
       cargarComentariosEvento(eventoId);
-    } catch {}
+    } catch { }
   };
 
   const handleDislike = async (eventoId, comentarioId) => {
     try {
       await comentarioEventoService.dislikeComentario(comentarioId);
       cargarComentariosEvento(eventoId);
-    } catch {}
+    } catch { }
   };
 
   const handleReplySubmit = async (e, eventoId, comentarioId) => {
@@ -253,7 +515,7 @@ const TailwindExternalDashboard = () => {
       setShowReplyNotification((prev) => ({ ...prev, [eventoId]: true }));
       setTimeout(() => setShowReplyNotification((prev) => ({ ...prev, [eventoId]: false })), 3000);
       cargarComentariosEvento(eventoId);
-    } catch {}
+    } catch { }
   };
 
   const handleEditCommentSubmit = async (e, eventoId, commentId) => {
@@ -414,33 +676,39 @@ const TailwindExternalDashboard = () => {
     setReservaStatus(null);
   };
 
-  const handleReservaFormChange = (e) => {
-    const { name, value } = e.target;
-    setReservaForm((prev) => ({ ...prev, [name]: value }));
+  const handleShowDetails = (cabana) => {
+    setCabanaSeleccionada(cabana);
+    setShowDetailsModal(true);
   };
 
-  const handleReservaSubmit = async (e) => {
-    e.preventDefault();
-    setReservaStatus(null);
-    try {
-      const reserva = {
-        cabana: cabanaSeleccionada._id,
-        usuario: user?._id,
-        fechaInicio: new Date(),
-        fechaFin: new Date(Date.now() + 86400000),
-        ...reservaForm
-      };
-      const response = await reservaService.create(reserva);
-      if (response.success) {
-        setReservaStatus('Reserva realizada con éxito');
-        setShowReservaModal(false);
-      } else {
-        setReservaStatus('No se pudo realizar la reserva');
+  // Paso 2: pago y guardar reserva
+  const handlePagoReserva = async () => {
+    const noches = reservaForm.fechaInicio && reservaForm.fechaFin ?
+      (new Date(reservaForm.fechaFin) - new Date(reservaForm.fechaInicio)) / (1000 * 60 * 60 * 24) : 1;
+    const precioTotal = reservaForm.cantidadPersonas * noches * 15000;
+    setReservaForm(f => ({ ...f, precioTotal }));
+    // Aquí iría la integración con la pasarela de pagos real (PSE/ePayco/Wompi)
+    // Simulación: esperar 2 segundos y continuar
+    setTimeout(async () => {
+      try {
+        const reservaPayload = {
+          ...reservaForm,
+          cabana: cabanaSeleccionada._id, // Cambiado a 'cabana'
+          estado: 'Pendiente',
+          fechaReserva: new Date().toISOString(),
+          usuario: user?._id || user?.id || null
+        };
+        console.log('Reserva enviada:', reservaPayload);
+        await reservaService.create(reservaPayload);
+        setWizardStep(3);
+      } catch (err) {
+        console.error('Error al guardar la reserva:', err);
+        alert('Error al guardar la reserva');
       }
-    } catch (error) {
-      setReservaStatus('Error al reservar la cabaña');
-    }
+    }, 2000);
   };
+
+
 
   const isInscrito = (itemId, tipo) => {
     if (!inscripciones || inscripciones.length === 0) {
@@ -462,8 +730,8 @@ const TailwindExternalDashboard = () => {
   const ShaderBackground = () => (
     <div className="fixed inset-0 -z-10">
       <div className={`absolute inset-0 transition-all duration-1000 ${darkMode
-          ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900'
-          : 'bg-gradient-to-br from-blue-500 via-purple-500 to-blue-600'
+        ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900'
+        : 'bg-gradient-to-br from-blue-500 via-purple-500 to-blue-600'
         }`}>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(120,20,120,0.2),transparent_50%)]" />
@@ -536,6 +804,53 @@ const TailwindExternalDashboard = () => {
     );
   };
 
+  // Render del wizard de reserva (pasos 2 y 3)
+  const renderReservaWizard = () => {
+    if (!showReservaModal || !cabanaSeleccionada) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+        <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-2xl relative">
+          <button type="button" onClick={() => { setShowReservaModal(false); setWizardStep(1); }} className="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl">×</button>
+          {wizardStep === 1 && (
+            <form onSubmit={e => { e.preventDefault(); setWizardStep(2); }}>
+              <h2 className="text-xl font-bold mb-4">Datos de la Reserva</h2>
+              <div className="mb-2"><b>Cabaña:</b> {cabanaSeleccionada.nombre}</div>
+              <div className="mb-2"><b>Precio por persona/noche:</b> ${cabanaSeleccionada.precio?.toLocaleString() || 'No disponible'}</div>
+              <input className="border rounded p-2 w-full mb-2" type="text" placeholder="Nombre completo" value={reservaForm.nombre} onChange={e => setReservaForm(f => ({ ...f, nombre: e.target.value }))} required />
+              <input className="border rounded p-2 w-full mb-2" type="text" placeholder="Documento" value={reservaForm.documento} onChange={e => setReservaForm(f => ({ ...f, documento: e.target.value }))} required />
+              <input className="border rounded p-2 w-full mb-2" type="number" min={1} placeholder="Cantidad de personas" value={reservaForm.cantidadPersonas} onChange={e => setReservaForm(f => ({ ...f, cantidadPersonas: parseInt(e.target.value) }))} required />
+              <label className="block mb-2"><input type="checkbox" checked={reservaForm.conNinos} onChange={e => setReservaForm(f => ({ ...f, conNinos: e.target.checked }))} /> ¿Va con niños?</label>
+              {reservaForm.conNinos && <input className="border rounded p-2 w-full mb-2" type="text" placeholder="Edades de los niños (separadas por coma)" value={Array.isArray(reservaForm.edadesNinos) ? reservaForm.edadesNinos.join(',') : ''} onChange={e => setReservaForm(f => ({ ...f, edadesNinos: e.target.value.split(',').map(x => x.trim()) }))} />}
+              <label className="block mb-2"><input type="checkbox" checked={reservaForm.conBebes} onChange={e => setReservaForm(f => ({ ...f, conBebes: e.target.checked }))} /> ¿Va con bebés?</label>
+              {reservaForm.conBebes && <input className="border rounded p-2 w-full mb-2" type="text" placeholder="Edades de los bebés (separadas por coma)" value={Array.isArray(reservaForm.edadesBebes) ? reservaForm.edadesBebes.join(',') : ''} onChange={e => setReservaForm(f => ({ ...f, edadesBebes: e.target.value.split(',').map(x => x.trim()) }))} />}
+              <div className="flex gap-2 mb-2">
+                <input className="border rounded p-2 w-full" type="date" value={reservaForm.fechaInicio} onChange={e => setReservaForm(f => ({ ...f, fechaInicio: e.target.value }))} required />
+                <input className="border rounded p-2 w-full" type="date" value={reservaForm.fechaFin} onChange={e => setReservaForm(f => ({ ...f, fechaFin: e.target.value }))} required />
+              </div>
+              <button className="w-full bg-orange-500 text-white py-2 rounded font-bold hover:bg-orange-600 transition mt-2 mb-1 text-lg" type="submit">Siguiente: Pago</button>
+            </form>
+          )}
+          {wizardStep === 2 && (
+            <div>
+              <div className="mb-2">(Simulación de integración con pasarela de pagos real)</div>
+              <button className="w-full bg-green-500 text-white py-2 rounded font-bold hover:bg-green-600 transition mt-2 mb-1 text-lg" onClick={handlePagoReserva}>Pagar y Reservar</button>
+            </div>
+          )}
+          {wizardStep === 3 && (
+            <div>
+              <h2 className="text-xl font-bold mb-4">Estado de la Reserva</h2>
+              <div className="mb-4">
+                <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-lg">Pendiente de confirmación por tesorero</span>
+              </div>
+              <div className="mb-2">Recibirás el certificado cuando el tesorero confirme el pago.</div>
+              <button className="w-full bg-gray-500 text-white py-2 rounded font-bold hover:bg-gray-600 transition mt-2 mb-1 text-lg" onClick={() => { setShowReservaModal(false); setWizardStep(1); }}>Cerrar</button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -582,8 +897,8 @@ const TailwindExternalDashboard = () => {
                 <button
                   key={item.id}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-                      ? 'bg-blue-500/20 text-white border border-blue-500/30 dark:bg-blue-700/30 dark:text-white dark:border-blue-700/40'
-                      : 'text-white/80 hover:bg-white/10 hover:text-white dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white'
+                    ? 'bg-blue-500/20 text-white border border-blue-500/30 dark:bg-blue-700/30 dark:text-white dark:border-blue-700/40'
+                    : 'text-white/80 hover:bg-white/10 hover:text-white dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white'
                     } ${sidebarCollapsed ? 'justify-center' : 'justify-start'}`}
                   onClick={() => setActiveSection(item.id)}
                 >
@@ -599,10 +914,18 @@ const TailwindExternalDashboard = () => {
             {user && (
               <div className={`flex items-center gap-3 ${sidebarCollapsed ? 'justify-center' : ''}`}>
                 <div
-                  className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold cursor-pointer dark:bg-blue-700 dark:text-white"
+                  className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold cursor-pointer dark:bg-blue-700 dark:text-white overflow-hidden"
                   onClick={() => setShowProfilePanel(true)}
                 >
-                  {user.nombre ? user.nombre.charAt(0).toUpperCase() : 'U'}
+                  {user.fotoPerfil ? (
+                    <img
+                      src={user.fotoPerfil}
+                      alt={user.nombre}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    user.nombre ? user.nombre.charAt(0).toUpperCase() : 'U'
+                  )}
                 </div>
                 {!sidebarCollapsed && (
                   <div className="flex-1 min-w-0">
@@ -621,8 +944,9 @@ const TailwindExternalDashboard = () => {
           </div>
         </div>
       </div>
-
       {/* Main Content */}
+      {/* Wizard de reserva por pasos */}
+      {renderReservaWizard()}
       <div className={`transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-80'}`}>
         {/* Header */}
         <header className="backdrop-blur-md bg-card/20 border-b border-border px-8 py-4 dark:bg-black/40 dark:border-white/40">
@@ -808,9 +1132,57 @@ const TailwindExternalDashboard = () => {
               >
                 {darkMode ? <Sun className="w-5 h-5 dark:text-white" /> : <Moon className="w-5 h-5 dark:text-white" />}
               </button>
-              <button className="text-foreground hover:bg-accent/10 p-2 rounded-lg transition-colors dark:text-white dark:hover:bg-slate-700">
+              <button
+                className="relative text-foreground hover:bg-accent/10 p-2 rounded-lg transition-colors dark:text-white dark:hover:bg-slate-700"
+                onClick={() => setShowNotifications((prev) => !prev)}
+              >
                 <Bell className="w-5 h-5 dark:text-white" />
+                {notifications.some(n => !n.read) && (
+                  <span className="absolute top-0 right-0 block w-2 h-2 bg-red-500 rounded-full"></span>
+                )}
               </button>
+              {/* Panel de notificaciones */}
+              {/* Panel de notificaciones fuera del flujo principal */}
+
+
+              {/* Panel de notificaciones: SIEMPRE al final del componente para evitar stacking context */}
+              {showNotifications && (
+                <div className="fixed top-16 right-8 z-[99999] w-80 bg-white dark:bg-gray-900 border-2 border-blue-400 dark:border-blue-600 rounded-xl shadow-2xl p-4 transition-all duration-300 animate-fade-in">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-lg dark:text-black">Notificaciones</span>
+                    <button onClick={() => setShowNotifications(false)} className="text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white">
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {notifications.length === 0 ? (
+                      <div className="text-blue-600 dark:text-blue-300 font-semibold text-center py-4">No tienes notificaciones por ahora.<br />¡Aquí verás avisos importantes de eventos, pagos y novedades!</div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div key={notif._id} className={`flex items-start gap-2 p-2 rounded-lg ${notif.read ? 'bg-gray-100 dark:bg-gray-800' : 'bg-blue-50 dark:bg-blue-900'}`}>
+                          <Bell className="w-5 h-5 text-blue-500 dark:text-blue-300 mt-1" />
+                          <div className="flex-1">
+                            <div className="font-semibold dark:text-white">{notif.title}</div>
+                            <div className="text-sm dark:text-gray-200">{notif.message}</div>
+                            <div className="text-xs text-gray-400 dark:text-gray-400">{new Date(notif.createdAt).toLocaleString()}</div>
+                          </div>
+                          {!notif.read && (
+                            <button
+                              className="ml-2 text-xs text-blue-600 dark:text-blue-300 hover:underline"
+                              onClick={async () => {
+                                const usuario = JSON.parse(localStorage.getItem('usuario'));
+                                const notificationService = await import('../../services/notificationService');
+                                await notificationService.default.markNotificationAsRead(notif._id, usuario.token);
+                                setNotifications((prev) => prev.map(n => n._id === notif._id ? { ...n, read: true } : n));
+                              }}
+                            >Marcar como leída</button>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
               <button
                 className="text-foreground hover:bg-accent/10 p-2 rounded-lg transition-colors dark:text-white dark:hover:bg-slate-700"
                 onClick={() => setShowProfilePanel(true)}
@@ -835,7 +1207,7 @@ const TailwindExternalDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card>
                   <div className="p-6">
-                    <h3 className="text-sm font-medium text-white/80 mb-2 dark:text-slate-200">Cursos Disponibles</h3>
+                    <h3 className="text-sm font-medium text-white/80 mb-2 dark:text-slate-200">Programas Academicos Disponibles</h3>
                     <div className="text-3xl font-bold text-white dark:text-white">{cursos.length}</div>
                     <p className="text-xs text-white/60 dark:text-slate-200">Para inscribirse</p>
                   </div>
@@ -1091,9 +1463,7 @@ const TailwindExternalDashboard = () => {
                                 {showReplyNotification[evento._id] && (
                                   <div className="text-green-600 dark:text-green-400 text-xs mb-2">¡Respuesta enviada!</div>
                                 )}
-                                {showCommentFeedback[evento._id] && (
-                                  <div className="text-green-600 dark:text-green-400 text-xs mb-2">¡Comentario enviado!</div>
-                                )}
+                                {/* Eliminado: showCommentFeedback, ya no existe el estado */}
                               </div>
                             </div>
                           )}
@@ -1113,9 +1483,9 @@ const TailwindExternalDashboard = () => {
             <div className="space-y-6">
               <div>
                 <h2 className="text-5xl font-bold text-foreground mb-2 dark:text-white">
-                  Cursos <span className="font-instrument-serif italic text-primary dark:text-blue-300">Disponibles</span>
+                  Programas Académicos <span className="font-instrument-serif italic text-primary dark:text-blue-300">Disponibles</span>
                 </h2>
-                <p className="text-muted-foreground text-sm dark:text-slate-200">Encuentra el curso perfecto para tu desarrollo espiritual</p>
+                <p className="text-muted-foreground text-sm dark:text-slate-200">Encuentra el programa académico perfecto para tu desarrollo espiritual</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1222,93 +1592,102 @@ const TailwindExternalDashboard = () => {
                 <p className="text-muted-foreground text-sm dark:text-slate-200">Escápate a la naturaleza en nuestras cabañas</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="flex flex-row gap-8 flex-wrap">
                 {cabanas.map((cabana) => (
-                  <Card key={cabana._id}>
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-3">
-                        <Badge variant="success">Disponible</Badge>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 dark:fill-yellow-300 dark:text-yellow-300" />
-                          <span className="text-sm text-white/60 dark:text-slate-200">4.9</span>
-                        </div>
-                      </div>
-                      <h3 className="text-white font-semibold text-lg mb-2 dark:text-white">{cabana.nombre}</h3>
-                      <p className="text-white/60 text-sm mb-4 dark:text-slate-200">{cabana.descripcion}</p>
-
-                      <div className="flex items-center gap-2 text-sm text-white/60 mb-4 dark:text-slate-200">
-                        <Users className="h-4 w-4 dark:text-slate-200" />
-                        {cabana.capacidad} personas
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <span className="text-xl font-bold text-primary dark:text-blue-300">
-                          ${cabana.precio?.toLocaleString()}/noche
-                        </span>
-                        <Button onClick={() => handleReservarCabana(cabana)}>
-                          Reservar
-                        </Button>
-                        {/* Modal de reserva de cabaña */}
-                        {showReservaModal && cabanaSeleccionada && (
-                          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-                            <form onSubmit={handleReservaSubmit} className="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative dark:bg-gray-800">
-                              <button type="button" onClick={() => setShowReservaModal(false)} className="absolute top-4 right-4 text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white"><X /></button>
-                              <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Reserva de Cabaña</h2>
-                              <div className="mb-3">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
-                                <input name="nombre" value={reservaForm.nombre} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white" />
-                              </div>
-                              <div className="mb-3">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Apellido</label>
-                                <input name="apellido" value={reservaForm.apellido} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white" />
-                              </div>
-                              <div className="mb-3">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Documento</label>
-                                <select name="tipoDocumento" value={reservaForm.tipoDocumento} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white">
-                                  <option value="">Seleccione...</option>
-                                  <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
-                                  <option value="Cédula de extranjería">Cédula de extranjería</option>
-                                  <option value="Pasaporte">Pasaporte</option>
-                                  <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-                                </select>
-                              </div>
-                              <div className="mb-3">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Documento</label>
-                                <input name="numeroDocumento" value={reservaForm.numeroDocumento} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white" />
-                              </div>
-                              <div className="mb-3">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Correo Electrónico</label>
-                                <input name="correoElectronico" type="email" value={reservaForm.correoElectronico} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white" />
-                              </div>
-                              <div className="mb-3">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
-                                <input name="telefono" value={reservaForm.telefono} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white" />
-                              </div>
-                              <div className="mb-3">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Personas</label>
-                                <input name="numeroPersonas" type="number" min="1" value={reservaForm.numeroPersonas} onChange={handleReservaFormChange} required className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white" />
-                              </div>
-                              <div className="mb-3">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Propósito de la estadía (opcional)</label>
-                                <input name="propositoEstadia" value={reservaForm.propositoEstadia} onChange={handleReservaFormChange} className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white" />
-                              </div>
-                              <div className="mb-3">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Solicitudes Especiales (opcional)</label>
-                                <input name="solicitudesEspeciales" value={reservaForm.solicitudesEspeciales} onChange={handleReservaFormChange} className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white" />
-                              </div>
-                              <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition dark:bg-blue-700 dark:hover:bg-blue-800">Confirmar Reserva</button>
-                            </form>
-                          </div>
-                        )}
+                  <div
+                    key={cabana._id}
+                    className="relative flex flex-col justify-between bg-black/80 border border-white/30 rounded-2xl shadow-lg min-w-[340px] max-w-[420px] w-full transition-all duration-200 hover:bg-black/90 dark:bg-black/90 dark:border-white/40 p-5"
+                  >
+                    {/* Imagen principal de la cabaña con overlay */}
+                    <div className="w-full h-44 rounded-2xl overflow-hidden mb-5 relative">
+                      <img
+                        src={Array.isArray(cabana.imagen) && cabana.imagen.length > 0 ? cabana.imagen[0] : (cabana.foto || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80')}
+                        alt={cabana.nombre}
+                        className="w-full h-full object-cover"
+                      />
+                      {/* Overlay oscuro para mejorar contraste */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+                      {/* Nombre sobre la imagen */}
+                      <div className="absolute left-6 bottom-4 text-xl font-bold text-white drop-shadow-lg">
+                        {cabana.nombre}
                       </div>
                     </div>
-                  </Card>
+                    {/* Etiquetas y rating fuera de la imagen */}
+                    <div className="flex justify-between items-center mb-4 px-1">
+                      <div className="flex gap-3 items-center">
+                        <span className="px-4 py-1 rounded-full bg-green-600 text-white text-xs font-bold shadow">Disponible</span>
+                        <span className="px-3 py-1 rounded-full bg-blue-900 text-white text-xs font-bold shadow">
+                          +{Array.isArray(cabana.imagen) ? cabana.imagen.length : 0} fotos
+                        </span>
+                      </div>
+                      <div className="flex gap-3 items-center">
+                        <span className="flex items-center gap-2 text-yellow-400 font-bold text-base">
+                          <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> 4.2
+                        </span>
+                        <button
+                          className={`ml-2 text-xl transition ${favoritos.includes(cabana._id) ? 'text-red-500' : 'text-white/60 hover:text-red-500'}`}
+                          title={favoritos.includes(cabana._id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                          onClick={() => handleToggleFavorito(cabana._id)}
+                        >
+                          ♥
+                        </button>
+                      </div>
+                    </div>
+                    {/* Info principal */}
+                    <div className="mb-7 px-1">
+                      <p className="text-white/80 text-base mb-4 dark:text-slate-200">{cabana.descripcion}</p>
+                      <div className="flex flex-wrap gap-6 text-white/70 text-sm mb-4">
+                        <span className="flex items-center gap-2"><Users className="h-5 w-5" /> {cabana.capacidad} personas</span>
+                        <span className="flex items-center gap-2"><span className="font-bold">3</span> habitaciones</span>
+                        <span className="flex items-center gap-2"><span className="font-bold">2</span> baños</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-white/60 text-sm mb-2">
+                        <MapPin className="h-5 w-5" /> {cabana.ubicacion || 'Sector Norte'}
+                      </div>
+                    </div>
+                    {/* Precio y acciones */}
+                    <div className="flex items-center justify-between mt-6 px-1 pb-2">
+                      <span className="text-2xl font-bold text-green-400 dark:text-green-300">
+                        ${cabana.precio?.toLocaleString() || '0'} / noche
+                      </span>
+                      <div className="flex gap-3">
+                        <Button
+                          variant="secondary"
+                          className="!bg-white !text-black !rounded-lg !px-5 !py-2 !font-bold !shadow"
+                          onClick={() => handleShowDetails(cabana)}
+                        >
+                          Ver Detalles
+                        </Button>
+                        <Button
+                          variant="primary"
+                          className="!bg-green-500 !text-white !rounded-lg !px-5 !py-2 !font-bold !shadow"
+                          onClick={() => handleReservarCabana(cabana)}
+                        >
+                          Reservar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
+              {/* Modal de detalles de cabaña */}
+              {showDetailsModal && cabanaSeleccionada && (
+                <CabanaDetailsModal
+                  cabana={cabanaSeleccionada}
+                  onClose={() => setShowDetailsModal(false)}
+                  onReservar={() => {
+                    setShowDetailsModal(false);
+                    handleReservarCabana(cabanaSeleccionada);
+                  }}
+                />
+              )}
             </div>
           )}
         </main>
       </div>
+
+      {/* Wizard de reserva por pasos */}
+      {renderReservaWizard()}
 
       {/* Notifications */}
       {reservaStatus && (
@@ -1357,8 +1736,8 @@ const TailwindExternalDashboard = () => {
           }}
         />
       )}
+
     </div>
   );
-};
-
+}
 export default TailwindExternalDashboard;

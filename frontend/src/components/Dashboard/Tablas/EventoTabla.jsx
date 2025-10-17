@@ -15,7 +15,7 @@ import {
 
 const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabilitar, onVerDetalle }) => {
 
- // Estado para manejar el índice de imagen de cada evento
+  // Estado para manejar el índice de imagen de cada evento
   const [imgIndices, setImgIndices] = useState({});
 
   // Funciones para navegar en el carrusel
@@ -48,8 +48,8 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
             <div key={evento._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
               {/* Imagen del evento */}
               <div className="relative h-64 bg-gradient-to-r from-blue-500 to-purple-600">
-              
-                 {imagenes.length > 0 ? (
+
+                {imagenes.length > 0 ? (
                   <>
                     <img
                       src={imagenes[imgIndex]}
@@ -85,7 +85,7 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                     )}
                   </>
                 ) : (
-                 <div className="flex items-center justify-center w-full h-64 text-white text-4xl">
+                  <div className="flex items-center justify-center w-full h-64 text-white text-4xl">
                     <span>📅</span>
                   </div>
                 )}
@@ -115,12 +115,12 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                 {/* Botones de acción */}
                 <div className="flex  justify-end  gap-2  px-6 py-3 ">
                   <button
-                  onClick={() => onVerDetalle(evento)}
-                   className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                  title="Ver detalles"
-                >
-                  <Eye className="w-4 h-4" />
-                </button>
+                    onClick={() => onVerDetalle(evento)}
+                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                    title="Ver detalles"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
 
                   <button
                     onClick={() => onEditar(evento)}
@@ -131,7 +131,7 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                   </button>
                   <button
                     onClick={() => onEliminar(evento._id)}
-                     className="p-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
+                    className="p-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
                     title="Eliminar"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -151,45 +151,56 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                   <div className="flex items-center space-x-2 text-sm">
                     <Calendar className="w-4 h-4 text-blue-600" />
                     <span className="text-slate-600">
+                      {evento.fechaEvento}
 
                     </span>
                   </div>
 
                   {/* Ubicación */}
-                  {evento.ubicacion && (
-                    <div className="flex items-center space-x-2 text-sm">
-                      <MapPin className="w-4 h-4 text-red-600" />
-                      <span className="text-slate-600 line-clamp-1">{evento.ubicacion}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center space-x-2 text-sm">
+                    <MapPin className="w-4 h-4 text-red-600" />
+                    <span className="text-slate-600 line-clamp-1">{evento.lugar}</span>
+                  </div>
+
+                  <div className="flex items-center space-x-2 text-sm">
+                    <span className="text-slate-600 line-clamp-1">{evento.direccion}</span>
+                  </div>
+
 
                   {/* Horario */}
-                  {(evento.horaInicio || evento.horaFin) && (
-                    <div className="flex items-center space-x-2 text-sm">
-                      <Clock className="w-4 h-4 text-purple-600" />
-                      <span className="text-slate-600">
-                        {evento.horaInicio} {evento.horaFin && `- ${evento.horaFin}`}
-                      </span>
-                    </div>
-                  )}
+
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Clock className="w-4 h-4 text-purple-600" />
+                    <span className="text-slate-600">
+                      {evento.horaInicio} {evento.horaFin && `- ${evento.horaFin}`}
+                    </span>
+                    <span className="ml-2 text-xs text-slate-500">
+                      ({evento.duracionDias} día{evento.duracionDias > 1 ? 's' : ''})
+                    </span>
+                  </div>
+
+
 
                   {/* Capacidad */}
-                  {evento.capacidadMaxima && (
-                    <div className="flex items-center space-x-2 text-sm">
-                      <Users className="w-4 h-4 text-green-600" />
-                      <span className="text-slate-600">Máximo {evento.capacidadMaxima} participantes</span>
-                    </div>
-                  )}
+
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Users className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-600">Máximo {evento.cuposDisponibles} participantes</span>
+                  </div>
+
 
                   {/* Precio */}
-                  {evento.precio && (
-                    <div className="flex items-center space-x-2 text-sm">
-                      <DollarSign className="w-4 h-4 text-emerald-600" />
-                      <span className="font-semibold text-emerald-600">
-                        {/*formatearPrecio(evento.precio)*/}
-                      </span>
-                    </div>
-                  )}
+
+                  <div className="flex items-center space-x-2 text-sm">
+                    <DollarSign className="w-4 h-4 text-emerald-600" />
+                    <span className="font-semibold text-emerald-600">
+                      {evento.precio}
+                    </span>
+                  </div>
+                  <span className="text-xs">
+                    Estado: {evento.active ? 'Activo' : 'Inactivo'}
+                  </span>
+
 
                   {/* Servicios incluidos */}
                   <div className="flex flex-wrap gap-2">

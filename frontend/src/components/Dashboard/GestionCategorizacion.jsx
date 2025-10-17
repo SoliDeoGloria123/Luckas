@@ -14,12 +14,14 @@ const GestionCategorizacion = () => {
     const [seccionActiva, setSeccionActiva] = useState("dashboard");
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
     const [nuevaCategoria, setNuevaCategoria] = useState({ nombre: "", codigo: "", estado: "activo" });
+    const [estadisticas, setEstadisticas] = useState({ totalCategorias: 0, categoriasActivas: 0, categoriasInactivas: 0, nuevasEsteMes: 0 });
 
     // Obtener categorías
     const obtenerCategorias = async () => {
         try {
             const res = await categorizacionService.getAll();
             setCategorias(res.data || []);
+            obtenerEstadisticas();
         } catch (error) {
             setCategorias([]);
         }
@@ -71,6 +73,28 @@ const GestionCategorizacion = () => {
         }
     };
 
+    const obtenerEstadisticas = async () => {
+        try {
+            const stats = await categorizacionService.getStats();
+            setEstadisticas(stats);
+        } catch (error) {
+            console.error("Error al obtener estadísticas de categorías:", error);
+        }
+    };
+
+    const handleToggleEstado = async (categoria) => {
+        const nuevoEstado = categoria.estado === "activo" ? "inactivo" : "activo";
+        try {
+            await categorizacionService.toggleActivation(categoria._id, nuevoEstado);
+            mostrarAlerta("¡Éxito!", `Categoría actualizada a ${nuevoEstado}`);
+            obtenerCategorias(); // refresca la lista
+        } catch (error) {
+            mostrarAlerta("Error", "No se pudo actualizar el estado");
+        }
+    };
+
+
+
     // Abrir modal para crear
     const abrirModalCrear = () => {
         setModoEdicion(false);
@@ -121,38 +145,38 @@ const GestionCategorizacion = () => {
                     <div className="dashboard-grid-reporte-admin">
                         <div className="stat-card-reporte-admin">
                             <div className="stat-icon-reporte-admin-admin users">
-                                <i className="fas fa-users"></i>
+                                <i className="fas fa-layer-group"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>5</h3>
-                                <p>Total Usuarios</p>
+                                <h3>{estadisticas.totalCategorias}</h3>
+                                <p>Total Categorías</p>
                             </div>
                         </div>
                         <div className="stat-card-reporte-admin">
                             <div className="stat-icon-reporte-admin-admin active">
-                                <i className="fas fa-user-check"></i>
+                                <i className="fas fa-check-circle"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>4</h3>
-                                <p>Usuarios Activos</p>
+                                <h3>{estadisticas.categoriasActivas}</h3>
+                                <p>Categorías Activas</p>
                             </div>
                         </div>
                         <div className="stat-card-reporte-admin">
                             <div className="stat-icon-reporte-admin-admin admins">
-                                <i className="fas fa-user-shield"></i>
+                                <i className="fas fa-times-circle"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>1</h3>
-                                <p>Administradores</p>
+                                <h3>{estadisticas.categoriasInactivas}</h3>
+                                <p>Categorías Inactivas</p>
                             </div>
                         </div>
                         <div className="stat-card-reporte-admin">
                             <div className="stat-icon-reporte-admin-admin new">
-                                <i className="fas fa-user-plus"></i>
+                                <i className="fas fa-plus-circle"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>12</h3>
-                                <p>Nuevos Este Mes</p>
+                                <h3>{estadisticas.nuevasEsteMes}</h3>
+                                <p>Nuevas Este Mes</p>
                             </div>
                         </div>
                     </div>
@@ -187,6 +211,7 @@ const GestionCategorizacion = () => {
                         categorias={categoriasPaginadas}
                         onEditar={abrirModalEditar}
                         onEliminar={eliminarCategoria}
+                        onToggleEstado={handleToggleEstado}
                     />
                     <CategorizacionModal
                         mostrar={mostrarModal}

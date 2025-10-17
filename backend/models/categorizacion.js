@@ -20,9 +20,10 @@ const categorizacionSchema = new mongoose.Schema({
     uppercase: true,
     trim: true
   },
-  activo: {
-    type: Boolean,
-    default: true
+  estado: {
+    type: String,
+    enum: ['activo', 'inactivo'],
+    default: 'activo'
   },
   creadoPor: {
     type: mongoose.Schema.Types.ObjectId, 

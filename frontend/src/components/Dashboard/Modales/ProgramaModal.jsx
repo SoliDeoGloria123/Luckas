@@ -10,6 +10,12 @@ const ProgramaModal = ({
   onClose,
   onSubmit
 }) => {
+    // Obtener la fecha de hoy en formato YYYY-MM-DD
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -80,18 +86,28 @@ const ProgramaModal = ({
     }));
   };
 
+
+
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.titulo?.trim()) newErrors.titulo = 'El título es requerido';
     if (!formData.descripcion?.trim()) newErrors.descripcion = 'La descripción es requerida';
     if (!formData.duracion?.trim()) newErrors.duracion = 'La duración es requerida';
     if (!formData.precio) newErrors.precio = 'El precio es requerido';
-    if (!formData.fechaInicio) newErrors.fechaInicio = 'La fecha de inicio es requerida';
-    if (!formData.fechaFin) newErrors.fechaFin = 'La fecha de fin es requerida';
+    if (!formData.fechaInicio) {
+      newErrors.fechaInicio = 'La fecha de inicio es requerida';
+    } else if (formData.fechaInicio < todayStr) {
+      newErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a hoy';
+    }
+    if (!formData.fechaFin) {
+      newErrors.fechaFin = 'La fecha de fin es requerida';
+    } else if (formData.fechaFin < todayStr) {
+      newErrors.fechaFin = 'La fecha de fin no puede ser anterior a hoy';
+    } else if (formData.fechaFin < formData.fechaInicio) {
+      newErrors.fechaFin = 'La fecha de fin no puede ser anterior a la de inicio';
+    }
     if (!formData.cupos) newErrors.cupos = 'Los cupos son requeridos';
     if (!formData.profesor?.trim()) newErrors.profesor = 'El profesor es requerido';
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -244,6 +260,7 @@ const ProgramaModal = ({
                 name="fechaInicio"
                 value={formData.fechaInicio}
                 onChange={handleInputChange}
+                min={todayStr}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.fechaInicio ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -260,6 +277,7 @@ const ProgramaModal = ({
                 name="fechaFin"
                 value={formData.fechaFin}
                 onChange={handleInputChange}
+                min={todayStr}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.fechaFin ? 'border-red-500' : 'border-gray-300'
                 }`}

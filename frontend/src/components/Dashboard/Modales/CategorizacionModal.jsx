@@ -16,7 +16,7 @@ const CategorizacionModal = ({
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
         <div
-          className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
+          className="4sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
           style={{
             background: 'linear-gradient(90deg, var(--color-blue-principal), var(--color-blue-oscuro))',
             color: 'white'
@@ -84,17 +84,17 @@ const CategorizacionModal = ({
               </div>
             </div>
             <div className="form-grupo-admin">
-            <label>Activo:</label>
+            <label>Estado:</label>
             <select
-              value={modoEdicion ? categoriaSeleccionada?.activo : nuevaCategoria.activo}
+              value={modoEdicion ? categoriaSeleccionada?.estado : nuevaCategoria.estado}
               onChange={e =>
                 modoEdicion
-                  ? setCategoriaSeleccionada({ ...categoriaSeleccionada, activo: e.target.value === "true" })
-                  : setNuevaCategoria({ ...nuevaCategoria, activo: e.target.value === "true" })
+                  ? setCategoriaSeleccionada({ ...categoriaSeleccionada, estado: e.target.value })
+                  : setNuevaCategoria({ ...nuevaCategoria, estado: e.target.value })
               }
             >
-              <option value="true">Activo</option>
-              <option value="false">Desactivado</option>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
             </select>
             </div>
           </div>

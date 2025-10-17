@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Users,
     Settings,
@@ -18,7 +18,17 @@ import {
 
 const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionActiva }) => {
     const navigate = useNavigate();
+    const location = useLocation();
 
+    // Determinar la sección activa según la ruta actual
+    const getActiveSection = () => {
+        const path = location.pathname;
+        // Extraer el id de la ruta: /admin/usuarios => usuarios
+        const match = path.match(/^\/admin\/([^/]+)/);
+        if (match) return match[1];
+        return seccionActiva;
+    };
+    const activeSection = getActiveSection();
 
     const menuItems = [
         {
@@ -57,7 +67,7 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
     ];
     return (
         <>
-         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
             {/* Sidebar Premium con animaciones */}
             <div className={`fixed left-0 top-0 h-full glass-card border-r shadow-2xl transition-all duration-300 z-30 ${sidebarAbierto ? 'w-72' : 'w-20'}`}>
                 {/* Logo con efecto shimmer */}
@@ -88,15 +98,15 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
                                 <ul className="space-y-1">
                                     {section.items.map((item, itemIndex) => {
                                         const Icon = item.icon;
-                                        const isActive = seccionActiva === item.id;
+                                        const isActive = activeSection === item.id;
                                         return (
                                             <li key={item.id} style={{ animationDelay: `${(sectionIndex * 4 + itemIndex) * 0.05}s` }}>
                                                 <button
                                                     onClick={() => {
-                                                        setSeccionActiva(item.id);
                                                         if (["dashboard", "usuarios", "categorizacion", "programas-academicos", "solicitudes", "inscripciones", "certificaciones", "tareas", "cabanas", "reservas", "reportes", "eventos"].includes(item.id)) {
                                                             navigate(`/admin/${item.id}`);
                                                         }
+                                                        setSeccionActiva(item.id);
                                                     }}
                                                     className={`sidebar-item w-full flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200 group ${isActive
                                                         ? `active text-white shadow-lg ${item.color}`

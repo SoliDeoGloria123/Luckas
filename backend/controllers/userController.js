@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { normalizeTipoDocumento } = require('../utils/userValidation');
 //const { use } = require('react');
 
-//Obtener todos los usuarios (Solo Admin)
+//Obtener todos los usuarios (Admin tesorero)
 exports.getAllUsers = async (req, res) => {
     console.log('[CONTROLLER] Ejecutando getAllUsers');
     try {
@@ -24,8 +24,8 @@ exports.getAllUsers = async (req, res) => {
 };
 
 //Obtener usuario espesifico
-exports.getUserById = async(req, res)=>{
-    try{
+exports.getUserById = async (req, res) => {
+    try {
         console.log('[CONTROLLER] getUserById - req.userId:', req.userId);
         console.log('[CONTROLLER] getUserById - req.userRole:', req.userRole);
         console.log('[CONTROLLER] getUserById - params.id:', req.params.id);
@@ -148,7 +148,7 @@ exports.createUser = async (req, res) => {
     }
 };
 
-// actualizar usuario (admin y coordinador)
+// actualizar usuario (admin y tesorero)
 exports.updateUser = async (req, res) => {
     try {
         // Normalizar el tipo de documento si está presente en la actualización
@@ -182,16 +182,16 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-// Actualizar perfil propio
+// Actualizar perfil propio usuarios
 exports.updateOwnProfile = async (req, res) => {
     console.log('[CONTROLLER] Ejecutando updateOwnProfile para usuario:', req.userId);
     console.log('[CONTROLLER] Datos recibidos:', req.body);
     try {
-        const { 
-            nombre, 
-            apellido, 
-            telefono, 
-            correo, 
+        const {
+            nombre,
+            apellido,
+            telefono,
+            correo,
             tipoDocumento,
             numeroDocumento,
             fechaNacimiento,
@@ -201,7 +201,7 @@ exports.updateOwnProfile = async (req, res) => {
             idiomas,
             especialidad
         } = req.body;
-        
+
         // Validar que el usuario existe
         const user = await User.findById(req.userId);
         if (!user) {
@@ -232,8 +232,8 @@ exports.updateOwnProfile = async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(
             req.userId,
             updateData,
-            { 
-                new: true, 
+            {
+                new: true,
                 runValidators: false // Desactivar validadores para evitar problemas con documentos existentes
             }
         ).select('-password');
@@ -267,7 +267,7 @@ exports.changePassword = async (req, res) => {
     console.log('[CONTROLLER] Ejecutando changePassword para usuario:', req.userId);
     try {
         const { currentPassword, newPassword } = req.body;
-        
+
         if (!currentPassword || !newPassword) {
             return res.status(400).json({
                 success: false,
@@ -311,6 +311,47 @@ exports.changePassword = async (req, res) => {
         });
     }
 };
+// Estadísticas de usuarios para dashboard
+exports.getUserStats = async (req, res) => {
+    try {
+        const total = await User.countDocuments();
+        const activos = await User.countDocuments({ estado: 'activo' });
+        const administradores = await User.countDocuments({ role: 'admin' });
+        // Nuevos este mes
+        const now = new Date();
+        const primerDiaMes = new Date(now.getFullYear(), now.getMonth(), 1);
+        const nuevosEsteMes = await User.countDocuments({ createdAt: { $gte: primerDiaMes } });
+        res.json({
+            success: true,
+            stats: {
+                totalUsuarios: total,
+                usuariosActivos: activos,
+                administradores,
+                nuevosEsteMes
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error al obtener estadísticas', error: error.message });
+    }
+};
+// Activar/desactivar usuario por ID
+exports.toggleUserActivation = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { estado } = req.body; // 'activo' o 'inactivo'
+        if (!['activo', 'inactivo'].includes(estado)) {
+            return res.status(400).json({ success: false, message: 'Estado inválido' });
+        }
+        const user = await User.findByIdAndUpdate(id, { estado }, { new: true }).select('-password');
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        }
+        res.json({ success: true, message: `Usuario actualizado a ${estado}`, user });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error al actualizar estado', error: error.message });
+    }
+};
+
 
 // Eliminar usuaario (solo admin)
 exports.deleteUser = async (req, res) => {

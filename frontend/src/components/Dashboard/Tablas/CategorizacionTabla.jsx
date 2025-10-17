@@ -1,5 +1,5 @@
 import React from "react";
-const TablaCategorias = ({ categorias, onEditar, onEliminar }) => (
+const TablaCategorias = ({ categorias, onEditar, onEliminar, onToggleEstado }) => (
   <div className="tabla-contenedor-admin">
     <table className="tabla-usuarios-admin">
       <thead>
@@ -35,6 +35,17 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar }) => (
                   {onEliminar && (
                     <button className="btn-action eliminar" onClick={() => onEliminar(cat._id)}><i class="fas fa-trash"></i></button>
                   )}
+
+                  <button
+                    className={`btn-action ${cat.estado === "activo" ? "desactivar" : "activar"}`}
+                    onClick={() => onToggleEstado(cat)}
+                  >
+                    {cat.estado === "activo" ? (
+                      <i className="fas fa-ban"></i> // ícono para desactivar
+                    ) : (
+                      <i className="fas fa-check"></i> // ícono para activar
+                    )}
+                  </button>
                 </div>
               </td>
             </tr>

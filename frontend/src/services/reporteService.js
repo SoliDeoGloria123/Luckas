@@ -1,9 +1,9 @@
-const API_URL = "http://localhost:3000/api/reportes";
+const API_URL = "http://localhost:3000/api";
 
 export const reporteService = {
   // Reporte del dashboard
   getDashboard: async () => {
-    const res = await fetch(`${API_URL}/dashboard`, {
+    const res = await fetch(`${API_URL}/reportes/dashboard`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -19,7 +19,7 @@ export const reporteService = {
     Object.keys(filtros).forEach(key => {
       if (filtros[key]) params.append(key, filtros[key]);
     });
-    
+
     const res = await fetch(`${API_URL}/reservas?${params}`, {
       headers: {
         "Content-Type": "application/json",
@@ -36,7 +36,7 @@ export const reporteService = {
     Object.keys(filtros).forEach(key => {
       if (filtros[key]) params.append(key, filtros[key]);
     });
-    
+
     const res = await fetch(`${API_URL}/inscripciones?${params}`, {
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export const reporteService = {
     Object.keys(filtros).forEach(key => {
       if (filtros[key]) params.append(key, filtros[key]);
     });
-    
+
     const res = await fetch(`${API_URL}/solicitudes?${params}`, {
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export const reporteService = {
     Object.keys(filtros).forEach(key => {
       if (filtros[key]) params.append(key, filtros[key]);
     });
-    
+
     const res = await fetch(`${API_URL}/usuarios?${params}`, {
       headers: {
         "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export const reporteService = {
     Object.keys(filtros).forEach(key => {
       if (filtros[key]) params.append(key, filtros[key]);
     });
-    
+
     const res = await fetch(`${API_URL}/eventos?${params}`, {
       headers: {
         "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export const reporteService = {
     Object.keys(filtros).forEach(key => {
       if (filtros[key]) params.append(key, filtros[key]);
     });
-    
+
     const res = await fetch(`${API_URL}/financiero?${params}`, {
       headers: {
         "Content-Type": "application/json",
@@ -121,7 +121,7 @@ export const reporteService = {
     Object.keys(filtros).forEach(key => {
       if (filtros[key]) params.append(key, filtros[key]);
     });
-    
+
     const res = await fetch(`${API_URL}/actividad-usuarios?${params}`, {
       headers: {
         "Content-Type": "application/json",
@@ -139,14 +139,14 @@ export const reporteService = {
       if (filtros[key]) params.append(key, filtros[key]);
     });
     params.append('format', 'pdf');
-    
+
     const res = await fetch(`${API_URL}/${tipoReporte}?${params}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
     if (!res.ok) throw new Error("Error al exportar reporte");
-    
+
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -165,14 +165,14 @@ export const reporteService = {
       if (filtros[key]) params.append(key, filtros[key]);
     });
     params.append('format', 'excel');
-    
+
     const res = await fetch(`${API_URL}/${tipoReporte}?${params}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
     if (!res.ok) throw new Error("Error al exportar reporte");
-    
+
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -185,15 +185,50 @@ export const reporteService = {
   },
 
   guardarReporte: async (reporte) => {
-  const res = await fetch('http://localhost:3000/api/reporte/guardar', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: JSON.stringify(reporte),
-  });
-  if (!res.ok) throw new Error('Error al guardar el reporte');
-  return await res.json();
-}
+    const res = await fetch(`${API_URL}/reportes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(reporte),
+    });
+    if (!res.ok) throw new Error('Error al guardar el reporte');
+    return await res.json();
+  },
+  getReportesGuardados: async () => {
+    const res = await fetch(`${API_URL}/reportes`, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    if (!res.ok) throw new Error("Error al obtener reportes guardados");
+    return await res.json();
+  },
+  editarReporte: async (id, datosActualizados) => {
+    const res = await fetch(`${API_URL}/reportes/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(datosActualizados),
+    });
+    if (!res.ok) throw new Error('Error al editar el reporte');
+    return await res.json();
+  },
+  eliminarReporte: async (id) => {
+    const res = await fetch(`${API_URL}/reportes/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    if (!res.ok) throw new Error('Error al eliminar el reporte');
+    return await res.json();
+  }
+
 };

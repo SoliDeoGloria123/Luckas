@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import ProgramasTabla from './Tablas/ProgramasTabla';
 import { programasAcademicosService } from '../../services/programasAcademicosService';
 import Sidebar from './Sidebar/Sidebar';
@@ -390,7 +389,7 @@ const ProgramasAcademicos = () => {
                             </div>
                             <div className="stat-info-admin">
                                 <h3>5</h3>
-                                <p>Total Usuarios</p>
+                                <p>Total de programas académicos</p>
                             </div>
                         </div>
                         <div className="stat-card-reporte-admin">
@@ -399,7 +398,7 @@ const ProgramasAcademicos = () => {
                             </div>
                             <div className="stat-info-admin">
                                 <h3>4</h3>
-                                <p>Usuarios Activos</p>
+                                <p>Total de cursos</p>
                             </div>
                         </div>
                         <div className="stat-card-reporte-admin">
@@ -408,7 +407,25 @@ const ProgramasAcademicos = () => {
                             </div>
                             <div className="stat-info-admin">
                                 <h3>1</h3>
-                                <p>Administradores</p>
+                                <p>Total de programas técnicos</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin admins">
+                                <i className="fas fa-user-shield"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>1</h3>
+                                <p>Programas activos</p>
+                            </div>
+                        </div>
+                        <div className="stat-card-reporte-admin">
+                            <div className="stat-icon-reporte-admin-admin admins">
+                                <i className="fas fa-user-shield"></i>
+                            </div>
+                            <div className="stat-info-admin">
+                                <h3>1</h3>
+                                <p>Programas inactivos</p>
                             </div>
                         </div>
                         <div className="stat-card-reporte-admin">
@@ -417,7 +434,7 @@ const ProgramasAcademicos = () => {
                             </div>
                             <div className="stat-info-admin">
                                 <h3>12</h3>
-                                <p>Nuevos Este Mes</p>
+                                <p>Nuevos programas este mes</p>
                             </div>
                         </div>
                     </div>

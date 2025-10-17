@@ -6,7 +6,10 @@ const {
   obtenerCategoriaPorId,
   actualizarCategoria,
   eliminarCategoria,
-  categorizarSolicitud 
+  categorizarSolicitud,
+  activarDesactivarCategoria,
+  estadisticasCategorias
+
 } = require('../controllers/categorizacionController');
 const { authJwt, role } = require('../middlewares');
 
@@ -15,13 +18,15 @@ router.use(authJwt.verifyToken);
 
 // Rutas de consulta (todos los roles autenticados)
 router.get('/', obtenerCategorias);
+router.get('/estadistica', role.checkRole('admin', 'tesorero'), estadisticasCategorias);
 router.get('/:id', obtenerCategoriaPorId);
+//ruta para desabilitar y activar categoria
+router.patch('/toggle-activation/:id', role.checkRole('admin', 'tesorero'), activarDesactivarCategoria);
 
 // Rutas de creación y modificación (admin y tesorero)
 router.post('/', role.checkRole('admin', 'tesorero'), crearCategoria);
 router.put('/:id', role.checkRole('admin', 'tesorero'), actualizarCategoria);
 router.put('/solicitud/:id/categorizar', role.checkRole('admin', 'tesorero'), categorizarSolicitud);
-
 // Rutas de eliminación (solo admin)
 router.delete('/:id', role.isAdmin, eliminarCategoria);
 

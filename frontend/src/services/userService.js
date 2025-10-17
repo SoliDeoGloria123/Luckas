@@ -64,4 +64,18 @@ export const userService = {
     apiRequest(`/users/${userId}`, {
       method: "GET",
     }),
+  //activar y desactivar usuario
+  toggleUserEstado: (userId, estado) =>
+    apiRequest(`/users/toggle-activation/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify({ estado })
+    }),
+  //obtener estadisticas de usuarios
+  getUserStats: () =>
+    apiRequest("/users/estadistica")
+      .then(res => res.stats),
 };

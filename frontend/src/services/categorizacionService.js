@@ -54,5 +54,28 @@ export const categorizacionService = {
     });
     if (!res.ok) throw new Error("Error al eliminar categoría");
     return await res.json();
-  }
+  },
+
+  //Activar o desactivar categoría
+  toggleActivation: async (id, estado) => {
+    const res = await fetch(`${API_URL}/toggle-activation/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify({ estado })
+    });
+    if (!res.ok) throw new Error("Error al cambiar estado de categoría");
+    return await res.json();
+  },
+  //Estadisticas de categorías
+getStats: async () => {
+  const res = await fetch(`${API_URL}/estadistica`, {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+  });
+  if (!res.ok) throw new Error("Error al obtener estadísticas de categorías");
+  const data = await res.json();
+  return data.stats; // <-- Devuelve solo el objeto stats
+}
 };

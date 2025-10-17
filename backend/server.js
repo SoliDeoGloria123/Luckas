@@ -20,9 +20,10 @@ const cabanasRoutes = require('./routes/cabanasRoutes');
 const inscripcionRoutes = require('./routes/inscripcionRoutes');
 const ReportesRoutes = require('./routes/reportesRoutes');
 const programasAcademicosRoutes = require('./routes/programaAcademicoRoutes');
-const reporteguardarRoutes = require('./routes/reporteRoutes');
+const reporteguardarRoutes = require('./routes/reportesRoutes');
 const comentarioEventoRoutes = require('./routes/comentarioEventoRoutes');
 const certificadoRoutes = require('./routes/certificadoRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 // Inicializar Express
 const app = express();
@@ -59,6 +60,7 @@ app.use('/api/programas-academicos', programasAcademicosRoutes);
 app.use('/api/reporte', reporteguardarRoutes);
 app.use('/api/comentarios-evento', comentarioEventoRoutes);
 app.use('/api/certificados', certificadoRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Ruta para el login/admin - redirigir al frontend React
 app.get('/admin', (req, res) => {

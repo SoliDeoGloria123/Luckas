@@ -121,7 +121,12 @@ const ProfilePanel = ({ isOpen, onClose, currentUser, onUserUpdate }) => {
       
       // Actualizar usuario en el componente padre
       if (onUserUpdate) {
-        onUserUpdate(response.data || response);
+        // Si la respuesta viene como { user: {...} }, usar user.user
+        if (response && response.user) {
+          onUserUpdate(response.user);
+        } else {
+          onUserUpdate(response.data || response);
+        }
       }
     } catch (error) {
       console.error('Error updating profile:', error);
