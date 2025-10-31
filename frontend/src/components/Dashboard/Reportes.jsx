@@ -5,7 +5,7 @@ import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import ReportesTabla from './Tablas/ReportesTabla';
 import ReporteModal from './Modales/ReporteModal';
-import { mostrarAlerta } from '../utils/alertas';
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import { Download, FileSpreadsheet } from "lucide-react"
 
 const Reportes = () => {
@@ -127,7 +127,7 @@ const Reportes = () => {
       await reporteService.guardarReporte(data);
       setMostrarModal(false);
       mostrarAlerta('¡Éxito!', 'Reporte guardado exitosamente');
-
+      cargarReportesGuardados(); // Recargar la lista
     } catch (err) {
       mostrarAlerta('Error al guardar el reporte: ' + err.message, 'error');
       setError(err.message || "Error al guardar el reporte");
@@ -143,19 +143,21 @@ const Reportes = () => {
     try {
       await reporteService.editarReporte(id, datosActualizados);
       mostrarAlerta('Reporte editado correctamente', 'success');
+      cargarReportesGuardados();
       setMostrarModal(false);
       setReporteEditando(null);
       setModoEdicion(false);
-      cargarReportesGuardados();
     } catch (err) {
       mostrarAlerta('Error al editar el reporte: ' + err.message, 'error');
     }
   };
   // Eliminar un reporte guardado
   const eliminarReporte = async (id) => {
+    const confirmacion = await mostrarConfirmacion('¿Estás seguro de que deseas eliminar este reporte? Esta acción no se puede deshacer.');
+    if (!confirmacion) return;
     try {
       await reporteService.eliminarReporte(id);
-      mostrarAlerta('Reporte eliminado correctamente', 'success');
+      mostrarAlerta("¡Éxito!","Reporte eliminado correctamente");
       cargarReportesGuardados();
     } catch (err) {
       mostrarAlerta('Error al eliminar el reporte: ' + err.message, 'error');
@@ -316,7 +318,11 @@ const Reportes = () => {
         </div>
         <ReporteModal
           mostrar={mostrarModal}
-          onClose={cerrarModal}
+          onClose={() => {
+            setMostrarModal(false);
+            setReporteEditando(null);
+            setModoEdicion(false);
+          }}
           onSubmit={(data) => {
             if (modoEdicion && reporteEditando) {
               editarReporte(reporteEditando._id || reporteEditando.id, data);
@@ -488,7 +494,7 @@ const Reportes = () => {
           setSidebarAbierto={setSidebarAbierto}
           seccionActiva={seccionActiva}
         />
-        <div className="reportes-container">
+        <div className="reportes-container w-full max-w-full px-2 md:px-8">
           {/*<div className="reportes-header">
             <div className='page-title-reporte'>
               <h1>Sistema de Reportes</h1>
@@ -528,12 +534,12 @@ const Reportes = () => {
             </div>
           </div>*/}
           {/* Page Header */}
-          <div className="mb-6 flex items-start justify-between">
+          <div className="mb-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div>
               <h1 className="font-bold text-3xl text-gray-900 mb-2">Sistema de Reportes</h1>
               <p className="text-gray-600">Genera y administra reportes del sistema</p>
             </div>
-            <div className="flex items-center gap-3">
+           <div className="flex flex-wrap items-center gap-2 md:gap-3 justify-end w-full md:w-auto">
               <button
                 //onClick={handleExportPDF}
                 className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
@@ -554,6 +560,7 @@ const Reportes = () => {
               >
                 + Nuevo Reporte
               </button>
+             
             </div>
           </div>
           {tipoReporte !== 'dashboard' && (

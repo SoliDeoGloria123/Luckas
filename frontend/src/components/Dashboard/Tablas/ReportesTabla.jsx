@@ -16,8 +16,7 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
-  Download,
-FileSpreadsheet
+  Pencil
 } from "lucide-react"
 import {
   LineChart,
@@ -29,318 +28,11 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from "recharts"
 
-const MOCK_DATA = {
-  usuarios: [
-    {
-      id: 1,
-      nombre: "Juan Pérez",
-      email: "juan@example.com",
-      rol: "Administrador",
-      estado: "Activo",
-      fechaRegistro: "2025-01-15",
-    },
-    {
-      id: 2,
-      nombre: "María García",
-      email: "maria@example.com",
-      rol: "Usuario",
-      estado: "Activo",
-      fechaRegistro: "2025-02-20",
-    },
-    {
-      id: 3,
-      nombre: "Carlos López",
-      email: "carlos@example.com",
-      rol: "Usuario",
-      estado: "Inactivo",
-      fechaRegistro: "2025-01-10",
-    },
-    {
-      id: 4,
-      nombre: "Ana Martínez",
-      email: "ana@example.com",
-      rol: "Moderador",
-      estado: "Activo",
-      fechaRegistro: "2025-03-05",
-    },
-    {
-      id: 5,
-      nombre: "Pedro Sánchez",
-      email: "pedro@example.com",
-      rol: "Usuario",
-      estado: "Activo",
-      fechaRegistro: "2025-02-28",
-    },
-  ],
-  inscripciones: [
-    {
-      id: 1,
-      estudiante: "Juan Pérez",
-      programa: "Administración de Empresas",
-      fecha: "2025-01-15",
-      estado: "Confirmada",
-      monto: "$350",
-    },
-    {
-      id: 2,
-      estudiante: "María García",
-      programa: "Pintura al Óleo",
-      fecha: "2025-02-20",
-      estado: "Pendiente",
-      monto: "$120",
-    },
-    {
-      id: 3,
-      estudiante: "Carlos López",
-      programa: "Inglés Conversacional",
-      fecha: "2025-01-10",
-      estado: "Confirmada",
-      monto: "$200",
-    },
-    {
-      id: 4,
-      estudiante: "Ana Martínez",
-      programa: "Yoga y Meditación",
-      fecha: "2025-03-05",
-      estado: "Confirmada",
-      monto: "$80",
-    },
-    {
-      id: 5,
-      estudiante: "Pedro Sánchez",
-      programa: "Administración de Empresas",
-      fecha: "2025-02-28",
-      estado: "Cancelada",
-      monto: "$350",
-    },
-  ],
-  reservas: [
-    {
-      id: 1,
-      cliente: "Juan Pérez",
-      cabaña: "Cabaña del Bosque",
-      fechaInicio: "2025-03-15",
-      fechaFin: "2025-03-20",
-      estado: "Confirmada",
-      total: "$450",
-    },
-    {
-      id: 2,
-      cliente: "María García",
-      cabaña: "Cabaña del Lago",
-      fechaInicio: "2025-04-01",
-      fechaFin: "2025-04-05",
-      estado: "Pendiente",
-      total: "$380",
-    },
-    {
-      id: 3,
-      cliente: "Carlos López",
-      cabaña: "Cabaña de la Montaña",
-      fechaInicio: "2025-02-10",
-      fechaFin: "2025-02-15",
-      estado: "Completada",
-      total: "$520",
-    },
-    {
-      id: 4,
-      cliente: "Ana Martínez",
-      cabaña: "Cabaña del Bosque",
-      fechaInicio: "2025-05-20",
-      fechaFin: "2025-05-25",
-      estado: "Confirmada",
-      total: "$450",
-    },
-  ],
-  eventos: [
-    {
-      id: 1,
-      nombre: "Taller de Liderazgo",
-      fecha: "2025-03-25",
-      ubicacion: "Auditorio Principal",
-      asistentes: 45,
-      estado: "Programado",
-    },
-    {
-      id: 2,
-      nombre: "Conferencia de Innovación",
-      fecha: "2025-04-10",
-      ubicacion: "Sala de Conferencias",
-      asistentes: 120,
-      estado: "Programado",
-    },
-    {
-      id: 3,
-      nombre: "Retiro Espiritual",
-      fecha: "2025-02-15",
-      ubicacion: "Centro de Retiros",
-      asistentes: 30,
-      estado: "Completado",
-    },
-    {
-      id: 4,
-      nombre: "Seminario de Finanzas",
-      fecha: "2025-05-05",
-      ubicacion: "Auditorio Principal",
-      asistentes: 80,
-      estado: "Programado",
-    },
-  ],
-  solicitudes: [
-    {
-      id: 1,
-      solicitante: "Juan Pérez",
-      tipo: "Certificado",
-      fecha: "2025-02-20",
-      estado: "Pendiente",
-      prioridad: "Alta",
-    },
-    {
-      id: 2,
-      solicitante: "María García",
-      tipo: "Constancia",
-      fecha: "2025-02-22",
-      estado: "Aprobada",
-      prioridad: "Media",
-    },
-    {
-      id: 3,
-      solicitante: "Carlos López",
-      tipo: "Reembolso",
-      fecha: "2025-02-18",
-      estado: "Rechazada",
-      prioridad: "Baja",
-    },
-    {
-      id: 4,
-      solicitante: "Ana Martínez",
-      tipo: "Certificado",
-      fecha: "2025-02-25",
-      estado: "Pendiente",
-      prioridad: "Alta",
-    },
-  ],
-  programas: [
-    {
-      id: 1,
-      nombre: "Administración de Empresas",
-      categoria: "Técnico",
-      duracion: "16 semanas",
-      inscritos: 25,
-      estado: "Activo",
-    },
-    { id: 2, nombre: "Pintura al Óleo", categoria: "Arte", duracion: "10 semanas", inscritos: 15, estado: "Activo" },
-    {
-      id: 3,
-      nombre: "Inglés Conversacional",
-      categoria: "Idiomas",
-      duracion: "12 semanas",
-      inscritos: 30,
-      estado: "Activo",
-    },
-    {
-      id: 4,
-      nombre: "Yoga y Meditación",
-      categoria: "Bienestar",
-      duracion: "6 semanas",
-      inscritos: 20,
-      estado: "Activo",
-    },
-  ],
-  certificaciones: [
-    {
-      id: 1,
-      estudiante: "Juan Pérez",
-      programa: "Administración de Empresas",
-      fechaEmision: "2025-02-28",
-      codigo: "CERT-2025-001",
-      estado: "Emitido",
-    },
-    {
-      id: 2,
-      estudiante: "María García",
-      programa: "Pintura al Óleo",
-      fechaEmision: "2025-03-05",
-      codigo: "CERT-2025-002",
-      estado: "Emitido",
-    },
-    {
-      id: 3,
-      estudiante: "Carlos López",
-      programa: "Inglés Conversacional",
-      fechaEmision: "2025-02-20",
-      codigo: "CERT-2025-003",
-      estado: "Emitido",
-    },
-  ],
-  tareas: [
-    {
-      id: 1,
-      titulo: "Revisar solicitudes",
-      asignado: "Admin",
-      fechaVencimiento: "2025-03-01",
-      estado: "Pendiente",
-      prioridad: "Alta",
-    },
-    {
-      id: 2,
-      titulo: "Actualizar base de datos",
-      asignado: "Admin",
-      fechaVencimiento: "2025-03-05",
-      estado: "En Progreso",
-      prioridad: "Media",
-    },
-    {
-      id: 3,
-      titulo: "Preparar informe mensual",
-      asignado: "Admin",
-      fechaVencimiento: "2025-02-28",
-      estado: "Completada",
-      prioridad: "Alta",
-    },
-  ],
-  cabanas: [
-    { id: 1, nombre: "Cabaña del Bosque", capacidad: 4, precio: "$90/noche", estado: "Disponible", reservasActivas: 2 },
-    { id: 2, nombre: "Cabaña del Lago", capacidad: 6, precio: "$120/noche", estado: "Disponible", reservasActivas: 1 },
-    {
-      id: 3,
-      nombre: "Cabaña de la Montaña",
-      capacidad: 8,
-      precio: "$150/noche",
-      estado: "Ocupada",
-      reservasActivas: 1,
-    },
-  ],
-  notificaciones: [
-    {
-      id: 1,
-      titulo: "Nueva inscripción",
-      mensaje: "Juan Pérez se inscribió en Administración",
-      fecha: "2025-02-28",
-      tipo: "Info",
-      leida: false,
-    },
-    {
-      id: 2,
-      titulo: "Solicitud pendiente",
-      mensaje: "Tienes 2 solicitudes pendientes de revisión",
-      fecha: "2025-02-27",
-      tipo: "Alerta",
-      leida: false,
-    },
-    {
-      id: 3,
-      titulo: "Evento próximo",
-      mensaje: "Taller de Liderazgo en 3 días",
-      fecha: "2025-02-26",
-      tipo: "Recordatorio",
-      leida: true,
-    },
-  ],
-}
+
 
 const REPORT_TYPES = [
   { value: "usuarios", label: "Usuarios", icon: Users },
@@ -354,66 +46,200 @@ const REPORT_TYPES = [
   { value: "cabanas", label: "Cabañas", icon: Home },
   { value: "notificaciones", label: "Notificaciones", icon: FileText },
 ]
+const generateChartData = (activeReport) => {
+  if (!activeReport || !activeReport.datos) return { trend: [], distribution: [] };
+  const est = activeReport.datos.estadisticas || {};
 
-const generateChartData = (reportType) => {
-  switch (reportType) {
-    case "usuarios":
-      return {
-        trend: [
-          { mes: "Ene", total: 12 },
-          { mes: "Feb", total: 18 },
-          { mes: "Mar", total: 25 },
-          { mes: "Abr", total: 32 },
-          { mes: "May", total: 28 },
-          { mes: "Jun", total: 35 },
-        ],
-        distribution: [
-          { name: "Administrador", value: 2 },
-          { name: "Moderador", value: 3 },
-          { name: "Usuario", value: 20 },
-        ],
-      }
-    case "inscripciones":
-      return {
-        trend: [
-          { mes: "Ene", total: 15 },
-          { mes: "Feb", total: 22 },
-          { mes: "Mar", total: 28 },
-          { mes: "Abr", total: 35 },
-          { mes: "May", total: 30 },
-          { mes: "Jun", total: 40 },
-        ],
-        distribution: [
-          { name: "Confirmada", value: 45 },
-          { name: "Pendiente", value: 12 },
-          { name: "Cancelada", value: 8 },
-        ],
-      }
-    case "reservas":
-      return {
-        trend: [
-          { mes: "Ene", total: 8 },
-          { mes: "Feb", total: 12 },
-          { mes: "Mar", total: 15 },
-          { mes: "Abr", total: 20 },
-          { mes: "May", total: 18 },
-          { mes: "Jun", total: 25 },
-        ],
-        distribution: [
-          { name: "Confirmada", value: 30 },
-          { name: "Pendiente", value: 10 },
-          { name: "Completada", value: 25 },
-        ],
-      }
-    default:
-      return {
-        trend: [],
-        distribution: [],
-      }
+  // Si no hay estadísticas pre-calculadas, intentar generar desde los datos directos
+  if (!est || Object.keys(est).length === 0) {
+    return generateChartsFromRawData(activeReport);
   }
-}
 
-const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) => {
+  // Distribución - buscar cualquier tipo de distribución disponible
+  let distribution = [];
+  if (est.porRol) {
+    distribution = est.porRol.map(e => ({ name: e._id, value: e.count }));
+  } else if (est.porEstado) {
+    distribution = est.porEstado.map(e => ({ name: e._id, value: e.count }));
+  } else if (est.porCategoria) {
+    distribution = est.porCategoria.map(e => ({ name: e._id, value: e.count }));
+  } else if (est.porEvento) {
+    distribution = est.porEvento.map(e => ({ name: e._id, value: e.count }));
+  } else if (est.porReferencia) {
+    distribution = est.porReferencia.map(e => ({ name: e._id, value: e.count }));
+  } else if (est.porTipoReferencia) {
+    distribution = est.porTipoReferencia.map(e => ({ name: e._id, value: e.count }));
+  } else if (est.porTipo) {
+    distribution = est.porTipo.map(e => ({ name: e._id, value: e.count }));
+  }
+
+  // Tendencia - buscar cualquier tipo de tendencia temporal disponible
+  let trend = [];
+  if (est.registrosPorMes) {
+    trend = est.registrosPorMes.map(e => ({
+      mes: e._id.mes ? `${e._id.mes}/${e._id.año}` : e._id,
+      total: e.count
+    }));
+  } else if (est.registrosPorFecha) {
+    trend = est.registrosPorFecha.map(e => ({
+      mes: e._id,
+      total: e.count
+    }));
+  }
+  return { trend, distribution };
+};
+
+// Función auxiliar para generar gráficas desde datos directos cuando no hay estadísticas
+const generateChartsFromRawData = (activeReport) => {
+  const datos = activeReport.datos;
+  let dataArray = [];
+
+
+  // Identificar el array de datos según el tipo de reporte
+  const tipoReporte = activeReport.tipo || activeReport.type;
+
+  if (datos.usuarios) {
+    dataArray = datos.usuarios;
+  } else if (datos.inscripciones) {
+    dataArray = datos.inscripciones;
+  } else if (datos.reservas) {
+    dataArray = datos.reservas;
+  } else if (datos.eventos) {
+    dataArray = datos.eventos;
+  } else if (datos.solicitudes) {
+    dataArray = datos.solicitudes;
+  } else if (Array.isArray(datos)) {
+    dataArray = datos;
+   
+  }
+
+  if (!dataArray || dataArray.length === 0) {
+
+    return { trend: [], distribution: [] };
+  }
+
+
+  // Generar distribución basada en el tipo de reporte
+  let distribution = [];
+
+  if (tipoReporte === 'usuarios') {
+    // Distribución por rol
+    const roleCount = {};
+    dataArray.forEach(user => {
+      const role = user.rol || user.role || user.roles?.[0] || 'Sin rol';
+      roleCount[role] = (roleCount[role] || 0) + 1;
+    });
+    distribution = Object.entries(roleCount).map(([name, value]) => ({ name, value }));
+  
+  } else if (tipoReporte === 'eventos') {
+    // Distribución por estado activo/inactivo
+    const statusCount = { 'Activos': 0, 'Inactivos': 0 };
+    dataArray.forEach(evento => {
+      if (evento.active || evento.activo) {
+        statusCount['Activos'] += 1;
+      } else {
+        statusCount['Inactivos'] += 1;
+      }
+    });
+    distribution = Object.entries(statusCount)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({ name, value }));
+   
+  } else if (tipoReporte === 'reservas') {
+    // Distribución por estado
+    const statusCount = {};
+    dataArray.forEach(reserva => {
+      const status = reserva.estado || reserva.status || 'Sin estado';
+      statusCount[status] = (statusCount[status] || 0) + 1;
+    });
+    distribution = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+    
+  } else if (tipoReporte === 'inscripciones') {
+    // Distribución por referencia (programa o evento)
+    const programCount = {};
+    dataArray.forEach(inscripcion => {
+      const programa = inscripcion.referencia?.name || inscripcion.referencia?.nombre || inscripcion.programa || inscripcion.evento?.name || inscripcion.evento?.nombre || 'Sin referencia';
+      programCount[programa] = (programCount[programa] || 0) + 1;
+    });
+    distribution = Object.entries(programCount).map(([name, value]) => ({ name, value }));
+  
+  } else if (tipoReporte === 'solicitudes') {
+    // Distribución por estado
+    const statusCount = {};
+    dataArray.forEach(solicitud => {
+      const status = solicitud.estado || 'Sin estado';
+      statusCount[status] = (statusCount[status] || 0) + 1;
+    });
+    distribution = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+
+  } else if (tipoReporte === 'cabañas' || tipoReporte === 'cabanas') {
+    // Distribución por disponibilidad
+    const statusCount = {};
+    dataArray.forEach(cabana => {
+      const status = cabana.disponible ? 'Disponibles' : 'No disponibles';
+      statusCount[status] = (statusCount[status] || 0) + 1;
+    });
+    distribution = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+    
+  } else if (tipoReporte === 'tareas') {
+    // Distribución por estado
+    const statusCount = {};
+    dataArray.forEach(tarea => {
+      const status = tarea.estado || tarea.completada ? 'Completadas' : 'Pendientes';
+      statusCount[status] = (statusCount[status] || 0) + 1;
+    });
+    distribution = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+   
+  } else if (tipoReporte === 'programas') {
+    // Distribución por estado activo/inactivo
+    const statusCount = { 'Activos': 0, 'Inactivos': 0 };
+    dataArray.forEach(programa => {
+      if (programa.activo) {
+        statusCount['Activos'] += 1;
+      } else {
+        statusCount['Inactivos'] += 1;
+      }
+    });
+    distribution = Object.entries(statusCount)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({ name, value }));
+  
+  }
+
+  // Generar tendencia basada en fechas
+  let trend = [];
+  const monthCount = {};
+
+  dataArray.forEach(item => {
+    let date = null;
+
+    // Intentar diferentes campos de fecha según el tipo de datos
+    if (item.fechaEvento) date = new Date(item.fechaEvento);
+    else if (item.createdAt) date = new Date(item.createdAt);
+    else if (item.fechaRegistro) date = new Date(item.fechaRegistro);
+    else if (item.fecha) date = new Date(item.fecha);
+    else if (item.fechaInicio) date = new Date(item.fechaInicio);
+
+    if (date && !isNaN(date.getTime())) {
+      const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`;
+      monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
+    }
+  });
+
+  trend = Object.entries(monthCount)
+    .sort(([a], [b]) => {
+      const [aMonth, aYear] = a.split('/').map(Number);
+      const [bMonth, bYear] = b.split('/').map(Number);
+      return aYear - bYear || aMonth - bMonth;
+    })
+    .map(([mes, total]) => ({ mes, total }));
+
+
+
+  return { trend, distribution };
+};
+
+const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) => {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedReportType, setSelectedReportType] = useState("")
   const [reportFilters, setReportFilters] = useState({
@@ -426,15 +252,42 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
   const [activeReport, setActiveReport] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
+  const [alertaDatos, setAlertaDatos] = useState("")
   const itemsPerPage = 5
 
   const filteredData = useMemo(() => {
-    if (!activeReport) return []
-    const data = MOCK_DATA[activeReport.type] || []
+    if (!activeReport) return [];
+
+
+    let data = [];
+    if (activeReport.datos) {
+      if (activeReport.datos.reservas) {
+        data = activeReport.datos.reservas;
+      } else if (activeReport.datos.inscripciones) {
+        data = activeReport.datos.inscripciones;
+      } else if (activeReport.datos.usuarios) {
+        data = activeReport.datos.usuarios;
+      } else if (activeReport.datos.eventos) {
+        data = activeReport.datos.eventos;
+      } else if (activeReport.datos.solicitudes) {
+        data = activeReport.datos.solicitudes;
+      } else if (activeReport.datos.cabanas) {
+        data = activeReport.datos.cabanas;
+      } else if (activeReport.datos.tareas) {
+        data = activeReport.datos.tareas;
+      } else if (activeReport.datos.certificaciones) {
+        data = activeReport.datos.certificaciones;
+      } else if (activeReport.datos.notificaciones) {
+        data = activeReport.datos.notificaciones;
+      } else if (Array.isArray(activeReport.datos)) {
+        data = activeReport.datos;
+      }
+    }
+
     return data.filter((item) =>
-      Object.values(item).some((value) => String(value).toLowerCase().includes(searchTerm.toLowerCase())),
-    )
-  }, [activeReport, searchTerm])
+      Object.values(item).some((value) => String(value).toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [activeReport, searchTerm]);
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage
@@ -476,34 +329,7 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
   return (
     <div className="flex min-h-screen bg-gray-50">
       <div className="flex-1">{/* Sidebar removido temporalmente */}
-         <div className="mb-6 flex items-start justify-between">
-            <div>
-              <h1 className="font-bold text-3xl text-gray-900 mb-2">Sistema de Reportes</h1>
-              <p className="text-gray-600">Genera y administra reportes del sistema</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleExportPDF}
-                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <Download className="h-4 w-4" />
-                Exportar PDF
-              </button>
-              <button
-                onClick={handleExportExcel}
-                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <FileSpreadsheet className="h-4 w-4" />
-                Exportar Excel
-              </button>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
-              >
-                + Nuevo Reporte
-              </button>
-            </div>
-          </div>
+
 
 
         <main className="p-6">
@@ -539,31 +365,58 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
 
               {/* Data Table */}
               <div className="mb-6 overflow-x-auto rounded-lg border border-gray-200">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      {Object.keys(paginatedData[0] || {}).map((key) => (
-                        <th
-                          key={key}
-                          className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                        >
-                          {key}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 bg-white">
-                    {paginatedData.map((row, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50">
-                        {Object.values(row).map((value, cellIdx) => (
-                          <td key={cellIdx} className="px-4 py-3 text-sm text-gray-900">
-                            {String(value)}
-                          </td>
+                {filteredData.length > 0 ? (
+                  <>
+                    <table className="hidden md:table w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          {Object.keys(paginatedData[0] || {}).map((key) => (
+                            <th
+                              key={key}
+                              className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                            >
+                              {key}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 bg-white">
+                        {paginatedData.map((row, idx) => (
+                          <tr key={idx} className="hover:bg-gray-50">
+                            {Object.values(row).map((value, cellIdx) => (
+                              <td key={cellIdx} className="px-4 py-3 text-sm text-gray-900">
+                                {String(value)}
+                              </td>
+                            ))}
+                          </tr>
                         ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                      </tbody>
+                    </table>
+                    {/* Tarjetas responsive para móvil */}
+                    <div className="md:hidden">
+                      {paginatedData.map((row, idx) => (
+                        <div key={idx} className="bg-white rounded-lg shadow p-3 mb-2 border">
+                          {Object.entries(row).map(([key, value]) => (
+                            <div key={key} className="flex justify-between py-1 text-sm">
+                              <span className="font-semibold text-gray-700">{key}:</span>
+                              <span className="text-gray-900">{String(value)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-48 text-gray-500">
+                    <div className="text-center">
+                      <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No hay datos disponibles</h3>
+                      <p className="text-sm text-gray-600">
+                        Este reporte no contiene datos para los filtros seleccionados o el tipo de reporte no está soportado.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Pagination */}
@@ -601,15 +454,24 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
                     <TrendingUp className="h-5 w-5 text-blue-600" />
                     <h3 className="font-semibold text-gray-900">Tendencia</h3>
                   </div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={generateChartData(activeReport.type).trend}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="mes" stroke="#6b7280" fontSize={12} />
-                      <YAxis stroke="#6b7280" fontSize={12} />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="total" stroke="#2563eb" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  {generateChartData(activeReport).trend.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <LineChart data={generateChartData(activeReport).trend}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <XAxis dataKey="mes" stroke="#6b7280" fontSize={12} />
+                        <YAxis stroke="#6b7280" fontSize={12} />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="total" stroke="#2563eb" strokeWidth={2} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-48 text-gray-500">
+                      <div className="text-center">
+                        <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p>No hay datos de tendencia disponibles</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Distribution Chart */}
@@ -618,25 +480,33 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
                     <PieChartIcon className="h-5 w-5 text-purple-600" />
                     <h3 className="font-semibold text-gray-900">Distribución</h3>
                   </div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={generateChartData(activeReport.type).distribution}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={(entry) => entry.name}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {generateChartData(activeReport.type).distribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  {generateChartData(activeReport).distribution.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={generateChartData(activeReport).distribution}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {generateChartData(activeReport).distribution.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-48 text-gray-500">
+                      <div className="text-center">
+                        <PieChartIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p>No hay datos de distribución disponibles</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -645,13 +515,13 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
           {/* Saved Reports Section */}
           <div className="rounded-xl border border-gray-200 bg-white p-6">
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="font-bold text-xl text-gray-900">Reportes Guardados</h2>
+              <h2 className="font-bold text-xl text-gray-900">Reportes Generados</h2>
             </div>
 
             {/* Reports Grid */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 
-              
+
               {reportesGuardados.map((report) => (
                 <div
                   key={report.id}
@@ -677,9 +547,24 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => {
-                        setActiveReport(report)
-                        setCurrentPage(1)
-                        setSearchTerm("")
+                        // Validar si el reporte tiene datos reales o error
+                        let alerta = "";
+                        if (report.datos) {
+                          if (typeof report.datos === "object" && report.datos.mensaje === "Tipo de reporte no soportado") {
+                            alerta = "Este reporte no se pudo generar: Tipo de reporte no soportado.";
+                          } else if (
+                            (Array.isArray(report.datos) && report.datos.length === 0) ||
+                            (typeof report.datos === "object" && Object.keys(report.datos).length === 0)
+                          ) {
+                            alerta = "No existen datos para los filtros seleccionados.";
+                          }
+                        } else {
+                          alerta = "No existen datos para los filtros seleccionados.";
+                        }
+                        setAlertaDatos(alerta);
+                        setActiveReport(report);
+                        setCurrentPage(1);
+                        setSearchTerm("");
                       }}
                       className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
                     >
@@ -687,12 +572,25 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
                       Ver Reporte
                     </button>
                     <button
-                      onClick={() => setSavedReports(savedReports.filter((r) => r.id !== report.id))}
+                      onClick={() => {editarReporte(report);}}
+                      className="rounded-lg border border-gray-200 bg-white p-2 hover:bg-yellow-50 hover:border-yellow-200 transition-colors"
+                      title="Editar"
+                    >
+                      <Pencil className="h-4 w-4 text-gray-600 hover:text-yellow-600" />
+                    </button>
+                    <button
+                      onClick={() => eliminarReporte && eliminarReporte(report._id || report.id)}
                       className="rounded-lg border border-gray-200 bg-white p-2 hover:bg-red-50 hover:border-red-200 transition-colors"
                     >
                       <Trash2 className="h-4 w-4 text-gray-600 hover:text-red-600" />
                     </button>
                   </div>
+                  {/* Alerta de datos */}
+                  {alertaDatos && activeReport && activeReport.id === report.id && (
+                    <div className="mt-3 p-2 rounded bg-yellow-100 text-yellow-800 text-sm">
+                      {alertaDatos}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -724,16 +622,14 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
                       <button
                         key={type.value}
                         onClick={() => setSelectedReportType(type.value)}
-                        className={`flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all ${
-                          selectedReportType === type.value
-                            ? "border-blue-600 bg-blue-50"
-                            : "border-gray-200 hover:border-gray-300"
-                        }`}
+                        className={`flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all ${selectedReportType === type.value
+                          ? "border-blue-600 bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300"
+                          }`}
                       >
                         <div
-                          className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                            selectedReportType === type.value ? "bg-blue-600" : "bg-gray-100"
-                          }`}
+                          className={`flex h-10 w-10 items-center justify-center rounded-lg ${selectedReportType === type.value ? "bg-blue-600" : "bg-gray-100"
+                            }`}
                         >
                           <Icon
                             className={`h-5 w-5 ${selectedReportType === type.value ? "text-white" : "text-gray-600"}`}
@@ -809,6 +705,8 @@ const TablaReportes = ({ reportesGuardados , editarReporte, eliminarReporte }) =
           </div>
         </div>
       )}
+
+
     </div>
   )
 }

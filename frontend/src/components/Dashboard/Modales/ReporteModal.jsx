@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Users,
   Bed,
@@ -10,7 +10,7 @@ import {
   Filter,
 } from "lucide-react"
 
-const ReporteModal = ({ mostrar, onClose, onSubmit }) => {
+const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion }) => {
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
@@ -21,8 +21,48 @@ const ReporteModal = ({ mostrar, onClose, onSubmit }) => {
     categoria: "",
     usuario: ""
   });
-  const [selectedReportType, setSelectedReportType] = useState("")
+  const [selectedReportType, setSelectedReportType] = useState("");
   const [error, setError] = useState("");
+
+  // Actualizar el formulario cuando se abra en modo edición
+  useEffect(() => {
+    
+    if (mostrar) {
+      if (modoEdicion && datosIniciales) {
+        // Modo edición - cargar datos del reporte
+        const formData = {
+          nombre: datosIniciales.nombre || "",
+          descripcion: datosIniciales.descripcion || datosIniciales.description || "",
+          tipo: datosIniciales.tipo || datosIniciales.type || "",
+          fechaInicio: datosIniciales.filtros?.fechaInicio
+            ? new Date(datosIniciales.filtros.fechaInicio).toISOString().split('T')[0]
+            : "",
+          fechaFin: datosIniciales.filtros?.fechaFin
+            ? new Date(datosIniciales.filtros.fechaFin).toISOString().split('T')[0]
+            : "",
+          estado: datosIniciales.filtros?.estado || "",
+          categoria: datosIniciales.filtros?.categoria || "",
+          usuario: datosIniciales.filtros?.usuario || ""
+        };
+        setForm(formData);
+        setSelectedReportType(datosIniciales.tipo || datosIniciales.type || "");
+      } else {
+        // Modo creación - limpiar formulario
+        setForm({
+          nombre: "",
+          descripcion: "",
+          tipo: "",
+          fechaInicio: "",
+          fechaFin: "",
+          estado: "",
+          categoria: "",
+          usuario: ""
+        });
+        setSelectedReportType("");
+      }
+      setError(""); // Limpiar errores al abrir el modal
+    }
+  }, [mostrar, datosIniciales, modoEdicion]);
 
   // Calcular la fecha actual en formato YYYY-MM-DD
   const today = new Date();
@@ -37,6 +77,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
     if (!form.nombre || !form.descripcion || !form.tipo) {
       setError("Todos los campos obligatorios deben estar completos.");
       return;
@@ -51,12 +92,14 @@ const ReporteModal = ({ mostrar, onClose, onSubmit }) => {
       otros: {}
     };
     setError("");
-    onSubmit({
+    
+    const datosEnvio = {
       nombre: form.nombre,
       descripcion: form.descripcion,
       tipo: form.tipo,
       filtros
-    });
+    };
+    onSubmit(datosEnvio);
   };
 
   const REPORT_TYPES = [
@@ -67,7 +110,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit }) => {
     { value: "solicitudes", label: "Solicitudes", icon: FileText },
     { value: "programas", label: "Programas Académicos", icon: BarChart3 },
     { value: "tareas", label: "Tareas", icon: FileText },
-    { value: "cabanas", label: "Cabañas", icon: Home },
+  { value: "cabañas", label: "Cabañas", icon: Home },
   ]
 
   return (
@@ -79,7 +122,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit }) => {
           color: 'white'
         }}
       >
-        <h2>Crear Nuevo Reporte</h2>
+  <h2>{modoEdicion ? "Editar Reporte" : "Crear Nuevo Reporte"}</h2>
         <button className="modal-cerrar" onClick={onClose}>
           ✕
         </button>
@@ -149,32 +192,29 @@ const ReporteModal = ({ mostrar, onClose, onSubmit }) => {
               <h3 className="font-semibold text-gray-900">Filtros</h3>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              {(form.tipo === "usuarios" || form.tipo === "reservas" || form.tipo === "eventos" || form.tipo === "inscripciones") && (
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Fecha Desde</label>
-                  <input
-                    type="date"
-                    name="fechaInicio"
-                    value={form.fechaInicio}
-                    onChange={handleChange}
-                    max={maxDate}
-                    className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                </div>
-              )}
-              {(form.tipo === "usuarios" || form.tipo === "reservas" || form.tipo === "eventos" || form.tipo === "inscripciones") && (
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Fecha Hasta</label>
-                  <input
-                    type="date"
-                    name="fechaFin"
-                    value={form.fechaFin}
-                    onChange={handleChange}
-                    max={maxDate}
-                    className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                </div>
-              )}
+              
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Fecha Desde</label>
+                <input
+                  type="date"
+                  name="fechaInicio"
+                  value={form.fechaInicio}
+                  onChange={handleChange}
+                  max={maxDate}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Fecha Hasta</label>
+                <input
+                  type="date"
+                  name="fechaFin"
+                  value={form.fechaFin}
+                  onChange={handleChange}
+                  max={maxDate}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
               {(form.tipo === "usuarios" || form.tipo === "reservas" || form.tipo === "solicitudes") && (
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">Estado</label>
@@ -201,7 +241,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit }) => {
               <i className="fas fa-times"></i> Cancelar
             </button>
             <button type="submit" className="btn-admin btn-primary">
-              <i className="fas fa-save"></i> Crear Reporte
+              <i className="fas fa-save"></i> {modoEdicion ? 'Guardar Cambios' : 'Crear Reporte'}
             </button>
           </div>
         </form>

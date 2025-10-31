@@ -137,12 +137,12 @@ exports.getInscripcionesReport = async (req, res) => {
         $lte: new Date(fechaFin)
       };
     }
-    if (evento) filtros.evento = evento;
+    if (evento) filtros.referencia = evento;
     if (categoria) filtros.categoria = categoria;
 
     const inscripciones = await Inscripcion.find(filtros)
       .populate('usuario', 'username email phone')
-      .populate('evento', 'name description price fecha')
+      .populate('referencia')
       .populate('categoria', 'nombre descripcion codigo')
       .populate('solicitud', 'estado prioridad fechaSolicitud')
       .sort({ createdAt: -1 });
@@ -150,11 +150,20 @@ exports.getInscripcionesReport = async (req, res) => {
     // Estadísticas
     const estadisticas = {
       total: inscripciones.length,
-      porEvento: await Inscripcion.aggregate([
+      porReferencia: await Inscripcion.aggregate([
         { $match: filtros },
-        { $lookup: { from: 'eventos', localField: 'evento', foreignField: '_id', as: 'eventoInfo' } },
-        { $unwind: '$eventoInfo' },
-        { $group: { _id: '$eventoInfo.name', count: { $sum: 1 } } }
+        { $lookup: { from: 'eventos', localField: 'referencia', foreignField: '_id', as: 'eventoInfo' } },
+        { $lookup: { from: 'programaacademicos', localField: 'referencia', foreignField: '_id', as: 'programaInfo' } },
+        { $project: {
+          referenciaNombre: {
+            $cond: {
+              if: { $eq: ['$tipoReferencia', 'Evento'] },
+              then: { $ifNull: [{ $arrayElemAt: ['$eventoInfo.name', 0] }, 'Evento sin nombre'] },
+              else: { $ifNull: [{ $arrayElemAt: ['$programaInfo.nombre', 0] }, 'Programa sin nombre'] }
+            }
+          }
+        }},
+        { $group: { _id: '$referenciaNombre', count: { $sum: 1 } } }
       ]),
       porCategoria: await Inscripcion.aggregate([
         { $match: filtros },
@@ -162,11 +171,9 @@ exports.getInscripcionesReport = async (req, res) => {
         { $unwind: '$categoriaInfo' },
         { $group: { _id: '$categoriaInfo.nombre', count: { $sum: 1 } } }
       ]),
-      ingresosPotenciales: await Inscripcion.aggregate([
+      porTipoReferencia: await Inscripcion.aggregate([
         { $match: filtros },
-        { $lookup: { from: 'eventos', localField: 'evento', foreignField: '_id', as: 'eventoInfo' } },
-        { $unwind: '$eventoInfo' },
-        { $group: { _id: null, total: { $sum: '$eventoInfo.price' } } }
+        { $group: { _id: '$tipoReferencia', count: { $sum: 1 } } }
       ])
     };
 
@@ -342,7 +349,7 @@ exports.getEventosReport = async (req, res) => {
     // Obtener inscripciones por evento
     const eventosConInscripciones = await Promise.all(
       eventos.map(async (evento) => {
-        const inscripciones = await Inscripcion.countDocuments({ evento: evento._id });
+        const inscripciones = await Inscripcion.countDocuments({ referencia: evento._id, tipoReferencia: 'Evento' });
         return {
           ...evento.toObject(),
           totalInscripciones: inscripciones
@@ -591,12 +598,40 @@ exports.guardarReporte = async (req, res) => {
         r.activo = typeof r.activo === 'string' ? r.activo === 'true' : Boolean(r.activo);
         return r;
       });
+      
+      // Generar estadísticas más detalladas para reservas
+      const porEstado = {};
+      reservasNorm.forEach(reserva => {
+        const estado = reserva.estado || 'Sin estado';
+        porEstado[estado] = (porEstado[estado] || 0) + 1;
+      });
+      const porEstadoArray = Object.entries(porEstado).map(([estado, count]) => ({ _id: estado, count }));
+
+      const registrosPorMes = {};
+      reservasNorm.forEach(reserva => {
+        if (reserva.fechaInicio) {
+          const fecha = new Date(reserva.fechaInicio);
+          const mes = fecha.getMonth() + 1;
+          const año = fecha.getFullYear();
+          const clave = `${mes}/${año}`;
+          registrosPorMes[clave] = (registrosPorMes[clave] || 0) + 1;
+        }
+      });
+      const registrosPorMesArray = Object.entries(registrosPorMes)
+        .sort(([a], [b]) => {
+          const [aMonth, aYear] = a.split('/').map(Number);
+          const [bMonth, bYear] = b.split('/').map(Number);
+          return aYear - bYear || aMonth - bMonth;
+        })
+        .map(([mes, count]) => ({ _id: { mes: mes.split('/')[0], año: mes.split('/')[1] }, count }));
+      
       datos = { reservas: reservasNorm };
-      // Agregar resumen mínimo
       datos.estadisticas = {
         total: reservasNorm.length,
         activos: reservasNorm.filter(r => r.activo).length,
-        inactivos: reservasNorm.filter(r => !r.activo).length
+        inactivos: reservasNorm.filter(r => !r.activo).length,
+        porEstado: porEstadoArray,
+        registrosPorMes: registrosPorMesArray
       };
     } else if (tipo === 'inscripciones') {
       let query = {};
@@ -607,11 +642,51 @@ exports.guardarReporte = async (req, res) => {
       if (queryUsuarioForDB) query.usuario = queryUsuarioForDB;
       const inscripciones = await Inscripcion.find(query)
         .populate('usuario', 'username email phone')
-        .populate('evento', 'name description price fecha')
+        .populate('referencia')
         .populate('categoria', 'nombre descripcion codigo')
         .sort({ createdAt: -1 });
+      
+      // Generar estadísticas más detalladas para inscripciones
+      const porReferencia = {};
+      inscripciones.forEach(inscripcion => {
+        let referenciaNombre = 'Sin referencia';
+        if (inscripcion.referencia) {
+          if (inscripcion.tipoReferencia === 'Eventos') {
+            referenciaNombre = inscripcion.referencia.name || 'Evento sin nombre';
+          } else if (inscripcion.tipoReferencia === 'ProgramaAcademico') {
+            referenciaNombre = inscripcion.referencia.nombre || 'Programa sin nombre';
+          } else {
+            referenciaNombre = inscripcion.referencia.nombre || inscripcion.referencia.name || 'Referencia sin nombre';
+          }
+        }
+        porReferencia[referenciaNombre] = (porReferencia[referenciaNombre] || 0) + 1;
+      });
+      const porReferenciaArray = Object.entries(porReferencia).map(([referencia, count]) => ({ _id: referencia, count }));
+
+      const registrosPorMes = {};
+      inscripciones.forEach(inscripcion => {
+        if (inscripcion.createdAt) {
+          const fecha = new Date(inscripcion.createdAt);
+          const mes = fecha.getMonth() + 1;
+          const año = fecha.getFullYear();
+          const clave = `${mes}/${año}`;
+          registrosPorMes[clave] = (registrosPorMes[clave] || 0) + 1;
+        }
+      });
+      const registrosPorMesArray = Object.entries(registrosPorMes)
+        .sort(([a], [b]) => {
+          const [aMonth, aYear] = a.split('/').map(Number);
+          const [bMonth, bYear] = b.split('/').map(Number);
+          return aYear - bYear || aMonth - bMonth;
+        })
+        .map(([mes, count]) => ({ _id: { mes: mes.split('/')[0], año: mes.split('/')[1] }, count }));
+      
       datos = { inscripciones };
-      datos.estadisticas = { total: inscripciones.length };
+      datos.estadisticas = { 
+        total: inscripciones.length,
+        porReferencia: porReferenciaArray,
+        registrosPorMes: registrosPorMesArray
+      };
     } else if (tipo === 'usuarios') {
       let query = {};
       if (filtrosInput?.fechaInicio && filtrosInput?.fechaFin) {
@@ -619,9 +694,105 @@ exports.guardarReporte = async (req, res) => {
       }
       if (filtrosInput?.estado) query.active = filtrosInput.estado === 'activo';
       if (queryUsuarioForDB) query._id = queryUsuarioForDB;
+      
       const usuarios = await Usuario.find(query).select('-password').sort({ createdAt: -1 });
+      
+      // Generar estadísticas más detalladas para usuarios
+      const porRol = {};
+      usuarios.forEach(usuario => {
+        const rol = usuario.rol || usuario.role || (usuario.roles && usuario.roles[0]) || 'Sin rol';
+        porRol[rol] = (porRol[rol] || 0) + 1;
+      });
+      const porRolArray = Object.entries(porRol).map(([rol, count]) => ({ _id: rol, count }));
+
+      const registrosPorMes = {};
+      usuarios.forEach(usuario => {
+        if (usuario.createdAt) {
+          const fecha = new Date(usuario.createdAt);
+          const mes = fecha.getMonth() + 1;
+          const año = fecha.getFullYear();
+          const clave = `${mes}/${año}`;
+          registrosPorMes[clave] = (registrosPorMes[clave] || 0) + 1;
+        }
+      });
+      const registrosPorMesArray = Object.entries(registrosPorMes)
+        .sort(([a], [b]) => {
+          const [aMonth, aYear] = a.split('/').map(Number);
+          const [bMonth, bYear] = b.split('/').map(Number);
+          return aYear - bYear || aMonth - bMonth;
+        })
+        .map(([mes, count]) => ({ _id: { mes: mes.split('/')[0], año: mes.split('/')[1] }, count }));
+      
       datos = { usuarios };
-      datos.estadisticas = { total: usuarios.length };
+      datos.estadisticas = { 
+        total: usuarios.length,
+        porRol: porRolArray,
+        registrosPorMes: registrosPorMesArray
+      };
+    } else if (tipo === 'solicitudes') {
+      let query = {};
+      if (filtrosInput?.fechaInicio && filtrosInput?.fechaFin) {
+        query.fechaSolicitud = { $gte: new Date(filtrosInput.fechaInicio), $lte: new Date(filtrosInput.fechaFin) };
+      }
+      if (filtrosInput?.estado) query.estado = filtrosInput.estado;
+      if (filtrosInput?.prioridad) query.prioridad = filtrosInput.prioridad;
+      if (queryCategoriaForDB) query.categoria = queryCategoriaForDB;
+      if (queryUsuarioForDB) query.solicitante = queryUsuarioForDB;
+      const solicitudes = await Solicitud.find(query)
+        .populate('solicitante', 'username email phone')
+        .populate('responsable', 'username email')
+        .populate('categoria', 'nombre descripcion codigo')
+        .sort({ fechaSolicitud: -1 });
+
+      // Estadísticas
+      const porEstado = {};
+      solicitudes.forEach(solicitud => {
+        const estado = solicitud.estado || 'Sin estado';
+        porEstado[estado] = (porEstado[estado] || 0) + 1;
+      });
+      const porEstadoArray = Object.entries(porEstado).map(([estado, count]) => ({ _id: estado, count }));
+
+      const porTipo = {};
+      solicitudes.forEach(solicitud => {
+        const tipoSol = solicitud.tipoSolicitud || 'Sin tipo';
+        porTipo[tipoSol] = (porTipo[tipoSol] || 0) + 1;
+      });
+      const porTipoArray = Object.entries(porTipo).map(([tipo, count]) => ({ _id: tipo, count }));
+
+      const porPrioridad = {};
+      solicitudes.forEach(solicitud => {
+        const prioridad = solicitud.prioridad || 'Sin prioridad';
+        porPrioridad[prioridad] = (porPrioridad[prioridad] || 0) + 1;
+      });
+      const porPrioridadArray = Object.entries(porPrioridad).map(([prioridad, count]) => ({ _id: prioridad, count }));
+
+      // Tendencia por mes
+      const registrosPorMes = {};
+      solicitudes.forEach(solicitud => {
+        if (solicitud.fechaSolicitud) {
+          const fecha = new Date(solicitud.fechaSolicitud);
+          const mes = fecha.getMonth() + 1;
+          const año = fecha.getFullYear();
+          const clave = `${mes}/${año}`;
+          registrosPorMes[clave] = (registrosPorMes[clave] || 0) + 1;
+        }
+      });
+      const registrosPorMesArray = Object.entries(registrosPorMes)
+        .sort(([a], [b]) => {
+          const [aMonth, aYear] = a.split('/').map(Number);
+          const [bMonth, bYear] = b.split('/').map(Number);
+          return aYear - bYear || aMonth - bMonth;
+        })
+        .map(([mes, count]) => ({ _id: { mes: mes.split('/')[0], año: mes.split('/')[1] }, count }));
+
+      datos = { solicitudes };
+      datos.estadisticas = {
+        total: solicitudes.length,
+        porEstado: porEstadoArray,
+        porTipo: porTipoArray,
+        porPrioridad: porPrioridadArray,
+        registrosPorMes: registrosPorMesArray
+      };
     } else if (tipo === 'eventos') {
       let query = {};
       if (filtrosInput?.fechaInicio && filtrosInput?.fechaFin) {
@@ -629,11 +800,49 @@ exports.guardarReporte = async (req, res) => {
       }
       if (queryCategoriaForDB) query.categoria = queryCategoriaForDB;
       if (filtrosInput?.estado) query.active = filtrosInput.estado === 'activo';
+      
       const eventos = await Evento.find(query)
         .populate('categoria', 'nombre descripcion codigo')
         .sort({ fechaEvento: -1 });
+      
+      // Generar estadísticas más detalladas para eventos
+      const porEstado = [
+        { _id: 'Activos', count: eventos.filter(e => e.active).length },
+        { _id: 'Inactivos', count: eventos.filter(e => !e.active).length }
+      ].filter(item => item.count > 0);
+
+      const porCategoria = {};
+      eventos.forEach(evento => {
+        const catNombre = evento.categoria?.nombre || 'Sin categoría';
+        porCategoria[catNombre] = (porCategoria[catNombre] || 0) + 1;
+      });
+      const porCategoriaArray = Object.entries(porCategoria).map(([nombre, count]) => ({ _id: nombre, count }));
+
+      const registrosPorMes = {};
+      eventos.forEach(evento => {
+        if (evento.fechaEvento) {
+          const fecha = new Date(evento.fechaEvento);
+          const mes = fecha.getMonth() + 1;
+          const año = fecha.getFullYear();
+          const clave = `${mes}/${año}`;
+          registrosPorMes[clave] = (registrosPorMes[clave] || 0) + 1;
+        }
+      });
+      const registrosPorMesArray = Object.entries(registrosPorMes)
+        .sort(([a], [b]) => {
+          const [aMonth, aYear] = a.split('/').map(Number);
+          const [bMonth, bYear] = b.split('/').map(Number);
+          return aYear - bYear || aMonth - bMonth;
+        })
+        .map(([mes, count]) => ({ _id: { mes: mes.split('/')[0], año: mes.split('/')[1] }, count }));
+      
       datos = { eventos };
-      datos.estadisticas = { total: eventos.length };
+      datos.estadisticas = { 
+        total: eventos.length,
+        porEstado,
+        porCategoria: porCategoriaArray,
+        registrosPorMes: registrosPorMesArray
+      };
     } else if (tipo === 'financiero') {
       // Reusar la lógica de getReporteFinanciero para cálculos avanzados si se desea
       const fechaInicio = filtrosInput.fechaInicio;
@@ -649,14 +858,84 @@ exports.guardarReporte = async (req, res) => {
         { $group: { _id: null, totalReservas: { $sum: 1 }, ingresoTotal: { $sum: { $ifNull: ['$cabanaInfo.precio', 0] } }, promedioPorReserva: { $avg: '$cabanaInfo.precio' } } }
       ]);
       const ingresosEventos = await Inscripcion.aggregate([
-        { $match: filtrosFecha },
-        { $lookup: { from: 'eventos', localField: 'evento', foreignField: '_id', as: 'eventoInfo' } },
+        { $match: { ...filtrosFecha, tipoReferencia: 'Evento' } },
+        { $lookup: { from: 'eventos', localField: 'referencia', foreignField: '_id', as: 'eventoInfo' } },
         { $unwind: { path: '$eventoInfo', preserveNullAndEmptyArrays: true } },
         { $group: { _id: null, totalInscripciones: { $sum: 1 }, ingresoTotal: { $sum: { $ifNull: ['$eventoInfo.price', 0] } }, promedioPorInscripcion: { $avg: '$eventoInfo.price' } } }
       ]);
       datos = {
         cabanas: ingresosCabanas[0] || { totalReservas: 0, ingresoTotal: 0, promedioPorReserva: 0 },
         eventos: ingresosEventos[0] || { totalInscripciones: 0, ingresoTotal: 0, promedioPorInscripcion: 0 }
+      };
+    } else if (tipo === 'cabañas') {
+      let query = {};
+      if (filtrosInput?.estado) query.estado = filtrosInput.estado;
+      
+      const cabanas = await Cabana.find(query).sort({ createdAt: -1 });
+      
+      // Estadísticas para cabañas
+      const porEstado = {};
+      cabanas.forEach(cabana => {
+        const estado = cabana.estado || 'Sin estado';
+        porEstado[estado] = (porEstado[estado] || 0) + 1;
+      });
+      const porEstadoArray = Object.entries(porEstado).map(([estado, count]) => ({ _id: estado, count }));
+      
+      datos = { cabanas };
+      datos.estadisticas = {
+        total: cabanas.length,
+        porEstado: porEstadoArray
+      };
+    } else if (tipo === 'tareas') {
+      let query = {};
+      if (filtrosInput?.fechaInicio && filtrosInput?.fechaFin) {
+        query.createdAt = { $gte: new Date(filtrosInput.fechaInicio), $lte: new Date(filtrosInput.fechaFin) };
+      }
+      if (filtrosInput?.estado) query.estado = filtrosInput.estado;
+      if (queryUsuarioForDB) query.asignadoPor = queryUsuarioForDB;
+      
+      const tareas = await Tarea.find(query)
+        .populate('asignadoPor', 'username email')
+        .populate('asignadoA', 'username email')
+        .sort({ createdAt: -1 });
+      
+      // Estadísticas para tareas
+      const porEstado = {};
+      tareas.forEach(tarea => {
+        const estado = tarea.estado || 'Sin estado';
+        porEstado[estado] = (porEstado[estado] || 0) + 1;
+      });
+      const porEstadoArray = Object.entries(porEstado).map(([estado, count]) => ({ _id: estado, count }));
+      
+      datos = { tareas };
+      datos.estadisticas = {
+        total: tareas.length,
+        porEstado: porEstadoArray
+      };
+    } else if (tipo === 'programas') {
+      let query = {};
+      if (filtrosInput?.fechaInicio && filtrosInput?.fechaFin) {
+        query.createdAt = { $gte: new Date(filtrosInput.fechaInicio), $lte: new Date(filtrosInput.fechaFin) };
+      }
+      if (filtrosInput?.estado) query.activo = filtrosInput.estado === 'activo';
+      if (queryCategoriaForDB) query.categoria = queryCategoriaForDB;
+      
+      const programas = await require('../models/ProgramaAcademico').find(query)
+        .populate('categoria', 'nombre descripcion codigo')
+        .sort({ createdAt: -1 });
+      
+      // Estadísticas para programas
+      const porCategoria = {};
+      programas.forEach(programa => {
+        const catNombre = programa.categoria?.nombre || 'Sin categoría';
+        porCategoria[catNombre] = (porCategoria[catNombre] || 0) + 1;
+      });
+      const porCategoriaArray = Object.entries(porCategoria).map(([nombre, count]) => ({ _id: nombre, count }));
+      
+      datos = { programas };
+      datos.estadisticas = {
+        total: programas.length,
+        porCategoria: porCategoriaArray
       };
     } else if (tipo === 'dashboard') {
       // Reusar getDashboardReport
@@ -694,6 +973,7 @@ exports.guardarReporte = async (req, res) => {
     await reporteToSave.save();
     res.status(201).json({ success: true, message: 'Reporte guardado correctamente', data: reporteToSave });
   } catch (error) {
+    console.error('Error al guardar el reporte:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
