@@ -2,10 +2,108 @@ const Tarea = require('../models/Tarea');
 const Usuario = require('../models/User');
 const mongoose = require('mongoose');
 
+// Función auxiliar para validar IDs de ObjectId
+function validarObjectIds(asignadoA, finalAsignadoPor) {
+    if (!mongoose.Types.ObjectId.isValid(asignadoA)) {
+        return { 
+            error: true, 
+            status: 400, 
+            message: 'ID de usuario asignado inválido' 
+        };
+    }
+    if (!mongoose.Types.ObjectId.isValid(finalAsignadoPor)) {
+        return { 
+            error: true, 
+            status: 400, 
+            message: 'ID de usuario que asigna inválido' 
+        };
+    }
+    return { error: false };
+}
+
+// Función auxiliar para validar existencia de usuarios
+async function validarUsuarios(asignadoA, finalAsignadoPor) {
+    const usuarioAsignado = await Usuario.findById(asignadoA);
+    if (!usuarioAsignado) {
+        return { 
+            error: true, 
+            status: 404, 
+            message: 'El usuario asignado no existe' 
+        };
+    }
+
+    const usuarioAsignador = await Usuario.findById(finalAsignadoPor);
+    if (!usuarioAsignador) {
+        return { 
+            error: true, 
+            status: 404, 
+            message: 'El usuario que asigna no existe' 
+        };
+    }
+
+    return { 
+        error: false, 
+        usuarioAsignado, 
+        usuarioAsignador 
+    };
+}
+
+// Función auxiliar para validar permisos de seminarista
+function validarPermisosSeminarista(userRole, asignadoA, userId, usuarioAsignado) {
+    if (userRole === 'seminarista' && asignadoA !== userId) {
+        if (usuarioAsignado.role !== 'seminarista') {
+            return { 
+                error: true, 
+                status: 403, 
+                message: 'Como seminarista, solo puedes asignar tareas a otros seminaristas' 
+            };
+        }
+    }
+    return { error: false };
+}
+
+// Función auxiliar para validar comentarios
+async function validarComentarios(comentarios) {
+    if (comentarios && Array.isArray(comentarios)) {
+        for (const comentario of comentarios) {
+            if (comentario.autor && !mongoose.Types.ObjectId.isValid(comentario.autor)) {
+                return { 
+                    error: true, 
+                    status: 400, 
+                    message: 'ID de autor de comentario inválido' 
+                };
+            }
+            if (comentario.autor) {
+                const autorExiste = await Usuario.findById(comentario.autor);
+                if (!autorExiste) {
+                    return { 
+                        error: true, 
+                        status: 404, 
+                        message: 'El autor del comentario no existe' 
+                    };
+                }
+            }
+        }
+    }
+    return { error: false };
+}
+
+// Función auxiliar para crear y guardar la tarea
+async function crearYGuardarTarea(dataTarea) {
+    const nuevaTarea = new Tarea(dataTarea);
+    await nuevaTarea.save();
+    
+    const tareaPoblada = await Tarea.findById(nuevaTarea._id)
+        .populate('asignadoA', ' nombre role')
+        .populate('asignadoPor',' nombre role');
+    
+    return tareaPoblada;
+}
+
 // Crear tarea
 exports.crearTarea = async (req, res) => {
-   try {
-        const { asignadoA, asignadoPor, comentarios } = req.body;
+    try {
+        const { asignadoA, comentarios } = req.body;
         const userRole = req.userRole;
         const userId = req.userId;
 
@@ -17,61 +115,52 @@ exports.crearTarea = async (req, res) => {
             req.body.asignadoPor = userId;
         }
 
-        // Usar el valor actualizado de asignadoPor
         const finalAsignadoPor = req.body.asignadoPor;
 
-        // Validar que los IDs sean ObjectId válidos
-        if (!mongoose.Types.ObjectId.isValid(asignadoA)) {
-            console.log('Error: ID asignadoA inválido:', asignadoA);
-            return res.status(400).json({ success: false, message: 'ID de usuario asignado inválido' });
-        }
-        if (!mongoose.Types.ObjectId.isValid(finalAsignadoPor)) {
-            console.log('Error: ID asignadoPor inválido:', finalAsignadoPor);
-            return res.status(400).json({ success: false, message: 'ID de usuario que asigna inválido' });
-        }
-
-        // Verificar que los usuarios existan
-        const usuarioAsignado = await Usuario.findById(asignadoA);
-        if (!usuarioAsignado) {
-            return res.status(404).json({ success: false, message: 'El usuario asignado no existe' });
+        // Validar IDs de ObjectId
+        const validacionIds = validarObjectIds(asignadoA, finalAsignadoPor);
+        if (validacionIds.error) {
+            console.log('Error de validación ID:', validacionIds.message);
+            return res.status(validacionIds.status).json({ 
+                success: false, 
+                message: validacionIds.message 
+            });
         }
 
-        // Si es seminarista, verificar que puede asignar tareas a otros seminaristas
-        if (userRole === 'seminarista' && asignadoA !== userId) {
-            if (usuarioAsignado.role !== 'seminarista') {
-                return res.status(403).json({ 
-                    success: false, 
-                    message: 'Como seminarista, solo puedes asignar tareas a otros seminaristas' 
-                });
-            }
-        }
-        const usuarioAsignador = await Usuario.findById(finalAsignadoPor);
-        if (!usuarioAsignador) {
-            return res.status(404).json({ success: false, message: 'El usuario que asigna no existe' });
+        // Validar existencia de usuarios
+        const validacionUsuarios = await validarUsuarios(asignadoA, finalAsignadoPor);
+        if (validacionUsuarios.error) {
+            return res.status(validacionUsuarios.status).json({ 
+                success: false, 
+                message: validacionUsuarios.message 
+            });
         }
 
-        // Validar autores de comentarios si existen
-        if (comentarios && Array.isArray(comentarios)) {
-            for (const comentario of comentarios) {
-                if (comentario.autor && !mongoose.Types.ObjectId.isValid(comentario.autor)) {
-                    return res.status(400).json({ success: false, message: 'ID de autor de comentario inválido' });
-                }
-                if (comentario.autor) {
-                    const autorExiste = await Usuario.findById(comentario.autor);
-                    if (!autorExiste) {
-                        return res.status(404).json({ success: false, message: 'El autor del comentario no existe' });
-                    }
-                }
-            }
+        // Validar permisos de seminarista
+        const validacionPermisos = validarPermisosSeminarista(
+            userRole, 
+            asignadoA, 
+            userId, 
+            validacionUsuarios.usuarioAsignado
+        );
+        if (validacionPermisos.error) {
+            return res.status(validacionPermisos.status).json({ 
+                success: false, 
+                message: validacionPermisos.message 
+            });
         }
 
-        const nuevaTarea = new Tarea(req.body);
-        await nuevaTarea.save();
+        // Validar comentarios
+        const validacionComentarios = await validarComentarios(comentarios);
+        if (validacionComentarios.error) {
+            return res.status(validacionComentarios.status).json({ 
+                success: false, 
+                message: validacionComentarios.message 
+            });
+        }
 
-        // Populamos los campos de usuario para la respuesta
-        const tareaPoblada = await Tarea.findById(nuevaTarea._id)
-            .populate('asignadoA', ' nombre role')
-            .populate('asignadoPor',' nombre role');
+        // Crear y guardar tarea
+        const tareaPoblada = await crearYGuardarTarea(req.body);
 
         res.status(201).json({
             success: true,

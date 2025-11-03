@@ -12,7 +12,7 @@ exports.crearReserva = async (req, res) => {
     console.log('Usuario autenticado:', req.userId);
     console.log('Rol del usuario:', req.userRole);
 
-    const { usuario, cabana, fechaInicio, fechaFin, estado, observaciones } = req.body;
+    const { usuario, cabana } = req.body;
 
     // Validar campos requeridos según el modelo
     const camposRequeridos = [
@@ -21,11 +21,11 @@ exports.crearReserva = async (req, res) => {
     ];
     
     const camposFaltantes = [];
-    camposRequeridos.forEach(campo => {
+    for (const campo of camposRequeridos) {
       if (!req.body[campo]) {
         camposFaltantes.push(campo);
       }
-    });
+    }
     
     if (camposFaltantes.length > 0) {
       console.log('❌ CAMPOS FALTANTES:', camposFaltantes);

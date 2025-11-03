@@ -7,7 +7,7 @@ const normalizeTipoDocumento = (tipoDocumento) => {
   if (!tipoDocumento) return '';
   
   // Normalizar la cadena: trim, lowercase, y normalizar caracteres unicode
-  let tipo = tipoDocumento.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  let tipo = tipoDocumento.trim().toLowerCase().normalize('NFD').replaceAll(/[\u0300-\u036f]/g, '');
   
   // Mapeo de variaciones comunes a valores válidos
   const mappings = {

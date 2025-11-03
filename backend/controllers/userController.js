@@ -2,7 +2,6 @@ const { connect } = require('mongoose');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const { normalizeTipoDocumento } = require('../utils/userValidation');
-//const { use } = require('react');
 
 //Obtener todos los usuarios (Admin tesorero)
 exports.getAllUsers = async (req, res) => {

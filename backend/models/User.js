@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
-    match: /^[0-9]{7,15}$/  // solo dígitos, mínimo 7 y máximo 15 caracteres
+    match: /\\d{7,15}/  // solo dígitos, mínimo 7 y máximo 15 caracteres
   },
   tipoDocumento: {
     type: String,
@@ -43,17 +43,17 @@ const userSchema = new mongoose.Schema({
         switch (this.tipoDocumento) {
           case 'Cédula de ciudadanía':
           case 'Cédula de extranjería':
-            // Para cédulas: solo números, mínimo 7 dígitos, máximo 12
-            return /^[0-9]{7,12}$/.test(value);
+              // Para cédulas: solo números, mínimo 7 dígitos, máximo 12
+              return /^\d{7,12}$/.test(value);
           case 'Pasaporte':
-            // Para pasaporte: alfanumérico, mínimo 6 caracteres, máximo 15
-            return /^[A-Za-z0-9]{6,15}$/.test(value);
+          // Para pasaporte: alfanumérico, mínimo 6 caracteres, máximo 15
+          return /^[A-Za-z0-9]{6,15}$/.test(value);
           case 'Tarjeta de identidad':
-            // Para tarjeta de identidad: solo números, mínimo 8 dígitos, máximo 15
-            return /^[0-9]{8,15}$/.test(value);
+          // Para tarjeta de identidad: solo números, mínimo 8 dígitos, máximo 15
+          return /^\d{8,15}$/.test(value);
           default:
-            // Por defecto, permitir números y letras de 6 a 15 caracteres
-            return /^[A-Za-z0-9]{6,15}$/.test(value);
+          // Por defecto, permitir números y letras de 6 a 15 caracteres
+          return /^[A-Za-z0-9]{6,15}$/.test(value);
         }
       },
       message: function(props) {

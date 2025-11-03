@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const ROLES = ['admin', 'tesorero', 'seminarista', 'externo'];
+const ROLES = new Set(['admin', 'tesorero', 'seminarista', 'externo']);
 
 const checkDuplicateEmailOrPhone = async (req, res, next) => {
     try {
@@ -33,7 +33,7 @@ const checkDuplicateEmailOrPhone = async (req, res, next) => {
 
 const checkRolesExisted = (req, res, next) => {
     if (req.body.role) {
-        if (!ROLES.includes(req.body.role)) {
+        if (!ROLES.has(req.body.role)) {
             return res.status(400).json({
                 success: false,
                 message: `Rol ${req.body.role} no existe`

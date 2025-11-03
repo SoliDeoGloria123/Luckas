@@ -33,7 +33,7 @@ exports.obtenerSolicitudes = async (req, res) => {
       }
 
       // Configurar paginación
-      const skip = (parseInt(page) - 1) * parseInt(limit);
+      const skip = (Number.parseInt(page) - 1) * Number.parseInt(limit);
       const sortOptions = {};
       sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
@@ -44,7 +44,7 @@ exports.obtenerSolicitudes = async (req, res) => {
         .populate('responsable', 'nombre apellido')
         .sort(sortOptions)
         .skip(skip)
-        .limit(parseInt(limit))
+        .limit(Number.parseInt(limit))
         .lean();
 
       // Contar total para paginación
@@ -69,10 +69,10 @@ exports.obtenerSolicitudes = async (req, res) => {
         success: true,
         data: solicitudes,
         pagination: {
-          currentPage: parseInt(page),
-          totalPages: Math.ceil(total / parseInt(limit)),
+          currentPage: Number.parseInt(page),
+          totalPages: Math.ceil(total / Number.parseInt(limit)),
           totalItems: total,
-          itemsPerPage: parseInt(limit)
+          itemsPerPage: Number.parseInt(limit)
         },
         estadisticas: estadisticas[0] || {
           total: 0, nuevas: 0, enRevision: 0, urgentes: 0, completadas: 0
@@ -141,7 +141,7 @@ exports.obtenerSolicitudes = async (req, res) => {
       }
 
       // Validación personalizada para modeloReferencia y referencia
-      const { tipoSolicitud, modeloReferencia, referencia } = req.body;
+      const { tipoSolicitud, modeloReferencia } = req.body;
       
       if ((tipoSolicitud === 'Inscripción' || tipoSolicitud === 'Hospedaje')) {
         if (!modeloReferencia) {

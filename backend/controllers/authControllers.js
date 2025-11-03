@@ -223,12 +223,12 @@ exports.updateUser = async (req, res) => {
 
     // Filtrar actualizaciones
     const filteredUpdates = {};
-    Object.keys(updates).forEach(key => {
+    for (const key of Object.keys(updates)) {
       if (allowedFields.includes(key)) {
         filteredUpdates[key] = updates[key];
       }
-    });
-
+    };
+    
     // Si se actualiza password, hacer hash
     if (updates.password) {
       filteredUpdates.password = bcrypt.hashSync(updates.password, 8);

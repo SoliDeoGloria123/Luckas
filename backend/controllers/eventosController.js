@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const Evento = require('../models/Eventos');
 const Categorizacion = require('../models/categorizacion');
 const Usuario = require('../models/User');
-const fs = require('fs');
-const path = require('path');
 
 // Obtener todos los eventos
 exports.getAllEvents = async (req, res) => {
@@ -59,7 +57,7 @@ exports.createEvent = async (req, res) => {
     console.log('[EVENTOS] req.body:', req.body);
     console.log('[EVENTOS] req.files:', req.files);
     console.log('[EVENTOS] req.cloudinaryUrls:', req.cloudinaryUrls);
-    
+
     const {
       nombre,
       descripcion,
@@ -103,7 +101,7 @@ exports.createEvent = async (req, res) => {
         return res.status(404).json({ success: false, message: 'El usuario categorizador no existe.' });
       }
     }
-   const imagen = req.cloudinaryUrls || [];
+    const imagen = req.cloudinaryUrls || [];
     // Crear el evento
     const event = new Evento({
       nombre,
@@ -141,42 +139,23 @@ exports.updateEvent = async (req, res) => {
   try {
     const currentEvent = await Evento.findById(req.params.id);
     if (!currentEvent) {
-      console.log('[EVENTOS] updateEvent - Evento no encontrado');
       return res.status(404).json({ success: false, message: 'Evento no encontrado' });
     }
     const cloudinary = require('../config/cloudinary');
     const updateData = { ...req.body };
     // Manejo de imagen nueva con Cloudinary
     if (req.cloudinaryUrls && req.cloudinaryUrls.length > 0) {
-      // Eliminar imágenes antiguas de Cloudinary si son URLs de Cloudinary
-      if (Array.isArray(currentEvent.imagen)) {
-        for (const url of currentEvent.imagen) {
-          // Extraer public_id de la URL de Cloudinary
-          const matches = url.match(/\/Luckas\/eventos\/([^\.]+)\./);
-          if (matches && matches[1]) {
-            const publicId = `Luckas/eventos/${matches[1]}`;
-            try {
-              await cloudinary.uploader.destroy(publicId);
-            } catch (err) {
-              console.error('Error eliminando imagen de Cloudinary:', publicId, err);
-            }
-          }
-        }
-      }
-      // Asignar nuevas imágenes
+      await eliminarImagenesCloudinary(currentEvent.imagen, cloudinary);
       updateData.imagen = req.cloudinaryUrls;
     }
     if (updateData.nombre === currentEvent.nombre) {
       delete updateData.nombre;
-      console.log('[EVENTOS] updateEvent - Nombre no cambió, excluyendo de actualización');
     } else {
-      console.log('[EVENTOS] updateEvent - Nombre cambió, manteniendo en actualización');
       const existingEvent = await Evento.findOne({
         nombre: updateData.nombre,
         _id: { $ne: req.params.id }
       });
       if (existingEvent) {
-        console.log('[EVENTOS] updateEvent - Ya existe otro evento con ese nombre');
         return res.status(400).json({
           success: false,
           message: 'Ya existe un evento con ese nombre',
@@ -189,13 +168,8 @@ exports.updateEvent = async (req, res) => {
       { $set: updateData },
       { new: true, runValidators: true }
     );
-
-    console.log('[EVENTOS] updateEvent - Evento actualizado exitosamente');
     return res.status(200).json({ success: true, data: updatedEvent });
-
   } catch (error) {
-    console.error('[EVENTOS] updateEvent - Error:', error.message);
-    console.error('[EVENTOS] updateEvent - Stack:', error.stack);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -204,45 +178,36 @@ exports.updateEvent = async (req, res) => {
 exports.deleteEvent = async (req, res) => {
   try {
     const deletedEvent = await Evento.findByIdAndDelete(req.params.id);
-    if (!deletedEvent){
+    if (!deletedEvent) {
       return res.status(404).json({ success: false, message: 'Evento no encontrado' });
     }
     // Eliminar inscripciones asociadas a este evento
     const Inscripcion = require('../models/Inscripciones');
     const result = await Inscripcion.deleteMany({ referencia: deletedEvent._id, tipoReferencia: 'Eventos' });
-    console.log(`[EVENTOS] Se eliminaron ${result.deletedCount} inscripciones asociadas al evento.`);
 
     const cloudinary = require('../config/cloudinary');
-    // Eliminar imágenes de Cloudinary si existen
-    if (Array.isArray(deletedEvent.imagen)) {
-      for (const url of deletedEvent.imagen) {
-        const matches = url.match(/\/Luckas\/eventos\/([^\.]+)\./);
-        if (matches && matches[1]) {
-          const publicId = `Luckas/eventos/${matches[1]}`;
-          try {
-            await cloudinary.uploader.destroy(publicId);
-          } catch (err) {
-            console.error('Error eliminando imagen de Cloudinary:', publicId, err);
-          }
-        }
-      }
-    } else if (typeof deletedEvent.imagen === 'string') {
-      const matches = deletedEvent.imagen.match(/\/Luckas\/eventos\/([^\.]+)\./);
-      if (matches && matches[1]) {
-        const publicId = `Luckas/eventos/${matches[1]}`;
-        try {
-          await cloudinary.uploader.destroy(publicId);
-        } catch (err) {
-          console.error('Error eliminando imagen de Cloudinary:', publicId, err);
-        }
-      }
-    }
+    await eliminarImagenesCloudinary(deletedEvent.imagen, cloudinary);
+
     res.status(200).json({ success: true, message: `Evento eliminado correctamente. Se eliminaron ${result.deletedCount} inscripciones asociadas.` });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al eliminar evento', error: error.message });
   }
 };
-
+async function eliminarImagenesCloudinary(imagenes, cloudinary) {
+  if (!imagenes) return;
+  const urls = Array.isArray(imagenes) ? imagenes : [imagenes];
+  for (const url of urls) {
+    const matches = url.match(/\/Luckas\/eventos\/([^.]+)\./);
+    if (matches?.[1]) {
+      const publicId = `Luckas/eventos/${matches[1]}`;
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (err) {
+        console.error('Error eliminando imagen de Cloudinary:', publicId, err);
+      }
+    }
+  }
+}
 // Deshabilitar evento (solo admin)
 exports.disableEvent = async (req, res) => {
   try {

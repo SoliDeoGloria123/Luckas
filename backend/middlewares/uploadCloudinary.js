@@ -12,7 +12,6 @@ const uploadToCloudinary = async (req, res, next) => {
   if (!req.file) return next();
 
   try {
-    uploadMultiple = multer({ storage }).array('imagen', 10);
     const streamUpload = (req) => {
       return new Promise((resolve, reject) => {
         let stream = cloudinary.uploader.upload_stream(
