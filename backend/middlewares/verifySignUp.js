@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const ROLES = new Set(['admin', 'tesorero', 'seminarista', 'externo']);
 
+
 const checkDuplicateEmailOrPhone = async (req, res, next) => {
     try {
         // Verificar email

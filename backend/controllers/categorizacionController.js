@@ -128,8 +128,7 @@ const actualizarCategoria = async (req, res) => {
         message: 'ID inválido'
       });
     }
-
-    const objectId = mongoose.Types.ObjectId(id);
+  const objectId = mongoose.Types.ObjectId.createFromHexString(id);
 
     if (codigo) {
       const categoriaExistente = await Categorizacion.findOne({

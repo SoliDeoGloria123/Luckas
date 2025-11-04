@@ -1,52 +1,50 @@
 const Solicitud = require('../models/Solicitud');
 const { validationResult } = require('express-validator');
 
-// Obtener todas las solicitudes con filtros
+
+
+// Función auxiliar para construir filtros
+function construirFiltros(query) {
+  const { categoria, estado, prioridad, responsable, fechaDesde, fechaHasta } = query;
+  const filtros = {};
+  if (categoria && categoria !== 'todos') filtros.categoria = categoria;
+  if (estado && estado !== 'todos') filtros.estado = estado;
+  if (prioridad && prioridad !== 'todos') filtros.prioridad = prioridad;
+  if (responsable) filtros.responsableAsignado = responsable;
+  if (fechaDesde || fechaHasta) {
+    filtros.fechaSolicitud = {};
+    if (fechaDesde) filtros.fechaSolicitud.$gte = new Date(fechaDesde);
+    if (fechaHasta) filtros.fechaSolicitud.$lte = new Date(fechaHasta);
+  }
+  return filtros;
+}
+
+// Función auxiliar para paginación
+function configurarPaginacion(query) {
+  const page = Number.parseInt(query.page) || 1;
+  const limit = Number.parseInt(query.limit) || 10;
+  const skip = (page - 1) * limit;
+  return { skip, limit };
+}
+
 exports.obtenerSolicitudes = async (req, res) => {
     try {
-      const { 
-        categoria, 
-        estado, 
-        prioridad, 
-        responsable,
-        fechaDesde,
-        fechaHasta,
-        page = 1, 
-        limit = 10,
-        sortBy = 'fechaSolicitud',
-        sortOrder = 'desc'
-      } = req.query;
+      try {
+        const filtros = construirFiltros(req.query);
+        const { skip, limit } = configurarPaginacion(req.query);
+        const sortBy = req.query.sortBy || 'fechaSolicitud';
+        const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
 
-      // Construir filtros
-      const filtros = {};
-      
-      if (categoria && categoria !== 'todas') filtros.categoria = categoria;
-      if (estado && estado !== 'todos') filtros.estado = estado;
-      if (prioridad && prioridad !== 'todas') filtros.prioridad = prioridad;
-      if (responsable) filtros.responsableAsignado = responsable;
-      
-      // Filtro por fechas
-      if (fechaDesde || fechaHasta) {
-        filtros.fechaSolicitud = {};
-        if (fechaDesde) filtros.fechaSolicitud.$gte = new Date(fechaDesde);
-        if (fechaHasta) filtros.fechaSolicitud.$lte = new Date(fechaHasta);
+        const solicitudes = await Solicitud.find(filtros)
+          .sort({ [sortBy]: sortOrder })
+          .skip(skip)
+          .limit(limit);
+
+        res.json({ success: true, data: solicitudes });
+      } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
       }
-
-      // Configurar paginación
-      const skip = (Number.parseInt(page) - 1) * Number.parseInt(limit);
-      const sortOptions = {};
-      sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
-
-      // Ejecutar consulta
-      const solicitudes = await Solicitud.find(filtros)
-        .populate('solicitante', 'username nombre apellido correo telefono numeroDocumento tipoDocumento role')
-        .populate('categoria', 'nombre  codigo')
-        .populate('responsable', 'nombre apellido')
-        .sort(sortOptions)
-        .skip(skip)
-        .limit(Number.parseInt(limit))
-        .lean();
-
+  
       // Contar total para paginación
       const total = await Solicitud.countDocuments(filtros);
 

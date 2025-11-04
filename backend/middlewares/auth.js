@@ -1,23 +1,21 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Función auxiliar para verificar el token y obtener el usuario
+function obtenerUsuarioDesdeToken(req) {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) throw new Error('Token de autenticacion requerido');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded;
+}
+
 
 exports.authenticate = async (req, res, next) => {
     try {
-        const token = req.header('Authorization')?.replace('Bearer', '');
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'Token de autenticacion requerido'
-            });
-        }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = obtenerUsuarioDesdeToken(req);
         const user = await User.findById(decoded.id);
         if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: 'Usuario no encontrado'
-            });
+            return res.status(401).json({ success: false, message: 'Usuario no encontrado' });
         }
         req.user = user;
         next();
@@ -25,7 +23,7 @@ exports.authenticate = async (req, res, next) => {
         console.error('Error en autenticación:', error);
         res.status(401).json({
             success: false,
-            message: 'Token invalido o expirado',
+            message: error.message === 'Token de autenticacion requerido' ? error.message : 'Token inválido o expirado',
             error: error.message
         });
     }

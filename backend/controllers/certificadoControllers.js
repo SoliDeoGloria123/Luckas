@@ -13,8 +13,8 @@ function validarIds(userId, cursoId) {
   try {
     return {
       valido: true,
-      userObjectId: mongoose.Types.ObjectId(userId),
-      cursoObjectId: mongoose.Types.ObjectId(cursoId)
+      userObjectId: mongoose.Types.ObjectId.createFromHexString(userId),
+      cursoObjectId: mongoose.Types.ObjectId.createFromHexString(cursoId)
     };
   } catch (e) {
     console.error('Error al validar ObjectId:', e);
@@ -166,9 +166,9 @@ exports.generarCertificado = async (req, res) => {
     // ¡IMPORTANTE! Finalizar el documento PDF
     doc.end();
   } catch (error) {
-    res.status(400).json({ 
-      success: false, 
-      message: `Error al generar certificado: ${error.message}` 
+    res.status(400).json({
+      success: false,
+      message: `Error al generar certificado: ${error.message}`
     });
   }
 };
