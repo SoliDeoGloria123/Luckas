@@ -2,11 +2,17 @@
 const multer = require('multer');
 const cloudinary = require('../config/cloudinary');
 const streamifier = require('streamifier');
-
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// Límite de 5 MB por archivo
+const upload = multer({ 
+  storage, 
+  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB por archivo
+}).single('imagen'); // Para un solo archivo
 
-const uploadMultiple = multer({ storage }).array('imagen', 10); // hasta 10 imágenes
+const uploadMultiple = multer({ 
+  storage, 
+  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB por archivo
+}).array('imagen', 10); // Hasta 10 archivos
 
 const uploadToCloudinary = async (req, res, next) => {
   if (!req.file) return next();

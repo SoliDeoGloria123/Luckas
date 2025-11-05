@@ -1,76 +1,37 @@
 const Solicitud = require('../models/Solicitud');
 const { validationResult } = require('express-validator');
+const { construirFiltros, configurarPaginacion, generarPipelineEstadisticasSolicitudes } = require('../utils/solicitudUtils');
 
 
 
-// Función auxiliar para construir filtros
-function construirFiltros(query) {
-  const { categoria, estado, prioridad, responsable, fechaDesde, fechaHasta } = query;
-  const filtros = {};
-  if (categoria && categoria !== 'todos') filtros.categoria = categoria;
-  if (estado && estado !== 'todos') filtros.estado = estado;
-  if (prioridad && prioridad !== 'todos') filtros.prioridad = prioridad;
-  if (responsable) filtros.responsableAsignado = responsable;
-  if (fechaDesde || fechaHasta) {
-    filtros.fechaSolicitud = {};
-    if (fechaDesde) filtros.fechaSolicitud.$gte = new Date(fechaDesde);
-    if (fechaHasta) filtros.fechaSolicitud.$lte = new Date(fechaHasta);
-  }
-  return filtros;
-}
-
-// Función auxiliar para paginación
-function configurarPaginacion(query) {
-  const page = Number.parseInt(query.page) || 1;
-  const limit = Number.parseInt(query.limit) || 10;
-  const skip = (page - 1) * limit;
-  return { skip, limit };
-}
 
 exports.obtenerSolicitudes = async (req, res) => {
     try {
-      try {
-        const filtros = construirFiltros(req.query);
-        const { skip, limit } = configurarPaginacion(req.query);
-        const sortBy = req.query.sortBy || 'fechaSolicitud';
-        const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
+      const filtros = construirFiltros(req.query);
+      const { skip, limit, page } = configurarPaginacion(req.query);
+      const sortBy = req.query.sortBy || 'fechaSolicitud';
+      const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
 
-        const solicitudes = await Solicitud.find(filtros)
-          .sort({ [sortBy]: sortOrder })
-          .skip(skip)
-          .limit(limit);
+      // Obtener solicitudes con paginación
+      const solicitudes = await Solicitud.find(filtros)
+        .sort({ [sortBy]: sortOrder })
+        .skip(skip)
+        .limit(limit);
 
-        res.json({ success: true, data: solicitudes });
-      } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-      }
-  
       // Contar total para paginación
       const total = await Solicitud.countDocuments(filtros);
 
       // Estadísticas
-      const estadisticas = await Solicitud.aggregate([
-        { $match: filtros },
-        {
-          $group: {
-            _id: null,
-            total: { $sum: 1 },
-            nuevas: { $sum: { $cond: [{ $eq: ['$estado', 'Nueva'] }, 1, 0] } },
-            enRevision: { $sum: { $cond: [{ $eq: ['$estado', 'En Revisión'] }, 1, 0] } },
-            urgentes: { $sum: { $cond: [{ $eq: ['$prioridad', 'Urgente'] }, 1, 0] } },
-            completadas: { $sum: { $cond: [{ $eq: ['$estado', 'Completada'] }, 1, 0] } }
-          }
-        }
-      ]);
+      const estadisticas = await Solicitud.aggregate(generarPipelineEstadisticasSolicitudes(filtros));
 
       res.status(200).json({
         success: true,
         data: solicitudes,
         pagination: {
-          currentPage: Number.parseInt(page),
-          totalPages: Math.ceil(total / Number.parseInt(limit)),
+          currentPage: page,
+          totalPages: Math.ceil(total / limit),
           totalItems: total,
-          itemsPerPage: Number.parseInt(limit)
+          itemsPerPage: limit
         },
         estadisticas: estadisticas[0] || {
           total: 0, nuevas: 0, enRevision: 0, urgentes: 0, completadas: 0

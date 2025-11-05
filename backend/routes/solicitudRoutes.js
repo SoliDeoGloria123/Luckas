@@ -7,6 +7,7 @@ const Inscripcion = require('../models/Inscripciones');
 const Reserva = require('../models/Reservas');
 const Solicitud = require('../models/Solicitud');
 
+
 // Validaciones para crear y actualizar solicitud
 const validarSolicitud = [
   body('solicitante')
