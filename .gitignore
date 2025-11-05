@@ -1,2 +1,7 @@
 node_modules
 node_modules
+# Ignorar SonarScanner
+sonar-project.properties
+
+# Ignorar carpeta de workflows de GitHub
+.github/

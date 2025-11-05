@@ -218,17 +218,39 @@ exports.obtenerReservaPorId = async (req, res) => {
 // Actualizar reserva
 exports.actualizarReserva = async (req, res) => {
   try {
-    // Forzar el campo activo a booleano
-    let activo = req.body.activo;
-    if (typeof activo === 'string') {
-      activo = activo === 'true';
-    } else if (typeof activo !== 'boolean') {
-      activo = true;
+    // Forzar el campo activo a booleano si viene en el body
+    if (Object.prototype.hasOwnProperty.call(req.body, 'activo')) {
+      let activo = req.body.activo;
+      if (typeof activo === 'string') {
+        activo = activo === 'true';
+      } else if (typeof activo !== 'boolean') {
+        activo = true;
+      }
+      req.body.activo = activo;
     }
-    req.body.activo = activo;
     const reserva = await Reserva.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!reserva) return res.status(404).json({ success: false, message: 'Reserva no encontrada' });
     res.json({ success: true, data: reserva });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+
+// Alternar activación/desactivación de una reserva
+exports.toggleReservaActivation = async (req, res) => {
+  try {
+    const reserva = await Reserva.findById(req.params.id);
+    if (!reserva) {
+      return res.status(404).json({ success: false, message: 'Reserva no encontrada' });
+    }
+    reserva.activo = !reserva.activo;
+    await reserva.save();
+    res.json({
+      success: true,
+      message: reserva.activo ? 'Reserva activada' : 'Reserva desactivada',
+      data: reserva
+    });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
