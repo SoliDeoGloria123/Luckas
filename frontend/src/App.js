@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Index from './components/Panel Principal/Panel'
 import Login from './components/Login/Login';
 import Registro from './components/signup/registro';
 import OlvidoPassw from './components/forget password/olvidarPassword';
@@ -43,6 +42,7 @@ import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
 import Perfil from './components/Seminarista/Shared/MiPerfil';
 import Configuracion from './components/Seminarista/pages/configuracion';
+import PanelPrincipal from './components/Panel Principal/Panel'
 
 
 // Componente para usuarios externos
@@ -52,7 +52,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Index to="/index" replace />} />
+        <Route path="/" element={<PanelPrincipal />} />
         <Route path="/external" element={<ExternalDashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup/registro" element={<Registro />} />

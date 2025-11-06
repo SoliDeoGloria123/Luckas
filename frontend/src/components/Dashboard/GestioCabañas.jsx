@@ -10,6 +10,10 @@ import {
   Plus,
   X,
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+
+
+
 
 const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [cabanas, setCabanas] = useState([]);
@@ -185,7 +189,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
           seccionActiva={seccionActiva}
         />
         <div className="seccion-usuarios">
-          <div  className="page-header-Academicos">
+          <div className="page-header-Academicos">
             <div className="page-title-admin">
               <h1>Gestión de Cabañas</h1>
               <p >Administra las cabañas y alojamientos del seminario</p>
@@ -330,4 +334,11 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   );
 };
 
+GestioCabañas.propTypes = {
+  readOnly: PropTypes.bool,
+  modoTesorero: PropTypes.bool,
+  canCreate: PropTypes.bool,
+  canEdit: PropTypes.bool,
+  canDelete: PropTypes.bool
+};
 export default GestioCabañas;

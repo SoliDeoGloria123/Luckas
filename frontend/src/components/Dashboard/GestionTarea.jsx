@@ -6,6 +6,7 @@ import TareaModal from "./Modales/TareaModal";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
+import PropTypes from 'prop-types';
 
 const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [tareas, setTareas] = useState([]);
@@ -148,13 +149,13 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
   });
 
 
-    const [paginaActual, setPaginaActual] = useState(1);
-    const registrosPorPagina = 10;
-    const totalPaginas = Math.ceil(tareasFiltradas.length / registrosPorPagina);
-    const tareasPaginadas = tareasFiltradas.slice(
-      (paginaActual - 1) * registrosPorPagina,
-      paginaActual * registrosPorPagina
-    );
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
+  const totalPaginas = Math.ceil(tareasFiltradas.length / registrosPorPagina);
+  const tareasPaginadas = tareasFiltradas.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
@@ -222,7 +223,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
           </div>
           <section className="filtros-section-admin">
             <div className="busqueda-contenedor">
-              <i class="fas fa-search"></i>
+              <i className="fas fa-search"></i>
               <input
                 type="text"
                 placeholder="Buscar Tarea..."
@@ -271,8 +272,8 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
           <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
             <button
               className="pagination-btn-admin"
-            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
-            disabled={paginaActual === 1}
+              onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+              disabled={paginaActual === 1}
             >
               <i className="fas fa-chevron-left"></i>
             </button>
@@ -281,8 +282,8 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
             </span>
             <button
               className="pagination-btn-admin"
-            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-             disabled={paginaActual === totalPaginas || totalPaginas === 0}
+              onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+              disabled={paginaActual === totalPaginas || totalPaginas === 0}
             >
               <i className="fas fa-chevron-right"></i>
             </button>
@@ -294,3 +295,13 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
 };
 
 export default GestionTarea;
+
+// Validación de props con PropTypes
+
+GestionTarea.propTypes = {
+  readOnly: PropTypes.bool,
+  modoTesorero: PropTypes.bool,
+  canCreate: PropTypes.bool,
+  canEdit: PropTypes.bool,
+  canDelete: PropTypes.bool
+};

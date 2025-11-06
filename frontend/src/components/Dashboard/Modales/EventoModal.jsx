@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+  import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 
 const EventoModal = ({
@@ -111,8 +112,9 @@ const EventoModal = ({
         <form className="modal-body-admin" onSubmit={e => { e.preventDefault(); onSubmit(); handleSubmit(); }}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Nombre Evento:</label>
+              <label htmlFor="nombre-evento">Nombre Evento:</label>
               <input
+                id="nombre-evento"
                 type="text"
                 value={modoEdicion ? eventoSeleccionado?.nombre : nuevoEvento.nombre}
                 onChange={e =>
@@ -125,8 +127,9 @@ const EventoModal = ({
             </div>
 
             <div className="form-grupo-admin">
-              <label>Descripcion Evento:</label>
+              <label htmlFor="descripcion-evento">Descripcion Evento:</label>
               <input
+                id="descripcion-evento"
                 type="text"
                 value={modoEdicion ? eventoSeleccionado?.descripcion : nuevoEvento.descripcion}
                 onChange={e =>
@@ -140,8 +143,9 @@ const EventoModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Precio Evento:</label>
+              <label htmlFor="precio-evento">Precio Evento:</label>
               <input
+                id="precio-evento"
                 type="number"
                 value={modoEdicion ? eventoSeleccionado?.precio : nuevoEvento.precio}
                 onChange={e =>
@@ -153,8 +157,9 @@ const EventoModal = ({
               />
             </div>
             <div className="form-grupo-admin">
-              <label>Categoría:</label>
+              <label htmlFor="categoria-evento">Categoría:</label>
               <select
+                id="categoria-evento"
                 value={modoEdicion ? eventoSeleccionado?.categoria : nuevoEvento.categoria}
                 onChange={e =>
                   modoEdicion
@@ -175,8 +180,9 @@ const EventoModal = ({
           <div className="from-grid-admin">
             {!modoEdicion && (
               <div className="form-grupo-admin">
-                <label>Etiquetas Evento:</label>
+                <label htmlFor="etiquetas-evento">Etiquetas Evento:</label>
                 <input
+                  id="etiquetas-evento"
                   type="text"
                   value={nuevoEvento.etiquetas}
                   onChange={e =>
@@ -187,8 +193,9 @@ const EventoModal = ({
               </div>
             )}
             <div className="form-grupo-admin">
-              <label>Fecha del Evento:</label>
+              <label htmlFor="fecha-evento">Fecha del Evento:</label>
               <input
+                id="fecha-evento"
                 type="date"
                 value={modoEdicion ? eventoSeleccionado?.fechaEvento : nuevoEvento.fechaEvento}
                 onChange={e =>
@@ -202,8 +209,9 @@ const EventoModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Hora de Inicio:</label>
+              <label htmlFor="hora-inicio">Hora de Inicio:</label>
               <input
+                id="hora-inicio"
                 type="time"
                 value={modoEdicion ? eventoSeleccionado?.horaInicio : nuevoEvento.horaInicio}
                 onChange={e =>
@@ -215,8 +223,9 @@ const EventoModal = ({
             </div>
 
             <div className="form-grupo-admin">
-              <label>Hora de Fin:</label>
+              <label htmlFor="hora-fin">Hora de Fin:</label>
               <input
+                id="hora-fin"
                 type="time"
                 value={modoEdicion ? eventoSeleccionado?.horaFin : nuevoEvento.horaFin}
                 onChange={e =>
@@ -229,8 +238,9 @@ const EventoModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Lugar:</label>
+              <label htmlFor="lugar-evento">Lugar:</label>
               <input
+                id="lugar-evento"
                 type="text"
                 value={modoEdicion ? eventoSeleccionado?.lugar : nuevoEvento.lugar}
                 onChange={e =>
@@ -243,8 +253,9 @@ const EventoModal = ({
             </div>
             {!modoEdicion && (
               <div className="form-grupo-admin">
-                <label>Dirección:</label>
+                <label htmlFor="direccion-evento">Dirección:</label>
                 <input
+                  id="direccion-evento"
                   type="text"
                   value={nuevoEvento.direccion}
                   onChange={e =>
@@ -257,8 +268,9 @@ const EventoModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Cupos Totales:</label>
+              <label htmlFor="cupos-totales">Cupos Totales:</label>
               <input
+                id="cupos-totales"
                 type="number"
                 value={modoEdicion ? eventoSeleccionado?.cuposTotales : nuevoEvento.cuposTotales}
                 onChange={e =>
@@ -270,8 +282,9 @@ const EventoModal = ({
             </div>
 
             <div className="form-grupo-admin">
-              <label>Cupos Disponibles:</label>
+              <label htmlFor="cupos-disponibles">Cupos Disponibles:</label>
               <input
+                id="cupos-disponibles"
                 type="number"
                 value={modoEdicion ? eventoSeleccionado?.cuposDisponibles : nuevoEvento.cuposDisponibles}
                 onChange={e =>
@@ -284,8 +297,9 @@ const EventoModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Prioridad:</label>
+              <label htmlFor="prioridad-evento">Prioridad:</label>
               <select
+                id="prioridad-evento"
                 value={modoEdicion ? eventoSeleccionado?.prioridad : nuevoEvento.prioridad}
                 onChange={e =>
                   modoEdicion
@@ -301,8 +315,9 @@ const EventoModal = ({
             </div>
             {!modoEdicion && (
               <div className="form-grupo-admin">
-                <label>Observaciones:</label>
+                <label htmlFor="observaciones-evento">Observaciones:</label>
                 <input
+                  id="observaciones-evento"
                   type="text"
                   value={nuevoEvento.observaciones}
                   onChange={e =>
@@ -315,8 +330,9 @@ const EventoModal = ({
           </div>
 
           <div className="form-grupo-admin">
-            <label>Estado:</label>
+            <label htmlFor="estado-evento">Estado:</label>
             <select
+              id="estado-evento"
               value={modoEdicion ? eventoSeleccionado?.active : nuevoEvento.active}
               onChange={e =>
                 modoEdicion
@@ -332,9 +348,9 @@ const EventoModal = ({
 
 
           <div className="form-group-tesorero full-width">
-            <label>Imagen</label>
+            <label htmlFor="imagen-evento">Imagen</label>
             <div className="image-upload-container">
-              <div className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
+              <button className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault();
@@ -347,7 +363,7 @@ const EventoModal = ({
                   <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
                 </div>
                 <input type="file" id='imageInput' multiple accept="image/*" hidden onChange={(e) => handleFileSelection(e.target.files)} />
-              </div>
+              </button>
 
 
               <div className="image-preview-grid" id="imagePreviewGrid">
@@ -380,4 +396,49 @@ const EventoModal = ({
     </div>
   );
 };
+
+EventoModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  modoEdicion: PropTypes.bool,
+  eventoSeleccionado: PropTypes.shape({
+    nombre: PropTypes.string,
+    descripcion: PropTypes.string,
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    categoria: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    fechaEvento: PropTypes.string,
+    horaInicio: PropTypes.string,
+    horaFin: PropTypes.string,
+    lugar: PropTypes.string,
+    cuposTotales: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    cuposDisponibles: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    prioridad: PropTypes.string,
+    active: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+    observaciones: PropTypes.string
+  }),
+  setEventoSeleccionado: PropTypes.func,
+  nuevoEvento: PropTypes.shape({
+    nombre: PropTypes.string,
+    descripcion: PropTypes.string,
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    categoria: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    fechaEvento: PropTypes.string,
+    horaInicio: PropTypes.string,
+    horaFin: PropTypes.string,
+    lugar: PropTypes.string,
+    direccion: PropTypes.string,
+    cuposTotales: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    cuposDisponibles: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    prioridad: PropTypes.string,
+    active: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+    etiquetas: PropTypes.string,
+    observaciones: PropTypes.string
+  }),
+  setNuevoEvento: PropTypes.func,
+  categorias: PropTypes.array,
+  onClose: PropTypes.func,
+  onSubmit: PropTypes.func,
+  selectedImages: PropTypes.array,
+  setSelectedImages: PropTypes.func
+};
+
 export default EventoModal;

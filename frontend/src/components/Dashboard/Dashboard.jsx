@@ -1,15 +1,11 @@
+import PropTypes from 'prop-types';
 import React, { useState, useRef, Suspense } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
-
 import {
   Users,
   BarChart3,
   UserPlus,
-  Bell,
-  Search,
-  Menu,
-  Plus,
   Activity,
   TrendingUp,
   TrendingDown,
@@ -18,17 +14,12 @@ import {
   Sun,
   Moon
 } from 'lucide-react';
-
-// Estilos
 import './Dashboard.css';
-
 // Hooks optimizados
 import { useDashboardAdmin } from './hooks/useDashboardAdmin';
 import { useUsuariosAdmin } from './hooks/useUsuariosAdmin';
 import { useTheme } from './hooks/useTheme';
-
 // Componentes
-
 import { PremiumLoader } from './LazyComponents';
 
 
@@ -214,9 +205,6 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
               <div className="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded">
                 <small>Debug: Sección activa = "{seccionActiva}"</small>
               </div>
-
-  
-
               {/* Secciones no implementadas aún */}
               {!["programas-academicos", "eventos", "cabanas"].includes(seccionActiva) && (
                 <div className="glass-card rounded-2xl p-8 border border-white/20 shadow-lg fade-in-up">
@@ -235,6 +223,14 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
       </div>
     </div>
   );
+};
+
+Dashboard.propTypes = {
+  usuario: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string
+  ]),
+  onCerrarSesion: PropTypes.func
 };
 
 export default Dashboard;

@@ -7,7 +7,7 @@ import useBusqueda from "./Busqueda/useBusqueda";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
-
+import PropTypes from 'prop-types';
 
 
 const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, modoTesorero = false, userRole, readOnly = false, canCreate = true, canEdit = true, canDelete = true }) => {
@@ -253,7 +253,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
           </div>
           <section className="filtros-section-admin">
             <div className="busqueda-contenedor">
-              <i class="fas fa-search"></i>
+              <i className="fas fa-search"></i>
               <input
                 type="text"
                 placeholder="Buscar por nombre, apellido, cédula, correo..."
@@ -281,7 +281,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
           </section>
           <div className="p-6 glass-card rounded-2xl border border-white/20 shadow-lg overflow-hidden user-card">
             <TablaUnificadaSolicitudes
-             datosUnificados={{ solicitudes: solicitudesPaginadas, inscripciones: [], reservas: [] }}
+              datosUnificados={{ solicitudes: solicitudesPaginadas, inscripciones: [], reservas: [] }}
               abrirModalEditarSolicitud={(canEdit && !readOnly) ? abrirModalEditarSolicitud : null}
               eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
             />
@@ -311,8 +311,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
             </span>
             <button
               className="pagination-btn-admin"
-            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-             disabled={paginaActual === totalPaginas || totalPaginas === 0}
+              onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+              disabled={paginaActual === totalPaginas || totalPaginas === 0}
             >
               <i className="fas fa-chevron-right"></i>
             </button>
@@ -324,3 +324,16 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
 };
 
 export default GestionSolicitud;
+
+// Validación de props con PropTypes
+
+GestionSolicitud.propTypes = {
+  usuario: PropTypes.object,
+  onCerrarSesion: PropTypes.func,
+  modoTesorero: PropTypes.bool,
+  userRole: PropTypes.string,
+  readOnly: PropTypes.bool,
+  canCreate: PropTypes.bool,
+  canEdit: PropTypes.bool,
+  canDelete: PropTypes.bool
+};

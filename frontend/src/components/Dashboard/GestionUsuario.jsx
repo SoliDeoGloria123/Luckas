@@ -5,6 +5,7 @@ import { userService } from "../../services/userService";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
+import PropTypes from 'prop-types';
 
 import "./Dashboard.css";
 
@@ -73,15 +74,15 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
     };
 
     // Calcular estadísticas
-    
-        const obtenerEstadisticas = async () => {
-            try {
-                const stats = await userService.getUserStats();
-                setEstadisticas(stats);
-            } catch (error) {
-                console.error("Error al obtener estadísticas de usuarios:", error);
-            }
-        };
+
+    const obtenerEstadisticas = async () => {
+        try {
+            const stats = await userService.getUserStats();
+            setEstadisticas(stats);
+        } catch (error) {
+            console.error("Error al obtener estadísticas de usuarios:", error);
+        }
+    };
 
     // Crear usuario
     const crearUsuario = async (e) => {
@@ -210,13 +211,13 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
     //desactivar usuario o activarlo
     const onToggleEstado = async (usuario) => {
         const nuevoEstado = usuario.estado === "activo" ? "inactivo" : "activo";
-       try {
-        await userService.toggleUserEstado(usuario._id, nuevoEstado);
-        mostrarAlerta("¡Éxito!", `Usuario ${nuevoEstado === "activo" ? "activado" : "desactivado"} exitosamente`);
-        obtenerUsuarios(); // <-- Esto refresca la lista
-    } catch (error) {
-        mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`);
-    }
+        try {
+            await userService.toggleUserEstado(usuario._id, nuevoEstado);
+            mostrarAlerta("¡Éxito!", `Usuario ${nuevoEstado === "activo" ? "activado" : "desactivado"} exitosamente`);
+            obtenerUsuarios(); // <-- Esto refresca la lista
+        } catch (error) {
+            mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`);
+        }
     };
 
 
@@ -377,3 +378,16 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
 }
 
 export default GestionUsuario;
+
+// Validación de props con PropTypes
+
+GestionUsuario.propTypes = {
+    usuario: PropTypes.object,
+    onCerrarSesion: PropTypes.func,
+    modoTesorero: PropTypes.bool,
+    userRole: PropTypes.string,
+    readOnly: PropTypes.bool,
+    canCreate: PropTypes.bool,
+    canEdit: PropTypes.bool,
+    canDelete: PropTypes.bool
+};

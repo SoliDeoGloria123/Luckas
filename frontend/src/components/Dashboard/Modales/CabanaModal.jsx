@@ -1,5 +1,6 @@
 
 import React, {useState} from "react";
+import PropTypes from 'prop-types';
 
 
 const CabanaModal = ({
@@ -100,8 +101,9 @@ const CabanaModal = ({
         <form className="modal-body-admin" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Nombre:</label>
+              <label htmlFor="nombre-cabana">Nombre:</label>
               <input
+                id="nombre-cabana"
                 type="text"
                 value={modoEdicion ? cabanaSeleccionada?.nombre : nuevaCabana.nombre}
                 onChange={e =>
@@ -114,8 +116,9 @@ const CabanaModal = ({
               />
             </div>
             <div className="form-grupo-admin">
-              <label>Descripción:</label>
+              <label htmlFor="descripcion-cabana">Descripción:</label>
               <input
+                id="descripcion-cabana"
                 type="text"
                 value={modoEdicion ? cabanaSeleccionada?.descripcion : nuevaCabana.descripcion}
                 onChange={e =>
@@ -129,8 +132,9 @@ const CabanaModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Capacidad:</label>
+              <label htmlFor="capacidad-cabana">Capacidad:</label>
               <input
+                id="capacidad-cabana"
                 type="number"
                 value={modoEdicion ? cabanaSeleccionada?.capacidad : nuevaCabana.capacidad}
                 onChange={e =>
@@ -143,8 +147,9 @@ const CabanaModal = ({
               />
             </div>
             <div className="form-grupo-admin">
-              <label>Categoría:</label>
+              <label htmlFor="categoria-cabana">Categoría:</label>
               <select
+                id="categoria-cabana"
                 type="text"
                 value={modoEdicion ? cabanaSeleccionada?.categoria : nuevaCabana.categoria}
                 onChange={e =>
@@ -165,8 +170,9 @@ const CabanaModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Precio:</label>
+              <label htmlFor="precio-cabana">Precio:</label>
               <input
+                id="precio-cabana"
                 type="number"
                 value={modoEdicion ? cabanaSeleccionada?.precio : nuevaCabana.precio}
                 onChange={e =>
@@ -180,8 +186,9 @@ const CabanaModal = ({
             </div>
             {!modoEdicion && (
               <div className="form-grupo-admin">
-                <label>Ubicacion:</label>
+                <label htmlFor="ubicacion-cabana">Ubicacion:</label>
                 <input
+                  id="ubicacion-cabana"
                   type="text"
                   value={nuevaCabana.ubicacion}
                   onChange={e =>
@@ -194,8 +201,9 @@ const CabanaModal = ({
           </div>
       
             <div className="form-grupo-admin">
-              <label>Estado:</label>
+              <label htmlFor="estado-cabana">Estado:</label>
               <select
+                id="estado-cabana"
                 value={modoEdicion ? cabanaSeleccionada?.estado : nuevaCabana.estado}
                 onChange={e =>
                   modoEdicion
@@ -211,9 +219,9 @@ const CabanaModal = ({
             </div>
         
             <div className="form-group-tesorero full-width">
-              <label>Imagen</label>
+              <label htmlFor="imageInput">Imagen</label>
               <div className="image-upload-container">
-                <div className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
+                <button className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
                     e.preventDefault();
@@ -226,7 +234,7 @@ const CabanaModal = ({
                     <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
                   </div>
                   <input type="file" id='imageInput' multiple accept="image/*" hidden onChange={(e) => handleFileSelection(e.target.files)} />
-                </div>
+                </button>
 
 
                 <div className="image-preview-grid" id="imagePreviewGrid">
@@ -250,11 +258,11 @@ const CabanaModal = ({
           </small>
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" type="button" onClick={onClose}>
-              <i class="fas fa-times"></i>
+              <i className="fas fa-times"></i>
               Cancelar
             </button>
             <button className="btn-admin btn-primary" type="submit">
-              <i class="fas fa-save"></i>
+              <i className="fas fa-save"></i>
               {modoEdicion ? "Guardar Cambios" : "Crear Cabaña"}
             </button>
           </div>
@@ -264,5 +272,37 @@ const CabanaModal = ({
     </div>
   );
 };
+CabanaModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  modoEdicion: PropTypes.bool,
+  cabanaSeleccionada: PropTypes.shape({
+    nombre: PropTypes.string,
+    descripcion: PropTypes.string,
+    capacidad: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    categoria: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    estado: PropTypes.string,
+    imagen: PropTypes.array,
+    ubicacion: PropTypes.string
+  }),
+  setCabanaSeleccionada: PropTypes.func,
+  nuevaCabana: PropTypes.shape({
+    nombre: PropTypes.string,
+    descripcion: PropTypes.string,
+    capacidad: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    categoria: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    estado: PropTypes.string,
+    imagen: PropTypes.array,
+    ubicacion: PropTypes.string
+  }),
+  setNuevaCabana: PropTypes.func,
+  onClose: PropTypes.func,
+  onSubmit: PropTypes.func,
+  categorias: PropTypes.array,
+  selectedImages: PropTypes.array,
+  setSelectedImages: PropTypes.func
+};
 
 export default CabanaModal;
+

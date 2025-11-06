@@ -253,7 +253,7 @@ const GestionIscripcion = () => {
 
           <section className="filtros-section-admin">
             <div className="busqueda-contenedor">
-              <i class="fas fa-search"></i>
+              <i className="fas fa-search"></i>
               <input
                 type="text"
                 placeholder="Buscar por nombre, apellido, cédula, correo..."

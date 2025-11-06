@@ -8,6 +8,7 @@ import useBusqueda from "./Busqueda/useBusqueda";
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import PropTypes from 'prop-types';
 
 const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [reservas, setReservas] = useState([]);
@@ -253,7 +254,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
           </div>
           <section className="filtros-section-admin">
             <div className="busqueda-contenedor">
-              <i class="fas fa-search"></i>
+              <i className="fas fa-search"></i>
               <input
                 type="text"
                 placeholder="Buscar Reserva..."
@@ -262,7 +263,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
                 className="input-busqueda"
               />
             </div>
-            <div class="filtro-grupo-admin">
+            <div className="filtro-grupo-admin">
               <select className="filtro-dropdown">
                 <option>Todos los Roles</option>
                 <option>Administrador</option>
@@ -323,3 +324,13 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
 };
 
 export default GestionReservas;
+
+// Validación de props con PropTypes
+
+GestionReservas.propTypes = {
+  readOnly: PropTypes.bool,
+  modoTesorero: PropTypes.bool,
+  canCreate: PropTypes.bool,
+  canEdit: PropTypes.bool,
+  canDelete: PropTypes.bool
+};

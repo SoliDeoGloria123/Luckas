@@ -37,7 +37,7 @@ const Footer = () => {
       </div>
       <div className="footer-bottom">
         <div className="footer-logo">
-          <img src="../../public/favicon.ico" alt="LUCKAS Logo" />
+          <img src="/favicon.ico" alt="LUCKAS Logo" />
         </div>
         <div className="footer-copyright">
           <p>© 2024 LUCKAS - Seminario Bautista de Colombia. Todos los derechos reservados.</p>

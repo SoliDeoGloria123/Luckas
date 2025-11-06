@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types';
 
 const CategorizacionModal = ({
   mostrar,
@@ -30,8 +31,9 @@ const CategorizacionModal = ({
         <div className="modal-body-admin">
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Nombre:</label>
+              <label htmlFor="nombre-categoria">Nombre:</label>
               <input
+                id="nombre-categoria"
                 type="text"
                 value={modoEdicion ? categoriaSeleccionada?.nombre : nuevaCategoria.nombre}
                 onChange={e =>
@@ -44,16 +46,15 @@ const CategorizacionModal = ({
               />
             </div>
             <div className="form-grupo-admin">
-              <label>Tipo Categoria:</label>
+              <label htmlFor="tipo-categoria">Tipo Categoria:</label>
               <select
-  
+                id="tipo-categoria"
                 value={modoEdicion ? categoriaSeleccionada?.tipo : nuevaCategoria.tipo}
                 onChange={e =>
                   modoEdicion
                     ? setCategoriaSeleccionada({ ...categoriaSeleccionada, tipo: e.target.value })
                     : setNuevaCategoria({ ...nuevaCategoria, tipo: e.target.value })
                 }
-  
                 required
               >
                 <option value="curso">Cursos</option>
@@ -69,8 +70,9 @@ const CategorizacionModal = ({
 
             <div className="form-grupo-admin">
               <div className="form-grupo-admin">
-                <label>Código:</label>
+                <label htmlFor="codigo-categoria">Código:</label>
                 <input
+                  id="codigo-categoria"
                   type="text"
                   value={modoEdicion ? categoriaSeleccionada?.codigo : nuevaCategoria.codigo}
                   onChange={e =>
@@ -84,8 +86,9 @@ const CategorizacionModal = ({
               </div>
             </div>
             <div className="form-grupo-admin">
-            <label>Estado:</label>
+            <label htmlFor="estado-categoria">Estado:</label>
             <select
+              id="estado-categoria"
               value={modoEdicion ? categoriaSeleccionada?.estado : nuevaCategoria.estado}
               onChange={e =>
                 modoEdicion
@@ -101,17 +104,39 @@ const CategorizacionModal = ({
         </div>
         <div className="modal-action-admin">
           <button className="btn-admin secondary-admin" onClick={onClose}>
-            <i class="fas fa-times"></i>
+            <i className="fas fa-times"></i>{" "}
             Cancelar
           </button>
           <button className="btn-admin btn-primary" onClick={onSubmit}>
-            <i class="fas fa-save"></i>
+            <i className="fas fa-save"></i>{" "}
             {modoEdicion ? "Guardar Cambios" : "Crear Categoría"}
           </button>
         </div>
       </div>
     </div>
   );
+};
+
+
+CategorizacionModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  modoEdicion: PropTypes.bool,
+  categoriaSeleccionada: PropTypes.shape({
+    nombre: PropTypes.string,
+    tipo: PropTypes.string,
+    codigo: PropTypes.string,
+    estado: PropTypes.string
+  }),
+  setCategoriaSeleccionada: PropTypes.func,
+  nuevaCategoria: PropTypes.shape({
+    nombre: PropTypes.string,
+    tipo: PropTypes.string,
+    codigo: PropTypes.string,
+    estado: PropTypes.string
+  }),
+  setNuevaCategoria: PropTypes.func,
+  onClose: PropTypes.func,
+  onSubmit: PropTypes.func
 };
 
 export default CategorizacionModal;

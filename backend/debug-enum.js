@@ -7,7 +7,7 @@ console.log('enum values:', schema.enumValues);
 
 schema.enumValues.forEach((value, index) => {
   console.log(`${index}: "${value}" (length: ${value.length})`);
-  console.log('Bytes:', [...value].map(char => char.charCodeAt(0)));
+  console.log('Bytes:', [...value].map(char => char.codePointAt(0)));
   console.log('---');
 });
 
@@ -24,8 +24,8 @@ console.log('\nPruebas de normalización:');
 testValues.forEach(value => {
   const normalized = normalizeTipoDocumento(value);
   console.log(`"${value}" -> "${normalized}"`);
-  console.log('Original bytes:', [...value].map(char => char.charCodeAt(0)));
-  console.log('Normalized bytes:', [...normalized].map(char => char.charCodeAt(0)));
+  console.log('Original bytes:', [...value].map(char => char.codePointAt(0)));
+  console.log('Normalized bytes:', [...normalized].map(char => char.codePointAt(0)));
   console.log('Match:', schema.enumValues.includes(normalized));
   console.log('---');
 });

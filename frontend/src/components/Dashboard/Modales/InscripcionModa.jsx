@@ -1,5 +1,6 @@
-                   import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { userService } from "../../../services/ObteneruserService";
+import PropTypes from 'prop-types';
 
 const defaultForm = {
   usuario: "",
@@ -95,14 +96,14 @@ const InscripcionModal = ({
         numeroDocumento: usuario.numeroDocumento
       });
       setUsuarioEncontrado(usuario);
-      
+
       // Calcular edad a partir de la fecha de nacimiento
       let edadCalculada = 25; // Edad por defecto
       if (usuario.fechaNacimiento) {
         try {
           const hoy = new Date();
           const fechaNac = new Date(usuario.fechaNacimiento);
-          if (!isNaN(fechaNac.getTime())) {
+          if (!Number.isNaN(fechaNac.getTime())) {
             edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
             const mes = hoy.getMonth() - fechaNac.getMonth();
             if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
@@ -116,7 +117,7 @@ const InscripcionModal = ({
       } else {
         console.log('⚠️ Usuario sin fecha de nacimiento, usando edad por defecto');
       }
-      
+
       setForm(prev => ({
         ...prev,
         usuario: String(usuario._id || ""),
@@ -173,7 +174,7 @@ const InscripcionModal = ({
     ].includes(name)) {
       return;
     }
-    
+
     // Si es el campo numeroDocumento, actualizar también la búsqueda de cédula
     if (name === "numeroDocumento") {
       setCedulaBusqueda(value);
@@ -241,7 +242,7 @@ const InscripcionModal = ({
       numeroDocumento: form.numeroDocumento,
       correo: form.correo,
       telefono: form.telefono,
-      edad: parseInt(form.edad) || 0,
+      edad: Number.parseInt(form.edad) || 0,
       tipoReferencia: form.tipoReferencia,
       referencia: form.referencia,
       categoria: form.categoria,
@@ -280,8 +281,9 @@ const InscripcionModal = ({
         <form className="modal-body-admin" onSubmit={handleSubmit}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Cédula del Usuario:</label>
+              <label htmlFor="cedula-usuario">Cédula del Usuario:</label>
               <input
+                id="cedula-usuario"
                 type="text"
                 value={cedulaBusqueda}
                 onChange={handleChangeCedula}
@@ -310,31 +312,31 @@ const InscripcionModal = ({
               )}
             </div>
             <div className="form-grupo-admin">
-              <label>
+              <label htmlFor="nombre-usuario">
                 Nombre:
                 {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
                   <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
                 )}
               </label>
-              <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" disabled={modo === "editar"} />
+              <input id="nombre-usuario" name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" disabled={modo === "editar"} />
             </div>
             <div className="form-grupo-admin">
-              <label>
+              <label htmlFor="apellido-usuario">
                 Apellido:
                 {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
                   <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
                 )}
               </label>
-              <input name="apellido" value={form.apellido} onChange={handleChange} placeholder="Apellido" disabled={modo === "editar"} />
+              <input id="apellido-usuario" name="apellido" value={form.apellido} onChange={handleChange} placeholder="Apellido" disabled={modo === "editar"} />
             </div>
             <div className="form-grupo-admin">
-              <label>
+              <label htmlFor="tipo-documento">
                 Tipo de Documento:
                 {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
                   <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
                 )}
               </label>
-              <select name="tipoDocumento" value={form.tipoDocumento} onChange={handleChange} disabled={modo === "editar"} required>
+              <select id="tipo-documento" name="tipoDocumento" value={form.tipoDocumento} onChange={handleChange} disabled={modo === "editar"} required>
                 <option value="">Seleccione tipo de documento</option>
                 <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
                 <option value="Cédula de extranjería">Cédula de extranjería</option>
@@ -343,52 +345,54 @@ const InscripcionModal = ({
               </select>
             </div>
             <div className="form-grupo-admin">
-              <label>Número de Documento:</label>
-              <input name="numeroDocumento" value={form.numeroDocumento} onChange={handleChange} placeholder="Número de Documento" disabled={modo === "editar"} required />
+              <label htmlFor="numero-documento">Número de Documento:</label>
+              <input id="numero-documento" name="numeroDocumento" value={form.numeroDocumento} onChange={handleChange} placeholder="Número de Documento" disabled={modo === "editar"} required />
             </div>
             <div className="form-grupo-admin">
-              <label>
+              <label htmlFor="correo-usuario">
                 Correo:
                 {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
                   <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
                 )}
               </label>
-              <input name="correo" type="email" value={form.correo} onChange={handleChange} placeholder="Correo" disabled={modo === "editar"} />
+              <input id="correo-usuario" name="correo" type="email" value={form.correo} onChange={handleChange} placeholder="Correo" disabled={modo === "editar"} />
             </div>
             <div className="form-grupo-admin">
-              <label>
+              <label htmlFor="telefono-usuario">
                 Teléfono:
                 {modo === "crear" && !usuarioEncontrado && cedulaBusqueda && (
                   <span style={{ color: '#28a745', fontSize: '11px', marginLeft: '5px' }}>✏️ Manual</span>
                 )}
               </label>
-              <input name="telefono" type="tel" value={form.telefono} onChange={handleChange} placeholder="Teléfono" disabled={modo === "editar"} required />
+              <input id="telefono-usuario" name="telefono" type="tel" value={form.telefono} onChange={handleChange} placeholder="Teléfono" disabled={modo === "editar"} required />
             </div>
             <div className="form-grupo-admin">
-              <label>Edad:</label>
-              <input 
-                name="edad" 
-                value={form.edad} 
-                onChange={handleChange} 
-                placeholder="Edad" 
-                type="number" 
+              <label htmlFor="edad-usuario">Edad:</label>
+              <input
+                id="edad-usuario"
+                name="edad"
+                value={form.edad}
+                onChange={handleChange}
+                placeholder="Edad"
+                type="number"
                 min="1"
                 max="120"
                 style={{
-                  borderColor: !form.edad || parseInt(form.edad) < 1 ? '#dc3545' : '#28a745',
+                  borderColor: !form.edad || Number.parseInt(form.edad) < 1 ? '#dc3545' : '#28a745',
                   backgroundColor: !form.edad || parseInt(form.edad) < 1 ? '#f8d7da' : '#d4edda'
                 }}
                 title="La edad es calculada automáticamente desde la fecha de nacimiento, pero puede editarse si es necesario"
               />
-              {form.edad && parseInt(form.edad) > 0 && (
+              {form.edad && Number.parseInt(form.edad) > 0 && (
                 <small style={{ marginTop: '5px', fontSize: '12px', color: '#28a745', display: 'block' }}>
                   ✅ Edad válida
                 </small>
               )}
             </div>
             <div className="form-grupo-admin">
-              <label>Tipo de inscripción:</label>
+              <label htmlFor="tipo-referencia">Tipo de inscripción:</label>
               <select
+                id="tipo-referencia"
                 name="tipoReferencia"
                 value={form.tipoReferencia}
                 onChange={handleChange}
@@ -402,8 +406,9 @@ const InscripcionModal = ({
             </div>
             {form.tipoReferencia === "Eventos" && (
               <div className="form-grupo-admin">
-                <label>Evento:</label>
+                <label htmlFor="evento-referencia">Evento:</label>
                 <select
+                  id="evento-referencia"
                   name="referencia"
                   value={form.referencia}
                   onChange={handleChange}
@@ -419,8 +424,9 @@ const InscripcionModal = ({
             )}
             {form.tipoReferencia === "ProgramaAcademico" && (
               <div className="form-grupo-admin">
-                <label>Programa académico:</label>
+                <label htmlFor="programa-referencia">Programa académico:</label>
                 <select
+                  id="programa-referencia"
                   name="referencia"
                   value={form.referencia}
                   onChange={handleChange}
@@ -435,8 +441,9 @@ const InscripcionModal = ({
               </div>
             )}
             <div className="form-grupo-admin">
-              <label>Categoría:</label>
+              <label htmlFor="categoria-referencia">Categoría:</label>
               <select
+                id="categoria-referencia"
                 name="categoria"
                 value={form.categoria}
                 onChange={handleChange}
@@ -450,8 +457,8 @@ const InscripcionModal = ({
               </select>
             </div>
             <div className="form-grupo-admin">
-              <label>Estado:</label>
-              <select name="estado" value={form.estado} onChange={handleChange} placeholder="Estado" >
+              <label htmlFor="estado-referencia">Estado:</label>
+              <select id="estado-referencia" name="estado" value={form.estado} onChange={handleChange} placeholder="Estado" >
                 <option value="">Seleccione estado</option>
                 {getOpcionesEstado(form.tipoReferencia).map(opcion => (
                   <option key={opcion.value} value={opcion.value}>
@@ -461,13 +468,13 @@ const InscripcionModal = ({
               </select>
             </div>
             <div className="form-grupo-admin">
-              <label>Observaciones:</label>
-              <input name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones" />
+              <label htmlFor="observaciones-referencia">Observaciones:</label>
+              <input id="observaciones-referencia" name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones" />
             </div>
           </div>
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" type="button" onClick={onClose}>
-              <i className="fas fa-times"></i>
+              <i className="fas fa-times"></i>{" "}
               Cancelar
             </button>
             <button type="submit" className="btn-admin btn-primary">
@@ -479,5 +486,65 @@ const InscripcionModal = ({
     </div>
   );
 };
+InscripcionModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  eventos: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string,
+    nombre: PropTypes.string,
+    categoria: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({ _id: PropTypes.string })
+    ])
+  })).isRequired,
+  programas: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string,
+    nombre: PropTypes.string,
+    categoria: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({ _id: PropTypes.string })
+    ])
+  })).isRequired,
+  categorias: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string,
+    nombre: PropTypes.string
+  })).isRequired,
+  modo: PropTypes.string,
+  inscripcion: PropTypes.shape({
+    usuario: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({
+        _id: PropTypes.string,
+        nombre: PropTypes.string,
+        apellido: PropTypes.string,
+        correo: PropTypes.string,
+        tipoDocumento: PropTypes.string,
+        numeroDocumento: PropTypes.string,
+        telefono: PropTypes.string,
+        fechaNacimiento: PropTypes.string
+      })
+    ]),
+    nombre: PropTypes.string,
+    apellido: PropTypes.string,
+    tipoDocumento: PropTypes.string,
+    numeroDocumento: PropTypes.string,
+    correo: PropTypes.string,
+    telefono: PropTypes.string,
+    edad: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    tipoReferencia: PropTypes.string,
+    referencia: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({ _id: PropTypes.string })
+    ]),
+    categoria: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({ _id: PropTypes.string })
+    ]),
+    estado: PropTypes.string,
+    observaciones: PropTypes.string
+  })
+};
+
 
 export default InscripcionModal;
