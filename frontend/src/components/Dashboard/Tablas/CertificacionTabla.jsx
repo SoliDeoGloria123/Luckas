@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
 const CertificacionTabla = ({ certificados, onDescargar }) => {
   return (
@@ -43,6 +44,11 @@ const CertificacionTabla = ({ certificados, onDescargar }) => {
       </table>
     </div>
   );
+};
+
+CertificacionTabla.propTypes = {
+  certificados: PropTypes.array.isRequired,
+  onDescargar: PropTypes.func.isRequired,
 };
 
 export default CertificacionTabla;

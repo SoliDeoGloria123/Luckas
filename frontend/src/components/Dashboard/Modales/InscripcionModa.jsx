@@ -130,17 +130,7 @@ const InscripcionModal = ({
         edad: String(edadCalculada)
       }));
     } catch (error) {
-      setUsuarioEncontrado(null);
-      setForm(prev => ({
-        ...prev,
-        usuario: "",
-        nombre: "",
-        apellido: "",
-        correo: "",
-        telefono: "",
-        tipoDocumento: "",
-        numeroDocumento: String(cedula)
-      }));
+      console.error('Error al buscar usuario por cédula:', error);
     } finally {
       setCargandoUsuario(false);
     }
@@ -173,7 +163,7 @@ const InscripcionModal = ({
       "usuario", "nombre", "apellido", "tipoDocumento", "numeroDocumento", "correo", "telefono", "categoria"
     ].includes(name)) {
       return;
-    }
+    };
 
     // Si es el campo numeroDocumento, actualizar también la búsqueda de cédula
     if (name === "numeroDocumento") {
@@ -184,7 +174,7 @@ const InscripcionModal = ({
       } else {
         setUsuarioEncontrado(null);
       }
-    }
+    };
     if (name === "tipoReferencia") {
       // Cuando cambia el tipo de referencia, establecer un estado por defecto
       const opcionesEstado = getOpcionesEstado(value);
@@ -196,7 +186,7 @@ const InscripcionModal = ({
         estadoDefecto = 'preinscrito';
       } else if (opcionesEstado.length > 0) {
         estadoDefecto = opcionesEstado[0].value;
-      }
+      };
       setForm({
         ...form,
         [name]: String(value),
@@ -208,24 +198,26 @@ const InscripcionModal = ({
     }
     if (name === "referencia") {
       if (form.tipoReferencia === "Eventos") {
-        const eventoSel = eventos.find(ev => String(ev._id) === String(value));
-        if (eventoSel && eventoSel.categoria) {
-          setForm({
-            ...form,
-            [name]: String(value),
-            categoria: String(eventoSel.categoria._id || eventoSel.categoria)
-          });
-          return;
+        for (const ev of eventos) {
+          if (String(ev._id) === String(value) && ev.categoria) {
+            setForm({
+              ...form,
+              [name]: String(value),
+              categoria: String(ev.categoria._id || ev.categoria)
+            });
+            return;
+          }
         }
       } else if (form.tipoReferencia === "ProgramaAcademico") {
-        const progSel = programas.find(pr => String(pr._id) === String(value));
-        if (progSel && progSel.categoria) {
-          setForm({
-            ...form,
-            [name]: String(value),
-            categoria: String(progSel.categoria._id || progSel.categoria)
-          });
-          return;
+        for (const pr of programas) {
+          if (String(pr._id) === String(value) && pr.categoria) {
+            setForm({
+              ...form,
+              [name]: String(value),
+              categoria: String(pr.categoria._id || pr.categoria)
+            });
+            return;
+          }
         }
       }
     }
@@ -249,13 +241,13 @@ const InscripcionModal = ({
       estado: form.estado || 'pendiente',
       observaciones: form.observaciones || ''
     };
-    Object.keys(payload).forEach(key => {
+    for (const key of Object.keys(payload)) {
       if (payload[key] === '' || payload[key] === undefined || payload[key] === null) {
         if (key !== 'observaciones') {
           delete payload[key];
         }
       }
-    });
+    };
     onSubmit(payload);
     if (modo === "crear") {
       setForm(defaultForm);
@@ -379,7 +371,7 @@ const InscripcionModal = ({
                 max="120"
                 style={{
                   borderColor: !form.edad || Number.parseInt(form.edad) < 1 ? '#dc3545' : '#28a745',
-                  backgroundColor: !form.edad || parseInt(form.edad) < 1 ? '#f8d7da' : '#d4edda'
+                  backgroundColor: !form.edad || Number.parseInt(form.edad) < 1 ? '#f8d7da' : '#d4edda'
                 }}
                 title="La edad es calculada automáticamente desde la fecha de nacimiento, pero puede editarse si es necesario"
               />

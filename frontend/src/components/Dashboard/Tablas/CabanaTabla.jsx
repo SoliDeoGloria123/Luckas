@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import PropTypes from "prop-types";
 import {
   Plus,
   Edit,
@@ -16,7 +17,6 @@ import {
   X,
   MapPin
 } from 'lucide-react';
-import { mostrarAlerta, mostrarConfirmacion } from '../../utils/alertas';
 
 
 const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, setNuevaCabana, onVerDetalle }) => {
@@ -210,9 +210,9 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
                             {">"}
                           </button>
                           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                            {imagenes.map((_, idx) => (
+                            {imagenes.map((img, idx) => (
                               <span
-                                key={idx}
+                                key={img || idx}
                                 className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
                               />
                             ))}
@@ -245,7 +245,7 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
                           ? 'bg-amber-500/90 text-white'
                           : 'bg-gray-500/90 text-white'
                       }`}>
-                      {cabana.estado}
+                      {cabana.estado}                                               
                     </span>
                   </div>
 
@@ -379,4 +379,33 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
     </>
   );
 };
+CabanaTabla.propTypes = {
+  cabanas: PropTypes.array.isRequired,
+  onEditar: PropTypes.func.isRequired,
+  onEliminar: PropTypes.func.isRequired,
+  onInsertar: PropTypes.func.isRequired,
+  nuevaCabana: PropTypes.shape({
+    nombre: PropTypes.string,
+    descripcion: PropTypes.string,
+    tipo: PropTypes.string,
+    estado: PropTypes.string,
+    capacidadMaxima: PropTypes.number,
+    numeroCuartos: PropTypes.number,
+    ubicacion: PropTypes.string,
+    precioPorNoche: PropTypes.number,
+    precioPorPersona: PropTypes.number,
+    servicios: PropTypes.array,
+    amenidades: PropTypes.array,
+    imagen: PropTypes.oneOfType([
+      PropTypes.array,
+      PropTypes.string
+    ]),
+    disponibilidad: PropTypes.bool,
+    destacada: PropTypes.bool,
+    _id: PropTypes.string
+  }).isRequired,
+  setNuevaCabana: PropTypes.func.isRequired,
+  onVerDetalle: PropTypes.func.isRequired
+};
+
 export default CabanaTabla;

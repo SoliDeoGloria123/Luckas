@@ -55,7 +55,7 @@ const ConfiguracionPage = () => {
                   <h3>Notificaciones por Correo</h3>
                   <p>Recibe notificaciones importantes en tu correo</p>
                 </div>
-                <label className="toggle-switch">
+                <label htmlFor="emailNotifications" className="toggle-switch">
                   <input 
                     type="checkbox" 
                     defaultChecked 
@@ -69,7 +69,7 @@ const ConfiguracionPage = () => {
                   <h3>Notificaciones Push</h3>
                   <p>Recibe notificaciones en tiempo real</p>
                 </div>
-                <label className="toggle-switch">
+                <label htmlFor="pushNotifications" className="toggle-switch">
                   <input 
                     type="checkbox" 
                     defaultChecked 
@@ -83,7 +83,7 @@ const ConfiguracionPage = () => {
                   <div className="setting-info">
                     <h3>Eventos</h3>
                   </div>
-                  <label className="toggle-switch">
+                  <label htmlFor="eventNotifications" className="toggle-switch">
                     <input 
                       type="checkbox" 
                       defaultChecked 
@@ -96,7 +96,7 @@ const ConfiguracionPage = () => {
                   <div className="setting-info">
                     <h3>Reservas</h3>
                   </div>
-                  <label className="toggle-switch">
+                  <label htmlFor="reservationNotifications" className="toggle-switch">
                     <input 
                       type="checkbox" 
                       defaultChecked 
@@ -111,7 +111,7 @@ const ConfiguracionPage = () => {
                   <div className="setting-info">
                     <h3>Solicitudes</h3>
                   </div>
-                  <label className="toggle-switch">
+                  <label htmlFor="requestNotifications" className="toggle-switch">
                     <input 
                       type="checkbox" 
                       defaultChecked 
@@ -124,7 +124,7 @@ const ConfiguracionPage = () => {
                   <div className="setting-info">
                     <h3>Seguridad</h3>
                   </div>
-                  <label className="toggle-switch">
+                  <label htmlFor="securityNotifications" className="toggle-switch">
                     <input 
                       type="checkbox" 
                       defaultChecked 

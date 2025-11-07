@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const TablaUnificadaSolicitudes = ({
   datosUnificados = { solicitudes: [], inscripciones: [], reservas: [] },
@@ -128,5 +129,14 @@ const TablaUnificadaSolicitudes = ({
     </div>
 
   );
-}
+};
+TablaUnificadaSolicitudes.propTypes = {
+  datosUnificados: PropTypes.shape({
+    solicitudes: PropTypes.array,
+    inscripciones: PropTypes.array,
+    
+  }),
+  abrirModalEditarSolicitud: PropTypes.func,
+  eliminarSolicitud: PropTypes.func,
+};
 export default TablaUnificadaSolicitudes;

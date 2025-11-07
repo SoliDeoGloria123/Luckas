@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 
 const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, categorias }) => {
@@ -16,13 +17,15 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
     // Si es un objeto Date o string con T, formatear
     try {
       const d = new Date(fecha);
-      if (!isNaN(d.getTime())) {
+      if (!Number.isNaN(d.getTime())) {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
       }
-    } catch (e) {}
+    } catch (error) {
+      console.error('Error normalizando fecha:', error);
+    }
     return '';
   }
 
@@ -156,7 +159,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
 
               <div className="form-group-tesorero">
-                <label>Descripcion Evento</label>
+                <label htmlFor='descripcion'>Descripcion Evento</label>
                 <input
                   type="text"
                   name="descripcion"
@@ -168,7 +171,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
 
               <div className="form-group-tesorero">
-                <label>Precio Evento</label>
+                <label htmlFor='precio'>Precio Evento</label>
                 <input
                   type="number"
                   name="precio"
@@ -180,7 +183,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
 
               <div className="form-group-tesorero">
-                <label>Categoria</label>
+                <label htmlFor='categoria'>Categoria</label>
                 <select
                   name="categoria"
                   value={formData.categoria ? String(formData.categoria) : ''}
@@ -197,7 +200,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
 
               <div className="form-group-tesorero">
-                <label>Etiquetas Evento</label>
+                <label htmlFor='etiquetas'>Etiquetas Evento</label>
                 <input
                   type="text"
                   name="etiquetas"
@@ -209,7 +212,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
 
               <div className="form-group-tesorero">
-                <label>Fecha Evento</label>
+                <label htmlFor='fechaEvento'>Fecha Evento</label>
                 <input
                   type="date"
                   name="fechaEvento"
@@ -220,7 +223,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Hora Inicia Evento</label>
+                <label htmlFor='horaInicio'>Hora Inicia Evento</label>
                 <input
                   type="time"
                   name="horaInicio"
@@ -231,7 +234,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Hora fin Evento</label>
+                <label htmlFor='horaFin'>Hora fin Evento</label>
                 <input
                   type="time"
                   name="horaFin"
@@ -242,7 +245,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Lugar</label>
+                <label htmlFor='lugar'>Lugar</label>
                 <input
                   type="text"
                   name="lugar"
@@ -254,7 +257,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
 
               <div className="form-group-tesorero">
-                <label>Direccion</label>
+                <label htmlFor='direccion'>Direccion</label>
                 <input
                   type="text"
                   name="direccion"
@@ -265,7 +268,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Cupos Totales</label>
+                <label htmlFor='cuposTotales'>Cupos Totales</label>
                 <input
                   type="text"
                   name="cuposTotales"
@@ -277,7 +280,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
 
               <div className="form-group-tesorero">
-                <label>Cupos Disponibles</label>
+                <label htmlFor='cuposDisponibles'>Cupos Disponibles</label>
                 <input
                   type="text"
                   name="cuposDisponibles"
@@ -289,7 +292,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
 
               <div className="form-group-tesorero">
-                <label>Prioridad</label>
+                <label htmlFor='prioridad'>Prioridad</label>
                 <select
                   name="prioridad"
                   value={formData.prioridad}
@@ -303,7 +306,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
                 </select>
               </div>
               <div className="form-group-tesorero">
-                <label>Observaciones</label>
+                <label htmlFor='observaciones'>Observaciones</label>
                 <input
                   type="text"
                   name="observaciones"
@@ -315,7 +318,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
 
               <div className="form-group-tesorero full-width">
-                <label>Imagen</label>
+                <label htmlFor='imagen'>Imagen</label>
                 <div className="image-upload-container">
                   <div className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
                     onDragOver={(e) => e.preventDefault()}
@@ -363,5 +366,11 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
     </div>
   );
 };
-
+EventosModal.propTypes = {
+  mode: PropTypes.oneOf(['create', 'edit']),
+  initialData: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  categorias: PropTypes.array.isRequired,
+};
 export default EventosModal;

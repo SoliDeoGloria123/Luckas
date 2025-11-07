@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const UsuarioModal = ({
   mostrar,
@@ -30,8 +31,9 @@ const UsuarioModal = ({
         <form className="modal-body-admin" onSubmit={e => onSubmit(e)}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label><i class="fas fa-user"></i>Nombre</label>
+              <label htmlFor="nombre"><i className="fas fa-user"></i>Nombre</label>
               <input
+                id="nombre"
                 type="text"
                 value={modoEdicion ? usuarioSeleccionado?.nombre : nuevoUsuario.nombre}
                 onChange={e =>
@@ -44,8 +46,9 @@ const UsuarioModal = ({
               />
             </div>
             <div className="form-grupo-admin">
-              <label><i class="fas fa-user"></i> Apellido</label>
+              <label htmlFor="apellido"><i className="fas fa-user"></i> Apellido</label>
               <input
+                id="apellido"
                 type="text"
                 value={modoEdicion ? usuarioSeleccionado?.apellido : nuevoUsuario.apellido}
                 onChange={e =>
@@ -61,8 +64,9 @@ const UsuarioModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>  <i class="fas fa-envelope"></i> Correo</label>
+              <label htmlFor="correo">  <i className="fas fa-envelope"></i> Correo</label>
               <input
+                id="correo"
                 type="email"
                 value={modoEdicion ? usuarioSeleccionado?.correo : nuevoUsuario.correo}
                 onChange={e =>
@@ -75,8 +79,9 @@ const UsuarioModal = ({
               />
             </div>
             <div className="form-grupo-admin">
-              <label><i class="fas fa-phone"></i> Teléfono</label>
+              <label htmlFor="telefono"><i className="fas fa-phone"></i> Teléfono</label>
               <input
+                id="telefono"
                 type="text"
                 value={modoEdicion ? usuarioSeleccionado?.telefono : nuevoUsuario.telefono}
                 onChange={e =>
@@ -91,8 +96,9 @@ const UsuarioModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label><i class="fas fa-id-card"></i> Tipo de Documento</label>
+              <label htmlFor="tipoDocumento"><i className="fas fa-id-card"></i> Tipo de Documento</label>
               <select
+                id="tipoDocumento"
                 value={modoEdicion ? usuarioSeleccionado?.tipoDocumento : nuevoUsuario.tipoDocumento}
                 onChange={e =>
                   modoEdicion
@@ -109,8 +115,9 @@ const UsuarioModal = ({
               </select>
             </div>
             <div className="form-grupo-admin">
-              <label><i class="fas fa-hashtag"></i> Número de Documento</label>
+              <label htmlFor="numeroDocumento"><i className="fas fa-hashtag"></i> Número de Documento</label>
               <input
+                id="numeroDocumento"
                 type="text"
                 value={modoEdicion ? usuarioSeleccionado?.numeroDocumento : nuevoUsuario.numeroDocumento}
                 onChange={e =>
@@ -125,8 +132,9 @@ const UsuarioModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label><i class="fas fa-hashtag"></i> Fecha de Nacimiento</label>
+              <label htmlFor="fechaNacimiento"><i className="fas fa-hashtag"></i> Fecha de Nacimiento</label>
               <input
+                id="fechaNacimiento"
                 type="date"
                 className="input-fecha-moderno"
                 value={
@@ -146,9 +154,10 @@ const UsuarioModal = ({
             </div>
             {!modoEdicion && (
               <div className="form-grupo-admin">
-                <label><i class="fas fa-lock"></i> Contraseña</label>
+                <label htmlFor="password"><i className="fas fa-lock"></i> Contraseña</label>
 
                 <input
+                  id="password"
                   type="password"
                   value={nuevoUsuario.password}
                   onChange={e =>
@@ -157,21 +166,22 @@ const UsuarioModal = ({
                   placeholder="Contraseña"
                   required={!modoEdicion}
                 />
-                <button type="button" class="password-toggle-admin" >
-                  <i class="fas fa-eye"></i>
+                <button type="button" className="password-toggle-admin" >
+                  <i className="fas fa-eye"></i>
                 </button>
-                <span class="error-message" id="passwordError"></span>
-                <div class="password-strength" id="passwordStrength"></div>
+                <span className="error-message" id="passwordError"></span>
+                <div className="password-strength" id="passwordStrength"></div>
               </div>
             )}
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>
-                <i class="fas fa-user-tag"></i>
+              <label htmlFor="role">
+                <i className="fas fa-user-tag"></i> {' '}
                 Rol
               </label>
               <select
+                id="role"
                 value={modoEdicion ? usuarioSeleccionado?.role : nuevoUsuario.role}
                 onChange={e =>
                   modoEdicion
@@ -187,8 +197,9 @@ const UsuarioModal = ({
               </select>
             </div>
             <div className="form-grupo-admin">
-              <label><i class="fas fa-toggle-on"></i> Estado</label>
+              <label htmlFor="estado"><i className="fas fa-toggle-on"></i> Estado</label>
               <select
+                id="estado"
                 value={modoEdicion ? usuarioSeleccionado?.estado : nuevoUsuario.estado}
                 onChange={e =>
                   modoEdicion
@@ -205,11 +216,11 @@ const UsuarioModal = ({
 
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" onClick={onClose}>
-              <i class="fas fa-times"></i>
+              <i className="fas fa-times"></i> {' '}
               Cancelar
             </button>
             <button type="submit" className="btn-admin btn-primary">
-              <i class="fas fa-save"></i>
+              <i className="fas fa-save"></i>
               {modoEdicion ? "Guardar Cambios" : "Crear Usuario"}
             </button>
           </div>
@@ -217,6 +228,38 @@ const UsuarioModal = ({
       </div>
     </div>
   );
+};
+
+UsuarioModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  modoEdicion: PropTypes.bool,
+  usuarioSeleccionado: PropTypes.shape({
+    nombre: PropTypes.string,
+    apellido: PropTypes.string,
+    correo: PropTypes.string,
+    telefono: PropTypes.string,
+    tipoDocumento: PropTypes.string,
+    numeroDocumento: PropTypes.string,
+    fechaNacimiento: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    role: PropTypes.string,
+    estado: PropTypes.string
+  }),
+  setUsuarioSeleccionado: PropTypes.func,
+  nuevoUsuario: PropTypes.shape({
+    nombre: PropTypes.string,
+    apellido: PropTypes.string,
+    correo: PropTypes.string,
+    telefono: PropTypes.string,
+    tipoDocumento: PropTypes.string,
+    numeroDocumento: PropTypes.string,
+    fechaNacimiento: PropTypes.string,
+    password: PropTypes.string,
+    role: PropTypes.string,
+    estado: PropTypes.string
+  }).isRequired,
+  setNuevoUsuario: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired
 };
 
 export default UsuarioModal;

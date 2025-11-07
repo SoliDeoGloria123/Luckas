@@ -4,8 +4,6 @@ import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import { programasAcademicosService } from "../../services/programasAcademicosService";
 import TablaInscripciones from "./Tablas/InscripcionTabla";
-//import InscripcionModalCrear from "./Modales/InscripcionModalCrear";
-//import InscripcionModalEditar from "./Modales/InscripcionModalEditar";
 import InscripcionModal from "./Modales/InscripcionModa";
 import useBusqueda from "./Busqueda/useBusqueda";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
@@ -51,6 +49,7 @@ const GestionIscripcion = () => {
       setInscripciones(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
       setInscripciones([]);
+      mostrarAlerta("Error", `No se pudieron obtener las inscripciones: ${error.message}`);
     }
   };
 
@@ -61,6 +60,7 @@ const GestionIscripcion = () => {
       setEventos(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
       setEventos([]);
+      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`);
     }
   };
 
@@ -71,6 +71,7 @@ const GestionIscripcion = () => {
       setCategorias(res.data || []);
     } catch (error) {
       setCategorias([]);
+      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`);
     }
   };
   // 2. Obtener programas académicos
@@ -80,6 +81,7 @@ const GestionIscripcion = () => {
       setProgramas(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       setProgramas([]);
+      mostrarAlerta("Error", `No se pudieron obtener los programas académicos: ${error.message}`);
     }
   };
 

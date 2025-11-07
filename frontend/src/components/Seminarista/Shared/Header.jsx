@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import UserMenu from './UserMenu';
-import Breadcrumb from './Breadcrumb';
-import QuickActions from './QuickActions';
 import './Header.css';
+
+
 
 const Header = ({ user, breadcrumbPath, onTabChange }) => {
   const [menuUsuarioAbierto, setMenuUsuarioAbierto] = useState(false);

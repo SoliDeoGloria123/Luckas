@@ -21,7 +21,7 @@ const Gestionsolicitud = () => {
       const data = await solicitudService.getAll();
       setSolicitudes(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
-      mostrarAlerta("Error", "Error al obtener solicitudes");
+      mostrarAlerta("Error", `Error al obtener solicitudes: ${error.message}`);
     }
   };
   useEffect(() => {
@@ -87,7 +87,7 @@ const Gestionsolicitud = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus"></i> {' '}
             Nueva Solicitud
           </button>
         </div>

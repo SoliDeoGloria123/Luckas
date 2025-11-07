@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
   Users,
   Bed,
@@ -26,7 +27,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
 
   // Actualizar el formulario cuando se abra en modo edición
   useEffect(() => {
-    
+
     if (mostrar) {
       if (modoEdicion && datosIniciales) {
         // Modo edición - cargar datos del reporte
@@ -77,7 +78,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!form.nombre || !form.descripcion || !form.tipo) {
       setError("Todos los campos obligatorios deben estar completos.");
       return;
@@ -92,7 +93,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
       otros: {}
     };
     setError("");
-    
+
     const datosEnvio = {
       nombre: form.nombre,
       descripcion: form.descripcion,
@@ -110,7 +111,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
     { value: "solicitudes", label: "Solicitudes", icon: FileText },
     { value: "programas", label: "Programas Académicos", icon: BarChart3 },
     { value: "tareas", label: "Tareas", icon: FileText },
-  { value: "cabañas", label: "Cabañas", icon: Home },
+    { value: "cabañas", label: "Cabañas", icon: Home },
   ]
 
   return (
@@ -122,7 +123,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
           color: 'white'
         }}
       >
-  <h2>{modoEdicion ? "Editar Reporte" : "Crear Nuevo Reporte"}</h2>
+        <h2>{modoEdicion ? "Editar Reporte" : "Crear Nuevo Reporte"}</h2>
         <button className="modal-cerrar" onClick={onClose}>
           ✕
         </button>
@@ -130,8 +131,9 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
         <form className="modal-body-admin" onSubmit={handleSubmit}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label><i className="fas fa-file-alt"></i> Nombre del Reporte *</label>
+              <label htmlFor="nombre"><i className="fas fa-file-alt"></i> Nombre del Reporte *</label>
               <input
+                id="nombre"
                 type="text"
                 name="nombre"
                 value={form.nombre}
@@ -141,8 +143,9 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
               />
             </div>
             <div className="form-grupo-admin">
-              <label><i className="fas fa-align-left"></i> Descripción *</label>
+              <label htmlFor="descripcion"><i className="fas fa-align-left"></i> Descripción *</label>
               <input
+                id="descripcion"
                 type="text"
                 name="descripcion"
                 value={form.descripcion}
@@ -153,15 +156,17 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
             </div>
           </div>
 
-          <>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Tipo de Reporte</label>
+          <div className="mb-2">
+            <label htmlFor="tipo" className="block text-sm font-medium text-gray-700">Tipo de Reporte</label>
             <div className="grid gap-3 md:grid-cols-2">
               {REPORT_TYPES.map((type) => {
-                const Icon = type.icon
+                const Icon = type.icon;
                 return (
                   <button
                     type="button"
                     key={type.value}
+                    id={type.value}
+                    aria-label={type.label}
                     onClick={() => {
                       setSelectedReportType(type.value);
                       setForm((prev) => ({ ...prev, tipo: type.value }));
@@ -181,10 +186,10 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
                     </div>
                     <span className="font-medium text-gray-900">{type.label}</span>
                   </button>
-                )
+                );
               })}
             </div>
-          </>
+          </div>
 
           <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4 mt-6">
             <div className="flex items-center gap-2 mb-2">
@@ -192,10 +197,11 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
               <h3 className="font-semibold text-gray-900">Filtros</h3>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              
+
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Fecha Desde</label>
+                <label htmlFor="fechaInicio" className="mb-1 block text-sm font-medium text-gray-700">Fecha Desde</label>
                 <input
+                  id="fechaInicio"
                   type="date"
                   name="fechaInicio"
                   value={form.fechaInicio}
@@ -205,8 +211,9 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Fecha Hasta</label>
+                <label htmlFor="fechaFin" className="mb-1 block text-sm font-medium text-gray-700">Fecha Hasta</label>
                 <input
+                  id="fechaFin"
                   type="date"
                   name="fechaFin"
                   value={form.fechaFin}
@@ -217,8 +224,10 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
               </div>
               {(form.tipo === "usuarios" || form.tipo === "reservas" || form.tipo === "solicitudes") && (
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Estado</label>
+                  <label htmlFor="estado" className="mb-1 block text-sm font-medium text-gray-700">Estado</label>
                   <select
+                    id="estado"
+                    name="estado"
                     value={form.estado}
                     onChange={handleChange}
                     className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
@@ -248,6 +257,28 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
       </div>
     </div>
   );
+};
+
+ReporteModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  modoEdicion: PropTypes.bool,
+  datosIniciales: PropTypes.shape({
+    nombre: PropTypes.string,
+    descripcion: PropTypes.string,
+    description: PropTypes.string,
+    tipo: PropTypes.string,
+    type: PropTypes.string,
+    filtros: PropTypes.shape({
+      fechaInicio: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+      fechaFin: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+      estado: PropTypes.string,
+      categoria: PropTypes.string,
+      usuario: PropTypes.string,
+      otros: PropTypes.object
+    })
+  })
 };
 
 export default ReporteModal;

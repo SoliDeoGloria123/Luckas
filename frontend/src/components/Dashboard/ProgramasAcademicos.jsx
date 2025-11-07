@@ -23,7 +23,6 @@ const ProgramasAcademicos = () => {
         modalidad: '',
         busqueda: ''
     });
-    const [modalEditar, setModalEditar] = useState(false);
     const [modoEdicion, setModoEdicion] = useState(false);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
     const [programaDetalle, setProgramaDetalle] = useState(null);
@@ -131,10 +130,10 @@ const ProgramasAcademicos = () => {
                 categoria: categoriaId,
                 modalidad: formData.modalidad,
                 duracion: formData.duracion,
-                precio: parseFloat(formData.precio) || 0,
+                precio: Number.parseFloat(formData.precio) || 0,
                 fechaInicio: formData.fechaInicio,
                 fechaFin: formData.fechaFin,
-                cuposDisponibles: parseInt(formData.cupos) || 0,
+                cuposDisponibles: Number.parseInt(formData.cupos) || 0,
                 profesor: formData.profesor,
                 nivel: formData.nivel || 'intermedio',
                 requisitos: formData.requisitos.filter(req => req.trim() !== ''),
@@ -183,6 +182,7 @@ const ProgramasAcademicos = () => {
             mostrarMensaje('Programa eliminado exitosamente', 'success');
         } catch (error) {
             setError('Error al eliminar el programa');
+            console.error('Error al eliminar programa:', error);
         }
     };
 
@@ -268,10 +268,10 @@ const ProgramasAcademicos = () => {
                 categoria: categoriaId,
                 modalidad: formData.modalidad,
                 duracion: formData.duracion,
-                precio: parseFloat(formData.precio) || 0,
+                    precio: Number.parseFloat(formData.precio) || 0,
                 fechaInicio: formData.fechaInicio,
                 fechaFin: formData.fechaFin,
-                cuposDisponibles: parseInt(formData.cupos) || 0,
+                    cuposDisponibles: Number.parseInt(formData.cupos) || 0,
                 profesor: formData.profesor,
                 nivel: 'básico', // valor por defecto
                 requisitos: formData.requisitos ? formData.requisitos.filter(req => req.trim() !== '') : [],

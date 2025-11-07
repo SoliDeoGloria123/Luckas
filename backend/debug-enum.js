@@ -5,11 +5,12 @@ console.log('Valores del enum en el modelo:');
 const schema = User.schema.paths.tipoDocumento;
 console.log('enum values:', schema.enumValues);
 
-schema.enumValues.forEach((value, index) => {
+for (let index = 0; index < schema.enumValues.length; index++) {
+  const value = schema.enumValues[index];
   console.log(`${index}: "${value}" (length: ${value.length})`);
   console.log('Bytes:', [...value].map(char => char.codePointAt(0)));
   console.log('---');
-});
+}
 
 // Probar normalización
 const { normalizeTipoDocumento } = require('./utils/userValidation');
@@ -21,11 +22,11 @@ const testValues = [
 ];
 
 console.log('\nPruebas de normalización:');
-testValues.forEach(value => {
+for (const value of testValues) {
   const normalized = normalizeTipoDocumento(value);
   console.log(`"${value}" -> "${normalized}"`);
   console.log('Original bytes:', [...value].map(char => char.codePointAt(0)));
   console.log('Normalized bytes:', [...normalized].map(char => char.codePointAt(0)));
   console.log('Match:', schema.enumValues.includes(normalized));
   console.log('---');
-});
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Plus, Trash2 } from 'lucide-react';
+import { X, Plus, Trash2 } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 const ProgramaModal = ({
   mostrar,
@@ -10,7 +11,7 @@ const ProgramaModal = ({
   onClose,
   onSubmit
 }) => {
-    // Obtener la fecha de hoy en formato YYYY-MM-DD
+  // Obtener la fecha de hoy en formato YYYY-MM-DD
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -57,8 +58,8 @@ const ProgramaModal = ({
   const handleArrayInputChange = (index, value, arrayName) => {
     setFormData(prev => ({
       ...prev,
-      [arrayName]: prev[arrayName].map((item, i) => 
-        i === index ? value : item
+      [arrayName]: prev[arrayName].map((item, i) =>
+        i === index ? { ...item, value } : item
       )
     }));
   };
@@ -72,10 +73,18 @@ const ProgramaModal = ({
     }));
   };
 
+  // Generador simple de id único
+  const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
+
   const addArrayItem = (arrayName, defaultValue) => {
     setFormData(prev => ({
       ...prev,
-      [arrayName]: [...prev[arrayName], defaultValue]
+      [arrayName]: [
+        ...prev[arrayName],
+        typeof defaultValue === 'object'
+          ? { ...defaultValue, id: generateId() }
+          : { id: generateId(), value: defaultValue }
+      ]
     }));
   };
 
@@ -125,7 +134,7 @@ const ProgramaModal = ({
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
         {/* Header */}
-           <div
+        <div
           className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
           style={{
             background: 'linear-gradient(90deg, var(--color-blue-principal), var(--color-blue-oscuro))',
@@ -148,27 +157,28 @@ const ProgramaModal = ({
           {/* Información Básica */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 mb-2">
                 Título del Programa *
               </label>
               <input
+                id="titulo"
                 type="text"
                 name="titulo"
                 value={formData.titulo}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.titulo ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.titulo ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 placeholder="Ej: Desarrollo Web Full Stack"
               />
               {errors.titulo && <p className="text-red-500 text-xs mt-1">{errors.titulo}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 mb-2">
                 Tipo de Programa *
               </label>
               <select
+                id="tipo"
                 name="tipo"
                 value={formData.tipo}
                 onChange={handleInputChange}
@@ -182,10 +192,11 @@ const ProgramaModal = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="modalidad" className="block text-sm font-medium text-gray-700 mb-2">
                 Modalidad *
               </label>
               <select
+                id="modalidad"
                 name="modalidad"
                 value={formData.modalidad}
                 onChange={handleInputChange}
@@ -198,34 +209,34 @@ const ProgramaModal = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="duracion" className="block text-sm font-medium text-gray-700 mb-2">
                 Duración *
               </label>
               <input
+                id="duracion"
                 type="text"
                 name="duracion"
                 value={formData.duracion}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.duracion ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.duracion ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 placeholder="Ej: 6 meses, 120 horas"
               />
               {errors.duracion && <p className="text-red-500 text-xs mt-1">{errors.duracion}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="precio" className="block text-sm font-medium text-gray-700 mb-2">
                 Precio *
               </label>
               <input
+                id="precio"
                 type="number"
                 name="precio"
                 value={formData.precio}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.precio ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.precio ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 placeholder="0.00"
                 min="0"
                 step="0.01"
@@ -234,17 +245,17 @@ const ProgramaModal = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="cupos" className="block text-sm font-medium text-gray-700 mb-2">
                 Cupos Disponibles *
               </label>
               <input
+                id="cupos"
                 type="number"
                 name="cupos"
                 value={formData.cupos}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.cupos ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cupos ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 placeholder="30"
                 min="1"
               />
@@ -252,35 +263,35 @@ const ProgramaModal = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700 mb-2">
                 Fecha de Inicio *
               </label>
               <input
+                id="fechaInicio"
                 type="date"
                 name="fechaInicio"
                 value={formData.fechaInicio}
                 onChange={handleInputChange}
                 min={todayStr}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.fechaInicio ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.fechaInicio ? 'border-red-500' : 'border-gray-300'
+                  }`}
               />
               {errors.fechaInicio && <p className="text-red-500 text-xs mt-1">{errors.fechaInicio}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-2">
                 Fecha de Fin *
               </label>
               <input
+                id="fechaFin"
                 type="date"
                 name="fechaFin"
                 value={formData.fechaFin}
                 onChange={handleInputChange}
                 min={todayStr}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.fechaFin ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.fechaFin ? 'border-red-500' : 'border-gray-300'
+                  }`}
               />
               {errors.fechaFin && <p className="text-red-500 text-xs mt-1">{errors.fechaFin}</p>}
             </div>
@@ -288,45 +299,46 @@ const ProgramaModal = ({
 
           {/* Descripción */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-2">
               Descripción del Programa *
             </label>
             <textarea
+              id="descripcion"
               name="descripcion"
               value={formData.descripcion}
               onChange={handleInputChange}
               rows={4}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.descripcion ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.descripcion ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="Describe detalladamente el programa académico..."
             />
             {errors.descripcion && <p className="text-red-500 text-xs mt-1">{errors.descripcion}</p>}
           </div>
 
           {/* Información del Profesor */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Profesor/Instructor *
-              </label>
-              <input
-                type="text"
-                name="profesor"
-                value={formData.profesor}
-                onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.profesor ? 'border-red-500' : 'border-gray-300'
+          <div>
+            <label htmlFor="profesor" className="block text-sm font-medium text-gray-700 mb-2">
+              Profesor/Instructor *
+            </label>
+            <input
+              id="profesor"
+              type="text"
+              name="profesor"
+              value={formData.profesor}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.profesor ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="Nombre del profesor"
-              />
-              {errors.profesor && <p className="text-red-500 text-xs mt-1">{errors.profesor}</p>}
-            </div>
+              placeholder="Nombre del profesor"
+            />
+            {errors.profesor && <p className="text-red-500 text-xs mt-1">{errors.profesor}</p>}
+          </div>
           {/* Biografía del Profesor */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="profesorBio" className="block text-sm font-medium text-gray-700 mb-2">
               Biografía del Profesor
             </label>
             <textarea
+              id="profesorBio"
               name="profesorBio"
               value={formData.profesorBio}
               onChange={handleInputChange}
@@ -338,14 +350,15 @@ const ProgramaModal = ({
 
           {/* Requisitos */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="requisitos" className="block text-sm font-medium text-gray-700 mb-2">
               Requisitos
             </label>
             {formData.requisitos.map((requisito, index) => (
-              <div key={index} className="flex gap-2 mb-2">
+              <div key={requisito.id || index} className="flex gap-2 mb-2">
                 <input
+                  id={`requisito-${index}`}
                   type="text"
-                  value={requisito}
+                  value={requisito.value}
                   onChange={(e) => handleArrayInputChange(index, e.target.value, 'requisitos')}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder={`Requisito ${index + 1}`}
@@ -372,14 +385,15 @@ const ProgramaModal = ({
 
           {/* Objetivos */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="objetivos" className="block text-sm font-medium text-gray-700 mb-2">
               Objetivos del Programa
             </label>
             {formData.objetivos.map((objetivo, index) => (
-              <div key={index} className="flex gap-2 mb-2">
+              <div key={objetivo.id || index} className="flex gap-2 mb-2">
                 <input
+                  id={`objetivo-${index}`}
                   type="text"
-                  value={objetivo}
+                  value={objetivo.value}
                   onChange={(e) => handleArrayInputChange(index, e.target.value, 'objetivos')}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder={`Objetivo ${index + 1}`}
@@ -406,12 +420,13 @@ const ProgramaModal = ({
 
           {/* Pensum */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="pensum" className="block text-sm font-medium text-gray-700 mb-2">
               Pensum/Módulos del Programa
             </label>
             {formData.pensum.map((modulo, index) => (
-              <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
+              <div key={modulo.id || index} className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
                 <input
+                  id={`modulo-nombre-${index}`}
                   type="text"
                   value={modulo.modulo}
                   onChange={(e) => handlePensumChange(index, 'modulo', e.target.value)}
@@ -419,6 +434,7 @@ const ProgramaModal = ({
                   placeholder="Nombre del módulo"
                 />
                 <input
+                  id={`modulo-descripcion-${index}`}
                   type="text"
                   value={modulo.descripcion}
                   onChange={(e) => handlePensumChange(index, 'descripcion', e.target.value)}
@@ -427,6 +443,7 @@ const ProgramaModal = ({
                 />
                 <div className="flex gap-2">
                   <input
+                    id={`modulo-horas-${index}`}
                     type="number"
                     value={modulo.horas}
                     onChange={(e) => handlePensumChange(index, 'horas', e.target.value)}
@@ -458,10 +475,11 @@ const ProgramaModal = ({
           {/* Información Adicional */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="metodologia" className="block text-sm font-medium text-gray-700 mb-2">
                 Metodología
               </label>
               <textarea
+                id="metodologia"
                 name="metodologia"
                 value={formData.metodologia}
                 onChange={handleInputChange}
@@ -472,10 +490,11 @@ const ProgramaModal = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="evaluacion" className="block text-sm font-medium text-gray-700 mb-2">
                 Sistema de Evaluación
               </label>
               <textarea
+                id="evaluacion"
                 name="evaluacion"
                 value={formData.evaluacion}
                 onChange={handleInputChange}
@@ -488,10 +507,11 @@ const ProgramaModal = ({
 
           {/* Certificación */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="certificacion" className="block text-sm font-medium text-gray-700 mb-2">
               Información de Certificación
             </label>
             <textarea
+              id="certificacion"
               name="certificacion"
               value={formData.certificacion}
               onChange={handleInputChange}
@@ -536,6 +556,63 @@ const ProgramaModal = ({
       </div>
     </div>
   );
+};
+ProgramaModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  modoEdicion: PropTypes.bool,
+  programaSeleccionado: PropTypes.shape({
+    nombre: PropTypes.string,
+    descripcion: PropTypes.string,
+    tipo: PropTypes.string,
+    modalidad: PropTypes.string,
+    duracion: PropTypes.string,
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    fechaInicio: PropTypes.string,
+    fechaFin: PropTypes.string,
+    cuposDisponibles: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    profesor: PropTypes.string,
+    profesorBio: PropTypes.string,
+    requisitos: PropTypes.arrayOf(PropTypes.string),
+    pensum: PropTypes.arrayOf(PropTypes.shape({
+      modulo: PropTypes.string,
+      descripcion: PropTypes.string,
+      horas: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    })),
+    objetivos: PropTypes.arrayOf(PropTypes.string),
+    metodologia: PropTypes.string,
+    evaluacion: PropTypes.string,
+    certificacion: PropTypes.string,
+    imagen: PropTypes.string,
+    destacado: PropTypes.bool
+  }),
+  formData: PropTypes.shape({
+    titulo: PropTypes.string,
+    tipo: PropTypes.string,
+    modalidad: PropTypes.string,
+    duracion: PropTypes.string,
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    cupos: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    fechaInicio: PropTypes.string,
+    fechaFin: PropTypes.string,
+    descripcion: PropTypes.string,
+    profesor: PropTypes.string,
+    profesorBio: PropTypes.string,
+    requisitos: PropTypes.arrayOf(PropTypes.string),
+    pensum: PropTypes.arrayOf(PropTypes.shape({
+      modulo: PropTypes.string,
+      descripcion: PropTypes.string,
+      horas: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    })),
+    objetivos: PropTypes.arrayOf(PropTypes.string),
+    metodologia: PropTypes.string,
+    evaluacion: PropTypes.string,
+    certificacion: PropTypes.string,
+    imagen: PropTypes.string,
+    destacado: PropTypes.bool
+  }).isRequired,
+  setFormData: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired
 };
 
 export default ProgramaModal;

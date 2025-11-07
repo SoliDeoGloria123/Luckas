@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { userService } from "../../../services/ObteneruserService";
 
 const SolicitudModal = ({
@@ -122,8 +123,9 @@ const SolicitudModal = ({
             {!modoEdicion ? (
               <>
                 <div className="form-grupo-admin">
-                  <label>Cédula del Solicitante:</label>
+                  <label htmlFor="cedulaBusqueda">Cédula del Solicitante:</label>
                   <input
+                    id="cedulaBusqueda"
                     type="text"
                     value={cedulaBusqueda}
                     onChange={handleChangeCedula}
@@ -146,8 +148,9 @@ const SolicitudModal = ({
                   )}
                 </div>
                 <div className="form-grupo-admin">
-                  <label>Solicitante (ID):</label>
+                  <label htmlFor="solicitanteNuevo">Solicitante (ID):</label>
                   <input
+                    id="solicitanteNuevo"
                     type="text"
                     value={nuevaSolicitud.solicitante}
                     onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, solicitante: e.target.value })}
@@ -157,8 +160,9 @@ const SolicitudModal = ({
                   />
                 </div>
                 <div className="form-grupo-admin">
-                  <label>Título de la Solicitud:</label>
+                  <label htmlFor="tituloNuevo">Título de la Solicitud:</label>
                   <input
+                    id="tituloNuevo"
                     type="text"
                     value={nuevaSolicitud.titulo}
                     onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, titulo: e.target.value })}
@@ -170,8 +174,9 @@ const SolicitudModal = ({
             ) : (
               <>
                 <div className="form-grupo-admin">
-                  <label>Solicitante (ID):</label>
+                  <label htmlFor="solicitanteEdit">Solicitante (ID):</label>
                   <input
+                    id="solicitanteEdit"
                     type="text"
                     value={solicitudSeleccionada?.solicitante || ''}
                     onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, solicitante: e.target.value })}
@@ -179,8 +184,9 @@ const SolicitudModal = ({
                   />
                 </div>
                 <div className="form-grupo-admin">
-                  <label>Título de la Solicitud:</label>
+                  <label htmlFor="tituloEdit">Título de la Solicitud:</label>
                   <input
+                    id="tituloEdit"
                     type="text"
                     value={solicitudSeleccionada?.titulo || ''}
                     onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, titulo: e.target.value })}
@@ -195,8 +201,9 @@ const SolicitudModal = ({
             {!modoEdicion ? (
               <>
                 <div className="form-grupo-admin">
-                  <label>Correo:</label>
+                  <label htmlFor="correoNuevo">Correo:</label>
                   <input
+                    id="correoNuevo"
                     type="email"
                     value={nuevaSolicitud.correo}
                     onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, correo: e.target.value })}
@@ -207,8 +214,9 @@ const SolicitudModal = ({
                   />
                 </div>
                 <div className="form-grupo-admin">
-                  <label>Teléfono:</label>
+                  <label htmlFor="telefonoNuevo">Teléfono:</label>
                   <input
+                    id="telefonoNuevo"
                     type="text"
                     value={nuevaSolicitud.telefono}
                     onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, telefono: e.target.value })}
@@ -222,8 +230,9 @@ const SolicitudModal = ({
             ) : (
               <>
                 <div className="form-grupo-admin">
-                  <label>Correo:</label>
+                  <label htmlFor="correoEdit">Correo:</label>
                   <input
+                    id="correoEdit"
                     type="email"
                     value={solicitudSeleccionada?.correo || ''}
                     onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, correo: e.target.value })}
@@ -232,8 +241,9 @@ const SolicitudModal = ({
                   />
                 </div>
                 <div className="form-grupo-admin">
-                  <label>Teléfono:</label>
+                  <label htmlFor="telefonoEdit">Teléfono:</label>
                   <input
+                    id="telefonoEdit"
                     type="text"
                     value={solicitudSeleccionada?.telefono || ''}
                     onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, telefono: e.target.value })}
@@ -248,8 +258,9 @@ const SolicitudModal = ({
             {!modoEdicion ? (
               <>
                 <div className="form-grupo-admin">
-                  <label>Tipo de Solicitud:</label>
+                  <label htmlFor="tipoSolicitudNuevo">Tipo de Solicitud:</label>
                   <select
+                    id="tipoSolicitudNuevo"
                     value={nuevaSolicitud.tipoSolicitud}
                     onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, tipoSolicitud: e.target.value, modeloReferencia: '' })}
                     required
@@ -263,8 +274,9 @@ const SolicitudModal = ({
                 </div>
                 {nuevaSolicitud.tipoSolicitud && (
                   <div className="form-grupo-admin">
-                    <label>Modelo Referencia:</label>
+                    <label htmlFor="modeloReferenciaNuevo">Modelo Referencia:</label>
                     <select
+                      id="modeloReferenciaNuevo"
                       value={nuevaSolicitud.modeloReferencia || ''}
                       onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, modeloReferencia: e.target.value })}
                       required
@@ -280,8 +292,9 @@ const SolicitudModal = ({
                   </div>
                 )}
                 <div className="form-grupo-admin">
-                  <label>Categoría:</label>
+                  <label htmlFor="categoriaNuevo">Categoría:</label>
                   <select
+                    id="categoriaNuevo"
                     value={nuevaSolicitud.categoria}
                     onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, categoria: e.target.value })}
                     required
@@ -296,8 +309,9 @@ const SolicitudModal = ({
             ) : (
               <>
                 <div className="form-grupo-admin">
-                  <label>Tipo de Solicitud:</label>
+                  <label htmlFor="tipoSolicitudEdit">Tipo de Solicitud:</label>
                   <select
+                    id="tipoSolicitudEdit"
                     value={solicitudSeleccionada?.tipoSolicitud || ''}
                     onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, tipoSolicitud: e.target.value })}
                     required
@@ -310,8 +324,9 @@ const SolicitudModal = ({
                   </select>
                 </div>
                 <div className="form-grupo-admin">
-                  <label>Categoría:</label>
+                  <label htmlFor="categoriaEdit">Categoría:</label>
                   <select
+                    id="categoriaEdit"
                     value={solicitudSeleccionada?.categoria || ''}
                     onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, categoria: e.target.value })}
                     required
@@ -328,8 +343,9 @@ const SolicitudModal = ({
           <div className="from-grid-admin">
             {!modoEdicion ? (
               <div className="form-grupo-admin">
-                <label>Descripción:</label>
+                <label htmlFor="descripcionNuevo">Descripción:</label>
                 <input
+                  id="descripcionNuevo"
                   type="text"
                   value={nuevaSolicitud.descripcion}
                   onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, descripcion: e.target.value })}
@@ -339,8 +355,9 @@ const SolicitudModal = ({
               </div>
             ) : (
               <div className="form-grupo-admin">
-                <label>Descripción:</label>
+                <label htmlFor="descripcionEdit">Descripción:</label>
                 <input
+                  id="descripcionEdit"
                   type="text"
                   value={solicitudSeleccionada?.descripcion || ''}
                   onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, descripcion: e.target.value })}
@@ -350,8 +367,9 @@ const SolicitudModal = ({
               </div>
             )}
             <div className="form-grupo-admin">
-              <label>Estado:</label>
+              <label htmlFor="estado">Estado:</label>
               <select
+                id="estado"
                 value={modoEdicion ? solicitudSeleccionada?.estado : nuevaSolicitud.estado}
                 onChange={e => modoEdicion ? setSolicitudSeleccionada({ ...solicitudSeleccionada, estado: e.target.value }) : setNuevaSolicitud({ ...nuevaSolicitud, estado: e.target.value })}
               >
@@ -366,8 +384,9 @@ const SolicitudModal = ({
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label>Prioridad:</label>
+              <label htmlFor="prioridad">Prioridad:</label>
               <select
+                id="prioridad"
                 value={modoEdicion ? solicitudSeleccionada?.prioridad : nuevaSolicitud.prioridad}
                 onChange={e => modoEdicion ? setSolicitudSeleccionada({ ...solicitudSeleccionada, prioridad: e.target.value }) : setNuevaSolicitud({ ...nuevaSolicitud, prioridad: e.target.value })}
               >
@@ -377,8 +396,9 @@ const SolicitudModal = ({
               </select>
             </div>
             <div className="form-grupo-admin">
-              <label>Responsable:</label>
+              <label htmlFor="responsable">Responsable:</label>
               <input
+                id="responsable"
                 type="text"
                 value={modoEdicion ? "Se asignará automáticamente al guardar cambios" : "Se asignará automáticamente"}
                 readOnly
@@ -392,8 +412,9 @@ const SolicitudModal = ({
             </div>
           </div>
           <div className="form-grupo-admin">
-            <label>Observaciones:</label>
+            <label htmlFor="observaciones">Observaciones:</label>
             <input
+              id="observaciones"
               type="text"
               value={modoEdicion ? solicitudSeleccionada?.observaciones : nuevaSolicitud.observaciones}
               onChange={e => modoEdicion ? setSolicitudSeleccionada({ ...solicitudSeleccionada, observaciones: e.target.value }) : setNuevaSolicitud({ ...nuevaSolicitud, observaciones: e.target.value })}
@@ -402,7 +423,7 @@ const SolicitudModal = ({
           </div>
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" type="button" onClick={onClose}>
-              <i className="fas fa-times"></i>
+              <i className="fas fa-times"></i> {' '}
               Cancelar
             </button>
             <button className="btn-admin btn-primary" type="submit">
@@ -414,6 +435,44 @@ const SolicitudModal = ({
       </div>
     </div>
   );
+};
+
+SolicitudModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  modoEdicion: PropTypes.bool,
+  solicitudSeleccionada: PropTypes.shape({
+    solicitante: PropTypes.string,
+    titulo: PropTypes.string,
+    correo: PropTypes.string,
+    telefono: PropTypes.string,
+    tipoSolicitud: PropTypes.string,
+    categoria: PropTypes.string,
+    descripcion: PropTypes.string,
+    estado: PropTypes.string,
+    prioridad: PropTypes.string,
+    observaciones: PropTypes.string
+  }),
+  setSolicitudSeleccionada: PropTypes.func,
+  nuevaSolicitud: PropTypes.shape({
+    solicitante: PropTypes.string,
+    titulo: PropTypes.string,
+    correo: PropTypes.string,
+    telefono: PropTypes.string,
+    tipoSolicitud: PropTypes.string,
+    modeloReferencia: PropTypes.string,
+    categoria: PropTypes.string,
+    descripcion: PropTypes.string,
+    estado: PropTypes.string,
+    prioridad: PropTypes.string,
+    observaciones: PropTypes.string
+  }).isRequired,
+  setNuevaSolicitud: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  categorias: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string,
+    nombre: PropTypes.string
+  })).isRequired
 };
 
 export default SolicitudModal;

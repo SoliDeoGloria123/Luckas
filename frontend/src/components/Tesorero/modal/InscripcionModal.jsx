@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { userService } from '../../../services/userService';
 import { jwtDecode } from "jwt-decode";
+import PropTypes from 'prop-types';
+
 
 
 const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, initialData = {}, onClose, onSubmit }) => {
@@ -25,6 +27,8 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
     try {
       return jwtDecode(token);
     } catch (e) {
+      console.error('❌ Error decodificando token:', e);
+
       return null;
     }
   };
@@ -123,7 +127,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
       }
     } catch (error) {
       setUsuarioNoEncontrado(true);
-      console.warn("No se encontró usuario con ese documento");
+      console.error('❌ Error buscando usuario por documento:', error);
     }
   };
 
@@ -215,7 +219,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Cedula Usuario</label>
+                <label htmlFor='numeroDocumento'>Cedula Usuario</label>
                 <input
                   type="text"
                   name="numeroDocumento"
@@ -230,7 +234,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
               </div>
 
               <div className="form-group-tesorero">
-                <label>Nombre</label>
+                <label htmlFor='nombre'>Nombre</label>
                 <input
                   type="text"
                   name="nombre"
@@ -242,7 +246,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
               </div>
 
               <div className="form-group-tesorero">
-                <label>Apellido</label>
+                <label htmlFor='apellido'>Apellido</label>
                 <input
                   type="text"
                   name="apellido"
@@ -254,7 +258,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
               </div>
 
               <div className="form-group-tesorero">
-                <label>Tipo de Documento</label>
+                <label htmlFor='tipoDocumento'>Tipo de Documento</label>
                 <select
                   type="text"
                   name="tipoDocumento"
@@ -273,7 +277,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
 
 
               <div className="form-group-tesorero">
-                <label>Correo</label>
+                <label htmlFor='correo'>Correo</label>
                 <input
                   type="email"
                   name="correo"
@@ -285,7 +289,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
               </div>
 
               <div className="form-group-tesorero">
-                <label>Teléfono</label>
+                <label htmlFor='telefono'>Teléfono</label>
                 <input
                   type='text'
                   name="telefono"
@@ -298,7 +302,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
               </div>
 
               <div className="form-group-tesorero">
-                <label>Edad</label>
+                <label htmlFor='edad'>Edad</label>
                 <input
                   type='number'
                   name="edad"
@@ -311,7 +315,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
               </div>
 
               <div className="form-group-tesorero">
-                <label>Tipo de inscripción</label>
+                <label htmlFor='tipoReferencia'>Tipo de inscripción</label>
                 <select
                   name="tipoReferencia"
                   value={formData.tipoReferencia}
@@ -326,7 +330,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
 
               {formData.tipoReferencia === "Eventos" && (
                 <div className="form-group-tesorero">
-                  <label>Evento</label>
+                  <label htmlFor='referencia'>Evento</label>
                   <select
                     name="referencia"
                     value={formData.referencia}
@@ -345,7 +349,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
 
               {formData.tipoReferencia === "ProgramaAcademico" && (
                 <div className="form-group-tesorero">
-                  <label>Programa académico</label>
+                  <label htmlFor='referencia'>Programa académico</label>
                   <select
                     name="referencia"
                     value={formData.referencia}
@@ -362,7 +366,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
                 </div>
               )}
               <div className="form-group-tesorero">
-                <label>Categoría</label>
+                <label htmlFor='categoria'>Categoría</label>
                 <select
                   name="categoria"
                   value={formData.categoria}
@@ -379,7 +383,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
                 </select>
               </div>
               <div className="form-group-tesorero">
-                <label>Estado</label>
+                <label htmlFor='estado'>Estado</label>
                 <select
                   name="estado"
                   value={formData.estado}
@@ -397,7 +401,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
 
             </div>
             <div className="form-group-tesorero">
-              <label>Observaciones</label>
+              <label htmlFor='observaciones'>Observaciones</label>
               <input
                 type="text"
                 name="observaciones"
@@ -421,5 +425,15 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
     </div>
   );
 };
+InscripcionModal.propTypes = {
+  mode: PropTypes.oneOf(['create', 'edit']),
+  eventos: PropTypes.array.isRequired,
+  programas: PropTypes.array.isRequired,
+  categorias: PropTypes.array.isRequired,
+  initialData: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+};
+
 
 export default InscripcionModal;

@@ -256,9 +256,10 @@ const Perfil = () => {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                                            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
                                             {isEditing ? (
                                                 <input
+                                                    id="nombre"
                                                     type="text"
                                                     value={datosEditados.nombre}
                                                     onChange={(e) => handleInputChange("nombre", e.target.value)}
@@ -270,9 +271,10 @@ const Perfil = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+                                            <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
                                             {isEditing ? (
                                                 <input
+                                                    id="apellido"
                                                     type="text"
                                                     value={datosEditados.apellido}
                                                     onChange={(e) => handleInputChange("apellido", e.target.value)}
@@ -284,9 +286,10 @@ const Perfil = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
+                                            <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
                                             {isEditing ? (
                                                 <select
+                                                    id="tipoDocumento"
                                                     value={datosEditados.tipoDocumento}
                                                     onChange={(e) => handleInputChange("tipoDocumento", e.target.value)}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
@@ -302,9 +305,10 @@ const Perfil = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
+                                            <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
                                             {isEditing ? (
                                                 <input
+                                                    id="numeroDocumento"
                                                     type="text"
                                                     value={datosEditados.numeroDocumento}
                                                     onChange={(e) => handleInputChange("numeroDocumento", e.target.value)}
@@ -316,9 +320,10 @@ const Perfil = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                                            <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
                                             {isEditing ? (
                                                 <input
+                                                    id="telefono"
                                                     type="tel"
                                                     value={datosEditados.telefono}
                                                     onChange={(e) => handleInputChange("telefono", e.target.value)}
@@ -330,9 +335,10 @@ const Perfil = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
+                                            <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
                                             {isEditing ? (
                                                 <input
+                                                    id="fechaNacimiento"
                                                     type="date"
                                                     value={datosEditados.fechaNacimiento ? datosEditados.fechaNacimiento.split('T')[0] : ''}
                                                     onChange={(e) => handleInputChange("fechaNacimiento", e.target.value)}
@@ -344,9 +350,10 @@ const Perfil = () => {
                                         </div>
 
                                         <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                                            <label htmlFor="correo" className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
                                             {isEditing ? (
                                                 <input
+                                                    id="correo"
                                                     type="email"
                                                     value={datosEditados.correo}
                                                     onChange={(e) => handleInputChange("correo", e.target.value)}
@@ -380,22 +387,22 @@ const Perfil = () => {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Cargo</label>
+                                            <label  htmlFor="cargo" className="block text-sm font-medium text-gray-700 mb-2">Cargo</label>
                                             <p className="text-gray-900 py-3">{usuarioLogueado.role} del Sistema</p>
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
+                                            <label  htmlFor="departamento" className="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
                                             <p className="text-gray-900 py-3">{adminData.departamento}</p>
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
+                                            <label htmlFor="fechaIngreso" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
                                             <p className="text-gray-900 py-3">{new Date(adminData.fechaIngreso).toLocaleDateString()}</p>
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Nivel de Permisos</label>
+                                            <label htmlFor="nivelPermisos" className="block text-sm font-medium text-gray-700 mb-2">Nivel de Permisos</label>
                                             <p className="text-gray-900 py-3">
                                                 <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
                                                     {usuarioLogueado.role} Total
@@ -427,8 +434,9 @@ const Perfil = () => {
 
                                         <div className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+                                                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
                                                 <input
+                                                    id="currentPassword"
                                                     type="password"
                                                     value={passwordData.currentPassword}
                                                     onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
@@ -438,8 +446,9 @@ const Perfil = () => {
                                             </div>
 
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                                                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
                                                 <input
+                                                    id="newPassword"
                                                     type="password"
                                                     value={passwordData.newPassword}
                                                     onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
@@ -449,8 +458,9 @@ const Perfil = () => {
                                             </div>
 
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
+                                                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
                                                 <input
+                                                    id="confirmPassword"
                                                     type="password"
                                                     value={passwordData.confirmPassword}
                                                     onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
@@ -504,8 +514,9 @@ const Perfil = () => {
                                         <div className="space-y-6">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Tema de la Interfaz</label>
+                                                    <label htmlFor="tema" className="block text-sm font-medium text-gray-700 mb-2">Tema de la Interfaz</label>
                                                     <select
+                                                        id="tema"
                                                         value={usuarioLogueado.tema}
                                                         onChange={(e) => handleInputChange("tema", e.target.value)}
                                                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
@@ -517,8 +528,9 @@ const Perfil = () => {
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Idioma</label>
+                                                    <label htmlFor="idioma" className="block text-sm font-medium text-gray-700 mb-2">Idioma</label>
                                                     <select
+                                                        id="idioma"
                                                         value={usuarioLogueado.idioma}
                                                         onChange={(e) => handleInputChange("idioma", e.target.value)}
                                                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"

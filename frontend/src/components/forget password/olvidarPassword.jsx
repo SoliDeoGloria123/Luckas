@@ -125,7 +125,7 @@ const OlvidarPassword = () => {
 
                                 <form className="recovery-form" onSubmit={handleEmailSubmit}>
                                     <div className="form-group-olvidarp">
-                                        <label for="email">Correo Electrónico</label>
+                                        <label htmlFor="email">Correo Electrónico</label>
                                         <div className="input-container-olvidarp">
                                             <i className="fas fa-envelope"></i>
                                             <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="correo@ejemplo.com" required />
@@ -199,7 +199,7 @@ const OlvidarPassword = () => {
 
                                 <form onSubmit={handleCodeSubmit} className="recovery-form">
                                     <div className="form-group-olvidarp">
-                                        <label for="verificationCode">Código de Verificación</label>
+                                        <label htmlFor="verificationCode">Código de Verificación</label>
                                         <div className="code-input-container-olvidarp">
                                             <input
                                                 type="text"
@@ -288,7 +288,7 @@ const OlvidarPassword = () => {
 
                                 <form className="recovery-form-olvidarp" onSubmit={handlePasswordSubmit}>
                                     <div className="form-group-olvidarp">
-                                        <label for="newPassword">Nueva Contraseña</label>
+                                        <label htmlFor="newPassword">Nueva Contraseña</label>
                                         <div className="input-container-olvidarp">
                                             <i className="fas fa-lock"></i>
                                             <input
@@ -310,9 +310,9 @@ const OlvidarPassword = () => {
                                         <div className="password-strength" id="passwordStrength"></div>
                                         {error && <div className="error-message" id="passwordError">{error}</div>}
                                     </div>
-
+                    
                                     <div className="form-group-olvidarp">
-                                        <label for="confirmPassword">Confirmar Contraseña</label>
+                                        <label htmlFor="confirmPassword">Confirmar Contraseña</label>
                                         <div className="input-container-olvidarp">
                                             <i className="fas fa-lock"></i>
                                             <input

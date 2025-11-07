@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaHome, FaCalendarAlt, FaUserCheck, FaBed, FaFileAlt, FaPlus, FaBell, FaUser, FaChevronDown, FaBars, FaTimes, FaCheckCircle, FaClock, FaExclamationCircle, FaHashtag, FaCalendar, FaUser as FaUserIcon, FaComment, FaEye, FaCheck, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
+import {  FaFileAlt,  FaTimes, FaCheckCircle, FaClock, FaExclamationCircle, FaHashtag, FaCalendar, FaUser as FaUserIcon, FaComment, FaEye, FaCheck, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 import './MisSolicitudes.css'; // Asegúrate de tener un archivo CSS para los estilos
 import Header from '../Shared/Header'
 import Footer from '../../footer/Footer';
@@ -240,7 +240,7 @@ const MisSolicitudes = () => {
           {/* Filters */}
           <div className="filters-section">
             <div className="filter-group">
-              <label className="filter-label">Estado:</label>
+              <label htmlFor='estado' className="filter-label">Estado:</label>
               <div className="filter-buttons">
                 <button 
                   className={`filter-btn ${currentStatusFilter === 'all' ? 'active' : ''}`} 
@@ -276,7 +276,7 @@ const MisSolicitudes = () => {
             </div>
 
             <div className="filter-group">
-              <label className="filter-label">Categoría:</label>
+              <label htmlFor='categoria' className="filter-label">Categoría:</label>
               <div className="filter-buttons">
                 <button 
                   className={`filter-btn ${currentCategoryFilter === 'all' ? 'active' : ''}`} 
@@ -409,23 +409,23 @@ const MisSolicitudes = () => {
                   <h4>Información General</h4>
                   <div className="detail-grid">
                     <div className="detail-item">
-                      <label>ID de Solicitud:</label>
+                      <label htmlFor='id'>ID de Solicitud:</label>
                       <span>{selectedRequest.id}</span>
                     </div>
                     <div className="detail-item">
-                      <label>Estado:</label>
+                      <label htmlFor='estado'>Estado:</label>
                       <span className={`status-badge ${selectedRequest.status}`}>
                         {getStatusText(selectedRequest.status)}
                       </span>
                     </div>
                     <div className="detail-item">
-                      <label>Prioridad:</label>
+                      <label htmlFor='prioridad'>Prioridad:</label>
                       <span className={`priority-badge ${selectedRequest.priority}`}>
                         {getPriorityText(selectedRequest.priority)}
                       </span>
                     </div>
                     <div className="detail-item">
-                      <label>Categoría:</label>
+                      <label htmlFor='categoria'>Categoría:</label>
                       <span>{getCategoryText(selectedRequest.category)}</span>
                     </div>
                   </div>
@@ -440,11 +440,11 @@ const MisSolicitudes = () => {
                   <h4>Fechas</h4>
                   <div className="detail-grid">
                     <div className="detail-item">
-                      <label>Fecha de Envío:</label>
+                      <label htmlFor='fechaEnvio'>Fecha de Envío:</label>
                       <span>{formatDate(selectedRequest.dateSubmitted)}</span>
                     </div>
                     <div className="detail-item">
-                      <label>Fecha de Respuesta:</label>
+                      <label htmlFor='fechaRespuesta'>Fecha de Respuesta:</label>
                       <span>{selectedRequest.dateResponded ? formatDate(selectedRequest.dateResponded) : 'Pendiente'}</span>
                     </div>
                   </div>
@@ -539,8 +539,7 @@ const MisSolicitudes = () => {
           </div>
         ))}
       </div>
-
-      <Footer />
+      <Footer/>
     </div>
   );
 };

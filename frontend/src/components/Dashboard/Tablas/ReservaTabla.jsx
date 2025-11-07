@@ -1,4 +1,6 @@
 import React from "react";
+import PropTypes from "prop-types";
+
 
 const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
   <div className="tabla-responsive">
@@ -10,7 +12,7 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
             <th>Usuario</th>
             <th>Cabaña</th>
             <th>Fecha Inicio</th>
-            <th>Fecha Fin</th>
+            <th>Fecha Fin</th>PropTypes
             <th>Número de Personas</th>
             <th>Tipo de Documento</th>
             <th>Número de Documento</th>
@@ -94,4 +96,9 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
   </div>
 );
 
+TablaReservas.propTypes = {
+  reservas: PropTypes.array.isRequired,
+  onEditar: PropTypes.func.isRequired,
+  onEliminar: PropTypes.func,
+};
 export default TablaReservas;

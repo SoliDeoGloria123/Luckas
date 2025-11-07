@@ -172,15 +172,6 @@ const TareasManagement = () => {
   }
 
 
-  /*const filteredTasks = tasks.filter((task) => {
-    const matchesSearch =
-      task.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesEstado = filterEstado === "todos" || task.estado === filterEstado
-    const matchesPrioridad = filterPrioridad === "todas" || task.prioridad === filterPrioridad
-    return matchesSearch && matchesEstado && matchesPrioridad
-  })*/
-
   const stats = {
     total: tareas.length,
     enProgreso: tareas.filter((t) => t.estado === "en_progreso").length,
@@ -411,7 +402,7 @@ const TareasManagement = () => {
 
             <div className="p-6 space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="titulo" className="block text-sm font-semibold text-gray-700 mb-2">
                   Título <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -424,7 +415,7 @@ const TareasManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+                <label htmlFor="descripcion" className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
                 <textarea
                   value={formData.descripcion}
                   onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
@@ -436,7 +427,7 @@ const TareasManagement = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Estado</label>
+                  <label htmlFor="estado" className="block text-sm font-semibold text-gray-700 mb-2">Estado</label>
                   <select
                     value={formData.estado}
                     onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
@@ -450,7 +441,7 @@ const TareasManagement = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
+                  <label htmlFor="prioridad" className="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
                   <select
                     value={formData.prioridad}
                     onChange={(e) => setFormData({ ...formData, prioridad: e.target.value })}
@@ -464,7 +455,7 @@ const TareasManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="asignadoA" className="block text-sm font-semibold text-gray-700 mb-2">
                   Asignar a <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -485,7 +476,7 @@ const TareasManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="fechaLimite" className="block text-sm font-semibold text-gray-700 mb-2">
                   Fecha Límite <span className="text-red-500">*</span>
                 </label>
                 <input

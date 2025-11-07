@@ -24,6 +24,7 @@ const GestionCategorizacion = () => {
             obtenerEstadisticas();
         } catch (error) {
             setCategorias([]);
+            mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`);
         }
     };
     useEffect(() => {
@@ -89,7 +90,7 @@ const GestionCategorizacion = () => {
             mostrarAlerta("¡Éxito!", `Categoría actualizada a ${nuevoEstado}`);
             obtenerCategorias(); // refresca la lista
         } catch (error) {
-            mostrarAlerta("Error", "No se pudo actualizar el estado");
+            mostrarAlerta("Error", `No se pudo actualizar el estado: ${error.message}`);
         }
     };
 

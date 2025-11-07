@@ -30,6 +30,7 @@ const GestionCertificacion = () => {
                 }
             } catch (err) {
                 setCertificados([]);
+                alert('Error al obtener certificados: ' + (err?.message || err));
             }
             setLoading(false);
         };
@@ -52,7 +53,7 @@ const GestionCertificacion = () => {
             a.remove();
             window.URL.revokeObjectURL(url);
         } catch (err) {
-            alert('Error generando certificado');
+            alert('Error generando certificado: ' + (err?.message || err));
         }
     };
 

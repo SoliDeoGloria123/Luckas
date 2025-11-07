@@ -1,4 +1,7 @@
 import React from "react";
+import PropTypes from "prop-types";
+
+
 const TablaCategorias = ({ categorias, onEditar, onEliminar, onToggleEstado }) => (
   <div className="tabla-contenedor-admin">
     <table className="tabla-usuarios-admin">
@@ -31,9 +34,9 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar, onToggleEstado }) =
               </td>
               <td>
                 <div className="acciones-botones">
-                  <button className="btn-action editar" onClick={() => onEditar(cat)}><i class="fas fa-edit"></i></button>
+                  <button className="btn-action editar" onClick={() => onEditar(cat)}><i className="fas fa-edit"></i></button>
                   {onEliminar && (
-                    <button className="btn-action eliminar" onClick={() => onEliminar(cat._id)}><i class="fas fa-trash"></i></button>
+                    <button className="btn-action eliminar" onClick={() => onEliminar(cat._id)}><i className="fas fa-trash"></i></button>
                   )}
 
                   <button
@@ -55,5 +58,12 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar, onToggleEstado }) =
     </table>
   </div>
 );
+
+TablaCategorias.propTypes = {
+  categorias: PropTypes.array.isRequired,
+  onEditar: PropTypes.func.isRequired,
+  onEliminar: PropTypes.func,
+  onToggleEstado: PropTypes.func.isRequired
+};
 
 export default TablaCategorias;

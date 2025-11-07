@@ -8,7 +8,6 @@ import {
   Plus,
   Edit,
   Eye,
-  Trash2,
   GraduationCap,
   BookOpen,
   Clock,
@@ -58,7 +57,7 @@ const Gestioncursos = () => {
       obtenerCursos();
       setShowModal(false);
     } catch (error) {
-      mostrarAlerta('Error', 'Hubo un problema al guardar el programa');
+      mostrarAlerta('Error', `Hubo un problema al guardar el programa: ${error.message}`);
     } finally {
       setCargando(false);
     }
@@ -288,7 +287,7 @@ const Gestioncursos = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus"></i> {' '}
             Nuevo Curso
           </button>
         </div>

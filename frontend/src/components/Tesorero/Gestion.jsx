@@ -4,7 +4,7 @@ import HeaderTesorero from "./Header/Header-tesorero";
 import Footer from '../footer/Footer';
 import './Gestion.css';
 
-const Gestion = ({ }) => {
+const Gestion = () => {
     const navigate = useNavigate();
 
     // Funciones de navegación a páginas específicas
@@ -66,9 +66,9 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Usuarios</h3>
                             <p className="card-description">Administrar cuentas de usuarios del sistema</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarUsuarios(); }}>
+                            <button type="button"  className="card-action" onClick={e => { e.preventDefault(); handleGestionarUsuarios(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
                     <div className="management-card" data-module="solicitudes">
@@ -83,9 +83,9 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Solicitudes</h3>
                             <p className="card-description">Revisar y categorizar solicitudes</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarSolicitudes(); }}>
+                            <button type="button" className="card-action" onClick={e => { e.preventDefault(); handleGestionarSolicitudes(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -102,9 +102,9 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Eventos</h3>
                             <p className="card-description">Organizar y categorizar eventos</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarEventos(); }}>
+                            <button type="button" className="card-action" onClick={e => { e.preventDefault(); handleGestionarEventos(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -121,9 +121,9 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Cabañas</h3>
                             <p className="card-description">Administrar reservas de cabañas</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarCabanas(); }}>
+                            <button type="button" className="card-action" onClick={e => { e.preventDefault(); handleGestionarCabanas(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -139,9 +139,9 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Cursos</h3>
                             <p className="card-description">Administrar programas académicos</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarProgramas(); }}>
+                            <button type="button" className="card-action" onClick={e => { e.preventDefault(); handleGestionarProgramas(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -158,9 +158,9 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Tareas</h3>
                             <p className="card-description">Asignar y supervisar tareas</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarTareas(); }}>
+                            <button type="button" className="card-action" onClick={e => { e.preventDefault(); handleGestionarTareas(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -196,9 +196,9 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Reportes</h3>
                             <p className="card-description">Generar informes del sistema</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarReportes(); }}>
+                            <button type="button" className="card-action" onClick={e => { e.preventDefault(); handleGestionarReportes(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -214,9 +214,9 @@ const Gestion = ({ }) => {
                             </div>
                             <h3 className="card-title">Gestionar Categorías</h3>
                             <p className="card-description">Administrar clasificaciones del sistema</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarCategorias(); }}>
+                            <button type="button" className="card-action" onClick={e => { e.preventDefault(); handleGestionarCategorias(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>

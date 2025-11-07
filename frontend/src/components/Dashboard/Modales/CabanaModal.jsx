@@ -258,7 +258,7 @@ const CabanaModal = ({
           </small>
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" type="button" onClick={onClose}>
-              <i className="fas fa-times"></i>
+              <i className="fas fa-times"></i> {' '}
               Cancelar
             </button>
             <button className="btn-admin btn-primary" type="submit">

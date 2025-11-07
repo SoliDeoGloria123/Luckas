@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import PropTypes from "prop-types";
 // Actualizar el precio automáticamente al seleccionar una cabaña
 
 const ReservasModal = ({
@@ -55,16 +56,18 @@ const ReservasModal = ({
         <form className="modal-body-admin" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {/* Usuario */}
           <div className="form-grupo-admin">
-            <label>Usuario:</label>
+            <label htmlFor="usuario">Usuario:</label>
             <select
+              id="usuario"
+              name="usuario"
               value={modoEdicion ? reservaSeleccionada?.usuario : nuevaReserva.usuario}
               onChange={e => {
                 const userId = e.target.value;
                 const usuarioSeleccionado = usuarios.find(u => u._id === userId);
-                
+
                 if (modoEdicion) {
-                  setReservaSeleccionada({ 
-                    ...reservaSeleccionada, 
+                  setReservaSeleccionada({
+                    ...reservaSeleccionada,
                     usuario: userId,
                     nombre: usuarioSeleccionado?.nombre || '',
                     apellido: usuarioSeleccionado?.apellido || '',
@@ -74,8 +77,8 @@ const ReservasModal = ({
                     numeroDocumento: usuarioSeleccionado?.numeroDocumento || ''
                   });
                 } else {
-                  setNuevaReserva({ 
-                    ...nuevaReserva, 
+                  setNuevaReserva({
+                    ...nuevaReserva,
                     usuario: userId,
                     nombre: usuarioSeleccionado?.nombre || '',
                     apellido: usuarioSeleccionado?.apellido || '',
@@ -96,11 +99,13 @@ const ReservasModal = ({
               ))}
             </select>
           </div>
-          
+
           <div className="form-grid-admin">
             <div className="form-grupo-admin">
-              <label>Cabaña:</label>
+              <label htmlFor="cabana">Cabaña:</label>
               <select
+                id="cabana"
+                name="cabana"
                 value={modoEdicion ? reservaSeleccionada?.cabana : nuevaReserva.cabana}
                 onChange={e => {
                   const cabanaId = e.target.value;
@@ -132,8 +137,10 @@ const ReservasModal = ({
               </select>
             </div>
             <div className="form-grupo-admin">
-              <label>Precio:</label>
+              <label htmlFor="precio">Precio:</label>
               <input
+                id="precio"
+                name="precio"
                 type="number"
                 value={modoEdicion ? reservaSeleccionada?.precio : nuevaReserva.precio}
                 readOnly
@@ -142,89 +149,106 @@ const ReservasModal = ({
             </div>
           </div>
           <div className="from-grid-admin">
-          {/* Fecha Inicio */}
-          <div className="form-grupo-admin">
-            <label>Fecha Inicio:</label>
-            <input
-              type="date"
-              value={
-                modoEdicion
-                  ? reservaSeleccionada?.fechaInicio?.substring(0, 10)
-                  : nuevaReserva.fechaInicio
-              }
-              onChange={e =>
-                modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, fechaInicio: e.target.value })
-                  : setNuevaReserva({ ...nuevaReserva, fechaInicio: e.target.value })
-              }
-              required
-            />
-          </div>
+            {/* Fecha Inicio */}
+            <div className="form-grupo-admin">
+              <label htmlFor="fechaInicio">Fecha Inicio:</label>
+              <input
+                id="fechaInicio"
+                name="fechaInicio"
+                type="date"
+                value={
+                  modoEdicion
+                    ? reservaSeleccionada?.fechaInicio?.substring(0, 10)
+                    : nuevaReserva.fechaInicio
+                }
+                onChange={e =>
+                  modoEdicion
+                    ? setReservaSeleccionada({ ...reservaSeleccionada, fechaInicio: e.target.value })
+                    : setNuevaReserva({ ...nuevaReserva, fechaInicio: e.target.value })
+                }
+                required
+              />
+            </div>
 
-          {/* Fecha Fin */}
-          <div className="form-grupo-admin">
-            <label>Fecha Fin:</label>
-            <input
-              type="date"
-              value={
-                modoEdicion
-                  ? reservaSeleccionada?.fechaFin?.substring(0, 10)
-                  : nuevaReserva.fechaFin
-              }
-              onChange={e =>
-                modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, fechaFin: e.target.value })
-                  : setNuevaReserva({ ...nuevaReserva, fechaFin: e.target.value })
-              }
-              required
-            />
+            {/* Fecha Fin */}
+            <div className="form-grupo-admin">
+              <label htmlFor="fechaFin">Fecha Fin:</label>
+              <input
+                id="fechaFin"
+                name="fechaFin"
+                type="date"
+                value={
+                  modoEdicion
+                    ? reservaSeleccionada?.fechaFin?.substring(0, 10)
+                    : nuevaReserva.fechaFin
+                }
+                onChange={e =>
+                  modoEdicion
+                    ? setReservaSeleccionada({ ...reservaSeleccionada, fechaFin: e.target.value })
+                    : setNuevaReserva({ ...nuevaReserva, fechaFin: e.target.value })
+                }
+                required
+              />
+            </div>
           </div>
-              </div>
-              <div className="from-grid-admin">
-          {/* Estado */}
-          <div className="form-grupo-admin">
-            <label>Estado:</label>
-            <select
-              value={modoEdicion ? reservaSeleccionada?.estado : nuevaReserva.estado || "Pendiente"}
-              onChange={e =>
-                modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, estado: e.target.value })
-                  : setNuevaReserva({ ...nuevaReserva, estado: e.target.value })
-              }
-              required
-            >
-              <option value="Pendiente">Pendiente</option>
-              <option value="Confirmada">Confirmada</option>
-              <option value="Cancelada">Cancelada</option>
-              <option value="finalizada">Finalizada</option>
-            </select>
-          </div>
-          {/* Activo */}
-          <div className="form-grupo-admin">
-            <label>Activo:</label>
-            <select
-              value={modoEdicion ? (reservaSeleccionada?.activo ? 'true' : 'false') : (nuevaReserva.activo !== undefined ? (nuevaReserva.activo ? 'true' : 'false') : 'true')}
-              onChange={e =>
-                modoEdicion
-                  ? setReservaSeleccionada({ ...reservaSeleccionada, activo: e.target.value === 'true' })
-                  : setNuevaReserva({ ...nuevaReserva, activo: e.target.value === 'true' })
-              }
-              required
-            >
-              <option value="true">Sí</option>
-              <option value="false">No</option>
-            </select>
-          </div>
+          <div className="from-grid-admin">
+            {/* Estado */}
+            <div className="form-grupo-admin">
+              <label htmlFor="estado">Estado:</label>
+              <select
+                id="estado"
+                name="estado"
+                value={modoEdicion ? reservaSeleccionada?.estado : nuevaReserva.estado || "Pendiente"}
+                onChange={e =>
+                  modoEdicion
+                    ? setReservaSeleccionada({ ...reservaSeleccionada, estado: e.target.value })
+                    : setNuevaReserva({ ...nuevaReserva, estado: e.target.value })
+                }
+                required
+              >
+                <option value="Pendiente">Pendiente</option>
+                <option value="Confirmada">Confirmada</option>
+                <option value="Cancelada">Cancelada</option>
+                <option value="finalizada">Finalizada</option>
+              </select>
+            </div>
+            {/* Activo */}
+            <div className="form-grupo-admin">
+              <label htmlFor="activo">Activo:</label>
+              <select
+                id="activo"
+                name="activo"
+                value={(() => {
+                  if (modoEdicion) {
+                    return reservaSeleccionada?.activo ? 'true' : 'false';
+                  }
+                  return (nuevaReserva.activo === undefined || nuevaReserva.activo) ? 'true' : 'false';
+                })()}
+                onChange={e => {
+                  const esActivo = e.target.value === 'true';
+                  if (modoEdicion) {
+                    setReservaSeleccionada({ ...reservaSeleccionada, activo: esActivo });
+                  } else {
+                    setNuevaReserva({ ...nuevaReserva, activo: esActivo });
+                  }
+                }}
+                required
+              >
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+              </select>
+            </div>
           </div>
 
           {/* Datos Personales */}
           <div className="form-section-admin">
             <h3 style={{ color: 'var(--primary-blue)', marginBottom: '1rem' }}>Datos del Huésped</h3>
-            
+
             <div className="from-grid-admin">
               <div className="form-grupo-admin">
-                <label>Nombre:</label>
+                <label htmlFor="nombre">Nombre:</label>
                 <input
+                  id="nombre"
                   type="text"
                   name="nombre"
                   value={modoEdicion ? reservaSeleccionada?.nombre : nuevaReserva.nombre}
@@ -233,10 +257,11 @@ const ReservasModal = ({
                   required
                 />
               </div>
-              
+
               <div className="form-grupo-admin">
-                <label>Apellido:</label>
+                <label htmlFor="apellido">Apellido:</label>
                 <input
+                  id="apellido"
                   type="text"
                   name="apellido"
                   value={modoEdicion ? reservaSeleccionada?.apellido : nuevaReserva.apellido}
@@ -246,11 +271,12 @@ const ReservasModal = ({
                 />
               </div>
             </div>
-            
+
             <div className="from-grid-admin">
               <div className="form-grupo-admin">
-                <label>Tipo de Documento:</label>
+                <label htmlFor="tipoDocumento">Tipo de Documento:</label>
                 <select
+                  id="tipoDocumento"
                   name="tipoDocumento"
                   value={modoEdicion ? reservaSeleccionada?.tipoDocumento : nuevaReserva.tipoDocumento}
                   onChange={handleChange}
@@ -263,10 +289,11 @@ const ReservasModal = ({
                   <option value="Tarjeta de identidad">Tarjeta de identidad</option>
                 </select>
               </div>
-              
+
               <div className="form-grupo-admin">
-                <label>Número de Documento:</label>
+                <label htmlFor="numeroDocumento">Número de Documento:</label>
                 <input
+                  id="numeroDocumento"
                   type="text"
                   name="numeroDocumento"
                   value={modoEdicion ? reservaSeleccionada?.numeroDocumento : nuevaReserva.numeroDocumento}
@@ -276,11 +303,12 @@ const ReservasModal = ({
                 />
               </div>
             </div>
-            
+
             <div className="from-grid-admin">
               <div className="form-grupo-admin">
-                <label>Correo Electrónico:</label>
+                <label htmlFor="correoElectronico">Correo Electrónico:</label>
                 <input
+                  id="correoElectronico"
                   type="email"
                   name="correoElectronico"
                   value={modoEdicion ? reservaSeleccionada?.correoElectronico : nuevaReserva.correoElectronico}
@@ -289,10 +317,11 @@ const ReservasModal = ({
                   required
                 />
               </div>
-              
+
               <div className="form-grupo-admin">
-                <label>Teléfono:</label>
+                <label htmlFor="telefono">Teléfono:</label>
                 <input
+                  id="telefono"
                   type="tel"
                   name="telefono"
                   value={modoEdicion ? reservaSeleccionada?.telefono : nuevaReserva.telefono}
@@ -302,10 +331,11 @@ const ReservasModal = ({
                 />
               </div>
             </div>
-            
+
             <div className="form-grupo-admin">
-              <label>Número de Personas:</label>
+              <label htmlFor="numeroPersonas">Número de Personas:</label>
               <input
+                id="numeroPersonas"
                 type="number"
                 name="numeroPersonas"
                 value={modoEdicion ? reservaSeleccionada?.numeroPersonas : nuevaReserva.numeroPersonas}
@@ -319,8 +349,9 @@ const ReservasModal = ({
 
           {/* Observaciones */}
           <div className="form-grupo-admin">
-            <label>Observaciones:</label>
+            <label htmlFor="observaciones">Observaciones:</label>
             <textarea
+              id="observaciones"
               name="observaciones"
               value={modoEdicion ? reservaSeleccionada?.observaciones : nuevaReserva.observaciones}
               onChange={handleChange}
@@ -339,6 +370,66 @@ const ReservasModal = ({
       </div>
     </div>
   );
+};
+
+ReservasModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  modoEdicion: PropTypes.bool,
+  reservaSeleccionada: PropTypes.shape({
+    usuario: PropTypes.string,
+    cabana: PropTypes.string,
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    fechaInicio: PropTypes.string,
+    fechaFin: PropTypes.string,
+    estado: PropTypes.string,
+    activo: PropTypes.bool,
+    nombre: PropTypes.string,
+    apellido: PropTypes.string,
+    tipoDocumento: PropTypes.string,
+    numeroDocumento: PropTypes.string,
+    correoElectronico: PropTypes.string,
+    telefono: PropTypes.string,
+    numeroPersonas: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    observaciones: PropTypes.string
+  }),
+  setReservaSeleccionada: PropTypes.func,
+  nuevaReserva: PropTypes.shape({
+    usuario: PropTypes.string,
+    cabana: PropTypes.string,
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    fechaInicio: PropTypes.string,
+    fechaFin: PropTypes.string,
+    estado: PropTypes.string,
+    activo: PropTypes.bool,
+    nombre: PropTypes.string,
+    apellido: PropTypes.string,
+    tipoDocumento: PropTypes.string,
+    numeroDocumento: PropTypes.string,
+    correoElectronico: PropTypes.string,
+    telefono: PropTypes.string,
+    numeroPersonas: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    observaciones: PropTypes.string
+  }).isRequired,
+  setNuevaReserva: PropTypes.func.isRequired,
+  usuarios: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string,
+    nombre: PropTypes.string,
+    username: PropTypes.string,
+    correo: PropTypes.string,
+    role: PropTypes.string,
+    apellido: PropTypes.string,
+    telefono: PropTypes.string,
+    tipoDocumento: PropTypes.string,
+    numeroDocumento: PropTypes.string
+  })).isRequired,
+  cabanas: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string,
+    nombre: PropTypes.string,
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  })).isRequired,
+  solicitudes: PropTypes.array,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired
 };
 
 export default ReservasModal;

@@ -20,6 +20,7 @@ const Gestioncategorizacion = () => {
       setCategorias(res.data || []);
     } catch (error) {
       setCategorias([]);
+      mostrarAlerta("ERROR", `Error al obtener categorías: ${error.message}`, 'error');
     }
   };
   useEffect(() => {
@@ -87,14 +88,14 @@ const Gestioncategorizacion = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus"></i> {' '}
             Nueva Categoría
           </button>
         </div>
         <div className="stats-grid-usuarios">
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios blue">
-              <i class="fas fa-tags"></i>
+              <i className="fas fa-tags"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios">4</div>
@@ -104,7 +105,7 @@ const Gestioncategorizacion = () => {
 
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios green">
-              <i class="fas fa-check-circle"></i>
+              <i className="fas fa-check-circle"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios">1</div>
@@ -115,7 +116,7 @@ const Gestioncategorizacion = () => {
 
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios purple">
-              <i class="fas fa-star"></i>
+              <i className="fas fa-star"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios">1</div>

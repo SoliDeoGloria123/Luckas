@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 
 const CategorizacionModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
@@ -43,7 +44,7 @@ const [formData, setFormData] = useState({
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Nombre</label>
+                <label htmlFor='nombre'>Nombre</label>
                 <input
                   type="text"
                   name="nombre"
@@ -54,7 +55,7 @@ const [formData, setFormData] = useState({
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Tipo</label>
+                <label htmlFor='tipo'>Tipo</label>
                 <select
                   name="tipo"
                   value={formData.tipo}
@@ -74,7 +75,7 @@ const [formData, setFormData] = useState({
               </div>
               
               <div className="form-group-tesorero">
-                <label>Codigo</label>
+                <label htmlFor='codigo'>Codigo</label>
                 <input
                   type="text"
                   name="codigo"
@@ -88,7 +89,7 @@ const [formData, setFormData] = useState({
       
               
               <div className="form-group-tesorero">
-                <label>Estado</label>
+                <label htmlFor='estado'>Estado</label>
                 <select
                   name="activo"
                   value={formData.activo}
@@ -115,6 +116,12 @@ const [formData, setFormData] = useState({
       </div>
     </div>
   );
+};
+CategorizacionModal.propTypes = {
+  mode: PropTypes.oneOf(['create', 'edit']),
+  initialData: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired
 };
 
 export default CategorizacionModal;

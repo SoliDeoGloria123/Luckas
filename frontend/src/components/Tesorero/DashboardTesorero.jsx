@@ -89,7 +89,7 @@ const DashboardTesorero = () => {
                   <p className="text-gray-600">Gestiona recursos y administra el sistema eficientemente</p>
               </div>
               <button className="quick-action-btn-tesorero" onClick={handleGestionesClick}>
-                <i className="fas fa-cog"></i>
+                <i className="fas fa-cog"></i> {' '}
                 Ver Todas las Gestiones
               </button>
             </div>
@@ -103,7 +103,7 @@ const DashboardTesorero = () => {
                     <div className="metric-value-tesorero">$45,231</div>
                     <div className="metric-label-tesorero">Ingresos Totales</div>
                     <div className="metric-trend-tesorero positive">
-                      <i className="fas fa-arrow-up"></i>
+                      <i className="fas fa-arrow-up"></i> {' '}
                       +15%
                     </div>
                   </div>
@@ -117,7 +117,7 @@ const DashboardTesorero = () => {
                     <div className="metric-value-tesorero">$28,450</div>
                     <div className="metric-label-tesorero">Gastos Operativos</div>
                     <div className="metric-trend-tesorero positive">
-                      <i className="fas fa-arrow-up"></i>
+                      <i className="fas fa-arrow-up"></i> {' '}
                       +8%
                     </div>
                   </div>
@@ -131,7 +131,7 @@ const DashboardTesorero = () => {
                     <div className="metric-value-tesorero">$16,781</div>
                     <div className="metric-label-tesorero">Balance Neto</div>
                     <div className="metric-trend-tesorero positive">
-                      <i className="fas fa-arrow-up"></i>
+                      <i className="fas fa-arrow-up"></i> {' '}
                       +22%
                     </div>
                   </div>

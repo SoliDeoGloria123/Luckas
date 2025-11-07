@@ -1,7 +1,7 @@
 
 import React, { useState,useEffect } from 'react';
 import './ProgramasModa.css';
-
+import PropTypes from 'prop-types';
 
 const ProgramaModal = ({ 
   mostrar,
@@ -190,6 +190,16 @@ const ProgramaModal = ({
       </div>
     </div>
   );
+};
+ProgramaModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  modoEdicion: PropTypes.bool,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  programaSeleccionado: PropTypes.object,
+  formData: PropTypes.object.isRequired,
+  setFormData: PropTypes.func.isRequired,
+  modoVista: PropTypes.bool
 };
 
 export default ProgramaModal;

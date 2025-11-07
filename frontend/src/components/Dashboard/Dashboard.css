@@ -2708,17 +2708,17 @@
 
 .estado.inactivo {
   background-color: #f8d7da;
-  color: #721c24;
+  color: #000000;
 }
 
 .estado.finalizado {
   background-color: #d1ecf1;
-  color: #0c5460;
+  color: #000000;
 }
 
 .estado.cancelado {
   background-color: #f5c6cb;
-  color: #721c24;
+  color: #000000;
 }
 
 .acciones {
@@ -2945,10 +2945,10 @@
 
 
 
-/* Estadísticas */
+/* Estadísticas - definición consolidada */
 .estadisticas-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
 }
@@ -3053,17 +3053,17 @@
 
 .estado.en.proceso {
   background-color: #fff3cd;
-  color: #856404;
+  color: #000000;
 }
 
 .estado.finalizado {
   background-color: #d1ecf1;
-  color: #0c5460;
+  color: #000000;
 }
 
 .estado.cancelado {
   background-color: #f5c6cb;
-  color: #721c24;
+  color: #000000;
 }
 
 .acciones {

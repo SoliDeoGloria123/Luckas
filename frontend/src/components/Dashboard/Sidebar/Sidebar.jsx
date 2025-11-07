@@ -16,6 +16,8 @@ import {
     Calendar as CalendarIcon,
 } from 'lucide-react';
 
+import PropTypes from "prop-types";
+
 const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionActiva }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -135,6 +137,13 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
             </div >
         </>
     )
+};
+
+Sidebar.propTypes = {
+    sidebarAbierto: PropTypes.bool.isRequired,
+    setSidebarAbierto: PropTypes.func.isRequired,
+    seccionActiva: PropTypes.string.isRequired,
+    setSeccionActiva: PropTypes.func.isRequired,
 };
 
 export default Sidebar;

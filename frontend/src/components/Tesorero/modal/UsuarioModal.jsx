@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 
 
@@ -92,7 +93,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Nombre</label>
+                <label htmlFor="nombre">Nombre</label>
                 <input
                   type="text"
                   name="nombre"
@@ -104,7 +105,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
               </div>
 
               <div className="form-group-tesorero">
-                <label>Apellido</label>
+                <label htmlFor="apellido">Apellido</label>
                 <input
                   type="text"
                   name="apellido"
@@ -117,7 +118,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
 
 
               <div className="form-group-tesorero">
-                <label>Teléfono</label>
+                <label htmlFor="telefono">Teléfono</label>
                 <input
                   type="tel"
                   name="telefono"
@@ -129,7 +130,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
               </div>
 
               <div className="form-group-tesorero">
-                <label>Tipo de Documento</label>
+                <label htmlFor="tipoDocumento">Tipo de Documento</label>
                 <select
                   name="tipoDocumento"
                   value={formData.tipoDocumento}
@@ -144,7 +145,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
               </div>
 
               <div className="form-group-tesorero">
-                <label>Número de Documento</label>
+                <label htmlFor="numeroDocumento">Número de Documento</label>
                 <input
                   type="text"
                   name="numeroDocumento"
@@ -155,7 +156,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Correo</label>
+                <label htmlFor="correo">Correo</label>
                 <input
                   type="email"
                   name="correo"
@@ -166,7 +167,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Fecha de Nacimiento</label>
+                <label htmlFor="fechaNacimiento">Fecha de Nacimiento</label>
                 <input
                   type="date"
                   name="fechaNacimiento"
@@ -177,7 +178,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
               </div>
               {mode === 'create' && (
                 <div className="form-group-tesorero">
-                  <label>Contraseña</label>
+                  <label htmlFor="password">Contraseña</label>
                   <input
                     type="password"
                     name="password"
@@ -191,7 +192,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
 
 
               <div className="form-group-tesorero">
-                <label>Rol</label>
+                <label htmlFor="role">Rol</label>
                 <select
                   name="role"
                   value={formData.role}
@@ -206,7 +207,7 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
               </div>
 
               <div className="form-group-tesorero">
-                <label>Estado</label>
+                <label htmlFor="estado">Estado</label>
                 <select
                   name="estado"
                   value={formData.estado}
@@ -232,6 +233,12 @@ const UsuarioModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) 
       </div>
     </div>
   );
+};
+UsuarioModal.propTypes = {
+  mode: PropTypes.oneOf(['create', 'edit']),
+  initialData: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default UsuarioModal;

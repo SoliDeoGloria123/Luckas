@@ -112,14 +112,14 @@ const Gestionreserva = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus"></i> {' '}
             Nueva Reserva
           </button>
         </div>
         <div className="stats-grid-usuarios">
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios blue">
-              <i class="fas fa-calendar-check"></i>
+              <i className="fas fa-calendar-check"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="totalUsers">5</div>
@@ -128,7 +128,7 @@ const Gestionreserva = () => {
           </div>
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios orange">
-              <i class="fas fa-clock"></i>
+              <i className="fas fa-clock"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="activeUsers">4</div>
@@ -137,7 +137,7 @@ const Gestionreserva = () => {
           </div>
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios purple">
-              <i class="fas fa-dollar-sign"></i>
+              <i className="fas fa-dollar-sign"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="adminUsers">$12,450</div>
@@ -146,7 +146,7 @@ const Gestionreserva = () => {
           </div>
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios green">
-              <i class="fas fa-check-circle"></i>
+              <i className="fas fa-check-circle"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="newUsers">12</div>
@@ -178,7 +178,7 @@ const Gestionreserva = () => {
               <i className="fas fa-download"></i>
             </button>
             <button className="btn-outline-tesorero" >
-              <i class="fas fa-share"></i>
+              <i className="fas fa-share"></i>
             </button>
           </div>
         </div>

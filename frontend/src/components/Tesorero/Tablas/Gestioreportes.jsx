@@ -155,15 +155,15 @@ const Gestionreportes = () => {
                         <option value="inscripciones">Reportes de Inscripciones</option>
                     </select>
                     <button className="btn-secondary-reporte" onClick={exportarPDF}>
-                        <i className="fas fa-file-pdf"></i>
+                        <i className="fas fa-file-pdf"></i>{' '}
                         Exportar PDF
                     </button>
                     <button className="btn-secondary-reporte" onClick={exportarExcel}>
-                        <i className="fas fa-file-excel"></i>
+                        <i className="fas fa-file-excel"></i>{' '}
                         Exportar Excel
                     </button>
                     <button className="btn-primary-reporte" onClick={guardarReporte}>
-                        <i className="fas fa-save"></i>
+                        <i className="fas fa-save"></i>{' '}
                         Guardar Reporte
                     </button>
                 </div>
@@ -232,18 +232,18 @@ const Gestionreportes = () => {
                 </div>
             </div>
             {/*Tabla de resportes*/}
-            <div class="reports-table-container-reporte">
-                <div class="table-header-reporte">
+            <div className="reports-table-container-reporte">
+                <div className="table-header-reporte">
                     <h3>Reportes Guardados</h3>
-                    <button class="btn-primary-reporte" id="newReportBtn">
-                        <i class="fas fa-plus"></i>
+                    <button className="btn-primary-reporte" id="newReportBtn">
+                        <i className="fas fa-plus"></i> {''}
                         Nuevo Reporte
                     </button>
                 </div>
 
-                <div class="table-filters-reporte">
-                    <div class="search-container-reporte">
-                        <i class="fas fa-search"></i>
+                <div className="table-filters-reporte">
+                    <div className="search-container-reporte">
+                        <i className="fas fa-search"></i>
                         <input type="text" placeholder="Buscar reportes..." id="reportSearch"/>
                     </div>
                     <select >
@@ -261,8 +261,8 @@ const Gestionreportes = () => {
                     </select>
                 </div>
 
-                <div class="table-wrapper-reporte">
-                    <table class="reports-table-reporte">
+                <div className="table-wrapper-reporte">
+                    <table className="reports-table-reporte">
                         <thead>
                             <tr>
                                 <th>Nombre del Reporte</th>
@@ -276,75 +276,75 @@ const Gestionreportes = () => {
                         <tbody id="reportsTableBody">
                             <tr>
                                 <td>
-                                    <div class="report-name-reporte">
-                                        <i class="fas fa-file-alt"></i>
+                                    <div className="report-name-reporte">
+                                        <i className="fas fa-file-alt"></i>
                                         <span>Reporte Financiero Enero 2025</span>
                                     </div>
                                 </td>
-                                <td><span class="badge-reporte badge-blue-reporte">Financiero</span></td>
+                                <td><span className="badge-reporte badge-blue-reporte">Financiero</span></td>
                                 <td>15/01/2025 14:30</td>
-                                <td><span class="badge-reporte badge-green-reporte">Generado</span></td>
+                                <td><span className="badge-reporte badge-green-reporte">Generado</span></td>
                                 <td>2.4 MB</td>
                                 <td>
-                                    <div class="action-buttons-reporte">
-                                        <button class="btn-icon-reporte" title="Ver">
-                                            <i class="fas fa-eye"></i>
+                                    <div className="action-buttons-reporte">
+                                        <button className="btn-icon-reporte" title="Ver">
+                                            <i className="fas fa-eye"></i>
                                         </button>
-                                        <button class="btn-icon-reporte" title="Descargar">
-                                            <i class="fas fa-download"></i>
+                                        <button className="btn-icon-reporte" title="Descargar">
+                                            <i className="fas fa-download"></i>
                                         </button>
-                                        <button class="btn-icon-reporte" title="Editar">
-                                            <i class="fas fa-edit"></i>
+                                        <button className="btn-icon-reporte" title="Editar">
+                                            <i className="fas fa-edit"></i>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <div class="report-name-reporte">
-                                        <i class="fas fa-users"></i>
+                                    <div className="report-name-reporte">
+                                        <i className="fas fa-users"></i>
                                         <span>Reporte de Usuarios Activos</span>
                                     </div>
                                 </td>
-                                <td><span class="badge-reporte badge-purple-reporte">Usuarios</span></td>
+                                <td><span className="badge-reporte badge-purple-reporte">Usuarios</span></td>
                                 <td>10/01/2025 09:15</td>
-                                <td><span class="badge-reporte badge-green-reporte">Generado</span></td>
+                                <td><span className="badge-reporte badge-green-reporte">Generado</span></td>
                                 <td>1.8 MB</td>
                                 <td>
-                                    <div class="action-buttons-reporte">
-                                        <button class="btn-icon-reporte" title="Ver">
-                                            <i class="fas fa-eye"></i>
+                                    <div className="action-buttons-reporte">
+                                        <button className="btn-icon-reporte" title="Ver">
+                                            <i className="fas fa-eye"></i>
                                         </button>
-                                        <button class="btn-icon-reporte" title="Descargar">
-                                            <i class="fas fa-download"></i>
+                                        <button className="btn-icon-reporte" title="Descargar">
+                                            <i className="fas fa-download"></i>
                                         </button>
-                                        <button class="btn-icon-reporte" title="Editar">
-                                            <i class="fas fa-edit"></i>
+                                        <button className="btn-icon-reporte" title="Editar">
+                                            <i className="fas fa-edit"></i>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <div class="report-name-reporte">
-                                        <i class="fas fa-calendar-alt"></i>
+                                    <div className="report-name-reporte">
+                                        <i className="fas fa-calendar-alt"></i>
                                         <span>Reporte de Eventos Diciembre</span>
                                     </div>
                                 </td>
-                                <td><span class="badge-reporte badge-orange-reporte">Eventos</span></td>
+                                <td><span className="badge-reporte badge-orange-reporte">Eventos</span></td>
                                 <td>05/01/2025 16:45</td>
-                                <td><span class="badge-reporte badge-yellow-reporte">Pendiente</span></td>
+                                <td><span className="badge-reporte badge-yellow-reporte">Pendiente</span></td>
                                 <td>-</td>
                                 <td>
-                                    <div class="action-buttons-reporte">
-                                        <button class="btn-icon-reporte" title="Ver">
-                                            <i class="fas fa-eye"></i>
+                                    <div className="action-buttons-reporte">
+                                        <button className="btn-icon-reporte" title="Ver">
+                                            <i className="fas fa-eye"></i>
                                         </button>
-                                        <button class="btn-icon-reporte" title="Generar">
-                                            <i class="fas fa-play"></i>
+                                        <button className="btn-icon-reporte" title="Generar">
+                                            <i className="fas fa-play"></i>
                                         </button>
-                                        <button class="btn-icon-reporte" title="Editar">
-                                            <i class="fas fa-edit"></i>
+                                        <button className="btn-icon-reporte" title="Editar">
+                                            <i className="fas fa-edit"></i>
                                         </button>
                                     </div>
                                 </td>

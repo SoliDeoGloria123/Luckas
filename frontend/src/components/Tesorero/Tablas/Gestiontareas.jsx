@@ -125,7 +125,7 @@ const Gestiontarea = () => {
           </div>
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios orange">
-              <i class="fas fa-clock"></i>
+              <i className="fas fa-clock"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="activeUsers">4</div>
@@ -134,7 +134,7 @@ const Gestiontarea = () => {
           </div>
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios blue     ">
-              <i class="fas fa-spinner"></i>
+              <i className="fas fa-spinner"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="adminUsers">1</div>
@@ -143,7 +143,7 @@ const Gestiontarea = () => {
           </div>
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios green">
-              <i class="fas fa-check-circle"></i>
+              <i className="fas fa-check-circle"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="newUsers">12</div>
@@ -175,7 +175,7 @@ const Gestiontarea = () => {
               <i className="fas fa-download"></i>
             </button>
             <button className="btn-outline-tesorero" >
-              <i class="fas fa-share"></i>
+              <i className="fas fa-share"></i>
             </button>
           </div>
         </div>

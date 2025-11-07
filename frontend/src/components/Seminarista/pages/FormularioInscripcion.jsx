@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './FormularioInscripcion.css';
 import { inscripcionService } from "../../../services/inscripcionService";
+import PropTypes from 'prop-types';
 
 
 const FormularioInscripcion = ({
@@ -485,14 +486,14 @@ const FormularioInscripcion = ({
                   }
                   if (formData.edad) {
                     const nacimiento = new Date(usuarioLogueado.fechaNacimiento);
-                    if (!isNaN(nacimiento.getTime())) {
+                    if (!Number.isNaN(nacimiento.getTime())) {
                       const hoy = new Date();
                       let edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
                       const m = hoy.getMonth() - nacimiento.getMonth();
                       if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
                         edadCalculada--;
                       }
-                      if (parseInt(formData.edad) !== edadCalculada) {
+                      if (Number.parseInt(formData.edad) !== edadCalculada) {
                         advertencias.push('La edad ingresada no coincide con la calculada según la fecha de nacimiento.');
                       }
                     }
@@ -653,4 +654,15 @@ const FormularioInscripcion = ({
   );
 };
 
+FormularioInscripcion.propTypes = {
+  evento: PropTypes.object,
+  curso: PropTypes.object,
+  programa: PropTypes.object,
+  usuario: PropTypes.object,
+  loading: PropTypes.bool,
+  mensaje: PropTypes.string,
+  nuevoUsuario: PropTypes.bool,
+  onSubmit: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
+};
 export default FormularioInscripcion;

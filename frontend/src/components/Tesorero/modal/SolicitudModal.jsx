@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { categorizacionService } from '../../../services/categorizacionService';
 import { userService } from '../../../services/userService';
 import { jwtDecode } from "jwt-decode";
+import PropTypes from 'prop-types';
 
 const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
   const getUsuarioSesion = () => {
@@ -11,6 +12,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
     try {
       return jwtDecode(token);
     } catch (e) {
+      console.error("Error al decodificar el token:", e);
       return null;
     }
   };
@@ -72,7 +74,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
         }));
       }
     } catch (error) {
-      console.warn("No se encontró usuario con ese documento");
+      console.error("Error al buscar usuario por documento:", error);
     }
   };
 
@@ -105,7 +107,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
             <div className="form-grid-tesorero">
               {mode === 'create' && (
                 <div className="form-group-tesorero">
-                  <label>Documento Solicitante</label>
+                  <label htmlFor="numeroDocumento">Documento Solicitante</label>
                   <input
                     type="text"
                     name="numeroDocumento"
@@ -119,7 +121,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
 
 
               <div className="form-group-tesorero">
-                <label>Nombre Solicitante</label>
+                <label htmlFor="nombre">Nombre Solicitante</label>
                 <input
                   type="text"
                   name="nombre"
@@ -130,7 +132,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>correo</label>
+                <label htmlFor="correo">Correo</label>
                 <input
                   type="email"
                   name="correo"
@@ -142,7 +144,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
               </div>
 
               <div className="form-group-tesorero">
-                <label>Teléfono </label>
+                <label htmlFor="telefono">Teléfono</label>
                 <input
                   type="text"
                   name="telefono"
@@ -154,7 +156,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
               </div>
 
               <div className="form-group-tesorero">
-                <label>Rol</label>
+                <label htmlFor="role">Rol</label>
                 <select
                   name="role"
                   value={formData.role ? String(formData.role) : ''}
@@ -170,7 +172,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
               </div>
 
               <div className="form-group-tesorero">
-                <label>Tipo de Solicitud:</label>
+                <label htmlFor="tipoSolicitud">Tipo de Solicitud:</label>
                 <select
                   name="tipoSolicitud"
                   value={formData.tipoSolicitud ? String(formData.tipoSolicitud) : ''}
@@ -187,7 +189,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
 
 
               <div className="form-group-tesorero">
-                <label>Modelo Referencia:</label>
+                <label htmlFor="modeloReferencia">Modelo Referencia:</label>
                 <select
                   name="modeloReferencia"
                   value={formData.modeloReferencia ? String(formData.modeloReferencia) : ''}
@@ -205,7 +207,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
                 </select>
               </div>
               <div className="form-group-tesorero">
-                <label>Categoría:</label>
+                <label htmlFor="categoria">Categoría:</label>
                 <select
                   name="categoria"
                   value={formData.categoria ? String(formData.categoria) : ''}
@@ -221,7 +223,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
               </div>
 
               <div className="form-group-tesorero">
-                <label>Estado:</label>
+                <label htmlFor="estado">Estado:</label>
                 <select
                   name="estado"
                   value={formData.estado ? String(formData.estado) : ''}
@@ -237,7 +239,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
                 </select>
               </div>
               <div className="form-group-tesorero">
-                <label>Prioridad:</label>
+                <label htmlFor="prioridad">Prioridad:</label>
                 <select
                   name="prioridad"
                   value={formData.prioridad ? String(formData.prioridad) : ''}
@@ -251,7 +253,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
               </div>
 
               <div className="form-group-tesorero">
-                <label>Observaciones</label>
+                <label htmlFor="observaciones">Observaciones</label>
                 <input
                   type="text"
                   name="observaciones"
@@ -262,8 +264,8 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
               </div>
 
               <div className="form-group-tesorero">
-                <label>Descripción</label>
-                <textarea
+                <label htmlFor="descripcion">Descripción</label>
+                <texta 
                   name="descripcion"
                   value={formData.descripcion}
                   onChange={handleChange}
@@ -288,6 +290,12 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
       </div>
     </div>
   );
+};
+SolicitudModal.propTypes = {
+  mode: PropTypes.oneOf(['create', 'edit']),
+  initialData: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired
 };
 
 export default SolicitudModal;

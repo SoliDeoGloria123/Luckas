@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import './header.css'
 import { Search, Bell, ChevronDown } from "lucide-react";
 
@@ -143,9 +142,9 @@ const HeaderTesorero = () => {
                                     Configuración
                                 </a>
                                 <hr className="my-1" />
-                                <a href="#" className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-50" onClick={handleLogout}>
+                                <button type="button" className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-50" onClick={handleLogout}>
                                     Cerrar Sesión
-                                </a>
+                                </button>
                             </div>
                         )}
                     </div>

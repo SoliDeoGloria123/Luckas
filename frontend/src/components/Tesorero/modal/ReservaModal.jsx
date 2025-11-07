@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { userService } from '../../../services/userService';
 
 
@@ -23,7 +24,9 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
         const day = String(d.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
       }
-    } catch (e) {}
+    } catch (error) {
+      console.error('Error normalizando fecha:', error);
+    }
     return '';
   }
   const [formData, setFormData] = useState({
@@ -67,7 +70,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
           }));
         }
       } catch (err) {
-        // Si no se encuentra usuario, no hacer nada especial
+        console.error('Error al buscar usuario por documento:', err);
       }
     }
   };
@@ -90,7 +93,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Usuarios</label>
+                <label htmlFor="usuario">Usuarios</label>
                 <select
                   name="usuario"
                   value={formData.usuario}
@@ -107,7 +110,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
               </div>
 
               <div className="form-group-tesorero">
-                <label>Cabañas</label>
+                <label htmlFor="cabana">Cabañas</label>
                 <select
                   name="cabana"
                   value={formData.cabana}
@@ -123,7 +126,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
               </div>
 
               <div className="form-group-tesorero">
-                <label>Nombre</label>
+                <label htmlFor="nombre">Nombre</label>
                 <input
                   type="text"
                   name="nombre"
@@ -134,7 +137,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Apellido</label>
+                <label htmlFor="apellido">Apellido</label>
                 <input
                   type="text"
                   name="apellido"
@@ -145,7 +148,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Tipo de Documento</label>
+                <label htmlFor="tipoDocumento">Tipo de Documento</label>
                 <select
                   name="tipoDocumento"
                   value={formData.tipoDocumento}
@@ -160,7 +163,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
                 </select>
               </div>
               <div className="form-group-tesorero">
-                <label>Número de Documento</label>
+                <label htmlFor="numeroDocumento">Número de Documento</label>
                 <input
                   type="text"
                   name="numeroDocumento"
@@ -171,7 +174,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Correo Electrónico</label>
+                <label htmlFor="correoElectronico">Correo Electrónico</label>
                 <input
                   type="email"
                   name="correoElectronico"
@@ -182,7 +185,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Teléfono</label>
+                <label htmlFor="telefono">Teléfono</label>
                 <input
                   type="text"
                   name="telefono"
@@ -193,7 +196,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Número de Personas</label>
+                <label htmlFor="numeroPersonas">Número de Personas</label>
                 <input
                   type="number"
                   name="numeroPersonas"
@@ -204,7 +207,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Propósito de la Estadia</label>
+                <label htmlFor="propositoEstadia">Propósito de la Estadia</label>
                 <input
                   type="text"
                   name="propositoEstadia"
@@ -214,7 +217,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Solicitudes Especiales</label>
+                <label htmlFor="solicitudesEspeciales">Solicitudes Especiales</label>
                 <input
                   type="text"
                   name="solicitudesEspeciales"
@@ -224,7 +227,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Precio</label>
+                <label htmlFor="precio">Precio</label>
                 <input
                   type="number"
                   name="precio"
@@ -236,7 +239,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
               </div>
 
               <div className="form-group-tesorero">
-                <label>Fecha Inicio:</label>
+                <label htmlFor="fechaInicio">Fecha Inicio:</label>
                 <input
                   type="date"
                   name="fechaInicio"
@@ -247,7 +250,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
               </div>
 
               <div className="form-group-tesorero">
-                <label>Fecha Fin:</label>
+                <label htmlFor="fechaFin">Fecha Fin:</label>
                 <input
                   type="date"
                   name="fechaFin"
@@ -258,7 +261,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
               </div>
 
               <div className="form-group-tesorero">
-                <label>Estado</label>
+                <label htmlFor="estado">Estado</label>
                 <select
                   name="estado"
                   value={formData.estado}
@@ -274,7 +277,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
               </div>
 
               <div className="form-group-tesorero">
-                <label>Activo</label>
+                <label htmlFor="activo">Activo</label>
                 <select
                   name="activo"
                   value={formData.activo}
@@ -288,7 +291,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
               </div>
 
               <div className="form-group-tesorero">
-                <label>Observaciones</label>
+                <label htmlFor="observaciones">Observaciones</label>
                 <input
                  type='text'
                   name="observaciones"

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 
 const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, categorias }) => {
@@ -126,7 +127,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Nombre</label>
+                <label htmlFor='nombre'>Nombre</label>
                 <input
                   type="text"
                   name="nombre"
@@ -138,7 +139,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
               </div>
 
               <div className="form-group-tesorero">
-                <label>Descripción</label>
+                <label htmlFor='descripcion'>Descripción</label>
                 <input
                   type="text"
                   name="descripcion"
@@ -150,7 +151,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
               </div>
 
               <div className="form-group-tesorero">
-                <label>Capacidad</label>
+                <label htmlFor='capacidad'>Capacidad</label>
                 <input
                   type="number"
                   name="capacidad"
@@ -161,7 +162,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Categoría</label>
+                <label htmlFor='categoria'>Categoría</label>
                 <select
                   name="categoria"
                   value={formData.categoria}
@@ -178,7 +179,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
               </div>
 
               <div className="form-group-tesorero">
-                <label>Precio</label>
+                <label htmlFor='precio'>Precio</label>
                 <input
                   type="number"
                   name="precio"
@@ -189,7 +190,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
                 />
               </div>
               <div className="form-group-tesorero">
-                <label>Ubicacion</label>
+                <label htmlFor='ubicacion'>Ubicacion</label>
                 <input
                   type="text"
                   name="ubicacion"
@@ -200,7 +201,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
                 />
               </div>
               <div className="form-group-tesorero">
-                <label> Estado</label>
+                <label htmlFor='estado'>Estado</label>
                 <select
                   name="estado"
                   value={formData.estado}
@@ -216,7 +217,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
             </div>
 
             <div className="form-group-tesorero full-width">
-              <label>Imagen</label>
+              <label htmlFor='imagen'>Imagen</label>
               <div className="image-upload-container">
                 <div className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
                   onDragOver={(e) => e.preventDefault()}
@@ -265,4 +266,11 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
   );
 };
 
+CabanaModal.propTypes = {
+  mode: PropTypes.oneOf(['create', 'edit']),
+  initialData: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  categorias: PropTypes.array.isRequired,
+};
 export default CabanaModal;

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState,  useEffect } from 'react';
 import UsuarioModal from "./Modales/UsuarioModal";
 import TablaUsuarios from "./Tablas/UserTabla";
 import { userService } from "../../services/userService";
@@ -6,9 +6,7 @@ import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import PropTypes from 'prop-types';
-
 import "./Dashboard.css";
-
 import {
     Search,
     Calendar as CalendarIcon,
@@ -16,7 +14,6 @@ import {
 } from 'lucide-react';
 
 const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, modoTesorero = false, userRole, readOnly = false, canCreate = true, canEdit = true, canDelete = true }) => {
-    const [submenuAcademicoAbierto, setSubmenuAcademicoAbierto] = useState(false);
     const [usuarios, setUsuarios] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [busqueda, setBusqueda] = useState("");
@@ -66,7 +63,6 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
             console.error("Error al obtener usuarios:", error.message);
             if (error.message === "Unauthorized") {
                 localStorage.removeItem("token");
-                //handleCerrarSesion();
             }
         } finally {
             setCargando(false);

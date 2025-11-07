@@ -18,19 +18,19 @@ const Footer = () => {
         <div className="footer-links-column">
           <div className="footer-link-list">
             <div className="footer-link-item">
-              <a href="#" className="footer-link">Inicio</a>
+              <button type="button" className="footer-link">Inicio</button>
             </div>
             <div className="footer-link-item">
-              <a href="#" className="footer-link">Contáctanos</a>
+              <button type="button" className="footer-link">Contáctanos</button>
             </div>
             <div className="footer-link-item">
-              <a href="#" className="footer-link">Ayuda Online</a>
+              <button type="button" className="footer-link">Ayuda Online</button>
             </div>
             <div className="footer-link-item">
-              <a href="#" className="footer-link">Política de Privacidad</a>
+              <button type="button" className="footer-link">Política de Privacidad</button>
             </div>
             <div className="footer-link-item">
-              <a href="#" className="footer-link">Términos de Uso</a>
+              <button type="button" className="footer-link">Términos de Uso</button>
             </div>
           </div>
         </div>
@@ -43,10 +43,10 @@ const Footer = () => {
           <p>© 2024 LUCKAS - Seminario Bautista de Colombia. Todos los derechos reservados.</p>
         </div>
         <div className="footer-social">
-          <a href="#" aria-label="Facebook"><i className="fab fa-facebook"></i></a>
-          <a href="#" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
-          <a href="#" aria-label="YouTube"><i className="fab fa-youtube"></i></a>
-          <a href="#" aria-label="Email"><i className="fas fa-envelope"></i></a>
+          <button type="button" className="footer-link" aria-label="Facebook"><i className="fab fa-facebook"></i></button>
+          <button type="button" className="footer-link" aria-label="Instagram"><i className="fab fa-instagram"></i></button>
+          <button type="button" className="footer-link" aria-label="YouTube"><i className="fab fa-youtube"></i></button>
+          <button type="button" className="footer-link" aria-label="Email"><i className="fas fa-envelope"></i></button>
         </div>
       </div>
     </footer>

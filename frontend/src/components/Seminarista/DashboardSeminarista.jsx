@@ -51,6 +51,7 @@ const DashboardSeminarista = () => {
         setEventos(eventosArray);
       } catch (err) {
         setEventos([]);
+        console.error('Error fetching eventos:', err);
       } finally {
         setLoadingEventos(false);
       }
@@ -70,6 +71,7 @@ const DashboardSeminarista = () => {
         setCabanas(cabanasArray);
       } catch (err) {
         setCabanas([]);
+        console.error('Error fetching cabañas:', err);
       } finally {
         setLoadingCabanas(false);
       }

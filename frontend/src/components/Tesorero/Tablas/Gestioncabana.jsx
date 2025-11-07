@@ -9,8 +9,6 @@ import Footer from '../../footer/Footer';
 import {
   Plus,
   Edit,
-  Trash2,
-  Search,
   Home,
   Users,
   Wifi,
@@ -163,7 +161,7 @@ const Gestioncabana = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus"></i> {' '}
             Nueva Cabaña
           </button>
         </div>
@@ -194,7 +192,7 @@ const Gestioncabana = () => {
               <div className="stat-label-solicitudes">Ocupadas</div>
             </div>
             <div className="stat-icon-solicitudes green">
-              <i class="fas fa-users"></i>
+              <i className="fas fa-users"></i>
             </div>
           </div>
 
@@ -204,7 +202,7 @@ const Gestioncabana = () => {
               <div className="stat-label-solicitudes">En Mantenimiento</div>
             </div>
             <div className="stat-icon-solicitudes red">
-              <i class="fas fa-tools"></i>
+              <i className="fas fa-tools"></i>
             </div>
           </div>
         </div>

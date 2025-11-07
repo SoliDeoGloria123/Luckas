@@ -69,6 +69,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       setCategorias(res.data || []);
     } catch (error) {
       setCategorias([]);
+      console.error('Error obteniendo categorías:', error);
     }
   };
 

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const TareaModal = ({
   mostrar,
@@ -32,8 +33,9 @@ const TareaModal = ({
           <div className="from-grid-admin">
             {/* Título */}
             <div className="form-grupo-admin">
-              <label>Título:</label>
+              <label htmlFor="titulo">Título:</label>
               <input
+                id="titulo"
                 type="text"
                 value={modoEdicion ? tareaSeleccionada?.titulo : nuevaTarea.titulo}
                 onChange={e =>
@@ -47,8 +49,9 @@ const TareaModal = ({
             </div>
             {/* Fecha Límite */}
             <div className="form-grupo-admin">
-              <label>Fecha Límite:</label>
+              <label htmlFor="fechaLimite">Fecha Límite:</label>
               <input
+                id="fechaLimite"
                 type="date"
                 value={modoEdicion ? tareaSeleccionada?.fechaLimite : nuevaTarea.fechaLimite}
                 onChange={e =>
@@ -64,8 +67,9 @@ const TareaModal = ({
 
             {/* Asignado A */}
             <div className="form-grupo-admin">
-              <label>Asignado a:</label>
+              <label htmlFor="asignadoA">Asignado a:</label>
               <select
+                id="asignadoA"
                 value={modoEdicion ? tareaSeleccionada?.asignadoA : nuevaTarea.asignadoA}
                 onChange={e =>
                   modoEdicion
@@ -85,8 +89,9 @@ const TareaModal = ({
 
 
             <div className="form-grupo-admin">
-              <label>Asignado por:</label>
+              <label htmlFor="asignadoPor">Asignado por:</label>
               <select
+                id="asignadoPor"
                 value={modoEdicion ? tareaSeleccionada?.asignadoPor : nuevaTarea.asignadoPor}
                 onChange={e =>
                   modoEdicion
@@ -107,8 +112,9 @@ const TareaModal = ({
           <div className="from-grid-admin">
             {/* Prioridad */}
             <div className="form-grupo-admin">
-              <label>Prioridad:</label>
+              <label htmlFor="prioridad">Prioridad:</label>
               <select
+                id="prioridad"
                 value={modoEdicion ? tareaSeleccionada?.prioridad : nuevaTarea.prioridad}
                 onChange={e =>
                   modoEdicion
@@ -125,8 +131,9 @@ const TareaModal = ({
 
             {/* Estado */}
             <div className="form-grupo-admin">
-              <label>Estado:</label>
+              <label htmlFor="estado">Estado:</label>
               <select
+                id="estado"
                 value={modoEdicion ? tareaSeleccionada?.estado : nuevaTarea.estado}
                 onChange={e =>
                   modoEdicion
@@ -143,8 +150,9 @@ const TareaModal = ({
             </div>
           </div>
           <div className="form-grupo-admin">
-            <label>Descripción:</label>
+            <label htmlFor="descripcion">Descripción:</label>
             <textarea
+              id="descripcion"
               value={modoEdicion ? tareaSeleccionada?.descripcion : nuevaTarea.descripcion}
               onChange={e =>
                 modoEdicion
@@ -157,11 +165,11 @@ const TareaModal = ({
           </div>
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" onClick={onClose}>
-               <i class="fas fa-times"></i>
+               <i className="fas fa-times"></i> {' '}
               Cancelar
             </button>
             <button className="btn-admin btn-primary" onClick={onSubmit}>
-                    <i class="fas fa-save"></i>
+                    <i className="fas fa-save"></i>
               {modoEdicion ? "Guardar Cambios" : "Crear Tarea"}
             </button>
           </div>
@@ -169,6 +177,38 @@ const TareaModal = ({
       </div>
     </div>
   );
+};
+
+TareaModal.propTypes = {
+  mostrar: PropTypes.bool.isRequired,
+  modoEdicion: PropTypes.bool,
+  tareaSeleccionada: PropTypes.shape({
+    titulo: PropTypes.string,
+    fechaLimite: PropTypes.string,
+    asignadoA: PropTypes.string,
+    asignadoPor: PropTypes.string,
+    prioridad: PropTypes.string,
+    estado: PropTypes.string,
+    descripcion: PropTypes.string
+  }),
+  setTareaSeleccionada: PropTypes.func,
+  nuevaTarea: PropTypes.shape({
+    titulo: PropTypes.string,
+    fechaLimite: PropTypes.string,
+    asignadoA: PropTypes.string,
+    asignadoPor: PropTypes.string,
+    prioridad: PropTypes.string,
+    estado: PropTypes.string,
+    descripcion: PropTypes.string
+  }).isRequired,
+  setNuevaTarea: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  usuarios: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string,
+    nombre: PropTypes.string,
+    role: PropTypes.string
+  })).isRequired
 };
 
 export default TareaModal;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
 const ModificarPerfil = ({ onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -205,6 +206,10 @@ const ModificarPerfil = ({ onClose, onSuccess }) => {
       </div>
     </div>
   );
+};
+ModificarPerfil.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired
 };
 
 export default ModificarPerfil;

@@ -8,7 +8,6 @@ import Footer from '../../footer/Footer'
 import {
   Plus,
   Edit,
-  Trash2,
   Calendar,
   Eye,
   MapPin,
@@ -37,6 +36,7 @@ const Gestionevento = () => {
       setEventos(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
       setEventos([]);
+      mostrarAlerta("ERROR", `Error al obtener eventos: ${error.message}`);
     }
   };
 
@@ -47,6 +47,7 @@ const Gestionevento = () => {
       setCategorias(res.data || []);
     } catch (error) {
       setCategorias([]);
+      mostrarAlerta("ERROR", `Error al obtener categorías: ${error.message}`, 'error');
     }
   };
 
@@ -92,7 +93,7 @@ const Gestionevento = () => {
         mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
         obtenerEventos();
       } catch (error) {
-        mostrarAlerta("Error", `Error al crear el evento: ${error.message}`);
+        mostrarAlerta("ERROR", `Error al crear el evento: ${error.message}`);
       }
     } else {
       try {
@@ -100,7 +101,7 @@ const Gestionevento = () => {
         mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
         obtenerEventos();
       } catch (error) {
-        mostrarAlerta("Error"`Error al actualizar el evento: ${error.message}`);
+        mostrarAlerta("ERROR", `Error al actualizar el evento: ${error.message}`);
       }
     }
   };
@@ -140,7 +141,7 @@ const Gestionevento = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus"></i> {' '}
             Nuevo Evento
           </button>
         </div>
@@ -162,7 +163,7 @@ const Gestionevento = () => {
               <div className="stat-label-solicitudes">Próximos</div>
             </div>
             <div className="stat-icon-solicitudes orange">
-              <i class="fas fa-clock"></i>
+              <i className="fas fa-clock"></i>
             </div>
           </div>
 
@@ -172,7 +173,7 @@ const Gestionevento = () => {
               <div className="stat-label-solicitudes">Completados</div>
             </div>
             <div className="stat-icon-solicitudes green">
-              <i class="fas fa-check-circle"></i>
+              <i className="fas fa-check-circle"></i>
             </div>
           </div>
 
@@ -182,7 +183,7 @@ const Gestionevento = () => {
               <div className="stat-label-solicitudes">Cancelados</div>
             </div>
             <div className="stat-icon-solicitudes red">
-              <i class="fas fa-times-circle"></i>
+              <i className="fas fa-times-circle"></i>
             </div>
           </div>
         </div>
@@ -256,7 +257,7 @@ const Gestionevento = () => {
                             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                               {imagenes.map((_, idx) => (
                                 <span
-                                  key={idx}
+                                  key={`dot-${evento._id}-${idx}`}
                                   className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
                                 />
                               ))}
@@ -430,8 +431,8 @@ const Gestionevento = () => {
               <p className="mb-2"><strong>Activo:</strong> {eventoDetalle.active ? 'Sí' : 'No'}</p>
               <p className="mb-2"><strong>Programa:</strong> {eventoDetalle.programa && eventoDetalle.programa.length > 0 ? (
                 <ul className="list-disc ml-6">
-                  {eventoDetalle.programa.map((mod, i) => (
-                    <li key={i}>
+                  {eventoDetalle.programa.map((mod) => (
+                    <li key={mod.tema + '-' + mod.horaInicio + '-' + mod.horaFin}>
                       <strong>{mod.tema}</strong> ({mod.horaInicio} - {mod.horaFin}): {mod.descripcion}
                     </li>
                   ))}
@@ -441,7 +442,7 @@ const Gestionevento = () => {
               <div className="flex flex-wrap gap-2 my-4">
                 {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.map((img, idx) => (
                   <img
-                    key={idx}
+                    key={img + '-' + idx}
                     src={img}
                     alt={`Imagen ${idx + 1}`}
                     className="w-32 h-32 object-cover rounded-lg border"

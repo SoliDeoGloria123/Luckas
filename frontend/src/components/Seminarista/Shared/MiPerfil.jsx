@@ -347,7 +347,7 @@ const ProfilePage = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                  <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
                   {isEditing ? (
                     <input
                       type="text"
@@ -365,7 +365,7 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+                  <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
                   {isEditing ? (
                     <input
                       type="text"
@@ -379,7 +379,7 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
+                  <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
                   {isEditing ? (
                     <select
                       value={datosEditados.tipoDocumento}
@@ -397,7 +397,7 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
+                  <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
                   {isEditing ? (
                     <input
                       type="text"
@@ -411,7 +411,7 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                  <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
                   {isEditing ? (
                     <input
                       type="tel"
@@ -425,7 +425,7 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                  <label htmlFor="correo" className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
                   {isEditing ? (
                     <input
                       type="email"
@@ -439,7 +439,7 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
+                  <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
                   {isEditing ? (
                     <input
                       type="date"
@@ -453,7 +453,7 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+                  <label htmlFor="direccion" className="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
                   {isEditing ? (
                     <input
                       type="text"
@@ -477,7 +477,7 @@ const ProfilePage = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nivel Actual</label>
+                  <label htmlFor="nivelActual" className="block text-sm font-medium text-gray-700 mb-2">Nivel Actual</label>
                   {isEditing ? (
                     <select
                       value={datosEditados.nivelAcademico}
@@ -497,12 +497,12 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
+                  <label htmlFor="fechaIngreso" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
                   <p className="text-gray-900 py-3">{new Date(profileData.fechaIngreso).toLocaleDateString()}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Director Espiritual</label>
+                  <label htmlFor="directorEspiritual" className="block text-sm font-medium text-gray-700 mb-2">Director Espiritual</label>
                   {isEditing ? (
                     <input
                       type="text"
@@ -516,7 +516,7 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Idiomas</label>
+                  <label htmlFor="idiomas" className="block text-sm font-medium text-gray-700 mb-2">Idiomas</label>
                   {isEditing ? (
                     <input
                       type="text"
@@ -530,7 +530,7 @@ const ProfilePage = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Especialidad</label>
+                  <label htmlFor="especialidad" className="block text-sm font-medium text-gray-700 mb-2">Especialidad</label>
                   {isEditing ? (
                     <input
                       type="text"
@@ -555,7 +555,7 @@ const ProfilePage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
@@ -574,7 +574,7 @@ const ProfilePage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
                     <div className="relative">
                       <input
                         type={showNewPassword ? "text" : "password"}
@@ -593,7 +593,7 @@ const ProfilePage = () => {
                   </div>
 
                     <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
                     <div className="relative">
                       <input
                         type={showConfirmPassword ? "text" : "password"}

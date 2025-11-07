@@ -31,11 +31,11 @@ const EventoModal = ({
     const maxSize = 5 * 1024 * 1024; // 5MB
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 
-    Array.from(files).forEach(file => {
-      if (!allowedTypes.includes(file.type)) return;
-      if (file.size > maxSize) return;
+    for (const file of Array.from(files)) {
+      if (!allowedTypes.includes(file.type)) continue;
+      if (file.size > maxSize) continue;
       validFiles.push(file);
-    });
+    }
 
     if (validFiles.length > 0) {
       uploadImages(validFiles);
@@ -51,7 +51,8 @@ const EventoModal = ({
     let uploadedCount = 0;
     const totalFiles = files.length;
 
-    files.forEach((file, index) => {
+    let index = 0;
+    for (const file of files) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageData = {
@@ -74,7 +75,8 @@ const EventoModal = ({
         }
       };
       reader.readAsDataURL(file);
-    });
+      index++;
+    }
   };
 
   const removeImage = (id) => {

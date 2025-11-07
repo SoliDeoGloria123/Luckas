@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './FormularioReserva.css';
 import { reservaService } from "../../../services/reservaService";
+import PropTypes from 'prop-types';
 
 const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
@@ -357,7 +358,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
               <form className="reservation-form-seminario" onSubmit={handleSubmit}>
                 <div className="form-row-reservation-seminario">
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Fecha de Inicio </label>
+                    <label htmlFor="checkInDate" className="form-label-reservation-seminario">Fecha de Inicio </label>
                     <div className="date-input-container-seminario">
                       <input
                         type="date"
@@ -372,7 +373,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                     </div>
                   </div>
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Fecha de Fin </label>
+                    <label htmlFor="checkOutDate" className="form-label-reservation-seminario">Fecha de Fin </label>
                     <div className="date-input-container-seminario">
                       <input
                         type="date"
@@ -390,7 +391,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
                 <div className="form-row-reservation-seminario">
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Nombre</label>
+                    <label htmlFor="firstName" className="form-label-reservation-seminario">Nombre</label>
                     <input
                       type="text"
                       className="form-input-reservation"
@@ -400,7 +401,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                     />
                   </div>
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Apellido</label>
+                    <label htmlFor="lastName" className="form-label-reservation-seminario">Apellido</label>
                     <input
                       type="text"
                       className="form-input-reservation"
@@ -415,7 +416,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
                 <div className="form-row-reservation-seminario">
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Tipo de Documento</label>
+                    <label htmlFor="documentType" className="form-label-reservation-seminario">Tipo de Documento</label>
                     <select
                       id="documentType"
                       name="documentType"
@@ -431,7 +432,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                     </select>
                   </div>
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Número de Documento</label>
+                    <label htmlFor="documentNumber" className="form-label-reservation-seminario">Número de Documento</label>
                     <input
                       type="text"
                       className="form-input-reservation"
@@ -447,7 +448,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
                 <div className="form-row-reservation-seminario">
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Correo Electrónico </label>
+                    <label htmlFor="email" className="form-label-reservation-seminario">Correo Electrónico </label>
                     <input
                       type="email"
                       className="form-input-reservation"
@@ -458,7 +459,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                     />
                   </div>
                   <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Teléfono </label>
+                    <label htmlFor="phone" className="form-label-reservation-seminario">Teléfono </label>
                     <input
                       type="tel"
                       className="form-input-reservation"
@@ -471,7 +472,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                 </div>
                 <div className="form-row-reservation-seminario">
                 <div className="form-group-reservation-seminario">
-                    <label className="form-label-reservation-seminario">Número de Personas *</label>
+                    <label htmlFor="numberOfPeople" className="form-label-reservation-seminario">Número de Personas *</label>
                     <input
                       type="number"
                       className="form-input-reservation"
@@ -484,7 +485,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                     />
                   </div>
                 <div className="form-group-reservation-seminario">
-                  <label className="form-label-reservation-seminario">Propósito de la Estadía</label>
+                  <label htmlFor="stayPurpose" className="form-label-reservation-seminario">Propósito de la Estadía</label>
                   <input
                     type="text"
                     className="form-input-reservation"
@@ -497,7 +498,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                 </div>
 
                 <div className="form-group-reservation-seminario full-width">
-                  <label className="form-label-reservation-seminario">Solicitudes Especiales</label>
+                  <label htmlFor="specialRequests" className="form-label-reservation-seminario">Solicitudes Especiales</label>
                   <textarea
                     className="form-textarea-reservation"
                     id="specialRequests"
@@ -676,7 +677,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
                 <div className="success-actions-seminario-reserva">
                   <button className="download-button-seminario-reserva">
-                    <i className="fas fa-download"></i>
+                    <i className="fas fa-download"></i> {' '}
                     Descargar Comprobante de Reserva
                   </button>
                   <button className="back-to-cabins-button-seminario-reserva" onClick={closeReservationModal}>
@@ -690,6 +691,12 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
       </div>
     </>
   );
+};
+FormularioReserva.propTypes = {
+  cabana: PropTypes.object.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSucces: PropTypes.func
 };
 
 export default FormularioReserva;

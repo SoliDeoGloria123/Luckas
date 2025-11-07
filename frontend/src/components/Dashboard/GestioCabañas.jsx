@@ -37,7 +37,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     imagen: [],
     ubicacion: ""
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     obtenerCabanas();

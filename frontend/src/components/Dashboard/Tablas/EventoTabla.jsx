@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 import {
   Plus,
@@ -245,6 +246,14 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
       )}
     </div>
   );
+};
+TablaEventos.propTypes = {
+  cargando: PropTypes.bool,
+  eventos: PropTypes.array.isRequired,
+  onEditar: PropTypes.func.isRequired,
+  onEliminar: PropTypes.func.isRequired,
+  onDeshabilitar: PropTypes.func,
+  onVerDetalle: PropTypes.func.isRequired,
 };
 
 export default TablaEventos;

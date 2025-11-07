@@ -1,7 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const TablaUsuarios = ({ usuarios, onEditar, onEliminar, onToggleEstado }) => (
-  
+
   <div className="tabla-contenedor-admin">
     <table className="tabla-usuarios-admin">
       <thead>
@@ -37,12 +38,12 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar, onToggleEstado }) => (
               <td>{user.apellido}</td>
               <td>{user.correo}</td>
               <td>{user.telefono}</td>
-      
+
               <td>
-                 <div class="document-info">
-                  <span class="doc-type"> {user.tipoDocumento}</span>
-                  <span class="doc-number">{user.numeroDocumento}</span>
-                  </div>
+                <div className="document-info">
+                  <span className="doc-type"> {user.tipoDocumento}</span>
+                  <span className="doc-number">{user.numeroDocumento}</span>
+                </div>
               </td>
               <td>{user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : "N/A"}</td>
               <td>
@@ -60,7 +61,7 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar, onToggleEstado }) => (
                   {onEliminar && (
                     <button className="btn-action eliminar" onClick={() => onEliminar(user._id)}><i className="fas fa-trash"></i></button>
                   )}
-                   <button
+                  <button
                     className={`btn-action ${user.estado === "activo" ? "desactivar" : "activar"}`}
                     onClick={() => onToggleEstado(user)}
                   >
@@ -79,5 +80,11 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar, onToggleEstado }) => (
     </table>
   </div>
 );
+TablaUsuarios.propTypes = {
+  usuarios: PropTypes.array.isRequired,
+  onEditar: PropTypes.func.isRequired,
+  onEliminar: PropTypes.func,
+  onToggleEstado: PropTypes.func,
+};
 
 export default TablaUsuarios;

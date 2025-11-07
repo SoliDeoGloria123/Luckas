@@ -193,7 +193,7 @@ const Reportes = () => {
               <h3 >{resumen.totalUsuarios}</h3>
               <p>Usuarios Totales</p>
               <span className="stat-trend positive">
-                <i className="fas fa-arrow-up"></i>
+                <i className="fas fa-arrow-up"></i> {' '}
                 +12% este mes
               </span>
             </div>
@@ -206,7 +206,7 @@ const Reportes = () => {
               <h3 >{resumen.totalReservas}</h3>
               <p>Reservas Totales</p>
               <span className="stat-trend neutral">
-                <i className="fas fa-minus"></i>
+                <i className="fas fa-minus"></i>{' '}
                 Sin cambios
               </span>
             </div>
@@ -220,7 +220,7 @@ const Reportes = () => {
               <h3 >{resumen.totalInscripciones}</h3>
               <p>Inscripciones Totales</p>
               <span className="stat-trend positive">
-                <i className="fas fa-arrow-up"></i>
+                <i className="fas fa-arrow-up"></i> {' '}
                 +5% esta semana
               </span>
             </div>
@@ -234,7 +234,7 @@ const Reportes = () => {
               <h3 >{resumen.eventosProximos}</h3>
               <p>Eventos Activos</p>
               <span className="stat-trend negative">
-                <i className="fas fa-arrow-down"></i>
+                <i className="fas fa-arrow-down"></i> {' '}
                 -100% este mes
               </span>
             </div>
@@ -248,7 +248,7 @@ const Reportes = () => {
               <h3 >{resumen.solicitudesPendientes}</h3>
               <p>Solicitudes Pendientes</p>
               <span className="stat-trend warning">
-                <i className="fas fa-exclamation-triangle"></i>
+                <i className="fas fa-exclamation-triangle"></i> {' '}
                 Requiere atención
               </span>
             </div>
@@ -262,7 +262,7 @@ const Reportes = () => {
               <h3 >{resumen.reservasActivas}</h3>
               <p>Reservas Activas</p>
               <span className="stat-trend neutral">
-                <i className="fas fa-minus"></i>
+                <i className="fas fa-minus"></i> {' '}
                 Sin actividad
               </span>
             </div>
@@ -279,21 +279,21 @@ const Reportes = () => {
 
           <div className="report-actions-reporte-admin">
             <button className="btn-reportea btn-sm-reportea btn-outline-reportea">
-              <i className="fas fa-refresh"></i>
+              <i className="fas fa-refresh"></i> {' '}
               Actualizar
             </button>
             <button className="btn-reportea btn-sm-reportea btn-outline-reportea">
-              <i className="fas fa-cog"></i>
+              <i className="fas fa-cog"></i> {' '}
               Configurar
             </button>
           </div>
         </div>
 
-        <div class="reports-table-container-reporte">
+        <div className="reports-table-container-reporte">
 
-          <div class="table-filters-reporte">
-            <div class="search-container-reporte">
-              <i class="fas fa-search"></i>
+          <div className="table-filters-reporte">
+            <div className="search-container-reporte">
+              <i className="fas fa-search"></i>
               <input type="text" placeholder="Buscar reportes..." id="reportSearch" />
             </div>
             <select >

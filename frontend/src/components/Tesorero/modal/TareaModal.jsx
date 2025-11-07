@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 
 const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usuarios }) => {
@@ -16,7 +17,9 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
         const day = String(d.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('Error normalizando fecha:', e);
+    }
     return '';
   }
   const [formData, setFormData] = useState({
@@ -52,7 +55,7 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Título</label>
+                <label htmlFor="titulo">Título</label>
                 <input
                   type="text"
                   name="titulo"
@@ -64,7 +67,7 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
               </div>
 
               <div className="form-group-tesorero">
-                <label>Descripción</label>
+                <label htmlFor="descripcion">Descripción</label>
                 <input
                   type="text"
                   name="descripcion"
@@ -76,7 +79,7 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
               </div>
 
               <div className="form-group-tesorero">
-                <label>Fecha Límite</label>
+                <label htmlFor="fechaLimite">Fecha Límite</label>
                 <input
                   type="date"
                   name="fechaLimite"
@@ -88,7 +91,7 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
               </div>
 
               <div className="form-group-tesorero">
-                <label>Asignado a</label>
+                <label htmlFor="asignadoA">Asignado a</label>
                 <select
                   name="asignadoA"
                   value={formData.asignadoA ? String(formData.asignadoA): ''}
@@ -104,7 +107,7 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
               </div>
 
               <div className="form-group-tesorero">
-                <label>Asignado por</label>
+                <label htmlFor="asignadoPor">Asignado por</label>
                 <select
                   name="asignadoPor"
                   value={formData.asignadoPor}
@@ -122,7 +125,7 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
 
 
               <div className="form-group-tesorero">
-                <label>Prioridad</label>
+                <label htmlFor="prioridad">Prioridad</label>
                 <select
                   name="prioridad"
                   value={formData.prioridad}
@@ -137,7 +140,7 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
               </div>
 
               <div className="form-group-tesorero">
-                <label>Estado</label>
+                <label htmlFor="estado">Estado</label>
                 <select
                   name="estado"
                   value={formData.estado}
@@ -166,6 +169,13 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
       </div>
     </div>
   );
+};
+TareaModal.propTypes = {
+  mode: PropTypes.oneOf(['create', 'edit']),
+  initialData: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  usuarios: PropTypes.arrayOf(PropTypes.object)
 };
 
 export default TareaModal;

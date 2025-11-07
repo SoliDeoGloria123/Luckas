@@ -28,6 +28,7 @@ const Gestioninscripcion = () => {
       setInscripciones(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
       setInscripciones([]);
+      mostrarAlerta("ERROR", `Error al obtener inscripciones: ${error.message}`, 'error');
     }
   };
 
@@ -38,6 +39,7 @@ const Gestioninscripcion = () => {
       setEventos(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
       setEventos([]);
+      mostrarAlerta("ERROR", `Error al obtener eventos: ${error.message}`, 'error');
     }
   };
 
@@ -48,6 +50,7 @@ const Gestioninscripcion = () => {
       setProgramas(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
       setProgramas([]);
+      mostrarAlerta("ERROR", `Error al obtener programas académicos: ${error.message}`, 'error');
     }
   };
 
@@ -57,6 +60,7 @@ const Gestioninscripcion = () => {
       setCategorias(res.data || []);
     } catch (error) {
       setCategorias([]);
+      mostrarAlerta("ERROR", `Error al obtener categorías: ${error.message}`, 'error');
     }
   };
 
@@ -126,14 +130,14 @@ const Gestioninscripcion = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i>
-            Nueva Inscripción
+            <i className="fas fa-plus"></i> {' '}
+            Nueva Inscripción{' '}
           </button>
         </div>
         <div className="stats-grid-usuarios">
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios blue">
-              <i class="fas fa-user-plus"></i>
+              <i className="fas fa-user-plus"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="totalUsers">5</div>
@@ -142,7 +146,7 @@ const Gestioninscripcion = () => {
           </div>
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios green">
-              <i class="fas fa-calendar-plus"></i>
+              <i className="fas fa-calendar-plus"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="activeUsers">4</div>
@@ -151,7 +155,7 @@ const Gestioninscripcion = () => {
           </div>
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios purple">
-              <i class="fas fa-check-double"></i>
+              <i className="fas fa-check-double"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="adminUsers">1</div>
@@ -160,7 +164,7 @@ const Gestioninscripcion = () => {
           </div>
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios orange">
-              <i class="fas fa-hourglass-half"></i>
+              <i className="fas fa-hourglass-half"></i>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="newUsers">12</div>
@@ -192,7 +196,7 @@ const Gestioninscripcion = () => {
               <i className="fas fa-download"></i>
             </button>
             <button className="btn-outline-tesorero" >
-              <i class="fas fa-share"></i>
+              <i className="fas fa-share"></i>
             </button>
           </div>
         </div>
@@ -204,7 +208,6 @@ const Gestioninscripcion = () => {
               <table className="users-table-tesorero">
                 <thead>
                   <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
-
                     <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">ID INSCRIPCION</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">NOMBRE COMPLETO</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">TIPO DOCUEMNTO</th>

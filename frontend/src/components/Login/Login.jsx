@@ -209,7 +209,7 @@ const Login = () => {
                 type="button"
                 className="btn btn-outline-secondary social-btn"
               >
-                <i className="fab fa-google me-2"></i>
+                <i className="fab fa-google me-2"></i> {' '}
                 Google
               </button>
 

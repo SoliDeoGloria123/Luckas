@@ -4,6 +4,7 @@ import Header from "../Header/Header-tesorero";
 import Footer from '../../footer/Footer'
 import { generarCertificado } from '../../../services/certificadoService';
 import { inscripcionService } from '../../../services/inscripcionService';
+import { mostrarAlerta } from '../../utils/alertas';
 
 
 const CertificadosPage = () => {
@@ -28,6 +29,7 @@ const CertificadosPage = () => {
                 }
             } catch (err) {
                 setCertificados([]);
+                mostrarAlerta("ERROR", `Error al obtener certificados: ${err.message}`, 'error');
             }
             setLoading(false);
         };
@@ -50,7 +52,7 @@ const CertificadosPage = () => {
             a.remove();
             window.URL.revokeObjectURL(url);
         } catch (err) {
-            alert('Error generando certificado');
+            mostrarAlerta("ERROR", `Error al descargar certificado: ${err.message}`, 'error');  
         }
     };
 

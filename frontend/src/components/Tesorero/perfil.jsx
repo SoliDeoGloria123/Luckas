@@ -221,7 +221,7 @@ const Perfil = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                                        <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
                                         {isEditing ? (
                                             <input
                                                 type="text"
@@ -235,7 +235,7 @@ const Perfil = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+                                        <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
                                         {isEditing ? (
                                             <input
                                                 type="text"
@@ -249,7 +249,7 @@ const Perfil = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
+                                        <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
                                         {isEditing ? (
                                             <select
                                                 value={datosEditados.tipoDocumento}
@@ -267,7 +267,7 @@ const Perfil = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
+                                        <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
                                         {isEditing ? (
                                             <input
                                                 type="text"
@@ -281,7 +281,7 @@ const Perfil = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                                        <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
                                         {isEditing ? (
                                             <input
                                                 type="tel"
@@ -295,7 +295,7 @@ const Perfil = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
+                                        <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
                                         {isEditing ? (
                                             <input
                                                 type="date"
@@ -309,7 +309,7 @@ const Perfil = () => {
                                     </div>
 
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                                        <label htmlFor="correo" className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
                                         {isEditing ? (
                                             <input
                                                 type="email"
@@ -360,7 +360,7 @@ const Perfil = () => {
 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+                                        <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
                                         <input
                                             type="password"
                                             value={passwordData.currentPassword}
@@ -372,7 +372,7 @@ const Perfil = () => {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                                            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
                                             <input
                                                 type="password"
                                                 value={passwordData.newPassword}
@@ -383,7 +383,7 @@ const Perfil = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
+                                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
                                             <input
                                                 type="password"
                                                 value={passwordData.confirmPassword}
@@ -421,15 +421,15 @@ const Perfil = () => {
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Información Profesional</h3>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
+                                        <label htmlFor="cargo" className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
                                         <p className="text-gray-900">{usuarioLogueado?.role}</p>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
+                                        <label htmlFor="departamento" className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
                                         <p className="text-gray-900">Administración Financiera</p>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                                        <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                             <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
                                             Activo

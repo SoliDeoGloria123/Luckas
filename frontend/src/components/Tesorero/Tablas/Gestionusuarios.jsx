@@ -5,7 +5,7 @@ import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
 
-import { Edit, ChevronLeft, ChevronRight } from "lucide-react"
+import { Edit } from "lucide-react"
 
 
 
@@ -87,7 +87,7 @@ const Gestionusuarios = () => {
       setShowModalUsuario(false);
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta('Error', 'Error al procesar el usuario', 'error');
+      mostrarAlerta("Error", `Error: ${error.message}`);
     };
   };
 
@@ -121,7 +121,7 @@ const Gestionusuarios = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus"></i> {' '}
             Nuevo Usuario
           </button>
         </div>
@@ -192,7 +192,7 @@ const Gestionusuarios = () => {
                 <i className="fas fa-download"></i>
               </button>
               <button className="btn-outline-tesorero" >
-                <i class="fas fa-share"></i>
+                <i className="fas fa-share"></i>
               </button>
             </div>
           </div>

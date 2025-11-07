@@ -3,7 +3,6 @@ import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaEventos from "./Tablas/EventoTabla";
 import EventoModal from "./Modales/EventoModal";
-// Estado para imágenes seleccionadas
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
@@ -20,7 +19,7 @@ const GestionEventos = () => {
   const [modoEdicion, setModoEdicion] = useState(false);
   const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
   const [filtros, setFiltros] = useState({ busqueda: '', tipo: 'todos', estado: 'todos' });
-  const [cargando, setCargando] = useState(false);
+  const [cargando] = useState(false);
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [eventoDetalle, setEventoDetalle] = useState(null);
@@ -52,6 +51,8 @@ const GestionEventos = () => {
       setEventos(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
       setEventos([]);
+      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`);
+
     }
   };
 
@@ -62,6 +63,7 @@ const GestionEventos = () => {
       setCategorias(res.data || []);
     } catch (error) {
       setCategorias([]);
+      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`);
     }
   };
 
@@ -83,9 +85,9 @@ const GestionEventos = () => {
         }
       });
       // Agregar imágenes
-      selectedImages.forEach(imgObj => {
+      for (const imgObj of selectedImages) {
         if (imgObj.file) formData.append('imagen', imgObj.file);
-      });
+      }
       await eventService.createEvent(formData, true); // true: indica FormData
       mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
       setMostrarModal(false);
@@ -207,7 +209,7 @@ const GestionEventos = () => {
         />
         <div className="space-y-7 fade-in-up p-9">
           {/* Header */}
-          <div  className="page-header-Academicos">
+          <div className="page-header-Academicos">
             <div className="page-title-admin">
               <h1 >Gestión de Eventos</h1>
               <p>Administra campamentos, retiros y actividades del seminario</p>

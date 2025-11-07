@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  FaCalendarAlt, FaTimes, FaDoorOpen, FaGraduationCap,
-  FaTools, FaHeart, FaEllipsisH, FaArrowLeft, FaArrowRight, FaPaperPlane,
+  FaTimes, FaDoorOpen, FaGraduationCap,
+  FaHeart, FaEllipsisH, FaArrowLeft, FaArrowRight, FaPaperPlane,
   FaCheckCircle, FaExclamationCircle, FaExclamationTriangle, FaInfoCircle,
   FaCloudUploadAlt, FaFile,
 } from 'react-icons/fa';
@@ -18,8 +18,6 @@ const NuevaSolicitud = () => {
   const [formData, setFormData] = useState({});
   const [usuarioLogueado, setUsuarioLogueado] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [showMobileNav, setShowMobileNav] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [tesoreroId, setTesoreroId] = useState(null);
   const [acceptTerms, setAcceptTerms] = useState(false);
@@ -125,6 +123,7 @@ const NuevaSolicitud = () => {
       setOpcionesReferencia(data.data || []);
     } catch (err) {
       setOpcionesReferencia([]);
+      console.error('Error cargando referencias:', err);
     }
   };
 
@@ -257,7 +256,7 @@ const NuevaSolicitud = () => {
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const showToast = (type, title, message) => {
@@ -774,7 +773,7 @@ const NuevaSolicitud = () => {
 
                 {/* File Upload */}
                 <div className="form-group-nuevasolicitud">
-                  <label>Documentos Adjuntos</label>
+                  <label htmlFor="fileInput">Documentos Adjuntos</label>
                   <div className="file-upload-area">
                     <div className="file-upload-content">
                       <FaCloudUploadAlt />

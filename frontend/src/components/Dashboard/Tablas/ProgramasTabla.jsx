@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from "prop-types";
 import {
   Plus,
   Edit,
@@ -149,6 +150,16 @@ const ProgramasTabla = ({
       )}
     </div>
   );
+};
+ProgramasTabla.propTypes = {
+  programas: PropTypes.array.isRequired,
+  abrirModalEditar: PropTypes.func.isRequired,
+  eliminarPrograma: PropTypes.func.isRequired,
+  formatearPrecio: PropTypes.func.isRequired,
+  formatearFecha: PropTypes.func.isRequired,
+  abrirModalVer: PropTypes.func.isRequired,
+  cargando: PropTypes.bool,
+  abrirModalCrear: PropTypes.func.isRequired,
 };
 
 export default ProgramasTabla;

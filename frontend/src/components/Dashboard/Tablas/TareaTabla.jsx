@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => (
   <div className="tabla-contenedor-admin">
@@ -53,11 +54,11 @@ const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => 
               <td>
                 <div className="acciones-botones">
                   <button className="btn-action editar" onClick={() => onEditar(tarea)}>
-                    <i class="fas fa-edit"></i>
+                    <i className="fas fa-edit"></i>
                   </button>
                   {onEliminar && (
                     <button className="btn-action eliminar" onClick={() => onEliminar(tarea._id)}>
-                      <i class="fas fa-trash"></i>
+                      <i className="fas fa-trash"></i>
                     </button>
                   )}
                 </div>
@@ -69,5 +70,12 @@ const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => 
     </table>
   </div>
 );
+
+TablaTareas.propTypes = {
+  tareas: PropTypes.array.isRequired,
+  onEditar: PropTypes.func.isRequired,
+  onEliminar: PropTypes.func,
+  onCambiarEstado: PropTypes.func,
+};
 
 export default TablaTareas;

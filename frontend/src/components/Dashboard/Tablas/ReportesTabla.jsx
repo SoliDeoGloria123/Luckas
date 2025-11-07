@@ -31,6 +31,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts"
+import PropTypes from "prop-types";
 
 
 
@@ -220,7 +221,7 @@ const generateChartsFromRawData = (activeReport) => {
     else if (item.fecha) date = new Date(item.fecha);
     else if (item.fechaInicio) date = new Date(item.fechaInicio);
 
-    if (date && !isNaN(date.getTime())) {
+    if (date && !Number.isNaN(date.getTime())) {
       const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`;
       monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
     }
@@ -614,7 +615,7 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
             <div className="space-y-4">
               {/* Report Type Selection */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Tipo de Reporte</label>
+                <label htmlFor="reportType" className="mb-2 block text-sm font-medium text-gray-700">Tipo de Reporte</label>
                 <div className="grid gap-3 md:grid-cols-2">
                   {REPORT_TYPES.map((type) => {
                     const Icon = type.icon
@@ -651,26 +652,29 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <label className="mb-1 block text-sm font-medium text-gray-700">Fecha Desde</label>
+                      <label htmlFor="dateFrom" className="mb-1 block text-sm font-medium text-gray-700">Fecha Desde</label>
                       <input
                         type="date"
+                        id="dateFrom"
                         value={reportFilters.dateFrom}
                         onChange={(e) => setReportFilters({ ...reportFilters, dateFrom: e.target.value })}
                         className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-medium text-gray-700">Fecha Hasta</label>
+                      <label htmlFor="dateTo" className="mb-1 block text-sm font-medium text-gray-700">Fecha Hasta</label>
                       <input
                         type="date"
+                        id="dateTo"
                         value={reportFilters.dateTo}
                         onChange={(e) => setReportFilters({ ...reportFilters, dateTo: e.target.value })}
                         className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-medium text-gray-700">Estado</label>
+                      <label htmlFor="status" className="mb-1 block text-sm font-medium text-gray-700">Estado</label>
                       <select
+                        id="status"
                         value={reportFilters.status}
                         onChange={(e) => setReportFilters({ ...reportFilters, status: e.target.value })}
                         className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
@@ -710,5 +714,10 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
     </div>
   )
 }
+TablaReportes.propTypes = {
+  reportesGuardados: PropTypes.array.isRequired,
+  editarReporte: PropTypes.func.isRequired,
+  eliminarReporte: PropTypes.func,
+};
 
 export default TablaReportes;

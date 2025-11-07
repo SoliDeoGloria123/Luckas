@@ -219,7 +219,7 @@ exports.obtenerReservaPorId = async (req, res) => {
 exports.actualizarReserva = async (req, res) => {
   try {
     // Forzar el campo activo a booleano si viene en el body
-    if (Object.prototype.hasOwnProperty.call(req.body, 'activo')) {
+  if (Object.hasOwn(req.body, 'activo')) {
       let activo = req.body.activo;
       if (typeof activo === 'string') {
         activo = activo === 'true';

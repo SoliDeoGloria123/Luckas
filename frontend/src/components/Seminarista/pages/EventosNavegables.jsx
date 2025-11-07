@@ -89,7 +89,7 @@ const EventosSeminario = () => {
         numeroDocumento: form.numeroDocumento.value,
         correo: form.correo.value,
         telefono: form.telefono.value,
-        edad: parseInt(form.edad.value),
+        edad: Number.parseInt(form.edad.value),
         observaciones: form.observaciones.value || undefined
       };
 
