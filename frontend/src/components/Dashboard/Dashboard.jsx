@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import {
@@ -10,7 +10,6 @@ import {
   TrendingUp,
   TrendingDown,
   Shield,
-  Calendar as CalendarIcon,
 
 } from 'lucide-react';
 import './Dashboard.css';
@@ -25,15 +24,9 @@ import { PremiumLoader } from './LazyComponents';
 
 const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp }) => {
   // Estados locales
-  const [busqueda, setBusqueda] = useState("");
+  const [busqueda] = useState("");
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
-  const [mostrarMenu, setMostrarMenu] = useState(false);
-
-  const menuRef = useRef(null);
-
-  // Hook para tema
-  const { toggleTema, esTemaOscuro } = useTheme();
 
   // Hook principal del dashboard
   const {

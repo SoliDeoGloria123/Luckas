@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [cabanas, setCabanas] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [busqueda, setBusqueda] = useState("");
+  const [busqueda] = useState("");
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -37,7 +37,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     imagen: [],
     ubicacion: ""
   });
-  const [error, setError] = useState(null);
+  const [err, setError] = useState(null);
 
   useEffect(() => {
     obtenerCabanas();
@@ -48,7 +48,14 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     try {
       const data = await cabanaService.getAll();
       // Soporta respuesta tipo {data: [...]} o array directa
-      let cabs = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+      let cabs = [];
+      if (Array.isArray(data)) {
+        cabs = data;
+      } else if (Array.isArray(data.data)) {
+        cabs = data.data;
+      } else {
+        cabs = [];
+      }
       setCabanas(cabs);
     } catch (err) {
       setError("Error al obtener cabañas: " + err.message);
@@ -59,7 +66,14 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     try {
       const data = await categorizacionService.getAll();
       // Soporta respuesta tipo {data: [...]} o array directa
-      let cats = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+      let cats = [];
+      if (Array.isArray(data)) {
+        cats = data;
+      } else if (Array.isArray(data.data)) {
+        cats = data.data;
+      } else {
+        cats = [];
+      }
       setCategorias(cats);
     } catch (err) {
       setError("Error", "Error al obtener categorías: " + err.message);
@@ -78,9 +92,9 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       formData.append("ubicacion", nuevaCabana.ubicacion);
 
       // Agregar imágenes seleccionadas
-      selectedImages.forEach(imgObj => {
+      for (const imgObj of selectedImages) {
         if (imgObj.file) formData.append('imagen', imgObj.file);
-      });
+      }
 
       await cabanaService.create(formData);
       mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente");
@@ -259,14 +273,18 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
                 <p className="mb-2"><strong>Creado por:</strong> {eventoDetalle.creadoPor?.nombre || eventoDetalle.creadoPor}</p>
                 <div className="flex flex-wrap gap-2 my-4">
                   {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.length > 0 ? (
-                    eventoDetalle.imagen.map((img, idx) => (
-                      <img
-                        key={idx}
-                        src={img}
-                        alt={`Imagen ${idx + 1}`}
-                        className="w-32 h-32 object-cover rounded-lg border"
-                      />
-                    ))
+                    eventoDetalle.imagen.map((img) => {
+                      // Usar el nombre de archivo o el string completo como key única
+                      const key = typeof img === 'string' ? img : (img?.name || Math.random());
+                      return (
+                        <img
+                          key={key}
+                          src={img}
+                          alt={typeof img === 'string' ? `Imagen` : (img?.name || 'Imagen')}
+                          className="w-32 h-32 object-cover rounded-lg border"
+                        />
+                      );
+                    })
                   ) : (
                     <span className="text-gray-400">Sin imágenes</span>
                   )}

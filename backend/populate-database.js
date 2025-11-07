@@ -1,5 +1,111 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
+function obtenerInscripcionesProgramas(usuarios, programas, categorias) {
+    const inscripciones = [];
+    if (programas && programas.length > 0) {
+        inscripciones.push({
+            usuario: usuarios[4]._id,
+            nombre: 'Ana',
+            apellido: 'García',
+            tipoDocumento: 'Cédula de ciudadanía',
+            numeroDocumento: '11223344',
+            correo: 'ana.garcia@email.com',
+            telefono: '3001234567',
+            edad: 29,
+            tipoReferencia: 'ProgramaAcademico',
+            referencia: programas[0]._id,
+            categoria: categorias[0]._id,
+            estado: 'certificado'
+        });
+        if (programas.length > 1) {
+            inscripciones.push({
+                usuario: usuarios[5]._id,
+                nombre: 'Pedro',
+                apellido: 'Martínez',
+                tipoDocumento: 'Cédula de ciudadanía',
+                numeroDocumento: '87654321',
+                correo: 'pedro.martinez@email.com',
+                telefono: '3007654321',
+                edad: 37,
+                tipoReferencia: 'ProgramaAcademico',
+                referencia: programas[1]._id,
+                categoria: categorias[1]._id,
+                estado: 'finalizado'
+            });
+        }
+        if (programas.length > 2) {
+            inscripciones.push({
+                usuario: usuarios[3]._id,
+                nombre: 'María',
+                apellido: 'Externa',
+                tipoDocumento: 'Cédula de ciudadanía',
+                numeroDocumento: '12345681',
+                correo: 'externa@luckas.com',
+                telefono: '1234567893',
+                edad: 36,
+                tipoReferencia: 'ProgramaAcademico',
+                referencia: programas[2]._id,
+                categoria: categorias[2]._id,
+                estado: 'matriculado'
+            });
+        }
+    }
+    return inscripciones;
+}
+
+function obtenerInscripcionesEventos(usuarios, eventos, categorias) {
+    const inscripciones = [];
+    if (eventos && eventos.length > 0) {
+        inscripciones.push({
+            usuario: usuarios[2]._id,
+            nombre: 'Juan',
+            apellido: 'Seminarista',
+            tipoDocumento: 'Cédula de ciudadanía',
+            numeroDocumento: '12345680',
+            correo: 'seminarista@luckas.com',
+            telefono: '1234567892',
+            edad: 32,
+            tipoReferencia: 'Eventos',
+            referencia: eventos[0]._id,
+            categoria: categorias[5] ? categorias[5]._id : categorias[0]._id,
+            estado: 'inscrito'
+        });
+        if (eventos.length > 1) {
+            inscripciones.push({
+                usuario: usuarios[4]._id,
+                nombre: 'Ana',
+                apellido: 'García',
+                tipoDocumento: 'Cédula de ciudadanía',
+                numeroDocumento: '11223344',
+                correo: 'ana.garcia@email.com',
+                telefono: '3001234567',
+                edad: 29,
+                tipoReferencia: 'Eventos',
+                referencia: eventos[1]._id,
+                categoria: categorias[6] ? categorias[6]._id : categorias[0]._id,
+                estado: 'finalizado'
+            });
+        }
+        if (eventos.length > 2) {
+            inscripciones.push({
+                usuario: usuarios[5]._id,
+                nombre: 'Pedro',
+                apellido: 'Martínez',
+                tipoDocumento: 'Cédula de ciudadanía',
+                numeroDocumento: '87654321',
+                correo: 'pedro.martinez@email.com',
+                telefono: '3007654321',
+                edad: 37,
+                tipoReferencia: 'Eventos',
+                referencia: eventos[2]._id,
+                categoria: categorias[5] ? categorias[5]._id : categorias[0]._id,
+                estado: 'inscrito'
+            });
+        }
+    }
+    return inscripciones;
+}
+
 
 // Modelos
 const User = require('./models/User');
@@ -496,126 +602,14 @@ async function createTareas(usuarios) {
 
 async function createInscripciones(usuarios, programas, eventos, categorias) {
     try {
-
-        
-        // Verificar que tenemos programas o eventos
         if ((!programas || programas.length === 0) && (!eventos || eventos.length === 0)) {
             console.log('❌ No hay programas ni eventos disponibles para crear inscripciones');
             return [];
         }
-
-        const inscripciones = [];
-        
-        // Agregar inscripciones a programas si existen
-        if (programas && programas.length > 0) {
-            // Inscripción 1: Usuario externo certificado en JavaScript
-            inscripciones.push({
-                usuario: usuarios[4]._id, // Ana García
-                nombre: 'Ana',
-                apellido: 'García',
-                tipoDocumento: 'Cédula de ciudadanía',
-                numeroDocumento: '11223344',
-                correo: 'ana.garcia@email.com',
-                telefono: '3001234567',
-                edad: 29,
-                tipoReferencia: 'ProgramaAcademico',
-                referencia: programas[0]._id, // JavaScript
-                categoria: categorias[0]._id, // Tecnología
-                estado: 'certificado'
-            });
-            
-            // Inscripción 2: Usuario externo finalizado en Inglés
-            if (programas.length > 1) {
-                inscripciones.push({
-                    usuario: usuarios[5]._id, // Pedro Martínez
-                    nombre: 'Pedro',
-                    apellido: 'Martínez',
-                    tipoDocumento: 'Cédula de ciudadanía',
-                    numeroDocumento: '87654321',
-                    correo: 'pedro.martinez@email.com',
-                    telefono: '3007654321',
-                    edad: 37,
-                    tipoReferencia: 'ProgramaAcademico',
-                    referencia: programas[1]._id, // Inglés
-                    categoria: categorias[1]._id, // Idiomas
-                    estado: 'finalizado'
-                });
-            }
-
-            // Inscripción 3: Usuario en curso de Administración
-            if (programas.length > 2) {
-                inscripciones.push({
-                    usuario: usuarios[3]._id, // María Externa
-                    nombre: 'María',
-                    apellido: 'Externa',
-                    tipoDocumento: 'Cédula de ciudadanía',
-                    numeroDocumento: '12345681',
-                    correo: 'externa@luckas.com',
-                    telefono: '1234567893',
-                    edad: 36,
-                    tipoReferencia: 'ProgramaAcademico',
-                    referencia: programas[2]._id, // Administración
-                    categoria: categorias[2]._id, // Negocios
-                    estado: 'matriculado'
-                });
-            }
-        }
-        
-        // Agregar inscripciones a eventos si existen
-        if (eventos && eventos.length > 0) {
-            // Inscripción 1: Seminarista inscrito en Conferencia de Tecnología
-            inscripciones.push({
-                usuario: usuarios[2]._id, // Juan Seminarista
-                nombre: 'Juan',
-                apellido: 'Seminarista',
-                tipoDocumento: 'Cédula de ciudadanía',
-                numeroDocumento: '12345680',
-                correo: 'seminarista@luckas.com',
-                telefono: '1234567892',
-                edad: 32,
-                tipoReferencia: 'Eventos',
-                referencia: eventos[0]._id, // Conferencia de Tecnología
-                categoria: categorias[5] ? categorias[5]._id : categorias[0]._id, // Conferencias
-                estado: 'inscrito'
-            });
-
-            // Inscripción 2: Usuario externo en Taller de Emprendimiento
-            if (eventos.length > 1) {
-                inscripciones.push({
-                    usuario: usuarios[4]._id, // Ana García
-                    nombre: 'Ana',
-                    apellido: 'García',
-                    tipoDocumento: 'Cédula de ciudadanía',
-                    numeroDocumento: '11223344',
-                    correo: 'ana.garcia@email.com',
-                    telefono: '3001234567',
-                    edad: 29,
-                    tipoReferencia: 'Eventos',
-                    referencia: eventos[1]._id, // Taller de Emprendimiento
-                    categoria: categorias[6] ? categorias[6]._id : categorias[0]._id, // Talleres
-                    estado: 'finalizado'
-                });
-            }
-
-            // Inscripción 3: Usuario externo en Festival Cultural
-            if (eventos.length > 2) {
-                inscripciones.push({
-                    usuario: usuarios[5]._id, // Pedro Martínez
-                    nombre: 'Pedro',
-                    apellido: 'Martínez',
-                    tipoDocumento: 'Cédula de ciudadanía',
-                    numeroDocumento: '87654321',
-                    correo: 'pedro.martinez@email.com',
-                    telefono: '3007654321',
-                    edad: 37,
-                    tipoReferencia: 'Eventos',
-                    referencia: eventos[2]._id, // Festival Cultural
-                    categoria: categorias[5] ? categorias[5]._id : categorias[0]._id, // Conferencias
-                    estado: 'inscrito'
-                });
-            }
-        }
-
+        const inscripciones = [
+            ...obtenerInscripcionesProgramas(usuarios, programas, categorias),
+            ...obtenerInscripcionesEventos(usuarios, eventos, categorias)
+        ];
         await Inscripciones.insertMany(inscripciones);
         console.log(`📝 ${inscripciones.length} inscripciones creadas`);
         return inscripciones;
@@ -748,14 +742,16 @@ async function createReportes(usuarios) {
 
 async function main() {
     console.log('🚀 Iniciando población de base de datos...\n');
-    
     await connectToDatabase();
-    
-    console.log('🧹 Limpiando base de datos existente...');
     await clearDatabase();
-    
+    await crearDatosEjemplo();
+    await mongoose.connection.close();
+    console.log('\n🔌 Conexión a base de datos cerrada');
+    console.log('✨ ¡Proceso completado!');
+}
+
+async function crearDatosEjemplo() {
     console.log('\n📝 Creando datos de ejemplo...');
-    
     const usuarios = await createUsers();
     const categorias = await createCategorizaciones();
     const programas = await createProgramasAcademicos(categorias);
@@ -765,14 +761,16 @@ async function main() {
     console.log('DEBUG - Eventos creados:', eventos ? eventos.length : 'undefined');
     // Crear comentarios de ejemplo
     const createComentariosDeEjemplo = require('./create-comentarios-ejemplo');
-    const comentarios = await createComentariosDeEjemplo(usuarios, eventos);
+    await createComentariosDeEjemplo(usuarios, eventos);
+    await createTareas(usuarios);
+    await createInscripciones(usuarios, programas, eventos, categorias);
+    await createReservas(usuarios, cabanas);
+    await createSolicitudes(usuarios, categorias);
+    await createReportes(usuarios);
+    mostrarResumen();
+}
 
-    const tareas = await createTareas(usuarios);
-    const inscripciones = await createInscripciones(usuarios, programas, eventos, categorias);
-    const reservas = await createReservas(usuarios, cabanas);
-    const solicitudes = await createSolicitudes(usuarios, categorias);
-    const reportes = await createReportes(usuarios);
-    
+function mostrarResumen() {
     console.log('\n✅ ¡Base de datos poblada exitosamente!');
     console.log('\n👥 Usuarios creados:');
     console.log('   • admin@luckas.com / admin123 (Administrador)');
@@ -781,24 +779,20 @@ async function main() {
     console.log('   • externa@luckas.com / externa123 (Usuario Externo)');
     console.log('   • ana.garcia@email.com / usuario123 (Usuario Externo)');
     console.log('   • pedro.martinez@email.com / usuario123 (Usuario Externo)');
-    
     console.log('\n🎓 Programas académicos: 5 programas creados');
     console.log('   • JavaScript Avanzado (con certificación)');
     console.log('   • Inglés Conversacional (certificación)');
     console.log('   • Administración de Empresas (certificación)');
     console.log('   • Pintura al Óleo');
     console.log('   • Yoga y Meditación');
-    
     console.log('\n🏠 Cabañas: 3 cabañas con imágenes reales');
     console.log('   • Cabaña Los Pinos (6 personas, vista al lago)');
     console.log('   • Cabaña El Roble (8 personas, con jacuzzi)');
     console.log('   • Cabaña La Montaña (4 personas, ejecutiva)');
-    
     console.log('\n🎉 Eventos: 3 eventos con imágenes reales');
     console.log('   • Conferencia de Tecnología 2025');
     console.log('   • Taller de Emprendimiento Digital');
     console.log('   • Festival Cultural Internacional');
-    
     console.log('\n📋 Tareas: 3 tareas asignadas');
     console.log('📝 Inscripciones: 6 inscripciones (3 programas, 3 eventos)');
     console.log('   • Estados válidos según tipo (certificado/finalizado/matriculado para programas)');
@@ -806,13 +800,12 @@ async function main() {
     console.log('🏨 Reservas: 2 reservas de cabañas');
     console.log('📄 Solicitudes: 2 solicitudes de ejemplo');
     console.log('📊 Reportes: 2 reportes de gestión');
-    
-    await mongoose.connection.close();
-    console.log('\n🔌 Conexión a base de datos cerrada');
-    console.log('✨ ¡Proceso completado!');
 }
 
-main().catch(error => {
+
+try {
+    await main();
+} catch (error) {
     console.error('💥 Error durante la población:', error);
     process.exit(1);
-});
+}
