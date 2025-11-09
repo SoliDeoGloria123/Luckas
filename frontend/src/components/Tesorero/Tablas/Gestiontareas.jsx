@@ -109,14 +109,13 @@ const Gestiontarea = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i>
-            Nueva Tarea
+            <i className="fas fa-plus"/>Nueva Tarea
           </button>
         </div>
         <div className="stats-grid-usuarios">
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios purple">
-              <i class="fas fa-tasks"></i>
+              <i className="fas fa-tasks"/>
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="totalUsers">5</div>

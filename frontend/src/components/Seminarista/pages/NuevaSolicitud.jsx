@@ -42,7 +42,7 @@ const NuevaSolicitud = () => {
         const data = await categorizacionService.getAll();
         setCategories(Array.isArray(data.data) ? data.data : []);
       } catch (err) {
-        showToast('error', 'Error al cargar categorías', err.message || 'No se pudieron cargar las categorías');
+        console.error('Error al cargar categorías:', err.message);
       }
     };
     fetchCategories();
@@ -51,7 +51,7 @@ const NuevaSolicitud = () => {
   useEffect(() => {
     const fetchTesorero = async () => {
       try {
-       const res = await userService.getAllUsers(); // Debe devolver todos los usuarios
+        const res = await userService.getAllUsers();
         const tesorero = res.data.find(u => u.role === 'tesorero');
         if (tesorero) setTesoreroId(tesorero._id);
       } catch (err) {
@@ -107,7 +107,7 @@ const NuevaSolicitud = () => {
         endpoint = 'http://localhost:3000/api/comedor';
         break;
       default:
-        endpoint = '';
+        break;
     }
     if (!endpoint) {
       setOpcionesReferencia([]);
@@ -136,39 +136,43 @@ const NuevaSolicitud = () => {
     'Comedor': 'comedor'
   };
 
+  const handleModeloReferenciaChange = (value) => {
+    setModeloReferencia(value);
+    setReferencia('');
+    cargarOpcionesReferencia(value);
+    setFormData({
+      ...formData,
+      category: '',
+      modeloReferencia: value
+    });
+  };
+
+  const handleReferenciaChange = (value) => {
+    setReferencia(value);
+    const refObj = opcionesReferencia.find(op => (op._id || op.id) === value);
+    let categoriaId = '';
+    if (refObj && refObj.categoria) {
+      categoriaId = typeof refObj.categoria === 'object' ? refObj.categoria._id : refObj.categoria;
+      const categoria = categories.find(cat => cat._id === categoriaId);
+      if (categoria) {
+        showToast('info', 'Categoría seleccionada automáticamente', 
+          `Se ha seleccionado la categoría "${categoria.nombre}" asociada a este evento.`);
+      }
+    }
+    setFormData({
+      ...formData,
+      category: categoriaId,
+      referencia: value
+    });
+  };
+
   const handleInputChange = (e) => {
     if (e.target.name === 'modeloReferencia') {
-      setModeloReferencia(e.target.value);
-      setReferencia('');
-      cargarOpcionesReferencia(e.target.value);
-      setFormData({
-        ...formData,
-        category: '', // Limpiar categoría al cambiar modelo
-        modeloReferencia: e.target.value
-      });
+      handleModeloReferenciaChange(e.target.value);
       return;
     }
     if (e.target.name === 'referencia') {
-      setReferencia(e.target.value);
-      // Buscar la referencia seleccionada en opcionesReferencia
-      const refObj = opcionesReferencia.find(op => (op._id || op.id) === e.target.value);
-      // Buscar la categoría asociada a la referencia
-      let categoriaId = '';
-      if (refObj && refObj.categoria) {
-        // Puede ser un objeto o solo el id
-        categoriaId = typeof refObj.categoria === 'object' ? refObj.categoria._id : refObj.categoria;
-        // Mostrar mensaje informativo al usuario
-        const categoria = categories.find(cat => cat._id === categoriaId);
-        if (categoria) {
-          showToast('info', 'Categoría seleccionada automáticamente', 
-            `Se ha seleccionado la categoría "${categoria.nombre}" asociada a este evento.`);
-        }
-      }
-      setFormData({
-        ...formData,
-        category: categoriaId,
-        referencia: e.target.value
-      });
+      handleReferenciaChange(e.target.value);
       return;
     }
     const { name, value, type, checked } = e.target;
@@ -185,17 +189,26 @@ const NuevaSolicitud = () => {
     }, 500);
   };
 
-  const nextStep = () => {
-    if (currentStep === 1 && !selectedType) {
+  const validateStepOne = () => {
+    if (!selectedType) {
       showToast('warning', 'Selección requerida', 'Por favor selecciona un tipo de solicitud');
-      return;
+      return false;
     }
+    return true;
+  };
 
-    if (currentStep === 2 && !validateForm()) {
+  const validateStepTwo = () => {
+    if (!validateForm()) {
       showToast('error', 'Formulario incompleto', 'Por favor completa todos los campos obligatorios');
-      return;
+      return false;
     }
+    return true;
+  };
 
+  const nextStep = () => {
+    if (currentStep === 1 && !validateStepOne()) return;
+    if (currentStep === 2 && !validateStepTwo()) return;
+    
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
@@ -278,39 +291,38 @@ const NuevaSolicitud = () => {
     setToasts(toasts.filter(toast => toast.id !== id));
   };
 
-  const submitRequest = async () => {
-    console.log('=== INICIANDO ENVÍO DE SOLICITUD ===');
-
+  const validateSubmission = () => {
     if (!acceptTerms) {
       showToast('warning', 'Términos requeridos', 'Debes aceptar los términos y condiciones');
-      return;
+      return false;
     }
 
     if (!tesoreroId) {
       showToast('error', 'Responsable no encontrado', 'No se pudo asignar el tesorero como responsable');
-      return;
+      return false;
     }
 
-    showToast('info', 'Enviando solicitud', 'Por favor espera...');
-
-    // Obtener usuario logueado
-    const usuarioStorage = localStorage.getItem('usuario');
-    const usuario = usuarioStorage ? JSON.parse(usuarioStorage) : null;
-    console.log('Usuario obtenido:', usuario);
-
-    if (!usuario) {
-      showToast('error', 'Usuario no encontrado', 'Debes iniciar sesión para enviar la solicitud');
-      return;
-    }
-
-    // Validar campos requeridos
     if (!formData.requestTitle || !formData.requestDescription) {
       showToast('error', 'Campos requeridos', 'El título y la descripción son obligatorios');
-      console.log('Validación falló - Título:', formData.requestTitle, 'Descripción:', formData.requestDescription);
-      return;
+      return false;
     }
 
-    // Construir objeto solicitud para la API
+    return true;
+  };
+
+  const getUserData = () => {
+    const usuarioStorage = localStorage.getItem('usuario');
+    const usuario = usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    
+    if (!usuario) {
+      showToast('error', 'Usuario no encontrado', 'Debes iniciar sesión para enviar la solicitud');
+      return null;
+    }
+    
+    return usuario;
+  };
+
+  const buildSolicitudData = (usuario) => {
     const solicitudData = {
       solicitante: usuario._id || usuario.id,
       titulo: formData.requestTitle,
@@ -324,7 +336,6 @@ const NuevaSolicitud = () => {
       origen: 'formulario'
     };
 
-    // Solo agregar campos opcionales si existen
     if (modeloReferencia) {
       solicitudData.modeloReferencia = modeloReferencia;
     }
@@ -335,6 +346,20 @@ const NuevaSolicitud = () => {
       solicitudData.observaciones = formData.requestJustification;
     }
 
+    return solicitudData;
+  };
+
+  const submitRequest = async () => {
+    console.log('=== INICIANDO ENVÍO DE SOLICITUD ===');
+
+    if (!validateSubmission()) return;
+
+    showToast('info', 'Enviando solicitud', 'Por favor espera...');
+
+    const usuario = getUserData();
+    if (!usuario) return;
+
+    const solicitudData = buildSolicitudData(usuario);
     console.log('Datos finales a enviar:', solicitudData);
 
     try {
@@ -354,12 +379,6 @@ const NuevaSolicitud = () => {
       console.error('Error enviando solicitud:', err);
       showToast('error', 'Error al enviar', err.message || 'No se pudo enviar la solicitud');
     }
-  };
-
-  const generateRequestNumber = () => {
-    const year = new Date().getFullYear();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `SOL-${year}-${random}`;
   };
 
   const getPriorityLabel = (priority) => {
@@ -382,173 +401,195 @@ const NuevaSolicitud = () => {
     });
   };
 
+  const renderPermisoFields = () => (
+    <>
+      <div className="form-row-nuevasolicitud">
+        <div className="form-group-nuevasolicitud">
+          <label htmlFor="exitDate">Fecha de Salida *</label>
+          <input
+            type="date"
+            id="exitDate"
+            name="exitDate"
+            required
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className="form-group-nuevasolicitud">
+          <label htmlFor="returnDate">Fecha de Regreso </label>
+          <input
+            type="date"
+            id="returnDate"
+            name="returnDate"
+            required
+            onChange={handleInputChange}
+          />
+        </div>
+      </div>
+      <div className="form-group-nuevasolicitud">
+        <label htmlFor="destination">Destino</label>
+        <input
+          type="text"
+          id="destination"
+          name="destination"
+          placeholder="¿A dónde vas?"
+          onChange={handleInputChange}
+        />
+      </div>
+      <div className="form-group-nuevasolicitud">
+        <label htmlFor="emergencyContact">Contacto de Emergencia</label>
+        <input
+          type="text"
+          id="emergencyContact"
+          name="emergencyContact"
+          placeholder="Nombre y teléfono"
+          onChange={handleInputChange}
+        />
+      </div>
+    </>
+  );
+
+  const renderAcademicoFields = () => (
+    <>
+      <div className="form-row-nuevasolicitud">
+        <div className="form-group-nuevasolicitud">
+          <label htmlFor="subject">Materia</label>
+          <select
+            id="subject"
+            name="subject"
+            onChange={handleInputChange}
+          >
+            <option value="">Seleccionar materia</option>
+            <option value="teologia">Teología Dogmática</option>
+            <option value="filosofia">Filosofía</option>
+            <option value="liturgia">Liturgia</option>
+            <option value="pastoral">Teología Pastoral</option>
+            <option value="escritura">Sagrada Escritura</option>
+          </select>
+        </div>
+        <div className="form-group-nuevasolicitud">
+          <label htmlFor="semester">Semestre</label>
+          <select
+            id="semester"
+            name="semester"
+            onChange={handleInputChange}
+          >
+            <option value="">Seleccionar semestre</option>
+            <option value="1">Primer Semestre</option>
+            <option value="2">Segundo Semestre</option>
+            <option value="3">Tercer Semestre</option>
+            <option value="4">Cuarto Semestre</option>
+            <option value="5">Quinto Semestre</option>
+            <option value="6">Sexto Semestre</option>
+          </select>
+        </div>
+      </div>
+      <div className="form-group-nuevasolicitud">
+        <label htmlFor="currentSchedule">Horario Actual</label>
+        <textarea
+          id="currentSchedule"
+          name="currentSchedule"
+          rows="3"
+          placeholder="Describe tu horario actual"
+          onChange={handleInputChange}
+        ></textarea>
+      </div>
+      <div className="form-group-nuevasolicitud">
+        <label htmlFor="proposedSchedule">Horario Propuesto</label>
+        <textarea
+          id="proposedSchedule"
+          name="proposedSchedule"
+          rows="3"
+          placeholder="Describe el horario que propones"
+          onChange={handleInputChange}
+        ></textarea>
+      </div>
+    </>
+  );
+
+  const filterCategories = () => {
+    return categories.filter(cat => {
+      if (referencia && formData.category) {
+        return cat._id === formData.category;
+      }
+      const tipoCategoria = modeloCategoriaMap[modeloReferencia] || 'general';
+      return !modeloReferencia || cat.tipo === tipoCategoria || cat.tipo === 'general';
+    });
+  };
+
+  const renderDefaultFields = () => (
+    <>
+      <div className="form-group-nuevasolicitud">
+        <label htmlFor="category">
+          Categoría Específica
+          {referencia && formData.category && (
+            <span style={{ color: '#28a745', fontSize: '12px', marginLeft: '5px' }}>
+              (Seleccionada automáticamente según el evento)
+            </span>
+          )}
+        </label>
+        <select
+          id="category"
+          name="category"
+          value={formData.category || ''}
+          onChange={handleInputChange}
+          required
+          disabled={!!referencia}
+        >
+          <option value="">
+            {referencia ? 'Categoría asociada al evento seleccionado' : 'Selecciona una categoría'}
+          </option>
+          {filterCategories().map(cat => (
+              <option key={cat._id} value={cat._id}>
+                {cat.nombre} {cat.codigo ? `(${cat.codigo})` : ''}
+              </option>
+            ))}
+        </select>
+        {referencia && formData.category && (
+          <small style={{ color: '#6c757d', fontSize: '12px' }}>
+            Esta categoría se seleccionó automáticamente porque está asociada al evento elegido.
+          </small>
+        )}
+      </div>
+      <div className="form-group-nuevasolicitud">
+        <label htmlFor="additionalInfo">Información Adicional</label>
+        <textarea
+          id="additionalInfo"
+          name="additionalInfo"
+          rows="4"
+          placeholder="Proporciona cualquier información adicional relevante"
+          onChange={handleInputChange}
+        ></textarea>
+      </div>
+    </>
+  );
+
   const renderDynamicFields = () => {
     switch (selectedType) {
       case 'permiso':
-        return (
-          <>
-            <div className="form-row-nuevasolicitud">
-              <div className="form-group-nuevasolicitud">
-                <label htmlFor="exitDate">Fecha de Salida *</label>
-                <input
-                  type="date"
-                  id="exitDate"
-                  name="exitDate"
-                  required
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="form-group-nuevasolicitud">
-                <label htmlFor="returnDate">Fecha de Regreso </label>
-                <input
-                  type="date"
-                  id="returnDate"
-                  name="returnDate"
-                  required
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-            <div className="form-group-nuevasolicitud">
-              <label htmlFor="destination">Destino</label>
-              <input
-                type="text"
-                id="destination"
-                name="destination"
-                placeholder="¿A dónde vas?"
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-group-nuevasolicitud">
-              <label htmlFor="emergencyContact">Contacto de Emergencia</label>
-              <input
-                type="text"
-                id="emergencyContact"
-                name="emergencyContact"
-                placeholder="Nombre y teléfono"
-                onChange={handleInputChange}
-              />
-            </div>
-          </>
-        );
+        return renderPermisoFields();
       case 'academico':
-        return (
-          <>
-            <div className="form-row-nuevasolicitud">
-              <div className="form-group-nuevasolicitud">
-                <label htmlFor="subject">Materia</label>
-                <select
-                  id="subject"
-                  name="subject"
-                  onChange={handleInputChange}
-                >
-                  <option value="">Seleccionar materia</option>
-                  <option value="teologia">Teología Dogmática</option>
-                  <option value="filosofia">Filosofía</option>
-                  <option value="liturgia">Liturgia</option>
-                  <option value="pastoral">Teología Pastoral</option>
-                  <option value="escritura">Sagrada Escritura</option>
-                </select>
-              </div>
-              <div className="form-group-nuevasolicitud">
-                <label htmlFor="semester">Semestre</label>
-                <select
-                  id="semester"
-                  name="semester"
-                  onChange={handleInputChange}
-                >
-                  <option value="">Seleccionar semestre</option>
-                  <option value="1">Primer Semestre</option>
-                  <option value="2">Segundo Semestre</option>
-                  <option value="3">Tercer Semestre</option>
-                  <option value="4">Cuarto Semestre</option>
-                  <option value="5">Quinto Semestre</option>
-                  <option value="6">Sexto Semestre</option>
-                </select>
-              </div>
-            </div>
-            <div className="form-group-nuevasolicitud">
-              <label htmlFor="currentSchedule">Horario Actual</label>
-              <textarea
-                id="currentSchedule"
-                name="currentSchedule"
-                rows="3"
-                placeholder="Describe tu horario actual"
-                onChange={handleInputChange}
-              ></textarea>
-            </div>
-            <div className="form-group-nuevasolicitud">
-              <label htmlFor="proposedSchedule">Horario Propuesto</label>
-              <textarea
-                id="proposedSchedule"
-                name="proposedSchedule"
-                rows="3"
-                placeholder="Describe el horario que propones"
-                onChange={handleInputChange}
-              ></textarea>
-            </div>
-          </>
-        );
-      // Add other cases for different request types
+        return renderAcademicoFields();
       default:
-        return (
-          <>
-            <div className="form-group-nuevasolicitud">
-              <label htmlFor="category">
-                Categoría Específica
-                {referencia && formData.category && (
-                  <span style={{ color: '#28a745', fontSize: '12px', marginLeft: '5px' }}>
-                    (Seleccionada automáticamente según el evento)
-                  </span>
-                )}
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={formData.category || ''}
-                onChange={handleInputChange}
-                required
-                disabled={!!referencia} // Solo deshabilitado si hay una referencia seleccionada
-              >
-                <option value="">
-                  {referencia ? 'Categoría asociada al evento seleccionado' : 'Selecciona una categoría'}
-                </option>
-                {categories
-                  .filter(cat => {
-                    // Si hay referencia seleccionada, mostrar solo la categoría asociada
-                    if (referencia && formData.category) {
-                      return cat._id === formData.category;
-                    }
-                    // Si no hay referencia, mostrar todas las categorías del tipo correspondiente
-                    const tipoCategoria = modeloCategoriaMap[modeloReferencia] || 'general';
-                    return !modeloReferencia || cat.tipo === tipoCategoria || cat.tipo === 'general';
-                  })
-                  .map(cat => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.nombre} {cat.codigo ? `(${cat.codigo})` : ''}
-                    </option>
-                  ))}
-              </select>
-              {referencia && formData.category && (
-                <small style={{ color: '#6c757d', fontSize: '12px' }}>
-                  Esta categoría se seleccionó automáticamente porque está asociada al evento elegido.
-                </small>
-              )}
-            </div>
-            <div className="form-group-nuevasolicitud">
-              <label htmlFor="additionalInfo">Información Adicional</label>
-              <textarea
-                id="additionalInfo"
-                name="additionalInfo"
-                rows="4"
-                placeholder="Proporciona cualquier información adicional relevante"
-                onChange={handleInputChange}
-              ></textarea>
-            </div>
-          </>
-        );
+        return renderDefaultFields();
     }
   };
+
+  const renderProgressSteps = () => (
+    <div className="progress-steps-nuevasolicitud">
+      <div className={`step-nuevasolicitud ${currentStep > 1 ? 'completed' : ''} ${currentStep === 1 ? 'active' : ''}`}>
+        <div className="step-number-nuevasolicitud">1</div>
+        <div className="step-label-nuevasolicitud">Tipo de Solicitud</div>
+      </div>
+      <div className={`step-nuevasolicitud ${currentStep > 2 ? 'completed' : ''} ${currentStep === 2 ? 'active' : ''}`}>
+        <div className="step-number-nuevasolicitud">2</div>
+        <div className="step-label-nuevasolicitud">Detalles</div>
+      </div>
+      <div className={`step-nuevasolicitud ${currentStep === 3 ? 'active' : ''}`}>
+        <div className="step-number-nuevasolicitud">3</div>
+        <div className="step-label-nuevasolicitud">Confirmación</div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="app">
@@ -563,20 +604,7 @@ const NuevaSolicitud = () => {
           </div>
 
           {/* Progress Steps */}
-          <div className="progress-steps-nuevasolicitud">
-            <div className={`step-nuevasolicitud ${currentStep > 1 ? 'completed' : ''} ${currentStep === 1 ? 'active' : ''}`}>
-              <div className="step-number-nuevasolicitud">1</div>
-              <div className="step-label-nuevasolicitud">Tipo de Solicitud</div>
-            </div>
-            <div className={`step-nuevasolicitud ${currentStep > 2 ? 'completed' : ''} ${currentStep === 2 ? 'active' : ''}`}>
-              <div className="step-number-nuevasolicitud">2</div>
-              <div className="step-label-nuevasolicitud">Detalles</div>
-            </div>
-            <div className={`step-nuevasolicitud ${currentStep === 3 ? 'active' : ''}`}>
-              <div className="step-number-nuevasolicitud">3</div>
-              <div className="step-label-nuevasolicitud">Confirmación</div>
-            </div>
-          </div>
+          {renderProgressSteps()}
 
           {/* Form Container */}
           <div className="form-container-nuevasolicitud">
@@ -589,11 +617,13 @@ const NuevaSolicitud = () => {
 
               <div className="request-types-nuevasolicitud">
                 {Object.entries(typeConfigs).map(([type, config]) => (
-                  <div
+                  <button
                     key={type}
+                    type="button"
                     className={`request-type-card-nuevasolicitud ${selectedType === type ? 'selected' : ''}`}
                     onClick={() => selectRequestType(type)}
                     data-type={type}
+                    style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
                   >
                     <div className="card-icon-nuevasolicitud">
                       {config.icon}
@@ -602,7 +632,7 @@ const NuevaSolicitud = () => {
                       <h3>{config.title}</h3>
                       <p>{config.description}</p>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -858,8 +888,7 @@ const NuevaSolicitud = () => {
                       checked={acceptTerms}
                       onChange={(e) => setAcceptTerms(e.target.checked)}
                     />
-
-                    Acepto los términos y condiciones del seminario
+                    <span>Acepto los términos y condiciones del seminario</span>
                   </label>
                 </div>
               </div>
@@ -889,10 +918,10 @@ const NuevaSolicitud = () => {
               ) : (
                 <button
                   type="button"
-                  className={`btn-nuevasolicitud btn-success-nuevasolicitud${!acceptTerms ? ' disabled' : ''}`}
+                  className={`btn-nuevasolicitud btn-success-nuevasolicitud${acceptTerms ? '' : ' disabled'}`}
                   onClick={acceptTerms ? submitRequest : undefined}
                   disabled={!acceptTerms}
-                  style={{ opacity: !acceptTerms ? 0.5 : 1, cursor: !acceptTerms ? 'not-allowed' : 'pointer' }}
+                  style={{ opacity: acceptTerms ? 1 : 0.5, cursor: acceptTerms ? 'pointer' : 'not-allowed' }}
                 >
                   <FaPaperPlane />
                   <span>Enviar Solicitud</span>
@@ -929,8 +958,6 @@ const NuevaSolicitud = () => {
                 <FaTimes />
               </button>
             </div>
-
-
           );
         })}
       </div>

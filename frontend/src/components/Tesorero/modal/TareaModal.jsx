@@ -11,7 +11,7 @@ const TareaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usua
     // Si es un objeto Date o string con T, formatear
     try {
       const d = new Date(fecha);
-      if (!isNaN(d.getTime())) {
+      if (!Number.isNaN(d.getTime())) {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');

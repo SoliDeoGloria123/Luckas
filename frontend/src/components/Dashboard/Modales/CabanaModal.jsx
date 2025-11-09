@@ -16,27 +16,22 @@ const CabanaModal = ({
   selectedImages,
   setSelectedImages
 }) => {
-  const [progress, setProgress] = useState(0);
+  const [ setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
-  function normalizeCategoria(categoria) {
-    if (!categoria) return '';
-    if (typeof categoria === 'object' && categoria._id) return String(categoria._id);
-    return String(categoria);
-  }
-
+  
 
   // Manejo de archivos seleccionados
   const handleFileSelection = (files) => {
     const validFiles = [];
     const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    const allowedTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif']);
 
-    Array.from(files).forEach(file => {
+    for (const file of Array.from(files)) {
       if (!allowedTypes.includes(file.type)) return;
       if (file.size > maxSize) return;
       validFiles.push(file);
-    });
+    };
 
     if (validFiles.length > 0) {
       uploadImages(validFiles);
@@ -52,7 +47,7 @@ const CabanaModal = ({
     let uploadedCount = 0;
     const totalFiles = files.length;
 
-    files.forEach((file, index) => {
+    for (const [index, file] of files.entries()) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageData = {
@@ -75,7 +70,7 @@ const CabanaModal = ({
         }
       };
       reader.readAsDataURL(file);
-    });
+    };
   };
 
   const removeImage = (id) => {

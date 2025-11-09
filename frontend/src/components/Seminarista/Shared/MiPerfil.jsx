@@ -5,40 +5,79 @@ import Header from './Header';
 import Footer from '../../footer/Footer';
 import { userService } from '../../../services/userService';
 
+// Función auxiliar para obtener usuario desde localStorage
+const obtenerUsuarioLogueado = () => {
+  try {
+    const usuarioStorage = localStorage.getItem('usuario');
+    const usuario = usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    console.log('Usuario logueado:', usuario);
+    return usuario;
+  } catch (error) {
+    console.error('Error al obtener usuario de localStorage:', error);
+    return null;
+  }
+};
+
+// Función auxiliar para crear estado inicial de datos editables
+const crearEstadoInicialDatos = (usuario) => ({
+  nombre: usuario?.nombre || "",
+  apellido: usuario?.apellido || "",
+  correo: usuario?.correo || "",
+  telefono: usuario?.telefono || "",
+  tipoDocumento: usuario?.tipoDocumento || "",
+  numeroDocumento: usuario?.numeroDocumento || "",
+  fechaNacimiento: usuario?.fechaNacimiento ? usuario.fechaNacimiento.split('T')[0] : "",
+  direccion: usuario?.direccion || "",
+  nivelAcademico: usuario?.nivelAcademico || "",
+  fechaIngreso: usuario?.fechaIngreso ? usuario.fechaIngreso.split('T')[0] : "",
+  directorEspiritual: usuario?.directorEspiritual || "",
+  idiomas: usuario?.idiomas || "",
+  especialidad: usuario?.especialidad || ""
+});
+
+// Función auxiliar para crear datos de perfil por defecto
+const crearPerfilPorDefecto = (usuario) => ({
+  nombre: usuario?.nombre || "Luis",
+  apellido: usuario?.apellido || "Muguel", 
+  tipoDocumento: usuario?.tipoDocumento || "Cédula de Ciudadanía",
+  numeroDocumento: usuario?.numeroDocumento || "435412543534534",
+  telefono: usuario?.telefono || "120524521546",
+  correo: usuario?.correo || "luis@gmail.com",
+  fechaNacimiento: usuario?.fechaNacimiento || "2005-05-05",
+  direccion: usuario?.direccion || "Carrera 15 #32-45, Medellín",
+  nivelActual: usuario?.nivelAcademico || "Filosofía II",
+  fechaIngreso: usuario?.fechaIngreso || "2023-02-01",
+  directorEspiritual: usuario?.directorEspiritual || "Padre Miguel",
+  idiomas: usuario?.idiomas || "Español, Inglés",
+  especialidad: usuario?.especialidad || "Teología Pastoral"
+});
+
+// Función auxiliar para validar datos de contraseña
+const validarCambioContrasena = (passwordData) => {
+  if (!passwordData.currentPassword || !passwordData.newPassword) {
+    return { esValido: false, mensaje: 'Por favor, completa todos los campos de contraseña' };
+  }
+
+  if (passwordData.newPassword !== passwordData.confirmPassword) {
+    return { esValido: false, mensaje: 'Las contraseñas nuevas no coinciden' };
+  }
+
+  if (passwordData.newPassword.length < 6) {
+    return { esValido: false, mensaje: 'La nueva contraseña debe tener al menos 6 caracteres' };
+  }
+
+  return { esValido: true };
+};
+
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Obtener usuario logueado desde localStorage
-  const usuarioLogueado = (() => {
-    try {
-      const usuarioStorage = localStorage.getItem('usuario');
-      const usuario = usuarioStorage ? JSON.parse(usuarioStorage) : null;
-      console.log('Usuario logueado:', usuario);
-      return usuario;
-    } catch (error) {
-      console.error('Error al obtener usuario de localStorage:', error);
-      return null;
-    }
-  })();
+  const usuarioLogueado = obtenerUsuarioLogueado();
 
   // Estado para los datos editables
-  const [datosEditados, setDatosEditados] = useState({
-    nombre: usuarioLogueado?.nombre || "",
-    apellido: usuarioLogueado?.apellido || "",
-    correo: usuarioLogueado?.correo || "",
-    telefono: usuarioLogueado?.telefono || "",
-    tipoDocumento: usuarioLogueado?.tipoDocumento || "",
-    numeroDocumento: usuarioLogueado?.numeroDocumento || "",
-    fechaNacimiento: usuarioLogueado?.fechaNacimiento ? usuarioLogueado.fechaNacimiento.split('T')[0] : "",
-    direccion: usuarioLogueado?.direccion || "",
-    // Campos específicos del seminarista
-    nivelAcademico: usuarioLogueado?.nivelAcademico || "",
-    fechaIngreso: usuarioLogueado?.fechaIngreso ? usuarioLogueado.fechaIngreso.split('T')[0] : "",
-    directorEspiritual: usuarioLogueado?.directorEspiritual || "",
-    idiomas: usuarioLogueado?.idiomas || "",
-    especialidad: usuarioLogueado?.especialidad || ""
-  });
+  const [datosEditados, setDatosEditados] = useState(() => crearEstadoInicialDatos(usuarioLogueado));
 
   console.log('Estado isEditing:', isEditing);
   console.log('Datos editados:', datosEditados);
@@ -51,23 +90,9 @@ const ProfilePage = () => {
   });
 
   // Datos estáticos del perfil (solo lectura)
-  const [profileData, setProfileData] = useState({
-    nombre: usuarioLogueado?.nombre || "Luis",
-    apellido: usuarioLogueado?.apellido || "Muguel", 
-    tipoDocumento: usuarioLogueado?.tipoDocumento || "Cédula de Ciudadanía",
-    numeroDocumento: usuarioLogueado?.numeroDocumento || "435412543534534",
-    telefono: usuarioLogueado?.telefono || "120524521546",
-    correo: usuarioLogueado?.correo || "luis@gmail.com",
-    fechaNacimiento: usuarioLogueado?.fechaNacimiento || "2005-05-05",
-    direccion: usuarioLogueado?.direccion || "Carrera 15 #32-45, Medellín",
-    nivelActual: usuarioLogueado?.nivelAcademico || "Filosofía II",
-    fechaIngreso: usuarioLogueado?.fechaIngreso || "2023-02-01",
-    directorEspiritual: usuarioLogueado?.directorEspiritual || "Padre Miguel",
-    idiomas: usuarioLogueado?.idiomas || "Español, Inglés",
-    especialidad: usuarioLogueado?.especialidad || "Teología Pastoral"
-  });
+  const [profileData, setProfileData] = useState(() => crearPerfilPorDefecto(usuarioLogueado));
 
-  const [formData, setFormData] = useState({});
+  // const [formData, setFormData] = useState({}); // Variable comentada - no se usa actualmente
   
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -112,21 +137,7 @@ const ProfilePage = () => {
 
   const handleCancelEdit = () => {
     // Resetear los datos editados a los valores originales
-    setDatosEditados({
-      nombre: usuarioLogueado?.nombre || "",
-      apellido: usuarioLogueado?.apellido || "",
-      correo: usuarioLogueado?.correo || "",
-      telefono: usuarioLogueado?.telefono || "",
-      tipoDocumento: usuarioLogueado?.tipoDocumento || "",
-      numeroDocumento: usuarioLogueado?.numeroDocumento || "",
-      fechaNacimiento: usuarioLogueado?.fechaNacimiento ? usuarioLogueado.fechaNacimiento.split('T')[0] : "",
-      direccion: usuarioLogueado?.direccion || "",
-      nivelAcademico: usuarioLogueado?.nivelAcademico || "",
-      fechaIngreso: usuarioLogueado?.fechaIngreso ? usuarioLogueado.fechaIngreso.split('T')[0] : "",
-      directorEspiritual: usuarioLogueado?.directorEspiritual || "",
-      idiomas: usuarioLogueado?.idiomas || "",
-      especialidad: usuarioLogueado?.especialidad || ""
-    });
+    setDatosEditados(crearEstadoInicialDatos(usuarioLogueado));
     // Resetear campos de contraseña
     setPasswordData({
       currentPassword: "",
@@ -136,28 +147,19 @@ const ProfilePage = () => {
     setIsEditing(false);
   };
 
-  const handlePasswordChange = (field, value) => {
-    setPasswordData(prev => ({ ...prev, [field]: value }));
-  };
+  // const handlePasswordChange = (field, value) => {
+  //   setPasswordData(prev => ({ ...prev, [field]: value }));  
+  // }; // Función comentada - no se usa actualmente
 
   const cambiarContrasena = async () => {
     try {
-      if (!passwordData.currentPassword || !passwordData.newPassword) {
-        alert('Por favor, completa todos los campos de contraseña');
+      const validacion = validarCambioContrasena(passwordData);
+      if (!validacion.esValido) {
+        alert(validacion.mensaje);
         return;
       }
 
-      if (passwordData.newPassword !== passwordData.confirmPassword) {
-        alert('Las contraseñas nuevas no coinciden');
-        return;
-      }
-
-      if (passwordData.newPassword.length < 6) {
-        alert('La nueva contraseña debe tener al menos 6 caracteres');
-        return;
-      }
-
-      const response = await userService.changePassword({
+      await userService.changePassword({
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword
       });
@@ -195,52 +197,19 @@ const ProfilePage = () => {
 
   // useEffect para cargar datos del usuario al iniciar
   useEffect(() => {
-    // Si hay datos en localStorage, actualizar los estados
     if (usuarioLogueado) {
       console.log("Datos del usuario logueado:", usuarioLogueado);
-      
-      // Actualizar datos editables
-      setDatosEditados({
-        nombre: usuarioLogueado.nombre || "",
-        apellido: usuarioLogueado.apellido || "",
-        correo: usuarioLogueado.correo || "",
-        telefono: usuarioLogueado.telefono || "",
-        tipoDocumento: usuarioLogueado.tipoDocumento || "",
-        numeroDocumento: usuarioLogueado.numeroDocumento || "",
-        fechaNacimiento: usuarioLogueado.fechaNacimiento || "",
-        direccion: usuarioLogueado.direccion || "",
-        nivelAcademico: usuarioLogueado.nivelAcademico || "",
-        fechaIngreso: usuarioLogueado.fechaIngreso || "",
-        directorEspiritual: usuarioLogueado.directorEspiritual || "",
-        idiomas: usuarioLogueado.idiomas || "",
-        especialidad: usuarioLogueado.especialidad || ""
-      });
-
-      // Actualizar datos de visualización
-      setProfileData({
-        nombre: usuarioLogueado.nombre || "Luis",
-        apellido: usuarioLogueado.apellido || "Muguel", 
-        tipoDocumento: usuarioLogueado.tipoDocumento || "Cédula de Ciudadanía",
-        numeroDocumento: usuarioLogueado.numeroDocumento || "435412543534534",
-        telefono: usuarioLogueado.telefono || "120524521546",
-        correo: usuarioLogueado.correo || "luis@gmail.com",
-        fechaNacimiento: usuarioLogueado.fechaNacimiento || "2005-05-05",
-        direccion: usuarioLogueado.direccion || "Carrera 15 #32-45, Medellín",
-        nivelActual: usuarioLogueado.nivelAcademico || "Filosofía II",
-        fechaIngreso: usuarioLogueado.fechaIngreso || "2023-02-01",
-        directorEspiritual: usuarioLogueado.directorEspiritual || "Padre Miguel",
-        idiomas: usuarioLogueado.idiomas || "Español, Inglés",
-        especialidad: usuarioLogueado.especialidad || "Teología Pastoral"
-      });
+      setDatosEditados(crearEstadoInicialDatos(usuarioLogueado));
+      setProfileData(crearPerfilPorDefecto(usuarioLogueado));
     }
   }, [usuarioLogueado]);
 
   // Formatea la fecha para mostrarla en formato legible
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString();
-  };
+  // const formatDate = (dateStr) => {
+  //   if (!dateStr) return "";
+  //   const date = new Date(dateStr);
+  //   return date.toLocaleDateString();
+  // }; // Función comentada - no se usa actualmente
 
 
   return (
@@ -305,8 +274,8 @@ const ProfilePage = () => {
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas</h3>
               <div className="space-y-4">
-                {seminaristaStats.map((stat, index) => (
-                  <div key={index} className="flex items-center space-x-3">
+                {seminaristaStats.map((stat) => (
+                  <div key={stat.label} className="flex items-center space-x-3">
                     <div className={`w-3 h-3 rounded-full ${stat.color}`}></div>
                     <div className="flex-1">
                       <p className="text-sm text-gray-600">{stat.label}</p>

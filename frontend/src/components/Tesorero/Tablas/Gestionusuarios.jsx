@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import UsuarioModal from '../modal/UsuarioModal';
 import { userService } from '../../../services/userService'
 import { mostrarAlerta } from '../../utils/alertas';
@@ -40,23 +40,23 @@ const Gestionusuarios = () => {
   // Función de búsqueda por número de cédula, nombre, apellido y correo
   const handleSearch = (searchValue) => {
     setSearchTerm(searchValue);
-    if (!searchValue.trim()) {
+    const trimmedValue = searchValue.trim();
+    if (trimmedValue.length === 0) {
       setUsuariosFiltrados(usuarios);
-    } else {
-      const searchLower = searchValue.toLowerCase().trim();
-      const filteredUsers = usuarios.filter(user => {
-        const numeroDocumento = user.numeroDocumento?.toString().toLowerCase();
-        const nombre = user.nombre?.toLowerCase();
-        const apellido = user.apellido?.toLowerCase();
-        const correo = user.correo?.toLowerCase();
-
-        return numeroDocumento?.includes(searchLower) ||
-          nombre?.includes(searchLower) ||
-          apellido?.includes(searchLower) ||
-          correo?.includes(searchLower);
-      });
-      setUsuariosFiltrados(filteredUsers);
+      return;
     }
+    const searchLower = trimmedValue.toLowerCase();
+    const filteredUsers = usuarios.filter(user => {
+      const numeroDocumento = user.numeroDocumento?.toString().toLowerCase();
+      const nombre = user.nombre?.toLowerCase();
+      const apellido = user.apellido?.toLowerCase();
+      const correo = user.correo?.toLowerCase();
+      return numeroDocumento?.includes(searchLower) ||
+        nombre?.includes(searchLower) ||
+        apellido?.includes(searchLower) ||
+        correo?.includes(searchLower);
+    });
+    setUsuariosFiltrados(filteredUsers);
   };
 
   useEffect(() => {
@@ -271,7 +271,8 @@ const Gestionusuarios = () => {
                                 setCurrentItem(user);
                                 setShowModalUsuario(true);
                               }}
-                              variant="ghost"
+                              
+                              
                               size="icon"
                               className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]"
                             >

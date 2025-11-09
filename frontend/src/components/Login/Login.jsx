@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { authService } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
-import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import { mostrarAlerta } from '../utils/alertas';
 import "./Login.css"
 
 const Login = () => {

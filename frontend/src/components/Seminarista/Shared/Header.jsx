@@ -1,4 +1,6 @@
+
 import React, { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import './Header.css';
 
 
@@ -33,21 +35,15 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
       return null;
     }
   })();
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/';
+    globalThis.location.href = '/';
   };
-
-  const handleModificarPerfil = () => {
-    // Navegar directamente a la página de perfil
-    window.location.href = '/dashboard/seminarista/Mi-Perfil';
-    setMenuUsuarioAbierto(false);
-  };
-
 
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const dropdownRef = useRef(null);
+  // const dropdownRef = useRef(null); // Variable comentada - no se usa actualmente
 
   // Abrir/cerrar al hacer click en el botón
   const toggleDropdown = () => {
@@ -84,43 +80,49 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
         <nav className="header-nav-seminario">
           <a
             href="/seminarista"
-            className={`nav-item-seminario${window.location.pathname === '/seminarista' ? ' active' : ''}`}
+            className={`nav-item-seminario${globalThis.location.pathname === '/seminarista' ? ' active' : ''}`}
           >
             <span className="nav-icon-seminario">🏠</span>Inicio
           </a>
           <a
             href="/seminarista/tareas"
-            className={`nav-item-seminario${window.location.pathname === '/seminarista/tareas' ? ' active' : ''}`}
+            className={`nav-item-seminario${globalThis.location.pathname === '/seminarista/tareas' ? ' active' : ''}`}
           >
             <span className="nav-icon-seminario">☑️</span>Tareas
           </a>
           <a
             href="/dashboard/seminarista/eventos"
-            className={`nav-item-seminario${window.location.pathname === '/dashboard/seminarista/eventos' ? ' active' : ''}`}
+            className={`nav-item-seminario${globalThis.location.pathname === '/dashboard/seminarista/eventos' ? ' active' : ''}`}
           >
             <span className="nav-icon-seminario">📅</span>Eventos
           </a>
           <a
             href="/dashboard/seminarista/cabanas"
-            className={`nav-item-seminario${window.location.pathname === '/dashboard/seminarista/cabanas' ? ' active' : ''}`}
+            className={`nav-item-seminario${globalThis.location.pathname === '/dashboard/seminarista/cabanas' ? ' active' : ''}`}
           >
             <span className="nav-icon-seminario">🏠</span>Cabañas
           </a>
           <a
             href="/dashboard/seminarista/cursos"
-            className={`nav-item-seminario${window.location.pathname === '/dashboard/seminarista/cursos' ? ' active' : ''}`}
+            className={`nav-item-seminario${globalThis.location.pathname === '/dashboard/seminarista/cursos' ? ' active' : ''}`}
           >
             <span className="nav-icon-seminario">📚</span>Cursos
           </a>
-          <a href="#" className="nav-item-seminario mis-gestiones-btn" onClick={e => { e.preventDefault(); setShowGestionesDropdown(prev => !prev); }}
+          <button
+            type="button"
+            className="nav-item-seminario mis-gestiones-btn"
+            aria-haspopup="true"
+            aria-expanded={showGestionesDropdown}
+            onClick={() => setShowGestionesDropdown(prev => !prev)}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setShowGestionesDropdown(prev => !prev); }}
           >
             <span className="nav-icon">📝</span> Mis Gestiones <span className="dropdown-arrow">▼</span>
-          </a>
+          </button>
           <div
             ref={gestionesDropdownRef}
             className={`dropdown-menu-seminario${showGestionesDropdown ? ' show' : ''}`}
           >
-             <div className="dropdown-container-seminario">
+            <div className="dropdown-container-seminario">
               <a href="/dashboard/seminarista/mis-inscripciones" className="dropdown-item-seminario"> <span className="dropdown-icon">📋</span>Mis Inscripciones</a>
               <a href="/dashboard/seminarista/mis-reservas" className="dropdown-item-seminario">  <span className="dropdown-icon">🏠</span>Mis Reservas</a>
               <a href="/dashboard/seminarista/mis-solicitudes" className="dropdown-item-seminario"> <span className="dropdown-icon">📄</span>Mis Solicitudes</a>
@@ -136,7 +138,13 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
               <span className="notification-badge-seminario">3</span>
             </button>
           </div>
-          <div className="user-profile-seminario" onClick={toggleDropdown}>
+          <button 
+            type="button"
+            className="user-profile-seminario" 
+            onClick={toggleDropdown}
+            aria-expanded={showUserDropdown}
+            aria-haspopup="true"
+          >
             <span className="user-avatar-seminario">S</span>
             <div className="user-info-seminario">
               <span className="user-name-seminario">{usuarioLogueado && usuarioLogueado.nombre ? usuarioLogueado.nombre : 'Usuario'}</span>
@@ -150,16 +158,22 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
                 <span>Configuración</span>
               </a>
               <hr className="dropdown-divider" />
-              <a href="#" className="dropdown-item" onClick={e => { e.preventDefault(); handleLogout(); }}>
+              <button type="button" className="dropdown-item" onClick={handleLogout}>
                 <span>Cerrar Sesión</span>
-              </a>
+              </button>
             </div>
             <span className="dropdown-arrow">▼</span>
-          </div>
+          </button>
         </div>
       </div>
     </header>
   );
+};
+
+Header.propTypes = {
+  user: PropTypes.object,
+  breadcrumbPath: PropTypes.string,
+  onTabChange: PropTypes.func,
 };
 
 export default Header;

@@ -156,71 +156,82 @@ const InscripcionModal = ({
     }
   };
 
+  // Funciones auxiliares para reducir complejidad cognitiva
+  const handleNumeroDocumentoChange = (value) => {
+    setCedulaBusqueda(value);
+    if (value.length >= 6) {
+      buscarUsuarioPorCedula(value);
+    } else {
+      setUsuarioEncontrado(null);
+    }
+  };
+
+  const getEstadoDefecto = (tipoReferencia) => {
+    if (tipoReferencia === 'Eventos') return 'no inscrito';
+    if (tipoReferencia === 'ProgramaAcademico') return 'preinscrito';
+    const opcionesEstado = getOpcionesEstado(tipoReferencia);
+    return opcionesEstado.length > 0 ? opcionesEstado[0].value : '';
+  };
+
+  const handleTipoReferenciaChange = (value) => {
+    const estadoDefecto = getEstadoDefecto(value);
+    setForm({
+      ...form,
+      tipoReferencia: String(value),
+      estado: estadoDefecto,
+      referencia: "",
+      categoria: ""
+    });
+  };
+
+  const handleReferenciaChange = (name, value) => {
+    if (form.tipoReferencia === "Eventos") {
+      const evento = eventos.find(ev => String(ev._id) === String(value) && ev.categoria);
+      if (evento) {
+        setForm({
+          ...form,
+          [name]: String(value),
+          categoria: String(evento.categoria._id || evento.categoria)
+        });
+        return true;
+      }
+    } else if (form.tipoReferencia === "ProgramaAcademico") {
+      const programa = programas.find(pr => String(pr._id) === String(value) && pr.categoria);
+      if (programa) {
+        setForm({
+          ...form,
+          [name]: String(value),
+          categoria: String(programa.categoria._id || programa.categoria)
+        });
+        return true;
+      }
+    }
+    return false;
+  };
+
   const handleChange = e => {
     const { name, value } = e.target;
+
     // En modo editar, no permitir modificar campos personales
     if (modo === "editar" && [
       "usuario", "nombre", "apellido", "tipoDocumento", "numeroDocumento", "correo", "telefono", "categoria"
     ].includes(name)) {
       return;
-    };
+    }
 
-    // Si es el campo numeroDocumento, actualizar también la búsqueda de cédula
+    // Manejar casos especiales
     if (name === "numeroDocumento") {
-      setCedulaBusqueda(value);
-      // Buscar automáticamente si tiene 6 o más caracteres
-      if (value.length >= 6) {
-        buscarUsuarioPorCedula(value);
-      } else {
-        setUsuarioEncontrado(null);
-      }
-    };
-    if (name === "tipoReferencia") {
-      // Cuando cambia el tipo de referencia, establecer un estado por defecto
-      const opcionesEstado = getOpcionesEstado(value);
-      // Para eventos, el estado por defecto será 'no inscrito', para programas 'preinscrito'
-      let estadoDefecto = '';
-      if (value === 'Eventos') {
-        estadoDefecto = 'no inscrito';
-      } else if (value === 'ProgramaAcademico') {
-        estadoDefecto = 'preinscrito';
-      } else if (opcionesEstado.length > 0) {
-        estadoDefecto = opcionesEstado[0].value;
-      };
-      setForm({
-        ...form,
-        [name]: String(value),
-        estado: estadoDefecto,
-        referencia: "",
-        categoria: ""
-      });
+      handleNumeroDocumentoChange(value);
+    } else if (name === "tipoReferencia") {
+      handleTipoReferenciaChange(value);
       return;
-    }
-    if (name === "referencia") {
-      if (form.tipoReferencia === "Eventos") {
-        for (const ev of eventos) {
-          if (String(ev._id) === String(value) && ev.categoria) {
-            setForm({
-              ...form,
-              [name]: String(value),
-              categoria: String(ev.categoria._id || ev.categoria)
-            });
-            return;
-          }
-        }
-      } else if (form.tipoReferencia === "ProgramaAcademico") {
-        for (const pr of programas) {
-          if (String(pr._id) === String(value) && pr.categoria) {
-            setForm({
-              ...form,
-              [name]: String(value),
-              categoria: String(pr.categoria._id || pr.categoria)
-            });
-            return;
-          }
-        }
+    } else if (name === "referencia") {
+      if (handleReferenciaChange(name, value)) {
+        return;
       }
     }
+
+    // Actualización general del formulario
     setForm({ ...form, [name]: String(value) });
   };
 
@@ -247,7 +258,7 @@ const InscripcionModal = ({
           delete payload[key];
         }
       }
-    };
+    }
     onSubmit(payload);
     if (modo === "crear") {
       setForm(defaultForm);

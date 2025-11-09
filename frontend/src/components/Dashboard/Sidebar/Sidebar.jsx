@@ -90,8 +90,8 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
                 {/* Navigation con efectos premium */}
                 < nav className="p-4 space-y-6" >
                     {
-                        menuItems.map((section, sectionIndex) => (
-                            <div key={sectionIndex} className="fade-in-up" style={{ animationDelay: `${sectionIndex * 0.1}s` }}>
+                menuItems.map((section, sectionIndex) => (
+                    <div key={section.section} className="fade-in-up" style={{ animationDelay: `${sectionIndex * 0.1}s` }}>
                                 {sidebarAbierto && (
                                     <h3 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
                                         {section.section}

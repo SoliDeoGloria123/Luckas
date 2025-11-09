@@ -17,31 +17,61 @@ const SolicitudModal = ({
   const [cargandoUsuario, setCargandoUsuario] = useState(false);
   const [usuarioEncontrado, setUsuarioEncontrado] = useState(null);
 
+  // Funciones auxiliares para reducir complejidad cognitiva
+  const actualizarSolicitudConUsuario = (usuario) => {
+    setNuevaSolicitud(prev => ({
+      ...prev,
+      solicitante: usuario._id,
+      correo: usuario.correo || "",
+      telefono: usuario.telefono || ""
+    }));
+  };
+
+  const limpiarDatosUsuario = () => {
+    setUsuarioEncontrado(null);
+    setNuevaSolicitud(prev => ({
+      ...prev,
+      solicitante: "",
+      correo: "",
+      telefono: ""
+    }));
+  };
+
+  const validarBusqueda = (cedula) => {
+    return cedula && cedula.length >= 6 && !modoEdicion;
+  };
+
   // Función para buscar usuario por cédula SOLO en modo creación
   const buscarUsuarioPorCedula = async (cedula) => {
-    if (!cedula || cedula.length < 6 || modoEdicion) return;
+    if (!validarBusqueda(cedula)) return;
 
     setCargandoUsuario(true);
     try {
       const usuario = await userService.getByDocumento(cedula);
       setUsuarioEncontrado(usuario);
-      setNuevaSolicitud(prev => ({
-        ...prev,
-        solicitante: usuario._id,
-        correo: usuario.correo || "",
-        telefono: usuario.telefono || ""
-      }));
+      actualizarSolicitudConUsuario(usuario);
     } catch (error) {
-      setUsuarioEncontrado(null);
-      setNuevaSolicitud(prev => ({
-        ...prev,
-        solicitante: "",
-        correo: "",
-        telefono: ""
-      }));
+      console.error('Error buscando usuario por cédula:', error);
+      limpiarDatosUsuario();
     } finally {
       setCargandoUsuario(false);
     }
+  };
+
+  // Funciones auxiliares para obtener datos según el modo
+  const getSolicitudData = () => ({
+    data: modoEdicion ? solicitudSeleccionada : nuevaSolicitud,
+    setData: modoEdicion ? setSolicitudSeleccionada : setNuevaSolicitud
+  });
+
+  const getFieldValue = (fieldName) => {
+    const { data } = getSolicitudData();
+    return data?.[fieldName] || '';
+  };
+
+  const handleFieldChange = (fieldName, value) => {
+    const { data, setData } = getSolicitudData();
+    setData({ ...data, [fieldName]: value });
   };
 
   // Detectar pegado en el campo de cédula SOLO en modo creación
@@ -66,30 +96,32 @@ const SolicitudModal = ({
     }
   };
 
-  // PRIMERO EL useEffect
+  // Función auxiliar para validar y cargar datos del solicitante
+  const validarSolicitante = (solicitante) => {
+    return solicitante && !modoEdicion && solicitante.length === 24;
+  };
+
+  const cargarDatosSolicitante = async () => {
+    if (!validarSolicitante(nuevaSolicitud.solicitante)) return;
+
+    try {
+      const user = await userService.getById(nuevaSolicitud.solicitante);
+      setNuevaSolicitud((prev) => ({
+        ...prev,
+        correo: user.correo || "",
+        telefono: user.telefono || ""
+      }));
+    } catch (error) {
+      console.error('Error cargando datos del solicitante:', error);
+      setNuevaSolicitud((prev) => ({
+        ...prev,
+        correo: "",
+        telefono: ""
+      }));
+    }
+  };
+
   useEffect(() => {
-    const cargarDatosSolicitante = async () => {
-      if (
-        nuevaSolicitud.solicitante &&
-        !modoEdicion &&
-        nuevaSolicitud.solicitante.length === 24
-      ) {
-        try {
-          const user = await userService.getById(nuevaSolicitud.solicitante);
-          setNuevaSolicitud((prev) => ({
-            ...prev,
-            correo: user.correo || "",
-            telefono: user.telefono || ""
-          }));
-        } catch (error) {
-          setNuevaSolicitud((prev) => ({
-            ...prev,
-            correo: "",
-            telefono: ""
-          }));
-        }
-      }
-    };
     cargarDatosSolicitante();
     // eslint-disable-next-line
   }, [nuevaSolicitud.solicitante, modoEdicion]);
@@ -102,6 +134,79 @@ const SolicitudModal = ({
       setCargandoUsuario(false);
     }
   }, [mostrar]);
+
+  // Funciones auxiliares para renderizar campos
+  const renderInputField = (fieldName, label, type = "text", required = false, placeholder = "") => {
+    const idSuffix = modoEdicion ? "Edit" : "Nuevo";
+    const fieldId = `${fieldName}${idSuffix}`;
+    const isReadOnly = !modoEdicion && !!usuarioEncontrado && ['correo', 'telefono', 'solicitante'].includes(fieldName);
+    
+    return (
+      <div className="form-grupo-admin">
+        <label htmlFor={fieldId}>{label}:</label>
+        <input
+          id={fieldId}
+          type={type}
+          value={getFieldValue(fieldName)}
+          onChange={e => handleFieldChange(fieldName, e.target.value)}
+          placeholder={placeholder}
+          required={required}
+          readOnly={isReadOnly}
+          style={isReadOnly ? { backgroundColor: '#f8f9fa', cursor: 'not-allowed' } : {}}
+        />
+      </div>
+    );
+  };
+
+  const renderSelectField = (fieldName, label, options, required = false) => {
+    const idSuffix = modoEdicion ? "Edit" : "Nuevo";
+    const fieldId = `${fieldName}${idSuffix}`;
+    
+    return (
+      <div className="form-grupo-admin">
+        <label htmlFor={fieldId}>{label}:</label>
+        <select
+          id={fieldId}
+          value={getFieldValue(fieldName)}
+          onChange={e => handleFieldChange(fieldName, e.target.value)}
+          required={required}
+        >
+          <option value="">Seleccione...</option>
+          {options.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
+  const getModeloReferenciaOptions = (tipoSolicitud) => {
+    const options = [];
+    if (tipoSolicitud === 'Inscripción') {
+      options.push(
+        { value: 'Eventos', label: 'Eventos' },
+        { value: 'ProgramaTecnico', label: 'Programa Técnico' }
+      );
+    } else if (tipoSolicitud === 'Hospedaje') {
+      options.push(
+        { value: 'Cabana', label: 'Cabaña' },
+        { value: 'Reserva', label: 'Reservas' }
+      );
+    } else if (tipoSolicitud === 'Alimentación') {
+      options.push({ value: 'Comedor', label: 'Comedor' });
+    }
+    return options;
+  };
+
+  const tipoSolicitudOptions = [
+    { value: 'Inscripción', label: 'Inscripción' },
+    { value: 'Hospedaje', label: 'Hospedaje' },
+    { value: 'Alimentación', label: 'Alimentación' },
+    { value: 'Otra', label: 'Otra' }
+  ];
+
+  const categoriaOptions = categorias ? categorias.map(cat => ({ value: cat._id, label: cat.nombre })) : [];
+
   if (!mostrar) return null;
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -120,281 +225,98 @@ const SolicitudModal = ({
         </div>
         <form className="modal-body-admin" onSubmit={e => { e.preventDefault(); onSubmit(); }}>
           <div className="from-grid-admin">
-            {!modoEdicion ? (
-              <>
-                <div className="form-grupo-admin">
-                  <label htmlFor="cedulaBusqueda">Cédula del Solicitante:</label>
-                  <input
-                    id="cedulaBusqueda"
-                    type="text"
-                    value={cedulaBusqueda}
-                    onChange={handleChangeCedula}
-                    onPaste={handlePasteCedula}
-                    placeholder="Ingrese o pegue la cédula del solicitante"
-                    style={{ paddingRight: cargandoUsuario ? '40px' : '10px' }}
-                  />
-                  {cargandoUsuario && (
-                    <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: '#666' }}>🔄</div>
-                  )}
-                  {usuarioEncontrado && (
-                    <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#d4edda', border: '1px solid #c3e6cb', borderRadius: '4px', fontSize: '14px', color: '#155724' }}>
-                      ✅ Usuario encontrado: {usuarioEncontrado.nombre} {usuarioEncontrado.apellido} - {usuarioEncontrado.correo}
-                    </div>
-                  )}
-                  {cedulaBusqueda && !usuarioEncontrado && !cargandoUsuario && (
-                    <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
-                      ❌ Usuario no encontrado con esta cédula
-                    </div>
-                  )}
-                </div>
-                <div className="form-grupo-admin">
-                  <label htmlFor="solicitanteNuevo">Solicitante (ID):</label>
-                  <input
-                    id="solicitanteNuevo"
-                    type="text"
-                    value={nuevaSolicitud.solicitante}
-                    onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, solicitante: e.target.value })}
-                    placeholder="ID del solicitante (se llena automáticamente)"
-                    readOnly={usuarioEncontrado ? true : false}
-                    style={{ backgroundColor: usuarioEncontrado ? '#f8f9fa' : 'white', cursor: usuarioEncontrado ? 'not-allowed' : 'text' }}
-                  />
-                </div>
-                <div className="form-grupo-admin">
-                  <label htmlFor="tituloNuevo">Título de la Solicitud:</label>
-                  <input
-                    id="tituloNuevo"
-                    type="text"
-                    value={nuevaSolicitud.titulo}
-                    onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, titulo: e.target.value })}
-                    placeholder="Título descriptivo de la solicitud"
-                    required
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="form-grupo-admin">
-                  <label htmlFor="solicitanteEdit">Solicitante (ID):</label>
-                  <input
-                    id="solicitanteEdit"
-                    type="text"
-                    value={solicitudSeleccionada?.solicitante || ''}
-                    onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, solicitante: e.target.value })}
-                    placeholder="ID del solicitante"
-                  />
-                </div>
-                <div className="form-grupo-admin">
-                  <label htmlFor="tituloEdit">Título de la Solicitud:</label>
-                  <input
-                    id="tituloEdit"
-                    type="text"
-                    value={solicitudSeleccionada?.titulo || ''}
-                    onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, titulo: e.target.value })}
-                    placeholder="Título descriptivo de la solicitud"
-                    required
-                  />
-                </div>
-              </>
-            )}
-          </div>
-          <div className="from-grid-admin">
-            {!modoEdicion ? (
-              <>
-                <div className="form-grupo-admin">
-                  <label htmlFor="correoNuevo">Correo:</label>
-                  <input
-                    id="correoNuevo"
-                    type="email"
-                    value={nuevaSolicitud.correo}
-                    onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, correo: e.target.value })}
-                    placeholder="correo@ejemplo.com"
-                    readOnly={usuarioEncontrado ? true : false}
-                    style={{ backgroundColor: usuarioEncontrado ? '#f8f9fa' : 'white', cursor: usuarioEncontrado ? 'not-allowed' : 'text' }}
-                    required
-                  />
-                </div>
-                <div className="form-grupo-admin">
-                  <label htmlFor="telefonoNuevo">Teléfono:</label>
-                  <input
-                    id="telefonoNuevo"
-                    type="text"
-                    value={nuevaSolicitud.telefono}
-                    onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, telefono: e.target.value })}
-                    placeholder="Teléfono"
-                    readOnly={usuarioEncontrado ? true : false}
-                    style={{ backgroundColor: usuarioEncontrado ? '#f8f9fa' : 'white', cursor: usuarioEncontrado ? 'not-allowed' : 'text' }}
-                    required
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="form-grupo-admin">
-                  <label htmlFor="correoEdit">Correo:</label>
-                  <input
-                    id="correoEdit"
-                    type="email"
-                    value={solicitudSeleccionada?.correo || ''}
-                    onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, correo: e.target.value })}
-                    placeholder="correo@ejemplo.com"
-                    required
-                  />
-                </div>
-                <div className="form-grupo-admin">
-                  <label htmlFor="telefonoEdit">Teléfono:</label>
-                  <input
-                    id="telefonoEdit"
-                    type="text"
-                    value={solicitudSeleccionada?.telefono || ''}
-                    onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, telefono: e.target.value })}
-                    placeholder="Teléfono"
-                    required
-                  />
-                </div>
-              </>
-            )}
-          </div>
-          <div className="from-grid-admin">
-            {!modoEdicion ? (
-              <>
-                <div className="form-grupo-admin">
-                  <label htmlFor="tipoSolicitudNuevo">Tipo de Solicitud:</label>
-                  <select
-                    id="tipoSolicitudNuevo"
-                    value={nuevaSolicitud.tipoSolicitud}
-                    onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, tipoSolicitud: e.target.value, modeloReferencia: '' })}
-                    required
-                  >
-                    <option value="">Seleccione...</option>
-                    <option value="Inscripción">Inscripción</option>
-                    <option value="Hospedaje">Hospedaje</option>
-                    <option value="Alimentación">Alimentación</option>
-                    <option value="Otra">Otra</option>
-                  </select>
-                </div>
-                {nuevaSolicitud.tipoSolicitud && (
-                  <div className="form-grupo-admin">
-                    <label htmlFor="modeloReferenciaNuevo">Modelo Referencia:</label>
-                    <select
-                      id="modeloReferenciaNuevo"
-                      value={nuevaSolicitud.modeloReferencia || ''}
-                      onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, modeloReferencia: e.target.value })}
-                      required
-                    >
-                      <option value="">Seleccione...</option>
-                      {nuevaSolicitud.tipoSolicitud === 'Inscripción' && <option value="Eventos">Eventos</option>}
-
-                      {nuevaSolicitud.tipoSolicitud === 'Inscripción' && <option value="ProgramaTecnico">Programa Tecnico </option>}
-                      {nuevaSolicitud.tipoSolicitud === 'Hospedaje' && <option value="Cabana">Cabaña</option>}
-                      {nuevaSolicitud.tipoSolicitud === 'Hospedaje' && <option value="Reserva">Reservas</option>}
-                      {nuevaSolicitud.tipoSolicitud === 'Alimentación' && <option value="Comedor">Comedor</option>}
-                    </select>
+            {!modoEdicion && (
+              <div className="form-grupo-admin">
+                <label htmlFor="cedulaBusqueda">Cédula del Solicitante:</label>
+                <input
+                  id="cedulaBusqueda"
+                  type="text"
+                  value={cedulaBusqueda}
+                  onChange={handleChangeCedula}
+                  onPaste={handlePasteCedula}
+                  placeholder="Ingrese o pegue la cédula del solicitante"
+                  style={{ paddingRight: cargandoUsuario ? '40px' : '10px' }}
+                />
+                {cargandoUsuario && (
+                  <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: '#666' }}>🔄</div>
+                )}
+                {usuarioEncontrado && (
+                  <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#d4edda', border: '1px solid #c3e6cb', borderRadius: '4px', fontSize: '14px', color: '#155724' }}>
+                    ✅ Usuario encontrado: {usuarioEncontrado.nombre} {usuarioEncontrado.apellido} - {usuarioEncontrado.correo}
                   </div>
                 )}
-                <div className="form-grupo-admin">
-                  <label htmlFor="categoriaNuevo">Categoría:</label>
-                  <select
-                    id="categoriaNuevo"
-                    value={nuevaSolicitud.categoria}
-                    onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, categoria: e.target.value })}
-                    required
-                  >
-                    <option value="">Seleccione...</option>
-                    {categorias && categorias.map(cat => (
-                      <option key={cat._id} value={cat._id}>{cat.nombre}</option>
-                    ))}
-                  </select>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="form-grupo-admin">
-                  <label htmlFor="tipoSolicitudEdit">Tipo de Solicitud:</label>
-                  <select
-                    id="tipoSolicitudEdit"
-                    value={solicitudSeleccionada?.tipoSolicitud || ''}
-                    onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, tipoSolicitud: e.target.value })}
-                    required
-                  >
-                    <option value="">Seleccione...</option>
-                    <option value="Inscripción">Inscripción</option>
-                    <option value="Hospedaje">Hospedaje</option>
-                    <option value="Alimentación">Alimentación</option>
-                    <option value="Otra">Otra</option>
-                  </select>
-                </div>
-                <div className="form-grupo-admin">
-                  <label htmlFor="categoriaEdit">Categoría:</label>
-                  <select
-                    id="categoriaEdit"
-                    value={solicitudSeleccionada?.categoria || ''}
-                    onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, categoria: e.target.value })}
-                    required
-                  >
-                    <option value="">Seleccione...</option>
-                    {categorias && categorias.map(cat => (
-                      <option key={cat._id} value={cat._id}>{cat.nombre}</option>
-                    ))}
-                  </select>
-                </div>
-              </>
+                {cedulaBusqueda && !usuarioEncontrado && !cargandoUsuario && (
+                  <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
+                    ❌ Usuario no encontrado con esta cédula
+                  </div>
+                )}
+              </div>
             )}
+            {renderInputField('solicitante', 'Solicitante (ID)', 'text', false, 'ID del solicitante')}
+            {renderInputField('titulo', 'Título de la Solicitud', 'text', true, 'Título descriptivo de la solicitud')}
           </div>
           <div className="from-grid-admin">
-            {!modoEdicion ? (
-              <div className="form-grupo-admin">
-                <label htmlFor="descripcionNuevo">Descripción:</label>
-                <input
-                  id="descripcionNuevo"
-                  type="text"
-                  value={nuevaSolicitud.descripcion}
-                  onChange={e => setNuevaSolicitud({ ...nuevaSolicitud, descripcion: e.target.value })}
-                  placeholder="Descripción"
-                  required
-                />
-              </div>
-            ) : (
-              <div className="form-grupo-admin">
-                <label htmlFor="descripcionEdit">Descripción:</label>
-                <input
-                  id="descripcionEdit"
-                  type="text"
-                  value={solicitudSeleccionada?.descripcion || ''}
-                  onChange={e => setSolicitudSeleccionada({ ...solicitudSeleccionada, descripcion: e.target.value })}
-                  placeholder="Descripción"
-                  required
-                />
-              </div>
-            )}
-            <div className="form-grupo-admin">
-              <label htmlFor="estado">Estado:</label>
-              <select
-                id="estado"
-                value={modoEdicion ? solicitudSeleccionada?.estado : nuevaSolicitud.estado}
-                onChange={e => modoEdicion ? setSolicitudSeleccionada({ ...solicitudSeleccionada, estado: e.target.value }) : setNuevaSolicitud({ ...nuevaSolicitud, estado: e.target.value })}
-              >
-                <option value="Nueva">Nueva</option>
-                <option value="En Revisión">Revisión</option>
-                <option value="Aprobada">Aprobada</option>
-                <option value="Rechazada">Rechazada</option>
-                <option value="Completada">Completada</option>
-                <option value="Pendiente Info">Pendiente</option>
-              </select>
-            </div>
+            {renderInputField('correo', 'Correo', 'email', true, 'correo@ejemplo.com')}
+            {renderInputField('telefono', 'Teléfono', 'text', true, 'Teléfono')}
           </div>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label htmlFor="prioridad">Prioridad:</label>
+              <label htmlFor={`tipoSolicitud${modoEdicion ? 'Edit' : 'Nuevo'}`}>Tipo de Solicitud:</label>
               <select
-                id="prioridad"
-                value={modoEdicion ? solicitudSeleccionada?.prioridad : nuevaSolicitud.prioridad}
-                onChange={e => modoEdicion ? setSolicitudSeleccionada({ ...solicitudSeleccionada, prioridad: e.target.value }) : setNuevaSolicitud({ ...nuevaSolicitud, prioridad: e.target.value })}
+                id={`tipoSolicitud${modoEdicion ? 'Edit' : 'Nuevo'}`}
+                value={getFieldValue('tipoSolicitud')}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (modoEdicion) {
+                    handleFieldChange('tipoSolicitud', value);
+                  } else {
+                    handleFieldChange('tipoSolicitud', value);
+                    handleFieldChange('modeloReferencia', '');
+                  }
+                }}
+                required
               >
-                <option value="Alta">Alta</option>
-                <option value="Media">Media</option>
-                <option value="Baja">Baja</option>
+                <option value="">Seleccione...</option>
+                {tipoSolicitudOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
               </select>
             </div>
+            {!modoEdicion && getFieldValue('tipoSolicitud') && (
+              <div className="form-grupo-admin">
+                <label htmlFor="modeloReferenciaNuevo">Modelo Referencia:</label>
+                <select
+                  id="modeloReferenciaNuevo"
+                  value={getFieldValue('modeloReferencia')}
+                  onChange={e => handleFieldChange('modeloReferencia', e.target.value)}
+                  required
+                >
+                  <option value="">Seleccione...</option>
+                  {getModeloReferenciaOptions(getFieldValue('tipoSolicitud')).map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {renderSelectField('categoria', 'Categoría', categoriaOptions, true)}
+          </div>
+          <div className="from-grid-admin">
+            {renderInputField('descripcion', 'Descripción', 'text', true, 'Descripción')}
+            {renderSelectField('estado', 'Estado', [
+              { value: 'Nueva', label: 'Nueva' },
+              { value: 'En Revisión', label: 'Revisión' },
+              { value: 'Aprobada', label: 'Aprobada' },
+              { value: 'Rechazada', label: 'Rechazada' },
+              { value: 'Completada', label: 'Completada' },
+              { value: 'Pendiente Info', label: 'Pendiente' }
+            ])}
+          </div>
+          <div className="from-grid-admin">
+            {renderSelectField('prioridad', 'Prioridad', [
+              { value: 'Alta', label: 'Alta' },
+              { value: 'Media', label: 'Media' },
+              { value: 'Baja', label: 'Baja' }
+            ])}
             <div className="form-grupo-admin">
               <label htmlFor="responsable">Responsable:</label>
               <input
@@ -411,16 +333,7 @@ const SolicitudModal = ({
               </small>
             </div>
           </div>
-          <div className="form-grupo-admin">
-            <label htmlFor="observaciones">Observaciones:</label>
-            <input
-              id="observaciones"
-              type="text"
-              value={modoEdicion ? solicitudSeleccionada?.observaciones : nuevaSolicitud.observaciones}
-              onChange={e => modoEdicion ? setSolicitudSeleccionada({ ...solicitudSeleccionada, observaciones: e.target.value }) : setNuevaSolicitud({ ...nuevaSolicitud, observaciones: e.target.value })}
-              placeholder="Observaciones"
-            />
-          </div>
+          {renderInputField('observaciones', 'Observaciones', 'text', false, 'Observaciones')}
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" type="button" onClick={onClose}>
               <i className="fas fa-times"></i> {' '}

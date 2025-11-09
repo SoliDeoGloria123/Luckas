@@ -51,7 +51,7 @@ const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard"
       } else {
         localStorage.removeItem('token');
         localStorage.removeItem('usuario');
-        window.location.href = '/login';
+        globalThis.location.href = '/login';
       }
     }, 100);
   };

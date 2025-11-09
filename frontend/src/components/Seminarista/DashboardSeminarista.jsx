@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ModificarPerfil from './pages/ModificarPerfil';
+
 import { useAuthCheck } from './hooks/useAuthCheck';
 import { eventService } from '../../services/eventService';
 import { cabanaService } from '../../services/cabanaService'
 import Footer from '../footer/Footer'
 import Header from './Shared/Header';
-import NotificationBanner from './Shared/NotificationBanner';
+
 import './DashboardSeminarista.css';
 
 const DashboardSeminarista = () => {
@@ -29,9 +29,9 @@ const DashboardSeminarista = () => {
       setMostrarModificarPerfil(true);
     };
 
-    window.addEventListener('modificar-perfil', handleModificarPerfil);
+    globalThis.addEventListener('modificar-perfil', handleModificarPerfil);
     return () => {
-      window.removeEventListener('modificar-perfil', handleModificarPerfil);
+      globalThis.removeEventListener('modificar-perfil', handleModificarPerfil);
     };
   }, []);
 

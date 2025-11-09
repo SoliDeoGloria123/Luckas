@@ -22,7 +22,7 @@ const Gestionevento = () => {
   const [eventos, setEventos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalEvento] = useState('create');
+  const [modalMode, setModalMode] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
   const [eventoDetalle, setEventoDetalle] = useState(null);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
@@ -56,7 +56,7 @@ const Gestionevento = () => {
     obtenerCategorias();
   }, []);
   // Estado de carga y filtrado
-  const [cargando, setCargando] = useState(false);
+  const [cargando] = useState(false); // setCargando commented as unused
   const eventosFiltrados = eventos; // Puedes aplicar filtros si lo necesitas
 
   // Carrusel de imágenes: un índice por evento
@@ -76,7 +76,7 @@ const Gestionevento = () => {
 
   // Modal de edición
   const onEditar = (evento) => {
-    setModalEvento('edit');
+    setModalMode('edit');
     setCurrentItem(evento);
     setShowModal(true);
   };
@@ -106,7 +106,7 @@ const Gestionevento = () => {
     }
   };
   const handleCreate = () => {
-    setModalEvento('create');
+    setModalMode('create');
     setCurrentItem(null);
     setShowModal(true);
   };
@@ -216,15 +216,31 @@ const Gestionevento = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cargando ? (
-            <div className="col-span-full text-center py-12">
-              <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-slate-600">Cargando eventos...</p>
-            </div>
-          ) : eventosFiltrados.length > 0 ? (
-            eventosPaginados.map((evento) => {
+          {(() => {
+            if (cargando) {
+              return (
+                <div className="col-span-full text-center py-12">
+                  <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-slate-600">Cargando eventos...</p>
+                </div>
+              );
+            }
+            
+            if (eventosFiltrados.length > 0) {
+              return eventosPaginados.map((evento) => {
               const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
               const imgIndex = imgIndices[evento._id] || 0;
+              
+              // Determinar clases para el estado del evento
+              let estadoClases = 'bg-amber-500/90 text-white';
+              if (evento.estado === 'activo') {
+                estadoClases = 'bg-emerald-500/90 text-white';
+              } else if (evento.estado === 'inactivo') {
+                estadoClases = 'bg-red-500/90 text-white';
+              } else if (evento.estado === 'finalizado') {
+                estadoClases = 'bg-gray-500/90 text-white';
+              }
+              
               return (
                 <div key={evento._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
                   {/* Imagen del evento */}
@@ -281,14 +297,7 @@ const Gestionevento = () => {
                           Destacado
                         </span>
                       )}
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${evento.estado === 'activo'
-                        ? 'bg-emerald-500/90 text-white'
-                        : evento.estado === 'inactivo'
-                          ? 'bg-red-500/90 text-white'
-                          : evento.estado === 'finalizado'
-                            ? 'bg-gray-500/90 text-white'
-                            : 'bg-amber-500/90 text-white'
-                        }`}>
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClases}`}>
                         {evento.estado}
                       </span>
                     </div>
@@ -392,21 +401,24 @@ const Gestionevento = () => {
                   </div>
                 </div>
               );
-            })
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay eventos</h3>
-              <p className="text-slate-500 mb-6">Comienza creando tu primer eventos o actividad</p>
-              <button
-                /* onClick={abrirModalCrear}*/
-                className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
-              >
-                <Plus className="w-5 h-5 mr-2 inline" />
-                Crear Evento
-              </button>
-            </div>
-          )}
+            });
+            }
+            
+            return (
+              <div className="col-span-full text-center py-12">
+                <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay eventos</h3>
+                <p className="text-slate-500 mb-6">Comienza creando tu primer eventos o actividad</p>
+                <button
+                  onClick={handleCreate}
+                  className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
+                >
+                  <Plus className="w-5 h-5 mr-2 inline" />
+                  Crear Evento
+                </button>
+              </div>
+            );
+          })()}
         </div>
         {/* Lista de Eventos */}
         {mostrarModalDetalle && eventoDetalle && (

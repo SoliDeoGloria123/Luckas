@@ -30,7 +30,7 @@ export const useDashboardAdmin = (usuarioProp, onCerrarSesion) => {
     } else {
       localStorage.removeItem('token'); 
       localStorage.removeItem('usuario');
-      window.location.href = '/login';
+      globalThis.location.href = '/login';
     }
   }, [onCerrarSesion]);
 

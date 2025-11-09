@@ -15,28 +15,108 @@ const ReservasModal = ({
   onClose,
   onSubmit
 }) => {
+  // Funciones auxiliares para reducir complejidad cognitiva
+  const getReservaData = () => ({
+    reservaActual: modoEdicion ? reservaSeleccionada : nuevaReserva,
+    setReserva: modoEdicion ? setReservaSeleccionada : setNuevaReserva
+  });
+
+  const actualizarPrecioCabana = (reservaActual, setReserva) => {
+    if (!reservaActual.cabana || !cabanas || cabanas.length === 0) return;
+    
+    const cabanaSeleccionada = cabanas.find(c => c._id === reservaActual.cabana);
+    const debeCambiarPrecio = cabanaSeleccionada && 
+                              cabanaSeleccionada.precio && 
+                              reservaActual.precio !== cabanaSeleccionada.precio;
+    
+    if (debeCambiarPrecio) {
+      setReserva({ ...reservaActual, precio: cabanaSeleccionada.precio });
+    }
+  };
+
   // Actualizar el precio automáticamente al seleccionar una cabaña
   useEffect(() => {
-    const reservaActual = modoEdicion ? reservaSeleccionada : nuevaReserva;
-    const setReserva = modoEdicion ? setReservaSeleccionada : setNuevaReserva;
-    if (reservaActual.cabana && cabanas && cabanas.length > 0) {
-      const cabanaSeleccionada = cabanas.find(c => c._id === reservaActual.cabana);
-      if (cabanaSeleccionada && cabanaSeleccionada.precio && reservaActual.precio !== cabanaSeleccionada.precio) {
-        setReserva({ ...reservaActual, precio: cabanaSeleccionada.precio });
-      }
-    }
+    const { reservaActual, setReserva } = getReservaData();
+    actualizarPrecioCabana(reservaActual, setReserva);
     // eslint-disable-next-line
   }, [modoEdicion, reservaSeleccionada?.cabana, nuevaReserva.cabana, cabanas]);
 
   if (!mostrar) return null;
 
-  const reservaActual = modoEdicion ? reservaSeleccionada : nuevaReserva;
-  const setReserva = modoEdicion ? setReservaSeleccionada : setNuevaReserva;
+  const { reservaActual, setReserva } = getReservaData();
+
+  const actualizarDatosUsuario = (userId) => {
+    const usuarioSeleccionado = usuarios.find(u => u._id === userId);
+    return {
+      usuario: userId,
+      nombre: usuarioSeleccionado?.nombre || '',
+      apellido: usuarioSeleccionado?.apellido || '',
+      correoElectronico: usuarioSeleccionado?.correo || '',
+      telefono: usuarioSeleccionado?.telefono || '',
+      tipoDocumento: usuarioSeleccionado?.tipoDocumento || '',
+      numeroDocumento: usuarioSeleccionado?.numeroDocumento || ''
+    };
+  };
+
+  const handleUsuarioChange = (userId) => {
+    const datosUsuario = actualizarDatosUsuario(userId);
+    if (modoEdicion) {
+      setReservaSeleccionada({ ...reservaSeleccionada, ...datosUsuario });
+    } else {
+      setNuevaReserva({ ...nuevaReserva, ...datosUsuario });
+    }
+  };
+
+  const handleCabanaChange = (cabanaId) => {
+    const cabanaSeleccionada = cabanas.find(c => c._id === cabanaId);
+    const nuevoPrecio = cabanaSeleccionada ? cabanaSeleccionada.precio : "";
+    
+    if (modoEdicion) {
+      setReservaSeleccionada({
+        ...reservaSeleccionada,
+        cabana: cabanaId,
+        precio: nuevoPrecio
+      });
+    } else {
+      setNuevaReserva({
+        ...nuevaReserva,
+        cabana: cabanaId,
+        precio: nuevoPrecio
+      });
+    }
+  };
+
+  const getFieldValue = (fieldName) => {
+    return modoEdicion ? reservaSeleccionada?.[fieldName] : nuevaReserva[fieldName];
+  };
+
+  const handleFieldChange = (fieldName, value) => {
+    if (modoEdicion) {
+      setReservaSeleccionada({ ...reservaSeleccionada, [fieldName]: value });
+    } else {
+      setNuevaReserva({ ...nuevaReserva, [fieldName]: value });
+    }
+  };
+
+  const getActivoValue = () => {
+    if (modoEdicion) {
+      return reservaSeleccionada?.activo ? 'true' : 'false';
+    }
+    return (nuevaReserva.activo === undefined || nuevaReserva.activo) ? 'true' : 'false';
+  };
+
+  const handleActivoChange = (value) => {
+    const esActivo = value === 'true';
+    if (modoEdicion) {
+      setReservaSeleccionada({ ...reservaSeleccionada, activo: esActivo });
+    } else {
+      setNuevaReserva({ ...nuevaReserva, activo: esActivo });
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setReserva({ ...reservaActual, [name]: value });
-
   };
 
   return (
@@ -61,34 +141,7 @@ const ReservasModal = ({
               id="usuario"
               name="usuario"
               value={modoEdicion ? reservaSeleccionada?.usuario : nuevaReserva.usuario}
-              onChange={e => {
-                const userId = e.target.value;
-                const usuarioSeleccionado = usuarios.find(u => u._id === userId);
-
-                if (modoEdicion) {
-                  setReservaSeleccionada({
-                    ...reservaSeleccionada,
-                    usuario: userId,
-                    nombre: usuarioSeleccionado?.nombre || '',
-                    apellido: usuarioSeleccionado?.apellido || '',
-                    correoElectronico: usuarioSeleccionado?.correo || '',
-                    telefono: usuarioSeleccionado?.telefono || '',
-                    tipoDocumento: usuarioSeleccionado?.tipoDocumento || '',
-                    numeroDocumento: usuarioSeleccionado?.numeroDocumento || ''
-                  });
-                } else {
-                  setNuevaReserva({
-                    ...nuevaReserva,
-                    usuario: userId,
-                    nombre: usuarioSeleccionado?.nombre || '',
-                    apellido: usuarioSeleccionado?.apellido || '',
-                    correoElectronico: usuarioSeleccionado?.correo || '',
-                    telefono: usuarioSeleccionado?.telefono || '',
-                    tipoDocumento: usuarioSeleccionado?.tipoDocumento || '',
-                    numeroDocumento: usuarioSeleccionado?.numeroDocumento || ''
-                  });
-                }
-              }}
+              onChange={e => handleUsuarioChange(e.target.value)}
               required
             >
               <option value="">Seleccione...</option>
@@ -107,25 +160,7 @@ const ReservasModal = ({
                 id="cabana"
                 name="cabana"
                 value={modoEdicion ? reservaSeleccionada?.cabana : nuevaReserva.cabana}
-                onChange={e => {
-                  const cabanaId = e.target.value;
-                  const cabanaSeleccionada = cabanas.find(c => c._id === cabanaId);
-                  const nuevoPrecio = cabanaSeleccionada ? cabanaSeleccionada.precio : "";
-
-                  if (modoEdicion) {
-                    setReservaSeleccionada({
-                      ...reservaSeleccionada,
-                      cabana: cabanaId,
-                      precio: nuevoPrecio
-                    });
-                  } else {
-                    setNuevaReserva({
-                      ...nuevaReserva,
-                      cabana: cabanaId,
-                      precio: nuevoPrecio
-                    });
-                  }
-                }}
+                onChange={e => handleCabanaChange(e.target.value)}
                 required
               >
                 <option value="">Seleccione...</option>
@@ -161,11 +196,7 @@ const ReservasModal = ({
                     ? reservaSeleccionada?.fechaInicio?.substring(0, 10)
                     : nuevaReserva.fechaInicio
                 }
-                onChange={e =>
-                  modoEdicion
-                    ? setReservaSeleccionada({ ...reservaSeleccionada, fechaInicio: e.target.value })
-                    : setNuevaReserva({ ...nuevaReserva, fechaInicio: e.target.value })
-                }
+                onChange={e => handleFieldChange('fechaInicio', e.target.value)}
                 required
               />
             </div>
@@ -182,11 +213,7 @@ const ReservasModal = ({
                     ? reservaSeleccionada?.fechaFin?.substring(0, 10)
                     : nuevaReserva.fechaFin
                 }
-                onChange={e =>
-                  modoEdicion
-                    ? setReservaSeleccionada({ ...reservaSeleccionada, fechaFin: e.target.value })
-                    : setNuevaReserva({ ...nuevaReserva, fechaFin: e.target.value })
-                }
+                onChange={e => handleFieldChange('fechaFin', e.target.value)}
                 required
               />
             </div>
@@ -198,12 +225,8 @@ const ReservasModal = ({
               <select
                 id="estado"
                 name="estado"
-                value={modoEdicion ? reservaSeleccionada?.estado : nuevaReserva.estado || "Pendiente"}
-                onChange={e =>
-                  modoEdicion
-                    ? setReservaSeleccionada({ ...reservaSeleccionada, estado: e.target.value })
-                    : setNuevaReserva({ ...nuevaReserva, estado: e.target.value })
-                }
+                value={getFieldValue('estado') || "Pendiente"}
+                onChange={e => handleFieldChange('estado', e.target.value)}
                 required
               >
                 <option value="Pendiente">Pendiente</option>
@@ -218,20 +241,8 @@ const ReservasModal = ({
               <select
                 id="activo"
                 name="activo"
-                value={(() => {
-                  if (modoEdicion) {
-                    return reservaSeleccionada?.activo ? 'true' : 'false';
-                  }
-                  return (nuevaReserva.activo === undefined || nuevaReserva.activo) ? 'true' : 'false';
-                })()}
-                onChange={e => {
-                  const esActivo = e.target.value === 'true';
-                  if (modoEdicion) {
-                    setReservaSeleccionada({ ...reservaSeleccionada, activo: esActivo });
-                  } else {
-                    setNuevaReserva({ ...nuevaReserva, activo: esActivo });
-                  }
-                }}
+                value={getActivoValue()}
+                onChange={e => handleActivoChange(e.target.value)}
                 required
               >
                 <option value="true">Sí</option>
@@ -251,7 +262,7 @@ const ReservasModal = ({
                   id="nombre"
                   type="text"
                   name="nombre"
-                  value={modoEdicion ? reservaSeleccionada?.nombre : nuevaReserva.nombre}
+                  value={getFieldValue('nombre')}
                   onChange={handleChange}
                   placeholder="Nombre del huésped"
                   required
@@ -264,7 +275,7 @@ const ReservasModal = ({
                   id="apellido"
                   type="text"
                   name="apellido"
-                  value={modoEdicion ? reservaSeleccionada?.apellido : nuevaReserva.apellido}
+                  value={getFieldValue('apellido')}
                   onChange={handleChange}
                   placeholder="Apellido del huésped"
                   required
@@ -278,7 +289,7 @@ const ReservasModal = ({
                 <select
                   id="tipoDocumento"
                   name="tipoDocumento"
-                  value={modoEdicion ? reservaSeleccionada?.tipoDocumento : nuevaReserva.tipoDocumento}
+                  value={getFieldValue('tipoDocumento')}
                   onChange={handleChange}
                   required
                 >
@@ -296,7 +307,7 @@ const ReservasModal = ({
                   id="numeroDocumento"
                   type="text"
                   name="numeroDocumento"
-                  value={modoEdicion ? reservaSeleccionada?.numeroDocumento : nuevaReserva.numeroDocumento}
+                  value={getFieldValue('numeroDocumento')}
                   onChange={handleChange}
                   placeholder="Número de documento"
                   required
@@ -311,7 +322,7 @@ const ReservasModal = ({
                   id="correoElectronico"
                   type="email"
                   name="correoElectronico"
-                  value={modoEdicion ? reservaSeleccionada?.correoElectronico : nuevaReserva.correoElectronico}
+                  value={getFieldValue('correoElectronico')}
                   onChange={handleChange}
                   placeholder="correo@ejemplo.com"
                   required
@@ -324,7 +335,7 @@ const ReservasModal = ({
                   id="telefono"
                   type="tel"
                   name="telefono"
-                  value={modoEdicion ? reservaSeleccionada?.telefono : nuevaReserva.telefono}
+                  value={getFieldValue('telefono')}
                   onChange={handleChange}
                   placeholder="Número de teléfono"
                   required
@@ -338,7 +349,7 @@ const ReservasModal = ({
                 id="numeroPersonas"
                 type="number"
                 name="numeroPersonas"
-                value={modoEdicion ? reservaSeleccionada?.numeroPersonas : nuevaReserva.numeroPersonas}
+                value={getFieldValue('numeroPersonas')}
                 onChange={handleChange}
                 min="1"
                 max="20"
@@ -353,7 +364,7 @@ const ReservasModal = ({
             <textarea
               id="observaciones"
               name="observaciones"
-              value={modoEdicion ? reservaSeleccionada?.observaciones : nuevaReserva.observaciones}
+              value={getFieldValue('observaciones')}
               onChange={handleChange}
               placeholder="Observaciones adicionales"
               rows="3"

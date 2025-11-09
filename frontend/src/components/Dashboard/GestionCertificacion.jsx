@@ -44,16 +44,16 @@ const GestionCertificacion = () => {
             const cursoId = cert.referencia?._id || cert.referencia;
             const nombre = cert.nombre;
             const blob = await generarCertificado(userId, cursoId);
-            const url = window.URL.createObjectURL(blob);
+            const url = globalThis.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = `certificado-${nombre}.pdf`;
             document.body.appendChild(a);
             a.click();
             a.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (err) {
-            alert('Error generando certificado: ' + (err?.message || err));
+            globalThis.URL.revokeObjectURL(url);
+        } catch (error) {
+            alert('Error generando certificado: ' + (error?.message || error));
         }
     };
 

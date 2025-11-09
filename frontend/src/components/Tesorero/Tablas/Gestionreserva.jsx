@@ -21,7 +21,14 @@ const Gestionreserva = () => {
   const obtenerReservas = async () => {
     try {
       const data = await reservaService.getAll();
-      let resvs = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+      let resvs = [];
+      if (Array.isArray(data)) {
+        resvs = data;
+      } else if (Array.isArray(data.data)) {
+        resvs = data.data;
+      } else {
+        resvs = [];
+      }
       setReservas(resvs);
     } catch (err) {
       console.log("Error al obtener reservas: " + err.message);
@@ -30,7 +37,14 @@ const Gestionreserva = () => {
   const obtenerUsuarios = async () => {
     try {
       const data = await userService.getAllUsers();
-      let users = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+      let users = [];
+      if (Array.isArray(data)) {
+        users = data;
+      } else if (Array.isArray(data.data)) {
+        users = data.data;
+      } else {
+        users = [];
+      }
       setUsuarios(users);
     } catch (err) {
       console.log("Error al obtener usuarios: " + err.message);
@@ -40,7 +54,14 @@ const Gestionreserva = () => {
   const obtenerCabanas = async () => {
     try {
       const data = await cabanaService.getAll();
-      let cabs = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+      let cabs = [];
+      if (Array.isArray(data)) {
+        cabs = data;
+      } else if (Array.isArray(data.data)) {
+        cabs = data.data;
+      } else {
+        cabs = [];
+      }
       setCabanas(cabs);
     } catch (err) {
       console.log("Error al obtener cabañas: " + err.message);

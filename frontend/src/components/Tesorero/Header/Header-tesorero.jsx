@@ -44,12 +44,9 @@ const HeaderTesorero = () => {
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("usuario");
-        window.location.href = "/";
+        globalThis.location.href = "/";
     };
-    // Función para cambiar la sección activa
-    const handleGestionar = (seccion) => {
-        setSeccionActiva(seccion);
-    };
+
 
 
     return (

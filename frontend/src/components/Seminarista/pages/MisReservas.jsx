@@ -8,11 +8,40 @@ import {
   faExclamationTriangle,
   faTimesCircle,
   faCalendar,
-  faClock,
-  faMapMarkerAlt,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { reservaService } from '../../../services/reservaService';
+import PropTypes from 'prop-types';
+
+// Carrusel simple para el modal
+const ModalImageCarousel = ({ images }) => {
+  const [index, setIndex] = useState(0);
+  const prev = () => setIndex(i => (i === 0 ? images.length - 1 : i - 1));
+  const next = () => setIndex(i => (i === images.length - 1 ? 0 : i + 1));
+  return (
+    <div className="modal-carousel-wrapper">
+      <button className="carousel-arrow left" onClick={prev}>&lt;</button>
+      <img
+        src={`http://localhost:3000/uploads/cabanas/${images[index]}`}
+        alt={`Imagen ${index + 1}`}
+        className="modal-image-misinscripciones"
+        style={{ maxHeight: '260px', borderRadius: '12px' }}
+      />
+      <button className="carousel-arrow right" onClick={next}>&gt;</button>
+      <div className="carousel-indicator">
+        {index + 1} / {images.length}
+      </div>
+    </div>
+  );
+};
+
+ModalImageCarousel.propTypes = {
+  images: PropTypes.arrayOf(PropTypes.string)
+};
+
+ModalImageCarousel.defaultProps = {
+  images: []
+};
 
 const MisReservas = () => {
   // Estados
@@ -20,12 +49,12 @@ const MisReservas = () => {
   const [activeFilter, setActiveFilter] = useState('Todas');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentInscripcion, setCurrentInscripcion] = useState(null);
-  const [stats, setStats] = useState({
-    confirmadas: 0,
-    pendientes: 0,
-    canceladas: 0,
-    total: 0
-  });
+  // const [stats, setStats] = useState({
+  //   confirmadas: 0,
+  //   pendientes: 0,
+  //   canceladas: 0,
+  //   total: 0
+  // });
   const usuarioLogueado = (() => {
     try {
       const usuarioStorage = localStorage.getItem('usuario');
@@ -50,36 +79,14 @@ const MisReservas = () => {
   }, [userId]);
 
   // Actualizar estadísticas
-  const updateStats = (data) => {
-    setStats({
-      confirmadas: data.filter(i => i.estado === 'Confirmada').length,
-      pendientes: data.filter(i => i.estado === 'Pendiente').length,
-      canceladas: data.filter(i => i.estado === 'Cancelada').length,
-      total: data.length
-    });
-  };
-  
-// Carrusel simple para el modal
-const ModalImageCarousel = ({ images }) => {
-  const [index, setIndex] = useState(0);
-  const prev = () => setIndex(i => (i === 0 ? images.length - 1 : i - 1));
-  const next = () => setIndex(i => (i === images.length - 1 ? 0 : i + 1));
-  return (
-    <div className="modal-carousel-wrapper">
-      <button className="carousel-arrow left" onClick={prev}>&lt;</button>
-      <img
-        src={`http://localhost:3000/uploads/cabanas/${images[index]}`}
-        alt={`Imagen ${index + 1}`}
-        className="modal-image-misinscripciones"
-        style={{ maxHeight: '260px', borderRadius: '12px' }}
-      />
-      <button className="carousel-arrow right" onClick={next}>&gt;</button>
-      <div className="carousel-indicator">
-        {index + 1} / {images.length}
-      </div>
-    </div>
-  );
-}
+  // const updateStats = (data) => {
+  //   setStats({
+  //     confirmadas: data.filter(i => i.estado === 'Confirmada').length,
+  //     pendientes: data.filter(i => i.estado === 'Pendiente').length,
+  //     canceladas: data.filter(i => i.estado === 'Cancelada').length,
+  //     total: data.length
+  //   });
+  // };
 
   // Filtrar inscripciones
   const filterInscripciones = (filter) => {
@@ -202,8 +209,8 @@ const ModalImageCarousel = ({ images }) => {
             </div>
           )}
         {filteredReservas.map((reserva) => (
-          <div className="inscripciones-container-misinscripciones">
-            <div className="inscripcion-card-misinscripciones" key={reserva.id}>
+          <div className="inscripciones-container-misinscripciones" key={reserva.id || reserva._id}>
+            <div className="inscripcion-card-misinscripciones">
               <div className="inscripcion-content-misinscripciones">
                 {Array.isArray(reserva.cabana?.imagen) && reserva.cabana.imagen.length > 0 ? (
                   <img
@@ -255,8 +262,7 @@ const ModalImageCarousel = ({ images }) => {
                     </div>
                     <div className="inscripcion-actions-misinscripciones">
                       <button className="btn-outline-misinscripciones" onClick={() => openModal(reserva)}>
-                        <i className="fas fa-eye"></i>
-                        Ver Detalles
+                        <i className="fas fa-eye" /> Ver Detalles
                       </button>
                       {/*<button className="btn-danger-misinscripciones">Cancelar</button>*/}
                     </div>
@@ -268,8 +274,22 @@ const ModalImageCarousel = ({ images }) => {
         ))}
         {/* Modal de Detalles */}
         {isModalOpen && currentInscripcion && (
-          <div className="modal-overlay-misinscripciones show" onClick={closeModal}>
-            <div className="modal-container-misinscripciones" onClick={e => e.stopPropagation()}>
+          <button
+            className="modal-overlay-misinscripciones show"
+            onClick={closeModal}
+            style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
+          >
+            <div 
+              className="modal-container-misinscripciones" 
+              onClick={e => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.stopPropagation();
+                }
+              }}
+              tabIndex={0}
+              role="dialog"
+            >
               <div className="modal-header-misinscripciones">
                 {Array.isArray(currentInscripcion.cabana?.imagen) && currentInscripcion.cabana.imagen.length > 0 ? (
                   <img
@@ -330,7 +350,7 @@ const ModalImageCarousel = ({ images }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         )}
       </div>
       <Footer />

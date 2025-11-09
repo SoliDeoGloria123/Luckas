@@ -9,7 +9,7 @@ const Perfil = () => {
     const [seccionActiva, setSeccionActiva] = useState("dashboard");
     const [isEditing, setIsEditing] = useState(false)
     const [showSuccess, setShowSuccess] = useState(false)
-    const [adminData, setAdminData] = useState({
+    const [adminData] = useState({
         nombre: "Steven",
         apellido: "Pedraza",
         tipoDocumento: "Cédula de Ciudadanía",

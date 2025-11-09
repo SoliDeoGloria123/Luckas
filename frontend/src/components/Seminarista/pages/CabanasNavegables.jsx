@@ -15,7 +15,7 @@ const CabanasSeminario = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cabanaSeleccionada, setCabanaSeleccionada] = useState(null);
-  const [feedback, setFeedback] = useState(null);
+
 
 
   const [selectedCabana, setSelectedCabana] = useState(null);
@@ -43,7 +43,7 @@ const CabanasSeminario = () => {
   };
 
   const goBack = () => {
-    window.history.back();
+    globalThis.history.back();
   };
 
   const filterCabins = (category) => {
@@ -65,8 +65,7 @@ const CabanasSeminario = () => {
         }
         setCabanas(cabanasArray);
       } catch (err) {
-        setError('No se pudieron cargar las cabañas.');
-
+        console.error('Error fetching cabins:', err);
       } finally {
         setLoading(false);
       }
@@ -240,8 +239,7 @@ const CabanasSeminario = () => {
               <div className="cabin-content">
                 <div className="cabin-header">
                   <div className="cabin-category">
-                    {cab.category === 'familiar' ? 'Familiar' :
-                      cab.category === 'individual' ? 'Individual' : 'Premium'}
+                     
                   </div>
                   <div className="cabin-rating">
                     <Star size={15} />

@@ -46,7 +46,7 @@ const Gestioncabana = () => {
 
   // Modal de edición
   const onEditar = (cabana) => {
-    setModalCabana('edit');
+    setModalMode('edit');
     setCurrentItem(cabana);
     setShowModal(true);
   };
@@ -55,21 +55,13 @@ const Gestioncabana = () => {
     setEventoDetalle(evento);
     setMostrarModalDetalle(true);
   };
-
-
-  // Insertar cabaña desde el botón vacío
-  const onInsertar = () => {
-    setModalCabana('create');
-    setCurrentItem(null);
-    setShowModal(true);
-  };
   const [cabanas, setCabanas] = useState([]);
-  const [cargando, setCargando] = useState(false);
+  const [cargando] = useState(false); // setCargando commented as unused
   const cabanasFiltradas = cabanas;
   const [categorias, setCategorias] = useState([]);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalCabana] = useState('create');
+  const [modalMode, setModalMode] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
 
 
@@ -79,11 +71,56 @@ const Gestioncabana = () => {
     navigate('/tesorero');
   };
 
+  // Funciones para navegación de imágenes
+  const prevImg = (cabanaId, imagenes) => {
+    setImgIndices(prev => ({
+      ...prev,
+      [cabanaId]: prev[cabanaId] > 0 ? prev[cabanaId] - 1 : imagenes.length - 1
+    }));
+  };
+
+  const nextImg = (cabanaId, imagenes) => {
+    setImgIndices(prev => ({
+      ...prev,
+      [cabanaId]: prev[cabanaId] < imagenes.length - 1 ? prev[cabanaId] + 1 : 0
+    }));
+  };
+
+  // Función para renderizar servicios
+  const renderServicios = (servicios) => {
+    const serviciosVisibles = servicios.slice(0, 4);
+    return (
+      <div className="flex flex-wrap gap-1">
+        {serviciosVisibles.map((servicio) => {
+          const servicioInfo = serviciosDisponibles.find(s => s.value === servicio);
+          return servicioInfo ? (
+            <span key={`servicio-${servicio}`} className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs">
+              {servicioInfo.icon}
+              {servicioInfo.label}
+            </span>
+          ) : (
+            <span key={`servicio-${servicio}`} className="px-2 py-1 bg-gray-50 text-gray-700 rounded text-xs">
+              {servicio}
+            </span>
+          );
+        })}
+        {servicios.length > 4 && (
+          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+            +{servicios.length - 4} más
+          </span>
+        )}
+      </div>
+    );
+  };
+
   // Obtener cabañas
   const obtenerCabanas = async () => {
     try {
       const data = await cabanaService.getAll();
-      let cabs = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+      let cabs = Array.isArray(data) ? data : [];
+      if (!Array.isArray(data) && Array.isArray(data.data)) {
+        cabs = data.data;
+      }
       setCabanas(cabs);
     } catch (err) {
       console.log("Error al obtener cabañas: " + err.message);
@@ -93,7 +130,10 @@ const Gestioncabana = () => {
     try {
       const data = await categorizacionService.getAll();
       // Soporta respuesta tipo {data: [...]} o array directa
-      let cats = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+      let cats = Array.isArray(data) ? data : [];
+      if (!Array.isArray(data) && Array.isArray(data.data)) {
+        cats = data.data;
+      }
       setCategorias(cats);
     } catch (err) {
       console.log("Error", "Error al obtener categorías: " + err.message);
@@ -126,7 +166,7 @@ const Gestioncabana = () => {
 
 
   const handleCreate = () => {
-    setModalCabana('create');
+    setModalMode('create');
     setCurrentItem(null);
     setShowModal(true);
   };
@@ -238,29 +278,32 @@ const Gestioncabana = () => {
 
         {/* Lista de Cabañas */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cargando ? (
-            <div className="col-span-full text-center py-12">
-              <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-slate-600">Cargando cabañas...</p>
-            </div>
-          ) : cabanasFiltradas.length > 0 ? (
-            cabanasPaginadas.map((cabana) => {
+          {(() => {
+            if (cargando) {
+              return (
+                <div className="col-span-full text-center py-12">
+                  <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-slate-600">Cargando cabañas...</p>
+                </div>
+              );
+            }
+            
+            if (cabanasFiltradas.length > 0) {
+              return cabanasPaginadas.map((cabana) => {
               const tipoCabana = obtenerTipoCabana(cabana.tipo);
-              // Definir variables y funciones dentro del map
+              // Definir variables dentro del map
               const imagenes = Array.isArray(cabana.imagen) ? cabana.imagen : [];
               const imgIndex = imgIndices[cabana._id] || 0;
-              const prevImg = () => {
-                setImgIndices(prev => ({
-                  ...prev,
-                  [cabana._id]: prev[cabana._id] > 0 ? prev[cabana._id] - 1 : imagenes.length - 1
-                }));
-              };
-              const nextImg = () => {
-                setImgIndices(prev => ({
-                  ...prev,
-                  [cabana._id]: prev[cabana._id] < imagenes.length - 1 ? prev[cabana._id] + 1 : 0
-                }));
-              };
+              // Determinar clases para el estado
+              let estadoClases = 'bg-gray-500/90 text-white';
+              if (cabana.estado === 'disponible') {
+                estadoClases = 'bg-emerald-500/90 text-white';
+              } else if (cabana.estado === 'ocupada') {
+                estadoClases = 'bg-red-500/90 text-white';
+              } else if (cabana.estado === 'mantenimiento') {
+                estadoClases = 'bg-amber-500/90 text-white';
+              }
+
               return (
                 <div key={cabana._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
                   {/* Imagen principal */}
@@ -276,14 +319,14 @@ const Gestioncabana = () => {
                         {imagenes.length > 1 && (
                           <>
                             <button
-                              onClick={prevImg}
+                              onClick={() => prevImg(cabana._id, imagenes)}
                               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
                               style={{ zIndex: 2 }}
                             >
                               {"<"}
                             </button>
                             <button
-                              onClick={nextImg}
+                              onClick={() => nextImg(cabana._id, imagenes)}
                               className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
                               style={{ zIndex: 2 }}
                             >
@@ -292,7 +335,7 @@ const Gestioncabana = () => {
                             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                               {imagenes.map((_, idx) => (
                                 <span
-                                  key={idx}
+                                  key={`indicator-${cabana._id}-${idx}`}
                                   className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
                                 />
                               ))}
@@ -317,14 +360,7 @@ const Gestioncabana = () => {
                           Destacada
                         </span>
                       )}
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${cabana.estado === 'disponible'
-                        ? 'bg-emerald-500/90 text-white'
-                        : cabana.estado === 'ocupada'
-                          ? 'bg-red-500/90 text-white'
-                          : cabana.estado === 'mantenimiento'
-                            ? 'bg-amber-500/90 text-white'
-                            : 'bg-gray-500/90 text-white'
-                        }`}>
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClases}`}>
                         {cabana.estado}
                       </span>
                     </div>
@@ -399,22 +435,7 @@ const Gestioncabana = () => {
                       </div>
 
                       {/* Servicios principales */}
-                      <div className="flex flex-wrap gap-2">
-                        {cabana.servicios?.slice(0, 4).map((servicio) => {
-                          const servicioInfo = serviciosDisponibles.find(s => s.value === servicio);
-                          return servicioInfo ? (
-                            <span key={servicio} className="flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-lg">
-                              {servicioInfo.icon}
-                              <span className="ml-1">{servicioInfo.label}</span>
-                            </span>
-                          ) : null;
-                        })}
-                        {cabana.servicios?.length > 4 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg">
-                            +{cabana.servicios.length - 4} más
-                          </span>
-                        )}
-                      </div>
+                      {cabana.servicios && cabana.servicios.length > 0 && renderServicios(cabana.servicios)}
 
                       {/* Disponibilidad */}
                       <div className="pt-3 border-t border-slate-200/50">
@@ -434,21 +455,24 @@ const Gestioncabana = () => {
                   </div>
                 </div>
               );
-            })
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <Home className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay cabañas</h3>
-              <p className="text-slate-500 mb-6">Comienza agregando tu primera cabaña o alojamiento</p>
-              <button
-                onClick={onInsertar}
-                className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
-              >
-                <Plus className="w-5 h-5 mr-2 inline" />
-                Crear Cabaña
-              </button>
-            </div>
-          )}
+            });
+            }
+            
+            return (
+              <div className="col-span-full text-center py-12">
+                <Home className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay cabañas</h3>
+                <p className="text-slate-500 mb-6">Comienza agregando tu primera cabaña o alojamiento</p>
+                <button
+                  onClick={handleCreate}
+                  className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
+                >
+                  <Plus className="w-5 h-5 mr-2 inline" />
+                  Crear Cabaña
+                </button>
+              </div>
+            );
+          })()}
         </div>
         {mostrarModalDetalle && eventoDetalle && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -471,7 +495,7 @@ const Gestioncabana = () => {
                 {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.length > 0 ? (
                   eventoDetalle.imagen.map((img, idx) => (
                     <img
-                      key={idx}
+                      key={`detalle-img-${eventoDetalle._id || eventoDetalle.id || 'default'}-${idx}`}
                       src={img}
                       alt={`Imagen ${idx + 1}`}
                       className="w-32 h-32 object-cover rounded-lg border"

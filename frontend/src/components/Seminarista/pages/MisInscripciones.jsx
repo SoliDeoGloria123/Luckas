@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import './MisInscripciones.css';
 import Header from '../Shared/Header';
 import Footer from '../../footer/Footer'
@@ -13,6 +14,28 @@ import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { inscripcionService } from '../../../services/inscripcionService';
+
+// Carrusel simple para el modal
+function ModalImageCarousel({ images }) {
+  const [index, setIndex] = useState(0);
+  const prev = () => setIndex(i => (i === 0 ? images.length - 1 : i - 1));
+  const next = () => setIndex(i => (i === images.length - 1 ? 0 : i + 1));
+  return (
+    <div className="modal-carousel-wrapper">
+      <button className="carousel-arrow left" onClick={prev}>&lt;</button>
+      <img
+        src={`http://localhost:3000/uploads/eventos/${images[index]}`}
+        alt={`Imagen ${index + 1}`}
+        className="modal-image-misinscripciones"
+        style={{ maxHeight: '260px', borderRadius: '12px' }}
+      />
+      <button className="carousel-arrow right" onClick={next}>&gt;</button>
+      <div className="carousel-indicator">
+        {index + 1} / {images.length}
+      </div>
+    </div>
+  );
+}
 
 const MisInscripciones = () => {
   // Estados
@@ -183,8 +206,8 @@ const MisInscripciones = () => {
 
         {/* Lista de inscripciones */}
         {filteredInscripciones.map((inscripcion) => (
-          <div className="inscripciones-container-misinscripciones">
-            <div className="inscripcion-card-misinscripciones" key={inscripcion.id}>
+          <div className="inscripciones-container-misinscripciones"  key={inscripcion.id || inscripcion._id}>
+            <div className="inscripcion-card-misinscripciones">
               <div className="inscripcion-content-misinscripciones">
                 {/* Carrusel de imágenes en la tarjeta */}
                 <div className="inscripcion-image-gallery">
@@ -235,8 +258,7 @@ const MisInscripciones = () => {
                     </div>
                     <div className="inscripcion-actions-misinscripciones">
                       <button className="btn-outline-misinscripciones" onClick={() => openModal(inscripcion)}>
-                        <i className="fas fa-eye"></i>
-                        Ver Detalles
+                        <i className="fas fa-eye"/>Ver Detalles
                       </button>
                       {/*<button className="btn-danger-misinscripciones">Cancelar</button>*/}
                     </div>
@@ -248,8 +270,21 @@ const MisInscripciones = () => {
         ))}
         {/* Modal de Detalles */}
         {isModalOpen && currentInscripcion && (
-          <div className="modal-overlay-misinscripciones show" onClick={closeModal}>
-            <div className="modal-container-misinscripciones" onClick={e => e.stopPropagation()}>
+          <button 
+            type="button"
+            className="modal-overlay-misinscripciones show" 
+            onClick={closeModal}
+            style={{ border: 'none', background: 'transparent', padding: 0, width: '100%', height: '100%' }}
+          >
+            <div 
+              className="modal-container-misinscripciones" 
+              onClick={e => e.stopPropagation()}
+              onKeyDown={(e) => { if (e.key === 'Escape') closeModal(); }}
+              role="dialog"
+              tabIndex={-1}
+              aria-modal="true"
+              aria-labelledby="modal-title"
+            >
               <div className="modal-header-misinscripciones">
                 {/* Carrusel de imágenes en el modal */}
                 <div className="modal-image-gallery">
@@ -285,7 +320,7 @@ const MisInscripciones = () => {
                   </span>
                 </div>
 
-                <h2 id="modalTitle" className="modal-title-misinscripciones">{currentInscripcion.titulo}</h2>
+                <h2 id="modal-title" className="modal-title-misinscripciones">{currentInscripcion.titulo}</h2>
 
                 <div className="modal-details-grid-misinscripciones">
                   <div className="modal-section-misinscripciones">
@@ -341,7 +376,7 @@ const MisInscripciones = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         )}
       </div>
       <Footer />
@@ -349,29 +384,19 @@ const MisInscripciones = () => {
   );
 };
 
+ModalImageCarousel.propTypes = {
+  images: PropTypes.arrayOf(PropTypes.string)
+};
+
+ModalImageCarousel.defaultProps = {
+  images: []
+};
+
 export default MisInscripciones;
 
-// Carrusel simple para el modal
-function ModalImageCarousel({ images }) {
-  const [index, setIndex] = useState(0);
-  const prev = () => setIndex(i => (i === 0 ? images.length - 1 : i - 1));
-  const next = () => setIndex(i => (i === images.length - 1 ? 0 : i + 1));
-  return (
-    <div className="modal-carousel-wrapper">
-      <button className="carousel-arrow left" onClick={prev}>&lt;</button>
-      <img
-        src={`http://localhost:3000/uploads/eventos/${images[index]}`}
-        alt={`Imagen ${index + 1}`}
-        className="modal-image-misinscripciones"
-        style={{ maxHeight: '260px', borderRadius: '12px' }}
-      />
-      <button className="carousel-arrow right" onClick={next}>&gt;</button>
-      <div className="carousel-indicator">
-        {index + 1} / {images.length}
-      </div>
-    </div>
-  );
-}
+
+
+
 
 // Carrusel para las imágenes en la tarjeta de inscripción
 

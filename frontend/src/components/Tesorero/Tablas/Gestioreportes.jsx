@@ -101,7 +101,7 @@ const Gestionreportes = () => {
                 mostrarAlerta('Éxito', 'Reporte exportado exitosamente', 'success');
             }, 2000);
         } catch (error) {
-            mostrarAlerta('Error', 'Error al exportar reporte', 'error');
+            console.log('Error al exportar reporte a PDF:', error);
         }
     };
 
@@ -114,7 +114,7 @@ const Gestionreportes = () => {
                 mostrarAlerta('Éxito', 'Reporte exportado exitosamente', 'success');
             }, 2000);
         } catch (error) {
-            mostrarAlerta('Error', 'Error al exportar reporte', 'error');
+            console.log('Error al exportar reporte a Excel:', error);
         }
     };
 
@@ -127,13 +127,71 @@ const Gestionreportes = () => {
                 datos: reportData,
                 fechaCreacion: new Date()
             };
-            
             // Aquí se guardaría el reporte usando el servicio
             mostrarAlerta('Éxito', 'Reporte guardado exitosamente', 'success');
         } catch (error) {
             mostrarAlerta('Error', 'Error al guardar reporte', 'error');
+            console.error('Error al guardar reporte:', error);
         }
     };
+
+    // Extraer la lógica ternaria de la sección de estadísticas
+    let statsContent;
+    if (loading) {
+        statsContent = (
+            <div className="loading-container">
+                <p>Cargando datos...</p>
+            </div>
+        );
+    } else if (dashboardData?.resumen) {
+        statsContent = (
+            <>
+                <div className="stat-card-reporte">
+                    <div className="stat-header-reporte">
+                        <h4>Usuarios Totales</h4>
+                    </div>
+                    <div className="stat-number-reporte">{dashboardData.resumen.totalUsuarios || 0}</div>
+                </div>
+                <div className="stat-card-reporte">
+                    <div className="stat-header-reporte">
+                        <h4>Reservas Totales</h4>
+                    </div>
+                    <div className="stat-number-reporte">{dashboardData.resumen.totalReservas || 0}</div>
+                </div>
+                <div className="stat-card-reporte">
+                    <div className="stat-header-reporte">
+                        <h4>Inscripciones Totales</h4>
+                    </div>
+                    <div className="stat-number-reporte">{dashboardData.resumen.totalInscripciones || 0}</div>
+                </div>
+                <div className="stat-card-reporte">
+                    <div className="stat-header-reporte">
+                        <h4>Eventos Activos</h4>
+                    </div>
+                    <div className="stat-number-reporte">{dashboardData.resumen.eventosProximos || 0}</div>
+                </div>
+                <div className="stat-card-reporte">
+                    <div className="stat-header-reporte">
+                        <h4>Solicitudes Pendientes</h4>
+                    </div>
+                    <div className="stat-number-reporte">{dashboardData.resumen.solicitudesPendientes || 0}</div>
+                </div>
+                <div className="stat-card-reporte">
+                    <div className="stat-header-reporte">
+                        <h4>Cabañas Disponibles</h4>
+                    </div>
+                    <div className="stat-number-reporte">{dashboardData.resumen.totalCabanas || 0}</div>
+                </div>
+            </>
+        );
+    } else {
+        statsContent = (
+            <div className="error-container">
+                <p>Error al cargar los datos</p>
+            </div>
+        );
+    }
+
     return (
         <>
         <Header/>
@@ -169,56 +227,8 @@ const Gestionreportes = () => {
                 </div>
             </div>
 
-
             <div className="stats-grid-reporte report-stats">
-                {loading ? (
-                    <div className="loading-container">
-                        <p>Cargando datos...</p>
-                    </div>
-                ) : dashboardData?.resumen ? (
-                    <>
-                        <div className="stat-card-reporte">
-                            <div className="stat-header-reporte">
-                                <h4>Usuarios Totales</h4>
-                            </div>
-                            <div className="stat-number-reporte">{dashboardData.resumen.totalUsuarios || 0}</div>
-                        </div>
-                        <div className="stat-card-reporte">
-                            <div className="stat-header-reporte">
-                                <h4>Reservas Totales</h4>
-                            </div>
-                            <div className="stat-number-reporte">{dashboardData.resumen.totalReservas || 0}</div>
-                        </div>
-                        <div className="stat-card-reporte">
-                            <div className="stat-header-reporte">
-                                <h4>Inscripciones Totales</h4>
-                            </div>
-                            <div className="stat-number-reporte">{dashboardData.resumen.totalInscripciones || 0}</div>
-                        </div>
-                        <div className="stat-card-reporte">
-                            <div className="stat-header-reporte">
-                                <h4>Eventos Activos</h4>
-                            </div>
-                            <div className="stat-number-reporte">{dashboardData.resumen.eventosProximos || 0}</div>
-                        </div>
-                        <div className="stat-card-reporte">
-                            <div className="stat-header-reporte">
-                                <h4>Solicitudes Pendientes</h4>
-                            </div>
-                            <div className="stat-number-reporte">{dashboardData.resumen.solicitudesPendientes || 0}</div>
-                        </div>
-                        <div className="stat-card-reporte">
-                            <div className="stat-header-reporte">
-                                <h4>Cabañas Disponibles</h4>
-                            </div>
-                            <div className="stat-number-reporte">{dashboardData.resumen.totalCabanas || 0}</div>
-                        </div>
-                    </>
-                ) : (
-                    <div className="error-container">
-                        <p>Error al cargar los datos</p>
-                    </div>
-                )}
+                {statsContent}
             </div>
 
             <div className="report-info-reporte">

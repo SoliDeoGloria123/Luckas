@@ -16,7 +16,7 @@ const ProgramasAcademicos = () => {
     const [sidebarAbierto, setSidebarAbierto] = useState(true);
     const [seccionActiva, setSeccionActiva] = useState("dashboard");
     const [mostrarModal, setMostrarModal] = useState(false);
-    const [error, setError] = useState('');
+    // const [error, setError] = useState(''); // Variable no utilizada - comentada para evitar warnings
     const [cargando, setCargando] = useState(false);
     const [filtros, setFiltros] = useState({
         tipo: '',
@@ -71,7 +71,7 @@ const ProgramasAcademicos = () => {
             }
         } catch (error) {
             console.error('Error al cargar programas:', error);
-            setError('Error al cargar los programas académicos');
+        
         } finally {
             setLoading(false);
         }
@@ -93,95 +93,16 @@ const ProgramasAcademicos = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            setCargando(true);
-            setError('');
 
-            console.log('=== DEBUG PROGRAMA ACADÉMICO ===');
-            console.log('FormData original:', formData);
-            console.log('Categorías disponibles:', categorias);
-            console.log('Token disponible:', !!localStorage.getItem('token'));
-
-            // Buscar la categoría correspondiente
-            let categoriaId = null;
-            if (formData.tipo && categorias.length > 0) {
-                const categoriaEncontrada = categorias.find(cat =>
-                    cat.tipo === 'programa' && formData.tipo.includes('programa') ||
-                    cat.tipo === 'curso' && formData.tipo === 'curso'
-                );
-                categoriaId = categoriaEncontrada ? categoriaEncontrada._id : categorias[0]._id;
-            } else if (categorias.length > 0) {
-                categoriaId = categorias[0]._id; // usar primera categoría como fallback
-            }
-
-            console.log('Categoria seleccionada:', categoriaId);
-
-            if (!categoriaId) {
-                setError('No hay categorías disponibles. Por favor, contacte al administrador.');
-                return;
-            }
-
-            // Mapear campos del frontend al backend
-            const dataToSend = {
-                nombre: formData.titulo,
-                descripcion: formData.descripcion,
-                categoria: categoriaId,
-                modalidad: formData.modalidad,
-                duracion: formData.duracion,
-                precio: Number.parseFloat(formData.precio) || 0,
-                fechaInicio: formData.fechaInicio,
-                fechaFin: formData.fechaFin,
-                cuposDisponibles: Number.parseInt(formData.cupos) || 0,
-                profesor: formData.profesor,
-                nivel: formData.nivel || 'intermedio',
-                requisitos: formData.requisitos.filter(req => req.trim() !== ''),
-                objetivos: formData.objetivos.filter(obj => obj.trim() !== ''),
-                metodologia: formData.metodologia || '',
-                evaluacion: formData.evaluacion || '',
-                certificacion: formData.certificacion === 'si' || formData.certificacion === true,
-                destacado: formData.destacado || false,
-                estado: 'activo'
-            };
-
-            console.log('Datos a enviar:', dataToSend);
-
-            let response;
-            if (modoEdicion && programaSeleccionado) {
-                console.log('Actualizando programa:', programaSeleccionado._id);
-                response = await programasAcademicosService.updatePrograma(programaSeleccionado._id, dataToSend);
-            } else {
-                console.log('Creando nuevo programa...');
-                response = await programasAcademicosService.createPrograma(dataToSend);
-            }
-
-            console.log('Respuesta del servidor:', response);
-
-            if (response.success) {
-                await cargarProgramas();
-                cerrarModal();
-                mostrarMensaje(modoEdicion ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente', 'success');
-            } else {
-                setError(response.message || 'Error al guardar el programa');
-            }
-        } catch (error) {
-            console.error('Error al guardar programa:', error);
-            setError(error.response?.data?.message || error.message || 'Error al guardar el programa');
-        } finally {
-            setCargando(false);
-        }
-    };
 
     const eliminarPrograma = async (id) => {
-        if (!window.confirm('¿Estás seguro de que deseas eliminar este programa?')) return;
+        if (!globalThis.confirm('¿Estás seguro de que deseas eliminar este programa?')) return;
 
         try {
             await programasAcademicosService.deletePrograma(id);
             cargarProgramas();
             mostrarMensaje('Programa eliminado exitosamente', 'success');
         } catch (error) {
-            setError('Error al eliminar el programa');
             console.error('Error al eliminar programa:', error);
         }
     };
@@ -233,67 +154,84 @@ const ProgramasAcademicos = () => {
         setMostrarModal(false);
         setModoEdicion(false);
         setProgramaSeleccionado(null);
-        setError('');
+        // setError(''); // Comentado porque setError no está disponible
+    };
+
+    // Funciones auxiliares para reducir complejidad cognitiva
+    const encontrarCategoriaId = () => {
+        if (!formData.tipo || !categorias.length) {
+            return categorias.length > 0 ? categorias[0]._id : null;
+        }
+        
+        const categoriaEncontrada = categorias.find(cat =>
+            cat.tipo === 'programa' && formData.tipo.includes('programa') ||
+            cat.tipo === 'curso' && formData.tipo === 'curso'
+        );
+        
+        return categoriaEncontrada ? categoriaEncontrada._id : categorias[0]._id;
+    };
+
+    const mapearDatosParaEnvio = (categoriaId) => ({
+        nombre: formData.titulo,
+        descripcion: formData.descripcion,
+        categoria: categoriaId,
+        modalidad: formData.modalidad,
+        duracion: formData.duracion,
+        precio: Number.parseFloat(formData.precio) || 0,
+        fechaInicio: formData.fechaInicio,
+        fechaFin: formData.fechaFin,
+        cuposDisponibles: Number.parseInt(formData.cupos) || 0,
+        profesor: formData.profesor,
+        nivel: 'básico',
+        requisitos: formData.requisitos ? formData.requisitos.filter(req => req.trim() !== '') : [],
+        objetivos: formData.objetivos ? formData.objetivos.filter(obj => obj.trim() !== '') : [],
+        metodologia: formData.metodologia || '',
+        evaluacion: formData.evaluacion || '',
+        certificacion: formData.certificacion === 'si' || formData.certificacion === true,
+        destacado: formData.destacado || false,
+        estado: 'activo'
+    });
+
+    const ejecutarOperacionPrograma = async (dataToSend) => {
+        if (modoEdicion && programaSeleccionado) {
+            console.log('Actualizando programa:', programaSeleccionado._id);
+            return await programasAcademicosService.updatePrograma(programaSeleccionado._id, dataToSend);
+        } else {
+            console.log('Creando nuevo programa...');
+            return await programasAcademicosService.createPrograma(dataToSend);
+        }
+    };
+
+    const manejarErrorSubmit = (error) => {
+        console.error('Error completo al guardar programa:', error);
+        if (error.response) {
+            console.error('Respuesta de error:', error.response.data);
+           
+        } else {
+            console.error('Mensaje de error:', error.message);
+        }
     };
 
     const handleSubmitModal = async (e) => {
         e.preventDefault();
         setCargando(true);
+        
         try {
             console.log('=== DEBUG MODAL SUBMIT ===');
             console.log('FormData del modal:', formData);
             console.log('Categorías disponibles:', categorias);
 
-            // Buscar la categoría correspondiente
-            let categoriaId = null;
-            if (formData.tipo && categorias.length > 0) {
-                const categoriaEncontrada = categorias.find(cat =>
-                    cat.tipo === 'programa' && formData.tipo.includes('programa') ||
-                    cat.tipo === 'curso' && formData.tipo === 'curso'
-                );
-                categoriaId = categoriaEncontrada ? categoriaEncontrada._id : categorias[0]._id;
-            } else if (categorias.length > 0) {
-                categoriaId = categorias[0]._id; // usar primera categoría como fallback
-            }
-
+            const categoriaId = encontrarCategoriaId();
+            
             if (!categoriaId) {
-                setError('No hay categorías disponibles. Por favor, contacte al administrador.');
+                console.error('No hay categorías disponibles. Por favor, contacte al administrador.');
                 return;
             }
 
-            // Mapear campos del frontend al backend correctamente
-            const dataToSend = {
-                nombre: formData.titulo,
-                descripcion: formData.descripcion,
-                categoria: categoriaId,
-                modalidad: formData.modalidad,
-                duracion: formData.duracion,
-                    precio: Number.parseFloat(formData.precio) || 0,
-                fechaInicio: formData.fechaInicio,
-                fechaFin: formData.fechaFin,
-                    cuposDisponibles: Number.parseInt(formData.cupos) || 0,
-                profesor: formData.profesor,
-                nivel: 'básico', // valor por defecto
-                requisitos: formData.requisitos ? formData.requisitos.filter(req => req.trim() !== '') : [],
-                objetivos: formData.objetivos ? formData.objetivos.filter(obj => obj.trim() !== '') : [],
-                metodologia: formData.metodologia || '',
-                evaluacion: formData.evaluacion || '',
-                certificacion: formData.certificacion === 'si' || formData.certificacion === true,
-                destacado: formData.destacado || false,
-                estado: 'activo'
-            };
-
+            const dataToSend = mapearDatosParaEnvio(categoriaId);
             console.log('Datos mapeados para enviar:', dataToSend);
 
-            let response;
-            if (modoEdicion && programaSeleccionado) {
-                console.log('Actualizando programa:', programaSeleccionado._id);
-                response = await programasAcademicosService.updatePrograma(programaSeleccionado._id, dataToSend);
-            } else {
-                console.log('Creando nuevo programa...');
-                response = await programasAcademicosService.createPrograma(dataToSend);
-            }
-
+            const response = await ejecutarOperacionPrograma(dataToSend);
             console.log('Respuesta del servidor:', response);
 
             if (response.success) {
@@ -304,16 +242,10 @@ const ProgramasAcademicos = () => {
                     'success'
                 );
             } else {
-                setError(response.message || 'Error al guardar el programa');
+                console.error('Error al guardar el programa:', response.message);
             }
         } catch (error) {
-            console.error('Error completo al guardar programa:', error);
-            if (error.response) {
-                console.error('Respuesta de error:', error.response.data);
-                setError(error.response.data.message || 'Error del servidor');
-            } else {
-                setError(error.message || 'Error al guardar el programa');
-            }
+            manejarErrorSubmit(error);
         } finally {
             setCargando(false);
         }
@@ -496,12 +428,12 @@ const ProgramasAcademicos = () => {
                                 <p className="mb-2"><strong>Nivel:</strong> {programaDetalle.nivel}</p>
                                 <p className="mb-2"><strong>Requisitos:</strong> {programaDetalle.requisitos && programaDetalle.requisitos.length > 0 ? (
                                     <ul className="list-disc ml-6">
-                                        {programaDetalle.requisitos.map((req, i) => <li key={i}>{req}</li>)}
+                                        {programaDetalle.requisitos.map((req, idx) => <li key={req + '-' + idx}>{req}</li>)}
                                     </ul>
                                 ) : 'Ninguno'}</p>
                                 <p className="mb-2"><strong>Objetivos:</strong> {programaDetalle.objetivos && programaDetalle.objetivos.length > 0 ? (
                                     <ul className="list-disc ml-6">
-                                        {programaDetalle.objetivos.map((obj, i) => <li key={i}>{obj}</li>)}
+                                        {programaDetalle.objetivos.map((obj, idx) => <li key={obj + '-' + idx}>{obj}</li>)}
                                     </ul>
                                 ) : 'Ninguno'}</p>
                                 <p className="mb-2"><strong>Metodología:</strong> {programaDetalle.metodologia}</p>
@@ -513,8 +445,8 @@ const ProgramasAcademicos = () => {
                                 <p className="mb-2"><strong>Fecha de actualización:</strong> {programaDetalle.updatedAt ? new Date(programaDetalle.updatedAt).toLocaleDateString() : ''}</p>
                                 <p className="mb-2"><strong>Inscripciones:</strong> {programaDetalle.inscripciones && programaDetalle.inscripciones.length > 0 ? (
                                     <ul className="list-disc ml-6">
-                                        {programaDetalle.inscripciones.map((insc, i) => (
-                                            <li key={i}>
+                                        {programaDetalle.inscripciones.map((insc, idx) => (
+                                            <li key={(insc.usuario?._id || insc.usuario || '') + '-' + (insc.fechaInscripcion || idx)}>
                                                 Usuario: {insc.usuario?.nombre || insc.usuario} | Estado: {insc.estado} | Fecha: {insc.fechaInscripcion ? new Date(insc.fechaInscripcion).toLocaleDateString() : ''}
                                             </li>
                                         ))}

@@ -13,6 +13,16 @@ const UsuarioModal = ({
 }) => {
   if (!mostrar) return null;
 
+  // Extraer el valor de fechaNacimiento a una variable para evitar ternarios anidados
+  let fechaNacimientoValue = '';
+  if (modoEdicion) {
+    if (usuarioSeleccionado?.fechaNacimiento) {
+      fechaNacimientoValue = new Date(usuarioSeleccionado.fechaNacimiento).toISOString().split('T')[0];
+    }
+  } else {
+    fechaNacimientoValue = nuevoUsuario.fechaNacimiento;
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
@@ -137,13 +147,7 @@ const UsuarioModal = ({
                 id="fechaNacimiento"
                 type="date"
                 className="input-fecha-moderno"
-                value={
-                  modoEdicion
-                    ? (usuarioSeleccionado?.fechaNacimiento
-                      ? new Date(usuarioSeleccionado.fechaNacimiento).toISOString().split('T')[0]
-                      : '')
-                    : nuevoUsuario.fechaNacimiento
-                }
+                value={fechaNacimientoValue}
                 onChange={e =>
                   modoEdicion
                     ? setUsuarioSeleccionado({ ...usuarioSeleccionado, fechaNacimiento: e.target.value })

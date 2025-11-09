@@ -29,12 +29,11 @@ export const authService = {
       console.error('❌ Response data:', error.response?.data);
       console.error('❌ Status:', error.response?.status);
       
-      // Lanzar el error con información más específica
-      throw {
-        message: error.response?.data?.message || 'Error de conexión',
-        status: error.response?.status || 500,
-        data: error.response?.data
-      };
+      // Lanzar un Error con información adicional
+      const customError = new Error(error.response?.data?.message || 'Error de conexión');
+      customError.status = error.response?.status || 500;
+      customError.data = error.response?.data;
+      throw customError;
     }
   },
 };

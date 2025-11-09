@@ -90,152 +90,159 @@ const generateChartData = (activeReport) => {
   return { trend, distribution };
 };
 
-// Función auxiliar para generar gráficas desde datos directos cuando no hay estadísticas
-const generateChartsFromRawData = (activeReport) => {
-  const datos = activeReport.datos;
-  let dataArray = [];
+// Funciones auxiliares para reducir complejidad cognitiva
+const extraerDataArray = (datos) => {
+  if (datos.usuarios) return datos.usuarios;
+  if (datos.inscripciones) return datos.inscripciones;
+  if (datos.reservas) return datos.reservas;
+  if (datos.eventos) return datos.eventos;
+  if (datos.solicitudes) return datos.solicitudes;
+  if (Array.isArray(datos)) return datos;
+  return [];
+};
 
-
-  // Identificar el array de datos según el tipo de reporte
-  const tipoReporte = activeReport.tipo || activeReport.type;
-
-  if (datos.usuarios) {
-    dataArray = datos.usuarios;
-  } else if (datos.inscripciones) {
-    dataArray = datos.inscripciones;
-  } else if (datos.reservas) {
-    dataArray = datos.reservas;
-  } else if (datos.eventos) {
-    dataArray = datos.eventos;
-  } else if (datos.solicitudes) {
-    dataArray = datos.solicitudes;
-  } else if (Array.isArray(datos)) {
-    dataArray = datos;
-   
+const generarDistribucionUsuarios = (dataArray) => {
+  const roleCount = {};
+  for (const user of dataArray) {
+    const role = user.rol || user.role || user.roles?.[0] || 'Sin rol';
+    roleCount[role] = (roleCount[role] || 0) + 1;
   }
+  return Object.entries(roleCount).map(([name, value]) => ({ name, value }));
+};
 
-  if (!dataArray || dataArray.length === 0) {
-
-    return { trend: [], distribution: [] };
+const generarDistribucionEventos = (dataArray) => {
+  const statusCount = { 'Activos': 0, 'Inactivos': 0 };
+  for (const evento of dataArray) {
+    if (evento.active || evento.activo) {
+      statusCount['Activos'] += 1;
+    } else {
+      statusCount['Inactivos'] += 1;
+    }
   }
+  return Object.entries(statusCount)
+    .filter(([, value]) => value > 0)
+    .map(([name, value]) => ({ name, value }));
+};
 
-
-  // Generar distribución basada en el tipo de reporte
-  let distribution = [];
-
-  if (tipoReporte === 'usuarios') {
-    // Distribución por rol
-    const roleCount = {};
-    dataArray.forEach(user => {
-      const role = user.rol || user.role || user.roles?.[0] || 'Sin rol';
-      roleCount[role] = (roleCount[role] || 0) + 1;
-    });
-    distribution = Object.entries(roleCount).map(([name, value]) => ({ name, value }));
-  
-  } else if (tipoReporte === 'eventos') {
-    // Distribución por estado activo/inactivo
-    const statusCount = { 'Activos': 0, 'Inactivos': 0 };
-    dataArray.forEach(evento => {
-      if (evento.active || evento.activo) {
-        statusCount['Activos'] += 1;
-      } else {
-        statusCount['Inactivos'] += 1;
-      }
-    });
-    distribution = Object.entries(statusCount)
-      .filter(([, value]) => value > 0)
-      .map(([name, value]) => ({ name, value }));
-   
-  } else if (tipoReporte === 'reservas') {
-    // Distribución por estado
-    const statusCount = {};
-    dataArray.forEach(reserva => {
-      const status = reserva.estado || reserva.status || 'Sin estado';
-      statusCount[status] = (statusCount[status] || 0) + 1;
-    });
-    distribution = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-    
-  } else if (tipoReporte === 'inscripciones') {
-    // Distribución por referencia (programa o evento)
-    const programCount = {};
-    dataArray.forEach(inscripcion => {
-      const programa = inscripcion.referencia?.name || inscripcion.referencia?.nombre || inscripcion.programa || inscripcion.evento?.name || inscripcion.evento?.nombre || 'Sin referencia';
-      programCount[programa] = (programCount[programa] || 0) + 1;
-    });
-    distribution = Object.entries(programCount).map(([name, value]) => ({ name, value }));
-  
-  } else if (tipoReporte === 'solicitudes') {
-    // Distribución por estado
-    const statusCount = {};
-    dataArray.forEach(solicitud => {
-      const status = solicitud.estado || 'Sin estado';
-      statusCount[status] = (statusCount[status] || 0) + 1;
-    });
-    distribution = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-
-  } else if (tipoReporte === 'cabañas' || tipoReporte === 'cabanas') {
-    // Distribución por disponibilidad
-    const statusCount = {};
-    dataArray.forEach(cabana => {
-      const status = cabana.disponible ? 'Disponibles' : 'No disponibles';
-      statusCount[status] = (statusCount[status] || 0) + 1;
-    });
-    distribution = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-    
-  } else if (tipoReporte === 'tareas') {
-    // Distribución por estado
-    const statusCount = {};
-    dataArray.forEach(tarea => {
-      const status = tarea.estado || tarea.completada ? 'Completadas' : 'Pendientes';
-      statusCount[status] = (statusCount[status] || 0) + 1;
-    });
-    distribution = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-   
-  } else if (tipoReporte === 'programas') {
-    // Distribución por estado activo/inactivo
-    const statusCount = { 'Activos': 0, 'Inactivos': 0 };
-    dataArray.forEach(programa => {
-      if (programa.activo) {
-        statusCount['Activos'] += 1;
-      } else {
-        statusCount['Inactivos'] += 1;
-      }
-    });
-    distribution = Object.entries(statusCount)
-      .filter(([, value]) => value > 0)
-      .map(([name, value]) => ({ name, value }));
-  
+const generarDistribucionReservas = (dataArray) => {
+  const statusCount = {};
+  for (const reserva of dataArray) {
+    const status = reserva.estado || reserva.status || 'Sin estado';
+    statusCount[status] = (statusCount[status] || 0) + 1;
   }
+  return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+};
 
-  // Generar tendencia basada en fechas
-  let trend = [];
+const generarDistribucionInscripciones = (dataArray) => {
+  const programCount = {};
+  for (const inscripcion of dataArray) {
+    const programa = inscripcion.referencia?.name || inscripcion.referencia?.nombre || inscripcion.programa || inscripcion.evento?.name || inscripcion.evento?.nombre || 'Sin referencia';
+    programCount[programa] = (programCount[programa] || 0) + 1;
+  }
+  return Object.entries(programCount).map(([name, value]) => ({ name, value }));
+};
+
+const generarDistribucionSolicitudes = (dataArray) => {
+  const statusCount = {};
+  for (const solicitud of dataArray) {
+    const status = solicitud.estado || 'Sin estado';
+    statusCount[status] = (statusCount[status] || 0) + 1;
+  }
+  return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+};
+
+const generarDistribucionCabanas = (dataArray) => {
+  const statusCount = {};
+  for (const cabana of dataArray) {
+    const status = cabana.disponible ? 'Disponibles' : 'No disponibles';
+    statusCount[status] = (statusCount[status] || 0) + 1;
+  }
+  return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+};
+
+const generarDistribucionTareas = (dataArray) => {
+  const statusCount = {};
+  for (const tarea of dataArray) {
+    const status = tarea.estado || tarea.completada ? 'Completadas' : 'Pendientes';
+    statusCount[status] = (statusCount[status] || 0) + 1;
+  }
+  return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+};
+
+const generarDistribucionProgramas = (dataArray) => {
+  const statusCount = { 'Activos': 0, 'Inactivos': 0 };
+  for (const programa of dataArray) {
+    if (programa.activo) {
+      statusCount['Activos'] += 1;
+    } else {
+      statusCount['Inactivos'] += 1;
+    }
+  }
+  return Object.entries(statusCount)
+    .filter(([, value]) => value > 0)
+    .map(([name, value]) => ({ name, value }));
+};
+
+const obtenerDistribucionPorTipo = (tipoReporte, dataArray) => {
+  const distribuidores = {
+    'usuarios': generarDistribucionUsuarios,
+    'eventos': generarDistribucionEventos,
+    'reservas': generarDistribucionReservas,
+    'inscripciones': generarDistribucionInscripciones,
+    'solicitudes': generarDistribucionSolicitudes,
+    'cabañas': generarDistribucionCabanas,
+    'cabanas': generarDistribucionCabanas,
+    'tareas': generarDistribucionTareas,
+    'programas': generarDistribucionProgramas
+  };
+
+  const distribuidor = distribuidores[tipoReporte];
+  return distribuidor ? distribuidor(dataArray) : [];
+};
+
+const extraerFechaDelItem = (item) => {
+  if (item.fechaEvento) return new Date(item.fechaEvento);
+  if (item.createdAt) return new Date(item.createdAt);
+  if (item.fechaRegistro) return new Date(item.fechaRegistro);
+  if (item.fecha) return new Date(item.fecha);
+  if (item.fechaInicio) return new Date(item.fechaInicio);
+  return null;
+};
+
+const generarTendenciaTemporal = (dataArray) => {
   const monthCount = {};
 
-  dataArray.forEach(item => {
-    let date = null;
-
-    // Intentar diferentes campos de fecha según el tipo de datos
-    if (item.fechaEvento) date = new Date(item.fechaEvento);
-    else if (item.createdAt) date = new Date(item.createdAt);
-    else if (item.fechaRegistro) date = new Date(item.fechaRegistro);
-    else if (item.fecha) date = new Date(item.fecha);
-    else if (item.fechaInicio) date = new Date(item.fechaInicio);
-
+  for (const item of dataArray) {
+    const date = extraerFechaDelItem(item);
+    
     if (date && !Number.isNaN(date.getTime())) {
       const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`;
       monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
     }
-  });
+  }
 
-  trend = Object.entries(monthCount)
+  return Object.entries(monthCount)
     .sort(([a], [b]) => {
       const [aMonth, aYear] = a.split('/').map(Number);
       const [bMonth, bYear] = b.split('/').map(Number);
       return aYear - bYear || aMonth - bMonth;
     })
     .map(([mes, total]) => ({ mes, total }));
+};
 
+// Función principal simplificada para generar gráficas desde datos directos
+const generateChartsFromRawData = (activeReport) => {
+  const datos = activeReport.datos;
+  const tipoReporte = activeReport.tipo || activeReport.type;
+  
+  const dataArray = extraerDataArray(datos);
+  
+  if (!dataArray || dataArray.length === 0) {
+    return { trend: [], distribution: [] };
+  }
 
+  const distribution = obtenerDistribucionPorTipo(tipoReporte, dataArray);
+  const trend = generarTendenciaTemporal(dataArray);
 
   return { trend, distribution };
 };
@@ -382,29 +389,35 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 bg-white">
-                        {paginatedData.map((row, idx) => (
-                          <tr key={idx} className="hover:bg-gray-50">
-                            {Object.values(row).map((value, cellIdx) => (
-                              <td key={cellIdx} className="px-4 py-3 text-sm text-gray-900">
-                                {String(value)}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
+                        {paginatedData.map((row, idx) => {
+                          const rowKey = row._id || row.id || Object.values(row).join('-') + '-' + idx;
+                          return (
+                            <tr key={rowKey} className="hover:bg-gray-50">
+                              {Object.entries(row).map(([colKey, value]) => (
+                                <td key={rowKey + '-' + colKey} className="px-4 py-3 text-sm text-gray-900">
+                                  {String(value)}
+                                </td>
+                              ))}
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                     {/* Tarjetas responsive para móvil */}
                     <div className="md:hidden">
-                      {paginatedData.map((row, idx) => (
-                        <div key={idx} className="bg-white rounded-lg shadow p-3 mb-2 border">
-                          {Object.entries(row).map(([key, value]) => (
-                            <div key={key} className="flex justify-between py-1 text-sm">
-                              <span className="font-semibold text-gray-700">{key}:</span>
-                              <span className="text-gray-900">{String(value)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ))}
+                      {paginatedData.map((row, idx) => {
+                        const rowKey = row._id || row.id || Object.values(row).join('-') + '-' + idx;
+                        return (
+                          <div key={rowKey} className="bg-white rounded-lg shadow p-3 mb-2 border">
+                            {Object.entries(row).map(([key, value]) => (
+                              <div key={key} className="flex justify-between py-1 text-sm">
+                                <span className="font-semibold text-gray-700">{key}:</span>
+                                <span className="text-gray-900">{String(value)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })}
                     </div>
                   </>
                 ) : (
@@ -493,7 +506,7 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
                           dataKey="value"
                         >
                           {generateChartData(activeReport).distribution.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell key={`cell-${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
                         <Tooltip />

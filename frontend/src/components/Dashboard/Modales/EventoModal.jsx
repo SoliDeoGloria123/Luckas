@@ -1,4 +1,4 @@
-  import React, { useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 
@@ -21,7 +21,7 @@ const EventoModal = ({
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
   const todayStr = `${yyyy}-${mm}-${dd}`;
-  const [progress, setProgress] = useState(0);
+  const [setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
 
@@ -29,7 +29,7 @@ const EventoModal = ({
   const handleFileSelection = (files) => {
     const validFiles = [];
     const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    const allowedTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif']);
 
     for (const file of Array.from(files)) {
       if (!allowedTypes.includes(file.type)) continue;
@@ -84,16 +84,16 @@ const EventoModal = ({
   };
 
   const handleSubmit = (e) => {
-  e.preventDefault();
-  const fecha = modoEdicion
-    ? eventoSeleccionado?.fechaEvento
-    : nuevoEvento.fechaEvento;
-  if (fecha && fecha < todayStr) {
-    alert('La fecha del evento no puede ser anterior a hoy');
-    return;
-  }
-  onSubmit();
-};
+    e.preventDefault();
+    const fecha = modoEdicion
+      ? eventoSeleccionado?.fechaEvento
+      : nuevoEvento.fechaEvento;
+    if (fecha && fecha < todayStr) {
+      alert('La fecha del evento no puede ser anterior a hoy');
+      return;
+    }
+    onSubmit();
+  };
   if (!mostrar) return null;
 
   return (

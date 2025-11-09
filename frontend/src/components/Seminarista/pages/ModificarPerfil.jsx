@@ -93,10 +93,18 @@ const ModificarPerfil = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-perfil" onClick={e => e.stopPropagation()}>
+    <button 
+      className="modal-overlay" 
+      onClick={onClose}
+      style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
+    >
+      <dialog 
+        className="modal-perfil" 
+        aria-labelledby="modal-title"
+        open
+      >
         <div className="modal-header">
-          <h2>👤 Modificar Perfil</h2>
+          <h2 id="modal-title">👤 Modificar Perfil</h2>
           <button className="btn-close" onClick={onClose}>✕</button>
         </div>
 
@@ -203,8 +211,8 @@ const ModificarPerfil = ({ onClose, onSuccess }) => {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </dialog>
+    </button>
   );
 };
 ModificarPerfil.propTypes = {

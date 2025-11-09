@@ -1,6 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+const renderEstadoActivo = (activo) => {
+  if (activo === undefined) return 'N/A';
+  return activo ? 'Activo' : 'Desactivado';
+};
 
 const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
   <div className="tabla-responsive">
@@ -70,7 +74,7 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
                     ? reserva.solicitud?._id || "N/A"
                     : reserva.solicitud || "N/A"}
                 </td>
-                <td>{reserva.activo === undefined ? 'N/A' : reserva.activo ? 'Activo' : 'Desactivado'}</td>
+                <td>{renderEstadoActivo(reserva.activo)}</td>
                 <td>{reserva.createdAt ? new Date(reserva.createdAt).toLocaleDateString() : "N/A"}</td>
                 <td>{reserva.updatedAt ? new Date(reserva.updatedAt).toLocaleDateString() : "N/A"}</td>
                 <td>

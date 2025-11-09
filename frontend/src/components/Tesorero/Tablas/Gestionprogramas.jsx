@@ -63,11 +63,9 @@ const Gestioncursos = () => {
     }
   };
 
-  const [error, setError] = useState(null);
   const obtenerCursos = () => { };
   const formatearPrecio = (precio) => `$${precio}`;
-  const [loading, setLoading] = useState(true);
-  const [filtros, setFiltros] = useState({
+  const [filtros] = useState({ // setFiltros commented as unused
     tipo: '',
     modalidad: '',
     busqueda: ''
@@ -227,21 +225,21 @@ const Gestioncursos = () => {
   // Función de búsqueda por nombre, instructor o categoría
   const handleSearch = (searchValue) => {
     setSearchTerm(searchValue);
-    if (!searchValue.trim()) {
+    const trimmedValue = searchValue.trim();
+    if (trimmedValue.length === 0) {
       setCursosFiltrados(cursos);
-    } else {
-      const searchLower = searchValue.toLowerCase().trim();
-      const filteredCursos = cursos.filter(curso => {
-        const nombre = curso.nombre?.toLowerCase();
-        const instructor = curso.instructor?.toLowerCase();
-        const categoria = curso.categoria?.toLowerCase();
-
-        return nombre?.includes(searchLower) ||
-          instructor?.includes(searchLower) ||
-          categoria?.includes(searchLower);
-      });
-      setCursosFiltrados(filteredCursos);
+      return;
     }
+    const searchLower = trimmedValue.toLowerCase();
+    const filteredCursos = cursos.filter(curso => {
+      const nombre = curso.nombre?.toLowerCase();
+      const instructor = curso.instructor?.toLowerCase();
+      const categoria = curso.categoria?.toLowerCase();
+      return nombre?.includes(searchLower) ||
+        instructor?.includes(searchLower) ||
+        categoria?.includes(searchLower);
+    });
+    setCursosFiltrados(filteredCursos);
   };
 
   useEffect(() => {
@@ -375,44 +373,56 @@ const Gestioncursos = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cargando ? (
-            <div className="col-span-full text-center py-12">
-              <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-slate-600">Cargando programas académicos...</p>
-            </div>
-          ) : programas.length > 0 ? (
-            cursosPaginados.map((programa) => (
-              <div key={programa._id} className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-                {/* Header del programa */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-3 rounded-xl ${programa.tipo === 'curso'
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
-                      : 'bg-gradient-to-r from-purple-600 to-violet-600'
-                      }`}>
-                      {programa.tipo === 'curso' ? (
-                        <BookOpen className="w-6 h-6 text-white" />
-                      ) : (
-                        <GraduationCap className="w-6 h-6 text-white" />
-                      )}
+          {(() => {
+            if (cargando) {
+              return (
+                <div className="col-span-full text-center py-12">
+                  <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-slate-600">Cargando programas académicos...</p>
+                </div>
+              );
+            }
+            
+            if (programas.length > 0) {
+              return cursosPaginados.map((programa) => {
+                // Determinar clases para el tipo de programa
+                const tipoClases = programa.tipo === 'curso'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
+                  : 'bg-gradient-to-r from-purple-600 to-violet-600';
+
+                const tipoLabelClases = programa.tipo === 'curso'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-purple-100 text-purple-800';
+
+                // Determinar clases para el estado del programa
+                let estadoClases = 'bg-amber-100 text-amber-800';
+                if (programa.estado === 'activo') {
+                  estadoClases = 'bg-emerald-100 text-emerald-800';
+                } else if (programa.estado === 'inactivo') {
+                  estadoClases = 'bg-red-100 text-red-800';
+                }
+
+                return (
+                <div key={programa._id} className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                  {/* Header del programa */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-3 rounded-xl ${tipoClases}`}>
+                        {programa.tipo === 'curso' ? (
+                          <BookOpen className="w-6 h-6 text-white" />
+                        ) : (
+                          <GraduationCap className="w-6 h-6 text-white" />
+                        )}
+                      </div>
+                      <div>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-lg ${tipoLabelClases}`}>
+                          {programa.tipo === 'curso' ? 'Curso' : 'Programa Técnico'}
+                        </span>
+                        <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-lg ${estadoClases}`}>
+                          {programa.estado}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-lg ${programa.tipo === 'curso'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-purple-100 text-purple-800'
-                        }`}>
-                        {programa.tipo === 'curso' ? 'Curso' : 'Programa Técnico'}
-                      </span>
-                      <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-lg ${programa.estado === 'activo'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : programa.estado === 'inactivo'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-amber-100 text-amber-800'
-                        }`}>
-                        {programa.estado}
-                      </span>
-                    </div>
-                  </div>
 
                   <div className="flex space-x-2">
                     <button
@@ -477,21 +487,25 @@ const Gestioncursos = () => {
                   )}
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <BookOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay programas académicos</h3>
-              <p className="text-slate-500 mb-6">Comienza creando tu primer curso o programa técnico</p>
-              <button
-                onClick={abrirModalCrear}
-                className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
-              >
-                <Plus className="w-5 h-5 mr-2 inline" />
-                Crear Programa Académico
-              </button>
-            </div>
-          )}
+                );
+              });
+            }
+            
+            return (
+              <div className="col-span-full text-center py-12">
+                <BookOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay programas académicos</h3>
+                <p className="text-slate-500 mb-6">Comienza creando tu primer curso o programa técnico</p>
+                <button
+                  onClick={abrirModalCrear}
+                  className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
+                >
+                  <Plus className="w-5 h-5 mr-2 inline" />
+                  Crear Programa Académico
+                </button>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Modal de Programas */}

@@ -59,13 +59,13 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
   const handleFileSelection = (files) => {
     const validFiles = [];
     const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    const allowedTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif']);
 
-    Array.from(files).forEach(file => {
-      if (!allowedTypes.includes(file.type)) return;
-      if (file.size > maxSize) return;
+    for (const file of Array.from(files)) {
+      if (!allowedTypes.has(file.type)) continue;
+      if (file.size > maxSize) continue;
       validFiles.push(file);
-    });
+    }
 
     if (validFiles.length > 0) {
       uploadImages(validFiles);
@@ -81,7 +81,8 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
     let uploadedCount = 0;
     const totalFiles = files.length;
 
-    files.forEach((file, index) => {
+    let index = 0;
+    for (const file of files) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageData = {
@@ -104,7 +105,8 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
         }
       };
       reader.readAsDataURL(file);
-    });
+      index++;
+    }
   };
 
   const removeImage = (id) => {
@@ -113,6 +115,12 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
   const handleSubmit = (e) => {
     e.preventDefault();
     // Normalizar datos antes de enviar
+    let imagenesNormalizadas = [];
+    if (selectedImages.length > 0) {
+      imagenesNormalizadas = selectedImages.map(img => img.name);
+    } else if (Array.isArray(formData.imagen)) {
+      imagenesNormalizadas = formData.imagen;
+    }
     const normalizado = {
       nombre: formData.nombre,
       descripcion: formData.descripcion,
@@ -129,7 +137,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
       cuposDisponibles: Number(formData.cuposDisponibles),
       prioridad: formData.prioridad,
       observaciones: formData.observaciones,
-      imagen: selectedImages.length > 0 ? selectedImages.map(img => img.name) : (Array.isArray(formData.imagen) ? formData.imagen : []),
+      imagen: imagenesNormalizadas,
     };
     onSubmit(normalizado);
     onClose();
@@ -147,7 +155,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
           <form onSubmit={handleSubmit}>
             <div className="form-grid-tesorero">
               <div className="form-group-tesorero">
-                <label>Nombre Evento</label>
+                <label htmlFor='nombre'>Nombre Evento</label>
                 <input
                   type="text"
                   name="nombre"
@@ -320,19 +328,31 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               <div className="form-group-tesorero full-width">
                 <label htmlFor='imagen'>Imagen</label>
                 <div className="image-upload-container">
-                  <div className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
+                  <div
+                    className="upload-area"
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Zona para subir imágenes. Haz clic o presiona Enter o Espacio para seleccionar archivos."
+                    onClick={() => !isUploading && document.getElementById('imageInput').click()}
+                    onKeyDown={e => {
+                      if (!isUploading && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        document.getElementById('imageInput').click();
+                      }
+                    }}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={e => {
                       e.preventDefault();
                       handleFileSelection(e.dataTransfer.files);
-                    }}>
+                    }}
+                  >
                     <div className="upload-content">
                       <i className="fas fa-cloud-upload-alt upload-icon"></i>
                       <h3>Arrastra y suelta tus imágenes aquí</h3>
                       <p>o <span className="browse-text">haz clic para seleccionar</span></p>
                       <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
                     </div>
-                    <input type="file" id='imageInput' multiple accept="image/*" hidden  onChange={(e) => handleFileSelection(e.target.files)} />
+                    <input type="file" id='imageInput' multiple accept="image/*" hidden  onChange={e => handleFileSelection(e.target.files)} />
                   </div>
 
 

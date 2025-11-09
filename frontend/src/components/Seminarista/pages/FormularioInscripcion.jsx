@@ -41,6 +41,56 @@ const FormularioInscripcion = ({
   const [edadError, setEdadError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Helper: calcular edad a partir de fecha de nacimiento
+  const calcularEdad = (fechaNacimiento) => {
+    if (!fechaNacimiento) return '';
+    const nacimiento = new Date(fechaNacimiento);
+    if (Number.isNaN(nacimiento.getTime())) return '';
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const m = hoy.getMonth() - nacimiento.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+    return edad;
+  };
+
+  // Función auxiliar para obtener fecha de nacimiento del usuario
+  const obtenerFechaNacimiento = () => {
+    let fechaNacimiento = usuario?.fechaNacimiento;
+    if (!fechaNacimiento) {
+      try {
+        const usuarioStorage = localStorage.getItem('usuario');
+        if (usuarioStorage) {
+          const usuarioLocal = JSON.parse(usuarioStorage);
+          fechaNacimiento = usuarioLocal?.fechaNacimiento;
+        }
+      } catch { 
+        // Error al parsear, mantener fechaNacimiento como undefined
+      }
+    }
+    return fechaNacimiento;
+  };
+
+  // Función auxiliar para validar edad ingresada
+  const validarEdadIngresada = (edadIngresada, fechaNacimiento) => {
+    if (!fechaNacimiento) {
+      return 'No se encontró la fecha de nacimiento.';
+    }
+
+    const nacimiento = new Date(fechaNacimiento);
+    if (Number.isNaN(nacimiento.getTime())) {
+      return 'Fecha de nacimiento inválida.';
+    }
+
+    const edadCalculada = calcularEdad(fechaNacimiento);
+    if (Number.parseInt(edadIngresada, 10) === edadCalculada) {
+      return ''; // Sin error
+    }
+
+    return `La edad ingresada (${edadIngresada}) no coincide con la calculada (${edadCalculada}) según la fecha de nacimiento.`;
+  };
+
   // Crear inscripción usando usuario logueado y evento
   const crearInscripcion = async () => {
     try {
@@ -58,40 +108,25 @@ const FormularioInscripcion = ({
         alert('No se encontró el usuario logueado. Inicia sesión nuevamente.');
         return;
       }
-      // Calcular edad usando fechaNacimiento del usuario
-      const calcularEdad = (fechaNacimiento) => {
-        if (!fechaNacimiento) return '';
-        const hoy = new Date();
-        const nacimiento = new Date(fechaNacimiento);
-        let edad = hoy.getFullYear() - nacimiento.getFullYear();
-        const m = hoy.getMonth() - nacimiento.getMonth();
-        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
-          edad--;
-        }
-        return edad;
-      };
+      // Calcular edad usando fechaNacimiento del usuario (usa helper)
       const edadCalculada = calcularEdad(usuarioLogueado?.fechaNacimiento);
       // Detectar tipo de inscripción y obtener datos
-      let tipoReferencia = '';
-      let referencia = null;
-      let categoria = null;
-      let itemData = null;
+  let tipoReferencia = '';
+  let referencia = null;
+  let categoria = null;
 
       if (evento) {
         tipoReferencia = 'Eventos';
         referencia = evento._id || evento.id;
-        categoria = evento.categoria?._id || evento.categoria;
-        itemData = evento;
+  categoria = evento.categoria?._id || evento.categoria;
       } else if (curso) {
         tipoReferencia = 'ProgramaAcademico';
         referencia = curso._id || curso.id;
-        categoria = curso.categoria?._id || curso.categoria;
-        itemData = curso;
+  categoria = curso.categoria?._id || curso.categoria;
       } else if (programa) {
         tipoReferencia = 'ProgramaAcademico';
         referencia = programa._id || programa.id;
-        categoria = programa.categoria?._id || programa.categoria;
-        itemData = programa;
+  categoria = programa.categoria?._id || programa.categoria;
       }
 
       if (!tipoReferencia) {
@@ -130,36 +165,9 @@ const FormularioInscripcion = ({
 
     // Validar edad si se modifica
     if (name === 'edad') {
-      let fechaNacimiento = usuario?.fechaNacimiento;
-      if (!fechaNacimiento) {
-        try {
-          const usuarioStorage = localStorage.getItem('usuario');
-          if (usuarioStorage) {
-            const usuarioLocal = JSON.parse(usuarioStorage);
-            fechaNacimiento = usuarioLocal?.fechaNacimiento;
-          }
-        } catch { }
-      }
-      if (fechaNacimiento) {
-        const nacimiento = new Date(fechaNacimiento);
-        if (!isNaN(nacimiento.getTime())) {
-          const hoy = new Date();
-          let edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
-          const m = hoy.getMonth() - nacimiento.getMonth();
-          if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
-            edadCalculada--;
-          }
-          if (parseInt(value) !== edadCalculada) {
-            setEdadError(`La edad ingresada (${value}) no coincide con la calculada (${edadCalculada}) según la fecha de nacimiento.`);
-          } else {
-            setEdadError('');
-          }
-        } else {
-          setEdadError('Fecha de nacimiento inválida.');
-        }
-      } else {
-        setEdadError('No se encontró la fecha de nacimiento.');
-      }
+      const fechaNacimiento = obtenerFechaNacimiento();
+      const errorMessage = validarEdadIngresada(value, fechaNacimiento);
+      setEdadError(errorMessage);
     }
   };
 
@@ -172,7 +180,7 @@ const FormularioInscripcion = ({
     setTimeout(async () => {
       setIsLoading(false);
       setCurrentStep(2);
-      updateProgress(50);
+      updateProgress(50); 
 
       // Llama a onSubmit para notificar al padre
       if (onSubmit) {
@@ -237,13 +245,78 @@ const FormularioInscripcion = ({
   // Usa datos del item seleccionado
   const tituloItem = item?.nombre || `${tipo} sin título`;
   const descripcionItem = item?.descripcion || `Descripción del ${tipo.toLowerCase()}`;
-  const fechaItem = item?.fecha ? new Date(item.fecha).toLocaleDateString() :
-    item?.fechaEvento ? new Date(item.fechaEvento).toLocaleDateString() :
-      item?.fechaInicio ? new Date(item.fechaInicio).toLocaleDateString() :
-        "Fecha no especificada";
+  const getFechaItem = (it) => {
+    if (!it) return 'Fecha no especificada';
+    if (it.fecha) return new Date(it.fecha).toLocaleDateString();
+    if (it.fechaEvento) return new Date(it.fechaEvento).toLocaleDateString();
+    if (it.fechaInicio) return new Date(it.fechaInicio).toLocaleDateString();
+    return 'Fecha no especificada';
+  };
+  const fechaItem = getFechaItem(item);
   const horaItem = item?.hora || item?.horaInicio || "Hora no especificada";
   const lugarItem = item?.lugar || item?.ubicacion || "Ubicación no especificada";
   const precioItem = item?.precio || "Precio no especificado";
+
+  // Función auxiliar para obtener usuario logueado para validación
+  const obtenerUsuarioParaValidacion = () => {
+    if (usuario) return usuario;
+    
+    try {
+      const usuarioStorage = localStorage.getItem('usuario');
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  // Función auxiliar para validar campos básicos
+  const validarCamposBasicos = (usuarioLogueado, advertencias) => {
+    const campos = [
+      { campo: 'nombre', mensaje: 'El nombre ingresado no coincide con el registrado.' },
+      { campo: 'apellido', mensaje: 'El apellido ingresado no coincide con el registrado.' },
+      { campo: 'tipoDocumento', mensaje: 'El tipo de documento no coincide con el registrado.' },
+      { campo: 'numeroDocumento', mensaje: 'El número de documento no coincide con el registrado.' },
+      { campo: 'correo', mensaje: 'El correo electrónico no coincide con el registrado.' },
+      { campo: 'telefono', mensaje: 'El teléfono no coincide con el registrado.' }
+    ];
+
+    for (const { campo, mensaje } of campos) {
+      if (formData[campo] !== usuarioLogueado[campo]) {
+        advertencias.push(mensaje);
+      }
+    }
+  };
+
+  // Función auxiliar para validar edad específicamente
+  const validarEdadEnAdvertencias = (usuarioLogueado, advertencias) => {
+    if (!formData.edad) return;
+    
+    const nacimiento = new Date(usuarioLogueado.fechaNacimiento);
+    if (Number.isNaN(nacimiento.getTime())) {
+      // Fecha de nacimiento inválida: omitir comprobación
+      return;
+    }
+
+    const edadCalculada = calcularEdad(usuarioLogueado.fechaNacimiento);
+    if (Number.parseInt(formData.edad, 10) !== edadCalculada) {
+      advertencias.push('La edad ingresada no coincide con la calculada según la fecha de nacimiento.');
+    }
+  };
+
+  // Validación automática: compara formData con usuario registrado
+  const getValidationWarnings = () => {
+    const usuarioLogueadoVal = obtenerUsuarioParaValidacion();
+    const advertencias = [];
+    
+    if (usuarioLogueadoVal) {
+      validarCamposBasicos(usuarioLogueadoVal, advertencias);
+      validarEdadEnAdvertencias(usuarioLogueadoVal, advertencias);
+    }
+    
+    return advertencias;
+  };
+
+  const advertencias = getValidationWarnings();
 
   return (
     <div className="modal-overlay-inscribirse-seminario active">
@@ -454,64 +527,18 @@ const FormularioInscripcion = ({
               <p>El personal académico está evaluando tu solicitud. Este proceso puede tomar entre 1-3 días hábiles.</p>
 
               {/* Validación automática de datos */}
-              {(() => {
-                let usuarioLogueado = usuario;
-                if (!usuarioLogueado) {
-                  try {
-                    const usuarioStorage = localStorage.getItem('usuario');
-                    if (usuarioStorage) {
-                      usuarioLogueado = JSON.parse(usuarioStorage);
-                    }
-                  } catch { }
-                }
-                const advertencias = [];
-                if (usuarioLogueado) {
-                  if (formData.nombre !== usuarioLogueado.nombre) {
-                    advertencias.push('El nombre ingresado no coincide con el registrado.');
-                  }
-                  if (formData.apellido !== usuarioLogueado.apellido) {
-                    advertencias.push('El apellido ingresado no coincide con el registrado.');
-                  }
-                  if (formData.tipoDocumento !== usuarioLogueado.tipoDocumento) {
-                    advertencias.push('El tipo de documento no coincide con el registrado.');
-                  }
-                  if (formData.numeroDocumento !== usuarioLogueado.numeroDocumento) {
-                    advertencias.push('El número de documento no coincide con el registrado.');
-                  }
-                  if (formData.correo !== usuarioLogueado.correo) {
-                    advertencias.push('El correo electrónico no coincide con el registrado.');
-                  }
-                  if (formData.telefono !== usuarioLogueado.telefono) {
-                    advertencias.push('El teléfono no coincide con el registrado.');
-                  }
-                  if (formData.edad) {
-                    const nacimiento = new Date(usuarioLogueado.fechaNacimiento);
-                    if (!Number.isNaN(nacimiento.getTime())) {
-                      const hoy = new Date();
-                      let edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
-                      const m = hoy.getMonth() - nacimiento.getMonth();
-                      if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
-                        edadCalculada--;
-                      }
-                      if (Number.parseInt(formData.edad) !== edadCalculada) {
-                        advertencias.push('La edad ingresada no coincide con la calculada según la fecha de nacimiento.');
-                      }
-                    }
-                  }
-                }
-                return advertencias.length > 0 ? (
-                  <div style={{ color: 'red', marginBottom: '1em' }}>
-                    <strong>Advertencias de validación:</strong>
-                    <ul>
-                      {advertencias.map((adv, idx) => <li key={idx}>{adv}</li>)}
-                    </ul>
-                  </div>
-                ) : (
-                  <div style={{ color: 'green', marginBottom: '1em' }}>
-                    Todos los datos coinciden con el usuario registrado.
-                  </div>
-                );
-              })()}
+              {advertencias.length > 0 ? (
+                <div style={{ color: 'red', marginBottom: '1em' }}>
+                  <strong>Advertencias de validación:</strong>
+                  <ul>
+                    {advertencias.map((adv) => <li key={adv}>{adv}</li>)}
+                  </ul>
+                </div>
+              ) : (
+                <div style={{ color: 'green', marginBottom: '1em' }}>
+                  Todos los datos coinciden con el usuario registrado.
+                </div>
+              )}
 
               <div className="submitted-data-seminario">
                 <h5>Datos enviados:</h5>

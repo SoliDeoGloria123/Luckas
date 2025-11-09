@@ -142,8 +142,7 @@ const OlvidarPassword = () => {
 
                                 <div className="form-footer">
                                     <a href="/login" className="back-link" >
-                                        <i className="fas fa-arrow-left"></i>
-                                        Volver al inicio de sesión
+                                        <i className="fas fa-arrow-left"/>Volver al inicio de sesión
                                     </a>
                                 </div>
                             </div>
@@ -207,7 +206,7 @@ const OlvidarPassword = () => {
                                                 value={code}
                                                 onChange={e => {
                                                     // Solo permitir números y máximo 6 dígitos
-                                                    const val = e.target.value.replace(/[^0-9]/g, '').slice(0,6);
+                                                    const val = e.target.value.replaceAll(/\D/g, '').slice(0,6);
                                                     setCode(val);
                                                 }}
                                                 maxLength={6}
@@ -235,10 +234,9 @@ const OlvidarPassword = () => {
                                 </form>
 
                                 <div className="form-footer">
-                                    <a href="/Olvidar-Contraseña" className="back-link" onclick="goToEmailPage()">
-                                        <i className="fas fa-arrow-left"></i>
-                                        Cambiar correo electrónico
-                                    </a>
+                                    <button type="button" className="back-link" onClick={goToEmailPage}>
+                                        <i className="fas fa-arrow-left"/>Cambiar correo electrónico
+                                    </button>
                                 </div>
                             </div>
                         </div>

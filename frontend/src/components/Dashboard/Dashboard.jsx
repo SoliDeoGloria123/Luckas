@@ -15,8 +15,8 @@ import {
 import './Dashboard.css';
 // Hooks optimizados
 import { useDashboardAdmin } from './hooks/useDashboardAdmin';
-import { useUsuariosAdmin } from './hooks/useUsuariosAdmin';
-import { useTheme } from './hooks/useTheme';
+
+
 // Componentes
 import { PremiumLoader } from './LazyComponents';
 
@@ -30,43 +30,39 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
 
   // Hook principal del dashboard
   const {
-    usuarios,
     cargando,
     estadisticas,
-    usuarioActual,
-    setUsuarioActual,
-    obtenerUsuarios,
-    handleCerrarSesion
+    usuarioActual
   } = useDashboardAdmin(usuarioProp, onCerrarSesionProp);
 
-  // Hook para operaciones de usuarios
-  const {
-    mostrarModal,
-    usuarioSeleccionado,
-    setUsuarioSeleccionado,
-    modoEdicion,
-    nuevoUsuario,
-    setNuevoUsuario,
-    crearUsuario,
-    actualizarUsuario,
-    eliminarUsuario,
-    abrirModalCrear,
-    abrirModalEditar,
-    cerrarModal
-  } = useUsuariosAdmin(obtenerUsuarios, usuarioActual, setUsuarioActual);
+  // Hook para operaciones de usuarios (comentado porque no se usa actualmente)
+  // const {
+  //   mostrarModal,
+  //   usuarioSeleccionado,
+  //   setUsuarioSeleccionado,
+  //   modoEdicion,
+  //   nuevoUsuario,
+  //   setNuevoUsuario,
+  //   crearUsuario,
+  //   actualizarUsuario,
+  //   eliminarUsuario,
+  //   abrirModalCrear,
+  //   abrirModalEditar,
+  //   cerrarModal
+  // } = useUsuariosAdmin(obtenerUsuarios, usuarioActual, setUsuarioActual);
 
   // Configuración del menú
 
 
-  // Filtros de usuarios
-  const usuariosFiltrados = Array.isArray(usuarios)
-    ? usuarios.filter(
-      (user) =>
-        user.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        user.correo?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        user.role?.toLowerCase().includes(busqueda.toLowerCase())
-    )
-    : [];
+  // Filtros de usuarios (comentado porque no se usa actualmente)
+  // const usuariosFiltrados = Array.isArray(usuarios)
+  //   ? usuarios.filter(
+  //     (user) =>
+  //       user.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+  //       user.correo?.toLowerCase().includes(busqueda.toLowerCase()) ||
+  //       user.role?.toLowerCase().includes(busqueda.toLowerCase())
+  //   )
+  //   : [];
 
   // Loading states
   if (cargando) {
@@ -140,7 +136,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
                   const TrendIcon = stat.trend === "up" ? TrendingUp : TrendingDown;
                   return (
                     <div
-                      key={index}
+                      key={stat.title}
                       className={`stat-card-dashboard-admin glass-card ${stat.bgColor} rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up`}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >

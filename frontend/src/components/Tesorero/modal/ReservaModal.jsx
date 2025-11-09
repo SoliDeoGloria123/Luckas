@@ -18,7 +18,7 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
     // Si es un objeto Date o string con T, formatear
     try {
       const d = new Date(fecha);
-      if (!isNaN(d.getTime())) {
+      if (!Number.isNaN(d.getTime())) {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
@@ -315,6 +315,14 @@ const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, us
       </div >
     </div >
   );
+};
+ReservaModal.propTypes = {
+  mode: PropTypes.oneOf(['create', 'edit']),
+  initialData: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  usuarios: PropTypes.array.isRequired,
+  cabanas: PropTypes.array.isRequired
 };
 
 export default ReservaModal;

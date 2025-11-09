@@ -98,7 +98,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
           try {
             const hoy = new Date();
             const fechaNac = new Date(usuario.fechaNacimiento);
-            if (!isNaN(fechaNac.getTime())) {
+            if (!Number.isNaN(fechaNac.getTime())) {
               edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
               const mes = hoy.getMonth() - fechaNac.getMonth();
               if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
@@ -196,7 +196,7 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
       numeroDocumento: formData.numeroDocumento,
       correo: formData.correo,
       telefono: formData.telefono,
-      edad: parseInt(formData.edad) || 0,
+      edad: Number.parseInt(formData.edad) || 0,
       tipoReferencia: formData.tipoReferencia,
       referencia: formData.referencia,
       categoria: formData.categoria,

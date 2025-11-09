@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {  FaFileAlt,  FaTimes, FaCheckCircle, FaClock, FaExclamationCircle, FaHashtag, FaCalendar, FaUser as FaUserIcon, FaComment, FaEye, FaCheck, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
+import {  FaFileAlt,  FaTimes, FaCheckCircle, FaClock, FaExclamationCircle, FaHashtag, FaCalendar, FaUser as FaUserIcon, FaComment, FaEye, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 import './MisSolicitudes.css'; // Asegúrate de tener un archivo CSS para los estilos
 import Header from '../Shared/Header'
 import Footer from '../../footer/Footer';
@@ -28,8 +28,7 @@ const MisSolicitudes = () => {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [showMobileNav, setShowMobileNav] = useState(false);
+
   const [toasts, setToasts] = useState([]);
 
   const usuarioLogueado = (() => {

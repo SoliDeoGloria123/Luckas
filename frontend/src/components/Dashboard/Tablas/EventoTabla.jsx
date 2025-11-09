@@ -34,17 +34,33 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
     }));
   };
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {cargando ? (
-        <div className="col-span-full text-center py-12">
-          <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Cargando eventos...</p>
-        </div>
-      ) : eventos.length > 0 ? (
+  // Renderizado condicional extraído para evitar ternarias anidadas en JSX
+  let contenidoEventos;
+  if (cargando) {
+    contenidoEventos = (
+      <div className="col-span-full text-center py-12">
+        <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-slate-600">Cargando eventos...</p>
+      </div>
+    );
+  } else if (eventos.length > 0) {
+    contenidoEventos = (
         eventos.map((evento) => {
           const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
           const imgIndex = imgIndices[evento._id] || 0;
+
+          // Extraer lógica de clase del estado para evitar ternarias anidadas
+          let estadoClass = '';
+          if (evento.estado === 'activo') {
+            estadoClass = 'bg-emerald-500/90 text-white';
+          } else if (evento.estado === 'inactivo') {
+            estadoClass = 'bg-red-500/90 text-white';
+          } else if (evento.estado === 'finalizado') {
+            estadoClass = 'bg-gray-500/90 text-white';
+          } else {
+            estadoClass = 'bg-amber-500/90 text-white';
+          }
+
           return (
             <div key={evento._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
               {/* Imagen del evento */}
@@ -75,9 +91,9 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                           {">"}
                         </button>
                         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                          {imagenes.map((_, idx) => (
+                          {imagenes.map((img, idx) => (
                             <span
-                              key={idx}
+                              key={`indicator-${evento._id}-${idx}`}
                               className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
                             />
                           ))}
@@ -101,20 +117,13 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                       Destacado
                     </span>
                   )}
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${evento.estado === 'activo'
-                    ? 'bg-emerald-500/90 text-white'
-                    : evento.estado === 'inactivo'
-                      ? 'bg-red-500/90 text-white'
-                      : evento.estado === 'finalizado'
-                        ? 'bg-gray-500/90 text-white'
-                        : 'bg-amber-500/90 text-white'
-                    }`}>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClass}`}>
                     {evento.estado}
                   </span>
                 </div>
 
                 {/* Botones de acción */}
-                <div className="flex  justify-end  gap-2  px-6 py-3 ">
+                <div className="flex justify-end gap-2 px-6 py-3">
                   <button
                     onClick={() => onVerDetalle(evento)}
                     className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
@@ -125,7 +134,7 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
 
                   <button
                     onClick={() => onEditar(evento)}
-                    className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors "
+                    className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors"
                     title="Editar"
                   >
                     <Edit className="w-4 h-4" />
@@ -230,20 +239,27 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
             </div>
           );
         })
-      ) : (
-        <div className="col-span-full text-center py-12">
-          <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay eventos</h3>
-          <p className="text-slate-500 mb-6">Comienza creando tu primer eventos o actividad</p>
-          <button
-            /* onClick={abrirModalCrear}*/
-            className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
-          >
-            <Plus className="w-5 h-5 mr-2 inline" />
-            Crear Evento
-          </button>
-        </div>
-      )}
+    );
+  } else {
+    contenidoEventos = (
+      <div className="col-span-full text-center py-12">
+        <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay eventos</h3>
+        <p className="text-slate-500 mb-6">Comienza creando tu primer eventos o actividad</p>
+        <button
+          /* onClick={abrirModalCrear}*/
+          className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
+        >
+          <Plus className="w-5 h-5 mr-2 inline" />
+          Crear Evento
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {contenidoEventos}
     </div>
   );
 };

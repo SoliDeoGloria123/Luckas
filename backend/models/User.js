@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
-    match: /\\d{7,15}/  // solo dígitos, mínimo 7 y máximo 15 caracteres
+    match: /^\d{7,15}$/  // solo dígitos, mínimo 7 y máximo 15 caracteres
   },
   tipoDocumento: {
     type: String,

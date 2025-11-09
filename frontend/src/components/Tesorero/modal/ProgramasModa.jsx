@@ -154,7 +154,7 @@ const ProgramaModal = ({
                   <div className="detalle-row">
                     <span className="detalle-label">Requisitos:</span>
                     <ul style={{margin:0,paddingLeft:'1.2em'}}>
-                      {formData.requisitos.map((req, i) => req && <li key={i}>{req}</li>)}
+                      {formData.requisitos.map((req) => req && <li key={req + '-' + Math.random().toString(36).substr(2, 9)}>{req}</li>)}
                     </ul>
                   </div>
                 )}
@@ -162,7 +162,7 @@ const ProgramaModal = ({
                   <div className="detalle-row">
                     <span className="detalle-label">Objetivos:</span>
                     <ul style={{margin:0,paddingLeft:'1.2em'}}>
-                      {formData.objetivos.map((obj, i) => obj && <li key={i}>{obj}</li>)}
+                      {formData.objetivos.map((obj) => obj && <li key={obj + '-' + Math.random().toString(36).substr(2, 9)}>{obj}</li>)}
                     </ul>
                   </div>
                 )}
@@ -170,8 +170,8 @@ const ProgramaModal = ({
                   <div className="detalle-row">
                     <span className="detalle-label">Pensum Académico:</span>
                     <ul style={{margin:0,paddingLeft:'1.2em'}}>
-                      {formData.pensum.map((mod, i) => (
-                        <li key={i}><b>{mod.modulo}</b>: {mod.descripcion} ({mod.horas} horas)</li>
+                      {formData.pensum.map((mod) => (
+                        <li key={(mod.modulo || '') + '-' + Math.random().toString(36).substr(2, 9)}><b>{mod.modulo}</b>: {mod.descripcion} ({mod.horas} horas)</li>
                       ))}
                     </ul>
                   </div>

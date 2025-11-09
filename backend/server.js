@@ -5,7 +5,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
-const path = require('path');
+const path = require('node:path');
 const config = require('./config');
 
 // Importar Rutas
@@ -42,8 +42,13 @@ app.use('/Externo', express.static(path.join(__dirname, '../frontend/public/Exte
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 
 //Conexion a mongo 
-mongoose.connect(process.env.MONGODB_URI).then(()=> console.log('Ok MonfoDB conectado'))
-.catch(error => console.error('X Error de MongoDB', error.message));
+try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✅ MongoDB conectado');
+} catch (error) {
+    console.error('❌ Error de MongoDB:', error.message);
+    process.exit(1);
+}
 
 //Rutas de API
 app.use('/api/auth', authRoutes);
@@ -73,11 +78,11 @@ app.get('/login', (req, res) => {
 
 // Manejo de rutas no encontradas
 app.get('*', (req, res) => {
-    // Si la ruta no es de API, servir la página de inicio
-    if (!req.path.startsWith('/api/')) {
-        res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/home.html'));
-    } else {
+    // Si la ruta es de API, retornar error 404
+    if (req.path.startsWith('/api/')) {
         res.status(404).json({ message: 'Ruta de API no encontrada' });
+    } else {
+        res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/home.html'));
     }
 });
 

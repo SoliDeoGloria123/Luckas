@@ -87,7 +87,6 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
     // Si es el paso 2, validar que tenemos los datos necesarios
     if (stepNumber === 2 && (!reservationData.checkInDate || !reservationData.checkOutDate)) {
       alert('Por favor completa los datos del paso 1 primero');
-      return;
     }
   };
 
@@ -221,14 +220,14 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
   };
 
   // Función para obtener el nombre del método de pago
-  const getPaymentMethodName = (method) => {
-    const methods = {
-      'tarjeta': 'Tarjeta de Crédito/Débito',
-      'transferencia': 'Transferencia Bancaria',
-      'pse': 'PSE'
-    };
-    return methods[method] || method;
-  };
+  // const getPaymentMethodName = (method) => {
+  //   const methods = {
+  //     'tarjeta': 'Tarjeta de Crédito/Débito',
+  //     'transferencia': 'Transferencia Bancaria',
+  //     'pse': 'PSE'
+  //   };
+  //   return methods[method] || method;
+  // };
 
   // Calcular total
   const calculateTotal = () => {
@@ -259,6 +258,21 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
 
   if (!isOpen) return null;
 
+  // Precompute step classes to avoid nested ternaries in JSX (resuelve SonarQube)
+  let step1Class = '';
+  if (currentStep === 1) step1Class = 'active';
+  else if (currentStep > 1) step1Class = 'completed';
+
+  let step2Class = '';
+  if (currentStep === 2) step2Class = 'active';
+  else if (currentStep > 2) step2Class = 'completed';
+
+  let step3Class = '';
+  if (currentStep === 3) step3Class = 'active';
+  else if (currentStep > 3) step3Class = 'completed';
+
+  let step4Class = '';
+  if (currentStep === 4) step4Class = 'active';
 
   return (
     <>
@@ -301,7 +315,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
             </div>
             <div className="steps-container-seminario-reserva">
               {/* Paso 1 */}
-              <div className={`step-seminario-reserva ${currentStep === 1 ? 'active' : currentStep > 1 ? 'completed' : ''}`} data-step="1">
+              <div className={`step-seminario-reserva ${step1Class}`} data-step="1">
                 <div className="step-icon-seminario-reserva">
                   <i className="fas fa-file-text"></i>
                 </div>
@@ -312,7 +326,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
               </div>
 
               {/* Paso 2 */}
-              <div className={`step-seminario-reserva ${currentStep === 2 ? 'active' : currentStep > 2 ? 'completed' : ''}`} data-step="2">
+              <div className={`step-seminario-reserva ${step2Class}`} data-step="2">
                 <div className="step-icon-seminario-reserva">
                   <i className="fas fa-clock"></i>
                 </div>
@@ -323,7 +337,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
               </div>
 
               {/* Paso 3 */}
-              <div className={`step-seminario-reserva ${currentStep === 3 ? 'active' : currentStep > 3 ? 'completed' : ''}`} data-step="3">
+              <div className={`step-seminario-reserva ${step3Class}`} data-step="3">
                 <div className="step-icon-seminario-reserva">
                   <i className="fas fa-credit-card"></i>
                 </div>
@@ -334,7 +348,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
               </div>
 
               {/* Paso 4 */}
-              <div className={`step-seminario-reserva ${currentStep === 4 ? 'active' : ''}`} data-step="4">
+              <div className={`step-seminario-reserva ${step4Class}`} data-step="4">
                 <div className="step-icon-seminario-reserva">
                   <i className="fas fa-check-circle"></i>
                 </div>

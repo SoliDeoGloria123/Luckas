@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 import "./Dashboard.css";
 import {
     Search,
-    Calendar as CalendarIcon,
 
 } from 'lucide-react';
 

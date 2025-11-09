@@ -177,9 +177,9 @@ const Gestion = () => {
                             </div>
                             <h3 className="card-title">Gestionar Inscripciones</h3>
                             <p className="card-description">Procesar inscripciones y categorizar</p>
-                            <a href="#" className="card-action" onClick={e => { e.preventDefault(); handleGestionarInscripciones(); }}>
+                            <button type="button" className="card-action" onClick={e => { e.preventDefault(); handleGestionarInscripciones(); }}>
                                 Gestionar <i className="fas fa-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
 

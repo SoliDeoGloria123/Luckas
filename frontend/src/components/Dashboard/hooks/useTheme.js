@@ -7,12 +7,12 @@ export const useTheme = () => {
     if (temaGuardado) {
       return temaGuardado;
     }
-    
+
     // Si no hay tema guardado, usar la preferencia del sistema
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (globalThis.matchMedia && globalThis.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }
-    
+
     return 'light';
   });
 
@@ -20,15 +20,15 @@ export const useTheme = () => {
     // Aplicar el tema al DOM
     const aplicarTema = (nuevoTema) => {
       const root = document.documentElement;
-      
+
       if (nuevoTema === 'dark') {
         root.classList.add('dark');
-        root.setAttribute('data-theme', 'dark');
+        root.dataset.theme = 'dark';
       } else {
         root.classList.remove('dark');
-        root.setAttribute('data-theme', 'light');
+        root.dataset.theme = 'light';
       }
-      
+
       // Guardar en localStorage
       localStorage.setItem('luckas-theme', nuevoTema);
     };

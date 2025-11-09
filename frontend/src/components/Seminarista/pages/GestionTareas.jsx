@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Search, Plus, X, Calendar, User, AlertCircle, CheckCircle, Clock, Edit2, Trash2 } from "lucide-react"
+import { Search, Plus, X, Calendar, User, AlertCircle, CheckCircle, Clock, Edit2 } from "lucide-react"
 import Header from "../../Seminarista/Shared/Header";
 import Footer from "../../footer/Footer";
 import { tareaService } from '../../../services/tareaService';

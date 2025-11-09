@@ -340,7 +340,7 @@ const Reportes = () => {
   const renderTablaReporte = () => {
     if (!datosReporte) return null;
     switch (tipoReporte) {
-      case 'reservas':
+      case 'reservas': {
         // Calcular reservas activas (estados: 'Pendiente', 'Confirmada', 'Activa')
         let reservasActivas = 0;
         if (Array.isArray(datosReporte.estadisticas.porEstado)) {
@@ -385,6 +385,7 @@ const Reportes = () => {
             </table>
           </div>
         );
+      }
 
       case 'inscripciones':
         return (

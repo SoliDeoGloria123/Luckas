@@ -75,15 +75,15 @@ const GestionEventos = () => {
   // Crear evento
   const crearEvento = async () => {
     try {
-      const formData = new window.FormData();
-      Object.entries(nuevoEvento).forEach(([key, value]) => {
+      const formData = new globalThis.FormData();
+      for (const [key, value] of Object.entries(nuevoEvento)) {
         // Si es etiquetas y es string, separa por coma
         if (key === 'etiquetas' && typeof value === 'string') {
           value.split(',').map(et => formData.append('etiquetas', et.trim()));
         } else {
           formData.append(key, value);
         }
-      });
+      };
       // Agregar imágenes
       for (const imgObj of selectedImages) {
         if (imgObj.file) formData.append('imagen', imgObj.file);
@@ -328,7 +328,7 @@ const GestionEventos = () => {
                 <p className="mb-2"><strong>Programa:</strong> {eventoDetalle.programa && eventoDetalle.programa.length > 0 ? (
                   <ul className="list-disc ml-6">
                     {eventoDetalle.programa.map((mod, i) => (
-                      <li key={i}>
+                      <li key={mod.id || mod.tema}>
                         <strong>{mod.tema}</strong> ({mod.horaInicio} - {mod.horaFin}): {mod.descripcion}
                       </li>
                     ))}
@@ -338,7 +338,7 @@ const GestionEventos = () => {
                 <div className="flex flex-wrap gap-2 my-4">
                   {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.map((img, idx) => (
                     <img
-                      key={idx}
+                      key={img}
                       src={img}
                       alt={`Imagen ${idx + 1}`}
                       className="w-32 h-32 object-cover rounded-lg border"

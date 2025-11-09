@@ -148,13 +148,13 @@ export const reporteService = {
     if (!res.ok) throw new Error("Error al exportar reporte");
 
     const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
+    const url = globalThis.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `reporte-${tipoReporte}-${new Date().toISOString().split('T')[0]}.pdf`;
     document.body.appendChild(a);
     a.click();
-    window.URL.revokeObjectURL(url);
+    globalThis.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   },
 
@@ -174,13 +174,13 @@ export const reporteService = {
     if (!res.ok) throw new Error("Error al exportar reporte");
 
     const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
+    const url = globalThis.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `reporte-${tipoReporte}-${new Date().toISOString().split('T')[0]}.xlsx`;
     document.body.appendChild(a);
     a.click();
-    window.URL.revokeObjectURL(url);
+    globalThis.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   },
 

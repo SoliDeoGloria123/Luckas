@@ -120,7 +120,7 @@ const CursosSeminario = () => {
         <div className="seminario-container">
           <div className="error-container">
             <p className="error-message">{error}</p>
-            <button onClick={() => window.location.reload()} className="retry-button">
+            <button onClick={() => globalThis.location.reload()} className="retry-button">
               Reintentar
             </button>
           </div>
@@ -216,7 +216,31 @@ const CursosSeminario = () => {
 
         {/* Courses Grid */}
         <div className="cabins-grid">
-          {cursosFiltrados.map((curso) => (
+          {cursosFiltrados.map((curso) => {
+            // Precompute labels to avoid nested ternaries / IIFEs inside JSX (mejora SonarQube)
+            const tipoLabel = (() => {
+              if (curso.categoria?.tipo === 'curso') return '📚 Curso';
+              if (curso.categoria?.tipo === 'programa') return '🎓 Programa Técnico';
+              return '🗂 Otro';
+            })();
+
+            const descripcionText = (() => {
+              if (curso.descripcion && curso.descripcion.length > 80) return curso.descripcion.substring(0, 80) + '...';
+              if (curso.descripcion) return curso.descripcion;
+              return 'Sin descripción';
+            })();
+
+            const isLleno = (curso.cuposDisponibles || 0) === 0;
+            const availabilityClass = isLleno ? 'reserved' : '';
+            const availabilityText = isLleno ? 'Lleno' : 'Disponible';
+
+            const inscribirLabel = (() => {
+              if (inscripcionLoading) return 'Inscribiendo...';
+              if (isLleno) return 'Lleno';
+              return 'Inscribirse';
+            })();
+
+            return (
             <div key={curso._id} className="cabin-card">
               <div className="cabin-image">
                 <img
@@ -226,15 +250,19 @@ const CursosSeminario = () => {
                 <div className={`cabin-status ${curso.estado === 'activo' ? 'available' : 'reserved'}`}>
                   {curso.estado === 'activo' ? 'Disponible' : 'No Disponible'}
                 </div>
-                <div
+                <button
+                  type="button"
                   className={`cabin-favorite ${favorites[curso._id] ? 'active' : ''}`}
+                  aria-pressed={!!favorites[curso._id]}
+                  tabIndex={0}
                   onClick={() => toggleFavorite(curso._id)}
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') toggleFavorite(curso._id); }}
                 >
                   <Heart/>
-                </div>
+                </button>
                 <div className="cabin-gallery">
                   <span className="gallery-count">
-                    {curso.categoria?.tipo === 'curso' ? '📚 Curso' : curso.categoria?.tipo === 'programa' ? '🎓 Programa Técnico' : '🗂 Otro'}
+                    {tipoLabel}
                   </span>
                 </div>
               </div>
@@ -251,12 +279,7 @@ const CursosSeminario = () => {
                 </div>
 
                 <h3 className="cabin-title-cabana">{curso.nombre}</h3>
-                <p className="cabin-description">
-                  {curso.descripcion && curso.descripcion.length > 80 
-                    ? curso.descripcion.substring(0, 80) + '...' 
-                    : curso.descripcion || 'Sin descripción'
-                  }
-                </p>
+                <p className="cabin-description">{descripcionText}</p>
 
                 <div className="cabin-features">
                   <div className="feature-item">
@@ -288,7 +311,7 @@ const CursosSeminario = () => {
                   )}
                 </div>
 
-                <div className="cabin-footer">
+                  <div className="cabin-footer">
                   <div className="cabin-price">
                     <span className="price">
                       ${curso.precio || 'Gratis'}
@@ -296,8 +319,8 @@ const CursosSeminario = () => {
                     {curso.precio && <span className="price-period">/ curso</span>}
                   </div>
                   <div className="cabin-availability">
-                    <span className={`availability-text ${(curso.cuposDisponibles || 0) === 0 ? 'reserved' : ''}`}>
-                      {(curso.cuposDisponibles || 0) > 0 ? 'Disponible' : 'Lleno'}
+                    <span className={`availability-text ${availabilityClass}`}>
+                      {availabilityText}
                     </span>
                   </div>
                 </div>
@@ -319,15 +342,14 @@ const CursosSeminario = () => {
                       setCursoSeleccionado(curso);
                       setMostrarFormulario(true);
                     }}
-                    disabled={inscripcionLoading || (curso.cuposDisponibles || 0) === 0}
+                    disabled={inscripcionLoading || isLleno}
                   >
-                    {inscripcionLoading ? 'Inscribiendo...' : 
-                     (curso.cuposDisponibles || 0) === 0 ? 'Lleno' : 'Inscribirse'}
+                    {inscribirLabel}
                   </button>
                 </div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
 
         {cursosFiltrados.length === 0 && (
@@ -339,15 +361,41 @@ const CursosSeminario = () => {
         )}
 
       {/* Modal de Detalles del Curso */}
-      {cursoSeleccionado && !mostrarFormulario && (
-        <div className="modal-overlay-programas" onClick={() => setCursoSeleccionado(null)}>
-          <div className="modal-content-programas" onClick={(e) => e.stopPropagation()}>
+      {cursoSeleccionado && !mostrarFormulario && (() => {
+        // Precompute labels to avoid IIFEs inside JSX (mejora SonarQube)
+        const tipoModalLabel = (() => {
+          if (cursoSeleccionado.categoria?.tipo === 'curso') return '📚 Curso';
+          if (cursoSeleccionado.categoria?.tipo === 'programa') return '🎓 Programa';
+          return '🗂 Otro';
+        })();
+
+        const inscribirModalLabel = (() => {
+          if (inscripcionLoading) return 'Inscribiendo...';
+          if ((cursoSeleccionado.cuposDisponibles || 0) === 0) return 'Sin Cupos';
+          return 'Inscribirse Ahora';
+        })();
+
+        const isModalDisabled = inscripcionLoading || (cursoSeleccionado.cuposDisponibles || 0) === 0;
+
+        return (
+        <button
+          type="button"
+          className="modal-overlay-programas"
+          onClick={() => setCursoSeleccionado(null)}
+          style={{ border: 'none', background: 'transparent', padding: 0, width: '100%', height: '100%' }}
+        >
+          <dialog 
+            className="modal-content-programas" 
+            onClick={(e) => e.stopPropagation()}
+            open
+            aria-labelledby="modal-title"
+          >
             <div className="modal-header-programas">
               <div className="modal-title-section-programas">
-                <h2>{cursoSeleccionado.nombre}</h2>
+                <h2 id="modal-title">{cursoSeleccionado.nombre}</h2>
                 <div className="modal-badges-programas">
                   <span className="modal-badge-programas tipo">
-                    {cursoSeleccionado.categoria?.tipo === 'curso' ? '📚 Curso' : cursoSeleccionado.categoria?.tipo === 'programa' ? '🎓 Programa' : '🗂 Otro'}
+                    {tipoModalLabel}
                   </span>
                   <span className="modal-badge-programas categoria">
                     {cursoSeleccionado.categoria?.nombre || 'Sin categoría'}
@@ -442,20 +490,20 @@ const CursosSeminario = () => {
                   <button
                     className="btn-modal-primary-programas"
                     onClick={() => {
-                      setCursoSeleccionado(cursoSeleccionado);
+                      // Abrir formulario de inscripción
                       setMostrarFormulario(true);
                     }}
-                    disabled={inscripcionLoading || (cursoSeleccionado.cuposDisponibles || 0) === 0}
+                    disabled={isModalDisabled}
                   >
-                    {inscripcionLoading ? 'Inscribiendo...' : 
-                     (cursoSeleccionado.cuposDisponibles || 0) === 0 ? 'Sin Cupos' : 'Inscribirse Ahora'}
+                    {inscribirModalLabel}
                   </button>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </dialog>
+        </button>
+        );
+      })()}
 
       {/* Formulario de Inscripción */}
       {mostrarFormulario && cursoSeleccionado && (

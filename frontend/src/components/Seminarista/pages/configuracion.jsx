@@ -56,6 +56,7 @@ const ConfiguracionPage = () => {
                   <p>Recibe notificaciones importantes en tu correo</p>
                 </div>
                 <label htmlFor="emailNotifications" className="toggle-switch">
+                  <span className="sr-only">Activar notificaciones por correo</span>
                   <input 
                     type="checkbox" 
                     defaultChecked 
@@ -70,6 +71,7 @@ const ConfiguracionPage = () => {
                   <p>Recibe notificaciones en tiempo real</p>
                 </div>
                 <label htmlFor="pushNotifications" className="toggle-switch">
+                  <span className="sr-only">Activar notificaciones push</span>
                   <input 
                     type="checkbox" 
                     defaultChecked 
@@ -84,6 +86,7 @@ const ConfiguracionPage = () => {
                     <h3>Eventos</h3>
                   </div>
                   <label htmlFor="eventNotifications" className="toggle-switch">
+                    <span className="sr-only">Activar notificaciones de eventos</span>
                     <input 
                       type="checkbox" 
                       defaultChecked 
@@ -97,6 +100,7 @@ const ConfiguracionPage = () => {
                     <h3>Reservas</h3>
                   </div>
                   <label htmlFor="reservationNotifications" className="toggle-switch">
+                    <span className="sr-only">Activar notificaciones de reservas</span>
                     <input 
                       type="checkbox" 
                       defaultChecked 
@@ -112,6 +116,7 @@ const ConfiguracionPage = () => {
                     <h3>Solicitudes</h3>
                   </div>
                   <label htmlFor="requestNotifications" className="toggle-switch">
+                    <span className="sr-only">Activar notificaciones de solicitudes</span>
                     <input 
                       type="checkbox" 
                       defaultChecked 
@@ -125,6 +130,7 @@ const ConfiguracionPage = () => {
                     <h3>Seguridad</h3>
                   </div>
                   <label htmlFor="securityNotifications" className="toggle-switch">
+                    <span className="sr-only">Activar notificaciones de seguridad</span>
                     <input 
                       type="checkbox" 
                       defaultChecked 
@@ -178,7 +184,8 @@ const ConfiguracionPage = () => {
                 <div className="setting-info">
                   <h3>Permitir Contacto</h3>
                 </div>
-                <label className="toggle-switch">
+                  <label className="toggle-switch">
+                    <span className="sr-only">Permitir contacto</span>
                   <input 
                     type="checkbox" 
                     defaultChecked 
@@ -316,6 +323,7 @@ const ConfiguracionPage = () => {
                   <p>Recibe noticias y actualizaciones del seminario</p>
                 </div>
                 <label className="toggle-switch">
+                  <span className="sr-only">Suscribirse al newsletter</span>
                   <input 
                     type="checkbox" 
                     defaultChecked 
@@ -375,7 +383,17 @@ const ConfiguracionPage = () => {
 
       {/* Modals */}
       {showDeleteModal && (
-        <div id="deleteModal" className="modal" onClick={(e) => e.target.id === 'deleteModal' && closeModal()}>
+        <div
+          id="deleteModal"
+          className="modal"
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+          onClick={(e) => e.target.id === 'deleteModal' && closeModal()}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') closeModal();
+          }}
+        >
           <div className="modal-content">
             <h3>¿Estás seguro?</h3>
             <p>Esta acción no se puede deshacer. Se eliminarán permanentemente todos tus datos.</p>
@@ -396,7 +414,17 @@ const ConfiguracionPage = () => {
       )}
 
       {showSuccessModal && (
-        <div id="successModal" className="modal" onClick={(e) => e.target.id === 'successModal' && closeModal()}>
+        <div
+          id="successModal"
+          className="modal"
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+          onClick={(e) => e.target.id === 'successModal' && closeModal()}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') closeModal();
+          }}
+        >
           <div className="modal-content">
             <div className="success-icon">
               
@@ -532,9 +560,9 @@ class ConfigurationManager {
   
   handleThemeChange(theme) {
     const themeOptions = document.querySelectorAll('.theme-option');
-    themeOptions.forEach(option => {
+    for (const option of themeOptions) {
       option.classList.remove('active');
-    });
+    }
     document.querySelector(`[data-theme="${theme}"]`).classList.add('active');
     
     this.settings.appearance.theme = theme;
@@ -545,13 +573,12 @@ class ConfigurationManager {
   applyTheme(theme) {
     const body = document.body;
     body.classList.remove('light-theme', 'dark-theme');
-    
     if (theme === 'dark') {
       body.classList.add('dark-theme');
     } else if (theme === 'light') {
       body.classList.add('light-theme');
     } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDark = globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
       if (prefersDark) {
         body.classList.add('dark-theme');
       }
@@ -593,7 +620,7 @@ class ConfigurationManager {
   deleteAccount() {
     this.showToast('Cuenta eliminada. Redirigiendo...', 'success');
     setTimeout(() => {
-      window.location.href = '/login.html';
+      globalThis.location.href = '/login.html';
     }, 2000);
   }
   

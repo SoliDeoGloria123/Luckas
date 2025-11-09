@@ -1,6 +1,6 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-module.exports = function(app) {
+function setupProxy(app) {
   // Proxy para rutas de API
   app.use(
     '/api',
@@ -20,4 +20,6 @@ module.exports = function(app) {
       logLevel: 'debug'
     })
   );
+
 };
+module.exports = setupProxy;

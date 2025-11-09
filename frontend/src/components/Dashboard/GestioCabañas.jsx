@@ -37,7 +37,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     imagen: [],
     ubicacion: ""
   });
-  const [err, setError] = useState(null);
+
 
   useEffect(() => {
     obtenerCabanas();
@@ -57,8 +57,9 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
         cabs = [];
       }
       setCabanas(cabs);
-    } catch (err) {
-      setError("Error al obtener cabañas: " + err.message);
+    } catch (error) {
+      // Puedes mostrar un alert o log, pero no usar setError si no lo necesitas
+      console.error("Error al obtener cabañas: " + error.message);
     }
   };
 
@@ -75,8 +76,9 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
         cats = [];
       }
       setCategorias(cats);
-    } catch (err) {
-      setError("Error", "Error al obtener categorías: " + err.message);
+    } catch (error) {
+      // Puedes mostrar un alert o log, pero no usar setError si no lo necesitas
+      console.error("Error al obtener categorías: " + error.message);
     }
   };
   // CRUD

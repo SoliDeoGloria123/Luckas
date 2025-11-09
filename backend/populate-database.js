@@ -2,6 +2,9 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 function obtenerInscripcionesProgramas(usuarios, programas, categorias) {
     const inscripciones = [];
+    if ((!usuarios || usuarios.length === 0) || (!programas || programas.length === 0)) {
+        return inscripciones;
+    }
     if (programas && programas.length > 0) {
         inscripciones.push({
             usuario: usuarios[4]._id,
@@ -55,6 +58,9 @@ function obtenerInscripcionesProgramas(usuarios, programas, categorias) {
 
 function obtenerInscripcionesEventos(usuarios, eventos, categorias) {
     const inscripciones = [];
+    if ((!usuarios || usuarios.length === 0) || (!eventos || eventos.length === 0)) {
+        return inscripciones;
+    }
     if (eventos && eventos.length > 0) {
         inscripciones.push({
             usuario: usuarios[2]._id,
@@ -561,6 +567,11 @@ async function createEventos(categorias) {
 
 async function createTareas(usuarios) {
     try {
+        if (!usuarios || usuarios.length === 0) {
+            console.log('❌ No hay usuarios disponibles para crear tareas');
+            return [];
+        }
+        
         const tareas = [
             {
                 titulo: 'Revisar inscripciones pendientes',
@@ -621,6 +632,15 @@ async function createInscripciones(usuarios, programas, eventos, categorias) {
 
 async function createReservas(usuarios, cabanas) {
     try {
+        if (!usuarios || usuarios.length === 0) {
+            console.log('❌ No hay usuarios disponibles para crear reservas');
+            return [];
+        }
+        if (!cabanas || cabanas.length === 0) {
+            console.log('❌ No hay cabañas disponibles para crear reservas');
+            return [];
+        }
+        
         const reservas = [
             {
                 usuario: usuarios[3]._id, // Usuario externo
@@ -665,6 +685,15 @@ async function createReservas(usuarios, cabanas) {
 
 async function createSolicitudes(usuarios, categorias) {
     try {
+        if (!usuarios || usuarios.length === 0) {
+            console.log('❌ No hay usuarios disponibles para crear solicitudes');
+            return [];
+        }
+        if (!categorias || categorias.length === 0) {
+            console.log('❌ No hay categorías disponibles para crear solicitudes');
+            return [];
+        }
+        
         const solicitudes = [
             {
                 solicitante: usuarios[3]._id, // Usuario externo
@@ -707,6 +736,11 @@ async function createSolicitudes(usuarios, categorias) {
 
 async function createReportes(usuarios) {
     try {
+        if (!usuarios || usuarios.length === 0) {
+            console.log('❌ No hay usuarios disponibles para crear reportes');
+            return [];
+        }
+        
         const reportes = [
             {
                 nombre: 'Reporte Mensual de Inscripciones - Septiembre 2025',
@@ -803,6 +837,7 @@ function mostrarResumen() {
 }
 
 
+// Ejecutar la función principal usando top-level await
 try {
     await main();
 } catch (error) {

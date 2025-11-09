@@ -28,13 +28,13 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
   const handleFileSelection = (files) => {
     const validFiles = [];
     const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    const allowedTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif']);
 
-    Array.from(files).forEach(file => {
-      if (!allowedTypes.includes(file.type)) return;
-      if (file.size > maxSize) return;
+    for (const file of Array.from(files)) {
+      if (!allowedTypes.has(file.type)) continue;
+      if (file.size > maxSize) continue;
       validFiles.push(file);
-    });
+    }
 
     if (validFiles.length > 0) {
       uploadImages(validFiles);
@@ -50,7 +50,8 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
     let uploadedCount = 0;
     const totalFiles = files.length;
 
-    files.forEach((file, index) => {
+    let index = 0;
+    for (const file of files) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageData = {
@@ -73,7 +74,8 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
         }
       };
       reader.readAsDataURL(file);
-    });
+      index++;
+    }
   };
 
   const removeImage = (id) => {
@@ -91,7 +93,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
       alert('El nombre es obligatorio');
       return;
     }
-    if (!formData.capacidad || isNaN(formData.capacidad)) {
+    if (!formData.capacidad || Number.isNaN(formData.capacidad)) {
       alert('La capacidad es obligatoria y debe ser un número');
       return;
     }
@@ -99,7 +101,7 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
       alert('La categoría es obligatoria');
       return;
     }
-    if (!formData.precio || isNaN(formData.precio)) {
+    if (!formData.precio || Number.isNaN(formData.precio)) {
       alert('El precio es obligatorio y debe ser un número');
       return;
     }
