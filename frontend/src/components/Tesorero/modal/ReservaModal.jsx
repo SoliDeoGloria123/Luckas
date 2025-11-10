@@ -2,33 +2,27 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { userService } from '../../../services/userService';
 
+// Función movida fuera del componente para evitar recrearla en cada render
+function normalizeFecha(fecha) {
+  if (!fecha) return '';
+  // Si ya está en formato YYYY-MM-DD, devolver tal cual
+  if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
+  // Si es un objeto Date o string con T, formatear
+  try {
+    const d = new Date(fecha);
+    if (!Number.isNaN(d.getTime())) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+  } catch (error) {
+    console.error('Error normalizando fecha:', error);
+  }
+  return '';
+}
 
 const ReservaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, usuarios, cabanas }) => {
-  // Normalización de categoria y fechaEvento para edición
-  function normalizeCategoria(categoria) {
-    if (!categoria) return '';
-    if (typeof categoria === 'object' && categoria._id) return String(categoria._id);
-    return String(categoria);
-  }
-
-  function normalizeFecha(fecha) {
-    if (!fecha) return '';
-    // Si ya está en formato YYYY-MM-DD, devolver tal cual
-    if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
-    // Si es un objeto Date o string con T, formatear
-    try {
-      const d = new Date(fecha);
-      if (!Number.isNaN(d.getTime())) {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      }
-    } catch (error) {
-      console.error('Error normalizando fecha:', error);
-    }
-    return '';
-  }
   const [formData, setFormData] = useState({
     usuario: initialData.usuario || '',
     cabana: initialData.cabana || '',

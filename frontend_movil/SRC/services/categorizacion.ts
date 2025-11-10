@@ -86,9 +86,9 @@ export class CategorizacionService {
                 // Verificar que sea un array antes de filtrar
                 if (Array.isArray(categorias)) {
                     const nombres = categorias
-                        .filter(cat => cat && cat.activo)
+                        .filter(cat => cat?.activo)
                         .map(cat => cat.nombre)
-                        .filter(nombre => nombre); // Filtrar nombres válidos
+                        .filter(Boolean); // Filtrar nombres válidos
                     
                     console.log('✅ Nombres de categorías activas:', nombres);
                     return { success: true, data: nombres };
@@ -127,13 +127,23 @@ export class CategorizacionService {
         ];
     }
 
-    getEstadoColor(activo: boolean): string {
-        return activo ? '#28a745' : '#dc3545';
+    getEstadoColorActivo(): string {
+        return '#28a745';
     }
 
-    getEstadoText(activo: boolean): string {
-        return activo ? 'Activo' : 'Inactivo';
+    getEstadoColorInactivo(): string {
+        return '#dc3545';
     }
+
+    getEstadoTextActivo(): string {
+        return 'Activo';
+    }
+
+    getEstadoTextInactivo(): string {
+        return 'Inactivo';
+    }
+
+
 }
 
 const categorizacionService = new CategorizacionService();

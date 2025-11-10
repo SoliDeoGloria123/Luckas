@@ -660,7 +660,7 @@ const FormularioReserva = ({ cabana, isOpen, onClose, onSucces }) => {
                   <div className="confirmation-grid-seminario-reserva">
                     <div>
                       <div className="confirmation-item-seminario-reserva">
-                        <strong>Número de Reserva:</strong> #RES-2025-{Math.floor(Math.random() * 1000).toString().padStart(3, '0')}
+                        <strong>Número de Reserva:</strong> #RES-2025-{Date.now().toString().slice(-3)}
                       </div>
                       <div className="confirmation-item-seminario-reserva">
                         <strong>Huésped Principal:</strong> {reservationData.fullName || '-'}

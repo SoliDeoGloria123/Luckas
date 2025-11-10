@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../context/AuthContext';
 import { RootStackParamList, MainTabParamList } from '../types/navigation';
-import { seminaristaStyles } from '../styles/SeminaristaMovil';
 
 // Constantes de estilo
 const NAVIGATION_COLORS = {
@@ -28,13 +27,69 @@ import ChangePasswordScreen  from '../screens/ChangePasswordScreen';
 
 // Ya no necesitamos pantallas temporales, todas están implementadas
 
+// Tipos para los iconos
+interface TabIconProps {
+    focused: boolean;
+    color: string;
+    size: number;
+}
+
+// Componentes de iconos extraídos
+const HomeIcon: React.FC<TabIconProps> = ({ focused, color, size }) => (
+    <Ionicons
+        name={focused ? 'home' : 'home-outline'}
+        size={size}
+        color={color}
+    />
+);
+
+const CursosIcon: React.FC<TabIconProps> = ({ focused, color, size }) => (
+    <Ionicons
+        name={focused ? 'school' : 'school-outline'}
+        size={size}
+        color={color}
+    />
+);
+
+const EventosIcon: React.FC<TabIconProps> = ({ focused, color, size }) => (
+    <Ionicons
+        name={focused ? 'calendar' : 'calendar-outline'}
+        size={size}
+        color={color}
+    />
+);
+
+const CabanasIcon: React.FC<TabIconProps> = ({ focused, color, size }) => (
+    <Ionicons
+        name={focused ? 'bed' : 'bed-outline'}
+        size={size}
+        color={color}
+    />
+);
+
+const TasksIcon: React.FC<TabIconProps> = ({ focused, color, size }) => (
+    <Ionicons
+        name={focused ? 'checkbox' : 'checkbox-outline'}
+        size={size}
+        color={color}
+    />
+);
+
+const ProfileIcon: React.FC<TabIconProps> = ({ focused, color, size }) => (
+    <Ionicons
+        name={focused ? 'person' : 'person-outline'}
+        size={size}
+        color={color}
+    />
+);
+
 //Creacion de navegadores
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // Navegador principal con tabs
 const MainTabNavigator: React.FC = () => {
-    const { isAdmin, isTesorero, isSeminarista, user } = useAuth();
+    const { isAdmin, isTesorero, isSeminarista } = useAuth();
 
     return (
         <Tab.Navigator
@@ -61,13 +116,7 @@ const MainTabNavigator: React.FC = () => {
                 component={HomeScreen} 
                 options={{
                     tabBarLabel: 'Inicio',
-                    tabBarIcon: ({ focused, color, size }: any) => (
-                        <Ionicons
-                            name={focused ? 'home' : 'home-outline'}
-                            size={size}
-                            color={color}
-                        />
-                    ),
+                    tabBarIcon: HomeIcon,
                 }} 
             />
 
@@ -76,13 +125,7 @@ const MainTabNavigator: React.FC = () => {
                 name="Cursos" 
                 component={CursosScreen} 
                 options={{
-                    tabBarIcon: ({ focused, color, size }: any) => (
-                        <Ionicons
-                            name={focused ? 'school' : 'school-outline'}
-                            size={size}
-                            color={color}
-                        />
-                    ),
+                    tabBarIcon: CursosIcon,
                 }} 
             />
 
@@ -91,13 +134,7 @@ const MainTabNavigator: React.FC = () => {
                 name="Eventos" 
                 component={EventosScreen} 
                 options={{
-                    tabBarIcon: ({ focused, color, size }: any) => (
-                        <Ionicons
-                            name={focused ? 'calendar' : 'calendar-outline'}
-                            size={size}
-                            color={color}
-                        />
-                    ),
+                    tabBarIcon: EventosIcon,
                 }} 
             />
 
@@ -107,13 +144,7 @@ const MainTabNavigator: React.FC = () => {
                 component={CabanasScreen} 
                 options={{
                     tabBarLabel: 'Cabañas',
-                    tabBarIcon: ({ focused, color, size }: any) => (
-                        <Ionicons
-                            name={focused ? 'bed' : 'bed-outline'}
-                            size={size}
-                            color={color}
-                        />
-                    ),
+                    tabBarIcon: CabanasIcon,
                 }} 
             />
 
@@ -124,13 +155,7 @@ const MainTabNavigator: React.FC = () => {
                     component={TareasScreen} 
                     options={{
                         tabBarLabel: 'Tareas',
-                        tabBarIcon: ({ focused, color, size }: any) => (
-                            <Ionicons
-                                name={focused ? 'checkbox' : 'checkbox-outline'}
-                                size={size}
-                                color={color}
-                            />
-                        ),
+                        tabBarIcon: TasksIcon,
                     }} 
                 />
             )}
@@ -141,13 +166,7 @@ const MainTabNavigator: React.FC = () => {
                 component={ProfileScreen} 
                 options={{
                     tabBarLabel: 'Perfil',
-                    tabBarIcon: ({ focused, color, size }: any) => (
-                        <Ionicons
-                            name={focused ? 'person' : 'person-outline'}
-                            size={size}
-                            color={color}
-                        />
-                    ),
+                    tabBarIcon: ProfileIcon,
                 }} 
             />
         </Tab.Navigator>

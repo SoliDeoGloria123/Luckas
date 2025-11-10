@@ -81,7 +81,7 @@ export const VALIDATION_RULES = {
     PHONE_MAX_LENGTH: 15,
     NAME_MIN_LENGTH: 2,
     EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    PHONE_REGEX: /^[0-9]{7,15}$/
+    PHONE_REGEX: /^\d{7,15}$/
 };
 
 // Mensajes de la aplicación
@@ -104,7 +104,7 @@ export const MESSAGES = {
 
 // Función para obtener la URL base según el entorno
 export const getApiBaseUrl = (): string => {
-    if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    if (__DEV__ !== undefined && __DEV__) {
         // En desarrollo, puedes cambiar esto según tu configuración
         // return 'http://10.0.2.2:3000/api'; // Para emulador Android
         return 'http://192.168.80.22:3000/api'; // Para dispositivo físico (cambiar IP)

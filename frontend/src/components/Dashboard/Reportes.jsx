@@ -92,13 +92,13 @@ const Reportes = () => {
     });
   };
 
-  const exportarPDF = async () => {
-    try {
-      await reporteService.exportToPDF(tipoReporte, filtros);
-    } catch (err) {
-      setError('Error al exportar PDF: ' + err.message);
-    }
-  };
+  ///const exportarPDF = async () => {
+  ///  try {
+  ///    await reporteService.exportToPDF(tipoReporte, filtros);
+  ///  } catch (err) {
+  ///    setError('Error al exportar PDF: ' + err.message);
+  ///  }
+  ///};
 
   const exportarExcel = async () => {
     try {
@@ -170,11 +170,11 @@ const Reportes = () => {
     setMostrarModal(true);
   };
   // Cerrar modal y limpiar edición
-  const cerrarModal = () => {
-    setMostrarModal(false);
-    setReporteEditando(null);
-    setModoEdicion(false);
-  };
+  //const cerrarModal = () => {
+  //  setMostrarModal(false);
+  //  setReporteEditando(null);
+  //  setModoEdicion(false);
+  //};
   const renderDashboard = () => {
     if (!datosReporte?.resumen) return null;
 

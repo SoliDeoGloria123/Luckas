@@ -52,12 +52,15 @@ const HomeScreen: React.FC = () => {
                 { 
                     text: 'Cerrar Sesión', 
                     style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await logout();
-                        } catch (error) {
-                            Alert.alert('Error', 'No se pudo cerrar la sesión');
-                        }
+                    onPress: () => {
+                        (async () => {
+                            try {
+                                await logout();
+                            } catch (error) {
+                                console.error('Error al cerrar sesión:', error);
+                                Alert.alert('Error', 'No se pudo cerrar la sesión');
+                            }
+                        })();
                     }
                 }
             ]

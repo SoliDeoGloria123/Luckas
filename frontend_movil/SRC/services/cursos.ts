@@ -20,9 +20,9 @@ class CursosService {
             // Si la respuesta es paginada, tomar el array correcto
             let cursos: Curso[] = [];
             if (Array.isArray(response.data)) {
-                cursos = response.data;
-            } else if (response.data && Array.isArray(response.data.data)) {
-                cursos = response.data.data;
+                cursos = response.data as Curso[];
+            } else if (response.data && Array.isArray((response.data as any).data)) {
+                cursos = (response.data as any).data as Curso[];
             }
             return { success: true, data: cursos };
         } catch (error) {

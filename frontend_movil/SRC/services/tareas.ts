@@ -216,13 +216,13 @@ export class TareasService {
             errors.push('La descripción de la tarea es requerida');
         }
 
-        if (!tarea.fechaLimite) {
-            errors.push('La fecha límite es requerida');
-        } else {
+        if (tarea.fechaLimite) {
             const fechaLimite = new Date(tarea.fechaLimite);
             if (fechaLimite < new Date()) {
                 errors.push('La fecha límite debe ser posterior a la fecha actual');
             }
+        } else {
+            errors.push('La fecha límite es requerida');
         }
 
         if (!tarea.prioridad) {

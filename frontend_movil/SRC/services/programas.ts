@@ -27,7 +27,7 @@ interface ProgramaTecnicoForm {
 }
 
 class ProgramasService {
-    private baseUrl = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROGRAMAS}`;
+    private readonly baseUrl = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROGRAMAS}`;
 
     // Realizar petición HTTP con autenticación
     private async makeRequest<T>(

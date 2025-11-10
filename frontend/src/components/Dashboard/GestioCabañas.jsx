@@ -275,9 +275,9 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
                 <p className="mb-2"><strong>Creado por:</strong> {eventoDetalle.creadoPor?.nombre || eventoDetalle.creadoPor}</p>
                 <div className="flex flex-wrap gap-2 my-4">
                   {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.length > 0 ? (
-                    eventoDetalle.imagen.map((img) => {
+                    eventoDetalle.imagen.map((img, index) => {
                       // Usar el nombre de archivo o el string completo como key única
-                      const key = typeof img === 'string' ? img : (img?.name || Math.random());
+                      const key = typeof img === 'string' ? img : (img?.name || `imagen-${index}`);
                       return (
                         <img
                           key={key}

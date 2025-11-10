@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { authService } from '../services';
 import { User } from '../types';
 
@@ -108,11 +108,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const canEdit = () => {
-        return user && (user.role === 'admin' || user.role === 'tesorero');
+        return user?.role === 'admin' || user?.role === 'tesorero';
     };
 
     const canDelete = () => {
-        return user && user.role === 'admin';
+        return user?.role === 'admin';
     };
 
     const hasRole = (role: string) => {
@@ -140,22 +140,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const isTesorero = () => hasRole('tesorero');
     const isSeminarista = () => hasRole('seminarista');
 
+    // Memoizar el objeto value para evitar re-renders innecesarios
+    const contextValue = useMemo(() => ({
+        isAuthenticated,
+        user,
+        loading,
+        login: loginWithLoading,
+        logout,
+        verifyToken,
+        updateUserInContext,
+        canEdit,
+        canDelete,
+        hasRole,
+        isAdmin,
+        isTesorero,
+        isSeminarista
+    }), [isAuthenticated, user, loading]);
+
     return (
-        <AuthContext.Provider value={{
-            isAuthenticated,
-            user,
-            loading,
-            login: loginWithLoading,
-            logout,
-            verifyToken,
-            updateUserInContext,
-            canEdit,
-            canDelete,
-            hasRole,
-            isAdmin,
-            isTesorero,
-            isSeminarista
-        }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );

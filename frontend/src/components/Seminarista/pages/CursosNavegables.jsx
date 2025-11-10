@@ -20,6 +20,28 @@ const CursosSeminario = () => {
   const [notification, setNotification] = useState({ show: false, message: '' });
   const [inscripcionLoading, setInscripcionLoading] = useState(false);
 
+  // Effect para manejar el cierre del modal con la tecla Escape
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && cursoSeleccionado) {
+        setCursoSeleccionado(null);
+      }
+    };
+
+    if (cursoSeleccionado) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Enfocar el botón de cerrar del modal para mejor accesibilidad
+      const closeButton = document.querySelector('.modal-close-programas');
+      if (closeButton) {
+        closeButton.focus();
+      }
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [cursoSeleccionado]);
+
   useEffect(() => {
   const cargarCursos = async () => {
     try {
@@ -53,20 +75,20 @@ const CursosSeminario = () => {
     showNotification('Curso agregado a favoritos');
   };
 
-  const inscribirseEnCurso = async (cursoId) => {
-    setInscripcionLoading(true);
-    try {
-      // Aquí se conectará con el servicio de inscripción
-      // await inscripcionService.inscribirCurso(cursoId);
-      const curso = cursos.find(c => c._id === cursoId);
-      showNotification(`Te has inscrito exitosamente en ${curso?.nombre || 'el curso'}`);
-    } catch (error) {
-      console.error('Error al inscribirse:', error);
-      showNotification('Error al inscribirse en el curso');
-    } finally {
-      setInscripcionLoading(false);
-    }
-  };
+const inscribirseEnCurso = async (cursoId) => {
+  setInscripcionLoading(true);
+  try {
+    // Aquí se conectará con el servicio de inscripción
+    // await inscripcionService.inscribirCurso(cursoId);
+    const curso = cursos.find(c => c._id === cursoId);
+    showNotification(`Te has inscrito exitosamente en ${curso?.nombre || 'el curso'}`);
+  } catch (error) {
+    console.error('Error al inscribirse:', error);
+    showNotification('Error al inscribirse en el curso');
+  } finally {
+    setInscripcionLoading(false);
+  }
+};
 
   const verDetalles = (curso) => {
     setCursoSeleccionado(curso);
@@ -378,17 +400,29 @@ const CursosSeminario = () => {
         const isModalDisabled = inscripcionLoading || (cursoSeleccionado.cuposDisponibles || 0) === 0;
 
         return (
-        <button
-          type="button"
-          className="modal-overlay-programas"
-          onClick={() => setCursoSeleccionado(null)}
-          style={{ border: 'none', background: 'transparent', padding: 0, width: '100%', height: '100%' }}
-        >
+        <div className="modal-overlay-programas">
+          <button
+            type="button"
+            className="modal-backdrop"
+            onClick={() => setCursoSeleccionado(null)}
+            style={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              width: '100%', 
+              height: '100%', 
+              background: 'transparent', 
+              border: 'none', 
+              cursor: 'default',
+              zIndex: 1
+            }}
+            aria-label="Cerrar modal"
+          />
           <dialog 
             className="modal-content-programas" 
-            onClick={(e) => e.stopPropagation()}
             open
             aria-labelledby="modal-title"
+            style={{ position: 'relative', zIndex: 2 }}
           >
             <div className="modal-header-programas">
               <div className="modal-title-section-programas">
@@ -501,7 +535,7 @@ const CursosSeminario = () => {
               </div>
             </div>
           </dialog>
-        </button>
+        </div>
         );
       })()}
 

@@ -237,21 +237,60 @@ export class InscripcionesService {
         fechaInicio?: string;
         fechaFin?: string;
     }): Inscripcion[] {
-        return inscripciones.filter(inscripcion => {
-            if (filters.estado && inscripcion.estado !== filters.estado) return false;
-            if (filters.estadoPago && inscripcion.pago.estado !== filters.estadoPago) return false;
-            if (filters.evento && inscripcion.evento !== filters.evento) return false;
-            if (filters.curso && inscripcion.curso !== filters.curso) return false;
-            if (filters.programa && inscripcion.programa !== filters.programa) return false;
-            
-            if (filters.fechaInicio || filters.fechaFin) {
-                const fechaInscripcion = new Date(inscripcion.fechaInscripcion);
-                if (filters.fechaInicio && fechaInscripcion < new Date(filters.fechaInicio)) return false;
-                if (filters.fechaFin && fechaInscripcion > new Date(filters.fechaFin)) return false;
-            }
-            
+        return inscripciones.filter(inscripcion => this.matchesFilters(inscripcion, filters));
+    }
+
+    private matchesFilters(inscripcion: Inscripcion, filters: {
+        estado?: string;
+        estadoPago?: string;
+        evento?: string;
+        curso?: string;
+        programa?: string;
+        fechaInicio?: string;
+        fechaFin?: string;
+    }): boolean {
+        if (!this.matchesBasicFilters(inscripcion, filters)) {
+            return false;
+        }
+        
+        return this.matchesDateFilters(inscripcion, filters);
+    }
+
+    private matchesBasicFilters(inscripcion: Inscripcion, filters: {
+        estado?: string;
+        estadoPago?: string;
+        evento?: string;
+        curso?: string;
+        programa?: string;
+    }): boolean {
+        if (filters.estado && inscripcion.estado !== filters.estado) return false;
+        if (filters.estadoPago && inscripcion.pago.estado !== filters.estadoPago) return false;
+        if (filters.evento && inscripcion.evento !== filters.evento) return false;
+        if (filters.curso && inscripcion.curso !== filters.curso) return false;
+        if (filters.programa && inscripcion.programa !== filters.programa) return false;
+        
+        return true;
+    }
+
+    private matchesDateFilters(inscripcion: Inscripcion, filters: {
+        fechaInicio?: string;
+        fechaFin?: string;
+    }): boolean {
+        if (!filters.fechaInicio && !filters.fechaFin) {
             return true;
-        });
+        }
+        
+        const fechaInscripcion = new Date(inscripcion.fechaInscripcion);
+        
+        if (filters.fechaInicio && fechaInscripcion < new Date(filters.fechaInicio)) {
+            return false;
+        }
+        
+        if (filters.fechaFin && fechaInscripcion > new Date(filters.fechaFin)) {
+            return false;
+        }
+        
+        return true;
     }
 
     // Validaciones
@@ -270,12 +309,12 @@ export class InscripcionesService {
         }
 
         // Validar pago
-        if (!inscripcion.pago) {
-            errors.push('La información de pago es requerida');
-        } else {
+        if (inscripcion.pago) {
             if (!inscripcion.pago.monto || inscripcion.pago.monto <= 0) {
                 errors.push('El monto del pago debe ser mayor a 0');
             }
+        } else {
+            errors.push('La información de pago es requerida');
         }
 
         return {

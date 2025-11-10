@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { AppRegistry, View, Text, ActivityIndicator } from 'react-native';
+import { AppRegistry } from 'react-native';
 import AppLoading from 'expo-app-loading';
 
 import { AuthProvider } from './SRC/context/AuthContext';

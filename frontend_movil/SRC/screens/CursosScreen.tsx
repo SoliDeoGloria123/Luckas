@@ -45,11 +45,12 @@ const CursosScreen: React.FC = () => {
             const response = await programasService.getAllProgramas();
             if (response.success && response.data) {
                 // Forzar el tipo de la respuesta para evitar errores de tipado
-                const cursosArray = Array.isArray(response.data)
-                    ? response.data
-                    : Array.isArray((response.data as any).data)
-                        ? (response.data as any).data
-                        : [];
+                let cursosArray = [];
+                if (Array.isArray(response.data)) {
+                    cursosArray = response.data;
+                } else if (Array.isArray((response.data as any).data)) {
+                    cursosArray = (response.data as any).data;
+                }
                 setCursos(cursosArray);
             } else {
                 Alert.alert('Error', response.message || 'No se pudieron cargar los cursos');
@@ -73,13 +74,13 @@ const CursosScreen: React.FC = () => {
     });
 
     // Nota: Funcionalidad de agregar cursos deshabilitada
-    const handleEditCurso = (cursoId: string) => {
-        Alert.alert('Solo Visualización', 'La funcionalidad de edición no está disponible en la versión móvil');
-    };
-
-    const handleDeleteCurso = (cursoId: string) => {
-        Alert.alert('Solo Visualización', 'La funcionalidad de eliminación no está disponible en la versión móvil');
-    };
+  ///  const handleEditCurso = (cursoId: string) => {
+  ///      Alert.alert('Solo Visualización', 'La funcionalidad de edición no está disponible en la versión móvil');
+  ///  };
+///
+  ///  const handleDeleteCurso = (cursoId: string) => {
+  ///      Alert.alert('Solo Visualización', 'La funcionalidad de eliminación no está disponible en la versión móvil');
+  ///  };
 
     const handleVerCurso = (curso: any) => {
         setSelectedCurso(curso);
@@ -186,7 +187,7 @@ const CursosScreen: React.FC = () => {
                                 <View style={styles.modalSection}>
                                     <Text style={styles.modalSectionTitle}>Requisitos</Text>
                                     {selectedCurso.requisitos.map((req: string, index: number) => (
-                                        <Text key={index} style={styles.modalListItem}>• {req}</Text>
+                                        <Text key={`requisito-${selectedCurso._id}-${index}-${req.substring(0, 10)}`} style={styles.modalListItem}>• {req}</Text>
                                     ))}
                                 </View>
                             )}
@@ -195,7 +196,7 @@ const CursosScreen: React.FC = () => {
                                 <View style={styles.modalSection}>
                                     <Text style={styles.modalSectionTitle}>Objetivos</Text>
                                     {selectedCurso.objetivos.map((obj: string, index: number) => (
-                                        <Text key={index} style={styles.modalListItem}>• {obj}</Text>
+                                        <Text key={`objetivo-${selectedCurso._id}-${index}-${obj.substring(0, 10)}`} style={styles.modalListItem}>• {obj}</Text>
                                     ))}
                                 </View>
                             )}

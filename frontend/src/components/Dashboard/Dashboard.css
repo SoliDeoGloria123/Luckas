@@ -628,7 +628,7 @@
 
 .btn-action.eliminar {
   background: rgba(239, 68, 68, 0.1);
-  color: #7f1d1d;
+  color: #991b1b;
 }
 
 .btn-action.eliminar:hover {
@@ -960,12 +960,12 @@
 
 .rol-tesorero {
   background: rgba(5, 150, 105, 0.1);
-  color: #064e3b;
+  color: #042f2e;
 }
 
 .rol-seminarista {
   background: rgba(139, 92, 246, 0.1);
-  color: #581c87;
+  color: #4c1d95;
 }
 
 .estado-active,
@@ -1033,7 +1033,7 @@
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: #475569;
 }
 
 .search-container-reporte input {
@@ -1155,7 +1155,7 @@
 }
 .usuario-inactivo-blur td:first-child::before {
   content: '\26A0'; /* ícono de advertencia Unicode */
-  color: #f59e0b;
+  color: #d97706;
   font-size: 1.2em;
   margin-right: 6px;
   vertical-align: middle;
@@ -1792,7 +1792,7 @@
 }
 
 .estado-revision {
-  color: #ffc107;
+  color: #d97706;
   font-weight: bold;
 }
 
@@ -1817,7 +1817,7 @@
 }
 
 .prioridad-media {
-  color: #ffc107;
+  color: #d97706;
   font-weight: bold;
 }
 
@@ -1871,7 +1871,7 @@
 
 .page-header-Academicos h1 i {
   font-size: 28px;
-  color: #fbbf24;
+  color: #d97706;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 

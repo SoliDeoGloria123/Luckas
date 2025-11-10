@@ -7,13 +7,12 @@ import { API_CONFIG, STORAGE_KEYS } from '../config';
 class AuthService {
     private token: string | null = null;
     private user: User | null = null;
+    private initialized: boolean = false;
 
-    constructor() {
-        this.loadStoredData();
-    }
-
-    // Cargar datos almacenados al inicializar
-    private async loadStoredData(): Promise<void> {
+    // Inicializar el servicio (debe llamarse antes de usar el servicio)
+    async initialize(): Promise<void> {
+        if (this.initialized) return;
+        
         try {
             const storedToken = await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
             const storedUser = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
@@ -25,8 +24,17 @@ class AuthService {
             if (storedUser) {
                 this.user = JSON.parse(storedUser);
             }
+            
+            this.initialized = true;
         } catch (error) {
             console.error('Error loading stored auth data:', error);
+        }
+    }
+
+    // Asegurar que el servicio esté inicializado
+    private async ensureInitialized(): Promise<void> {
+        if (!this.initialized) {
+            await this.initialize();
         }
     }
 
@@ -35,6 +43,8 @@ class AuthService {
         endpoint: string,
         options: RequestInit = {}
     ): Promise<ApiResponse<T>> {
+        await this.ensureInitialized();
+        
         try {
             const url = `${API_CONFIG.BASE_URL}${endpoint}`;
             const headers: Record<string, string> = {
@@ -80,14 +90,13 @@ class AuthService {
             });
 
             let data;
-            let alreadyRead = false;
             try {
                 data = await response.json();
             } catch (jsonError) {
+                console.error('Error parsing JSON response:', jsonError);
                 // Si la respuesta no es JSON, probablemente es HTML de error (por ejemplo, sesión expirada)
                 try {
                     const text = await response.text();
-                    alreadyRead = true;
                     console.error('Respuesta no JSON recibida:', text);
                     return {
                         success: false,
@@ -95,6 +104,7 @@ class AuthService {
                         error: text
                     };
                 } catch (readError) {
+                    console.error('Error reading response text:', readError);
                     // Si ya fue leída, evitar el error 'Already read'
                     console.error('La respuesta ya fue leída, no se puede leer de nuevo.');
                     return {
@@ -155,7 +165,7 @@ class AuthService {
                 const { token, user } = response.data;
                 
                 // Asegurarse de que tenemos los datos necesarios
-                if (!token || !user || !user.role) {
+                if (!token || !user?.role) {
                     console.error('Respuesta del servidor incompleta:', response);
                     throw new Error('Datos de sesión incompletos del servidor');
                 }
@@ -178,8 +188,8 @@ class AuthService {
                 console.log('Login exitoso:', {
                     token: this.token ? 'PRESENTE' : 'NO PRESENTE',
                     user: this.user ? {
-                        role: this.user.role,
-                        id: this.user._id
+                        role: this.user?.role,
+                        id: this.user?._id
                     } : 'NO PRESENTE'
                 });
 
@@ -306,6 +316,7 @@ class AuthService {
 
     // Verificar si está autenticado
     async isAuthenticated(): Promise<boolean> {
+        await this.ensureInitialized();
         const token = await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
         return !!token;
     }
@@ -329,6 +340,18 @@ class AuthService {
 
     // Obtener usuario actual (sincrónico)
     getUser(): User | null {
+        return this.user;
+    }
+
+    // Obtener token actual (con inicialización)
+    async getTokenAsync(): Promise<string | null> {
+        await this.ensureInitialized();
+        return this.token;
+    }
+
+    // Obtener usuario actual (con inicialización)
+    async getUserAsync(): Promise<User | null> {
+        await this.ensureInitialized();
         return this.user;
     }
 

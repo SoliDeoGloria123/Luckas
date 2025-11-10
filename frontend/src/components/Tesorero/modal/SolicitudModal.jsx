@@ -5,31 +5,30 @@ import { userService } from '../../../services/userService';
 import { jwtDecode } from "jwt-decode";
 import PropTypes from 'prop-types';
 
-const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
-  const getUsuarioSesion = () => {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-    try {
-      return jwtDecode(token);
-    } catch (e) {
-      console.error("Error al decodificar el token:", e);
-      return null;
-    }
-  };
-  const usuarioSesion = getUsuarioSesion();
-  console.log("usuarioSesion", usuarioSesion); // <-- Ver en consola qué campos trae el token
+// Funciones auxiliares movidas fuera del componente para reducir complejidad cognitiva
+function getUsuarioSesion() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  try {
+    return jwtDecode(token);
+  } catch (e) {
+    console.error("Error al decodificar el token:", e);
+    return null;
+  }
+}
 
-  const getNombreUsuarioSesion = () => {
-    if (!usuarioSesion) return "";
-    // Ajusta aquí según el campo real que trae tu token
-    return usuarioSesion.nombre || usuarioSesion.name || usuarioSesion.username || "";
-  };
-  const getResponsableId = () => {
-    if (!usuarioSesion) return "";
-    // El backend puede guardar el id como _id o id en el token
-    return usuarioSesion._id || usuarioSesion.id || "";
-  };
-  const [formData, setFormData] = useState({
+function getNombreUsuarioSesion(usuarioSesion) {
+  if (!usuarioSesion) return "";
+  return usuarioSesion.nombre || usuarioSesion.name || usuarioSesion.username || "";
+}
+
+function getResponsableId(usuarioSesion) {
+  if (!usuarioSesion) return "";
+  return usuarioSesion._id || usuarioSesion.id || "";
+}
+
+function initializeFormData(mode, initialData, usuarioSesion) {
+  return {
     solicitante: initialData.solicitante?._id?.toString() || initialData.solicitante?.toString() || initialData.solicitante || "",
     nombre: initialData.solicitante?.nombre || initialData.nombre || "",
     correo: initialData.correo || "",
@@ -39,15 +38,22 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
     categoria: initialData.categoria?._id?.toString() || initialData.categoria?._id || initialData.categoria?.toString() || initialData.categoria || "",
     categoriaNombre: initialData.categoria?.nombre || "",
     descripcion: initialData.descripcion || "",
-  estado: initialData.estado ? String(initialData.estado) : "Nueva",
+    estado: initialData.estado ? String(initialData.estado) : "Nueva",
     prioridad: initialData.prioridad ? String(initialData.prioridad) : "Media",
-    responsable: mode === 'create' && usuarioSesion ? getResponsableId() : (initialData.responsable?._id?.toString() || initialData.responsable?._id || initialData.responsable?.toString() || initialData.responsable || ""),
-    responsableNombre: mode === 'create' && usuarioSesion ? getNombreUsuarioSesion() : (initialData.responsable?.nombre || ""),
+    responsable: mode === 'create' && usuarioSesion ? getResponsableId(usuarioSesion) : (initialData.responsable?._id?.toString() || initialData.responsable?._id || initialData.responsable?.toString() || initialData.responsable || ""),
+    responsableNombre: mode === 'create' && usuarioSesion ? getNombreUsuarioSesion(usuarioSesion) : (initialData.responsable?.nombre || ""),
     observaciones: initialData.observaciones || "",
     role: initialData.solicitante?.role || initialData.role || "",
     tipoSolicitud: initialData.tipoSolicitud ? String(initialData.tipoSolicitud) : "",
     modeloReferencia: initialData.modeloReferencia ? String(initialData.modeloReferencia) : ""
-  });
+  };
+}
+
+const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }) => {
+  const usuarioSesion = getUsuarioSesion();
+  console.log("usuarioSesion", usuarioSesion); // <-- Ver en consola qué campos trae el token
+
+  const [formData, setFormData] = useState(initializeFormData(mode, initialData, usuarioSesion));
 
   const [categorias, setCategorias] = useState([]);
 
@@ -265,7 +271,7 @@ const SolicitudModal = ({ mode = 'create', initialData = {}, onClose, onSubmit }
 
               <div className="form-group-tesorero">
                 <label htmlFor="descripcion">Descripción</label>
-                <texta 
+                <textarea 
                   name="descripcion"
                   value={formData.descripcion}
                   onChange={handleChange}

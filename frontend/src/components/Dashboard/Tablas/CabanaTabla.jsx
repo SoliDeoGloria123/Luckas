@@ -97,21 +97,21 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
     }
   };
 
-  const toggleAmenidad = (amenidad, isEditing = false) => {
-    if (isEditing) {
-      const amenidadesActuales = cabanaSeleccionada.amenidades || [];
-      const nuevasAmenidades = amenidadesActuales.includes(amenidad)
-        ? amenidadesActuales.filter(a => a !== amenidad)
-        : [...amenidadesActuales, amenidad];
-      setCabanaSeleccionada({ ...cabanaSeleccionada, amenidades: nuevasAmenidades });
-    } else {
-      const amenidadesActuales = nuevaCabana.amenidades;
-      const nuevasAmenidades = amenidadesActuales.includes(amenidad)
-        ? amenidadesActuales.filter(a => a !== amenidad)
-        : [...amenidadesActuales, amenidad];
-      setNuevaCabana({ ...nuevaCabana, amenidades: nuevasAmenidades });
-    }
-  };
+ /// const toggleAmenidad = (amenidad, isEditing = false) => {
+ ///   if (isEditing) {
+ ///     const amenidadesActuales = cabanaSeleccionada.amenidades || [];
+ ///     const nuevasAmenidades = amenidadesActuales.includes(amenidad)
+ ///       ? amenidadesActuales.filter(a => a !== amenidad)
+ ///       : [...amenidadesActuales, amenidad];
+ ///     setCabanaSeleccionada({ ...cabanaSeleccionada, amenidades: nuevasAmenidades });
+ ///   } else {
+ ///     const amenidadesActuales = nuevaCabana.amenidades;
+ ///     const nuevasAmenidades = amenidadesActuales.includes(amenidad)
+ ///       ? amenidadesActuales.filter(a => a !== amenidad)
+ ///       : [...amenidadesActuales, amenidad];
+ ///     setNuevaCabana({ ...nuevaCabana, amenidades: nuevasAmenidades });
+ ///   }
+ /// };
 
   // Renderizado condicional extraído para evitar ternarias anidadas en JSX
   let contenidoCabanas;

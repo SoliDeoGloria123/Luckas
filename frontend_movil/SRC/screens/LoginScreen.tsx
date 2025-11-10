@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
-import type { LoginCredentials } from '../types';
+
 
 const LoginScreen: React.FC = () => {
     const { login } = useAuth();
@@ -110,7 +110,7 @@ const LoginScreen: React.FC = () => {
                             autoCorrect={false}
                             editable={!isLoading}
                         />
-                        {errors.correo && <Text style={styles.errorText}>{errors.correo}</Text>}
+                        {Boolean(errors.correo) && <Text style={styles.errorText}>{errors.correo}</Text>}
                     </View>
 
                     {/* Campo de contraseña con ojito dentro del input */}
@@ -144,7 +144,7 @@ const LoginScreen: React.FC = () => {
                                 />
                             </TouchableOpacity>
                         </View>
-                        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+                        {Boolean(errors.password) && <Text style={styles.errorText}>{errors.password}</Text>}
                     </View>
 
                     {/* Botón de login */}

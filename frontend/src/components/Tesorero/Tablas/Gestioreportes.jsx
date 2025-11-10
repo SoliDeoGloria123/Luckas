@@ -71,25 +71,7 @@ const Gestionreportes = () => {
         }
     };
 
-    const handleCreate = () => {
-        setModalMode('create');
-        setCurrentItem(null);
-        setShowModal(true);
-    };
 
-    const handleEdit = (item) => {
-        setModalMode('edit');
-        setCurrentItem(item);
-        setShowModal(true);
-    };
-
-    const handleSubmit = (data) => {
-        if (modalMode === 'create') {
-            // Lógica para crear
-        } else {
-            // Lógica para editar
-        }
-    };
 
     // Exportar a PDF
     const exportarPDF = async () => {

@@ -224,7 +224,7 @@ const CabanasSeminario = () => {
                 </div>
                 <div className="cabin-gallery-cabana">
                   <span className="gallery-count-cabana">
-                    +{Math.floor(Math.random() * 10) + 5} fotos
+                    +{cab.imagen ? cab.imagen.length : 5} fotos
                   </span>
                 </div>
                 {cab.premium && (

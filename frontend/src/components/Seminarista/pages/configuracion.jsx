@@ -9,6 +9,12 @@ const ConfiguracionPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [toast, setToast] = useState(null);
 
+  const getToastBackgroundColor = (type) => {
+    if (type === 'success') return '#10b981';
+    if (type === 'error') return '#ef4444';
+    return '#6366f1';
+  };
+
   useEffect(() => {
     // Inicialización del manager
     configManager.setReactHooks({
@@ -17,6 +23,38 @@ const ConfiguracionPage = () => {
       showToast: setToast
     });
   }, [configManager]);
+
+  useEffect(() => {
+    // Manejar tecla Escape globalmente para modales
+    const handleEscapeKey = (e) => {
+      if (e.key === 'Escape' && (showDeleteModal || showSuccessModal)) {
+        closeModal();
+      }
+    };
+
+    // Agregar event listener global
+    document.addEventListener('keydown', handleEscapeKey);
+
+    // Enfocar modales cuando se abren
+    if (showDeleteModal) {
+      const modal = document.getElementById('deleteModal');
+      const firstButton = modal?.querySelector('button');
+      if (firstButton) {
+        firstButton.focus();
+      }
+    } else if (showSuccessModal) {
+      const modal = document.getElementById('successModal');
+      const button = modal?.querySelector('button');
+      if (button) {
+        button.focus();
+      }
+    }
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [showDeleteModal, showSuccessModal]);
 
   const closeModal = () => {
     setShowDeleteModal(false);
@@ -383,19 +421,16 @@ const ConfiguracionPage = () => {
 
       {/* Modals */}
       {showDeleteModal && (
-        <div
+        <dialog
           id="deleteModal"
           className="modal"
-          role="dialog"
-          aria-modal="true"
-          tabIndex={-1}
-          onClick={(e) => e.target.id === 'deleteModal' && closeModal()}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') closeModal();
-          }}
+          open={showDeleteModal}
         >
-          <div className="modal-content">
-            <h3>¿Estás seguro?</h3>
+          <div 
+            className="modal-content"
+            aria-labelledby="delete-modal-title"
+          >
+            <h3 id="delete-modal-title">¿Estás seguro?</h3>
             <p>Esta acción no se puede deshacer. Se eliminarán permanentemente todos tus datos.</p>
             <div className="modal-actions">
               <button className="cancel-btn" onClick={closeModal}>Cancelar</button>
@@ -410,30 +445,75 @@ const ConfiguracionPage = () => {
               </button>
             </div>
           </div>
-        </div>
+          <button 
+            className="modal-backdrop"
+            onClick={closeModal}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeModal();
+              }
+            }}
+            aria-label="Cerrar modal"
+            tabIndex={0}
+            type="button"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              zIndex: -1
+            }}
+          />
+        </dialog>
       )}
 
       {showSuccessModal && (
-        <div
+        <dialog
           id="successModal"
           className="modal"
-          role="dialog"
-          aria-modal="true"
-          tabIndex={-1}
-          onClick={(e) => e.target.id === 'successModal' && closeModal()}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') closeModal();
-          }}
+          open={showSuccessModal}
         >
-          <div className="modal-content">
+          <div 
+            className="modal-content"
+            aria-labelledby="success-modal-title"
+          >
             <div className="success-icon">
               
             </div>
-            <h3>¡Configuración Guardada!</h3>
+            <h3 id="success-modal-title">¡Configuración Guardada!</h3>
             <p>Tus cambios han sido guardados exitosamente.</p>
             <button className="ok-btn" onClick={closeModal}>Entendido</button>
           </div>
-        </div>
+          <button 
+            className="modal-backdrop"
+            onClick={closeModal}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeModal();
+              }
+            }}
+            aria-label="Cerrar modal"
+            tabIndex={0}
+            type="button"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              zIndex: -1
+            }}
+          />
+        </dialog>
       )}
 
       {/* Toast Notification */}
@@ -442,7 +522,7 @@ const ConfiguracionPage = () => {
           position: 'fixed',
           top: '20px',
           right: '20px',
-          background: toast.type === 'success' ? '#10b981' : toast.type === 'error' ? '#ef4444' : '#6366f1',
+          background: getToastBackgroundColor(toast.type),
           color: 'white',
           padding: '1rem 1.5rem',
           borderRadius: '8px',

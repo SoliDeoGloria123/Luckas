@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../styles/colors';
 import { Ionicons } from '@expo/vector-icons';
 
 const ChangePasswordScreen = () => {
@@ -33,6 +32,7 @@ const ChangePasswordScreen = () => {
         navigation.goBack();
       }, 1200);
     } catch (error) {
+      console.error('Error al cambiar contraseña:', error);
       setLoading(false);
       Alert.alert('Error', 'No se pudo cambiar la contraseña');
     }

@@ -20,9 +20,9 @@ class CabanasService {
             // Extraer array de cabañas aunque esté anidado
             let cabanas: Cabana[] = [];
             if (Array.isArray(response.data)) {
-                cabanas = response.data;
-            } else if (response.data && Array.isArray(response.data.data)) {
-                cabanas = response.data.data;
+                cabanas = response.data as Cabana[];
+            } else if (response.data && Array.isArray((response.data as any).data)) {
+                cabanas = (response.data as any).data as Cabana[];
             }
             return { success: true, data: cabanas };
         } catch (error) {

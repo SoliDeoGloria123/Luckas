@@ -3,6 +3,10 @@ import { tareaService } from "../../services/tareaService";
 import { userService } from "../../services/userService";
 import TablaTareas from "./Tablas/TareaTabla";
 import TareaModal from "./Modales/TareaModal";
+import StatsCard from "./Shared/StatsCard";
+import SearchAndFilters from "./Shared/SearchAndFilters";
+import Pagination from "./Shared/Pagination";
+import { usePagination } from "./hooks/usePagination";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
@@ -12,6 +16,8 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
   const [tareas, setTareas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [busqueda, setBusqueda] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [filtroPrioridad, setFiltroPrioridad] = useState('todas');
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -142,20 +148,40 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
     setMostrarModal(true);
   };
 
-  // Search filter
+  // Search and filter
   const tareasFiltradas = tareas.filter(t => {
-    const texto = `${t.titulo} ${t.descripcion} ${t.estado} ${t.prioridad}`.toLowerCase();
-    return texto.includes(busqueda.toLowerCase());
+    const matchesSearch = !busqueda || 
+      `${t.titulo} ${t.descripcion} ${t.estado} ${t.prioridad}`.toLowerCase().includes(busqueda.toLowerCase());
+    
+    const matchesEstado = filtroEstado === 'todos' || t.estado === filtroEstado;
+    const matchesPrioridad = filtroPrioridad === 'todas' || t.prioridad?.toLowerCase() === filtroPrioridad;
+    
+    return matchesSearch && matchesEstado && matchesPrioridad;
   });
 
+  // Usar hook de paginación
+  const {
+    currentPage,
+    totalPages,
+    paginatedData: tareasPaginadas,
+    nextPage,
+    prevPage
+  } = usePagination(tareasFiltradas, 10);
 
-  const [paginaActual, setPaginaActual] = useState(1);
-  const registrosPorPagina = 10;
-  const totalPaginas = Math.ceil(tareasFiltradas.length / registrosPorPagina);
-  const tareasPaginadas = tareasFiltradas.slice(
-    (paginaActual - 1) * registrosPorPagina,
-    paginaActual * registrosPorPagina
-  );
+  // Calcular estadísticas dinámicas
+  const statsData = {
+    total: tareas.length,
+    pendientes: tareas.filter(t => t.estado === 'pendiente').length,
+    enProgreso: tareas.filter(t => t.estado === 'en_progreso').length,
+    completadas: tareas.filter(t => t.estado === 'completada').length
+  };
+
+  const statsCards = [
+    { icon: 'fa-tasks', value: statsData.total, label: 'Total Tareas', type: 'users' },
+    { icon: 'fa-clock', value: statsData.pendientes, label: 'Pendientes', type: 'new' },
+    { icon: 'fa-spinner', value: statsData.enProgreso, label: 'En Progreso', type: 'active' },
+    { icon: 'fa-check-circle', value: statsData.completadas, label: 'Completadas', type: 'admins' }
+  ];
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
@@ -184,72 +210,45 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
             )}
           </div>
           <div className="dashboard-grid-reporte-admin">
-            <div className="stat-card-reporte-admin">
-              <div className="stat-icon-reporte-admin-admin users">
-                <i className="fas fa-users"></i>
-              </div>
-              <div className="stat-info-admin">
-                <h3>5</h3>
-                <p>Total Usuarios</p>
-              </div>
-            </div>
-            <div className="stat-card-reporte-admin">
-              <div className="stat-icon-reporte-admin-admin active">
-                <i className="fas fa-user-check"></i>
-              </div>
-              <div className="stat-info-admin">
-                <h3>4</h3>
-                <p>Usuarios Activos</p>
-              </div>
-            </div>
-            <div className="stat-card-reporte-admin">
-              <div className="stat-icon-reporte-admin-admin admins">
-                <i className="fas fa-user-shield"></i>
-              </div>
-              <div className="stat-info-admin">
-                <h3>1</h3>
-                <p>Administradores</p>
-              </div>
-            </div>
-            <div className="stat-card-reporte-admin">
-              <div className="stat-icon-reporte-admin-admin new">
-                <i className="fas fa-user-plus"></i>
-              </div>
-              <div className="stat-info-admin">
-                <h3>12</h3>
-                <p>Nuevos Este Mes</p>
-              </div>
-            </div>
-          </div>
-          <section className="filtros-section-admin">
-            <div className="busqueda-contenedor">
-              <i className="fas fa-search"></i>
-              <input
-                type="text"
-                placeholder="Buscar Tarea..."
-                value={busqueda}
-                onChange={e => setBusqueda(e.target.value)}
-                className="input-busqueda"
+            {statsCards.map((card, index) => (
+              <StatsCard
+                key={`task-stat-${card.label}-${index}`}
+                icon={card.icon}
+                value={card.value}
+                label={card.label}
+                type={card.type}
               />
-            </div>
-
-
-            <div className="filtro-grupo-admin">
-              <select className="filtro-dropdown">
-                <option>Todos los Roles</option>
-                <option>Administrador</option>
-                <option>Seminarista</option>
-                <option>Tesorero</option>
-                <option>Usuario Externo</option>
-              </select>
-              <select className="filtro-dropdown">
-                <option>Todos los Estados</option>
-                <option>Activo</option>
-                <option>Inactivo</option>
-                <option>Pendiente</option>
-              </select>
-            </div>
-          </section>
+            ))}
+          </div>
+          <SearchAndFilters 
+            searchPlaceholder="Buscar Tareas..."
+            searchValue={busqueda}
+            onSearchChange={(e) => setBusqueda(e.target.value)}
+            filters={[
+              {
+                value: filtroEstado,
+                onChange: (e) => setFiltroEstado(e.target.value),
+                options: [
+                  { value: 'todos', label: 'Todos los Estados' },
+                  { value: 'pendiente', label: 'Pendiente' },
+                  { value: 'en_progreso', label: 'En Progreso' },
+                  { value: 'completada', label: 'Completada' },
+                  { value: 'cancelada', label: 'Cancelada' }
+                ]
+              },
+              {
+                value: filtroPrioridad,
+                onChange: (e) => setFiltroPrioridad(e.target.value),
+                options: [
+                  { value: 'todas', label: 'Todas las Prioridades' },
+                  { value: 'baja', label: 'Baja' },
+                  { value: 'media', label: 'Media' },
+                  { value: 'alta', label: 'Alta' },
+                  { value: 'urgente', label: 'Urgente' }
+                ]
+              }
+            ]}
+          />
           {error && <div className="error-message">{error}</div>}
           <TablaTareas
             tareas={tareasPaginadas}
@@ -269,25 +268,12 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
             usuarios={usuarios}
           />
 
-          <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
-            <button
-              className="pagination-btn-admin"
-              onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
-              disabled={paginaActual === 1}
-            >
-              <i className="fas fa-chevron-left"></i>
-            </button>
-            <span className="pagination-info-admin">
-              Página {paginaActual} de {totalPaginas}
-            </span>
-            <button
-              className="pagination-btn-admin"
-              onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-              disabled={paginaActual === totalPaginas || totalPaginas === 0}
-            >
-              <i className="fas fa-chevron-right"></i>
-            </button>
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPrevious={prevPage}
+            onNext={nextPage}
+          />
         </div>
       </div>
     </div>

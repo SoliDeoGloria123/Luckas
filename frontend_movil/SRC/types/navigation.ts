@@ -15,10 +15,10 @@ export type MainTabParamList = {
     Profile: undefined;
     Tasks: undefined;
     // Tabs adicionales según rol
-    Programas?: undefined;
-    Reportes?: undefined;
-    Usuarios?: undefined;
-    Cabanas?: undefined;
+    Programas?: never;
+    Reportes?: never;
+    Usuarios?: never;
+    Cabanas?: never;
 };
 
 // Tipos para Stack Navigators específicos

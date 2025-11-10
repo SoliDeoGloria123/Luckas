@@ -44,7 +44,7 @@ export class UsuariosService {
         try {
             // Si el usuario edita su propio perfil, usar /profile/update
             const currentUser = authService.getUser();
-            const isOwnProfile = currentUser && currentUser._id === id;
+            const isOwnProfile = currentUser?._id === id;
             const endpoint = isOwnProfile
                 ? '/api/users/profile/update'
                 : `${API_CONFIG.ENDPOINTS.USERS}/${id}`;

@@ -8,6 +8,8 @@ const morgan = require('morgan');
 const path = require('node:path');
 const config = require('./config');
 
+async function startServer() {
+
 // Importar Rutas
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -28,10 +30,20 @@ const notificationRoutes = require('./routes/notificationRoutes');
 // Inicializar Express
 const app = express();
 
+// Deshabilitar la cabecera X-Powered-By por seguridad
+app.disable('x-powered-by');
+
 // Configuración de middlewares
 app.use(morgan('dev')); // Logging
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:19006', 'http://10.0.2.2:19006'],
+    origin: [
+        'http://localhost:3000',     // Frontend estático (desarrollo)
+        'http://localhost:3001',     // Frontend React (desarrollo)
+        'http://localhost:19006',    // App móvil Expo (desarrollo)
+        'https://localhost:3000',    // Frontend estático (HTTPS)
+        'https://localhost:3001',    // Frontend React (HTTPS)
+        'https://localhost:19006'    // App móvil Expo (HTTPS)
+    ],
     credentials: true
 }));
 app.use(express.json()); // Para parsear JSON
@@ -91,4 +103,11 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT,()=>{
     console.log(`Servidor en http://localhost:${PORT}`);
+});
+}
+
+// Iniciar el servidor
+startServer().catch((error) => {
+    console.error('❌ Error al iniciar el servidor:', error);
+    process.exit(1);
 });

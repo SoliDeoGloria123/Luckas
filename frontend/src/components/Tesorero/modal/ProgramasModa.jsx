@@ -16,13 +16,7 @@ const ProgramaModal = ({
   const [errors, setErrors] = useState({});
   
   // Función handleChange unificada
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
+ 
  
    useEffect(() => {
      if (modoEdicion && programaSeleccionado) {
@@ -52,46 +46,7 @@ const ProgramaModal = ({
      }
    }, [modoEdicion, programaSeleccionado, setFormData]);
  
-   const handleInputChange = (e) => {
-     const { name, value, type, checked } = e.target;
-     setFormData(prev => ({
-       ...prev,
-       [name]: type === 'checkbox' ? checked : value
-     }));
-   };
- 
-   const handleArrayInputChange = (index, value, arrayName) => {
-     setFormData(prev => ({
-       ...prev,
-       [arrayName]: prev[arrayName].map((item, i) => 
-         i === index ? value : item
-       )
-     }));
-   };
- 
-   const handlePensumChange = (index, field, value) => {
-     setFormData(prev => ({
-       ...prev,
-       pensum: prev.pensum.map((item, i) =>
-         i === index ? { ...item, [field]: value } : item
-       )
-     }));
-   };
- 
-   const addArrayItem = (arrayName, defaultValue) => {
-     setFormData(prev => ({
-       ...prev,
-       [arrayName]: [...prev[arrayName], defaultValue]
-     }));
-   };
- 
-   const removeArrayItem = (index, arrayName) => {
-     setFormData(prev => ({
-       ...prev,
-       [arrayName]: prev[arrayName].filter((_, i) => i !== index)
-     }));
-   };
- 
+
    const validateForm = () => {
      const newErrors = {};
      
@@ -154,7 +109,7 @@ const ProgramaModal = ({
                   <div className="detalle-row">
                     <span className="detalle-label">Requisitos:</span>
                     <ul style={{margin:0,paddingLeft:'1.2em'}}>
-                      {formData.requisitos.map((req) => req && <li key={req + '-' + Math.random().toString(36).substr(2, 9)}>{req}</li>)}
+                      {formData.requisitos.map((req, index) => req && <li key={`req-${index}-${req.substring(0, 10)}`}>{req}</li>)}
                     </ul>
                   </div>
                 )}
@@ -162,7 +117,7 @@ const ProgramaModal = ({
                   <div className="detalle-row">
                     <span className="detalle-label">Objetivos:</span>
                     <ul style={{margin:0,paddingLeft:'1.2em'}}>
-                      {formData.objetivos.map((obj) => obj && <li key={obj + '-' + Math.random().toString(36).substr(2, 9)}>{obj}</li>)}
+                      {formData.objetivos.map((obj, index) => obj && <li key={`obj-${index}-${obj.substring(0, 10)}`}>{obj}</li>)}
                     </ul>
                   </div>
                 )}
@@ -170,8 +125,8 @@ const ProgramaModal = ({
                   <div className="detalle-row">
                     <span className="detalle-label">Pensum Académico:</span>
                     <ul style={{margin:0,paddingLeft:'1.2em'}}>
-                      {formData.pensum.map((mod) => (
-                        <li key={(mod.modulo || '') + '-' + Math.random().toString(36).substr(2, 9)}><b>{mod.modulo}</b>: {mod.descripcion} ({mod.horas} horas)</li>
+                      {formData.pensum.map((mod, index) => (
+                        <li key={`pensum-${index}-${(mod.modulo || '').substring(0, 10)}`}><b>{mod.modulo}</b>: {mod.descripcion} ({mod.horas} horas)</li>
                       ))}
                     </ul>
                   </div>

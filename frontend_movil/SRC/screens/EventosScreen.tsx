@@ -31,6 +31,33 @@ interface ProgramaEvento {
     descripcion: string;
 }
 
+// Funciones auxiliares para reducir complejidad cognitiva
+const getCategoriaNombre = (categoria: any): string => {
+    return typeof categoria === 'string' ? categoria : '';
+};
+
+const shouldShowEvento = (evento: any, searchText: string, filtros: any): boolean => {
+    const matchSearch = evento.nombre.toLowerCase().includes(searchText.toLowerCase()) ||
+        evento.lugar?.toLowerCase().includes(searchText.toLowerCase()) ||
+        evento.descripcion?.toLowerCase().includes(searchText.toLowerCase());
+
+    const categoriaNombre = getCategoriaNombre(evento.categoria);
+    const matchCategoria = !filtros.categoria || categoriaNombre === filtros.categoria;
+    const matchPrioridad = !filtros.prioridad || evento.prioridad === filtros.prioridad;
+    
+    return matchSearch && matchCategoria && matchPrioridad;
+};
+
+const getCategoriaId = (categoria: any): string => {
+    if (typeof categoria === 'string') {
+        return categoria;
+    }
+    if (categoria && typeof categoria === 'object' && '_id' in categoria) {
+        return (categoria as any)._id;
+    }
+    return '';
+};
+
 const EventosScreen: React.FC = () => {
     // Filtro modal igual a CabañasScreen
     const [showFilters, setShowFilters] = useState(false);
@@ -171,27 +198,10 @@ const EventosScreen: React.FC = () => {
         setRefreshing(false);
     }, [loadEventos]);
 
-    // Filtrar eventos por búsqueda
-    const filteredEventos = eventos.filter(evento => {
-        const matchSearch = evento.nombre.toLowerCase().includes(searchText.toLowerCase()) ||
-            evento.lugar?.toLowerCase().includes(searchText.toLowerCase()) ||
-            evento.descripcion?.toLowerCase().includes(searchText.toLowerCase());
-
-        // Soporta categoria como string (ObjectId) o como objeto populado
-        let categoriaNombre = '';
-        if (typeof evento.categoria === 'string') {
-            categoriaNombre = evento.categoria;
-        } else {
-            categoriaNombre = '';
-        }
-
-        const matchCategoria = !filtros.categoria || categoriaNombre === filtros.categoria;
-        const matchPrioridad = !filtros.prioridad || evento.prioridad === filtros.prioridad;
-        return matchSearch && matchCategoria && matchPrioridad;
-    });
-
-    // Crear lista de nombres de categorías para filtros
-    const categoriasParaFiltros = ['Todos', ...categorias.map(cat => cat.nombre)];
+    // Filtrar eventos por búsqueda usando función auxiliar
+    const filteredEventos = eventos.filter(evento => 
+        shouldShowEvento(evento, searchText, filtros)
+    );
 
     // Manejar ver detalles del evento
     const handleVerDetalles = (evento: any) => {
@@ -228,12 +238,7 @@ const EventosScreen: React.FC = () => {
         setEditingEvento(evento);
         setSelectedImages(evento.imagen || []);
 
-        let categoriaId = '';
-        if (typeof evento.categoria === 'string') {
-            categoriaId = evento.categoria;
-        } else if (evento.categoria && typeof evento.categoria === 'object' && '_id' in evento.categoria) {
-            categoriaId = (evento.categoria as any)._id;
-        }
+        const categoriaId = getCategoriaId(evento.categoria);
         setFormData({
             nombre: evento.nombre,
             descripcion: evento.descripcion,
@@ -417,19 +422,21 @@ const EventosScreen: React.FC = () => {
                 {
                     text: 'Eliminar',
                     style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            const response = await eventosService.deleteEvento(evento._id);
-                            if (response.success) {
-                                Alert.alert('Éxito', 'Evento eliminado correctamente');
-                                loadEventos(); // Recargar la lista
-                            } else {
-                                Alert.alert('Error', response.message || 'No se pudo eliminar el evento');
+                    onPress: () => {
+                        (async () => {
+                            try {
+                                const response = await eventosService.deleteEvento(evento._id);
+                                if (response.success) {
+                                    Alert.alert('Éxito', 'Evento eliminado correctamente');
+                                    loadEventos(); // Recargar la lista
+                                } else {
+                                    Alert.alert('Error', response.message || 'No se pudo eliminar el evento');
+                                }
+                            } catch (error) {
+                                console.error('Error deleting evento:', error);
+                                Alert.alert('Error', 'Error de conexión');
                             }
-                        } catch (error) {
-                            console.error('Error deleting evento:', error);
-                            Alert.alert('Error', 'Error de conexión');
-                        }
+                        })();
                     }
                 }
             ]
@@ -553,12 +560,17 @@ const EventosScreen: React.FC = () => {
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
             >
-                {isLoading ? (
-                    <View style={styles.loadingContainer}>
-                        <Text style={styles.loadingText}>Cargando eventos...</Text>
-                    </View>
-                ) : filteredEventos.length > 0 ? (
-                    filteredEventos.map(evento => (
+                {(() => {
+                    if (isLoading) {
+                        return (
+                            <View style={styles.loadingContainer}>
+                                <Text style={styles.loadingText}>Cargando eventos...</Text>
+                            </View>
+                        );
+                    }
+                    
+                    if (filteredEventos.length > 0) {
+                        return filteredEventos.map(evento => (
                         <View
                             key={evento._id}
                             style={styles.eventoCardWeb}
@@ -572,7 +584,7 @@ const EventosScreen: React.FC = () => {
                                         style={styles.imageScrollView}
                                     >
                                         {evento.imagen.map((imageUri, index) => (
-                                            <View key={index} style={styles.imageWrapper}>
+                                            <View key={`evento-image-${evento._id}-${index}-${imageUri.slice(-10)}`} style={styles.imageWrapper}>
                                                 {imageUri.startsWith('mock-image') ? (
                                                     <View style={[styles.cabanaImage, styles.mockImagePlaceholder]}>
                                                         <Ionicons name="image" size={40} color="#718096" />
@@ -654,16 +666,19 @@ const EventosScreen: React.FC = () => {
                                 </View>
                             )}
                         </View>
-                    ))
-                ) : (
-                    <View style={styles.emptyContainer}>
-                        <Ionicons name="calendar-outline" size={64} color={colors.textSecondary} />
-                        <Text style={styles.emptyText}>No se encontraron eventos</Text>
-                        <Text style={styles.emptySubtext}>
-                            {searchText ? 'Intenta con otros términos de búsqueda' : 'Aún no hay eventos registrados'}
-                        </Text>
-                    </View>
-                )}
+                        ));
+                    }
+                    
+                    return (
+                        <View style={styles.emptyContainer}>
+                            <Ionicons name="calendar-outline" size={64} color={colors.textSecondary} />
+                            <Text style={styles.emptyText}>No se encontraron eventos</Text>
+                            <Text style={styles.emptySubtext}>
+                                {searchText ? 'Intenta con otros términos de búsqueda' : 'Aún no hay eventos registrados'}
+                            </Text>
+                        </View>
+                    );
+                })()}
 
             </ScrollView>
             {/* Botón crear evento solo para admins */}
@@ -791,7 +806,7 @@ const EventosScreen: React.FC = () => {
                                         <View style={styles.modalSection}>
                                             <Text style={styles.modalSectionTitle}>Programa del Evento</Text>
                                             {selectedEventos.programa.map((item: any, idx: number) => (
-                                                <Text key={idx} style={styles.modalListItem}>
+                                                <Text key={`programa-${selectedEventos._id}-${idx}-${item.tema?.slice(0, 10) || 'item'}`} style={styles.modalListItem}>
                                                     • {item.horaInicio} - {item.horaFin}: {item.tema} 
                                                     {item.descripcion && ` (${item.descripcion})`}
                                                 </Text>
@@ -942,7 +957,7 @@ const EventosScreen: React.FC = () => {
                                 <TextInput
                                     style={styles.textInput}
                                     value={formData.precio.toString()}
-                                    onChangeText={(text) => setFormData({ ...formData, precio: parseFloat(text) || 0 })}
+                                    onChangeText={(text) => setFormData({ ...formData, precio: Number.parseFloat(text) || 0 })}
                                     placeholder="0"
                                     keyboardType="numeric"
                                 />
@@ -955,7 +970,7 @@ const EventosScreen: React.FC = () => {
                                 <TextInput
                                     style={styles.textInput}
                                     value={formData.cuposTotales.toString()}
-                                    onChangeText={(text) => setFormData({ ...formData, cuposTotales: parseInt(text) || 50 })}
+                                    onChangeText={(text) => setFormData({ ...formData, cuposTotales: Number.parseInt(text, 10) || 50 })}
                                     placeholder="50"
                                     keyboardType="numeric"
                                 />
@@ -965,7 +980,7 @@ const EventosScreen: React.FC = () => {
                                 <TextInput
                                     style={styles.textInput}
                                     value={formData.cuposDisponibles.toString()}
-                                    onChangeText={(text) => setFormData({ ...formData, cuposDisponibles: parseInt(text) || 0 })}
+                                    onChangeText={(text) => setFormData({ ...formData, cuposDisponibles: Number.parseInt(text, 10) || 0 })}
                                     placeholder="Se asignará automáticamente"
                                     keyboardType="numeric"
                                     editable={false}
@@ -998,7 +1013,7 @@ const EventosScreen: React.FC = () => {
                                             {categorias.map((cat) => (
                                                 <Picker.Item
                                                     key={cat._id}
-                                                    label={`${cat.nombre}${cat.tipo ? ` (${cat.tipo})` : ''}`}
+                                                    label={cat.tipo ? `${cat.nombre} (${cat.tipo})` : cat.nombre}
                                                     value={cat._id}
                                                     color={colors.text}
                                                 />
@@ -1053,7 +1068,7 @@ const EventosScreen: React.FC = () => {
                             {selectedImages.length > 0 && (
                                 <ScrollView horizontal style={styles.imagePreviewContainer}>
                                     {selectedImages.map((imageUri, index) => (
-                                        <View key={index} style={styles.imagePreview}>
+                                        <View key={`selected-image-${index}-${imageUri.slice(-10)}`} style={styles.imagePreview}>
                                             <View style={styles.imagePlaceholder}>
                                                 <Text style={styles.imagePlaceholderText}>IMG {index + 1}</Text>
                                             </View>

@@ -18,7 +18,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../context/AuthContext';
 import { Tarea, User } from '../types';
-import { colors, spacing, typography, shadows } from '../styles';
+import { colors, spacing, typography } from '../styles';
 import Icon from 'react-native-vector-icons/Ionicons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { tareasService } from '../services';
@@ -107,7 +107,7 @@ const getUserDisplayName = (userField: string | User): string => {
         return estados[indiceActual + 1];
     };
 
-    // API functions
+    // API functions (declarar primero para evitar errores de referencia)
     const cargarTareas = useCallback(async () => {
         if (!user?._id) return;
         try {
@@ -120,22 +120,72 @@ const getUserDisplayName = (userField: string | User): string => {
                 setTareas([]);
             }
         } catch (error) {
+            console.error('Error cargando tareas:', error);
             setTareas([]);
         } finally {
             setLoading(false);
         }
     }, [user?._id]);
 
+    // Función auxiliar para eliminar tarea (reducir anidamiento)
+    const handleEliminarTarea = useCallback(async (tareaId: string) => {
+        try {
+            const response = await tareasService.deleteTarea(tareaId);
+            if (response.success) {
+                Alert.alert('Eliminada', 'La tarea fue eliminada');
+                cargarTareas();
+            } else {
+                Alert.alert('Error', response.message || 'No se pudo eliminar la tarea');
+            }
+        } catch (error) {
+            console.error('Error eliminando tarea:', error);
+            Alert.alert('Error', 'Error de conexión');
+        }
+    }, [cargarTareas]);
+
+    // Función auxiliar para editar tarea (reducir anidamiento)
+    const handleEditarTarea = useCallback((tarea: Tarea) => {
+        setEditingTarea(tarea);
+        setNuevaTarea({
+            titulo: tarea.titulo,
+            descripcion: tarea.descripcion,
+            prioridad: tarea.prioridad,
+            estado: tarea.estado,
+            asignadoA: typeof tarea.asignadoA === 'string' ? tarea.asignadoA : (tarea.asignadoA?._id || ''),
+            asignadoPor: typeof tarea.asignadoPor === 'string' ? tarea.asignadoPor : (tarea.asignadoPor?._id || user?._id || ''),
+            fechaLimite: new Date(tarea.fechaLimite),
+            comentarios: []
+        });
+        setShowCreateModal(true);
+    }, [user?._id]);
+
+    // Función auxiliar para abrir modal de crear tarea (reducir anidamiento)
+    const handleAbrirCrearTarea = useCallback(() => {
+        setEditingTarea(null);
+        setNuevaTarea({
+            ...resetFormData(),
+            asignadoPor: user?._id || '' // Asegurar que se asigne el usuario actual
+        });
+        setShowCreateModal(true);
+    }, [user?._id]);
+
+    // Función auxiliar para cerrar modal (reducir anidamiento)
+    const handleCerrarModal = useCallback(() => {
+        setShowCreateModal(false);
+        setEditingTarea(null);
+        setNuevaTarea(resetFormData());
+    }, []);
+
     // Cargar usuarios disponibles para los pickers (asignadoA / asignadoPor)
     const cargarUsuarios = useCallback(async () => {
-        if (!user || !user._id) {
+        if (!user?._id) {
             setAsignadoAOptions([]);
             return;
         }
         try {
             setLoadingUsers(true);
             const resp: any = await usuariosService.getAllUsers();
-            if (resp && resp.success) {
+            if (resp?.success) {
                 const users = Array.isArray(resp.data) ? resp.data : (resp.data?.data || resp.data || []);
                 setAsignadoAOptions(users as User[]);
                 setNuevaTarea(prev => ({ ...prev, asignadoPor: prev.asignadoPor || user?._id || '' }));
@@ -279,7 +329,7 @@ const getUserDisplayName = (userField: string | User): string => {
         const puedeEditarEstado = user &&
             (user.role === 'admin' ||
                 user.role === 'tesorero' ||
-                user._id === String(tarea.asignadoA));
+                user._id === (typeof tarea.asignadoA === 'string' ? tarea.asignadoA : tarea.asignadoA?._id));
 
         return (
             <View style={[styles.card, { borderLeftColor: tareasService.getPrioridadColor(tarea.prioridad) }]}>
@@ -297,7 +347,12 @@ const getUserDisplayName = (userField: string | User): string => {
                                 style={styles.estadoButton}
                             >
                                 <Icon
-                                    name={tarea.estado === 'pendiente' ? 'time' : tarea.estado === 'en_progreso' ? 'sync' : tarea.estado === 'completada' ? 'checkmark-circle' : 'close-circle'}
+                                    name={(() => {
+                                        if (tarea.estado === 'pendiente') return 'time';
+                                        if (tarea.estado === 'en_progreso') return 'sync';
+                                        if (tarea.estado === 'completada') return 'checkmark-circle';
+                                        return 'close-circle';
+                                    })()}
                                     size={24}
                                     color={colors.primary}
                                 />
@@ -307,20 +362,7 @@ const getUserDisplayName = (userField: string | User): string => {
                         {(user?.role === 'admin' || user?.role === 'tesorero') && (
                             <TouchableOpacity
                                 style={{ marginLeft: 8, padding: 6 }}
-                                onPress={() => {
-                                    setEditingTarea(tarea);
-                                    setNuevaTarea({
-                                        titulo: tarea.titulo,
-                                        descripcion: tarea.descripcion,
-                                        prioridad: tarea.prioridad,
-                                        estado: tarea.estado,
-                                        asignadoA: typeof tarea.asignadoA === 'string' ? tarea.asignadoA : (tarea.asignadoA?._id || ''),
-                                        asignadoPor: typeof tarea.asignadoPor === 'string' ? tarea.asignadoPor : (tarea.asignadoPor?._id || user?._id || ''),
-                                        fechaLimite: new Date(tarea.fechaLimite),
-                                        comentarios: []
-                                    });
-                                    setShowCreateModal(true);
-                                }}
+                                onPress={() => handleEditarTarea(tarea)}
                             >
                                 <Icon name="pencil" size={20} color="#17a2b8" />
                             </TouchableOpacity>
@@ -338,18 +380,8 @@ const getUserDisplayName = (userField: string | User): string => {
                                             {
                                                 text: 'Eliminar',
                                                 style: 'destructive',
-                                                onPress: async () => {
-                                                    try {
-                                                        const response = await tareasService.deleteTarea(tarea._id);
-                                                        if (response.success) {
-                                                            Alert.alert('Eliminada', 'La tarea fue eliminada');
-                                                            cargarTareas();
-                                                        } else {
-                                                            Alert.alert('Error', response.message || 'No se pudo eliminar la tarea');
-                                                        }
-                                                    } catch (error) {
-                                                        Alert.alert('Error', 'Error de conexión');
-                                                    }
+                                                onPress: () => {
+                                                    handleEliminarTarea(tarea._id);
                                                 }
                                             }
                                         ]
@@ -421,15 +453,24 @@ const getUserDisplayName = (userField: string | User): string => {
                     <View style={styles.modalContent}>
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>Asignado a * ({asignadoAOptions.length} opciones disponibles)</Text>
-                            {loadingUsers ? (
-                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}>
-                                    <Text>Cargando usuarios...</Text>
-                                </View>
-                            ) : asignadoAOptions.length === 0 ? (
-                                <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}>
-                                    <Text style={{ color: '#dc3545', textAlign: 'center' }}>No hay usuarios disponibles</Text>
-                                </View>
-                            ) : (
+                            {(() => {
+                                if (loadingUsers) {
+                                    return (
+                                        <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}>
+                                            <Text>Cargando usuarios...</Text>
+                                        </View>
+                                    );
+                                }
+                                
+                                if (asignadoAOptions.length === 0) {
+                                    return (
+                                        <View style={[styles.textInput, { justifyContent: 'center', alignItems: 'center', height: 60 }]}>
+                                            <Text style={{ color: '#dc3545', textAlign: 'center' }}>No hay usuarios disponibles</Text>
+                                        </View>
+                                    );
+                                }
+                                
+                                return (
                                 <View style={[styles.pickerContainer, { minHeight: 60, maxHeight: 80 }]}>
                                     <Picker
                                         selectedValue={nuevaTarea.asignadoA}
@@ -441,7 +482,7 @@ const getUserDisplayName = (userField: string | User): string => {
                                         mode={Platform.OS === 'android' ? 'dropdown' : undefined}
                                     >
                                         <Picker.Item label="-- Seleccione un usuario --" value="" />
-                                        {asignadoAOptions.map((u, index) => (
+                                        {asignadoAOptions.map((u) => (
                                             <Picker.Item
                                                 key={u._id}
                                                 label={`${u.nombre} ${u.apellido} (${u.role})`}
@@ -450,7 +491,8 @@ const getUserDisplayName = (userField: string | User): string => {
                                         ))}
                                     </Picker>
                                 </View>
-                            )}
+                                );
+                            })()}
                             {prioridades.map((prioridad) => (
                                 <TouchableOpacity
                                     key={prioridad.value}
@@ -558,14 +600,7 @@ const getUserDisplayName = (userField: string | User): string => {
             {canCreateTasks && (
                 <TouchableOpacity
                     style={styles.fab}
-                    onPress={() => {
-                        setEditingTarea(null);
-                        setNuevaTarea({
-                            ...resetFormData(),
-                            asignadoPor: user?._id || '' // Asegurar que se asigne el usuario actual
-                        });
-                        setShowCreateModal(true);
-                    }}
+                    onPress={handleAbrirCrearTarea}
                 >
                     <Icon name="add" size={24} color="#fff" />
                 </TouchableOpacity>
@@ -579,22 +614,14 @@ const getUserDisplayName = (userField: string | User): string => {
                 visible={showCreateModal}
                 animationType="slide"
                 presentationStyle="pageSheet"
-                onRequestClose={() => {
-                    setShowCreateModal(false);
-                    setEditingTarea(null);
-                    setNuevaTarea(resetFormData());
-                }}
+                onRequestClose={handleCerrarModal}
             >
                 <KeyboardAvoidingView
                     style={styles.modalContainer}
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 >
                     <View style={styles.modalHeader}>
-                        <TouchableOpacity onPress={() => {
-                            setShowCreateModal(false);
-                            setEditingTarea(null);
-                            setNuevaTarea(resetFormData());
-                        }}>
+                        <TouchableOpacity onPress={handleCerrarModal}>
                             <Icon name="close" size={24} color={colors.text} />
                         </TouchableOpacity>
                         <Text style={styles.modalTitle}>{editingTarea ? 'Editar Tarea' : 'Crear Tarea'}</Text>

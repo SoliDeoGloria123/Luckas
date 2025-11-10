@@ -16,7 +16,6 @@ const ProgramasAcademicos = () => {
     const [sidebarAbierto, setSidebarAbierto] = useState(true);
     const [seccionActiva, setSeccionActiva] = useState("dashboard");
     const [mostrarModal, setMostrarModal] = useState(false);
-    // const [error, setError] = useState(''); // Variable no utilizada - comentada para evitar warnings
     const [cargando, setCargando] = useState(false);
     const [filtros, setFiltros] = useState({
         tipo: '',

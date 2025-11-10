@@ -3,7 +3,64 @@ import { userService } from '../../../services/userService';
 import { jwtDecode } from "jwt-decode";
 import PropTypes from 'prop-types';
 
+// Funciones movidas fuera del componente para evitar recrearlas en cada render
+function normalizeCategoria(categoria) {
+  if (!categoria) return '';
+  if (typeof categoria === 'object' && categoria._id) return String(categoria._id);
+  return String(categoria);
+}
 
+function normalizaTipoDocumento(tipo) {
+  if (!tipo) return '';
+  const map = {
+    'Cédula de ciudadanía': 'Cédula de ciudadanía',
+    'Cédula de Ciudadanía': 'Cédula de ciudadanía',
+    'Cédula de extranjería': 'Cédula de extranjería',
+    'Cédula de Extranjería': 'Cédula de extranjería',
+    'Pasaporte': 'Pasaporte',
+    'Tarjeta de identidad': 'Tarjeta de identidad',
+    'Tarjeta de Identidad': 'Tarjeta de identidad',
+  };
+  return map[tipo] || tipo;
+}
+
+// Función auxiliar para calcular edad
+function calcularEdad(fechaNacimiento) {
+  try {
+    const hoy = new Date();
+    const fechaNac = new Date(fechaNacimiento);
+    if (Number.isNaN(fechaNac.getTime())) return 25;
+    
+    let edad = hoy.getFullYear() - fechaNac.getFullYear();
+    const mes = hoy.getMonth() - fechaNac.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+      edad--;
+    }
+    return edad;
+  } catch (error) {
+    console.log('❌ Error calculando edad:', error);
+    return 25;
+  }
+}
+
+// Función auxiliar para obtener estado por defecto según tipo de referencia
+function getEstadoDefecto(tipoReferencia) {
+  if (tipoReferencia === 'Eventos') return 'no inscrito';
+  if (tipoReferencia === 'ProgramaAcademico') return 'preinscrito';
+  return '';
+}
+
+// Función auxiliar para obtener categoría de evento
+function getCategoriaEvento(eventos, eventoId) {
+  const evento = eventos.find(ev => String(ev._id) === String(eventoId));
+  return evento?.categoria ? String(evento.categoria._id || evento.categoria) : '';
+}
+
+// Función auxiliar para obtener categoría de programa
+function getCategoriaPrograma(programas, programaId) {
+  const programa = programas.find(pr => String(pr._id) === String(programaId));
+  return programa?.categoria ? String(programa.categoria._id || programa.categoria) : '';
+}
 
 const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, initialData = {}, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -35,21 +92,11 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
   const usuarioSesion = getUsuarioSesion();
   console.log("usuarioSesion", usuarioSesion); // <-- Ver en consola qué campos trae el token
 
-  const getNombreUsuarioSesion = () => {
-    if (!usuarioSesion) return "";
-    // Ajusta aquí según el campo real que trae tu token
-    return usuarioSesion.nombre || usuarioSesion.name || usuarioSesion.username || "";
-  };
   const getResponsableId = () => {
     if (!usuarioSesion) return "";
     // El backend puede guardar el id como _id o id en el token
     return usuarioSesion._id || usuarioSesion.id || "";
   };
-  function normalizeCategoria(categoria) {
-    if (!categoria) return '';
-    if (typeof categoria === 'object' && categoria._id) return String(categoria._id);
-    return String(categoria);
-  }
   // Obtener opciones de estado según el tipo de referencia
   const getOpcionesEstado = (tipoReferencia = formData.tipoReferencia) => {
     if (tipoReferencia === 'Eventos') {
@@ -73,58 +120,31 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
     }
   };
   const [usuarioNoEncontrado, setUsuarioNoEncontrado] = useState(false);
-  // Normaliza el tipo de documento a los valores válidos del select/backend
-  function normalizaTipoDocumento(tipo) {
-    if (!tipo) return '';
-    const map = {
-      'Cédula de ciudadanía': 'Cédula de ciudadanía',
-      'Cédula de Ciudadanía': 'Cédula de ciudadanía',
-      'Cédula de extranjería': 'Cédula de extranjería',
-      'Cédula de Extranjería': 'Cédula de extranjería',
-      'Pasaporte': 'Pasaporte',
-      'Tarjeta de identidad': 'Tarjeta de identidad',
-      'Tarjeta de Identidad': 'Tarjeta de identidad',
-    };
-    return map[tipo] || tipo;
-  }
+  
   const buscarUsuarioPorDocumento = async (numeroDocumento) => {
     if (!numeroDocumento) return;
+    
     try {
       const usuario = await userService.getByDocumento(numeroDocumento);
-      if (usuario) {
-        // Calcular edad a partir de la fecha de nacimiento
-        let edadCalculada = 25; // Edad por defecto
-        if (usuario.fechaNacimiento) {
-          try {
-            const hoy = new Date();
-            const fechaNac = new Date(usuario.fechaNacimiento);
-            if (!Number.isNaN(fechaNac.getTime())) {
-              edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
-              const mes = hoy.getMonth() - fechaNac.getMonth();
-              if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
-                edadCalculada--;
-              }
-            }
-          } catch (error) {
-            console.log('❌ Error calculando edad:', error);
-          }
-        }
-
-        setFormData(prev => ({
-          ...prev,
-          usuario: String(usuario._id || ""),
-          nombre: usuario.nombre || "",
-          apellido: usuario.apellido || "",
-          correo: usuario.correo || "",
-          telefono: usuario.telefono || "",
-          tipoDocumento: normalizaTipoDocumento(usuario.tipoDocumento) || "",
-          numeroDocumento: usuario.numeroDocumento || numeroDocumento,
-          edad: String(edadCalculada)
-        }));
-        setUsuarioNoEncontrado(false);
-      } else {
+      if (!usuario) {
         setUsuarioNoEncontrado(true);
+        return;
       }
+
+      const edadCalculada = usuario.fechaNacimiento ? calcularEdad(usuario.fechaNacimiento) : 25;
+      
+      setFormData(prev => ({
+        ...prev,
+        usuario: String(usuario._id || ""),
+        nombre: usuario.nombre || "",
+        apellido: usuario.apellido || "",
+        correo: usuario.correo || "",
+        telefono: usuario.telefono || "",
+        tipoDocumento: normalizaTipoDocumento(usuario.tipoDocumento) || "",
+        numeroDocumento: usuario.numeroDocumento || numeroDocumento,
+        edad: String(edadCalculada)
+      }));
+      setUsuarioNoEncontrado(false);
     } catch (error) {
       setUsuarioNoEncontrado(true);
       console.error('❌ Error buscando usuario por documento:', error);
@@ -134,50 +154,36 @@ const InscripcionModal = ({ mode = 'create', eventos, programas, categorias, ini
   const handleChange = async (e) => {
     const { name, value } = e.target;
 
-    // Si el campo es numeroDocumento, busca el usuario
+    // Buscar usuario si es número de documento
     if (name === "numeroDocumento" && value.length > 5) {
       await buscarUsuarioPorDocumento(value);
     }
 
+    // Manejar cambio de tipo de referencia
     if (name === "tipoReferencia") {
-      // Cuando cambia el tipo de referencia, establecer un estado por defecto
-      let estadoDefecto = '';
-      if (value === 'Eventos') {
-        estadoDefecto = 'no inscrito';
-      } else if (value === 'ProgramaAcademico') {
-        estadoDefecto = 'preinscrito';
-      }
       setFormData(prev => ({
         ...prev,
         [name]: value,
-        estado: estadoDefecto,
+        estado: getEstadoDefecto(value),
         referencia: "",
         categoria: ""
       }));
       return;
     }
 
+    // Manejar cambio de referencia (evento o programa)
     if (name === "referencia") {
-      if (formData.tipoReferencia === "Eventos") {
-        const eventoSel = eventos.find(ev => String(ev._id) === String(value));
-        if (eventoSel && eventoSel.categoria) {
-          setFormData(prev => ({
-            ...prev,
-            [name]: value,
-            categoria: String(eventoSel.categoria._id || eventoSel.categoria)
-          }));
-          return;
-        }
-      } else if (formData.tipoReferencia === "ProgramaAcademico") {
-        const progSel = programas.find(pr => String(pr._id) === String(value));
-        if (progSel && progSel.categoria) {
-          setFormData(prev => ({
-            ...prev,
-            [name]: value,
-            categoria: String(progSel.categoria._id || progSel.categoria)
-          }));
-          return;
-        }
+      const categoria = formData.tipoReferencia === "Eventos" 
+        ? getCategoriaEvento(eventos, value)
+        : getCategoriaPrograma(programas, value);
+      
+      if (categoria) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: value,
+          categoria
+        }));
+        return;
       }
     }
 

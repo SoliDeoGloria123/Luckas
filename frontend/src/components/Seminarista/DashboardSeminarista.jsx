@@ -93,14 +93,7 @@ const DashboardSeminarista = () => {
     }, 5000);
   };
 
-  const handleNavigation = (route) => {
-    navigate(route);
-  };
 
-  const closeMensaje = () => {
-    setMensaje('');
-    setMensajeTipo('info');
-  };
 
 
     return (

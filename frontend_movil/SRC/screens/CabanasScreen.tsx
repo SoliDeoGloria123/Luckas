@@ -11,6 +11,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     Image,
+    StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
@@ -18,7 +19,6 @@ import { useAuth } from '../context/AuthContext';
 import { cabanasService } from '../services/cabanas';
 import categorizacionService from '../services/categorizacion';
 import { Cabana, CabanaForm, Categorizacion } from '../types';
-import { StyleSheet } from 'react-native';
 import { colors, spacing, typography, shadows } from '../styles';
 
 const CabanasScreen: React.FC = () => {
@@ -59,7 +59,7 @@ const CabanasScreen: React.FC = () => {
         imagen: []
     });
 
-    //const categorizacionService = categorizacionModule.categorizacionService;
+
 
     // Verificar si el usuario tiene permisos para ver cabañas
     useEffect(() => {
@@ -289,6 +289,7 @@ const CabanasScreen: React.FC = () => {
                 }
             }
         } catch (error) {
+            console.error('Error al guardar cabaña:', error);
             Alert.alert('Error', 'Error de conexión');
         }
     };
@@ -304,18 +305,21 @@ const CabanasScreen: React.FC = () => {
                     {
                         text: 'Eliminar',
                         style: 'destructive',
-                        onPress: async () => {
-                            try {
-                                const response = await cabanasService.deleteCabana(cabana._id);
-                                if (response.success) {
-                                    Alert.alert('Éxito', 'Cabaña eliminada correctamente');
-                                    loadCabanas();
-                                } else {
-                                    Alert.alert('Error', response.message || 'No se pudo eliminar la cabaña');
+                        onPress: () => {
+                            (async () => {
+                                try {
+                                    const response = await cabanasService.deleteCabana(cabana._id);
+                                    if (response.success) {
+                                        Alert.alert('Éxito', 'Cabaña eliminada correctamente');
+                                        loadCabanas();
+                                    } else {
+                                        Alert.alert('Error', response.message || 'No se pudo eliminar la cabaña');
+                                    }
+                                } catch (error) {
+                                    console.error('Error al eliminar cabaña:', error);
+                                    Alert.alert('Error', 'Error de conexión');
                                 }
-                            } catch (error) {
-                                Alert.alert('Error', 'Error de conexión');
-                            }
+                            })();
                         }
                     }
                 ]
@@ -434,7 +438,7 @@ const CabanasScreen: React.FC = () => {
                                         style={styles.imageScrollView}
                                     >
                                         {cabana.imagen.map((imageUri, index) => (
-                                            <View key={index} style={styles.imageWrapper}>
+                                            <View key={`${cabana._id}-image-${index}`} style={styles.imageWrapper}>
                                                 {imageUri.startsWith('mock-image') ? (
                                                     <View style={[styles.cabanaImage, styles.mockImagePlaceholder]}>
                                                         <Ionicons name="image" size={40} color="#718096" />
@@ -463,7 +467,7 @@ const CabanasScreen: React.FC = () => {
                                 </View>
                             </View>
 
-                            {cabana.descripcion && (
+                            {Boolean(cabana.descripcion) && (
                                 <Text style={styles.cabanaDescription}>{cabana.descripcion}</Text>
                             )}
 
@@ -476,7 +480,7 @@ const CabanasScreen: React.FC = () => {
                                     <Ionicons name="cash" size={16} color="#666" />
                                     <Text style={styles.detailText}>Precio: ${cabana.precio}/noche</Text>
                                 </View>
-                                {cabana.ubicacion && (
+                                {Boolean(cabana.ubicacion) && (
                                     <View style={styles.detailRow}>
                                         <Ionicons name="location" size={16} color="#666" />
                                         <Text style={styles.detailText}>Ubicación: {cabana.ubicacion}</Text>
@@ -597,7 +601,7 @@ const CabanasScreen: React.FC = () => {
 
                                         <View style={styles.modalInfoRow}>
                                             <Text style={styles.modalLabel}>Capacidad:</Text>
-                                            <Text style={styles.modalValue}>{detalleCabana.capacidad} persona{detalleCabana.capacidad !== 1 ? 's' : ''}</Text>
+                                            <Text style={styles.modalValue}>{detalleCabana.capacidad} persona{detalleCabana.capacidad === 1 ? '' : 's'}</Text>
                                         </View>
 
                                         <View style={styles.modalInfoRow}>
@@ -610,7 +614,7 @@ const CabanasScreen: React.FC = () => {
                                         <View style={styles.modalSection}>
                                             <Text style={styles.modalSectionTitle}>Imágenes</Text>
                                             <Text style={styles.modalDescription}>
-                                                Esta cabaña tiene {detalleCabana.imagen.length} imagen{detalleCabana.imagen.length !== 1 ? 'es' : ''} disponible{detalleCabana.imagen.length !== 1 ? 's' : ''}
+                                                Esta cabaña tiene {detalleCabana.imagen.length} imagen{detalleCabana.imagen.length === 1 ? '' : 'es'} disponible{detalleCabana.imagen.length === 1 ? '' : 's'}
                                             </Text>
                                         </View>
                                     )}
@@ -685,7 +689,7 @@ const CabanasScreen: React.FC = () => {
                                 <TextInput
                                     style={styles.textInput}
                                     value={formData.capacidad.toString()}
-                                    onChangeText={(text) => setFormData({ ...formData, capacidad: parseInt(text) || 1 })}
+                                    onChangeText={(text) => setFormData({ ...formData, capacidad: Number.parseInt(text, 10) || 1 })}
                                     placeholder="1"
                                     keyboardType="numeric"
                                 />
@@ -695,7 +699,7 @@ const CabanasScreen: React.FC = () => {
                                 <TextInput
                                     style={styles.textInput}
                                     value={formData.precio.toString()}
-                                    onChangeText={(text) => setFormData({ ...formData, precio: parseFloat(text) || 0 })}
+                                    onChangeText={(text) => setFormData({ ...formData, precio: Number.parseFloat(text) || 0 })}
                                     placeholder="0"
                                     keyboardType="numeric"
                                 />
@@ -734,14 +738,18 @@ const CabanasScreen: React.FC = () => {
                                                 value=""
                                                 color={colors.textSecondary}
                                             />
-                                            {categorias.map((cat) => (
-                                                <Picker.Item
-                                                    key={cat._id}
-                                                    label={`${cat.nombre}${cat.tipo ? ` (${cat.tipo})` : ''}`}
-                                                    value={cat._id}
-                                                    color={colors.text}
-                                                />
-                                            ))}
+                                            {categorias.map((cat) => {
+                                                const tipoSuffix = cat.tipo ? ` (${cat.tipo})` : '';
+                                                const label = `${cat.nombre}${tipoSuffix}`;
+                                                return (
+                                                    <Picker.Item
+                                                        key={cat._id}
+                                                        label={label}
+                                                        value={cat._id}
+                                                        color={colors.text}
+                                                    />
+                                                );
+                                            })}
                                         </Picker>
                                     </View>
                                 )}
@@ -783,7 +791,7 @@ const CabanasScreen: React.FC = () => {
                             {selectedImages.length > 0 && (
                                 <ScrollView horizontal style={styles.imagePreviewContainer}>
                                     {selectedImages.map((imageUri, index) => (
-                                        <View key={index} style={styles.imagePreview}>
+                                        <View key={`selected-image-${index}-${imageUri}`} style={styles.imagePreview}>
                                             <View style={styles.imagePlaceholder}>
                                                 <Text style={styles.imagePlaceholderText}>IMG {index + 1}</Text>
                                             </View>

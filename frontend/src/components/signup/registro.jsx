@@ -110,7 +110,7 @@ const Registro = () => {
                   </div>
                   <div className="form-group-registro">
                     <label htmlFor="apellido">Apellido</label>
-                    <div class="input-group-registro">
+                    <div className="input-group-registro">
                       <FaUser className="input-icon" />
                       <input type="text" name="apellido" placeholder="Ingrese su apellido" required onChange={handleChange} />
                     </div>
@@ -221,7 +221,7 @@ const Registro = () => {
                   <button
                     type="button"
                     className="btn-primary-registro"
-                    onClick={() => window.location.href = '/login'}
+                    onClick={() => globalThis.location.href = '/login'}
                   >
                     <FaSignInAlt />
                     Ir a Iniciar Sesión

@@ -2,7 +2,7 @@
 // Adaptados para React Native
 
 import { StyleSheet } from 'react-native';
-import { spacing, typography, shadows } from '../styles';
+
 
 const colors = {
   // Nueva paleta de colores actualizada

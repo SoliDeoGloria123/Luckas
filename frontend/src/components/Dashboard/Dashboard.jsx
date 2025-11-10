@@ -24,7 +24,7 @@ import { PremiumLoader } from './LazyComponents';
 
 const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp }) => {
   // Estados locales
-  const [busqueda] = useState("");
+  //const [busqueda] = useState("");
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
 

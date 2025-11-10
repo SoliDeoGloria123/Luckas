@@ -382,7 +382,7 @@ export class SolicitudesService {
 
         const tiempos = respondidas.map(s => {
             const inicio = new Date(s.fechaSolicitud);
-            const fin = new Date(s.fechaRespuesta!);
+            const fin = new Date(s.fechaRespuesta);
             return fin.getTime() - inicio.getTime();
         });
 

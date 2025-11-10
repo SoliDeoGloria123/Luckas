@@ -74,7 +74,8 @@ const ProgramaModal = ({
   };
 
   // Generador simple de id único
-  const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
+  let idCounter = 0;
+  const generateId = () => `item_${Date.now()}_${++idCounter}`;
 
   const addArrayItem = (arrayName, defaultValue) => {
     setFormData(prev => ({

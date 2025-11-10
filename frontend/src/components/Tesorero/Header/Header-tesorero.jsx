@@ -7,10 +7,9 @@ import { Search, Bell, ChevronDown } from "lucide-react";
 const HeaderTesorero = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [openmenu, setOpenMenu] = useState(false);
-    const [showDropdown, setShowDropdown] = useState(false)
-    const [usuario, setUsuario] = useState({});
-    const [seccionActiva, setSeccionActiva] = useState("gestion");
+
+    const [showDropdown, setShowDropdown] = useState(false);
+
 
     // Obtener usuario logueado desde localStorage
     const usuarioLogueado = (() => {

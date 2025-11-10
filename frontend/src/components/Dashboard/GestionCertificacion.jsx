@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import CertificacionTabla from './Tablas/CertificacionTabla';
+import StatsCard from './Shared/StatsCard';
+import SearchAndFilters from './Shared/SearchAndFilters';
 import { generarCertificado } from '../../services/certificadoService';
 import { inscripcionService } from '../../services/inscripcionService';
 
@@ -12,6 +14,8 @@ const GestionCertificacion = () => {
     const [seccionActiva, setSeccionActiva] = useState("certificaciones");
     const [certificados, setCertificados] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [busqueda, setBusqueda] = useState('');
+    const [filtroEstado, setFiltroEstado] = useState('todos');
 
     useEffect(() => {
         // Obtener inscripciones con estado certificado o finalizado usando inscripcionService
@@ -54,8 +58,22 @@ const GestionCertificacion = () => {
             globalThis.URL.revokeObjectURL(url);
         } catch (error) {
             alert('Error generando certificado: ' + (error?.message || error));
-        }
+        };
     };
+
+    // Calcular estadísticas reales basadas en certificados
+    const totalCertificados = certificados.length;
+    const certificadosFinalizados = certificados.filter(cert => cert.estado === 'finalizado').length;
+    const certificadosGenerados = certificados.filter(cert => cert.estado === 'certificado').length;
+    const certificadosEspera = totalCertificados - certificadosFinalizados - certificadosGenerados;
+
+    // Configuración de stats cards con datos reales
+    const statsCards = [
+        { icon: 'fa-certificate', value: totalCertificados, label: 'Total Certificados', type: 'users' },
+        { icon: 'fa-check-circle', value: certificadosGenerados, label: 'Certificados Emitidos', type: 'active' },
+        { icon: 'fa-clock', value: certificadosEspera, label: 'En Espera', type: 'admins' },
+        { icon: 'fa-graduation-cap', value: certificadosFinalizados, label: 'Finalizados', type: 'new' }
+    ];
 
     return (
         <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
@@ -80,70 +98,33 @@ const GestionCertificacion = () => {
 
                     </div>
                     <div className="dashboard-grid-reporte-admin">
-                        <div className="stat-card-reporte-admin">
-                            <div className="stat-icon-reporte-admin-admin users">
-                                <i className="fas fa-users"></i>
-                            </div>
-                            <div className="stat-info-admin">
-                                <h3>5</h3>
-                                <p>Total Usuarios</p>
-                            </div>
-                        </div>
-                        <div className="stat-card-reporte-admin">
-                            <div className="stat-icon-reporte-admin-admin active">
-                                <i className="fas fa-user-check"></i>
-                            </div>
-                            <div className="stat-info-admin">
-                                <h3>4</h3>
-                                <p>Usuarios Activos</p>
-                            </div>
-                        </div>
-                        <div className="stat-card-reporte-admin">
-                            <div className="stat-icon-reporte-admin-admin admins">
-                                <i className="fas fa-user-shield"></i>
-                            </div>
-                            <div className="stat-info-admin">
-                                <h3>1</h3>
-                                <p>Administradores</p>
-                            </div>
-                        </div>
-                        <div className="stat-card-reporte-admin">
-                            <div className="stat-icon-reporte-admin-admin new">
-                                <i className="fas fa-user-plus"></i>
-                            </div>
-                            <div className="stat-info-admin">
-                                <h3>12</h3>
-                                <p>Nuevos Este Mes</p>
-                            </div>
-                        </div>
-                    </div>
-                    <section className="filtros-section-admin">
-                        <div className="busqueda-contenedor">
-                            <i className="fas fa-search"></i>
-                            <input
-                                type="text"
-                                placeholder="Buscar Certificados..."
-                                //value={busqueda}
-                                //onChange={(e) => setBusqueda(e.target.value)}
-                                className="input-busqueda"
+                        {statsCards.map((card, index) => (
+                            <StatsCard
+                                key={`${card.label}-${card.value}`}
+                                icon={card.icon}
+                                value={card.value}
+                                label={card.label}
+                                type={card.type}
                             />
-                        </div>
-                        <div className="filtro-grupo-admin">
-                            <select className="filtro-dropdown">
-                                <option>Todos los Roles</option>
-                                <option>Administrador</option>
-                                <option>Seminarista</option>
-                                <option>Tesorero</option>
-                                <option>Usuario Externo</option>
-                            </select>
-                            <select className="filtro-dropdown">
-                                <option>Todos los Estados</option>
-                                <option>Activo</option>
-                                <option>Inactivo</option>
-                                <option>Pendiente</option>
-                            </select>
-                        </div>
-                    </section>
+                        ))}
+                    </div>
+                    <SearchAndFilters 
+                        searchPlaceholder="Buscar Certificados..."
+                        searchValue={busqueda}
+                        onSearchChange={(e) => setBusqueda(e.target.value)}
+                        filters={[
+                            {
+                                value: filtroEstado,
+                                onChange: (e) => setFiltroEstado(e.target.value),
+                                options: [
+                                    { value: 'todos', label: 'Todos los Estados' },
+                                    { value: 'certificado', label: 'Certificados' },
+                                    { value: 'finalizado', label: 'Finalizados' },
+                                    { value: 'pendiente', label: 'Pendientes' }
+                                ]
+                            }
+                        ]}
+                    />
                     {loading ? (
                         <div className="text-center py-12 text-gray-400">Cargando certificados...</div>
                     ) : (

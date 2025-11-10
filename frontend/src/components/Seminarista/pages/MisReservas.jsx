@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import './MisInscripciones.css';
 import Header from '../Shared/Header';
-import Footer from '../../footer/Footer'
+import Footer from '../../footer/Footer';
+import StatsGridSeminarista from '../Shared/StatsGridSeminarista';
+import FilterButtonsSeminarista from '../Shared/FilterButtonsSeminarista';
+import EmptyState from '../Shared/EmptyState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCheckCircle,
-  faExclamationTriangle,
-  faTimesCircle,
-  faCalendar,
-  faTimes
-} from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { reservaService } from '../../../services/reservaService';
+import { useUsuarioLogueado } from '../hooks/useUsuarioLogueado';
 import PropTypes from 'prop-types';
 
 // Carrusel simple para el modal
@@ -49,21 +47,30 @@ const MisReservas = () => {
   const [activeFilter, setActiveFilter] = useState('Todas');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentInscripcion, setCurrentInscripcion] = useState(null);
-  // const [stats, setStats] = useState({
-  //   confirmadas: 0,
-  //   pendientes: 0,
-  //   canceladas: 0,
-  //   total: 0
-  // });
-  const usuarioLogueado = (() => {
-    try {
-      const usuarioStorage = localStorage.getItem('usuario');
-      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
-    } catch {
-      return null;
+
+  const { userId } = useUsuarioLogueado();
+
+  // Effect para manejar el cierre del modal con Escape
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && isModalOpen) {
+        setIsModalOpen(false);
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Enfocar el botón de cerrar del modal para mejor accesibilidad
+      const closeButton = document.querySelector('.modal-close-misinscripciones');
+      if (closeButton) {
+        closeButton.focus();
+      }
     }
-  })();
-  const userId = usuarioLogueado?._id || usuarioLogueado?.id;
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (!userId) return;
@@ -125,89 +132,22 @@ const MisReservas = () => {
           <p className="page-subtitle">Gestiona y revisa el estado de tus reservas de cabañas</p>
         </div>
 
-        <div className="stats-grid-inscripciones-semianrista">
-          <div className="stat-card-misolicitudes">
-            <div className="stat-icon-inscripciones-semianrista confirmed">
-              <FontAwesomeIcon icon={faCheckCircle} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number" id="confirmadasCount">0</div>
-              <div className="stat-label">Confirmadas</div>
-            </div>
-          </div>
-
-          <div className="stat-card-misolicitudes">
-            <div className="stat-icon-inscripciones-semianrista pending">
-              <FontAwesomeIcon icon={faExclamationTriangle} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number" id="pendientesCount">0</div>
-              <div className="stat-label">Pendientes</div>
-            </div>
-          </div>
-
-          <div className="stat-card-misolicitudes">
-            <div className="stat-icon-inscripciones-semianrista cancelled">
-              <FontAwesomeIcon icon={faTimesCircle} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number" id="canceladasCount">0</div>
-              <div className="stat-label">Canceladas</div>
-            </div>
-          </div>
-
-          <div className="stat-card-misolicitudes">
-            <div className="stat-icon-inscripciones-semianrista total">
-              <FontAwesomeIcon icon={faCalendar} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number" id="totalCount">0</div>
-              <div className="stat-label">Total</div>
-            </div>
-          </div>
-        </div>
+        <StatsGridSeminarista data={reservas} type="reservas" />
 
         {/* Filtros */}
-        <div className="filters-card-inscripciones-semianrista">
-          <div className="filters-content-inscripciones-semianrista">
-            <span className="filter-label-inscripciones-semianrista">Filtrar por estado:</span>
-            <div className="filter-buttons-inscripciones-semianrista">
-              <button
-                className={`filter-btn-inscripciones-semianrista ${activeFilter === 'Todas' ? 'active' : ''}`}
-                onClick={() => filterInscripciones('Todas')}
-              >
-                Todas
-              </button>
-              <button
-                className={`filter-btn-inscripciones-semianrista ${activeFilter === 'Confirmada' ? 'active' : ''}`}
-                onClick={() => filterInscripciones('Confirmada')}
-              >
-                Confirmada
-              </button>
-              <button
-                className={`filter-btn-inscripciones-semianrista ${activeFilter === 'Pendiente' ? 'active' : ''}`}
-                onClick={() => filterInscripciones('Pendiente')}
-              >
-                Pendiente
-              </button>
-              <button
-                className={`filter-btn-inscripciones-semianrista ${activeFilter === 'Cancelada' ? 'active' : ''}`}
-                onClick={() => filterInscripciones('Cancelada')}
-              >
-                Cancelada
-              </button>
-            </div>
-          </div>
-        </div>
+        <FilterButtonsSeminarista 
+          activeFilter={activeFilter}
+          onFilterChange={filterInscripciones}
+        />
 
-        {/* Lista de inscripciones */}
-          {filteredReservas.length === 0 && (
-            <div className='no-data-container-misinscripciones'>
-              <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="Sin reservas" style={{width: '120px', marginBottom: '20px', opacity: 0.7}} />
-              <div>No tienes reservas registradas.</div>
-              <div style={{fontSize: '0.95em', color: '#888', marginTop: '8px'}}>¡Haz tu primera reserva y disfruta la experiencia!</div>
-            </div>
-          )}
+        {/* Lista de reservas */}
+        {filteredReservas.length === 0 && (
+          <EmptyState 
+            title="No tienes reservas registradas."
+            subtitle="¡Haz tu primera reserva y disfruta la experiencia!"
+            iconAlt="Sin reservas"
+          />
+        )}
         {filteredReservas.map((reserva) => (
           <div className="inscripciones-container-misinscripciones" key={reserva.id || reserva._id}>
             <div className="inscripcion-card-misinscripciones">
@@ -274,21 +214,29 @@ const MisReservas = () => {
         ))}
         {/* Modal de Detalles */}
         {isModalOpen && currentInscripcion && (
-          <button
-            className="modal-overlay-misinscripciones show"
-            onClick={closeModal}
-            style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
-          >
-            <div 
-              className="modal-container-misinscripciones" 
-              onClick={e => e.stopPropagation()}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.stopPropagation();
-                }
+          <div className="modal-overlay-misinscripciones show">
+            <button
+              type="button"
+              className="modal-backdrop"
+              onClick={closeModal}
+              style={{ 
+                position: 'absolute', 
+                top: 0, 
+                left: 0, 
+                width: '100%', 
+                height: '100%', 
+                background: 'transparent', 
+                border: 'none', 
+                cursor: 'default',
+                zIndex: 1
               }}
-              tabIndex={0}
-              role="dialog"
+              aria-label="Cerrar modal"
+            />
+            <dialog 
+              className="modal-container-misinscripciones" 
+              open
+              aria-labelledby="modalTitle"
+              style={{ position: 'relative', zIndex: 2 }}
             >
               <div className="modal-header-misinscripciones">
                 {Array.isArray(currentInscripcion.cabana?.imagen) && currentInscripcion.cabana.imagen.length > 0 ? (
@@ -349,8 +297,8 @@ const MisReservas = () => {
                   )}
                 </div>
               </div>
-            </div>
-          </button>
+            </dialog>
+          </div>
         )}
       </div>
       <Footer />

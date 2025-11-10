@@ -328,23 +328,17 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               <div className="form-group-tesorero full-width">
                 <label htmlFor='imagen'>Imagen</label>
                 <div className="image-upload-container">
-                  <div
+                  <button
+                    type="button"
                     className="upload-area"
-                    role="button"
-                    tabIndex={0}
                     aria-label="Zona para subir imágenes. Haz clic o presiona Enter o Espacio para seleccionar archivos."
                     onClick={() => !isUploading && document.getElementById('imageInput').click()}
-                    onKeyDown={e => {
-                      if (!isUploading && (e.key === 'Enter' || e.key === ' ')) {
-                        e.preventDefault();
-                        document.getElementById('imageInput').click();
-                      }
-                    }}
                     onDragOver={e => e.preventDefault()}
                     onDrop={e => {
                       e.preventDefault();
                       handleFileSelection(e.dataTransfer.files);
                     }}
+                    disabled={isUploading}
                   >
                     <div className="upload-content">
                       <i className="fas fa-cloud-upload-alt upload-icon"></i>
@@ -353,7 +347,7 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
                       <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
                     </div>
                     <input type="file" id='imageInput' multiple accept="image/*" hidden  onChange={e => handleFileSelection(e.target.files)} />
-                  </div>
+                  </button>
 
 
                   <div className="image-preview-grid" id="imagePreviewGrid">
