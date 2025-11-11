@@ -10,6 +10,7 @@ import Header from '../Shared/Header';
 import { solicitudService } from '../../../services/solicirudService';
 import { categorizacionService } from '../../../services/categorizacionService';
 import { userService } from '../../../services/userService'; // Debes tener un servicio para usuarios
+import Footer from '../../footer/Footer';
 
 
 const NuevaSolicitud = () => {
@@ -930,6 +931,7 @@ const NuevaSolicitud = () => {
             </div>
           </div>
         </div>
+     
       </main>
 
       {/* Toast Notifications */}
@@ -961,6 +963,7 @@ const NuevaSolicitud = () => {
           );
         })}
       </div>
+         <Footer />
     </div>
   );
 };

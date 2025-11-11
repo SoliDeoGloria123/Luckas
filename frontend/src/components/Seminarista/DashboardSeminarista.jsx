@@ -92,16 +92,12 @@ const DashboardSeminarista = () => {
       setMensajeTipo('info');
     }, 5000);
   };
-
-
-
-
     return (
       <div className="dashboard-seminarista-contenedo">
         <Header/>
         <main className="main-content">
           {/* Hero Section */}
-          <section className="hero-section">
+
             <div className="hero-content">
               <div className="hero-text">
                 <h1>¡Bienvenido, <span className="highlight">Seminarista</span>!</h1>
@@ -169,7 +165,7 @@ const DashboardSeminarista = () => {
                 </div>
               </div>
             </div>
-          </section>
+
 
           {/* Services Grid */}
           <section className="services-section">

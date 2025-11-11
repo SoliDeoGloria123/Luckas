@@ -8,6 +8,7 @@ import './Header.css';
 const Header = ({ user, breadcrumbPath, onTabChange }) => {
   const [menuUsuarioAbierto, setMenuUsuarioAbierto] = useState(false);
   const [showGestionesDropdown, setShowGestionesDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const gestionesDropdownRef = useRef(null);
 
 
@@ -43,11 +44,14 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
   };
 
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  // const dropdownRef = useRef(null); // Variable comentada - no se usa actualmente
 
   // Abrir/cerrar al hacer click en el botón
   const toggleDropdown = () => {
     setShowUserDropdown((prev) => !prev);
+  };
+
+  const handleNavClick = () => {
+    setIsMobileMenuOpen(false);
   };
 
 
@@ -60,15 +64,29 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
       ) {
         setShowGestionesDropdown(false);
       }
+      
+      // Cerrar menú móvil al hacer clic fuera
+      if (isMobileMenuOpen && !event.target.closest('.header-nav-seminario') && !event.target.closest('.mobile-menu-toggle')) {
+        setIsMobileMenuOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isMobileMenuOpen]);
   return (
-    <header className="header-seminario">
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+    <>
+      <div 
+        className={`mobile-menu-overlay ${isMobileMenuOpen ? 'show' : ''}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') setIsMobileMenuOpen(false);
+        }}
+        aria-hidden="true"
+      />
+      <header className="header-seminario">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
       <div className="header-container-seminario">
         <div className="header-left-seminario">
           <div className="logo-seminario">
@@ -77,34 +95,39 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
           </div>
         </div>
 
-        <nav className="header-nav-seminario">
+        <nav className={`header-nav-seminario ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
           <a
             href="/seminarista"
             className={`nav-item-seminario${globalThis.location.pathname === '/seminarista' ? ' active' : ''}`}
+            onClick={handleNavClick}
           >
             <span className="nav-icon-seminario">🏠</span>Inicio
           </a>
           <a
             href="/seminarista/tareas"
             className={`nav-item-seminario${globalThis.location.pathname === '/seminarista/tareas' ? ' active' : ''}`}
+            onClick={handleNavClick}
           >
             <span className="nav-icon-seminario">☑️</span>Tareas
           </a>
           <a
             href="/dashboard/seminarista/eventos"
             className={`nav-item-seminario${globalThis.location.pathname === '/dashboard/seminarista/eventos' ? ' active' : ''}`}
+            onClick={handleNavClick}
           >
             <span className="nav-icon-seminario">📅</span>Eventos
           </a>
           <a
             href="/dashboard/seminarista/cabanas"
             className={`nav-item-seminario${globalThis.location.pathname === '/dashboard/seminarista/cabanas' ? ' active' : ''}`}
+            onClick={handleNavClick}
           >
             <span className="nav-icon-seminario">🏠</span>Cabañas
           </a>
           <a
             href="/dashboard/seminarista/cursos"
             className={`nav-item-seminario${globalThis.location.pathname === '/dashboard/seminarista/cursos' ? ' active' : ''}`}
+            onClick={handleNavClick}
           >
             <span className="nav-icon-seminario">📚</span>Cursos
           </a>
@@ -123,15 +146,24 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
             className={`dropdown-menu-seminario${showGestionesDropdown ? ' show' : ''}`}
           >
             <div className="dropdown-container-seminario">
-              <a href="/dashboard/seminarista/mis-inscripciones" className="dropdown-item-seminario"> <span className="dropdown-icon">📋</span>Mis Inscripciones</a>
-              <a href="/dashboard/seminarista/mis-reservas" className="dropdown-item-seminario">  <span className="dropdown-icon">🏠</span>Mis Reservas</a>
-              <a href="/dashboard/seminarista/mis-solicitudes" className="dropdown-item-seminario"> <span className="dropdown-icon">📄</span>Mis Solicitudes</a>
-              <a href="/dashboard/seminarista/nueva-solicitud" className="dropdown-item-seminario"><span className="dropdown-icon">📄</span>Nueva Solicitud</a>
+              <a href="/dashboard/seminarista/mis-inscripciones" className="dropdown-item-seminario" onClick={handleNavClick}> <span className="dropdown-icon">📋</span>Mis Inscripciones</a>
+              <a href="/dashboard/seminarista/mis-reservas" className="dropdown-item-seminario" onClick={handleNavClick}>  <span className="dropdown-icon">🏠</span>Mis Reservas</a>
+              <a href="/dashboard/seminarista/mis-solicitudes" className="dropdown-item-seminario" onClick={handleNavClick}> <span className="dropdown-icon">📄</span>Mis Solicitudes</a>
+              <a href="/dashboard/seminarista/nueva-solicitud" className="dropdown-item-seminario" onClick={handleNavClick}><span className="dropdown-icon">📄</span>Nueva Solicitud</a>
             </div>
           </div>
         </nav>
 
         <div className="header-right-seminario">
+          <button 
+            type="button"
+            className="mobile-menu-toggle"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+            aria-expanded={isMobileMenuOpen}
+          >
+            ☰
+          </button>
           <div className="header-icons-seminario">
             <button className="icon-btn-seminario">
               <span className="notification-icon-seminario">🔔</span>
@@ -167,6 +199,7 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
         </div>
       </div>
     </header>
+    </>
   );
 };
 
