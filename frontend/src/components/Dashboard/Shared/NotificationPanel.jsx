@@ -1,277 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import notificationService from '../../../services/notificationService';
 import './NotificationPanel.css';
+import useNotifications from '../../hooks/useNotifications';
+import BaseNotificationPanel from '../../shared/BaseNotificationPanel';
 
 const NotificationPanel = ({ token, userRole, isOpen, onClose }) => {
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // Obtener notificaciones
-  const fetchNotifications = async () => {
-    if (!token || !['admin', 'tesorero'].includes(userRole)) return;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await notificationService.getNotifications(token);
-      setNotifications(data || []);
-      
-      // Contar no leídas
-      const unreadCount = data?.filter(notif => !notif.read).length || 0;
-      setUnreadCount(unreadCount);
-    } catch (error) {
-      console.error('Error al cargar notificaciones:', error);
-      setError('Error al cargar las notificaciones');
-    } finally {
-      setLoading(false);
-    }
+  // Configuración de clases CSS específicas para Dashboard
+  const dashboardCssClasses = {
+    loading: 'notification-loading',
+    spinner: 'spinner',
+    error: 'notification-error',
+    retryBtn: 'retry-btn',
+    empty: 'notification-empty',
+    emptyIcon: 'empty-icon',
+    list: 'notification-list',
+    item: 'notification-item',
+    iconItem: 'notification-icon',
+    contentItem: 'notification-content-item',
+    titleItem: 'notification-title-item',
+    message: 'notification-message',
+    date: 'notification-date',
+    actionsItem: 'notification-actions-item',
+    markReadBtn: 'mark-read-btn',
+    deleteBtn: 'delete-btn'
   };
-
-  // Marcar como leída
-  const markAsRead = async (notificationId) => {
-    try {
-      await notificationService.markNotificationAsRead(notificationId, token);
-      
-      // Actualizar estado local
-      setNotifications(notifications.map(notif => 
-        notif._id === notificationId 
-          ? { ...notif, read: true }
-          : notif
-      ));
-      
-      setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error('Error al marcar como leída:', error);
-    }
-  };
-
-  // Marcar todas como leídas
-  const markAllAsRead = async () => {
-    try {
-      await notificationService.markAllNotificationsAsRead(token);
-      
-      setNotifications(notifications.map(notif => ({ ...notif, read: true })));
-      setUnreadCount(0);
-    } catch (error) {
-      console.error('Error al marcar todas como leídas:', error);
-    }
-  };
-
-  // Eliminar notificación
-  const deleteNotification = async (notificationId) => {
-    try {
-      await notificationService.deleteNotification(notificationId, token);
-      
-      const deletedNotification = notifications.find(notif => notif._id === notificationId);
-      setNotifications(notifications.filter(notif => notif._id !== notificationId));
-      
-      if (deletedNotification && !deletedNotification.read) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      }
-    } catch (error) {
-      console.error('Error al eliminar notificación:', error);
-    }
-  };
-
-  // Manejar tecla Escape
-  const handleKeyDown = (event) => {
-    if (event.key === 'Escape') {
-      onClose();
-    }
-  };
-
-  // Obtener ícono según el tipo
-  const getNotificationIcon = (icon) => {
-    const iconMap = {
-      'UserPlus': '👤',
-      'Calendar': '📅',
-      'FileText': '📄',
-      'Bell': '🔔',
-      'Info': 'ℹ️',
-      'Warning': '⚠️',
-      'Error': '❌',
-      'Success': '✅'
-    };
-    return iconMap[icon] || '🔔';
-  };
-
-  // Formatear fecha
-  const formatDate = (date) => {
-    return new Date(date).toLocaleString('es-CO', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  // Renderizar contenido principal
-  const renderContent = () => {
-    if (loading) {
-      return (
-        <div className="notification-loading">
-          <div className="spinner"></div>
-          <p>Cargando notificaciones...</p>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="notification-error">
-          <p>{error}</p>
-          <button onClick={fetchNotifications} className="retry-btn">
-            Reintentar
-          </button>
-        </div>
-      );
-    }
-
-    if (notifications.length === 0) {
-      return (
-        <div className="notification-empty">
-          <div className="empty-icon">🔔</div>
-          <p>No hay notificaciones</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="notification-list">
-        {notifications.map((notification) => (
-          <div 
-            key={notification._id}
-            className={`notification-item ${notification.read ? 'read' : 'unread'}`}
-          >
-            <div className="notification-icon">
-              {getNotificationIcon(notification.icon)}
-            </div>
-            
-            <div className="notification-content-item">
-              <div className="notification-title-item">
-                {notification.title}
-              </div>
-              <div className="notification-message">
-                {notification.message}
-              </div>
-              <div className="notification-date">
-                {formatDate(notification.createdAt)}
-              </div>
-            </div>
-
-            <div className="notification-actions-item">
-              {!notification.read && (
-                <button 
-                  onClick={() => markAsRead(notification._id)}
-                  className="mark-read-btn"
-                  title="Marcar como leída"
-                >
-                  👁️
-                </button>
-              )}
-              <button 
-                onClick={() => deleteNotification(notification._id)}
-                className="delete-btn"
-                title="Eliminar"
-              >
-                🗑️
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchNotifications();
-    }
-  }, [isOpen, token, userRole]);
-
-  // Auto-refresh cada 30 segundos si está abierto
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [isOpen, token, userRole]);
-
-  if (!['admin', 'tesorero'].includes(userRole)) {
-    return null;
-  }
 
   return (
-    <>
-      {/* Overlay */}
-      {isOpen && (
-        <button
-          className="notification-overlay" 
-          onClick={onClose}
-          onKeyDown={handleKeyDown}
-          aria-label="Cerrar panel de notificaciones"
-          type="button"
-        />
-      )}
-
-      {/* Panel de notificaciones */}
-      <div className={`notification-panel ${isOpen ? 'open' : ''}`}>
-        {/* Header */}
-        <div className="notification-header">
-          <div className="notification-title">
-            <span className="title">Notificaciones</span>
-            {unreadCount > 0 && (
-              <span className="unread-count">{unreadCount}</span>
-            )}
-          </div>
-          
-          <div className="notification-actions">
-            {unreadCount > 0 && (
-              <button 
-                onClick={markAllAsRead}
-                className="mark-all-read-btn"
-                title="Marcar todas como leídas"
-              >
-                ✓
-              </button>
-            )}
-            <button 
-              onClick={onClose}
-              className="close-btn"
-              title="Cerrar"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="notification-content">
-          {renderContent()}
-        </div>
-
-        {/* Footer */}
-        {notifications.length > 0 && (
-          <div className="notification-footer">
-            <button 
-              onClick={fetchNotifications} 
-              className="refresh-btn"
-            >
-              🔄 Actualizar
-            </button>
-          </div>
-        )}
-      </div>
-    </>
+    <BaseNotificationPanel 
+      token={token}
+      userRole={userRole}
+      isOpen={isOpen}
+      onClose={onClose}
+      useNotifications={useNotifications}
+      cssClasses={dashboardCssClasses}
+    />
   );
 };
+
+
 
 NotificationPanel.propTypes = {
   token: PropTypes.string.isRequired,

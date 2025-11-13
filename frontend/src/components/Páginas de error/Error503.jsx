@@ -169,7 +169,7 @@ export default function ServerDown() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style >{`
         @keyframes wave {
           0%, 100% { transform: translateX(0); }
           50% { transform: translateX(-25%); }

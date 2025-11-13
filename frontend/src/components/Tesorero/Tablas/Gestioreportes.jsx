@@ -3,19 +3,27 @@ import { reporteService } from '../../../services/reporteService';
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
-import ReporteModal from '../modal/reportesModal';
+import ReporteModal from '../../Dashboard/Modales/ReporteModal';
 import '../Gestion.css';
 
 const Gestionreportes = () => {
 
     const [dashboardData, setDashboardData] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [reportType, setReportType] = useState('dashboard');
     const [reportesGuardados, setReportesGuardados] = useState([]);
-    const [reportData, setReportData] = useState(null);
-    const [showModal, setShowModal] = useState(false);
+
+    // Variables para el modal del Dashboard
+    const [mostrarModal, setMostrarModal] = useState(false);
     const [modoEdicion, setModoEdicion] = useState(false);
     const [reporteSeleccionado, setReporteSeleccionado] = useState(null);
+    const [nuevoReporte, setNuevoReporte] = useState({
+        nombre: '',
+        descripcion: '',
+        tipo: 'dashboard',
+        fechaInicio: '',
+        fechaFin: '',
+        estado: 'borrador'
+    });
 
 
     const cargarReportesGuardados = async () => {
@@ -45,8 +53,6 @@ const Gestionreportes = () => {
                 setDashboardData(data);
             } catch (err) {
                 console.error('Error al cargar dashboard inicial', err);
-            } finally {
-                setLoading(false);
             }
         };
         init();
@@ -55,8 +61,7 @@ const Gestionreportes = () => {
     // Cambiar tipo de reporte
     const handleReportTypeChange = async (type) => {
         setReportType(type);
-        setLoading(true);
-
+        
         try {
             let data;
             switch (type) {
@@ -81,12 +86,11 @@ const Gestionreportes = () => {
                 default:
                     data = await reporteService.getDashboard();
             }
-            setReportData(data);
+            // Los datos se procesan pero no se almacenan en una variable de estado
+            console.log('Datos cargados:', data);
         } catch (error) {
             console.error('Error al cargar reporte:', error);
             mostrarAlerta('Error', 'No se pudo cargar el reporte', 'error');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -120,17 +124,17 @@ const Gestionreportes = () => {
     };
 
     // Función para crear reporte
-    const handleCrearReporte = async (datosReporte) => {
-        try {
-            // El servicio en frontend usa guardarReporte
-            await reporteService.guardarReporte(datosReporte);
-            mostrarAlerta('Éxito', 'Reporte creado exitosamente');
-            setShowModal(false);
-            cargarReportesGuardados();
-        } catch (error) {
-            mostrarAlerta('Error', `Error al crear reporte: ${error.message}`);
-        }
-    };
+    // const handleCrearReporte = async (datosReporte) => {
+    //     try {
+    //         // El servicio en frontend usa guardarReporte
+    //         await reporteService.guardarReporte(datosReporte);
+    //         mostrarAlerta('Éxito', 'Reporte creado exitosamente');
+    //         setShowModal(false);
+    //         cargarReportesGuardados();
+    //     } catch (error) {
+    //         mostrarAlerta('Error', `Error al crear reporte: ${error.message}`);
+    //     }
+    // };
 
     // Función para editar reporte
     const handleEditarReporte = (reporte) => {
@@ -140,25 +144,65 @@ const Gestionreportes = () => {
     };
 
     // Función para actualizar reporte
-    const handleActualizarReporte = async (datosReporte) => {
+     //const handleActualizarReporte = async (datosReporte) => {
+     //    try {
+     //        // El servicio en frontend usa editarReporte
+     //        await reporteService.editarReporte(reporteSeleccionado._id, datosReporte);
+     //        mostrarAlerta('Éxito', 'Reporte actualizado exitosamente');
+     //        setShowModal(false);
+     //        setModoEdicion(false);
+     //        setReporteSeleccionado(null);
+     //        cargarReportesGuardados();
+     //    } catch (error) {
+     //        mostrarAlerta('Error', `Error al actualizar reporte: ${error.message}`);
+     //    }
+     //};
+ 
+     // Función para cerrar modal
+    //const handleCerrarModal = () => {
+    //    setMostrarModal(false);
+    //    setModoEdicion(false);
+    //    setReporteSeleccionado(null);
+    //};
+//
+    const handleCreate = () => {
+        setModoEdicion(false);
+        setReporteSeleccionado(null);
+        setNuevoReporte({
+            nombre: '',
+            descripcion: '',
+            tipo: 'dashboard',
+            fechaInicio: '',
+            fechaFin: '',
+            estado: 'borrador'
+        });
+        setMostrarModal(true);
+    };
+
+
+    // Funciones para el modal del Dashboard
+    const crearReporte = async (e) => {
+        e.preventDefault();
         try {
-            // El servicio en frontend usa editarReporte
-            await reporteService.editarReporte(reporteSeleccionado._id, datosReporte);
-            mostrarAlerta('Éxito', 'Reporte actualizado exitosamente');
-            setShowModal(false);
-            setModoEdicion(false);
-            setReporteSeleccionado(null);
+            await reportesService.createReporte(nuevoReporte);
+            mostrarAlerta("¡Éxito!", "Reporte creado exitosamente", 'success');
+            setMostrarModal(false);
             cargarReportesGuardados();
         } catch (error) {
-            mostrarAlerta('Error', `Error al actualizar reporte: ${error.message}`);
+            mostrarAlerta("ERROR", `Error al crear reporte: ${error.message}`, 'error');
         }
     };
 
-    // Función para cerrar modal
-    const handleCerrarModal = () => {
-        setShowModal(false);
-        setModoEdicion(false);
-        setReporteSeleccionado(null);
+    const actualizarReporte = async (e) => {
+        e.preventDefault();
+        try {
+            await reportesService.updateReporte(reporteSeleccionado._id, nuevoReporte);
+            mostrarAlerta("¡Éxito!", "Reporte actualizado exitosamente", 'success');
+            setMostrarModal(false);
+            cargarReportesGuardados();
+        } catch (error) {
+            mostrarAlerta("ERROR", `Error al actualizar reporte: ${error.message}`, 'error');
+        }
     };
 
 
@@ -226,7 +270,10 @@ const Gestionreportes = () => {
                             <option value="reservas">Reportes de Reservas</option>
                             <option value="inscripciones">Reportes de Inscripciones</option>
                         </select>
-                        <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#334155] font-medium">
+                        <button 
+                            onClick={exportarPDF}
+                            className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#334155] font-medium"
+                        >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     strokeLinecap="round"
@@ -237,7 +284,10 @@ const Gestionreportes = () => {
                             </svg>
                             Exportar PDF
                         </button>
-                        <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#334155] font-medium">
+                        <button 
+                            onClick={exportarExcel}
+                            className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#334155] font-medium"
+                        >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     strokeLinecap="round"
@@ -261,7 +311,7 @@ const Gestionreportes = () => {
                     <div className="rounded-xl border border-gray-200 bg-white p-6">
                         <div className="mb-6 flex items-center justify-between">
                             <h2 className="font-bold text-xl text-gray-900">Reportes Generados</h2>
-                            <button className="btn-primary-reporte" id="newReportBtn" onClick={() => setShowModal(true)}>
+                            <button className="btn-primary-reporte" id="newReportBtn" onClick={handleCreate}>
                                 <i className="fas fa-plus"></i> {''}
                                 Nuevo Reporte
                             </button>
@@ -366,13 +416,16 @@ const Gestionreportes = () => {
             <Footer />
 
             {/* Modal de Reportes */}
-            {showModal && (
+            {mostrarModal && (
                 <ReporteModal
-                    mostrar={showModal}
-                    onClose={handleCerrarModal}
-                    onSubmit={modoEdicion ? handleActualizarReporte : handleCrearReporte}
+                    mostrar={mostrarModal}
                     modoEdicion={modoEdicion}
-                    datosIniciales={reporteSeleccionado}
+                    reporteSeleccionado={reporteSeleccionado}
+                    setReporteSeleccionado={setReporteSeleccionado}
+                    nuevoReporte={nuevoReporte}
+                    setNuevoReporte={setNuevoReporte}
+                    onClose={() => setMostrarModal(false)}
+                    onSubmit={(e) => modoEdicion ? actualizarReporte(e) : crearReporte(e)}
                 />
             )}
         </>

@@ -3,7 +3,7 @@ import { inscripcionService } from '../../../services/inscripcionService';
 import { eventService } from '../../../services/eventService';
 import { categorizacionService } from '../../../services/categorizacionService';
 import { programasAcademicosService } from '../../../services/programasAcademicosService';
-import InscripcionModal from '../modal/InscripcionModal';
+import InscripcionModal from '../../Dashboard/Modales/InscripcionModa';
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
@@ -15,9 +15,24 @@ const Gestioninscripcion = () => {
   const [programas, setProgramas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [inscripciones, setInscripciones] = useState([]);
-  const [showModal, setShowModalnscribir] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
-  const [currentItemIncribir, setcurrentItemIncribir] = useState(null);
+
+  // Variables para el modal del Dashboard
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
+  const [nuevaInscripcion, setNuevaInscripcion] = useState({
+    nombre: '',
+    apellido: '',
+    tipoDocumento: '',
+    numeroDocumento: '',
+    correo: '',
+    telefono: '',
+    edad: '',
+    tipoReferencia: 'evento',
+    referencia: '',
+    categoria: '',
+    estado: 'pendiente'
+  });
 
 
 
@@ -71,33 +86,55 @@ const Gestioninscripcion = () => {
     obtenerCategorias();
   }, []);
 
-  const handleSubmit = async (Inscribirdata) => {
-    try {
-      if (modalMode === 'create') {
-        await inscripcionService.create(Inscribirdata);
-        mostrarAlerta("¡Éxito!", "Inscripción creada exitosamente");
-        // Lógica para crear
-      } else {
-        await inscripcionService.update(currentItemIncribir._id, Inscribirdata);
-        mostrarAlerta("¡Éxito!", "Inscripción actualizada exitosamente");
-      }
-      setShowModalnscribir(false);
-      obtenerInscripciones();
 
+  const handleCreate = () => {
+    setModoEdicion(false);
+    setInscripcionSeleccionada(null);
+    setNuevaInscripcion({
+      nombre: '',
+      apellido: '',
+      tipoDocumento: '',
+      numeroDocumento: '',
+      correo: '',
+      telefono: '',
+      edad: '',
+      tipoReferencia: 'evento',
+      referencia: '',
+      categoria: '',
+      estado: 'pendiente'
+    });
+    setMostrarModal(true);
+  };
+
+  const handleEdit = (inscripcion) => {
+    setModoEdicion(true);
+    setInscripcionSeleccionada(inscripcion);
+    setMostrarModal(true);
+  };
+
+  // Funciones para el modal del Dashboard
+  const crearInscripcion = async (e) => {
+    e.preventDefault();
+    try {
+      await inscripcionService.createInscripcion(nuevaInscripcion);
+      mostrarAlerta("¡Éxito!", "Inscripción creada exitosamente", 'success');
+      setMostrarModal(false);
+      obtenerInscripciones();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error: ${error.message}`, 'error');
+      mostrarAlerta("ERROR", `Error al crear inscripción: ${error.message}`, 'error');
     }
   };
-  const handleCreate = () => {
-    setModalMode('create');
-    setcurrentItemIncribir(null);
-    setShowModalnscribir(true);
-  };
 
-  const handleEdit = (item) => {
-    setModalMode('edit');
-    setcurrentItemIncribir(item);
-    setShowModalnscribir(true);
+  const actualizarInscripcion = async (e) => {
+    e.preventDefault();
+    try {
+      await inscripcionService.updateInscripcion(inscripcionSeleccionada._id, nuevaInscripcion);
+      mostrarAlerta("¡Éxito!", "Inscripción actualizada exitosamente", 'success');
+      setMostrarModal(false);
+      obtenerInscripciones();
+    } catch (error) {
+      mostrarAlerta("ERROR", `Error al actualizar inscripción: ${error.message}`, 'error');
+    }
   };
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
@@ -290,15 +327,19 @@ const Gestioninscripcion = () => {
           </button>
         </div>
 
-        {showModal && (
+        {mostrarModal && (
           <InscripcionModal
-            mode={modalMode}
-            initialData={currentItemIncribir || {}}
-            onClose={() => setShowModalnscribir(false)}
-            onSubmit={handleSubmit}
-            categorias={categorias}
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            inscripcionSeleccionada={inscripcionSeleccionada}
+            setInscripcionSeleccionada={setInscripcionSeleccionada}
+            nuevaInscripcion={nuevaInscripcion}
+            setNuevaInscripcion={setNuevaInscripcion}
             eventos={eventos}
+            categorias={categorias}
             programas={programas}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={(e) => modoEdicion ? actualizarInscripcion(e) : crearInscripcion(e)}
           />
         )}
       </main>

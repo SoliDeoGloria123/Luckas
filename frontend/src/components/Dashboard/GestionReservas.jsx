@@ -37,62 +37,47 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   });
   const [error, setError] = useState("");
 
+  // Función utilitaria para manejo de datos con try/catch
+  const manejarOperacionAsync = async (operacion, setEstado, mensajeError) => {
+    try {
+      const data = await operacion();
+      let resultado;
+      if (Array.isArray(data)) {
+        resultado = data;
+      } else if (Array.isArray(data.data)) {
+        resultado = data.data;
+      } else {
+        resultado = [];
+      }
+      setEstado(resultado);
+    } catch (err) {
+      setError(`${mensajeError}: ${err.message}`);
+    }
+  };
+
   useEffect(() => {
     obtenerReservas();
     obtenerUsuarios();
     obtenerCabanas();
   }, []);
 
-  const obtenerReservas = async () => {
-    try {
-      const data = await reservaService.getAll();
-      let resvs;
-      if (Array.isArray(data)) {
-        resvs = data;
-      } else if (Array.isArray(data.data)) {
-        resvs = data.data;
-      } else {
-        resvs = [];
-      }
-      setReservas(resvs);
-    } catch (err) {
-      setError("Error al obtener reservas: " + err.message);
-    }
-  };
+  const obtenerReservas = () => manejarOperacionAsync(
+    () => reservaService.getAll(),
+    setReservas,
+    "Error al obtener reservas"
+  );
 
-  const obtenerUsuarios = async () => {
-    try {
-      const data = await userService.getAllUsers();
-      let users;
-      if (Array.isArray(data)) {
-        users = data;
-      } else if (Array.isArray(data.data)) {
-        users = data.data;
-      } else {
-        users = [];
-      }
-      setUsuarios(users);
-    } catch (err) {
-      setError("Error al obtener usuarios: " + err.message);
-    }
-  };
+  const obtenerUsuarios = () => manejarOperacionAsync(
+    () => userService.getAllUsers(),
+    setUsuarios,
+    "Error al obtener usuarios"
+  );
 
-  const obtenerCabanas = async () => {
-    try {
-      const data = await cabanaService.getAll();
-      let cabs;
-      if (Array.isArray(data)) {
-        cabs = data;
-      } else if (Array.isArray(data.data)) {
-        cabs = data.data;
-      } else {
-        cabs = [];
-      }
-      setCabanas(cabs);
-    } catch (err) {
-      setError("Error al obtener cabañas: " + err.message);
-    }
-  };
+  const obtenerCabanas = () => manejarOperacionAsync(
+    () => cabanaService.getAll(),
+    setCabanas,
+    "Error al obtener cabañas"
+  );
 
   // CRUD
   const crearReserva = async () => {

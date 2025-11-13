@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import CategorizacionModal from '../modal/CategorizacionModal';
+import CategorizacionModal from '../../Dashboard/Modales/CategorizacionModal';
 import { categorizacionService } from '../../../services/categorizacionService';
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
@@ -9,9 +9,16 @@ import { Edit } from "lucide-react"
 
 const Gestioncategorizacion = () => {
   const [categorias, setCategorias] = useState([]);
-  const [modalMode, setModalMode] = useState('create');
-  const [showModal, setShowModal] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  
+  // Variables para el modal del Dashboard
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
+  const [nuevaCategoria, setNuevaCategoria] = useState({
+    nombre: '',
+    descripcion: '',
+    estado: 'activo'
+  });
 
   // Obtener categorías
   const obtenerCategorias = async () => {
@@ -27,34 +34,50 @@ const Gestioncategorizacion = () => {
     obtenerCategorias();
   }, []);
 
-  const handleSubmit = async (data) => {
-    try {
-      if (modalMode === "create") {
-        await categorizacionService.create(data);
-        mostrarAlerta("¡EXITO!", "Categoría creada exitosamente");
-      } else {
-        await categorizacionService.update(currentItem._id, data);
-        mostrarAlerta("¡EXITO!", "Categoría actualizada exitosamente");
-      }
-      setShowModal(false);
-      obtenerCategorias();
-    } catch (error) {
-      mostrarAlerta("ERROR", `Error: ${error.message}`, 'error');
-    }
-  };
+
 
   // Abrir modal para crear
   const handleCreate = () => {
-    setModalMode("create");
-    setCurrentItem(null);
-    setShowModal(true);
+    setModoEdicion(false);
+    setCategoriaSeleccionada(null);
+    setNuevaCategoria({
+      nombre: '',
+      descripcion: '',
+      estado: 'activo'
+    });
+    setMostrarModal(true);
   };
 
   // Abrir modal para editar
   const handleEdit = (categoria) => {
-    setModalMode("edit");
-    setCurrentItem(categoria);
-    setShowModal(true);
+    setModoEdicion(true);
+    setCategoriaSeleccionada(categoria);
+    setMostrarModal(true);
+  };
+
+  // Funciones para el modal del Dashboard
+  const crearCategoria = async (e) => {
+    e.preventDefault();
+    try {
+      await categorizacionService.create(nuevaCategoria);
+      mostrarAlerta("¡Éxito!", "Categoría creada exitosamente");
+      setMostrarModal(false);
+      obtenerCategorias();
+    } catch (error) {
+      mostrarAlerta("Error", `Error: ${error.message}`);
+    }
+  };
+
+  const actualizarCategoria = async (e) => {
+    e.preventDefault();
+    try {
+      await categorizacionService.update(categoriaSeleccionada._id, categoriaSeleccionada);
+      mostrarAlerta("¡Éxito!", "Categoría actualizada exitosamente");
+      setMostrarModal(false);
+      obtenerCategorias();
+    } catch (error) {
+      mostrarAlerta("Error", `Error: ${error.message}`);
+    }
   };
 
   //descativar y activar categoria
@@ -257,12 +280,16 @@ const Gestioncategorizacion = () => {
             <i className="fas fa-chevron-right"></i>
           </button>
         </div>
-        {showModal && (
+        {mostrarModal && (
           <CategorizacionModal
-            mode={modalMode}
-            initialData={currentItem || {}}
-            onClose={() => setShowModal(false)}
-            onSubmit={handleSubmit}
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            categoriaSeleccionada={categoriaSeleccionada}
+            setCategoriaSeleccionada={setCategoriaSeleccionada}
+            nuevaCategoria={nuevaCategoria}
+            setNuevaCategoria={setNuevaCategoria}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarCategoria : crearCategoria}
           />
         )}
       </main>

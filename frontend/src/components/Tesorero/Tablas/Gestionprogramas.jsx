@@ -3,7 +3,7 @@ import { programasAcademicosService } from "../../../services/programasAcademico
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero';
 import Footer from '../../footer/Footer';
-import ProgramaModal from '../modal/ProgramasModa';
+import ProgramaModal from '../../Dashboard/Modales/ProgramaModal';
 import {
   Plus,
   Edit,
@@ -17,77 +17,39 @@ import {
 } from 'lucide-react';
 
 const Gestioncursos = () => {
-  // --- CREAR Y EDITAR PROGRAMA ---
-  // formData: { titulo, descripcion, tipo, modalidad, duracion, precio, fechaInicio, fechaFin, cupos, profesor, ... }
-  const handleGuardarPrograma = async (formData, modoEdicion, idPrograma) => {
-    // Procesar arrays de objetos a arrays de strings
-    const procesarRequisitos = (requisitos) => {
-      if (!Array.isArray(requisitos)) return [];
-      return requisitos
-        .map(req => typeof req === 'object' ? req.value : req)
-        .filter(req => req && req.trim() !== '');
-    };
 
-    const procesarObjetivos = (objetivos) => {
-      if (!Array.isArray(objetivos)) return [];
-      return objetivos
-        .map(obj => typeof obj === 'object' ? obj.value : obj)
-        .filter(obj => obj && obj.trim() !== '');
-    };
 
-    // Adaptar los campos del formulario al modelo del backend
-    const payload = {
-      nombre: formData.titulo,
-      descripcion: formData.descripcion,
-      tipo: formData.tipo,
-      modalidad: formData.modalidad,
-      duracion: formData.duracion,
-      precio: Number(formData.precio),
-      fechaInicio: formData.fechaInicio,
-      fechaFin: formData.fechaFin,
-      cuposDisponibles: Number(formData.cupos),
-      profesor: formData.profesor,
-      profesorBio: formData.profesorBio || '',
-      requisitos: procesarRequisitos(formData.requisitos),
-      pensum: formData.pensum || [],
-      objetivos: procesarObjetivos(formData.objetivos),
-      metodologia: formData.metodologia || '',
-      evaluacion: formData.evaluacion || '',
-      certificacion: Boolean(formData.certificacion) || false,
-      imagen: formData.imagen || ''
-    };
-
-    // Solo agregar destacado si está definido
-    if (formData.destacado !== undefined) {
-      payload.destacado = formData.destacado;
-    }
-    
-    // Usar un ObjectId válido por defecto para categoría
-    // Este debe existir en la base de datos o el backend debe manejarlo
-    payload.categoria = '507f1f77bcf86cd799439011'; // ObjectId válido genérico
+  const obtenerCursos = async () => {
+    setCargando(true);
     try {
-      setCargando(true);
-      if (modoEdicion && idPrograma) {
-        // Editar
-        await programasAcademicosService.updatePrograma(idPrograma, payload);
-        mostrarAlerta('¡Éxito!', 'Programa actualizado correctamente');
-      } else {
-        // Crear
-        await programasAcademicosService.createPrograma(payload);
-        mostrarAlerta('¡Éxito!', 'Programa creado correctamente');
+      const response = await programasAcademicosService.getAllProgramas();
+      if (response.success || response.data) {
+        const programasData = response.data || response;
+        setCursos(Array.isArray(programasData) ? programasData : []);
       }
-      // Refrescar lista
-      obtenerCursos();
-      setShowModal(false);
     } catch (error) {
-      mostrarAlerta('Error', `Hubo un problema al guardar el programa: ${error.message}`);
+      console.error('Error al cargar programas:', error);
+      setCursos([]);
     } finally {
       setCargando(false);
     }
   };
-
-  const obtenerCursos = () => { };
   const formatearPrecio = (precio) => `$${precio}`;
+  
+  // Funciones auxiliares para procesar datos del formulario
+  const procesarRequisitos = (requisitos) => {
+    if (!Array.isArray(requisitos)) return [];
+    return requisitos
+      .map(req => typeof req === 'object' ? req.value : req)
+      .filter(req => req && req.trim() !== '');
+  };
+
+  const procesarObjetivos = (objetivos) => {
+    if (!Array.isArray(objetivos)) return [];
+    return objetivos
+      .map(obj => typeof obj === 'object' ? obj.value : obj)
+      .filter(obj => obj && obj.trim() !== '');
+  };
   const [filtros] = useState({ // setFiltros commented as unused
     tipo: '',
     modalidad: '',
@@ -97,16 +59,16 @@ const Gestioncursos = () => {
   const setProgramas = setCursos;
   const [cursosFiltrados, setCursosFiltrados] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
-  const [currentItem, setCurrentItem] = useState(null);
   const [cargando, setCargando] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const programas = cursos;
 
-  // Estado para el formulario del modal
-  const [formData, setFormData] = useState({
+  // Variables para el modal del Dashboard
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
+  const [nuevoPrograma, setNuevoPrograma] = useState({
     titulo: '',
     descripcion: '',
     tipo: 'curso',
@@ -123,10 +85,12 @@ const Gestioncursos = () => {
     objetivos: [{ id: 'obj_0', value: '' }],
     metodologia: '',
     evaluacion: '',
-    certificacion: false,
+    certificacion: '',
     imagen: '',
     destacado: false
   });
+
+
 
   // Funciones del modal
   const abrirModalVer = (programa) => {
@@ -134,11 +98,40 @@ const Gestioncursos = () => {
     setShowDetailModal(true);
   };
 
-  const abrirModalEditar = (programa) => {
-    setModalMode('edit');
-    setCurrentItem(programa);
-    // Llenar formData con datos del programa seleccionado
-    setFormData({
+
+
+  const handleCreate = () => {
+    setModoEdicion(false);
+    setProgramaSeleccionado(null);
+    setNuevoPrograma({
+      titulo: '',
+      descripcion: '',
+      tipo: 'curso',
+      modalidad: 'presencial',
+      duracion: '',
+      precio: '',
+      fechaInicio: '',
+      fechaFin: '',
+      cupos: '',
+      profesor: '',
+      profesorBio: '',
+      requisitos: [{ id: 'req_0', value: '' }],
+      pensum: [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
+      objetivos: [{ id: 'obj_0', value: '' }],
+      metodologia: '',
+      evaluacion: '',
+      certificacion: '',
+      imagen: '',
+      destacado: false
+    });
+    setMostrarModal(true);
+  };
+
+  const handleEdit = (programa) => {
+    setModoEdicion(true);
+    setProgramaSeleccionado(programa);
+    // Configurar nuevoPrograma con los datos del programa seleccionado
+    setNuevoPrograma({
       titulo: programa.nombre || '',
       descripcion: programa.descripcion || '',
       tipo: programa.tipo || 'curso',
@@ -161,53 +154,80 @@ const Gestioncursos = () => {
         : [{ id: 'obj_0', value: '' }],
       metodologia: programa.metodologia || '',
       evaluacion: programa.evaluacion || '',
-      certificacion: programa.certificacion || false,
+      certificacion: programa.certificacion || '',
       imagen: programa.imagen || '',
       destacado: programa.destacado || false
     });
-    setShowModal(true);
+    setMostrarModal(true);
   };
 
-  const abrirModalCrear = () => {
-    setModalMode('create');
-    setCurrentItem(null);
-    // Limpiar formData para crear nuevo
-    setFormData({
-      titulo: '',
-      descripcion: '',
-      tipo: 'curso',
-      modalidad: 'presencial',
-      duracion: '',
-      precio: '',
-      fechaInicio: '',
-      fechaFin: '',
-      cupos: '',
-      profesor: '',
-      profesorBio: '',
-      requisitos: [{ id: 'req_0', value: '' }],
-      pensum: [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
-      objetivos: [{ id: 'obj_0', value: '' }],
-      metodologia: '',
-      evaluacion: '',
-      certificacion: false,
-      imagen: '',
-      destacado: false
-    });
-    setShowModal(true);
-  };
-
-  // Función para manejar el submit del modal
-  const handleSubmitModal = async (e) => {
+  // Funciones para el modal del Dashboard
+  const crearPrograma = async (e) => {
     e.preventDefault();
-    const modoEdicion = modalMode === 'edit';
-    const idPrograma = currentItem?._id;
-    await handleGuardarPrograma(formData, modoEdicion, idPrograma);
+    try {
+      // Convertir la estructura del formulario a la estructura del backend
+      const programaData = {
+        nombre: nuevoPrograma.titulo,
+        descripcion: nuevoPrograma.descripcion,
+        tipo: nuevoPrograma.tipo,
+        modalidad: nuevoPrograma.modalidad,
+        duracion: nuevoPrograma.duracion,
+        precio: Number(nuevoPrograma.precio),
+        fechaInicio: nuevoPrograma.fechaInicio,
+        fechaFin: nuevoPrograma.fechaFin,
+        cuposDisponibles: Number(nuevoPrograma.cupos),
+        profesor: nuevoPrograma.profesor,
+        profesorBio: nuevoPrograma.profesorBio || '',
+        requisitos: procesarRequisitos(nuevoPrograma.requisitos),
+        pensum: nuevoPrograma.pensum || [],
+        objetivos: procesarObjetivos(nuevoPrograma.objetivos),
+        metodologia: nuevoPrograma.metodologia || '',
+        evaluacion: nuevoPrograma.evaluacion || '',
+        certificacion: nuevoPrograma.certificacion || '',
+        imagen: nuevoPrograma.imagen || '',
+        destacado: nuevoPrograma.destacado || false
+      };
+      await programasAcademicosService.createPrograma(programaData);
+      mostrarAlerta("¡Éxito!", "Programa creado exitosamente", 'success');
+      setMostrarModal(false);
+      obtenerCursos();
+    } catch (error) {
+      mostrarAlerta("ERROR", `Error al crear programa: ${error.message}`, 'error');
+    }
   };
 
-  const handleCreate = () => {
-    setModalMode('create');
-    setCurrentItem(null);
-    setShowModal(true);
+  const actualizarPrograma = async (e) => {
+    e.preventDefault();
+    try {
+      // Convertir la estructura del formulario a la estructura del backend
+      const programaData = {
+        nombre: nuevoPrograma.titulo,
+        descripcion: nuevoPrograma.descripcion,
+        tipo: nuevoPrograma.tipo,
+        modalidad: nuevoPrograma.modalidad,
+        duracion: nuevoPrograma.duracion,
+        precio: Number(nuevoPrograma.precio),
+        fechaInicio: nuevoPrograma.fechaInicio,
+        fechaFin: nuevoPrograma.fechaFin,
+        cuposDisponibles: Number(nuevoPrograma.cupos),
+        profesor: nuevoPrograma.profesor,
+        profesorBio: nuevoPrograma.profesorBio || '',
+        requisitos: procesarRequisitos(nuevoPrograma.requisitos),
+        pensum: nuevoPrograma.pensum || [],
+        objetivos: procesarObjetivos(nuevoPrograma.objetivos),
+        metodologia: nuevoPrograma.metodologia || '',
+        evaluacion: nuevoPrograma.evaluacion || '',
+        certificacion: nuevoPrograma.certificacion || '',
+        imagen: nuevoPrograma.imagen || '',
+        destacado: nuevoPrograma.destacado || false
+      };
+      await programasAcademicosService.updatePrograma(programaSeleccionado._id, programaData);
+      mostrarAlerta("¡Éxito!", "Programa actualizado exitosamente", 'success');
+      setMostrarModal(false);
+      obtenerCursos();
+    } catch (error) {
+      mostrarAlerta("ERROR", `Error al actualizar programa: ${error.message}`, 'error');
+    }
   };
 
   //------------------------------------------------------------------------------------------------------------------------------------
@@ -441,7 +461,7 @@ const Gestioncursos = () => {
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => abrirModalEditar(programa)}
+                      onClick={() => handleEdit(programa)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Editar"
                     >
@@ -505,7 +525,7 @@ const Gestioncursos = () => {
                 <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay programas académicos</h3>
                 <p className="text-slate-500 mb-6">Comienza creando tu primer curso o programa técnico</p>
                 <button
-                  onClick={abrirModalCrear}
+                  onClick={handleCreate}
                   className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
                 >
                   <Plus className="w-5 h-5 mr-2 inline" />
@@ -519,15 +539,15 @@ const Gestioncursos = () => {
 
 
         {/* Modal de Programas */}
-        {showModal && (
+        {mostrarModal && (
           <ProgramaModal
-            mostrar={showModal}
-            modoEdicion={modalMode === 'edit'}
-            programaSeleccionado={currentItem}
-            formData={formData}
-            setFormData={setFormData}
-            onClose={() => setShowModal(false)}
-            onSubmit={handleSubmitModal}
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            programaSeleccionado={programaSeleccionado}
+            formData={nuevoPrograma}
+            setFormData={setNuevoPrograma}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={(e) => modoEdicion ? actualizarPrograma(e) : crearPrograma(e)}
           />
         )}
 

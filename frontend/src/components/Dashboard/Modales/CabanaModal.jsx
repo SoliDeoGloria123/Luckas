@@ -35,12 +35,6 @@ const CabanaModal = ({
     setTimeout(() => setIsUploading(false), 500);
   };
 
-  // Función auxiliar para actualizar progreso
-  const updateProgress = (count, total) => {
-    const progressValue = (count / total) * 100;
-    setProgress(progressValue);
-  };
-
   // Función auxiliar para agregar imagen
   const addImageToState = (imageData) => {
     if (setSelectedImages && typeof setSelectedImages === 'function') {
@@ -82,43 +76,38 @@ const CabanaModal = ({
     let uploadedCount = 0;
     const totalFiles = files.length;
 
-    const handleFileLoad = (e, file, index) => {
-      try {
-        const imageData = {
-          id: Date.now() + index,
-          file,
-          url: e.target.result,
-          name: file.name
-        };
-
-        addImageToState(imageData);
-        uploadedCount++;
-        updateProgress(uploadedCount, totalFiles);
-
-        if (uploadedCount === totalFiles) {
-          finishUpload();
-        }
-      } catch (error) {
-        console.error('Error procesando imagen:', error);
-        uploadedCount++;
-        if (uploadedCount === totalFiles) {
-          setIsUploading(false);
-        }
-      }
-    };
-
-    const handleFileError = () => {
-      console.error('Error leyendo archivo');
+    const handleUploadComplete = () => {
       uploadedCount++;
       if (uploadedCount === totalFiles) {
-        setIsUploading(false);
+        finishUpload();
       }
     };
 
-    for (const [index, file] of files.entries()) {
+    for (let index = 0; index < files.length; index++) {
+      const file = files[index];
       const reader = new FileReader();
-      reader.onload = (e) => handleFileLoad(e, file, index);
-      reader.onerror = handleFileError;
+      
+      reader.onload = (e) => {
+        try {
+          const imageData = {
+            id: Date.now() + index,
+            file,
+            url: e.target.result,
+            name: file.name
+          };
+          addImageToState(imageData);
+          handleUploadComplete();
+        } catch (error) {
+          console.error('Error procesando imagen:', error);
+          handleUploadComplete();
+        }
+      };
+      
+      reader.onerror = () => {
+        console.error('Error leyendo archivo');
+        handleUploadComplete();
+      };
+      
       reader.readAsDataURL(file);
     }
   };
@@ -135,6 +124,20 @@ const CabanaModal = ({
       return selectedImages.length > 0 ? 'Subiendo imágenes...' : 'Creando cabaña...';
     }
     return modoEdicion ? "Guardar Cambios" : "Crear Cabaña";
+  };
+
+  // Función utilitaria para manejar cambios de valores
+  const handleFieldChange = (fieldName, value) => {
+    if (modoEdicion) {
+      setCabanaSeleccionada({ ...cabanaSeleccionada, [fieldName]: value });
+    } else {
+      setNuevaCabana({ ...nuevaCabana, [fieldName]: value });
+    }
+  };
+
+  // Función utilitaria para obtener valores de campos
+  const getFieldValue = (fieldName) => {
+    return modoEdicion ? cabanaSeleccionada?.[fieldName] : nuevaCabana[fieldName];
   };
 
   // Función auxiliar para preparar FormData con imágenes
@@ -214,12 +217,8 @@ const CabanaModal = ({
               <input
                 id="nombre-cabana"
                 type="text"
-                value={modoEdicion ? cabanaSeleccionada?.nombre : nuevaCabana.nombre}
-                onChange={e =>
-                  modoEdicion
-                    ? setCabanaSeleccionada({ ...cabanaSeleccionada, nombre: e.target.value })
-                    : setNuevaCabana({ ...nuevaCabana, nombre: e.target.value })
-                }
+                value={getFieldValue('nombre')}
+                onChange={e => handleFieldChange('nombre', e.target.value)}
                 placeholder="Nombre de la cabaña"
                 required
               />
@@ -229,12 +228,8 @@ const CabanaModal = ({
               <input
                 id="descripcion-cabana"
                 type="text"
-                value={modoEdicion ? cabanaSeleccionada?.descripcion : nuevaCabana.descripcion}
-                onChange={e =>
-                  modoEdicion
-                    ? setCabanaSeleccionada({ ...cabanaSeleccionada, descripcion: e.target.value })
-                    : setNuevaCabana({ ...nuevaCabana, descripcion: e.target.value })
-                }
+                value={getFieldValue('descripcion')}
+                onChange={e => handleFieldChange('descripcion', e.target.value)}
                 placeholder="Descripción"
               />
             </div>
@@ -245,12 +240,8 @@ const CabanaModal = ({
               <input
                 id="capacidad-cabana"
                 type="number"
-                value={modoEdicion ? cabanaSeleccionada?.capacidad : nuevaCabana.capacidad}
-                onChange={e =>
-                  modoEdicion
-                    ? setCabanaSeleccionada({ ...cabanaSeleccionada, capacidad: e.target.value })
-                    : setNuevaCabana({ ...nuevaCabana, capacidad: e.target.value })
-                }
+                value={getFieldValue('capacidad')}
+                onChange={e => handleFieldChange('capacidad', e.target.value)}
                 placeholder="Capacidad"
                 required
               />
@@ -260,12 +251,8 @@ const CabanaModal = ({
               <select
                 id="categoria-cabana"
                 type="text"
-                value={modoEdicion ? cabanaSeleccionada?.categoria : nuevaCabana.categoria}
-                onChange={e =>
-                  modoEdicion
-                    ? setCabanaSeleccionada({ ...cabanaSeleccionada, categoria: e.target.value })
-                    : setNuevaCabana({ ...nuevaCabana, categoria: e.target.value })
-                }
+                value={getFieldValue('categoria')}
+                onChange={e => handleFieldChange('categoria', e.target.value)}
                 placeholder="Categoría"
               >
                 <option value="">Seleccione...</option>
@@ -283,12 +270,8 @@ const CabanaModal = ({
               <input
                 id="precio-cabana"
                 type="number"
-                value={modoEdicion ? cabanaSeleccionada?.precio : nuevaCabana.precio}
-                onChange={e =>
-                  modoEdicion
-                    ? setCabanaSeleccionada({ ...cabanaSeleccionada, precio: e.target.value })
-                    : setNuevaCabana({ ...nuevaCabana, precio: e.target.value })
-                }
+                value={getFieldValue('precio')}
+                onChange={e => handleFieldChange('precio', e.target.value)}
                 placeholder="Precio por noche"
                 required
               />
@@ -299,10 +282,8 @@ const CabanaModal = ({
                 <input
                   id="ubicacion-cabana"
                   type="text"
-                  value={nuevaCabana.ubicacion}
-                  onChange={e =>
-                    setNuevaCabana({ ...nuevaCabana, ubicacion: e.target.value })
-                  }
+                  value={getFieldValue('ubicacion')}
+                  onChange={e => handleFieldChange('ubicacion', e.target.value)}
                   placeholder="Ubicación"
                 />
               </div>
@@ -313,12 +294,8 @@ const CabanaModal = ({
               <label htmlFor="estado-cabana">Estado:</label>
               <select
                 id="estado-cabana"
-                value={modoEdicion ? cabanaSeleccionada?.estado : nuevaCabana.estado}
-                onChange={e =>
-                  modoEdicion
-                    ? setCabanaSeleccionada({ ...cabanaSeleccionada, estado: e.target.value })
-                    : setNuevaCabana({ ...nuevaCabana, estado: e.target.value })
-                }
+                value={getFieldValue('estado')}
+                onChange={e => handleFieldChange('estado', e.target.value)}
                 required
               >
                 <option value="disponible">Disponible</option>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { eventService } from "../../../services/eventService";
 import { categorizacionService } from "../../../services/categorizacionService";
 import { mostrarAlerta } from '../../utils/alertas';
-import EventosModal from '../modal/EventosModal'
+import EventoModal from '../../Dashboard/Modales/EventoModal';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
 import {
@@ -21,9 +21,21 @@ import {
 const Gestionevento = () => {
   const [eventos, setEventos] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
-  const [currentItem, setCurrentItem] = useState(null);
+  
+  // Variables para el modal del Dashboard
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
+  const [nuevoEvento, setNuevoEvento] = useState({
+    nombre: '',
+    descripcion: '',
+    fecha: '',
+    capacidad: '',
+    ubicacion: '',
+    categoria: '',
+    estado: 'activo'
+  });
+  const [selectedImages, setSelectedImages] = useState([]);
   const [eventoDetalle, setEventoDetalle] = useState(null);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
 
@@ -74,58 +86,57 @@ const Gestionevento = () => {
     }));
   };
 
-  // Modal de edición
-  const onEditar = (evento) => {
-    setModalMode('edit');
-    setCurrentItem(evento);
-    setShowModal(true);
-  };
-
   const abrirModalVer = (evento) => {
     setEventoDetalle(evento);
     setMostrarModalDetalle(true);
   };
 
-  const handleSubmit = async (data, mode, isFormData = false) => {
-    const currentMode = mode || modalMode;
-    
-    console.log('HandleSubmit - Modo:', currentMode);
-    console.log('HandleSubmit - Es FormData:', isFormData);
-    console.log('HandleSubmit - Tiene archivos:', isFormData && data.has && data.has('imagen'));
-    
-    if (currentMode === 'create') {
-      try {
-        const resultado = await eventService.createEvent(data, isFormData);
-        console.log('Evento creado exitosamente:', resultado);
-        
-        const mensaje = isFormData 
-          ? "¡Evento creado exitosamente con imágenes!" 
-          : "¡Evento creado exitosamente!";
-        
-        mostrarAlerta("¡Éxito!", mensaje);
-        obtenerEventos();
-      } catch (error) {
-        console.error('Error creando evento:', error);
-        mostrarAlerta("ERROR", `Error al crear el evento: ${error.message}`);
-      }
-    } else {
-      try {
-        await eventService.updateEvent(currentItem._id, data, isFormData);
-        const mensaje = isFormData 
-          ? "¡Evento actualizado exitosamente con imágenes!" 
-          : "¡Evento actualizado exitosamente!";
-        mostrarAlerta("¡Éxito!", mensaje);
-        obtenerEventos();
-      } catch (error) {
-        console.error('Error actualizando evento:', error);
-        mostrarAlerta("ERROR", `Error al actualizar el evento: ${error.message}`);
-      }
+
+  const handleCreate = () => {
+    setModoEdicion(false);
+    setEventoSeleccionado(null);
+    setNuevoEvento({
+      nombre: '',
+      descripcion: '',
+      fecha: '',
+      capacidad: '',
+      ubicacion: '',
+      categoria: '',
+      estado: 'activo'
+    });
+    setSelectedImages([]);
+    setMostrarModal(true);
+  };
+
+  const handleEdit = (evento) => {
+    setModoEdicion(true);
+    setEventoSeleccionado(evento);
+    setMostrarModal(true);
+  };
+
+  // Funciones para el modal del Dashboard
+  const crearEvento = async (e) => {
+    e.preventDefault();
+    try {
+      await eventService.createEvent(nuevoEvento);
+      mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
+      setMostrarModal(false);
+      obtenerEventos();
+    } catch (error) {
+      mostrarAlerta("Error", `Error: ${error.message}`);
     }
   };
-  const handleCreate = () => {
-    setModalMode('create');
-    setCurrentItem(null);
-    setShowModal(true);
+
+  const actualizarEvento = async (e) => {
+    e.preventDefault();
+    try {
+      await eventService.updateEvent(eventoSeleccionado._id, nuevoEvento);
+      mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
+      setMostrarModal(false);
+      obtenerEventos();
+    } catch (error) {
+      mostrarAlerta("Error", `Error: ${error.message}`);
+    }
   };
 
   // Paginación
@@ -330,7 +341,7 @@ const Gestionevento = () => {
                         </button>
 
                         <button
-                          onClick={() => onEditar(evento)}
+                          onClick={() => handleEdit(evento)}
                           className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors "
                           title="Editar"
                         >
@@ -499,16 +510,7 @@ const Gestionevento = () => {
           </div>
         )}
 
-        {showModal && (
-          <EventosModal
-            mode={modalMode}
-            initialData={currentItem || {}}
-            onClose={() => setShowModal(false)}
-            onSubmit={handleSubmit}
-            categorias={categorias}
 
-          />
-        )}
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
           <button
             className="pagination-btn-admin"
@@ -528,6 +530,22 @@ const Gestionevento = () => {
             <i className="fas fa-chevron-right"></i>
           </button>
         </div>
+
+        {mostrarModal && (
+          <EventoModal
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            eventoSeleccionado={eventoSeleccionado}
+            setEventoSeleccionado={setEventoSeleccionado}
+            nuevoEvento={nuevoEvento}
+            setNuevoEvento={setNuevoEvento}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarEvento : crearEvento}
+            categorias={categorias}
+            selectedImages={selectedImages}
+            setSelectedImages={setSelectedImages}
+          />
+        )}
 
       </main>
       <Footer />

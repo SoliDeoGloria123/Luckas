@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import UsuarioModal from '../modal/UsuarioModal';
+import UsuarioModal from '../../Dashboard/Modales/UsuarioModal';
 import { userService } from '../../../services/userService'
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
@@ -14,14 +14,69 @@ const Gestionusuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModalUsuario] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
-  const [currentItem, setCurrentItem] = useState(null);
+  
+  // Variables para el modal del Dashboard
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
+  const [nuevoUsuario, setNuevoUsuario] = useState({
+    nombre: '',
+    apellido: '',
+    correo: '',
+    telefono: '',
+    role: '',
+    fechaNacimiento: '',
+    tipoDocumento: '',
+    numeroDocumento: '',
+    password: ''
+  });
 
   const handleCreate = () => {
-    setModalMode('create');
-    setCurrentItem(null);
-    setShowModalUsuario(true);
+    setModoEdicion(false);
+    setUsuarioSeleccionado(null);
+    setNuevoUsuario({
+      nombre: '',
+      apellido: '',
+      correo: '',
+      telefono: '',
+      role: '',
+      fechaNacimiento: '',
+      tipoDocumento: '',
+      numeroDocumento: '',
+      password: ''
+    });
+    setMostrarModal(true);
+  };
+
+  const handleEdit = (usuario) => {
+    setModoEdicion(true);
+    setUsuarioSeleccionado(usuario);
+    setMostrarModal(true);
+  };
+
+  // Funciones para el modal del Dashboard
+  const crearUsuario = async (e) => {
+    e.preventDefault();
+    try {
+      await userService.createUser(nuevoUsuario);
+      mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
+      setMostrarModal(false);
+      obtenerUsuarios();
+    } catch (error) {
+      mostrarAlerta("Error", `Error: ${error.message}`);
+    }
+  };
+
+  const actualizarUsuario = async (e) => {
+    e.preventDefault();
+    try {
+      await userService.updateUser(usuarioSeleccionado._id, usuarioSeleccionado);
+      mostrarAlerta("¡Éxito!", "Usuario actualizado exitosamente");
+      setMostrarModal(false);
+      obtenerUsuarios();
+    } catch (error) {
+      mostrarAlerta("Error", `Error: ${error.message}`);
+    }
   };
 
   //------------------------------------------------------------------------------------------------------------------------------------
@@ -71,25 +126,6 @@ const Gestionusuarios = () => {
       setUsuariosFiltrados(usuarios);
     }
   }, [usuarios]);
-
-  const handleSubmit = async (Usuariodata) => {
-    try {
-      if (modalMode === 'create') {
-        console.log("Datos enviados al backend:", Usuariodata); // <-- Verifica aquí
-        await userService.createUser(Usuariodata)
-        mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
-
-      } else {
-        await userService.updateUser(currentItem._id, Usuariodata);
-        mostrarAlerta("¡Éxito!", "Usuario actualizado exitosamente");
-        obtenerUsuarios();
-      }
-      setShowModalUsuario(false);
-      obtenerUsuarios();
-    } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
-    };
-  };
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
@@ -280,11 +316,7 @@ const Gestionusuarios = () => {
                           <td className="whitespace-nowrap px-6 py-4">
                             <div style={{ display: 'flex', gap: '8px' }}>
                               <button
-                                onClick={() => {
-                                  setModalMode('edit');
-                                  setCurrentItem(user);
-                                  setShowModalUsuario(true);
-                                }}
+                                onClick={() => handleEdit(user)}
                                 size="icon"
                                 className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]"
                               >
@@ -333,12 +365,16 @@ const Gestionusuarios = () => {
           </div>
         </div>
 
-        {showModal && (
+        {mostrarModal && (
           <UsuarioModal
-            mode={modalMode}
-            initialData={currentItem || {}}
-            onClose={() => setShowModalUsuario(false)}
-            onSubmit={handleSubmit}
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            usuarioSeleccionado={usuarioSeleccionado}
+            setUsuarioSeleccionado={setUsuarioSeleccionado}
+            nuevoUsuario={nuevoUsuario}
+            setNuevoUsuario={setNuevoUsuario}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarUsuario : crearUsuario}
           />
         )}
       </main >

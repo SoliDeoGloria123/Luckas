@@ -44,9 +44,9 @@ const Login = () => {
       if (err.message) {
         errorMessage = err.message;
       }
-      
+       mostrarAlerta('Error', errorMessage, 'error')
       setError(errorMessage);
-      mostrarAlerta('Error', errorMessage, 'error');
+     ;
     }
   };
 

@@ -3,7 +3,7 @@ import { cabanaService } from '../../../services/cabanaService';
 import { categorizacionService } from '../../../services/categorizacionService';
 import { useNavigate } from "react-router-dom";
 import { mostrarAlerta } from '../../utils/alertas';
-import CabanaModal from '../modal/CabanaModal';
+import CabanaModal from '../../Dashboard/Modales/CabanaModal';
 import Header from '../Header/Header-tesorero';
 import Footer from '../../footer/Footer';
 import {
@@ -30,6 +30,21 @@ const Gestioncabana = () => {
   const [eventoDetalle, setEventoDetalle] = useState(null);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
 
+  // Variables para el modal del Dashboard
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [cabanaSeleccionada, setCabanaSeleccionada] = useState(null);
+  const [nuevaCabana, setNuevaCabana] = useState({
+    nombre: '',
+    descripcion: '',
+    capacidad: '',
+    precio: '',
+    categoria: '',
+    estado: 'disponible',
+    servicios: []
+  });
+  const [selectedImages, setSelectedImages] = useState([]);
+
   // Función para obtener el tipo de cabaña (dummy)
   const obtenerTipoCabana = (tipo) => ({ label: tipo || 'Cabaña', icon: <Home className="w-6 h-6" /> });
 
@@ -44,12 +59,7 @@ const Gestioncabana = () => {
     // ...agrega más si lo necesitas
   ];
 
-  // Modal de edición
-  const onEditar = (cabana) => {
-    setModalMode('edit');
-    setCurrentItem(cabana);
-    setShowModal(true);
-  };
+
 
   const abrirModalVer = (evento) => {
     setEventoDetalle(evento);
@@ -60,9 +70,6 @@ const Gestioncabana = () => {
   const cabanasFiltradas = cabanas;
   const [categorias, setCategorias] = useState([]);
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
-  const [currentItem, setCurrentItem] = useState(null);
 
 
 
@@ -144,63 +151,51 @@ const Gestioncabana = () => {
     obtenerCategorias();
   }, []);
 
-  const handleSubmit = async (data, isFormData = false) => {
-    console.log('Gestioncabana: HandleSubmit - Modo:', modalMode);
-    console.log('Gestioncabana: HandleSubmit - Es FormData:', isFormData);
-    console.log('Gestioncabana: HandleSubmit - Tiene archivos:', isFormData && data.has && data.has('imagen'));
-    
-    if (modalMode === 'create') {
-      try {
-        console.log('Gestioncabana: Llamando cabanaService.create...');
-        const resultado = await cabanaService.create(data);
-        console.log('Gestioncabana: Cabaña creada exitosamente:', resultado);
-        
-        const mensaje = isFormData 
-          ? "¡Cabaña creada exitosamente con imágenes!" 
-          : "¡Cabaña creada exitosamente!";
-        
-        console.log('Gestioncabana: A punto de mostrar alerta de éxito:', mensaje);
-        mostrarAlerta("¡Éxito!", mensaje);
-        console.log('Gestioncabana: Alerta mostrada, cerrando modal');
-        
-        // Cerrar modal después del éxito
-        setShowModal(false);
-        
-        // Actualizar lista
-        obtenerCabanas();
-        
-      } catch (error) {
-        console.error('Gestioncabana: Error creando cabaña:', error);
-        mostrarAlerta("Error", "Error al crear la cabaña: " + error.message, "error");
-        // No cerrar modal si hay error para que el usuario pueda corregir
-      }
-    } else {
-      try {
-        await cabanaService.update(currentItem._id, data);
-        const mensaje = isFormData 
-          ? "¡Cabaña actualizada exitosamente con imágenes!" 
-          : "¡Cabaña actualizada exitosamente!";
-        mostrarAlerta("¡Éxito!", mensaje);
-        
-        // Cerrar modal después del éxito
-        setShowModal(false);
-        
-        // Actualizar lista
-        obtenerCabanas();
-        
-      } catch (err) {
-        console.error('Gestioncabana: Error actualizando cabaña:', err);
-        mostrarAlerta("Error", "Error al actualizar cabaña: " + err.message);
-        // No cerrar modal si hay error
-      }
+  const handleCreate = () => {
+    setModoEdicion(false);
+    setCabanaSeleccionada(null);
+    setNuevaCabana({
+      nombre: '',
+      descripcion: '',
+      capacidad: '',
+      precio: '',
+      categoria: '',
+      estado: 'disponible',
+      servicios: []
+    });
+    setSelectedImages([]);
+    setMostrarModal(true);
+  };
+
+  const handleEdit = (cabana) => {
+    setModoEdicion(true);
+    setCabanaSeleccionada(cabana);
+    setMostrarModal(true);
+  };
+
+  // Funciones para el modal del Dashboard
+  const crearCabana = async (e) => {
+    e.preventDefault();
+    try {
+      await cabanaService.createCabana(nuevaCabana);
+      mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente", 'success');
+      setMostrarModal(false);
+      obtenerCabanas();
+    } catch (error) {
+      mostrarAlerta("ERROR", `Error al crear cabaña: ${error.message}`, 'error');
     }
   };
 
-
-  const handleCreate = () => {
-    setModalMode('create');
-    setCurrentItem(null);
-    setShowModal(true);
+  const actualizarCabana = async (e) => {
+    e.preventDefault();
+    try {
+      await cabanaService.updateCabana(cabanaSeleccionada._id, nuevaCabana);
+      mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente", 'success');
+      setMostrarModal(false);
+      obtenerCabanas();
+    } catch (error) {
+      mostrarAlerta("ERROR", `Error al actualizar cabaña: ${error.message}`, 'error');
+    }
   };
 
   // Paginación
@@ -407,7 +402,7 @@ const Gestioncabana = () => {
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => onEditar(cabana)}
+                        onClick={() => handleEdit(cabana)}
                         className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors "
                         title="Editar"
                       >
@@ -551,13 +546,19 @@ const Gestioncabana = () => {
           </div>
         )}
 
-        {showModal && (
+        {mostrarModal && (
           <CabanaModal
-            mode={modalMode}
-            initialData={currentItem || {}}
-            onClose={() => setShowModal(false)}
-            onSubmit={handleSubmit}
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            cabanaSeleccionada={cabanaSeleccionada}
+            setCabanaSeleccionada={setCabanaSeleccionada}
+            nuevaCabana={nuevaCabana}
+            setNuevaCabana={setNuevaCabana}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={(e) => modoEdicion ? actualizarCabana(e) : crearCabana(e)}
             categorias={categorias}
+            selectedImages={selectedImages}
+            setSelectedImages={setSelectedImages}
           />
         )}
 

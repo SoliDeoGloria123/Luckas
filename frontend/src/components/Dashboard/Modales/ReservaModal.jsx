@@ -23,12 +23,12 @@ const ReservasModal = ({
 
   const actualizarPrecioCabana = (reservaActual, setReserva) => {
     if (!reservaActual.cabana || !cabanas || cabanas.length === 0) return;
-    
+
     const cabanaSeleccionada = cabanas.find(c => c._id === reservaActual.cabana);
-    const debeCambiarPrecio = cabanaSeleccionada && 
-                              cabanaSeleccionada.precio && 
-                              reservaActual.precio !== cabanaSeleccionada.precio;
-    
+    const debeCambiarPrecio = cabanaSeleccionada &&
+      cabanaSeleccionada.precio &&
+      reservaActual.precio !== cabanaSeleccionada.precio;
+
     if (debeCambiarPrecio) {
       setReserva({ ...reservaActual, precio: cabanaSeleccionada.precio });
     }
@@ -70,7 +70,7 @@ const ReservasModal = ({
   const handleCabanaChange = (cabanaId) => {
     const cabanaSeleccionada = cabanas.find(c => c._id === cabanaId);
     const nuevoPrecio = cabanaSeleccionada ? cabanaSeleccionada.precio : "";
-    
+
     if (modoEdicion) {
       setReservaSeleccionada({
         ...reservaSeleccionada,

@@ -39,48 +39,40 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   });
 
 
+  // Función utilitaria para manejo de datos con try/catch
+  const manejarOperacionAsync = async (operacion, setEstado, mensajeError) => {
+    try {
+      const data = await operacion();
+      let resultado = [];
+      if (Array.isArray(data)) {
+        resultado = data;
+      } else if (Array.isArray(data.data)) {
+        resultado = data.data;
+      } else {
+        resultado = [];
+      }
+      setEstado(resultado);
+    } catch (error) {
+      console.error(`${mensajeError}: ${error.message}`);
+    }
+  };
+
   useEffect(() => {
     obtenerCabanas();
     obtenerCategorias();
   }, []);
 
-  const obtenerCabanas = async () => {
-    try {
-      const data = await cabanaService.getAll();
-      // Soporta respuesta tipo {data: [...]} o array directa
-      let cabs = [];
-      if (Array.isArray(data)) {
-        cabs = data;
-      } else if (Array.isArray(data.data)) {
-        cabs = data.data;
-      } else {
-        cabs = [];
-      }
-      setCabanas(cabs);
-    } catch (error) {
-      // Puedes mostrar un alert o log, pero no usar setError si no lo necesitas
-      console.error("Error al obtener cabañas: " + error.message);
-    }
-  };
+  const obtenerCabanas = () => manejarOperacionAsync(
+    () => cabanaService.getAll(),
+    setCabanas,
+    "Error al obtener cabañas"
+  );
 
-  const obtenerCategorias = async () => {
-    try {
-      const data = await categorizacionService.getAll();
-      // Soporta respuesta tipo {data: [...]} o array directa
-      let cats = [];
-      if (Array.isArray(data)) {
-        cats = data;
-      } else if (Array.isArray(data.data)) {
-        cats = data.data;
-      } else {
-        cats = [];
-      }
-      setCategorias(cats);
-    } catch (error) {
-      // Puedes mostrar un alert o log, pero no usar setError si no lo necesitas
-      console.error("Error al obtener categorías: " + error.message);
-    }
-  };
+  const obtenerCategorias = () => manejarOperacionAsync(
+    () => categorizacionService.getAll(),
+    setCategorias,
+    "Error al obtener categorías"
+  );
   // CRUD
   const crearCabana = async () => {
     try {

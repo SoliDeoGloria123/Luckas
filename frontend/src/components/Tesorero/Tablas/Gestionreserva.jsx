@@ -1,21 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { reservaService } from '../../../services/reservaService';
-import { userService } from "../../../services/userService";
-import { cabanaService } from "../../../services/cabanaService";
+import { userService } from '../../../services/userService';
+import { cabanaService } from '../../../services/cabanaService';
 import { mostrarAlerta } from '../../utils/alertas';
-import ReservaModal from '../modal/ReservaModal';
-import Header from '../Header/Header-tesorero'
-import Footer from '../../footer/Footer'
-import { Edit } from "lucide-react"
+import ReservaModal from '../../Dashboard/Modales/ReservaModal';
+import Header from '../Header/Header-tesorero';
+import Footer from '../../footer/Footer';
+import { Edit } from 'lucide-react';
 
 
 const Gestionreserva = () => {
   const [reservas, setReservas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [cabanas, setCabanas] = useState([]);
-  const [showModalEvento, setshowModalEvento] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
-  const [currentItem, setCurrentItem] = useState(null);
+
+  // Variables para el modal del Dashboard
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
+  const [nuevaReserva, setNuevaReserva] = useState({
+    usuario: '',
+    cabana: '',
+    fechaInicio: '',
+    fechaFin: '',
+    numeroPersonas: 1,
+    tipoDocumento: '',
+    numeroDocumento: '',
+    correoElectronico: '',
+    telefono: '',
+    propositoEstadia: '',
+    estado: 'pendiente'
+  });
 
   //obtener reservas 
   const obtenerReservas = async () => {
@@ -75,32 +90,56 @@ const Gestionreserva = () => {
   }, []);
 
   const handleCreate = () => {
-    setModalMode('create');
-    setCurrentItem(null);
-    setshowModalEvento(true);
+    setModoEdicion(false);
+    setReservaSeleccionada(null);
+    setNuevaReserva({
+      usuario: '',
+      cabana: '',
+      fechaInicio: '',
+      fechaFin: '',
+      numeroPersonas: 1,
+      tipoDocumento: '',
+      numeroDocumento: '',
+      correoElectronico: '',
+      telefono: '',
+      propositoEstadia: '',
+      estado: 'pendiente'
+    });
+    setMostrarModal(true);
   };
 
-  const handleEdit = (item) => {
-    setModalMode('edit');
-    setCurrentItem(item);
-    setshowModalEvento(true);
+  const handleEdit = (reserva) => {
+    setModoEdicion(true);
+    setReservaSeleccionada(reserva);
+    setMostrarModal(true);
   };
 
-  const handleSubmit = async (Reservadata) => {
+  // Funciones para el modal del Dashboard
+  const crearReserva = async (e) => {
+    e.preventDefault();
     try {
-      if (modalMode === 'create') {
-        await reservaService.create(Reservadata);
-        mostrarAlerta("¡Éxito!", "Reserva creada exitosamente");
-      } else {
-        await reservaService.update(currentItem._id, Reservadata);
-        mostrarAlerta("¡Éxito!", "Reserva actualizada exitosamente");
-      }
-      setshowModalEvento(false);
+      await reservaService.createReserva(nuevaReserva);
+      mostrarAlerta("¡Éxito!", "Reserva creada exitosamente", 'success');
+      setMostrarModal(false);
       obtenerReservas();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
-    };
+      mostrarAlerta("ERROR", `Error al crear reserva: ${error.message}`, 'error');
+    }
   };
+
+  const actualizarReserva = async (e) => {
+    e.preventDefault();
+    try {
+      await reservaService.updateReserva(reservaSeleccionada._id, nuevaReserva);
+      mostrarAlerta("¡Éxito!", "Reserva actualizada exitosamente", 'success');
+      setMostrarModal(false);
+      obtenerReservas();
+    } catch (error) {
+      mostrarAlerta("ERROR", `Error al actualizar reserva: ${error.message}`, 'error');
+    }
+  };
+
+
 
 
   // Paginación
@@ -312,14 +351,18 @@ const Gestionreserva = () => {
           </button>
         </div>
 
-        {showModalEvento && (
+        {mostrarModal && (
           <ReservaModal
-            mode={modalMode}
-            initialData={currentItem || {}}
-            onClose={() => setshowModalEvento(false)}
-            onSubmit={handleSubmit}
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            reservaSeleccionada={reservaSeleccionada}
+            setReservaSeleccionada={setReservaSeleccionada}
+            nuevaReserva={nuevaReserva}
+            setNuevaReserva={setNuevaReserva}
             usuarios={usuarios}
             cabanas={cabanas}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={(e) => modoEdicion ? actualizarReserva(e) : crearReserva(e)}
           />
         )}
       </main>

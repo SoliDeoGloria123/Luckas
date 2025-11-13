@@ -41,49 +41,68 @@ const GestionIscripcion = () => {
     ]
   );
 
+  // Función utilitaria para manejo de datos con try/catch
+  const manejarOperacionAsync = async (operacion, setEstado, valorPorDefecto = [], mensajeError = "No se pudieron obtener los datos") => {
+    try {
+      const data = await operacion();
+      const datos = data.data || data;
+      setEstado(Array.isArray(datos) ? datos : valorPorDefecto);
+    } catch (error) {
+      setEstado(valorPorDefecto);
+      mostrarAlerta("Error", `${mensajeError}: ${error.message}`);
+    }
+  };
+
+  // Función utilitaria para manejo de operaciones CRUD
+  const ejecutarOperacionCRUD = async (operacion, mensajeExito, mensajeError, callback = null) => {
+    try {
+      await operacion();
+      mostrarAlerta("¡Éxito!", mensajeExito);
+      if (callback) callback();
+    } catch (error) {
+      console.error(mensajeError, error.response?.data || error.message);
+      mostrarAlerta("Error", `${mensajeError}: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
+  // Función utilitaria para configuración de modales
+  const configurarModal = (esEdicion, item = null) => {
+    setModoEdicion(esEdicion);
+    setInscripcionSeleccionada(esEdicion ? { ...item } : null);
+    setMostrarModal(true);
+  };
+
 
   // Obtener inscripciones
-  const obtenerInscripciones = async () => {
-    try {
-      const data = await inscripcionService.getAll();
-      setInscripciones(Array.isArray(data.data) ? data.data : []);
-    } catch (error) {
-      setInscripciones([]);
-      mostrarAlerta("Error", `No se pudieron obtener las inscripciones: ${error.message}`);
-    }
-  };
+  const obtenerInscripciones = () => manejarOperacionAsync(
+    () => inscripcionService.getAll(),
+    setInscripciones,
+    [],
+    "No se pudieron obtener las inscripciones"
+  );
 
   // Obtener eventos
-  const obtenerEventos = async () => {
-    try {
-      const data = await eventService.getAllEvents();
-      setEventos(Array.isArray(data.data) ? data.data : []);
-    } catch (error) {
-      setEventos([]);
-      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`);
-    }
-  };
+  const obtenerEventos = () => manejarOperacionAsync(
+    () => eventService.getAllEvents(),
+    setEventos,
+    [],
+    "No se pudieron obtener los eventos"
+  );
 
   // Obtener categorías
-  const obtenerCategorias = async () => {
-    try {
-      const res = await categorizacionService.getAll();
-      setCategorias(res.data || []);
-    } catch (error) {
-      setCategorias([]);
-      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`);
-    }
-  };
-  // 2. Obtener programas académicos
-  const obtenerProgramas = async () => {
-    try {
-      const res = await programasAcademicosService.getAllProgramas();
-      setProgramas(Array.isArray(res.data) ? res.data : []);
-    } catch (error) {
-      setProgramas([]);
-      mostrarAlerta("Error", `No se pudieron obtener los programas académicos: ${error.message}`);
-    }
-  };
+  const obtenerCategorias = () => manejarOperacionAsync(
+    () => categorizacionService.getAll(),
+    setCategorias,
+    [],
+    "No se pudieron obtener las categorías"
+  );
+  // Obtener programas académicos
+  const obtenerProgramas = () => manejarOperacionAsync(
+    () => programasAcademicosService.getAllProgramas(),
+    setProgramas,
+    [],
+    "No se pudieron obtener los programas académicos"
+  );
 
   useEffect(() => {
     obtenerInscripciones();
@@ -94,60 +113,58 @@ const GestionIscripcion = () => {
 
   // Crear inscripción
   const crearInscripcion = async (payload) => {
-    try {
-      // Elimina el campo solicitud si está vacío
-      const insc = { ...payload };
-      if (!insc.solicitud || insc.solicitud === "") {
-        delete insc.solicitud;
-      }
-      // Convertir edad a número
-      if (insc.edad) insc.edad = Number(insc.edad);
-      // Corregir: enviar referencia en vez de evento
-      if (insc.evento) {
-        insc.referencia = insc.evento;
-        delete insc.evento;
-      }
-      await inscripcionService.create(insc);
-      mostrarAlerta("¡Éxito!", "Inscripción creada exitosamente");
-      setMostrarModal(false);
-      obtenerInscripciones();
-    } catch (error) {
-      // Mostrar el error exacto del backend
-      console.error("Error al crear inscripción:", error.response?.data || error.message);
-      mostrarAlerta("Error", `Error al crear la inscripción: ${error.response?.data?.message || error.message}`);
+    // Procesar payload
+    const insc = { ...payload };
+    if (!insc.solicitud || insc.solicitud === "") {
+      delete insc.solicitud;
     }
+    if (insc.edad) insc.edad = Number(insc.edad);
+    if (insc.evento) {
+      insc.referencia = insc.evento;
+      delete insc.evento;
+    }
+    
+    await ejecutarOperacionCRUD(
+      () => inscripcionService.create(insc),
+      "Inscripción creada exitosamente",
+      "Error al crear la inscripción",
+      () => {
+        setMostrarModal(false);
+        obtenerInscripciones();
+      }
+    );
   };
 
   // Actualizar inscripción
   const actualizarInscripcion = async (form) => {
-    try {
-      const usuarioId = typeof form.usuario === 'object' && form.usuario._id ? form.usuario._id : form.usuario;
-      const payload = {
-        usuario: usuarioId,
-        tipoReferencia: form.tipoReferencia,
-        referencia: form.referencia,
-        categoria: form.categoria,
-        estado: form.estado,
-        observaciones: form.observaciones,
-        nombre: form.nombre,
-        tipoDocumento: form.tipoDocumento,
-        numeroDocumento: form.numeroDocumento,
-        telefono: form.telefono,
-        edad: Number(form.edad),
-        correo: form.correo,
-        apellido: form.apellido,
-      };
-      await inscripcionService.update(inscripcionSeleccionada._id, payload);
-      mostrarAlerta("¡Éxito!", "Inscripción actualizada exitosamente");
-      setMostrarModal(false);
-      setInscripcionSeleccionada(null);
-      setModoEdicion(false);
-      obtenerInscripciones();
-    } catch (error) {
-      // Mostrar el error exacto del backend
-      console.error("Error al actualizar inscripción:", error.response?.data || error.message);
-      mostrarAlerta("Error", `Error al actualizar la inscripción: ${error.response?.data?.message || error.message}`);
-    }
+    const usuarioId = typeof form.usuario === 'object' && form.usuario._id ? form.usuario._id : form.usuario;
+    const payload = {
+      usuario: usuarioId,
+      tipoReferencia: form.tipoReferencia,
+      referencia: form.referencia,
+      categoria: form.categoria,
+      estado: form.estado,
+      observaciones: form.observaciones,
+      nombre: form.nombre,
+      tipoDocumento: form.tipoDocumento,
+      numeroDocumento: form.numeroDocumento,
+      telefono: form.telefono,
+      edad: Number(form.edad),
+      correo: form.correo,
+      apellido: form.apellido,
+    };
+    
+    await ejecutarOperacionCRUD(
+      () => inscripcionService.update(inscripcionSeleccionada._id, payload),
+      "Inscripción actualizada exitosamente",
+      "Error al actualizar la inscripción",
+      () => {
+        setMostrarModal(false);
+        setInscripcionSeleccionada(null);
+        setModoEdicion(false);
+        obtenerInscripciones();
+      }
+    );
   };
 
   // Eliminar inscripción
@@ -158,27 +175,20 @@ const GestionIscripcion = () => {
     );
 
     if (!confirmado) return;
-    try {
-      await inscripcionService.delete(id);
-      mostrarAlerta("¡Éxito!", "Inscripción eliminada exitosamente");
-      obtenerInscripciones();
-    } catch (error) {
-      mostrarAlerta("Error", `Error al eliminar la inscripción: ${error.message}`);
-    }
+    
+    await ejecutarOperacionCRUD(
+      () => inscripcionService.delete(id),
+      "Inscripción eliminada exitosamente",
+      "Error al eliminar la inscripción",
+      obtenerInscripciones
+    );
   };
 
   // Abrir modal para crear
-  const abrirModalCrear = () => {
-    setModoEdicion(false);
-    setMostrarModal(true);
-  };
+  const abrirModalCrear = () => configurarModal(false);
 
   // Abrir modal para editar
-  const abrirModalEditar = (inscripcion) => {
-    setModoEdicion(true);
-    setInscripcionSeleccionada({ ...inscripcion });
-    setMostrarModal(true);
-  };
+  const abrirModalEditar = (inscripcion) => configurarModal(true, inscripcion);
 
 
   // Paginación para programas académicos

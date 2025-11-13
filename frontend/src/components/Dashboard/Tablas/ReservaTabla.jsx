@@ -25,7 +25,6 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
             <th>Propósito de Estadía</th>
             <th>Estado</th>
             <th>Observaciones</th>
-            <th>Solicitud</th>
             <th>Activo</th>
             <th>Fecha de creación</th>
             <th>Fecha de actualización</th>
@@ -56,6 +55,7 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
                     : reserva.cabana || "N/A"}
                 </td>
                 <td>{reserva.fechaInicio ? new Date(reserva.fechaInicio).toLocaleDateString() : ""}</td>
+                <td>{reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : ""}</td>
  
                 <td>{reserva.numeroPersonas || "N/A"}</td>
                 <td>{reserva.tipoDocumento || "N/A"}</td>
@@ -69,11 +69,7 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
                   </span>
                 </td>
                 <td>{reserva.observaciones || "N/A"}</td>
-                <td>
-                  {typeof reserva.solicitud === "object"
-                    ? reserva.solicitud?._id || "N/A"
-                    : reserva.solicitud || "N/A"}
-                </td>
+               
                 <td>{renderEstadoActivo(reserva.activo)}</td>
                 <td>{reserva.createdAt ? new Date(reserva.createdAt).toLocaleDateString() : "N/A"}</td>
                 <td>{reserva.updatedAt ? new Date(reserva.updatedAt).toLocaleDateString() : "N/A"}</td>

@@ -221,7 +221,7 @@ const GestionEventos = () => {
           setSidebarAbierto={setSidebarAbierto}
           seccionActiva={seccionActiva}
         />
-        <div>
+        <div className="seccion-usuarios">
           {/* Header */}
           <div className="page-header-Academicos">
             <div className="page-title-admin">

@@ -18,7 +18,7 @@ const CursosSeminario = () => {
   const [activeFilter, setActiveFilter] = useState('todos');
   const [favorites, setFavorites] = useState({});
   const [notification, setNotification] = useState({ show: false, message: '' });
-  const [inscripcionLoading, setInscripcionLoading] = useState(false);
+  const [inscripcionLoading] = useState(false);
 
   // Effect para manejar el cierre del modal con la tecla Escape
   useEffect(() => {
@@ -74,21 +74,6 @@ const CursosSeminario = () => {
     }));
     showNotification('Curso agregado a favoritos');
   };
-
-const inscribirseEnCurso = async (cursoId) => {
-  setInscripcionLoading(true);
-  try {
-    // Aquí se conectará con el servicio de inscripción
-    // await inscripcionService.inscribirCurso(cursoId);
-    const curso = cursos.find(c => c._id === cursoId);
-    showNotification(`Te has inscrito exitosamente en ${curso?.nombre || 'el curso'}`);
-  } catch (error) {
-    console.error('Error al inscribirse:', error);
-    showNotification('Error al inscribirse en el curso');
-  } finally {
-    setInscripcionLoading(false);
-  }
-};
 
   const verDetalles = (curso) => {
     setCursoSeleccionado(curso);
@@ -306,7 +291,7 @@ const inscribirseEnCurso = async (cursoId) => {
                 <div className="cabin-features">
                   <div className="feature-item">
                     <BookOpen size={16} />
-                    <span>{curso.nivel}</span>
+                    <span className={getNivelColor(curso.nivel)}>{curso.nivel}</span>
                   </div>
                   <div className="feature-item">
                     <Users size={16} />
@@ -318,7 +303,7 @@ const inscribirseEnCurso = async (cursoId) => {
                   </div>
                   <div className="feature-item">
                     <Calendar size={16} />
-                    <span>{curso.modalidad}</span>
+                    <span>{getModalidadIcon(curso.modalidad)} {curso.modalidad}</span>
                   </div>
                 </div>
 

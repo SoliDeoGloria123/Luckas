@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { tareaService } from "../../../services/tareaService";
 import { userService } from "../../../services/userService";
-import TareaModal from '../modal/TareaModal';
+import TareaModal from '../../Dashboard/Modales/TareaModal';
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
@@ -11,9 +11,21 @@ import { Edit } from "lucide-react"
 const Gestiontarea = () => {
   const [tareas, setTareas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
-  const [showModal, setShowModalTarea] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
-  const [currentItemTarea, setcurrentItemTarea] = useState(null);
+  
+  // Variables para el modal del Dashboard
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [tareaSeleccionada, setTareaSeleccionada] = useState(null);
+  const [nuevaTarea, setNuevaTarea] = useState({
+    titulo: '',
+    descripcion: '',
+    prioridad: 'Media',
+    estado: 'pendiente',
+    fechaVencimiento: '',
+    asignadoA: '',
+    asignadoPor: '',
+    comentarios: []
+  });
 
 
   // Obtener tareas y usuarios
@@ -39,27 +51,20 @@ const Gestiontarea = () => {
     obtenerUsuarios();
   }, []);
 
-  const handleSubmit = async (Tareadata) => {
-    try {
-      if (modalMode === 'create') {
-        await tareaService.create(Tareadata);
-        mostrarAlerta("¡Éxito!", "Tarea creada exitosamente");
-      } else {
-        await tareaService.update(currentItemTarea._id, Tareadata);
-        mostrarAlerta("¡Éxito!", "Tarea actualizada exitosamente");
-
-      }
-      setShowModalTarea(false);
-      obtenerTareas();
-    } catch (error) {
-      mostrarAlerta("Error", "Error al procesar la tarea: " + error.message);
-    }
-  };
-
   const handleCreate = () => {
-    setModalMode('create');
-    setcurrentItemTarea(null);
-    setShowModalTarea(true);
+    setModoEdicion(false);
+    setTareaSeleccionada(null);
+    setNuevaTarea({
+      titulo: '',
+      descripcion: '',
+      prioridad: 'Media',
+      estado: 'pendiente',
+      fechaVencimiento: '',
+      asignadoA: '',
+      asignadoPor: '',
+      comentarios: []
+    });
+    setMostrarModal(true);
   };
 
   const handleEdit = (item) => {
@@ -72,11 +77,35 @@ const Gestiontarea = () => {
       asignadoA: item.asignadoA?._id || item.asignadoA || '',
       asignadoPor: item.asignadoPor?._id || item.asignadoPor || ''
     };
-    setModalMode('edit');
-    setcurrentItemTarea(normalizado);
-    setShowModalTarea(true);
+    setModoEdicion(true);
+    setTareaSeleccionada(normalizado);
+    setMostrarModal(true);
   };
 
+  // Funciones para el modal del Dashboard
+  const crearTarea = async (e) => {
+    e.preventDefault();
+    try {
+      await tareaService.create(nuevaTarea);
+      mostrarAlerta("¡Éxito!", "Tarea creada exitosamente");
+      setMostrarModal(false);
+      obtenerTareas();
+    } catch (error) {
+      mostrarAlerta("Error", "Error al procesar la tarea: " + error.message);
+    }
+  };
+
+  const actualizarTarea = async (e) => {
+    e.preventDefault();
+    try {
+      await tareaService.update(tareaSeleccionada._id, tareaSeleccionada);
+      mostrarAlerta("¡Éxito!", "Tarea actualizada exitosamente");
+      setMostrarModal(false);
+      obtenerTareas();
+    } catch (error) {
+      mostrarAlerta("Error", "Error al procesar la tarea: " + error.message);
+    }
+  };
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
@@ -261,12 +290,16 @@ const Gestiontarea = () => {
         </div>
 
 
-        {showModal && (
+        {mostrarModal && (
           <TareaModal
-            mode={modalMode}
-            initialData={currentItemTarea || {}}
-            onClose={() => setShowModalTarea(false)}
-            onSubmit={handleSubmit}
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            tareaSeleccionada={tareaSeleccionada}
+            setTareaSeleccionada={setTareaSeleccionada}
+            nuevaTarea={nuevaTarea}
+            setNuevaTarea={setNuevaTarea}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarTarea : crearTarea}
             usuarios={usuarios}
           />
         )}

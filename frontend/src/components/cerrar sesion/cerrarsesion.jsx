@@ -21,16 +21,36 @@ const CerrarSesion = () => {
     return "#059669"
   }
 
-  // Generar partículas con IDs únicos
+
+  const secureRandomWithIndex = (i) => {
+    if (typeof globalThis !== 'undefined' && globalThis.crypto && globalThis.crypto.getRandomValues) {
+      const arr = new Uint32Array(1)
+      globalThis.crypto.getRandomValues(arr)
+      return arr[0] / (0xffffffff + 1)
+    }
+    // Deterministic fallback (not a pseudorandom generator): combine index and time
+    // into a repeatable fractional value in [0,1). This is sufficient for visuals.
+    const t = Date.now() % 100000
+    const val = (t * (i + 1) * 2654435761) % 100000
+    return val / 100000
+  }
+
+  const uniqueId = (i) => {
+    if (typeof globalThis !== 'undefined' && globalThis.crypto && globalThis.crypto.randomUUID) {
+      return `particle-${globalThis.crypto.randomUUID()}`
+    }
+    return `particle-${Date.now()}-${i}`
+  }
+
   const particles = Array.from({ length: 20 }, (_, i) => ({
-    id: `particle-${Date.now()}-${i}`,
+    id: uniqueId(i),
     color: getParticleColor(i),
-    width: Math.random() * 100 + 50,
-    height: Math.random() * 100 + 50,
-    left: Math.random() * 100,
-    top: Math.random() * 100,
-    duration: Math.random() * 10 + 10,
-    delay: Math.random() * 5
+    width: Math.floor(secureRandomWithIndex(i) * 100) + 50,
+    height: Math.floor(secureRandomWithIndex(i + 1) * 100) + 50,
+    left: secureRandomWithIndex(i + 2) * 100,
+    top: secureRandomWithIndex(i + 3) * 100,
+    duration: secureRandomWithIndex(i + 4) * 10 + 10,
+    delay: secureRandomWithIndex(i + 5) * 5
   }))
 
   return (

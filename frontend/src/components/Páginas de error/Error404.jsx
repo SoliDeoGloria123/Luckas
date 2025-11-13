@@ -1,7 +1,7 @@
-//import { useRouter } from "next/navigation"
+import { useNavigate } from 'react-router-dom';
 
 export default function Error404() {
-  //const router = useRouter()
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#f1f5f9] flex items-center justify-center p-4 relative overflow-hidden">
@@ -65,7 +65,7 @@ export default function Error404() {
           {/* Action buttons */}
           <div className="flex flex-col gap-3 animate-fade-in-up" style={{ animationDelay: "1.2s" }}>
             <button
-              onClick={() => router.push("/login")}
+              onClick={() => navigate("/login")}
               className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +80,7 @@ export default function Error404() {
             </button>
 
             <button
-              onClick={() => router.back()}
+              onClick={() => navigate(-1)}
               className="w-full bg-white hover:bg-[#f1f5f9] text-[#334155] font-semibold py-3 px-6 rounded-xl border-2 border-[#334155]/20 transform hover:scale-105 transition-all duration-200"
             >
               Volver Atrás
@@ -89,7 +89,7 @@ export default function Error404() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes grid-move {
           0% { transform: translateY(0); }
           100% { transform: translateY(50px); }

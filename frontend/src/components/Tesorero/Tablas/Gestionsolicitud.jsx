@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import SolicitudModal from '../modal/SolicitudModal';
+import SolicitudModal from '../../Dashboard/Modales/SolicitudModal';
 import { solicitudService } from '../../../services/solicirudService';
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
@@ -10,9 +10,21 @@ import { Edit } from "lucide-react"
 const Gestionsolicitud = () => {
 
   const [solicitudes, setSolicitudes] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [modalModeSolicitud, setModalMode] = useState('create');
-  const [currentItemSolicitud, setCurrentItem] = useState(null);
+  
+  // Variables para el modal del Dashboard
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
+  const [nuevaSolicitud, setNuevaSolicitud] = useState({
+    usuarioId: '',
+    tipo: '',
+    descripcion: '',
+    estado: 'pendiente',
+    fechaSolicitud: new Date().toISOString().split('T')[0],
+    fechaRespuesta: '',
+    respuesta: '',
+    prioridad: 'Media'
+  });
 
 
   // Obtener solicitudes
@@ -29,32 +41,50 @@ const Gestionsolicitud = () => {
   }, []);
 
   const handleCreate = () => {
-    setModalMode('create');
-    setCurrentItem(null);
-    setShowModal(true);
+    setModoEdicion(false);
+    setSolicitudSeleccionada(null);
+    setNuevaSolicitud({
+      usuarioId: '',
+      tipo: '',
+      descripcion: '',
+      estado: 'pendiente',
+      fechaSolicitud: new Date().toISOString().split('T')[0],
+      fechaRespuesta: '',
+      respuesta: '',
+      prioridad: 'Media'
+    });
+    setMostrarModal(true);
   };
 
-  const handleEdit = (item) => {
-    setModalMode('edit');
-    setCurrentItem(item);
-    setShowModal(true);
+  const handleEdit = (solicitud) => {
+    setModoEdicion(true);
+    setSolicitudSeleccionada(solicitud);
+    setMostrarModal(true);
   };
 
-  const handleSubmit = async (dataSolicitud) => {
+  // Funciones para el modal del Dashboard
+  const crearSolicitud = async (e) => {
+    e.preventDefault();
     try {
-      if (modalModeSolicitud === 'create') {
-        await solicitudService.create(dataSolicitud);
-        mostrarAlerta("¡EXITO!", "Solciitud creada exitosamente");
-      } else {
-        await solicitudService.update(currentItemSolicitud._id, dataSolicitud);
-        mostrarAlerta("¡EXITO!", "Solicitud actualizada exitosamente");
-      }
-      setShowModal(false);
+      await solicitudService.create(nuevaSolicitud);
+      mostrarAlerta("¡EXITO!", "Solicitud creada exitosamente");
+      setMostrarModal(false);
       obtenerSolicitudes();
     } catch (error) {
       mostrarAlerta("ERROR", `Error: ${error.message}`, 'error');
     }
+  };
 
+  const actualizarSolicitud = async (e) => {
+    e.preventDefault();
+    try {
+      await solicitudService.update(solicitudSeleccionada._id, solicitudSeleccionada);
+      mostrarAlerta("¡EXITO!", "Solicitud actualizada exitosamente");
+      setMostrarModal(false);
+      obtenerSolicitudes();
+    } catch (error) {
+      mostrarAlerta("ERROR", `Error: ${error.message}`, 'error');
+    }
   };
 
   // Paginación
@@ -268,14 +298,17 @@ const Gestionsolicitud = () => {
           </button>
         </div>
 
-        {showModal && (
+        {mostrarModal && (
           <SolicitudModal
-            mode={modalModeSolicitud}
-            initialData={currentItemSolicitud || {}}
-            onClose={() => setShowModal(false)}
-            onSubmit={handleSubmit}
+            mostrar={mostrarModal}
+            modoEdicion={modoEdicion}
+            solicitudSeleccionada={solicitudSeleccionada}
+            setSolicitudSeleccionada={setSolicitudSeleccionada}
+            nuevaSolicitud={nuevaSolicitud}
+            setNuevaSolicitud={setNuevaSolicitud}
+            onClose={() => setMostrarModal(false)}
+            onSubmit={modoEdicion ? actualizarSolicitud : crearSolicitud}
           />
-
         )}
       </main>
       <Footer />

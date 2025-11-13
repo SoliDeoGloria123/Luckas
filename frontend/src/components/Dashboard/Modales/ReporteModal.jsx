@@ -7,21 +7,22 @@ import {
   Calendar,
   FileText,
   Home,
-  BarChart3,
-  Filter,
-} from "lucide-react"
+  BarChart3
+} from "lucide-react";
+import ReportTypePicker from './common/ReportTypePicker';
+import ReportFilters from './common/ReportFilters';
+import FormField from './common/FormField';
+import ModalHeader from './common/ModalHeader';
+import { 
+  initialFormState, 
+  getCurrentDate, 
+  formatDateForForm, 
+  buildSubmissionData,
+  datosInicialesPropType 
+} from './common/reporteModalTypes';
 
 const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion }) => {
-  const [form, setForm] = useState({
-    nombre: "",
-    descripcion: "",
-    tipo: "",
-    fechaInicio: "",
-    fechaFin: "",
-    estado: "",
-    categoria: "",
-    usuario: ""
-  });
+  const [form, setForm] = useState(initialFormState);
   const [selectedReportType, setSelectedReportType] = useState("");
   const [error, setError] = useState("");
 
@@ -35,12 +36,8 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
           nombre: datosIniciales.nombre || "",
           descripcion: datosIniciales.descripcion || datosIniciales.description || "",
           tipo: datosIniciales.tipo || datosIniciales.type || "",
-          fechaInicio: datosIniciales.filtros?.fechaInicio
-            ? new Date(datosIniciales.filtros.fechaInicio).toISOString().split('T')[0]
-            : "",
-          fechaFin: datosIniciales.filtros?.fechaFin
-            ? new Date(datosIniciales.filtros.fechaFin).toISOString().split('T')[0]
-            : "",
+          fechaInicio: formatDateForForm(datosIniciales.filtros?.fechaInicio),
+          fechaFin: formatDateForForm(datosIniciales.filtros?.fechaFin),
           estado: datosIniciales.filtros?.estado || "",
           categoria: datosIniciales.filtros?.categoria || "",
           usuario: datosIniciales.filtros?.usuario || ""
@@ -49,16 +46,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
         setSelectedReportType(datosIniciales.tipo || datosIniciales.type || "");
       } else {
         // Modo creación - limpiar formulario
-        setForm({
-          nombre: "",
-          descripcion: "",
-          tipo: "",
-          fechaInicio: "",
-          fechaFin: "",
-          estado: "",
-          categoria: "",
-          usuario: ""
-        });
+        setForm(initialFormState);
         setSelectedReportType("");
       }
       setError(""); // Limpiar errores al abrir el modal
@@ -66,8 +54,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
   }, [mostrar, datosIniciales, modoEdicion]);
 
   // Calcular la fecha actual en formato YYYY-MM-DD
-  const today = new Date();
-  const maxDate = today.toISOString().split('T')[0];
+  const maxDate = getCurrentDate();
 
   if (!mostrar) return null;
 
@@ -83,23 +70,9 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
       setError("Todos los campos obligatorios deben estar completos.");
       return;
     }
-    // Construir objeto de filtros para el backend
-    const filtros = {
-      fechaInicio: form.fechaInicio ? new Date(form.fechaInicio) : null,
-      fechaFin: form.fechaFin ? new Date(form.fechaFin) : null,
-      estado: form.estado,
-      categoria: form.categoria,
-      usuario: form.usuario,
-      otros: {}
-    };
+    // Construir objeto de datos para el backend
     setError("");
-
-    const datosEnvio = {
-      nombre: form.nombre,
-      descripcion: form.descripcion,
-      tipo: form.tipo,
-      filtros
-    };
+    const datosEnvio = buildSubmissionData(form);
     onSubmit(datosEnvio);
   };
 
@@ -116,26 +89,17 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white">        <div
-        className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
-        style={{
-          background: 'linear-gradient(90deg, var(--color-blue-principal), var(--color-blue-oscuro))',
-          color: 'white'
-        }}
-      >
-        <h2>{modoEdicion ? "Editar Reporte" : "Crear Nuevo Reporte"}</h2>
-        <button className="modal-cerrar" onClick={onClose}>
-          ✕
-        </button>
-      </div>
+      <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white">        <ModalHeader 
+          title={modoEdicion ? "Editar Reporte" : "Crear Nuevo Reporte"}
+          onClose={onClose}
+        />
         <form className="modal-body-admin" onSubmit={handleSubmit}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
-              <label htmlFor="nombre"><i className="fas fa-file-alt"></i> Nombre del Reporte *</label>
-              <input
-                id="nombre"
-                type="text"
+              <FormField
+                label="Nombre del Reporte"
                 name="nombre"
+                type="text"
                 value={form.nombre}
                 onChange={handleChange}
                 placeholder="Ej: Reporte de Inscripciones Octubre"
@@ -143,11 +107,10 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
               />
             </div>
             <div className="form-grupo-admin">
-              <label htmlFor="descripcion"><i className="fas fa-align-left"></i> Descripción *</label>
-              <input
-                id="descripcion"
-                type="text"
+              <FormField
+                label="Descripción"
                 name="descripcion"
+                type="text"
                 value={form.descripcion}
                 onChange={handleChange}
                 placeholder="Breve descripción del reporte"
@@ -158,91 +121,14 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
 
           <div className="mb-2">
             <label htmlFor="tipo" className="block text-sm font-medium text-gray-700">Tipo de Reporte</label>
-            <div className="grid gap-3 md:grid-cols-2">
-              {REPORT_TYPES.map((type) => {
-                const Icon = type.icon;
-                return (
-                  <button
-                    type="button"
-                    key={type.value}
-                    id={type.value}
-                    aria-label={type.label}
-                    onClick={() => {
-                      setSelectedReportType(type.value);
-                      setForm((prev) => ({ ...prev, tipo: type.value }));
-                    }}
-                    className={`flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all ${selectedReportType === type.value
-                      ? "border-blue-600 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
-                      }`}
-                  >
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${selectedReportType === type.value ? "bg-blue-600" : "bg-gray-100"
-                        }`}
-                    >
-                      <Icon
-                        className={`h-5 w-5 ${selectedReportType === type.value ? "text-white" : "text-gray-600"}`}
-                      />
-                    </div>
-                    <span className="font-medium text-gray-900">{type.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+            <ReportTypePicker
+              types={REPORT_TYPES}
+              selected={selectedReportType}
+              onSelect={(val) => { setSelectedReportType(val); setForm((prev) => ({ ...prev, tipo: val })); }}
+            />
           </div>
 
-          <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4 mt-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Filter className="h-4 w-4 text-gray-600" />
-              <h3 className="font-semibold text-gray-900">Filtros</h3>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-
-              <div>
-                <label htmlFor="fechaInicio" className="mb-1 block text-sm font-medium text-gray-700">Fecha Desde</label>
-                <input
-                  id="fechaInicio"
-                  type="date"
-                  name="fechaInicio"
-                  value={form.fechaInicio}
-                  onChange={handleChange}
-                  max={maxDate}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                />
-              </div>
-              <div>
-                <label htmlFor="fechaFin" className="mb-1 block text-sm font-medium text-gray-700">Fecha Hasta</label>
-                <input
-                  id="fechaFin"
-                  type="date"
-                  name="fechaFin"
-                  value={form.fechaFin}
-                  onChange={handleChange}
-                  max={maxDate}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                />
-              </div>
-              {(form.tipo === "usuarios" || form.tipo === "reservas" || form.tipo === "solicitudes") && (
-                <div>
-                  <label htmlFor="estado" className="mb-1 block text-sm font-medium text-gray-700">Estado</label>
-                  <select
-                    id="estado"
-                    name="estado"
-                    value={form.estado}
-                    onChange={handleChange}
-                    className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  >
-                    <option value="">Sin filtro</option>
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="finalizado">Finalizado</option>
-                    <option value="cancelado">Cancelado</option>
-                  </select>
-                </div>
-              )}
-            </div>
-          </div>
+          <ReportFilters form={form} onChange={handleChange} maxDate={maxDate} />
 
           {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
           <div className="modal-action-admin">
@@ -264,21 +150,7 @@ ReporteModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   modoEdicion: PropTypes.bool,
-  datosIniciales: PropTypes.shape({
-    nombre: PropTypes.string,
-    descripcion: PropTypes.string,
-    description: PropTypes.string,
-    tipo: PropTypes.string,
-    type: PropTypes.string,
-    filtros: PropTypes.shape({
-      fechaInicio: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
-      fechaFin: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
-      estado: PropTypes.string,
-      categoria: PropTypes.string,
-      usuario: PropTypes.string,
-      otros: PropTypes.object
-    })
-  })
+  datosIniciales: datosInicialesPropType
 };
 
 export default ReporteModal;
