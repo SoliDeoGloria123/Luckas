@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import './header.css'
-import { Search, Bell, ChevronDown } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
+import NotificationButton from '../Notifications/NotificationButton';
 
 
 const HeaderTesorero = () => {
@@ -9,8 +10,6 @@ const HeaderTesorero = () => {
     const location = useLocation();
 
     const [showDropdown, setShowDropdown] = useState(false);
-
-
     // Obtener usuario logueado desde localStorage
     const usuarioLogueado = (() => {
         try {
@@ -24,8 +23,11 @@ const HeaderTesorero = () => {
     // Funciones de navegación
     const handleDashboardClick = () => navigate('/tesorero');
     const handleGestionesClick = () => navigate('/tesorero-Gestiones');
-    const handleFinanzasClick = () => navigate('/tesorero/reportes');
     const handleReportesClick = () => navigate('/tesorero/reportes');
+
+    // Obtener token del usuario logueado
+    const token = localStorage.getItem('token');
+    const userRole = usuarioLogueado?.role || 'tesorero';
 
     // Función para determinar si un botón está activo
     const isActive = (path) => {
@@ -43,7 +45,7 @@ const HeaderTesorero = () => {
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("usuario");
-        globalThis.location.href = "/";
+        globalThis.location.href = '/cerrar-sesion';
     };
 
 
@@ -76,14 +78,7 @@ const HeaderTesorero = () => {
                         >
                             Gestiones
                         </button>
-                        <button 
-                            onClick={handleFinanzasClick} 
-                            className={`text-sm font-medium hover:text-blue-600 transition-colors ${
-                                isActive('/tesorero/reportes') ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-600'
-                            }`}
-                        >
-                            Finanzas
-                        </button>
+                    
                         <button 
                             onClick={handleReportesClick} 
                             className={`text-sm font-medium hover:text-blue-600 transition-colors ${
@@ -108,10 +103,12 @@ const HeaderTesorero = () => {
                     </div>
 
                     {/* Notifications */}
-                    <button className="relative rounded-lg p-2 hover:bg-gray-100 transition-colors">
-                        <Bell className="h-5 w-5 text-gray-600" />
-                        <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500"></span>
-                    </button>
+                    {token && (
+                        <NotificationButton 
+                            token={token} 
+                            userRole={userRole} 
+                        />
+                    )}
 
                     {/* User Profile */}
                     <div className="relative">

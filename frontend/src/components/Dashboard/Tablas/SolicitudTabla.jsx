@@ -41,9 +41,9 @@ const TablaUnificadaSolicitudes = ({
 
               {/* Nombre del solicitante */}
               <td >
-                {typeof sol.solicitante === "object"
-                  ? sol.solicitante?.username || sol.solicitante?.nombre || sol.solicitante?.correo || sol.solicitante?._id || "N/A"
-                  : sol.solicitante || "N/A"}
+                {sol.solicitante?.nombre && sol.solicitante?.apellido
+                  ? `${sol.solicitante.nombre} ${sol.solicitante.apellido}`
+                  : sol.solicitante?.username || sol.solicitante?.nombre || sol.solicitante?.correo || "N/A"}
               </td>
 
               {/* Cédula del solicitante */}
@@ -102,11 +102,18 @@ const TablaUnificadaSolicitudes = ({
               </td>
 
               <td>{sol.fechaSolicitud ? new Date(sol.fechaSolicitud).toLocaleDateString() : "N/A"}</td>
-              <td>
-                {typeof sol.responsable === "object"
-                  ? sol.responsable?.nombre || sol.responsable?.username || sol.responsable?.email || sol.responsable?._id || "N/A"
-                  : sol.responsable || "N/A"}
-              </td>
+              <div className="flex flex-col">
+                <span className="font-medium">
+                  {sol.responsable?.nombre && sol.responsable?.apellido
+                    ? `${sol.responsable.nombre} ${sol.responsable.apellido}`
+                    : sol.responsable?.username || sol.responsable?.nombre || "N/A"}
+                </span>
+                {sol.responsable?.role && (
+                  <span className={`text-xs role-badge-tesorero role-tesorero-${sol.responsable.role} mt-1`}>
+                    {sol.responsable.role}
+                  </span>
+                )}
+              </div>
               <td>
                 <div className="acciones-botones">
                   {abrirModalEditarSolicitud && (
@@ -134,7 +141,7 @@ TablaUnificadaSolicitudes.propTypes = {
   datosUnificados: PropTypes.shape({
     solicitudes: PropTypes.array,
     inscripciones: PropTypes.array,
-    
+
   }),
   abrirModalEditarSolicitud: PropTypes.func,
   eliminarSolicitud: PropTypes.func,

@@ -6,6 +6,12 @@ const programaAcademicoSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    tipo: {
+        type: String,
+        required: true,
+        enum: ['curso', 'programa-tecnico'],
+        default: 'curso'
+    },
     descripcion: {
         type: String,
         required: true
@@ -16,8 +22,9 @@ const programaAcademicoSchema = new mongoose.Schema({
         required: true
     },
     modalidad: {
-        type: String, required:
-            true, enum: ['presencial', 'virtual', 'semipresencial']
+        type: String,
+        required: true,
+        enum: ['presencial', 'virtual', 'hibrido']
     },
     duracion: {
         type: String,

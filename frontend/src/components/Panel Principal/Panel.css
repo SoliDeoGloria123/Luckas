@@ -40,17 +40,23 @@
     gap: 0.5rem;
 }
 
-.nav-brand-panel-princiapl h2 {
-    color: var(--primary-blue);
-    font-size: 1.5rem;
-    font-weight: 700;
+
+.icono-luckas {
+  display: block;
+  position: relative;
+  height: 46px;
+  margin: 0 0 0 0;
+  color: var(--primary-blue);
+  font-family: Bebas Neue, var(--default-font-family);
+  font-size: 60px;
+  font-weight: 400;
+  line-height: 52px;
+  text-align: left;
+  white-space: nowrap;
+  z-index: 6;
 }
 
-.nav-brand-panel-princiapl span {
-    color: var(--dark-gray);
-    font-size: 0.9rem;
-    font-weight: 500;
-}
+
 
 .nav-links-panel-princiapl {
     display: flex;

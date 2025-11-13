@@ -34,6 +34,6 @@ router.put('/:id', role.checkRole('admin', 'tesorero'), userController.updateUse
 // Rutas de eliminación (solo admin)
 router.delete('/:id', role.isAdmin, userController.deleteUser);
 //ruta de activar y desdeactivar usuario
-router.patch('/toggle-activation/:id', role.isAdmin, userController.toggleUserActivation);
+router.patch('/toggle-activation/:id', role.checkRole('admin', 'tesorero'), userController.toggleUserActivation);
 
 module.exports = router;

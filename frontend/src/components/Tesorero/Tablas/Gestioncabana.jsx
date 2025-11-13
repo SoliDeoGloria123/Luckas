@@ -144,22 +144,54 @@ const Gestioncabana = () => {
     obtenerCategorias();
   }, []);
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (data, isFormData = false) => {
+    console.log('Gestioncabana: HandleSubmit - Modo:', modalMode);
+    console.log('Gestioncabana: HandleSubmit - Es FormData:', isFormData);
+    console.log('Gestioncabana: HandleSubmit - Tiene archivos:', isFormData && data.has && data.has('imagen'));
+    
     if (modalMode === 'create') {
       try {
-        await cabanaService.create(data);
-        mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente")
+        console.log('Gestioncabana: Llamando cabanaService.create...');
+        const resultado = await cabanaService.create(data);
+        console.log('Gestioncabana: Cabaña creada exitosamente:', resultado);
+        
+        const mensaje = isFormData 
+          ? "¡Cabaña creada exitosamente con imágenes!" 
+          : "¡Cabaña creada exitosamente!";
+        
+        console.log('Gestioncabana: A punto de mostrar alerta de éxito:', mensaje);
+        mostrarAlerta("¡Éxito!", mensaje);
+        console.log('Gestioncabana: Alerta mostrada, cerrando modal');
+        
+        // Cerrar modal después del éxito
+        setShowModal(false);
+        
+        // Actualizar lista
         obtenerCabanas();
+        
       } catch (error) {
+        console.error('Gestioncabana: Error creando cabaña:', error);
         mostrarAlerta("Error", "Error al crear la cabaña: " + error.message, "error");
+        // No cerrar modal si hay error para que el usuario pueda corregir
       }
     } else {
       try {
         await cabanaService.update(currentItem._id, data);
-        mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente");
+        const mensaje = isFormData 
+          ? "¡Cabaña actualizada exitosamente con imágenes!" 
+          : "¡Cabaña actualizada exitosamente!";
+        mostrarAlerta("¡Éxito!", mensaje);
+        
+        // Cerrar modal después del éxito
+        setShowModal(false);
+        
+        // Actualizar lista
         obtenerCabanas();
+        
       } catch (err) {
+        console.error('Gestioncabana: Error actualizando cabaña:', err);
         mostrarAlerta("Error", "Error al actualizar cabaña: " + err.message);
+        // No cerrar modal si hay error
       }
     }
   };

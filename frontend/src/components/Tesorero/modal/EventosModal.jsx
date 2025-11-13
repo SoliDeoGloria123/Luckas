@@ -49,11 +49,22 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
   const [selectedImages, setSelectedImages] = useState([]);
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  // Resetear estado cuando se abre el modal en modo crear
+  React.useEffect(() => {
+    if (mode === 'create') {
+      setSelectedImages([]);
+      setProgress(0);
+      setIsUploading(false);
+      setIsSubmitting(false);
+    }
+  }, [mode]);
 
   // Manejo de archivos seleccionados
   const handleFileSelection = (files) => {
@@ -112,35 +123,80 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
   const removeImage = (id) => {
     setSelectedImages(prev => prev.filter(img => img.id !== id));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Normalizar datos antes de enviar
-    let imagenesNormalizadas = [];
-    if (selectedImages.length > 0) {
-      imagenesNormalizadas = selectedImages.map(img => img.name);
-    } else if (Array.isArray(formData.imagen)) {
-      imagenesNormalizadas = formData.imagen;
+    setIsSubmitting(true);
+    
+    try {
+      // Si hay imágenes seleccionadas, usar FormData para enviar archivos
+      if (selectedImages.length > 0) {
+        const formDataToSend = new FormData();
+        
+        // Agregar todos los campos del formulario
+        formDataToSend.append('nombre', formData.nombre);
+        formDataToSend.append('descripcion', formData.descripcion);
+        formDataToSend.append('precio', Number(formData.precio));
+        formDataToSend.append('categoria', String(formData.categoria));
+        
+        // Procesar etiquetas
+        const etiquetas = typeof formData.etiquetas === 'string' 
+          ? formData.etiquetas.split(',').map(e => e.trim()).filter(Boolean) 
+          : [];
+        formDataToSend.append('etiquetas', JSON.stringify(etiquetas));
+        
+        formDataToSend.append('fechaEvento', formData.fechaEvento);
+        formDataToSend.append('horaInicio', formData.horaInicio);
+        formDataToSend.append('horaFin', formData.horaFin);
+        formDataToSend.append('lugar', formData.lugar);
+        formDataToSend.append('direccion', formData.direccion);
+        formDataToSend.append('duracionDias', formData.duracionDias ? Number(formData.duracionDias) : 1);
+        formDataToSend.append('cuposTotales', Number(formData.cuposTotales));
+        formDataToSend.append('cuposDisponibles', Number(formData.cuposDisponibles));
+        formDataToSend.append('prioridad', formData.prioridad);
+        formDataToSend.append('observaciones', formData.observaciones);
+        
+        // Agregar las imágenes como archivos
+        selectedImages.forEach((imageData, index) => {
+          if (imageData.file) {
+            formDataToSend.append('imagen', imageData.file);
+          }
+        });
+
+        console.log('Enviando evento CON imágenes:', selectedImages.length, 'archivos');
+        await onSubmit(formDataToSend, mode, true); // true indica que es FormData
+      } else {
+        // Sin imágenes, enviar datos JSON normales
+        const normalizado = {
+          nombre: formData.nombre,
+          descripcion: formData.descripcion,
+          precio: Number(formData.precio),
+          categoria: String(formData.categoria),
+          etiquetas: typeof formData.etiquetas === 'string' 
+            ? formData.etiquetas.split(',').map(e => e.trim()).filter(Boolean) 
+            : [],
+          fechaEvento: formData.fechaEvento,
+          horaInicio: formData.horaInicio,
+          horaFin: formData.horaFin,
+          lugar: formData.lugar,
+          direccion: formData.direccion,
+          duracionDias: formData.duracionDias ? Number(formData.duracionDias) : 1,
+          cuposTotales: Number(formData.cuposTotales),
+          cuposDisponibles: Number(formData.cuposDisponibles),
+          prioridad: formData.prioridad,
+          observaciones: formData.observaciones,
+          imagen: [] // Sin imágenes
+        };
+
+        console.log('Enviando evento SIN imágenes');
+        await onSubmit(normalizado, mode, false); // false indica que es JSON
+      }
+      
+      onClose();
+    } catch (error) {
+      console.error('Error en handleSubmit:', error);
+    } finally {
+      setIsSubmitting(false);
     }
-    const normalizado = {
-      nombre: formData.nombre,
-      descripcion: formData.descripcion,
-      precio: Number(formData.precio),
-      categoria: String(formData.categoria),
-      etiquetas: typeof formData.etiquetas === 'string' ? formData.etiquetas.split(',').map(e => e.trim()).filter(Boolean) : [],
-      fechaEvento: formData.fechaEvento,
-      horaInicio: formData.horaInicio,
-      horaFin: formData.horaFin,
-      lugar: formData.lugar,
-      direccion: formData.direccion,
-      duracionDias: formData.duracionDias ? Number(formData.duracionDias) : 1,
-      cuposTotales: Number(formData.cuposTotales),
-      cuposDisponibles: Number(formData.cuposDisponibles),
-      prioridad: formData.prioridad,
-      observaciones: formData.observaciones,
-      imagen: imagenesNormalizadas,
-    };
-    onSubmit(normalizado);
-    onClose();
   };
 
   return (
@@ -349,6 +405,39 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
                     <input type="file" id='imageInput' multiple accept="image/*" hidden  onChange={e => handleFileSelection(e.target.files)} />
                   </button>
 
+                  {/* Barra de progreso */}
+                  {isUploading && (
+                    <div style={{
+                      margin: '10px 0',
+                      padding: '10px',
+                      background: '#f8f9fa',
+                      borderRadius: '8px',
+                      border: '1px solid #e9ecef'
+                    }}>
+                      <div style={{
+                        width: '100%',
+                        height: '8px',
+                        backgroundColor: '#e9ecef',
+                        borderRadius: '4px',
+                        overflow: 'hidden'
+                      }}>
+                        <div style={{
+                          width: `${progress}%`,
+                          height: '100%',
+                          backgroundColor: '#007bff',
+                          transition: 'width 0.3s ease'
+                        }}></div>
+                      </div>
+                      <p style={{
+                        margin: '8px 0 0 0',
+                        fontSize: '14px',
+                        color: '#6c757d',
+                        textAlign: 'center'
+                      }}>
+                        Procesando imágenes... {Math.round(progress)}%
+                      </p>
+                    </div>
+                  )}
 
                   <div className="image-preview-grid" id="imagePreviewGrid">
                     {selectedImages.map(img => (
@@ -359,6 +448,19 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
                             <i className="fas fa-trash"></i>
                           </button>
                         </div>
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '0',
+                          left: '0',
+                          right: '0',
+                          background: 'rgba(0,0,0,0.7)',
+                          color: 'white',
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          textAlign: 'center'
+                        }}>
+                          {img.name.length > 15 ? img.name.substring(0, 15) + '...' : img.name}
+                        </div>
                       </div>
                     ))}
 
@@ -367,11 +469,15 @@ const EventosModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, ca
               </div>
             </div>
             <div className="modal-footer-tesorero">
-              <button type="button" className="cancel-btn" onClick={onClose}>
+              <button type="button" className="cancel-btn" onClick={onClose} disabled={isSubmitting}>
                 Cancelar
               </button>
-              <button type="submit" className="submit-btn">
-                {mode === 'create' ? 'Crear Evento' : 'Guardar Cambios'}
+              <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  selectedImages.length > 0 ? 'Subiendo imágenes...' : 'Creando evento...'
+                ) : (
+                  mode === 'create' ? 'Crear Evento' : 'Guardar Cambios'
+                )}
               </button>
             </div>
           </form>

@@ -169,18 +169,19 @@ const Gestionsolicitud = () => {
                   <tr>
 
                     <th>ID</th>
-                    <th>NOMBRE SOLICITANTE </th>
-                    <th>CORREO SOLICITANTE</th>
-                    <th>TELEFONO SOLICITANTE</th>
-                    <th>ROL SOLICITANTE</th>
-                    <th>TIPO SOLICITUD</th>
-                    <th>CATEGORIA</th>
-                    <th>ORIGEN</th>
-                    <th>ESTADO</th>
-                    <th>PRIORIDAD</th>
-                    <th>FECHA SOLICITUD</th>
-                    <th>RESPONSABLE</th>
-                    <th>ACCIONES</th>
+                    <th>Nombre Solicitante</th>
+                    <th>Cédula</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Rol</th>
+                    <th>Tipo Solicitud</th>
+                    <th>Categoría</th>
+                    <th>Origen</th>
+                    <th>Estado</th>
+                    <th>Prioridad</th>
+                    <th>Fecha de Solicitud</th>
+                    <th>Responsable</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
@@ -188,14 +189,20 @@ const Gestionsolicitud = () => {
                     <tr key={soli._id}>
 
                       <td>{soli._id}</td>
-                      <td>{soli.solicitante?.username || soli.solicitante?.nombre || soli.solicitante?.correo || soli.solicitante?._id || "N/A"}</td>
-                      <td>{soli.solicitante?.correo || soli.correo || "N/A"}</td>
-                      <td>{soli.solicitante?.telefono || soli.telefono || "N/A"}</td>
+                      <td >
+                        {soli.solicitante?.nombre && soli.solicitante?.apellido
+                          ? `${soli.solicitante.nombre} ${soli.solicitante.apellido}`
+                          : soli.solicitante?.username || soli.solicitante?.nombre || soli.solicitante?.correo || "N/A"}
+                      </td>
+                      <td >
+                        {soli.solicitante?.numeroDocumento || "N/A"}
+                      </td>
+                      <td>{soli.solicitante?.correo || "N/A"}</td>
+                      <td>{soli.solicitante?.telefono || "N/A"}</td>
                       <td>
                         <span className={`role-badge-tesorero role-tesorero-${soli.solicitante?.role}`}>
                           {soli.solicitante?.role || "N/A"}
                         </span>
-
                       </td>
                       <td>{soli.tipoSolicitud || "N/A"}</td>
                       <td>{soli.categoria?.nombre || soli.categoria?._id || "N/A"}</td>
@@ -213,8 +220,20 @@ const Gestionsolicitud = () => {
 
                       </td>
                       <td>{new Date(soli.fechaSolicitud).toLocaleDateString()}</td>
-                      <td>{soli.responsable?.nombre || soli.responsable?.username || soli.responsable?.email || soli.responsable?._id || "N/A"
-                      }</td>
+                      <td>
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            {soli.responsable?.nombre && soli.responsable?.apellido
+                              ? `${soli.responsable.nombre} ${soli.responsable.apellido}`
+                              : soli.responsable?.username || soli.responsable?.nombre || "N/A"}
+                          </span>
+                          {soli.responsable?.role && (
+                            <span className={`text-xs role-badge-tesorero role-tesorero-${soli.responsable.role} mt-1`}>
+                              {soli.responsable.role}
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="whitespace-nowrap px-6 py-4">
                         <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(soli)}>
                           <Edit className="h-4 w-4" />
@@ -232,18 +251,18 @@ const Gestionsolicitud = () => {
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
           <button
             className="pagination-btn-admin"
-           onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
-          disabled={paginaActual === 1}
+            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+            disabled={paginaActual === 1}
           >
             <i className="fas fa-chevron-left"></i>
           </button>
           <span className="pagination-info-admin">
-           Página {paginaActual} de {totalPaginas || 1}
+            Página {paginaActual} de {totalPaginas || 1}
           </span>
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-          disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+            disabled={paginaActual === totalPaginas || totalPaginas === 0}
           >
             <i className="fas fa-chevron-right"></i>
           </button>

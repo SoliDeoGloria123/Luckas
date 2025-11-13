@@ -4,6 +4,7 @@ const Solicitud = require('../models/Solicitud');
 const Evento = require('../models/Eventos');
 const Usuario = require('../models/User');
 const Categorizacion = require('../models/categorizacion');
+const { notificarNuevaInscripcion } = require('../utils/notificationUtils');
 // Crear inscripción
 // Función auxiliar para validar ObjectId
 function validarObjectId(id, nombreCampo) {
@@ -224,8 +225,20 @@ exports.crearInscripcion = async (req, res) => {
       console.error('Error al crear inscripción:', inscripcionError);
       return res.status(400).json({ success: false, message: 'Error al crear inscripción: ' + inscripcionError.message });
     }
+    
     await crearSolicitudYEnlazar(inscripcion, referenciaExiste, req.body.tipoReferencia, req.body.categoria, req.body.usuario);
     await actualizarCuposProgramaAcademico(req.body.tipoReferencia, req.body.referencia);
+    
+    // Enviar notificación a administradores y tesoreros
+    try {
+      const usuarioData = validacion.usuarioExiste; // Ya tenemos los datos del usuario de la validación
+      await notificarNuevaInscripcion(inscripcion, usuarioData, referenciaExiste);
+      console.log('✅ Notificación de inscripción enviada correctamente');
+    } catch (notificationError) {
+      console.error('❌ Error al enviar notificación de inscripción:', notificationError);
+      // No fallar el proceso si hay error en notificación
+    }
+    
     res.status(201).json({ success: true, data: inscripcion });
   } catch (error) {
     res.status(400).json({ success: false, message: 'Error interno: ' + error.message });

@@ -23,7 +23,7 @@ const CertificacionTabla = ({ certificados, onDescargar }) => {
           )}
           {certificados.map((cert, idx) => (
             <tr key={cert._id || idx} className="hover:bg-blue-50 transition-all">
-              <td className="px-6 py-4 whitespace-nowrap font-semibold">{cert.certificados} {cert.apellido}</td>
+              <td className="px-6 py-4 whitespace-nowrap font-semibold">{cert.nombre} {cert.apellido}</td>
               <td className="px-6 py-4 whitespace-nowrap">{cert.numeroDocumento}</td>
               <td className="px-6 py-4 whitespace-nowrap">{cert.correo}</td>
               <td className="px-6 py-4 whitespace-nowrap">{cert.programaNombre || cert.cursoNombre || cert.referencia?.nombre || '-'}</td>

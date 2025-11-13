@@ -105,6 +105,19 @@ const Gestionusuarios = () => {
     setPaginaActual(1);
   }, [usuariosFiltrados]);
 
+  //desactivar usuario o activarlo
+  const onToggleEstado = async (usuario) => {
+    const nuevoEstado = usuario.estado === "activo" ? "inactivo" : "activo";
+    try {
+      await userService.toggleUserEstado(usuario._id, nuevoEstado);
+      mostrarAlerta("¡Éxito!", `Usuario ${nuevoEstado === "activo" ? "activado" : "desactivado"} exitosamente`);
+      obtenerUsuarios(); // <-- Esto refresca la lista
+    } catch (error) {
+      mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`);
+    }
+  };
+
+
   return (
     <>
       <Header />
@@ -265,20 +278,29 @@ const Gestionusuarios = () => {
                             </span>
                           </td>
                           <td className="whitespace-nowrap px-6 py-4">
-                            <button
-                              onClick={() => {
-                                setModalMode('edit');
-                                setCurrentItem(user);
-                                setShowModalUsuario(true);
-                              }}
-                              
-                              
-                              size="icon"
-                              className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]"
-                            >
-                              <Edit className="h-4 w-4" />
-                              <span className="sr-only">Editar registro</span>
-                            </button>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                onClick={() => {
+                                  setModalMode('edit');
+                                  setCurrentItem(user);
+                                  setShowModalUsuario(true);
+                                }}
+                                size="icon"
+                                className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </button>
+                              <button
+                                className={`btn-action ${user.estado === "activo" ? "desactivar" : "activar"}  text-red-600 hover:bg-red-50 rounded transition-colors`}
+                                onClick={() => onToggleEstado(user)}
+                              >
+                                {user.estado === "activo" ? (
+                                  <i className="fas fa-ban"></i>
+                                ) : (
+                                  <i className="fas fa-check"></i>
+                                )}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))

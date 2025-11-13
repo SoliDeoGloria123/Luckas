@@ -801,7 +801,7 @@
  .price-seminario {
     font-size: 32px;
     font-weight: 700;
-    color: #f59e0b;
+    color: var(--color-blue-primary);
     margin-bottom: 8px
 }
 .price-unit {
@@ -864,7 +864,7 @@
 }
 
 .capacity-icon-seminario {
-    color: #f59e0b;
+    color: var(--color-green);
     font-size: 24px;
     width: 32px;
     display: flex;
@@ -917,12 +917,12 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background-color: rgba(245, 158, 11, 0.1);
+    background-color: rgba(5, 150, 105, 0.1);
     border-radius: 8px;
 }
 
 .feature-icon {
-    color: #f59e0b;
+    color: var(--color-green);
     font-size: 16px;
 }
 
@@ -942,7 +942,7 @@
 }
 
 .policy-item i {
-    color: #f59e0b;
+    color: var(--color-green);
     width: 16px;
 }
 
@@ -969,7 +969,7 @@
 .panel-header h3 {
     font-size: 20px;
     font-weight: 600;
-    color: #f59e0b;
+    color: var(--color-purple);
 }
 
 .panel-content {
@@ -984,7 +984,7 @@
 .main-price {
     font-size: 32px;
     font-weight: 700;
-    color: #f59e0b;
+    color: var(--color-blue-primary);
 }
 
 .price-unit {
@@ -1049,7 +1049,7 @@
 /* Botón de reserva */
 .reserve-button {
     width: 100%;
-    background-color: #f59e0b;
+    background: linear-gradient(135deg, var(--color-purple), var(--color-blue-primary));
     color: white;
     border: none;
     padding: 16px;
@@ -1058,11 +1058,13 @@
     font-weight: 600;
     cursor: pointer;
     margin-bottom: 12px;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
 }
 
 .reserve-button:hover {
-    background-color: #d97706;
+    background: linear-gradient(135deg, var(--color-blue-primary), var(--color-purple));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 /* Aviso sin cargo */

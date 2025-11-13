@@ -24,9 +24,9 @@ const GestionCertificacion = () => {
             try {
                 const data = await inscripcionService.getAll();
                 if (data.success && Array.isArray(data.data)) {
-                    // Solo mostrar certificados de programas académicos
+                    // Solo mostrar certificados con estado "certificado" de programas académicos
                     const filtrados = data.data.filter(
-                        insc => (insc.tipoReferencia === 'ProgramaAcademico') && (insc.estado === 'certificado' || insc.estado === 'finalizado')
+                        insc => (insc.tipoReferencia === 'ProgramaAcademico') && (insc.estado === 'certificado')
                     );
                     setCertificados(filtrados);
                 } else {
@@ -61,18 +61,15 @@ const GestionCertificacion = () => {
         };
     };
 
-    // Calcular estadísticas reales basadas en certificados
+    // Calcular estadísticas reales basadas en certificados (solo estado "certificado")
     const totalCertificados = certificados.length;
-    const certificadosFinalizados = certificados.filter(cert => cert.estado === 'finalizado').length;
-    const certificadosGenerados = certificados.filter(cert => cert.estado === 'certificado').length;
-    const certificadosEspera = totalCertificados - certificadosFinalizados - certificadosGenerados;
 
     // Configuración de stats cards con datos reales
     const statsCards = [
         { icon: 'fa-certificate', value: totalCertificados, label: 'Total Certificados', type: 'users' },
-        { icon: 'fa-check-circle', value: certificadosGenerados, label: 'Certificados Emitidos', type: 'active' },
-        { icon: 'fa-clock', value: certificadosEspera, label: 'En Espera', type: 'admins' },
-        { icon: 'fa-graduation-cap', value: certificadosFinalizados, label: 'Finalizados', type: 'new' }
+        { icon: 'fa-check-circle', value: totalCertificados, label: 'Certificados Emitidos', type: 'active' },
+        { icon: 'fa-download', value: 0, label: 'Descargas Hoy', type: 'admins' },
+        { icon: 'fa-graduation-cap', value: totalCertificados, label: 'Listos para Descarga', type: 'new' }
     ];
 
     return (
@@ -117,10 +114,8 @@ const GestionCertificacion = () => {
                                 value: filtroEstado,
                                 onChange: (e) => setFiltroEstado(e.target.value),
                                 options: [
-                                    { value: 'todos', label: 'Todos los Estados' },
-                                    { value: 'certificado', label: 'Certificados' },
-                                    { value: 'finalizado', label: 'Finalizados' },
-                                    { value: 'pendiente', label: 'Pendientes' }
+                                    { value: 'todos', label: 'Todos los Certificados' },
+                                    { value: 'certificado', label: 'Certificados Emitidos' }
                                 ]
                             }
                         ]}

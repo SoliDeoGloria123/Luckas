@@ -16,7 +16,7 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
             <th>Usuario</th>
             <th>Cabaña</th>
             <th>Fecha Inicio</th>
-            <th>Fecha Fin</th>PropTypes
+            <th>Fecha Fin</th>
             <th>Número de Personas</th>
             <th>Tipo de Documento</th>
             <th>Número de Documento</th>
@@ -56,7 +56,7 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
                     : reserva.cabana || "N/A"}
                 </td>
                 <td>{reserva.fechaInicio ? new Date(reserva.fechaInicio).toLocaleDateString() : ""}</td>
-                <td>{reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : ""}</td>
+ 
                 <td>{reserva.numeroPersonas || "N/A"}</td>
                 <td>{reserva.tipoDocumento || "N/A"}</td>
                 <td>{reserva.numeroDocumento || "N/A"}</td>

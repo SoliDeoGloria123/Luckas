@@ -22,7 +22,8 @@ const requestsData = [
 ];
 
 const MisSolicitudes = () => {
-  const [currentRequests, setCurrentRequests] = useState([]);
+  const [allRequests, setAllRequests] = useState([]); // Todas las solicitudes del backend
+  const [filteredRequests, setFilteredRequests] = useState([]); // Solicitudes filtradas
   const [currentStatusFilter, setCurrentStatusFilter] = useState('all');
   const [currentCategoryFilter, setCurrentCategoryFilter] = useState('all');
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -45,7 +46,8 @@ const MisSolicitudes = () => {
     solicitudService.getSolicitudesPorUsuario(userId)
       .then(data => {
         const solicitudData = Array.isArray(data.data) ? data.data : [];
-        setCurrentRequests(solicitudData);
+        setAllRequests(solicitudData);
+        setFilteredRequests(solicitudData); // Inicialmente mostrar todas
 
       })
       .catch(error => {
@@ -56,7 +58,7 @@ const MisSolicitudes = () => {
 
   useEffect(() => {
     filterRequests();
-  }, [currentStatusFilter, currentCategoryFilter, currentRequests]);
+  }, [currentStatusFilter, currentCategoryFilter, allRequests]);
   const handleStatusFilter = (status) => {
     setCurrentStatusFilter(status);
   };
@@ -66,17 +68,17 @@ const MisSolicitudes = () => {
   };
 
   const filterRequests = () => {
-    // Filtrar sobre currentRequests (que ahora viene del backend)
-    const filtered = currentRequests.filter(request => {
+    // Filtrar sobre allRequests (todas las solicitudes del backend)
+    const filtered = allRequests.filter(request => {
       const statusMatch = currentStatusFilter === 'all' || request.estado === currentStatusFilter;
       const categoryMatch = currentCategoryFilter === 'all' || (request.categoria && request.categoria.nombre === currentCategoryFilter);
       return statusMatch && categoryMatch;
     });
-    setCurrentRequests(filtered);
+    setFilteredRequests(filtered);
   };
 
   const showRequestDetails = (requestId) => {
-    const request = requestsData.find(r => r.id === requestId);
+    const request = allRequests.find(r => r._id === requestId);
     if (request) {
       setSelectedRequest(request);
       setShowRequestModal(true);
@@ -85,21 +87,23 @@ const MisSolicitudes = () => {
 
   const showCancelConfirmation = (requestId) => {
     setShowRequestModal(false);
-    setSelectedRequest(requestsData.find(r => r.id === requestId));
+    setSelectedRequest(allRequests.find(r => r._id === requestId));
     setShowConfirmModal(true);
   };
 
   const cancelRequest = (requestId) => {
-    const requestIndex = requestsData.findIndex(r => r.id === requestId);
-    if (requestIndex !== -1) {
-      requestsData[requestIndex].status = 'rechazada';
-      requestsData[requestIndex].dateResponded = new Date().toISOString().split('T')[0];
-      requestsData[requestIndex].comments = 'Cancelada por el usuario';
-      
-      filterRequests();
-      setShowConfirmModal(false);
-      showToast('Solicitud cancelada', 'La solicitud ha sido cancelada exitosamente.', 'success');
-    }
+    // Aquí deberías hacer la llamada al backend para cancelar la solicitud
+    // Por ahora, solo actualizo el estado local
+    const updatedRequests = allRequests.map(request => 
+      request._id === requestId 
+        ? { ...request, estado: 'Rechazada', fechaRespuesta: new Date().toISOString(), observaciones: 'Cancelada por el usuario' }
+        : request
+    );
+    
+    setAllRequests(updatedRequests);
+    filterRequests();
+    setShowConfirmModal(false);
+    showToast('Solicitud cancelada', 'La solicitud ha sido cancelada exitosamente.', 'success');
   };
 
   const showToast = (title, message, type = 'info') => {
@@ -124,43 +128,38 @@ const MisSolicitudes = () => {
   // Funciones de utilidad
   const getStatusText = (status) => {
     const statusMap = {
-      'aprobada': 'Aprobada',
-      'revision': 'En Revisión',
-      'pendiente': 'Pendiente',
-      'rechazada': 'Rechazada'
+      'Nueva': 'Nueva',
+      'En Revisión': 'En Revisión', 
+      'Aprobada': 'Aprobada',
+      'Rechazada': 'Rechazada',
+      'Completada': 'Completada',
+      'Pendiente Info': 'Pendiente Info'
     };
     return statusMap[status] || status;
   };
 
   const getStatusIcon = (status) => {
     const iconMap = {
-      'aprobada': <FaCheckCircle style={{ color: '#16a34a' }} />,
-      'revision': <FaClock style={{ color: '#7c3aed' }} />,
-      'pendiente': <FaExclamationCircle style={{ color: '#f59e0b' }} />,
-      'rechazada': <FaTimes style={{ color: '#dc2626' }} />
+      'Aprobada': <FaCheckCircle style={{ color: '#16a34a' }} />,
+      'En Revisión': <FaClock style={{ color: '#7c3aed' }} />,
+      'Nueva': <FaExclamationCircle style={{ color: '#f59e0b' }} />,
+      'Pendiente Info': <FaExclamationCircle style={{ color: '#f59e0b' }} />,
+      'Rechazada': <FaTimes style={{ color: '#dc2626' }} />,
+      'Completada': <FaCheckCircle style={{ color: '#059669' }} />
     };
     return iconMap[status] || null;
   };
 
   const getPriorityText = (priority) => {
     const priorityMap = {
-      'alta': 'Alta',
-      'normal': 'Normal',
-      'baja': 'Baja'
+      'Alta': 'Alta',
+      'Media': 'Media',
+      'Baja': 'Baja'
     };
     return priorityMap[priority] || priority;
   };
 
-  const getCategoryText = (category) => {
-    const categoryMap = {
-      'permisos': 'Permisos',
-      'academico': 'Académico',
-      'recursos': 'Recursos',
-      'eventos': 'Eventos',
-      'bienestar': 'Bienestar'
-    };
-    return categoryMap[category] || category;
-  };
+
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Pendiente';
@@ -174,10 +173,10 @@ const MisSolicitudes = () => {
 
   // Estadísticas
   const stats = {
-    approved: currentRequests.filter(r => r.status === 'aprobada').length,
-    review: currentRequests.filter(r => r.status === 'revision').length,
-    pending: currentRequests.filter(r => r.status === 'pendiente').length,
-    total: currentRequests.length
+    approved: allRequests.filter(r => r.estado === 'Aprobada').length,
+    review: allRequests.filter(r => r.estado === 'En Revisión').length,
+    pending: allRequests.filter(r => r.estado === 'Nueva' || r.estado === 'Pendiente Info').length,
+    total: allRequests.length
   };
 
   return (
@@ -248,26 +247,26 @@ const MisSolicitudes = () => {
                   Todas
                 </button>
                 <button 
-                  className={`filter-btn ${currentStatusFilter === 'pendiente' ? 'active' : ''}`} 
-                  onClick={() => handleStatusFilter('pendiente')}
+                  className={`filter-btn ${currentStatusFilter === 'Nueva' ? 'active' : ''}`} 
+                  onClick={() => handleStatusFilter('Nueva')}
                 >
-                  Pendiente
+                  Nueva
                 </button>
                 <button 
-                  className={`filter-btn ${currentStatusFilter === 'revision' ? 'active' : ''}`} 
-                  onClick={() => handleStatusFilter('revision')}
+                  className={`filter-btn ${currentStatusFilter === 'En Revisión' ? 'active' : ''}`} 
+                  onClick={() => handleStatusFilter('En Revisión')}
                 >
                   En Revisión
                 </button>
                 <button 
-                  className={`filter-btn ${currentStatusFilter === 'aprobada' ? 'active' : ''}`} 
-                  onClick={() => handleStatusFilter('aprobada')}
+                  className={`filter-btn ${currentStatusFilter === 'Aprobada' ? 'active' : ''}`} 
+                  onClick={() => handleStatusFilter('Aprobada')}
                 >
                   Aprobada
                 </button>
                 <button 
-                  className={`filter-btn ${currentStatusFilter === 'rechazada' ? 'active' : ''}`} 
-                  onClick={() => handleStatusFilter('rechazada')}
+                  className={`filter-btn ${currentStatusFilter === 'Rechazada' ? 'active' : ''}`} 
+                  onClick={() => handleStatusFilter('Rechazada')}
                 >
                   Rechazada
                 </button>
@@ -319,20 +318,22 @@ const MisSolicitudes = () => {
 
           {/* Requests List */}
           <div className="requests-list">
-            {currentRequests.length === 0 ? (
+            {filteredRequests.length === 0 ? (
               <div className="empty-state">
                 <FaFileAlt />
                 <h3>No se encontraron solicitudes</h3>
                 <p>No hay solicitudes que coincidan con los filtros seleccionados.</p>
               </div>
             ) : (
-              currentRequests.map(request => (
-                <div className="request-card" key={request.id} data-id={request.id}>
+              filteredRequests.map(request => (
+                <div className="request-card" key={request._id} data-id={request._id}>
                   <div className="request-header">
                     <div className="request-title-section">
                       <h3 className="request-title">
-                        {/*request.title*/}
                         {getStatusIcon(request.estado)}
+                        <span style={{ marginLeft: '10px' }}>
+                          {request.titulo || 'Solicitud sin título'}
+                        </span>
                       </h3>
                       <p className="request-description">{request.descripcion}</p>
                     </div>
@@ -345,41 +346,58 @@ const MisSolicitudes = () => {
                     <span className={`priority-badge ${request.prioridad}`}>
                       {getPriorityText(request.prioridad)}
                     </span>
+                    {request.categoria && (
+                      <span className="category-badge">
+                        {request.categoria.nombre}
+                      </span>
+                    )}
                   </div>
 
                   <div className="request-meta">
                     <div className="meta-item">
                       <FaHashtag />
-                      <span>{request.id}</span>
+                      <span>{request._id.slice(-8)}</span>
                     </div>
                     <div className="meta-item">
                       <FaCalendar />
-                      <span>Enviada: {formatDate(request.dateSubmitted)}</span>
+                      <span>Enviada: {formatDate(request.fechaSolicitud || request.createdAt)}</span>
                     </div>
                     <div className="meta-item">
                       <FaClock />
-                      <span>Respondida: {request.dateResponded ? formatDate(request.dateResponded) : 'Pendiente'}</span>
+                      <span>Actualizada: {(() => {
+                        if (request.fechaRespuesta) return formatDate(request.fechaRespuesta);
+                        if (request.updatedAt) return formatDate(request.updatedAt);
+                        return 'Pendiente';
+                      })()}</span>
                     </div>
                     <div className="meta-item">
                       <FaUserIcon />
-                      <span>Responsable: {request.responsible}</span>
+                      <span>Responsable: {(() => {
+                        if (!request.responsable) return 'Por asignar';
+                        if (typeof request.responsable === 'object') {
+                          return `${request.responsable.nombre} ${request.responsable.apellido}`;
+                        }
+                        return request.responsable;
+                      })()}</span>
                     </div>
                   </div>
 
-                  {request.comments && (
+                  {request.observaciones && (
                     <div className="request-comments">
                       <div className="comments-title">
                         <FaComment />
-                        Comentarios:
+                        Observaciones:
                       </div>
-                      <div className="comments-text">{request.comments}</div>
+                      <div className="comments-text">
+                        {request.observaciones}
+                      </div>
                     </div>
                   )}
 
                   <div className="request-actions">
                     <button 
                       className="btn btn-primary" 
-                      onClick={() => showRequestDetails(request.id)}
+                      onClick={() => showRequestDetails(request._id)}
                     >
                       <FaEye />
                       Ver Detalles
@@ -397,7 +415,9 @@ const MisSolicitudes = () => {
         <div className="modal-overlay-misolicitudes show-misolicitudes">
           <div className="modal-content-misolicitudes">
             <div className="modal-header-misolicitudes">
-              <h2 className="modal-title-misolicitudes">Detalles de: {selectedRequest.title}</h2>
+              <h2 className="modal-title-misolicitudes">
+                Detalles de: {selectedRequest.titulo || 'Solicitud sin título'}
+              </h2>
               <button className="modal-close-misolicitudes" onClick={() => setShowRequestModal(false)}>
                 <FaTimes />
               </button>
@@ -409,57 +429,94 @@ const MisSolicitudes = () => {
                   <div className="detail-grid">
                     <div className="detail-item">
                       <label htmlFor='id'>ID de Solicitud:</label>
-                      <span>{selectedRequest.id}</span>
+                      <span>{selectedRequest._id.slice(-8)}</span>
                     </div>
                     <div className="detail-item">
                       <label htmlFor='estado'>Estado:</label>
-                      <span className={`status-badge ${selectedRequest.status}`}>
-                        {getStatusText(selectedRequest.status)}
+                      <span className={`status-badge ${selectedRequest.estado}`}>
+                        {getStatusText(selectedRequest.estado)}
                       </span>
                     </div>
                     <div className="detail-item">
                       <label htmlFor='prioridad'>Prioridad:</label>
-                      <span className={`priority-badge ${selectedRequest.priority}`}>
-                        {getPriorityText(selectedRequest.priority)}
+                      <span className={`priority-badge ${selectedRequest.prioridad}`}>
+                        {getPriorityText(selectedRequest.prioridad)}
                       </span>
                     </div>
                     <div className="detail-item">
                       <label htmlFor='categoria'>Categoría:</label>
-                      <span>{getCategoryText(selectedRequest.category)}</span>
+                      <span>{selectedRequest.categoria ? selectedRequest.categoria.nombre : 'Sin categoría'}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="detail-section">
                   <h4>Descripción</h4>
-                  <p>{selectedRequest.description}</p>
+                  <p>{selectedRequest.descripcion || 'Sin descripción'}</p>
                 </div>
 
                 <div className="detail-section">
                   <h4>Fechas</h4>
                   <div className="detail-grid">
                     <div className="detail-item">
-                      <label htmlFor='fechaEnvio'>Fecha de Envío:</label>
-                      <span>{formatDate(selectedRequest.dateSubmitted)}</span>
+                      <label htmlFor='fechaEnvio'>Fecha de Solicitud:</label>
+                      <span>{formatDate(selectedRequest.fechaSolicitud || selectedRequest.createdAt)}</span>
                     </div>
                     <div className="detail-item">
                       <label htmlFor='fechaRespuesta'>Fecha de Respuesta:</label>
-                      <span>{selectedRequest.dateResponded ? formatDate(selectedRequest.dateResponded) : 'Pendiente'}</span>
+                      <span>{selectedRequest.fechaRespuesta ? formatDate(selectedRequest.fechaRespuesta) : 'Sin respuesta'}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="detail-section">
                   <h4>Responsable</h4>
-                  <p>{selectedRequest.responsible}</p>
+                  <p>{(() => {
+                    if (!selectedRequest.responsable) return 'Por asignar';
+                    if (typeof selectedRequest.responsable === 'object') {
+                      return `${selectedRequest.responsable.nombre} ${selectedRequest.responsable.apellido}`;
+                    }
+                    return selectedRequest.responsable;
+                  })()}</p>
                 </div>
 
-                {selectedRequest.comments && (
+                <div className="detail-section">
+                  <h4>Usuario Solicitante</h4>
+                  <p>{(() => {
+                    if (selectedRequest.solicitante && typeof selectedRequest.solicitante === 'object') {
+                      return `${selectedRequest.solicitante.nombre} ${selectedRequest.solicitante.apellido}`;
+                    }
+                    return selectedRequest.correo || 'Usuario no disponible';
+                  })()}</p>
+                </div>
+
+                {selectedRequest.telefono && (
                   <div className="detail-section">
-                    <h4>Comentarios</h4>
+                    <h4>Teléfono</h4>
+                    <p>{selectedRequest.telefono}</p>
+                  </div>
+                )}
+
+                {selectedRequest.tipoSolicitud && (
+                  <div className="detail-section">
+                    <h4>Tipo de Solicitud</h4>
+                    <p>{selectedRequest.tipoSolicitud}</p>
+                  </div>
+                )}
+
+                {selectedRequest.observaciones && (
+                  <div className="detail-section">
+                    <h4>Observaciones</h4>
                     <div className="comments-box">
-                      {selectedRequest.comments}
+                      <p>{selectedRequest.observaciones}</p>
                     </div>
+                  </div>
+                )}
+
+                {!selectedRequest.observaciones && (
+                  <div className="detail-section">
+                    <h4>Observaciones</h4>
+                    <p style={{ color: '#666', fontStyle: 'italic' }}>No hay observaciones disponibles</p>
                   </div>
                 )}
               </div>
@@ -471,10 +528,10 @@ const MisSolicitudes = () => {
               >
                 Cerrar
               </button>
-              {(selectedRequest.status === 'pendiente' || selectedRequest.status === 'revision') && (
+              {(selectedRequest.estado === 'Nueva' || selectedRequest.estado === 'En Revisión' || selectedRequest.estado === 'Pendiente Info') && (
                 <button 
                   className="btn-misolicitudes btn-danger-misolicitudes" 
-                  onClick={() => showCancelConfirmation(selectedRequest.id)}
+                  onClick={() => showCancelConfirmation(selectedRequest._id)}
                 >
                   Cancelar Solicitud
                 </button>
@@ -509,7 +566,7 @@ const MisSolicitudes = () => {
               </button>
               <button 
                 className="btn btn-danger" 
-                onClick={() => cancelRequest(selectedRequest.id)}
+                onClick={() => cancelRequest(selectedRequest._id)}
               >
                 Sí, cancelar
               </button>

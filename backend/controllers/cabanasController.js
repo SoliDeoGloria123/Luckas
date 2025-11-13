@@ -9,7 +9,24 @@ exports.crearCabana = async (req, res) => {
     console.log('[CABANAS] req.files:', req.files ? req.files.length : 'No files');
     console.log('[CABANAS] req.cloudinaryUrls:', req.cloudinaryUrls);
     
-    const { categoria } = req.body;
+    const { categoria, capacidad, precio } = req.body;
+    
+    // Validar datos básicos
+    if (!req.body.nombre || !req.body.nombre.trim()) {
+      return res.status(400).json({ success: false, message: 'Nombre es obligatorio' });
+    }
+    
+    if (!req.body.descripcion || !req.body.descripcion.trim()) {
+      return res.status(400).json({ success: false, message: 'Descripción es obligatoria' });
+    }
+    
+    if (!capacidad || Number(capacidad) < 1) {
+      return res.status(400).json({ success: false, message: 'Capacidad debe ser mayor a 0' });
+    }
+    
+    if (!precio || Number(precio) < 0) {
+      return res.status(400).json({ success: false, message: 'Precio debe ser mayor o igual a 0' });
+    }
 
     // Validar que el ID de categoría sea válido
     if (!mongoose.Types.ObjectId.isValid(categoria)) {
@@ -23,10 +40,32 @@ exports.crearCabana = async (req, res) => {
     }
   // Usar las URLs de Cloudinary si existen, si no, array vacío
   const imagen = req.cloudinaryUrls || [];
-  const cabana = new Cabana({ ...req.body, imagen, creadoPor: req.userId });
-    await cabana.save();
-    res.status(201).json({ success: true, data: cabana });
+  console.log('[CABANAS] Imágenes a guardar:', imagen);
+  
+  const datosCompletos = {
+    nombre: req.body.nombre.trim(),
+    descripcion: req.body.descripcion.trim(),
+    capacidad: Number(req.body.capacidad),
+    categoria: req.body.categoria,
+    precio: Number(req.body.precio),
+    ubicacion: req.body.ubicacion ? req.body.ubicacion.trim() : '',
+    estado: req.body.estado || 'disponible',
+    imagen,
+    creadoPor: req.userId
+  };
+  
+  console.log('[CABANAS] Datos completos para crear cabaña:', datosCompletos);
+  
+  const cabana = new Cabana(datosCompletos);
+  console.log('[CABANAS] Cabaña creada en memoria, guardando...');
+  
+  await cabana.save();
+  console.log('[CABANAS] Cabaña guardada exitosamente:', cabana._id);
+  
+  res.status(201).json({ success: true, data: cabana });
   } catch (error) {
+    console.error('[CABANAS] Error al crear cabaña:', error);
+    console.error('[CABANAS] Stack trace:', error.stack);
     res.status(400).json({ success: false, message: error.message });
   }
 };

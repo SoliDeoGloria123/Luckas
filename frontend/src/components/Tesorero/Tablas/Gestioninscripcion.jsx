@@ -208,19 +208,21 @@ const Gestioninscripcion = () => {
               <table className="users-table-tesorero">
                 <thead>
                   <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">ID INSCRIPCION</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">NOMBRE COMPLETO</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">TIPO DOCUEMNTO</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">NUMERO DOCUEMENTO</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">TELEFOO</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">EDAD</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">CATEGORIA</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">EVENTO</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">OBSERVACIONES</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">FECHA INCRIPCION</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">ESTADO </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">SOLICITUD</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">ACCIONES</th>
+                    <th>ID</th>
+                    <th>Nombre completo</th>
+                    <th>Tipo Doc.</th>
+                    <th>Número Doc.</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Edad</th>
+                    <th>Tipo Inscripción</th>
+                    <th>Evento/Programa</th>
+                    <th>Categoría</th>
+                    <th>Estado</th>
+                    <th>Observaciones</th>
+                    <th>Fecha inscripción</th>
+                    <th>Solicitud</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
@@ -236,20 +238,24 @@ const Gestioninscripcion = () => {
                         <td>{(ins.nombre && ins.apelledio) ? `${ins.nombre} ${ins.apellido}` : ins.nombre || ins.apellido || "N/A"}</td>
                         <td>{ins.tipoDocumento}</td>
                         <td>{ins.numeroDocumento}</td>
+                        <td>{ins.correo}</td>
                         <td>{ins.telefono}</td>
                         <td>{ins.edad}</td>
-                        <td>{ins.categoria?.nombre}</td>
-                        <td>{ins.evento?.nombre}</td>
-                        <td>{ins.observaciones}</td>
+                        <td>{ins.tipoReferencia}</td>
+                        <td>{ins.referencia?.nombre || ins.evento?.nombre}</td>
+                        <td>{ins.categoria?.nombre || "N/A"}</td>
                         <td>
-                          {ins.fechaInscripcion ? new Date(ins.fechaInscripcion).toLocaleDateString('es-ES', { day: 'numeric', month: '2-digit', year: 'numeric' }) : ''}
-                        </td>
-                        <td className={`badge-tesorero badge-tesorero-${ins.estado}`}>
-                          <span>
-                            {ins.estado}
+                          <span className={`badge-estado estado-${(ins.estado || "pendiente").toLowerCase()}`}>
+                            {ins.estado || "Pendiente"}
                           </span>
                         </td>
-                        <td>{ins.solicitud}</td>
+                        <td>{ins.observaciones || "N/A"}</td>
+                        <td>
+                          {ins.fechaInscripcion
+                            ? new Date(ins.fechaInscripcion).toLocaleString()
+                            : "N/A"}
+                        </td>
+                        <td>{ins.solicitud ? ins.solicitud : "N/A"}</td>
                         <td className="whitespace-nowrap px-6 py-4">
                           <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(ins)}>
                             <Edit className="h-4 w-4" />
@@ -257,7 +263,7 @@ const Gestioninscripcion = () => {
                         </td>
                       </tr>
                     ))
-                  )}
+                  )};
 
                 </tbody>
               </table>
@@ -267,18 +273,18 @@ const Gestioninscripcion = () => {
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
-          disabled={paginaActual === 1}
+            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+            disabled={paginaActual === 1}
           >
             <i className="fas fa-chevron-left"></i>
           </button>
           <span className="pagination-info-admin">
-          Página {paginaActual} de {totalPaginas || 1}
+            Página {paginaActual} de {totalPaginas || 1}
           </span>
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-          disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+            disabled={paginaActual === totalPaginas || totalPaginas === 0}
           >
             <i className="fas fa-chevron-right"></i>
           </button>

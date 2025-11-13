@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal from './shared/BaseModal';
-import ImageUploader from './shared/ImageUploader';
 import { useFormValidation } from '../hooks/useFormValidation';
 
 // Función movida fuera del componente para evitar recrearla en cada render
@@ -36,25 +35,133 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
 
   const { validateForm, errors } = useFormValidation(validationRules);
 
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Manejar cambio de imágenes
   const handleImagesChange = (images) => {
-    setFormData(prev => ({ ...prev, imagen: images }));
+    setSelectedImages(images);
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // Manejo de archivos seleccionados
+  const handleFileSelection = (files) => {
+    const validFiles = [];  
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif']);
+
+    for (const file of Array.from(files)) {
+      if (!allowedTypes.has(file.type)) continue;
+      if (file.size > maxSize) continue;
+      validFiles.push(file);
+    }
+
+    if (validFiles.length > 0) {
+      const imageDataArray = validFiles.map((file, index) => ({
+        id: Date.now() + index,
+        file,
+        url: URL.createObjectURL(file),
+        name: file.name
+      }));
+      setSelectedImages(prev => [...prev, ...imageDataArray]);
+    }
+  };
+
+  const removeImage = (id) => {
+    setSelectedImages(prev => prev.filter(img => img.id !== id));
+  };
+
+  // Validación simplificada para reducir complejidad
+  const validateFormData = (data) => {
+    const errors = {};
+    if (!data.nombre || data.nombre.trim().length < 2) errors.nombre = 'Nombre es obligatorio (mínimo 2 caracteres)';
+    if (!data.descripcion || data.descripcion.trim().length < 10) errors.descripcion = 'Descripción es obligatoria (mínimo 10 caracteres)';
+    if (!data.capacidad || Number(data.capacidad) < 1) errors.capacidad = 'Capacidad debe ser mayor a 0';
+    if (!data.categoria) errors.categoria = 'Categoría es obligatoria';
+    if (!data.precio || Number(data.precio) < 0) errors.precio = 'Precio debe ser mayor o igual a 0';
+    if (!data.ubicacion || data.ubicacion.trim().length < 5) errors.ubicacion = 'Ubicación es obligatoria (mínimo 5 caracteres)';
+    if (!data.estado) errors.estado = 'Estado es obligatorio';
+    return errors;
+  };
+
+  const createFormData = () => {
+    const formDataToSend = new FormData();
+    formDataToSend.append('nombre', formData.nombre);
+    formDataToSend.append('descripcion', formData.descripcion);
+    formDataToSend.append('capacidad', Number(formData.capacidad));
+    formDataToSend.append('categoria', String(formData.categoria));
+    formDataToSend.append('precio', Number(formData.precio));
+    formDataToSend.append('ubicacion', formData.ubicacion);
+    formDataToSend.append('estado', formData.estado);
     
-    if (!validateForm(formData)) {
-      // Los errores se muestran automáticamente en el formulario
+    selectedImages.forEach((imageData) => {
+      if (imageData.file) {
+        formDataToSend.append('imagen', imageData.file);
+      }
+    });
+    
+    return formDataToSend;
+  };
+
+  const handleSubmit = async (e) => {
+    console.log('CabanaModal: handleSubmit ejecutado');
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    console.log('CabanaModal: Validando formulario...');
+    console.log('CabanaModal: Datos del formulario:', formData);
+    
+    // Validar formulario
+    const erroresValidacion = validateFormData(formData);
+    const hayErrores = Object.keys(erroresValidacion).length > 0;
+    
+    console.log('CabanaModal: Formulario válido:', !hayErrores);
+    
+    if (hayErrores) {
+      console.log('CabanaModal: Formulario inválido, mostrando errores');
+      alert(`Errores en el formulario:\n${Object.values(erroresValidacion).join('\n')}`);
+      setIsSubmitting(false);
       return;
     }
     
-    onSubmit(formData);
-    onClose();
+    try {
+      console.log('CabanaModal: Iniciando submit...');
+      
+      // Verificar que onSubmit existe y es una función
+      if (typeof onSubmit !== 'function') {
+        throw new TypeError('onSubmit debe ser una función');
+      }
+      
+      if (selectedImages.length > 0) {
+        console.log('CabanaModal: Enviando cabaña CON imágenes:', selectedImages.length, 'archivos');
+        await onSubmit(createFormData(), true);
+      } else {
+        console.log('CabanaModal: Enviando cabaña SIN imágenes');
+        await onSubmit(formData, false);
+      }
+      
+      console.log('CabanaModal: Submit completado exitosamente');
+      
+    } catch (error) {
+      console.error('CabanaModal: Error en handleSubmit:', error);
+      const errorMessage = `Error al crear cabaña: ${error.message}`;
+      
+      if (window.Swal) {
+        window.Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage
+        });
+      } else {
+        alert(errorMessage);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -159,19 +266,72 @@ const CabanaModal = ({ mode = 'create', initialData = {}, onClose, onSubmit, cat
 
             <div className="form-group-tesorero full-width">
               <label htmlFor='imagen'>Imagen</label>
-              <ImageUploader 
-                onImagesChange={handleImagesChange}
-                multiple={true}
-              />
+              <div className="image-upload-container">
+                <button
+                  type="button"
+                  className="upload-area"
+                  onClick={() => document.getElementById('cabanaImageInput').click()}
+                  onDragOver={e => e.preventDefault()}
+                  onDrop={e => {
+                    e.preventDefault();
+                    handleFileSelection(e.dataTransfer.files);
+                  }}
+                >
+                  <div className="upload-content">
+                    <i className="fas fa-cloud-upload-alt upload-icon"></i>
+                    <h3>Arrastra y suelta tus imágenes aquí</h3>
+                    <p>o <span className="browse-text">haz clic para seleccionar</span></p>
+                    <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
+                  </div>
+                  <input 
+                    type="file" 
+                    id='cabanaImageInput' 
+                    multiple 
+                    accept="image/*" 
+                    hidden  
+                    onChange={e => handleFileSelection(e.target.files)} 
+                  />
+                </button>
+
+                <div className="image-preview-grid">
+                  {selectedImages.map(img => (
+                    <div key={img.id} className="image-preview">
+                      <img src={img.url} alt={img.name} />
+                      <div className="image-overlay">
+                        <button type="button" className="remove-btn" onClick={() => removeImage(img.id)}>
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '0',
+                        left: '0',
+                        right: '0',
+                        background: 'rgba(0,0,0,0.7)',
+                        color: 'white',
+                        padding: '4px 8px',
+                        fontSize: '11px',
+                        textAlign: 'center'
+                      }}>
+                        {img.name.length > 15 ? img.name.substring(0, 15) + '...' : img.name}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               {errors.imagen && <span className="error-message">{errors.imagen}</span>}
             </div>
 
             <div className="modal-footer-tesorero">
-              <button type="button" className="cancel-btn" onClick={onClose}>
+              <button type="button" className="cancel-btn" onClick={onClose} disabled={isSubmitting}>
                 Cancelar
               </button>
-              <button type="submit" className="submit-btn">
-                {mode === 'create' ? 'Crear Cabaña' : 'Guardar Cambios'}
+              <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  selectedImages.length > 0 ? 'Subiendo imágenes...' : 'Creando cabaña...'
+                ) : (
+                  mode === 'create' ? 'Crear Cabaña' : 'Guardar Cambios'
+                )}
               </button>
             </div>
           </form>

@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { authService } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
@@ -18,13 +17,9 @@ const Login = () => {
     // Limpiar espacios en blanco y normalizar correo
     const correoLimpio = correo.trim().toLowerCase();
     const passwordLimpio = password.trim();
-    console.log('📧 Correo enviado:', correoLimpio);
-    console.log('🔑 Contraseña enviada:', passwordLimpio);
     
     try {
-      console.log('🔄 Iniciando proceso de login...');
       const data = await authService.login(correoLimpio, passwordLimpio);
-      console.log('✅ Login exitoso:', data);
       
       localStorage.setItem('token', data.token);
       localStorage.setItem('usuario', JSON.stringify(data.user));
@@ -43,10 +38,7 @@ const Login = () => {
         navigate('/admin/users'); // Por defecto para otros roles
       }
     } catch (err) {
-      console.error('❌ Error completo en login:', err);
-      console.error('❌ Mensaje de error:', err.message);
-      console.error('❌ Status:', err.status);
-      console.error('❌ Data:', err.data);
+      console.error('❌ Error durante el login:', err);
       
       let errorMessage = 'Error al iniciar sesión';
       if (err.message) {
@@ -199,21 +191,6 @@ const Login = () => {
               <span>Iniciar Sesión</span>
 
             </button>
-
-            {/* Divisor */}
-            <div className="divider">
-              <span>o continúa con</span>
-            </div>
-            <div className="social-buttons">
-              <button
-                type="button"
-                className="btn btn-outline-secondary social-btn"
-              >
-                <i className="fab fa-google me-2"></i> {' '}
-                Google
-              </button>
-
-            </div>
           </form>
 
           {/* Footer */}

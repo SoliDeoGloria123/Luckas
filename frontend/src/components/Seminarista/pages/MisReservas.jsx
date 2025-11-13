@@ -22,8 +22,7 @@ const ModalImageCarousel = ({ images }) => {
       <img
         src={`http://localhost:3000/uploads/cabanas/${images[index]}`}
         alt={`Imagen ${index + 1}`}
-        className="modal-image-misinscripciones"
-        style={{ maxHeight: '260px', borderRadius: '12px' }}
+        className="modal-image-reservas"
       />
       <button className="carousel-arrow right" onClick={next}>&gt;</button>
       <div className="carousel-indicator">
@@ -85,15 +84,7 @@ const MisReservas = () => {
       });
   }, [userId]);
 
-  // Actualizar estadísticas
-  // const updateStats = (data) => {
-  //   setStats({
-  //     confirmadas: data.filter(i => i.estado === 'Confirmada').length,
-  //     pendientes: data.filter(i => i.estado === 'Pendiente').length,
-  //     canceladas: data.filter(i => i.estado === 'Cancelada').length,
-  //     total: data.length
-  //   });
-  // };
+
 
   // Filtrar inscripciones
   const filterInscripciones = (filter) => {
@@ -111,10 +102,40 @@ const MisReservas = () => {
     setIsModalOpen(false);
   };
 
-  // Cancelar inscripción
-  const cancelarInscripcion = () => {
-    alert(`Inscripción a "${currentInscripcion.titulo}" cancelada`);
-    closeModal();
+  // Cancelar reserva
+  const cancelarInscripcion = async () => {
+    if (!globalThis.confirm(`¿Estás seguro de que deseas cancelar la reserva de "${currentInscripcion.cabana?.nombre}"?`)) {
+      return;
+    }
+
+    try {
+      // Actualizar el estado localmente
+      const updatedReservas = reservas.map(reserva => 
+        reserva._id === currentInscripcion._id 
+          ? { ...reserva, estado: 'Cancelada', observaciones: 'Cancelada por el usuario' }
+          : reserva
+      );
+      
+      setReservas(updatedReservas);
+      closeModal();
+      
+      // Aquí puedes agregar la llamada al backend para actualizar la reserva
+      // await reservaService.update(currentInscripcion._id, { estado: 'Cancelada', observaciones: 'Cancelada por el usuario' });
+      
+      alert(`Reserva de "${currentInscripcion.cabana?.nombre}" cancelada exitosamente`);
+    } catch (error) {
+      console.error('Error al cancelar reserva:', error);
+      alert('Error al cancelar la reserva');
+    }
+  };
+
+  // Función para calcular duración de estadía
+  const calcularDuracionEstadia = (fechaInicio, fechaFin) => {
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
+    const diffTime = Math.abs(fin - inicio);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
   // Reservas filtradas
@@ -177,22 +198,28 @@ const MisReservas = () => {
                       {/* <span className={`categoria-badge ${inscripcion.categoria?.toLowerCase()}`}>{inscripcion.categoria}</span> */}
                     </div>
                     <div className="inscripcion-price-section-misinscripciones">
-                      <div className="inscripcion-price-misinscripciones">{reserva.precio}</div>
+                      <div className="inscripcion-price-misinscripciones">{reserva.cabana?.precio || 'Precio no disponible'}</div>
                       <div className="inscripcion-date-misinscripciones">Fecha de Reserva: {new Date(reserva.createdAt).toLocaleDateString()}</div>
                     </div>
                   </div>
                   <div className="inscripcion-details-misinscripciones">
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-calendar"></i>
-                      <span>{new Date(reserva.createdAt).toLocaleDateString()} - {new Date(reserva.fechaFin).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(reserva.fechaInicio).toLocaleDateString()} - {new Date(reserva.fechaFin).toLocaleDateString()}
+                      </span>
                     </div>
                     <div className="detail-row-misinscripciones">
-                      <i className="fas fa-clock"></i>
-                      <span>{reserva.cabana?.capacidad || 'No especificada'} </span>
+                      <i className="fas fa-users"></i>
+                      <span>{reserva.numeroPersonas} persona(s)</span>
                     </div>
                     <div className="detail-row-misinscripciones">
                       <i className="fas fa-map-marker-alt"></i>
-                      <span>{reserva.cabana?.ubicacion}</span>
+                      <span>{reserva.cabana?.ubicacion || 'Ubicación no disponible'}</span>
+                    </div>
+                    <div className="detail-row-misinscripciones">
+                      <i className="fas fa-home"></i>
+                      <span>Capacidad: {reserva.cabana?.capacidad || 'No especificada'}</span>
                     </div>
                   </div>
                   <div className="inscripcion-footer-misinscripciones">
@@ -247,8 +274,7 @@ const MisReservas = () => {
                         : `http://localhost:3000/uploads/cabanas/${currentInscripcion.cabana.imagen[0]}`
                     }
                     alt={currentInscripcion.cabana?.nombre || 'Imagen de la cabaña'}
-                    className="modal-image-misinscripciones"
-                    style={{ maxHeight: '260px', borderRadius: '12px' }}
+                    className="modal-image-reservas"
                   />
                 ) : (
                   <p>Imagen no disponible</p>
@@ -263,30 +289,41 @@ const MisReservas = () => {
                     {currentInscripcion.estado}
                   </span>
                   <span id="modalPrice" className="modal-price-misinscripciones">
-                    {currentInscripcion.precio}
+                    {currentInscripcion.cabana?.precio || 'Precio no disponible'}
                   </span>
                 </div>
                 <h2 id="modalTitle" className="modal-title-misinscripciones">{currentInscripcion.cabana?.nombre}</h2>
                 <div className="modal-details-grid-misinscripciones">
                   <div className="modal-section-misinscripciones">
                     <h3 className="section-title-misinscripciones">Datos de la Cabaña</h3>
-                    <div className="detail-item-misinscripciones"><strong>Descripción:</strong> {currentInscripcion.cabana?.descripcion}</div>
-                    <div className="detail-item-misinscripciones"><strong>Ubicación:</strong> {currentInscripcion.cabana?.ubicacion}</div>
-                    <div className="detail-item-misinscripciones"><strong>Capacidad:</strong> {currentInscripcion.cabana?.capacidad}</div>
-                    <div className="detail-item-misinscripciones"><strong>Precio:</strong> {currentInscripcion.cabana?.precio}</div>
+                    <div className="detail-item-misinscripciones"><strong>Descripción:</strong> {currentInscripcion.cabana?.descripcion || 'No disponible'}</div>
+                    <div className="detail-item-misinscripciones"><strong>Ubicación:</strong> {currentInscripcion.cabana?.ubicacion || 'No disponible'}</div>
+                    <div className="detail-item-misinscripciones"><strong>Capacidad:</strong> {currentInscripcion.cabana?.capacidad || 'No especificada'}</div>
+                    <div className="detail-item-misinscripciones"><strong>Precio por noche:</strong> {currentInscripcion.cabana?.precio || 'No disponible'}</div>
                   </div>
                   <div className="modal-section-misinscripciones">
                     <h3 className="section-title-misinscripciones">Datos de la Reserva</h3>
                     <div className="detail-item-misinscripciones"><strong>Fecha de Reserva:</strong> {new Date(currentInscripcion.createdAt).toLocaleDateString()}</div>
                     <div className="detail-item-misinscripciones"><strong>Fechas de estadía:</strong> {new Date(currentInscripcion.fechaInicio).toLocaleDateString()} - {new Date(currentInscripcion.fechaFin).toLocaleDateString()}</div>
-                    <div className="detail-item-misinscripciones"><strong>Personas:</strong> {currentInscripcion.numeroPersonas}</div>
+                    <div className="detail-item-misinscripciones"><strong>Duración:</strong> {calcularDuracionEstadia(currentInscripcion.fechaInicio, currentInscripcion.fechaFin)} día(s)</div>
+                    <div className="detail-item-misinscripciones"><strong>Número de personas:</strong> {currentInscripcion.numeroPersonas}</div>
                     <div className="detail-item-misinscripciones"><strong>Estado:</strong> {currentInscripcion.estado}</div>
-                    <div className="detail-item-misinscripciones"><strong>Observaciones:</strong> {currentInscripcion.observaciones}</div>
+                    <div className="detail-item-misinscripciones"><strong>Propósito de la estadía:</strong> {currentInscripcion.propositoEstadia || 'No especificado'}</div>
+                    <div className="detail-item-misinscripciones"><strong>Solicitudes especiales:</strong> {currentInscripcion.solicitudesEspeciales || 'Ninguna'}</div>
+                    <div className="detail-item-misinscripciones"><strong>Observaciones:</strong> {currentInscripcion.observaciones || 'Ninguna'}</div>
+                  </div>
+                  <div className="modal-section-misinscripciones">
+                    <h3 className="section-title-misinscripciones">Datos del Huésped</h3>
+                    <div className="detail-item-misinscripciones"><strong>Nombre completo:</strong> {currentInscripcion.nombre} {currentInscripcion.apellido}</div>
+                    <div className="detail-item-misinscripciones"><strong>Tipo de documento:</strong> {currentInscripcion.tipoDocumento}</div>
+                    <div className="detail-item-misinscripciones"><strong>Número de documento:</strong> {currentInscripcion.numeroDocumento}</div>
+                    <div className="detail-item-misinscripciones"><strong>Correo electrónico:</strong> {currentInscripcion.correoElectronico}</div>
+                    <div className="detail-item-misinscripciones"><strong>Teléfono:</strong> {currentInscripcion.telefono}</div>
                   </div>
                 </div>
                 <div className="modal-actions-misinscripciones">
                   <button className="btn-secondary-misinscripciones" onClick={closeModal}>Cerrar</button>
-                  {currentInscripcion.estado === 'Confirmada' && (
+                  {(currentInscripcion.estado === 'Pendiente' || currentInscripcion.estado === 'Confirmada') && (
                     <button
                       id="cancelarBtn"
                       className="btn-danger-misinscripciones"

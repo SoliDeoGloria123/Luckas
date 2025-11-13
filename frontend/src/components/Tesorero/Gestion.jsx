@@ -103,8 +103,8 @@ const Gestion = () => {
                             <h3 className="card-title">Gestionar Eventos</h3>
                             <p className="card-description">Organizar y categorizar eventos</p>
                             <button type="button" className="card-action" onClick={e => { e.preventDefault(); handleGestionarEventos(); }}>
-                                Gestionar <i className="fas fa-arrow-right"></i>
-                            </button>
+                                Gestionar <i className="fas fa-arrow-right"/></button>
+                          
                         </div>
                     </div>
 

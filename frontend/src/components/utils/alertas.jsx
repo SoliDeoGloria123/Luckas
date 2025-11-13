@@ -1,7 +1,14 @@
 import Swal from 'sweetalert2';
 
 export const mostrarAlerta = (titulo, mensaje, tipo = "success") => {
-
+    console.log('MostrarAlerta llamada:', { titulo, mensaje, tipo });
+    console.log('Swal disponible:', !!Swal);
+    
+    if (!Swal) {
+        alert(`${titulo}: ${mensaje}`);
+        return;
+    }
+    
     Swal.fire({
         title: titulo,
         text: mensaje,

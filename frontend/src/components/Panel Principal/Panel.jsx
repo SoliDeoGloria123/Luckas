@@ -18,12 +18,13 @@ const PanelPrincipal = () => {
 
     return (
         <>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></link>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"/> 
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
+            
             <header className="header-panel-princiapl">
                 <nav className="nav-panel-princiapl">
                     <div className="nav-brand-panel-princiapl">
-                        <h2>SBC</h2>
-                        <span>Seminario Bautista</span>
+                          <h1 className="icono-luckas" >LUCKAS</h1>
                     </div>
                     <div className="nav-links-panel-princiapl">
                         <a href="#eventos">Eventos</a>

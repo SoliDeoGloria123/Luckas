@@ -38,7 +38,8 @@ const cabanaSchema = new mongoose.Schema({
     },
   imagen: {
     type: [String], // URL de imagen o nombre del archivo
-    required: true
+    required: false,
+    default: []
   }
 }, { timestamps: true });
 

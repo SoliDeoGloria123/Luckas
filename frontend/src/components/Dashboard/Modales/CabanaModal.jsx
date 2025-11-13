@@ -1,5 +1,5 @@
 
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import PropTypes from 'prop-types';
 
 
@@ -16,10 +16,37 @@ const CabanaModal = ({
   selectedImages,
   setSelectedImages
 }) => {
-  const [ setProgress] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  
+  // Resetear estado cuando se abre el modal en modo crear
+  useEffect(() => {
+    if (mostrar && !modoEdicion && setSelectedImages) {
+      setSelectedImages([]);
+      setProgress(0);
+      setIsUploading(false);
+      setIsSubmitting(false);
+    }
+  }, [mostrar, modoEdicion, setSelectedImages]);
+
+  // Función auxiliar para finalizar upload
+  const finishUpload = () => {
+    setTimeout(() => setIsUploading(false), 500);
+  };
+
+  // Función auxiliar para actualizar progreso
+  const updateProgress = (count, total) => {
+    const progressValue = (count / total) * 100;
+    setProgress(progressValue);
+  };
+
+  // Función auxiliar para agregar imagen
+  const addImageToState = (imageData) => {
+    if (setSelectedImages && typeof setSelectedImages === 'function') {
+      setSelectedImages(prev => Array.isArray(prev) ? [...prev, imageData] : [imageData]);
+    }
+  };
 
   // Manejo de archivos seleccionados
   const handleFileSelection = (files) => {
@@ -28,13 +55,21 @@ const CabanaModal = ({
     const allowedTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif']);
 
     for (const file of Array.from(files)) {
-      if (!allowedTypes.includes(file.type)) return;
-      if (file.size > maxSize) return;
+      if (!allowedTypes.has(file.type)) {
+        console.warn(`Tipo de archivo no permitido: ${file.type}`);
+        continue;
+      }
+      if (file.size > maxSize) {
+        console.warn(`Archivo muy grande: ${file.name} (${file.size} bytes)`);
+        continue;
+      }
       validFiles.push(file);
-    };
+    }
 
     if (validFiles.length > 0) {
       uploadImages(validFiles);
+    } else {
+      alert('No se seleccionaron archivos válidos. Asegúrate de seleccionar imágenes JPG, PNG o GIF menores a 5MB.');
     }
   };
 
@@ -47,9 +82,8 @@ const CabanaModal = ({
     let uploadedCount = 0;
     const totalFiles = files.length;
 
-    for (const [index, file] of files.entries()) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
+    const handleFileLoad = (e, file, index) => {
+      try {
         const imageData = {
           id: Date.now() + index,
           file,
@@ -57,25 +91,105 @@ const CabanaModal = ({
           name: file.name
         };
 
-        setSelectedImages(prev => [...prev, imageData]);
-
+        addImageToState(imageData);
         uploadedCount++;
-        const progressValue = (uploadedCount / totalFiles) * 100;
-        setProgress(progressValue);
+        updateProgress(uploadedCount, totalFiles);
 
         if (uploadedCount === totalFiles) {
-          setTimeout(() => {
-            setIsUploading(false);
-          }, 500);
+          finishUpload();
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error procesando imagen:', error);
+        uploadedCount++;
+        if (uploadedCount === totalFiles) {
+          setIsUploading(false);
+        }
+      }
     };
+
+    const handleFileError = () => {
+      console.error('Error leyendo archivo');
+      uploadedCount++;
+      if (uploadedCount === totalFiles) {
+        setIsUploading(false);
+      }
+    };
+
+    for (const [index, file] of files.entries()) {
+      const reader = new FileReader();
+      reader.onload = (e) => handleFileLoad(e, file, index);
+      reader.onerror = handleFileError;
+      reader.readAsDataURL(file);
+    }
   };
 
   const removeImage = (id) => {
-    setSelectedImages(prev => prev.filter(img => img.id !== id));
+    if (setSelectedImages && typeof setSelectedImages === 'function') {
+      setSelectedImages(prev => Array.isArray(prev) ? prev.filter(img => img.id !== id) : []);
+    }
   };
+
+  // Función auxiliar para obtener texto del botón
+  const getButtonText = () => {
+    if (isSubmitting) {
+      return selectedImages.length > 0 ? 'Subiendo imágenes...' : 'Creando cabaña...';
+    }
+    return modoEdicion ? "Guardar Cambios" : "Crear Cabaña";
+  };
+
+  // Función auxiliar para preparar FormData con imágenes
+  const prepararFormDataConImagenes = () => {
+    const formData = new FormData();
+    
+    const cabanaData = modoEdicion ? cabanaSeleccionada : nuevaCabana;
+    
+    // Agregar campos básicos
+    formData.append('nombre', cabanaData.nombre);
+    formData.append('descripcion', cabanaData.descripcion);
+    formData.append('capacidad', Number(cabanaData.capacidad));
+    formData.append('categoria', String(cabanaData.categoria));
+    formData.append('precio', Number(cabanaData.precio));
+    formData.append('estado', cabanaData.estado);
+    
+    if (!modoEdicion && cabanaData.ubicacion) {
+      formData.append('ubicacion', cabanaData.ubicacion);
+    }
+    
+    return formData;
+  };
+
+  // Función auxiliar para agregar imágenes al FormData
+  const agregarImagenesAFormData = (formData) => {
+    for (const imageData of selectedImages) {
+      if (imageData.file) {
+        formData.append('imagen', imageData.file);
+      }
+    }
+  };
+
+  // Función mejorada para el submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      const tieneImagenes = !modoEdicion && selectedImages.length > 0;
+      
+      if (tieneImagenes) {
+        const formData = prepararFormDataConImagenes();
+        agregarImagenesAFormData(formData);
+        console.log('Enviando cabaña CON imágenes:', selectedImages.length, 'archivos');
+        await onSubmit(formData, true);
+      } else {
+        await onSubmit();
+      }
+    } catch (error) {
+      console.error('Error en handleSubmit:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (!mostrar) return null;
 
   return (
@@ -93,7 +207,7 @@ const CabanaModal = ({
             ✕
           </button>
         </div>
-        <form className="modal-body-admin" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
+        <form className="modal-body-admin" onSubmit={handleSubmit}>
           <div className="from-grid-admin">
             <div className="form-grupo-admin">
               <label htmlFor="nombre-cabana">Nombre:</label>
@@ -216,30 +330,103 @@ const CabanaModal = ({
             <div className="form-group-tesorero full-width">
               <label htmlFor="imageInput">Imagen</label>
               <div className="image-upload-container">
-                <button className="upload-area" onClick={() => !isUploading && document.getElementById('imageInput').click()}
-                  onDragOver={(e) => e.preventDefault()}
+                <button 
+                  type="button"
+                  className="upload-area" 
+                  onClick={() => !isUploading && document.getElementById('imageInput').click()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
                   onDrop={(e) => {
                     e.preventDefault();
-                    handleFileSelection(e.dataTransfer.files);
-                  }}>
+                    e.stopPropagation();
+                    if (isUploading) return;
+                    const files = e.dataTransfer?.files;
+                    if (files && files.length > 0) {
+                      handleFileSelection(files);
+                    }
+                  }}
+                  disabled={isUploading}
+                >
                   <div className="upload-content">
                     <i className="fas fa-cloud-upload-alt upload-icon"></i>
                     <h3>Arrastra y suelta tus imágenes aquí</h3>
                     <p>o <span className="browse-text">haz clic para seleccionar</span></p>
                     <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
                   </div>
-                  <input type="file" id='imageInput' multiple accept="image/*" hidden onChange={(e) => handleFileSelection(e.target.files)} />
+                  <input 
+                    type="file" 
+                    id='imageInput' 
+                    multiple 
+                    accept="image/jpeg,image/jpg,image/png,image/gif" 
+                    hidden 
+                    onChange={(e) => {
+                      const files = e.target?.files;
+                      if (files && files.length > 0) {
+                        handleFileSelection(files);
+                      }
+                      // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
+                      e.target.value = '';
+                    }} 
+                  />
                 </button>
 
+                {/* Barra de progreso */}
+                {isUploading && (
+                  <div style={{
+                    margin: '10px 0',
+                    padding: '10px',
+                    background: '#f8f9fa',
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef'
+                  }}>
+                    <div style={{
+                      width: '100%',
+                      height: '8px',
+                      backgroundColor: '#e9ecef',
+                      borderRadius: '4px',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{
+                        width: `${progress}%`,
+                        height: '100%',
+                        backgroundColor: '#007bff',
+                        transition: 'width 0.3s ease'
+                      }}></div>
+                    </div>
+                    <p style={{
+                      margin: '8px 0 0 0',
+                      fontSize: '14px',
+                      color: '#6c757d',
+                      textAlign: 'center'
+                    }}>
+                      Procesando imágenes... {Math.round(progress)}%
+                    </p>
+                  </div>
+                )}
 
                 <div className="image-preview-grid" id="imagePreviewGrid">
-                  {selectedImages.map(img => (
+                  {Array.isArray(selectedImages) && selectedImages.map(img => (
                     <div key={img.id} className="image-preview">
-                      <img src={img.url} alt={img.name} />
+                      <img src={img.url} alt={img.name || 'Imagen'} />
                       <div className="image-overlay">
                         <button type="button" className="remove-btn" onClick={() => removeImage(img.id)}>
                           <i className="fas fa-trash"></i>
                         </button>
+                      </div>
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '0',
+                        left: '0',
+                        right: '0',
+                        background: 'rgba(0,0,0,0.7)',
+                        color: 'white',
+                        padding: '4px 8px',
+                        fontSize: '11px',
+                        textAlign: 'center'
+                      }}>
+                        {img.name && img.name.length > 15 ? img.name.substring(0, 15) + '...' : (img.name || 'Sin nombre')}
                       </div>
                     </div>
                   ))}
@@ -252,13 +439,13 @@ const CabanaModal = ({
             Puedes seleccionar varias imágenes manteniendo presionada la tecla Ctrl o Shift
           </small>
           <div className="modal-action-admin">
-            <button className="btn-admin secondary-admin" type="button" onClick={onClose}>
+            <button className="btn-admin secondary-admin" type="button" onClick={onClose} disabled={isSubmitting}>
               <i className="fas fa-times"></i> {' '}
               Cancelar
             </button>
-            <button className="btn-admin btn-primary" type="submit">
+            <button className="btn-admin btn-primary" type="submit" disabled={isSubmitting}>
               <i className="fas fa-save"></i>
-              {modoEdicion ? "Guardar Cambios" : "Crear Cabaña"}
+              {getButtonText()}
             </button>
           </div>
         </form>

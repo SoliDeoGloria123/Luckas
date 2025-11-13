@@ -34,9 +34,15 @@ const ProgramaModal = ({
         cupos: programaSeleccionado.cuposDisponibles || '', // backend usa 'cuposDisponibles'
         profesor: programaSeleccionado.profesor || '',
         profesorBio: programaSeleccionado.profesorBio || '',
-        requisitos: programaSeleccionado.requisitos || [''],
-        pensum: programaSeleccionado.pensum || [{ modulo: '', descripcion: '', horas: '' }],
-        objetivos: programaSeleccionado.objetivos || [''],
+        requisitos: Array.isArray(programaSeleccionado.requisitos) 
+          ? programaSeleccionado.requisitos.map((req, i) => ({ id: `req_${i}`, value: req }))
+          : [{ id: 'req_0', value: '' }],
+        pensum: Array.isArray(programaSeleccionado.pensum) 
+          ? programaSeleccionado.pensum.map((mod, i) => ({ id: `pen_${i}`, ...mod }))
+          : [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
+        objetivos: Array.isArray(programaSeleccionado.objetivos)
+          ? programaSeleccionado.objetivos.map((obj, i) => ({ id: `obj_${i}`, value: obj }))
+          : [{ id: 'obj_0', value: '' }],
         metodologia: programaSeleccionado.metodologia || '',
         evaluacion: programaSeleccionado.evaluacion || '',
         certificacion: programaSeleccionado.certificacion || '',
@@ -187,8 +193,6 @@ const ProgramaModal = ({
               >
                 <option value="curso">Curso</option>
                 <option value="programa-tecnico">Programa Técnico</option>
-                <option value="diplomado">Diplomado</option>
-                <option value="certificacion">Certificación</option>
               </select>
             </div>
 

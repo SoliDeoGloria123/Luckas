@@ -13,6 +13,7 @@ exports.crearProgramaAcademico = async (req, res) => {
     }
     const nuevoPrograma = new ProgramaAcademico({
       nombre: datos.nombre,
+      tipo: datos.tipo || 'curso',
       descripcion: datos.descripcion,
       categoria: datos.categoria,
       modalidad: datos.modalidad,

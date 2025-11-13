@@ -2,6 +2,38 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const InscripcionCard = ({ inscripcion, onViewDetails }) => {
+  // Función para obtener el texto correcto del estado
+  const getStatusText = (estado) => {
+    const statusMap = {
+      'no inscrito': 'No Inscrito',
+      'inscrito': 'Inscrito',
+      'finalizado': 'Finalizado',
+      'preinscrito': 'Preinscrito',
+      'matriculado': 'Matriculado',
+      'en_curso': 'En Curso',
+      'certificado': 'Certificado',
+      'rechazada': 'Rechazada',
+      'cancelada academico': 'Cancelada'
+    };
+    return statusMap[estado] || estado;
+  };
+
+  // Función para obtener la clase CSS del estado
+  const getStatusClass = (estado) => {
+    const classMap = {
+      'inscrito': 'confirmada',
+      'matriculado': 'confirmada',
+      'en_curso': 'confirmada',
+      'certificado': 'confirmada',
+      'finalizado': 'confirmada',
+      'preinscrito': 'pendiente',
+      'no inscrito': 'pendiente',
+      'rechazada': 'cancelada',
+      'cancelada academico': 'cancelada'
+    };
+    return classMap[estado] || 'pendiente';
+  };
+
   return (
     <div className="inscripciones-container-misinscripciones">
       <div className="inscripcion-card-misinscripciones">
@@ -22,18 +54,25 @@ const InscripcionCard = ({ inscripcion, onViewDetails }) => {
             <div className="header-misinscripciones">
               <div className="inscripcion-title-section-misinscripciones">
                 <div className="inscripcion-title-row-misinscripciones">
-                  <h3 className="inscripcion-title-misinscripciones">{inscripcion.referencia?.nombre}</h3>
-                  <span className={`status-badge-misinscripciones ${inscripcion.estado.toLowerCase()}`}>
-                    {inscripcion.estado}
+                  <h3 className="inscripcion-title-misinscripciones">
+                    {inscripcion.referencia?.nombre || inscripcion.referencia?.titulo || 'Evento sin título'}
+                  </h3>
+                  <span className={`status-badge-misinscripciones ${getStatusClass(inscripcion.estado)}`}>
+                    {getStatusText(inscripcion.estado)}
                   </span>
                 </div>
+                {inscripcion.categoria && (
+                  <span className={`categoria-badge ${inscripcion.categoria.nombre?.toLowerCase().replaceAll(' ', '')}`}>
+                    {inscripcion.categoria.nombre}
+                  </span>
+                )}
               </div>
               <div className="inscripcion-price-section-misinscripciones">
                 <div className="inscripcion-price-misinscripciones">
                   {inscripcion.referencia?.precio || 'Precio no disponible'}
                 </div>
                 <div className="inscripcion-date-misinscripciones">
-                  Inscrito: {new Date(inscripcion.createdAt).toLocaleDateString()}
+                  Inscrito: {new Date(inscripcion.fechaInscripcion || inscripcion.createdAt).toLocaleDateString()}
                 </div>
               </div>
             </div>
@@ -49,19 +88,24 @@ const InscripcionCard = ({ inscripcion, onViewDetails }) => {
               <div className="detail-row-misinscripciones">
                 <i className="fas fa-clock"></i>
                 <span>
-                  Hora Inicio: {inscripcion.referencia?.horaInicio || 'Horario no disponible'} - 
-                  Hora Fin: {inscripcion.referencia?.horaFin || 'Horario no disponible'}
+                  {inscripcion.referencia?.horaInicio && inscripcion.referencia?.horaFin
+                    ? `${inscripcion.referencia.horaInicio} - ${inscripcion.referencia.horaFin}`
+                    : 'Horario no disponible'}
                 </span>
               </div>
               <div className="detail-row-misinscripciones">
                 <i className="fas fa-map-marker-alt"></i>
                 <span>{inscripcion.referencia?.lugar || 'Ubicación no disponible'}</span>
               </div>
+              <div className="detail-row-misinscripciones">
+                <i className="fas fa-user"></i>
+                <span>{inscripcion.nombre} {inscripcion.apellido}</span>
+              </div>
             </div>
             <div className="inscripcion-footer-misinscripciones">
               <div className="status-info-misinscripciones">
-                <i className={`fas status-icon-misinscripciones ${inscripcion.estado.toLowerCase()}`}></i>
-                <span className="status-text-misinscripciones">{inscripcion.estado}</span>
+                <i className={`fas status-icon-misinscripciones ${getStatusClass(inscripcion.estado)}`}></i>
+                <span className="status-text-misinscripciones">{getStatusText(inscripcion.estado)}</span>
               </div>
               <div className="inscripcion-actions-misinscripciones">
                 <button className="btn-outline-misinscripciones" onClick={() => onViewDetails(inscripcion)}>
@@ -83,8 +127,15 @@ InscripcionCard.propTypes = {
     estado: PropTypes.string.isRequired,
     tipoReferencia: PropTypes.string,
     createdAt: PropTypes.string,
+    fechaInscripcion: PropTypes.string,
+    nombre: PropTypes.string,
+    apellido: PropTypes.string,
+    categoria: PropTypes.shape({
+      nombre: PropTypes.string
+    }),
     referencia: PropTypes.shape({
       nombre: PropTypes.string,
+      titulo: PropTypes.string,
       precio: PropTypes.string,
       fechaEvento: PropTypes.string,
       horaInicio: PropTypes.string,

@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-import { Menu, Search, Sun, Moon, Bell } from 'lucide-react';
+import { Menu, Search, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
+import NotificationButton from '../Shared/NotificationButton';
 
 
 
@@ -51,10 +52,12 @@ const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard"
       } else {
         localStorage.removeItem('token');
         localStorage.removeItem('usuario');
-        globalThis.location.href = '/login';
+        globalThis.location.href = '/cerrar-sesion';
+    
       }
     }, 100);
   };
+  
   const perfil = () => {
     navigate('/admin/perfil');
   };
@@ -106,11 +109,11 @@ const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard"
             )}
           </button>
 
-          {/* Notifications con pulse */}
-          <button className="relative p-2 rounded-xl glass-card transition-all duration-300 icon-bounce" style={{ color: 'var(--text-secondary)' }}>
-            <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full pulse-notification"></span>
-          </button>
+          {/* Notifications con sistema de notificaciones */}
+          <NotificationButton 
+            token={localStorage.getItem('token')} 
+            userRole={usuarioLogueado?.role || ''} 
+          />
 
           {/* User Menu Premium */}
           <div className="relative" ref={menuRef}>

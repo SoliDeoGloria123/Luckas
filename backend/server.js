@@ -46,8 +46,8 @@ app.use(cors({
     ],
     credentials: true
 }));
-app.use(express.json()); // Para parsear JSON
-app.use(express.urlencoded({ extended: true })); // Para parsear URL-encoded
+app.use(express.json({ limit: '50mb' })); // Para parsear JSON con límite aumentado
+app.use(express.urlencoded({ extended: true, limit: '50mb' })); // Para parsear URL-encoded con límite aumentado
 
 // Servir archivos estáticos del frontend
 app.use('/Externo', express.static(path.join(__dirname, '../frontend/public/Externo')));

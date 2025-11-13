@@ -57,20 +57,34 @@ const Gestioncategorizacion = () => {
     setShowModal(true);
   };
 
-  
-    // Paginación
-    const [paginaActual, setPaginaActual] = useState(1);
-    const registrosPorPagina = 10;
-    const totalPaginas = Math.ceil(categorias.length / registrosPorPagina);
-    const categorizacionPaginados = categorias.slice(
-      (paginaActual - 1) * registrosPorPagina,
-      paginaActual * registrosPorPagina
-    );
-  
-    // Reiniciar a la página 1 si cambia el filtro de usuarios
-    useEffect(() => {
-      setPaginaActual(1);
-    }, [categorias]);
+  //descativar y activar categoria
+
+  const handleToggleEstado = async (categoria) => {
+    const nuevoEstado = categoria.estado === "activo" ? "inactivo" : "activo";
+    try {
+      await categorizacionService.toggleActivation(categoria._id, nuevoEstado);
+      mostrarAlerta("¡Éxito!", `Categoría actualizada a ${nuevoEstado}`);
+      obtenerCategorias(); // refresca la lista
+    } catch (error) {
+      mostrarAlerta("Error", `No se pudo actualizar el estado: ${error.message}`);
+    }
+  };
+
+
+
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
+  const totalPaginas = Math.ceil(categorias.length / registrosPorPagina);
+  const categorizacionPaginados = categorias.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+
+  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [categorias]);
 
   return (
     <>
@@ -183,26 +197,36 @@ const Gestioncategorizacion = () => {
                 <tbody id="usersTableBody">
                   {categorias.length === 0 ? (
                     <tr>
-                      <td colSpan={5}>no hay categorias para mostrar</td>
+                      <td colSpan={6}>no hay categorias para mostrar</td>
                     </tr>
                   ) : (
                     categorizacionPaginados.map((cate) => (
                       <tr key={cate._id}>
-
                         <td>{cate._id}</td>
                         <td>{cate.nombre}</td>
                         <td>{cate.tipo}</td>
                         <td>{cate.codigo}</td>
                         <td>
-                          <span className={`badge-tesorero badge-tesorero-${cate.activo ? 'activo' : 'desactivado'}`}>
-                            {cate.activo ? 'activo' : 'desactivado'}
+                          <span className={`badge-tesorero badge-tesorero-${cate.estado === 'activo' ? 'activo' : 'desactivado'}`}>
+                            {cate.estado === 'activo' ? 'ACTIVO' : 'INACTIVO'}
                           </span>
                         </td>
-
                         <td className="whitespace-nowrap px-6 py-4">
-                          <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(cate)} size="icon">
-                            <Edit className="h-4 w-4" />
-                          </button>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(cate)} size="icon">
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              className={`btn-action ${cate.estado === 'activo' ? 'desactivar' : 'activar'} text-red-600 hover:bg-red-50 rounded transition-colors`}
+                              onClick={() => handleToggleEstado(cate)}
+                            >
+                              {cate.estado === 'activo' ? (
+                                <i className="fas fa-ban"></i>
+                              ) : (
+                                <i className="fas fa-check"></i>
+                              )}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -211,28 +235,28 @@ const Gestioncategorizacion = () => {
               </table>
             </div>
           </div>
-          
+
         </div>
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
-            <button
-              className="pagination-btn-admin"
+          <button
+            className="pagination-btn-admin"
             onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
             disabled={paginaActual === 1}
-            >
-              <i className="fas fa-chevron-left"></i>
-            </button>
-            <span className="pagination-info-admin">
-              Página {paginaActual} de {totalPaginas}
-            </span>
-          
-            <button
-              className="pagination-btn-admin"
+          >
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          <span className="pagination-info-admin">
+            Página {paginaActual} de {totalPaginas}
+          </span>
+
+          <button
+            className="pagination-btn-admin"
             onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-          disabled={paginaActual === totalPaginas || totalPaginas === 0}
-            >
-              <i className="fas fa-chevron-right"></i>
-            </button>
-          </div>
+            disabled={paginaActual === totalPaginas || totalPaginas === 0}
+          >
+            <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
         {showModal && (
           <CategorizacionModal
             mode={modalMode}

@@ -40,7 +40,7 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    globalThis.location.href = '/';
+    globalThis.location.href = '/cerrar-sesion';
   };
 
   const [showUserDropdown, setShowUserDropdown] = useState(false);

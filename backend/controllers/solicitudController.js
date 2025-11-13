@@ -1,6 +1,48 @@
 const Solicitud = require('../models/Solicitud');
 const { validationResult } = require('express-validator');
 const { construirFiltros, configurarPaginacion, generarPipelineEstadisticasSolicitudes } = require('../utils/solicitudUtils');
+const { notificarNuevaSolicitud } = require('../utils/notificationUtils');
+const Usuario = require('../models/User');
+
+// Función auxiliar para validar modeloReferencia
+const validarModeloReferencia = (tipoSolicitud, modeloReferencia) => {
+  if (tipoSolicitud === 'Inscripción' || tipoSolicitud === 'Hospedaje') {
+    if (!modeloReferencia) {
+      return 'modeloReferencia es requerido para solicitudes de Inscripción y Hospedaje';
+    }
+    
+    if (tipoSolicitud === 'Inscripción' && !['Eventos', 'ProgramaAcademico'].includes(modeloReferencia)) {
+      return 'Para solicitudes de Inscripción, modeloReferencia debe ser "Eventos" o "ProgramaAcademico"';
+    }
+    
+    if (tipoSolicitud === 'Hospedaje' && modeloReferencia !== 'Cabana') {
+      return 'Para solicitudes de Hospedaje, modeloReferencia debe ser "Cabana"';
+    }
+  }
+  return null;
+};
+
+// Función auxiliar para determinar responsable
+const determinarResponsable = (bodyResponsable, reqUserId, reqUser) => {
+  let responsable = bodyResponsable;
+  if (!responsable || responsable === "" || responsable === null || responsable === undefined) {
+    responsable = reqUserId || reqUser?.id || reqUser?._id;
+  }
+  return responsable;
+};
+
+// Función auxiliar para enviar notificaciones
+const enviarNotificacionSiCorresponde = async (solicitudGuardada, reqUserId) => {
+  try {
+    const usuarioCreador = await Usuario.findById(reqUserId);
+    if (usuarioCreador && !['admin', 'tesorero'].includes(usuarioCreador.role)) {
+      await notificarNuevaSolicitud(solicitudGuardada, usuarioCreador);
+      console.log('✅ Notificación de nueva solicitud enviada correctamente');
+    }
+  } catch (notificationError) {
+    console.error('❌ Error al enviar notificación de nueva solicitud:', notificationError);
+  }
+};
 
 
 
@@ -14,6 +56,9 @@ exports.obtenerSolicitudes = async (req, res) => {
 
       // Obtener solicitudes con paginación
       const solicitudes = await Solicitud.find(filtros)
+        .populate('solicitante', 'username nombre apellido correo telefono numeroDocumento tipoDocumento role')
+        .populate('categoria', 'nombre codigo')
+        .populate('responsable', 'username nombre apellido correo telefono role')
         .sort({ [sortBy]: sortOrder })
         .skip(skip)
         .limit(limit);
@@ -99,30 +144,14 @@ exports.obtenerSolicitudes = async (req, res) => {
         });
       }
 
-      // Validación personalizada para modeloReferencia y referencia
+      // Validación personalizada para modeloReferencia
       const { tipoSolicitud, modeloReferencia } = req.body;
-      
-      if ((tipoSolicitud === 'Inscripción' || tipoSolicitud === 'Hospedaje')) {
-        if (!modeloReferencia) {
-          return res.status(400).json({
-            success: false,
-            message: 'modeloReferencia es requerido para solicitudes de Inscripción y Hospedaje'
-          });
-        }
-        
-        if (tipoSolicitud === 'Inscripción' && !['Eventos', 'ProgramaAcademico'].includes(modeloReferencia)) {
-          return res.status(400).json({
-            success: false,
-            message: 'Para solicitudes de Inscripción, modeloReferencia debe ser "Eventos" o "ProgramaAcademico"'
-          });
-        }
-        
-        if (tipoSolicitud === 'Hospedaje' && modeloReferencia !== 'Cabana') {
-          return res.status(400).json({
-            success: false,
-            message: 'Para solicitudes de Hospedaje, modeloReferencia debe ser "Cabana"'
-          });
-        }
+      const errorModeloReferencia = validarModeloReferencia(tipoSolicitud, modeloReferencia);
+      if (errorModeloReferencia) {
+        return res.status(400).json({
+          success: false,
+          message: errorModeloReferencia
+        });
       }
 
       // Debug información
@@ -134,12 +163,8 @@ exports.obtenerSolicitudes = async (req, res) => {
       // Generar título automáticamente si no viene
       const titulo = req.body.titulo || `Solicitud de ${req.body.tipoSolicitud} - ${new Date().toLocaleDateString()}`;
       
-      // El responsable será el usuario que crea la solicitud si no se especifica
-      let responsable = req.body.responsable;
-      if (!responsable || responsable === "" || responsable === null || responsable === undefined) {
-        responsable = req.userId || req.user?.id || req.user?._id;
-      }
-
+      // Determinar responsable
+      const responsable = determinarResponsable(req.body.responsable, req.userId, req.user);
       console.log('responsable final:', responsable);
       
       // Validar que el responsable sea válido
@@ -173,6 +198,9 @@ exports.obtenerSolicitudes = async (req, res) => {
       });
 
       const solicitudGuardada = await nuevaSolicitud.save();
+
+      // Enviar notificación si corresponde
+      await enviarNotificacionSiCorresponde(solicitudGuardada, req.userId);
 
       res.status(201).json({
         success: true,

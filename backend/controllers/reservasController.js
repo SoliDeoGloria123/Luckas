@@ -3,6 +3,94 @@ const Reserva = require('../models/Reservas');
 const Solicitud = require('../models/Solicitud');
 const Usuario = require('../models/User');
 const Cabana = require('../models/Cabana');
+const { notificarNuevaReserva } = require('../utils/notificationUtils');
+
+// Función auxiliar para validar campos requeridos
+const validarCamposRequeridos = (body) => {
+  const camposRequeridos = [
+    'usuario', 'cabana', 'fechaInicio', 'fechaFin', 'nombre', 'apellido', 
+    'tipoDocumento', 'numeroDocumento', 'correoElectronico', 'telefono', 'numeroPersonas'
+  ];
+  
+  const camposFaltantes = [];
+  for (const campo of camposRequeridos) {
+    if (!body[campo]) {
+      camposFaltantes.push(campo);
+    }
+  }
+  
+  return camposFaltantes;
+};
+
+// Función auxiliar para validar IDs
+const validarIds = (usuario, cabana) => {
+  if (!mongoose.Types.ObjectId.isValid(usuario)) {
+    return { error: 'ID de usuario inválido' };
+  }
+  if (!mongoose.Types.ObjectId.isValid(cabana)) {
+    return { error: 'ID de cabaña inválido' };
+  }
+  return { error: null };
+};
+
+// Función auxiliar para validar existencia de usuario y cabaña
+const validarExistencia = async (usuario, cabana) => {
+  const usuarioExiste = await Usuario.findById(usuario);
+  if (!usuarioExiste) {
+    return { error: 'Usuario no encontrado' };
+  }
+
+  const cabanaExiste = await Cabana.findById(cabana);
+  if (!cabanaExiste) {
+    return { error: 'Cabaña no encontrada' };
+  }
+
+  console.log('Usuario encontrado:', usuarioExiste.nombre, usuarioExiste.apellido);
+  console.log('Cabaña encontrada:', cabanaExiste.nombre);
+  
+  return { usuarioExiste, cabanaExiste, error: null };
+};
+
+// Función auxiliar para validar enums
+const validarEnums = (body) => {
+  const tiposValidos = ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad'];
+  if (!tiposValidos.includes(body.tipoDocumento)) {
+    return { error: `Tipo de documento inválido. Debe ser: ${tiposValidos.join(', ')}` };
+  }
+
+  const estadosValidos = ['Pendiente', 'Confirmada', 'Cancelada', 'finalizada'];
+  if (body.estado && !estadosValidos.includes(body.estado)) {
+    return { error: `Estado inválido. Debe ser: ${estadosValidos.join(', ')}` };
+  }
+
+  return { error: null };
+};
+
+// Función auxiliar para crear la solicitud asociada
+const crearSolicitudAsociada = async (reserva, usuarioExiste, cabanaExiste) => {
+  const solicitud = new Solicitud({
+    solicitante: usuarioExiste._id,
+    responsable: usuarioExiste._id,
+    titulo: cabanaExiste.nombre || 'Reserva de cabaña',
+    correo: usuarioExiste.correo,
+    telefono: usuarioExiste.telefono,
+    tipoSolicitud: 'Hospedaje',
+    categoria: cabanaExiste.categoria,
+    descripcion: `Reserva de cabaña ${cabanaExiste.nombre}`,
+    estado: 'Nueva',
+    origin: 'reserva',
+    prioridad: 'Media',
+    modeloReferencia: 'Reserva',
+    referencia: reserva._id
+  });
+  
+  await solicitud.save();
+  console.log('Solicitud creada:', solicitud._id);
+  
+  // Enlazar la solicitud a la reserva
+  reserva.solicitud = solicitud._id;
+  await reserva.save();
+};
 
 // Crear reserva
 exports.crearReserva = async (req, res) => {
@@ -14,19 +102,8 @@ exports.crearReserva = async (req, res) => {
 
     const { usuario, cabana } = req.body;
 
-    // Validar campos requeridos según el modelo
-    const camposRequeridos = [
-      'usuario', 'cabana', 'fechaInicio', 'fechaFin', 'nombre', 'apellido', 
-      'tipoDocumento', 'numeroDocumento', 'correoElectronico', 'telefono', 'numeroPersonas'
-    ];
-    
-    const camposFaltantes = [];
-    for (const campo of camposRequeridos) {
-      if (!req.body[campo]) {
-        camposFaltantes.push(campo);
-      }
-    }
-    
+    // Validar campos requeridos
+    const camposFaltantes = validarCamposRequeridos(req.body);
     if (camposFaltantes.length > 0) {
       console.log('❌ CAMPOS FALTANTES:', camposFaltantes);
       return res.status(400).json({ 
@@ -36,59 +113,38 @@ exports.crearReserva = async (req, res) => {
     }
 
     // Validar IDs
-    if (!mongoose.Types.ObjectId.isValid(usuario)) {
-      console.log('Error: ID de usuario inválido:', usuario);
-      return res.status(400).json({ success: false, message: 'ID de usuario inválido' });
-    }
-    if (!mongoose.Types.ObjectId.isValid(cabana)) {
-      console.log('Error: ID de cabaña inválido:', cabana);
-      return res.status(400).json({ success: false, message: 'ID de cabaña inválido' });
+    const validacionIds = validarIds(usuario, cabana);
+    if (validacionIds.error) {
+      console.log('Error:', validacionIds.error);
+      return res.status(400).json({ success: false, message: validacionIds.error });
     }
 
     // Validar existencia
-    const usuarioExiste = await Usuario.findById(usuario);
-    if (!usuarioExiste) {
-      console.log('Error: Usuario no encontrado:', usuario);
-      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
-    }
-    console.log('Usuario encontrado:', usuarioExiste.nombre, usuarioExiste.apellido);
-
-    const cabanaExiste = await Cabana.findById(cabana);
-    if (!cabanaExiste) {
-      console.log('Error: Cabaña no encontrada:', cabana);
-      return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
-    }
-    console.log('Cabaña encontrada:', cabanaExiste.nombre);
-
-    // Validar enum de tipoDocumento
-    const tiposValidos = ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad'];
-    if (!tiposValidos.includes(req.body.tipoDocumento)) {
-      console.log('❌ TIPO DE DOCUMENTO INVÁLIDO:', req.body.tipoDocumento);
-      return res.status(400).json({ 
-        success: false, 
-        message: `Tipo de documento inválido. Debe ser: ${tiposValidos.join(', ')}` 
-      });
+    const validacionExistencia = await validarExistencia(usuario, cabana);
+    if (validacionExistencia.error) {
+      console.log('Error:', validacionExistencia.error);
+      return res.status(404).json({ success: false, message: validacionExistencia.error });
     }
 
-    // Validar estado si se proporciona
-    const estadosValidos = ['Pendiente', 'Confirmada', 'Cancelada', 'finalizada'];
-    if (req.body.estado && !estadosValidos.includes(req.body.estado)) {
-      console.log('❌ ESTADO INVÁLIDO:', req.body.estado);
-      return res.status(400).json({ 
-        success: false, 
-        message: `Estado inválido. Debe ser: ${estadosValidos.join(', ')}` 
-      });
+    const { usuarioExiste, cabanaExiste } = validacionExistencia;
+
+    // Validar enums
+    const validacionEnums = validarEnums(req.body);
+    if (validacionEnums.error) {
+      console.log('❌ ERROR ENUM:', validacionEnums.error);
+      return res.status(400).json({ success: false, message: validacionEnums.error });
     }
 
     console.log('✅ Validaciones pasadas, creando reserva...');
 
-    // Forzar el campo activo a booleano
+    // Procesar campo activo
     let activo = req.body.activo;
     if (typeof activo === 'string') {
       activo = activo === 'true';
     } else if (typeof activo !== 'boolean') {
-      activo = true; // valor por defecto
+      activo = true;
     }
+
     // Crear reserva
     const reserva = new Reserva({
       usuario: req.body.usuario,
@@ -111,40 +167,19 @@ exports.crearReserva = async (req, res) => {
     
     console.log('🔄 GUARDANDO RESERVA:', JSON.stringify(reserva.toObject(), null, 2));
     
-    try {
-      await reserva.save();
-      console.log('✅ Reserva creada exitosamente:', reserva._id);
-    } catch (saveError) {
-      console.log('❌ ERROR AL GUARDAR RESERVA:', saveError.message);
-      console.log('❌ DETALLES DEL ERROR:', saveError);
-      return res.status(400).json({ 
-        success: false, 
-        message: `Error al guardar reserva: ${saveError.message}` 
-      });
-    }
-
-    // Crear solicitud asociada (opcional)
-    const solicitud = new Solicitud({
-      solicitante: usuarioExiste._id,
-      responsable: usuarioExiste._id,
-      titulo: cabanaExiste.nombre || 'Reserva de cabaña',
-      correo: usuarioExiste.correo,
-      telefono: usuarioExiste.telefono,
-      tipoSolicitud: 'Hospedaje',
-      categoria: cabanaExiste.categoria,
-      descripcion: `Reserva de cabaña ${cabanaExiste.nombre}`,
-      estado: 'Nueva',
-      origin: 'reserva',
-      prioridad: 'Media',
-      modeloReferencia: 'Reserva',
-      referencia: reserva._id
-    });
-    await solicitud.save();
-    console.log('Solicitud creada:', solicitud._id);
-
-    // Enlazar la solicitud a la reserva
-    reserva.solicitud = solicitud._id;
     await reserva.save();
+    console.log('✅ Reserva creada exitosamente:', reserva._id);
+
+    // Crear solicitud asociada
+    await crearSolicitudAsociada(reserva, usuarioExiste, cabanaExiste);
+
+    // Enviar notificación a administradores y tesoreros
+    try {
+      await notificarNuevaReserva(reserva, usuarioExiste, cabanaExiste);
+      console.log('✅ Notificación de reserva enviada correctamente');
+    } catch (notificationError) {
+      console.error('❌ Error al enviar notificación de reserva:', notificationError);
+    }
 
     console.log('=== FIN DEBUG RESERVA ===');
     res.status(201).json({ success: true, data: reserva });

@@ -69,11 +69,17 @@ const MisInscripciones = () => {
       });
   }, [userId]);
 
-  // Calcular estadísticas en tiempo real
+  // Calcular estadísticas en tiempo real basadas en los estados reales del backend
   const stats = {
-    confirmadas: inscripciones.filter(i => i.estado === 'Confirmada').length,
-    pendientes: inscripciones.filter(i => i.estado === 'Pendiente').length,
-    canceladas: inscripciones.filter(i => i.estado === 'Cancelada').length,
+    confirmadas: inscripciones.filter(i => 
+      ['inscrito', 'matriculado', 'en_curso', 'certificado', 'finalizado'].includes(i.estado)
+    ).length,
+    pendientes: inscripciones.filter(i => 
+      ['no inscrito', 'preinscrito'].includes(i.estado)
+    ).length,
+    canceladas: inscripciones.filter(i => 
+      ['rechazada', 'cancelada academico'].includes(i.estado)
+    ).length,
     total: inscripciones.length
   };
 
@@ -150,9 +156,12 @@ const MisInscripciones = () => {
           onFilterChange={filterInscripciones}
           filterOptions={[
             { value: 'Todas', label: 'Todas' },
-            { value: 'Confirmada', label: 'Confirmada' },
-            { value: 'Pendiente', label: 'Pendiente' },
-            { value: 'Cancelada', label: 'Cancelada' }
+            { value: 'inscrito', label: 'Inscrito' },
+            { value: 'preinscrito', label: 'Preinscrito' },
+            { value: 'matriculado', label: 'Matriculado' },
+            { value: 'en_curso', label: 'En Curso' },
+            { value: 'finalizado', label: 'Finalizado' },
+            { value: 'rechazada', label: 'Rechazada' }
           ]}
         />
         {/* Lista de inscripciones */}

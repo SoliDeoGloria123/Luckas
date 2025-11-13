@@ -86,21 +86,38 @@ const Gestionevento = () => {
     setMostrarModalDetalle(true);
   };
 
-  const handleSubmit = async (data) => {
-    if (modalMode === 'create') {
+  const handleSubmit = async (data, mode, isFormData = false) => {
+    const currentMode = mode || modalMode;
+    
+    console.log('HandleSubmit - Modo:', currentMode);
+    console.log('HandleSubmit - Es FormData:', isFormData);
+    console.log('HandleSubmit - Tiene archivos:', isFormData && data.has && data.has('imagen'));
+    
+    if (currentMode === 'create') {
       try {
-        await eventService.createEvent(data);
-        mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
+        const resultado = await eventService.createEvent(data, isFormData);
+        console.log('Evento creado exitosamente:', resultado);
+        
+        const mensaje = isFormData 
+          ? "¡Evento creado exitosamente con imágenes!" 
+          : "¡Evento creado exitosamente!";
+        
+        mostrarAlerta("¡Éxito!", mensaje);
         obtenerEventos();
       } catch (error) {
+        console.error('Error creando evento:', error);
         mostrarAlerta("ERROR", `Error al crear el evento: ${error.message}`);
       }
     } else {
       try {
-        await eventService.updateEvent(currentItem._id, data);
-        mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
+        await eventService.updateEvent(currentItem._id, data, isFormData);
+        const mensaje = isFormData 
+          ? "¡Evento actualizado exitosamente con imágenes!" 
+          : "¡Evento actualizado exitosamente!";
+        mostrarAlerta("¡Éxito!", mensaje);
         obtenerEventos();
       } catch (error) {
+        console.error('Error actualizando evento:', error);
         mostrarAlerta("ERROR", `Error al actualizar el evento: ${error.message}`);
       }
     }
@@ -225,185 +242,196 @@ const Gestionevento = () => {
                 </div>
               );
             }
-            
+
             if (eventosFiltrados.length > 0) {
               return eventosPaginados.map((evento) => {
-              const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
-              const imgIndex = imgIndices[evento._id] || 0;
-              
-              // Determinar clases para el estado del evento
-              let estadoClases = 'bg-amber-500/90 text-white';
-              if (evento.estado === 'activo') {
-                estadoClases = 'bg-emerald-500/90 text-white';
-              } else if (evento.estado === 'inactivo') {
-                estadoClases = 'bg-red-500/90 text-white';
-              } else if (evento.estado === 'finalizado') {
-                estadoClases = 'bg-gray-500/90 text-white';
-              }
-              
-              return (
-                <div key={evento._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-                  {/* Imagen del evento */}
-                  <div className="relative h-64 bg-gradient-to-r from-blue-500 to-purple-600">
+                const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
+                const imgIndex = imgIndices[evento._id] || 0;
 
-                    {imagenes.length > 0 ? (
-                      <>
-                        <img
-                          src={imagenes[imgIndex]}
-                          alt={evento.nombre}
-                          className="w-full h-64 object-cover"
-                          style={{ borderRadius: '1rem' }}
-                        />
-                        {imagenes.length > 1 && (
-                          <>
-                            <button
-                              onClick={() => prevImg(evento._id, imagenes.length)}
-                              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
-                              style={{ zIndex: 2 }}
-                            >
-                              {"<"}
-                            </button>
-                            <button
-                              onClick={() => nextImg(evento._id, imagenes.length)}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
-                              style={{ zIndex: 2 }}
-                            >
-                              {">"}
-                            </button>
-                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                              {imagenes.map((_, idx) => (
-                                <span
-                                  key={`dot-${evento._id}-${idx}`}
-                                  className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
-                                />
-                              ))}
-                            </div>
-                          </>
-                        )}
-                      </>
-                    ) : (
-                      <div className="flex items-center justify-center w-full h-64 text-white text-4xl">
-                        <span>📅</span>
-                      </div>
-                    )}
-                    {/* Badges */}
-                    <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                      <span className="px-3 py-1 bg-white/90 text-slate-800 text-xs font-medium rounded-full">
-                        {/*tipoEvento.label*/}
-                      </span>
-                      {evento.destacado && (
-                        <span className="px-3 py-1 bg-yellow-500/90 text-white text-xs font-medium rounded-full flex items-center">
-                          <Star className="w-3 h-3 mr-1" />
-                          Destacado
-                        </span>
-                      )}
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClases}`}>
-                        {evento.estado}
-                      </span>
-                    </div>
+                // Determinar clases para el estado del evento
+                let estadoClases = 'bg-amber-500/90 text-white';
+                if (evento.estado === 'activo') {
+                  estadoClases = 'bg-emerald-500/90 text-white';
+                } else if (evento.estado === 'inactivo') {
+                  estadoClases = 'bg-red-500/90 text-white';
+                } else if (evento.estado === 'finalizado') {
+                  estadoClases = 'bg-gray-500/90 text-white';
+                }
 
-                    {/* Botones de acción */}
-                    <div className="flex  justify-end  gap-2  px-6 py-3 ">
-                      <button
-                        onClick={() => abrirModalVer(evento)}
-                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                        title="Ver detalles"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
+                return (
+                  <div key={evento._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                    {/* Imagen del evento */}
+                    <div className="relative h-64 bg-gradient-to-r from-blue-500 to-purple-600">
 
-                      <button
-                        onClick={() => onEditar(evento)}
-                        className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors "
-                        title="Editar"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-
-                    </div>
-                  </div>
-
-                  {/* Contenido del evento */}
-                  <div className="p-6 space-y-4">
-                    <div>
-                      <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-2">{evento.nombre}</h3>
-                      <p className="text-slate-600 text-sm line-clamp-3">{evento.descripcion}</p>
-                    </div>
-
-                    <div className="space-y-3">
-                      {/* Fechas */}
-                      <div className="flex items-center space-x-2 text-sm">
-                        <Calendar className="w-4 h-4 text-blue-600" />
-                        <span className="text-slate-600">
-
-                        </span>
-                      </div>
-
-                      {/* Ubicación */}
-                      {evento.ubicacion && (
-                        <div className="flex items-center space-x-2 text-sm">
-                          <MapPin className="w-4 h-4 text-red-600" />
-                          <span className="text-slate-600 line-clamp-1">{evento.ubicacion}</span>
+                      {imagenes.length > 0 ? (
+                        <>
+                          <img
+                            src={imagenes[imgIndex]}
+                            alt={evento.nombre}
+                            className="w-full h-64 object-cover"
+                            style={{ borderRadius: '1rem' }}
+                          />
+                          {imagenes.length > 1 && (
+                            <>
+                              <button
+                                onClick={() => prevImg(evento._id, imagenes.length)}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
+                                style={{ zIndex: 2 }}
+                              >
+                                {"<"}
+                              </button>
+                              <button
+                                onClick={() => nextImg(evento._id, imagenes.length)}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
+                                style={{ zIndex: 2 }}
+                              >
+                                {">"}
+                              </button>
+                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                                {imagenes.map((_, idx) => (
+                                  <span
+                                    key={`dot-${evento._id}-${idx}`}
+                                    className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-64 text-white text-4xl">
+                          <span>📅</span>
                         </div>
                       )}
+                      {/* Badges */}
+                      <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                        <span className="px-3 py-1 bg-white/90 text-slate-800 text-xs font-medium rounded-full">
+                          {/*tipoEvento.label*/}
+                        </span>
+                        {evento.destacado && (
+                          <span className="px-3 py-1 bg-yellow-500/90 text-white text-xs font-medium rounded-full flex items-center">
+                            <Star className="w-3 h-3 mr-1" />
+                            Destacado
+                          </span>
+                        )}
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClases}`}>
+                          {evento.estado}
+                        </span>
+                      </div>
 
-                      {/* Horario */}
-                      {(evento.horaInicio || evento.horaFin) && (
+                      {/* Botones de acción */}
+                      <div className="flex  justify-end  gap-2  px-6 py-3 ">
+                        <button
+                          onClick={() => abrirModalVer(evento)}
+                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          title="Ver detalles"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => onEditar(evento)}
+                          className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors "
+                          title="Editar"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+
+                      </div>
+                    </div>
+
+                    {/* Contenido del evento */}
+                    <div className="p-6 space-y-4">
+                      <div>
+                        <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-2">{evento.nombre}</h3>
+                        <p className="text-slate-600 text-sm line-clamp-3">{evento.descripcion}</p>
+                      </div>
+
+                      <div className="space-y-3">
+                        {/* Fechas */}
                         <div className="flex items-center space-x-2 text-sm">
-                          <Clock className="w-4 h-4 text-purple-600" />
+                          <Calendar className="w-4 h-4 text-blue-600" />
                           <span className="text-slate-600">
-                            {evento.horaInicio} {evento.horaFin && `- ${evento.horaFin}`}
+                            {evento.fechaEvento ? new Date(evento.fechaEvento).toLocaleDateString() : 'N/A'}
                           </span>
                         </div>
-                      )}
 
-                      {/* Capacidad */}
-                      {evento.capacidadMaxima && (
+                        {/* Ubicación */}
+
+                        <div className="flex items-center space-x-2 text-sm">
+                          <MapPin className="w-4 h-4 text-red-600" />
+                          <span className="text-slate-600 line-clamp-1">{evento.lugar || "N/A"}</span>
+                        </div>
+
+
+                        {/* Horario */}
+                        {(evento.horaInicio || evento.horaFin) && (
+                          <div className="flex items-center space-x-2 text-sm">
+                            <Clock className="w-4 h-4 text-purple-600" />
+                            <span className="text-slate-600">
+                              {evento.horaInicio} {evento.horaFin && `- ${evento.horaFin}`}
+                            </span>
+                             <span className="ml-2 text-xs text-slate-500">
+                      ({evento.duracionDias} día{evento.duracionDias > 1 ? 's' : ''})
+                    </span>
+                          </div>
+                        )}
+
+                        {/* Capacidad */}
+
                         <div className="flex items-center space-x-2 text-sm">
                           <Users className="w-4 h-4 text-green-600" />
-                          <span className="text-slate-600">Máximo {evento.capacidadMaxima} participantes</span>
+                          <span className="text-slate-600">Máximo {evento.cuposDisponibles} participantes</span>
                         </div>
-                      )}
 
-                      {/* Precio */}
-                      {evento.precio && (
+
+                        {/* Precio */}
+
                         <div className="flex items-center space-x-2 text-sm">
                           <DollarSign className="w-4 h-4 text-emerald-600" />
                           <span className="font-semibold text-emerald-600">
-                            {/*formatearPrecio(evento.precio)*/}
+                            {evento.precio}
                           </span>
                         </div>
+
+                        <div className="flex items-center space-x-2 text-sm">
+                    
+                          <span className="text-xs">
+                            Estado: {evento.active ? 'Activo' : 'Inactivo'}
+                          </span>
+                        </div>
+
+
+
+                        {/* Servicios incluidos */}
+                        <div className="flex flex-wrap gap-2">
+                          {evento.incluyeAlojamiento && (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-lg">
+                              🏠 Alojamiento
+                            </span>
+                          )}
+                          {evento.incluyeAlimentacion && (
+                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-lg">
+                              🍽️ Alimentación
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Coordinador */}
+                      {evento.coordinador && (
+                        <div className="pt-3 border-t border-slate-200/50">
+                          <p className="text-sm text-slate-600">
+                            <span className="font-medium">Coordinador:</span> {evento.coordinador}
+                          </p>
+                        </div>
                       )}
-
-                      {/* Servicios incluidos */}
-                      <div className="flex flex-wrap gap-2">
-                        {evento.incluyeAlojamiento && (
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-lg">
-                            🏠 Alojamiento
-                          </span>
-                        )}
-                        {evento.incluyeAlimentacion && (
-                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-lg">
-                            🍽️ Alimentación
-                          </span>
-                        )}
-                      </div>
                     </div>
-
-                    {/* Coordinador */}
-                    {evento.coordinador && (
-                      <div className="pt-3 border-t border-slate-200/50">
-                        <p className="text-sm text-slate-600">
-                          <span className="font-medium">Coordinador:</span> {evento.coordinador}
-                        </p>
-                      </div>
-                    )}
                   </div>
-                </div>
-              );
-            });
+                );
+              });
             }
-            
+
             return (
               <div className="col-span-full text-center py-12">
                 <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
@@ -484,8 +512,8 @@ const Gestionevento = () => {
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
-          disabled={paginaActual === 1}
+            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+            disabled={paginaActual === 1}
           >
             <i className="fas fa-chevron-left"></i>
           </button>
@@ -494,8 +522,8 @@ const Gestionevento = () => {
           </span>
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-          disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+            disabled={paginaActual === totalPaginas || totalPaginas === 0}
           >
             <i className="fas fa-chevron-right"></i>
           </button>

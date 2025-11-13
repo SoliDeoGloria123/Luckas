@@ -36,10 +36,14 @@ const GestionEventos = () => {
     horaInicio: "",
     horaFin: "",
     lugar: "",
+    direccion: "",
+    duracionDias: 1,
     cuposTotales: 0,
     cuposDisponibles: 0,
     prioridad: "Media",
     active: true,
+    etiquetas: "",
+    observaciones: "",
     imagen: ""
   });
   const [categorias, setCategorias] = useState([]);
@@ -72,42 +76,43 @@ const GestionEventos = () => {
     obtenerCategorias();
   }, []);
 
-  // Crear evento
-  const crearEvento = async () => {
-    try {
-      const formData = new globalThis.FormData();
-      for (const [key, value] of Object.entries(nuevoEvento)) {
-        // Si es etiquetas y es string, separa por coma
-        if (key === 'etiquetas' && typeof value === 'string') {
-          value.split(',').map(et => formData.append('etiquetas', et.trim()));
-        } else {
-          formData.append(key, value);
-        }
-      };
-      // Agregar imágenes
-      for (const imgObj of selectedImages) {
-        if (imgObj.file) formData.append('imagen', imgObj.file);
+  // Función auxiliar para preparar FormData del evento
+  const prepararFormDataEvento = () => {
+    const formData = new globalThis.FormData();
+    for (const [key, value] of Object.entries(nuevoEvento)) {
+      if (key === 'etiquetas' && typeof value === 'string') {
+        value.split(',').map(et => formData.append('etiquetas', et.trim()));
+      } else {
+        formData.append(key, value);
       }
-      await eventService.createEvent(formData, true); // true: indica FormData
-      mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
-      setMostrarModal(false);
-      setNuevoEvento({
-        nombre: "",
-        descripcion: "",
-        categoria: "",
-        fechaEvento: "",
-        horaInicio: "",
-        horaFin: "",
-        lugar: "",
-        prioridad: "Media",
-        precio: 0,
-        cuposTotales: 0,
-        cuposDisponibles: 0,
-        active: true,
-        imagen: ""
-      });
-      setSelectedImages([]);
-      obtenerEventos();
+    }
+    // Agregar imágenes
+    for (const imgObj of selectedImages) {
+      if (imgObj.file) formData.append('imagen', imgObj.file);
+    }
+    return formData;
+  };
+
+  // Función auxiliar para resetear el formulario
+  const resetearFormulario = () => {
+    setMostrarModal(false);
+    resetearEstadoEvento();
+    setSelectedImages([]);
+    obtenerEventos();
+  };
+
+  // Crear evento
+  const crearEvento = async (formDataFromModal = null, isFormData = false) => {
+    try {
+      if (formDataFromModal && isFormData) {
+        await eventService.createEvent(formDataFromModal, true);
+        mostrarAlerta("¡Éxito!", "Evento creado exitosamente con imágenes");
+      } else {
+        const formData = prepararFormDataEvento();
+        await eventService.createEvent(formData, true);
+        mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
+      }
+      resetearFormulario();
     } catch (error) {
       mostrarAlerta("Error", `Error al crear el evento: ${error.message}`);
     }
@@ -148,9 +153,8 @@ const GestionEventos = () => {
     setEventoDetalle(evento);
     setMostrarModalDetalle(true);
   };
-  // Abrir modal para crear
-  const abrirModalCrear = () => {
-    setModoEdicion(false);
+  // Función auxiliar para resetear estado inicial del evento
+  const resetearEstadoEvento = () => {
     setNuevoEvento({
       nombre: "",
       descripcion: "",
@@ -160,12 +164,22 @@ const GestionEventos = () => {
       horaInicio: "",
       horaFin: "",
       lugar: "",
+      direccion: "",
+      duracionDias: 1,
       cuposTotales: 0,
       cuposDisponibles: 0,
       prioridad: "Media",
       active: true,
+      etiquetas: "",
+      observaciones: "",
       imagen: ""
     });
+  };
+
+  // Abrir modal para crear
+  const abrirModalCrear = () => {
+    setModoEdicion(false);
+    resetearEstadoEvento();
     setMostrarModal(true);
   };
 
@@ -207,7 +221,7 @@ const GestionEventos = () => {
           setSidebarAbierto={setSidebarAbierto}
           seccionActiva={seccionActiva}
         />
-        <div className="space-y-7 fade-in-up p-9">
+        <div>
           {/* Header */}
           <div className="page-header-Academicos">
             <div className="page-title-admin">
@@ -371,7 +385,7 @@ const GestionEventos = () => {
             setNuevoEvento={setNuevoEvento}
             categorias={categorias}
             onClose={() => setMostrarModal(false)}
-            onSubmit={modoEdicion ? actualizarEvento : crearEvento}
+            onSubmit={modoEdicion ? actualizarEvento : (formData, isFormData) => crearEvento(formData, isFormData)}
             selectedImages={selectedImages}
             setSelectedImages={setSelectedImages}
           />

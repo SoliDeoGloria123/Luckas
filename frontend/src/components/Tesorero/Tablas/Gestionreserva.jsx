@@ -102,20 +102,20 @@ const Gestionreserva = () => {
     };
   };
 
-  
-    // Paginación
-    const [paginaActual, setPaginaActual] = useState(1);
-    const registrosPorPagina = 10;
-    const totalPaginas = Math.ceil(reservas.length / registrosPorPagina);
-    const reservasPaginadas = reservas.slice(
-      (paginaActual - 1) * registrosPorPagina,
-      paginaActual * registrosPorPagina
-    );
-  
-    // Reiniciar a la página 1 si cambia el filtro de usuarios
-    useEffect(() => {
-      setPaginaActual(1);
-    }, [reservas]);
+
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
+  const totalPaginas = Math.ceil(reservas.length / registrosPorPagina);
+  const reservasPaginadas = reservas.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+
+  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [reservas]);
 
   return (
     <>
@@ -212,18 +212,24 @@ const Gestionreserva = () => {
                 <thead>
                   <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
 
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >ID</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >USUARIOS</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >CÉDULA</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >CABAÑA</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >FECHA INCIO</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >FECHA FIN</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >PRECIO</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >ESTADO</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >OBSERVACION</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >SOLICITUD</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >ACTIVO</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >ACCIONES</th>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Cabaña</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Fin</th>
+                    <th>Número de Personas</th>
+                    <th>Tipo de Documento</th>
+                    <th>Número de Documento</th>
+                    <th>Correo Electrónico</th>
+                    <th>Teléfono</th>
+                    <th>Propósito de Estadía</th>
+                    <th>Estado</th>
+                    <th>Observaciones</th>
+                    <th>Solicitud</th>
+                    <th>Activo</th>
+                    <th>Fecha de creación</th>
+                    <th>Fecha de actualización</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
@@ -238,11 +244,7 @@ const Gestionreserva = () => {
                             ? reser.usuario?.username || reser.usuario?.nombre || reser.usuario?.correo || reser.usuario?._id || "N/A"
                             : reser.usuario || "N/A"}
                         </td>
-                        <td>
-                          {typeof reser.usuario === "object"
-                            ? reser.usuario?.numeroDocumento || "N/A"
-                            : "N/A"}
-                        </td>
+
                         <td>
                           {typeof reser.cabana === "object"
                             ? reser.cabana?.nombre || reser.cabana?._id || "N/A"
@@ -250,27 +252,32 @@ const Gestionreserva = () => {
                         </td>
                         <td>{reser.fechaInicio ? new Date(reser.fechaInicio).toLocaleDateString() : ""}</td>
                         <td>{reser.fechaFin ? new Date(reser.fechaFin).toLocaleDateString() : ""}</td>
-                        <td>
-                          <span className='price-cell-tesorero'>
-                            ${reser.precio}
-                          </span>
+                        <td>{reser.numeroPersonas || "N/A"}</td>
+                        <td>{reser.tipoDocumento || "N/A"}</td>
+                        <td>{reser.numeroDocumento || "N/A"}</td>
+                        <td>{reser.correoElectronico || "N/A"}</td>
+                        <td>{reser.telefono || "N/A"}</td>
+                        <td>{reser.propositoEstadia || "N/A"}</td>
 
-                        </td>
                         <td>
                           <span className={`badge-tesorero badge-tesorero-${reser.estado} `}>
                             {reser.estado}
                           </span>
 
                         </td>
-                        <td>{reser.observaciones}</td>
+                        <td>{reser.observaciones || "N/A"}</td>
                         <td>
-                          {typeof reser.solicitud === "object" ? reser.solicitud?._id || "N/A" : reser.solicitud || "N/A"}
+                          {typeof reser.solicitud === "object"
+                            ? reser.solicitud?._id || "N/A"
+                            : reser.solicitud || "N/A"}
                         </td>
-                        <td>
+                       <td>
                           <span className={`status-badge status-${reser.activo ? 'Activo' : 'Desactivado'}`}>
                             {reser.activo ? 'Activo' : 'Desactivado'}
                           </span>
                         </td>
+                       <td>{reser.createdAt ? new Date(reser.createdAt).toLocaleDateString() : "N/A"}</td>
+                       <td>{reser.updatedAt ? new Date(reser.updatedAt).toLocaleDateString() : "N/A"}</td>
                         <td className="whitespace-nowrap px-6 py-4">
                           <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(reser)}>
                             <Edit className="h-4 w-4" />
@@ -288,18 +295,18 @@ const Gestionreserva = () => {
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
-          disabled={paginaActual === 1}
+            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+            disabled={paginaActual === 1}
           >
             <i className="fas fa-chevron-left"></i>
           </button>
           <span className="pagination-info-admin">
-             Página {paginaActual} de {totalPaginas || 1} 
+            Página {paginaActual} de {totalPaginas || 1}
           </span>
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-          disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+            disabled={paginaActual === totalPaginas || totalPaginas === 0}
           >
             <i className="fas fa-chevron-right"></i>
           </button>

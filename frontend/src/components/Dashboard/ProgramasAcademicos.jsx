@@ -4,6 +4,7 @@ import { programasAcademicosService } from '../../services/programasAcademicosSe
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import ProgramaModal from './Modales/ProgramaModal';
+import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import {
     Plus,
     Search
@@ -40,9 +41,9 @@ const ProgramasAcademicos = () => {
         cupos: '',
         profesor: '',
         profesorBio: '',
-        requisitos: [''],
-        pensum: [{ modulo: '', descripcion: '', horas: '' }],
-        objetivos: [''],
+        requisitos: [{ id: 'req_0', value: '' }],
+        pensum: [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
+        objetivos: [{ id: 'obj_0', value: '' }],
         metodologia: '',
         evaluacion: '',
         certificacion: '',
@@ -92,25 +93,80 @@ const ProgramasAcademicos = () => {
         }
     };
 
-
-
-    const eliminarPrograma = async (id) => {
-        if (!globalThis.confirm('¿Estás seguro de que deseas eliminar este programa?')) return;
-
-        try {
-            await programasAcademicosService.deletePrograma(id);
-            cargarProgramas();
-            mostrarMensaje('Programa eliminado exitosamente', 'success');
-        } catch (error) {
-            console.error('Error al eliminar programa:', error);
-        }
-    };
-
-
     const mostrarMensaje = (mensaje, tipo) => {
         // Implementar sistema de notificaciones
         alert(mensaje);
     };
+
+    // Crear programa
+    const crearPrograma = async (e) => {
+        if (e) e.preventDefault();
+        setCargando(true);
+        
+        try {
+            const categoriaId = encontrarCategoriaId();
+            
+            if (!categoriaId) {
+                mostrarMensaje('No hay categorías disponibles. Por favor, contacte al administrador.', 'error');
+                return;
+            }
+            const dataToSend = mapearDatosParaEnvio(categoriaId);
+             await programasAcademicosService.createPrograma(dataToSend);
+            mostrarAlerta('¡Éxito!', 'Programa creado exitosamente');
+            cerrarModal();
+            cargarProgramas();
+        } catch (error) {
+            console.error('Error al crear programa:', error);
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    // Actualizar programa
+    const actualizarPrograma = async (e) => {
+        if (e) e.preventDefault();
+        setCargando(true);
+        
+        try {
+            const categoriaId = encontrarCategoriaId();
+            
+            if (!categoriaId) {
+                mostrarMensaje('No hay categorías disponibles. Por favor, contacte al administrador.', 'error');
+                return;
+            }
+            const dataToSend = mapearDatosParaEnvio(categoriaId);
+            await programasAcademicosService.updatePrograma(programaSeleccionado._id, dataToSend);
+            mostrarAlerta('Éxito!', 'Programa actualizado exitosamente');
+            cerrarModal();
+            cargarProgramas();
+        } catch (error) {
+            console.error('Error al actualizar programa:', error);
+            mostrarMensaje(`Error al actualizar el programa: ${error.message}`, 'error');
+        } finally {
+            setCargando(false);
+        }
+    };
+
+        // Eliminar programa
+    const eliminarPrograma = async (id) => {
+        const confirmado = await mostrarConfirmacion(
+            "¿Estás seguro?",
+            "Esta acción eliminará el programa de forma permanente."
+        );
+
+        if (!confirmado) return;
+
+        try {
+            await programasAcademicosService.deletePrograma(id);
+           mostrarAlerta('¡Éxito!', 'Programa eliminado exitosamente');
+            cargarProgramas();
+        } catch (error) {
+            console.error('Error al eliminar programa:', error);
+            mostrarMensaje(`No se pudo eliminar el programa: ${error.message}`, 'error');
+        }
+    };
+
+
 
     // Funciones del modal
     const abrirModalCrear = () => {
@@ -128,9 +184,9 @@ const ProgramasAcademicos = () => {
             cupos: '',
             profesor: '',
             profesorBio: '',
-            requisitos: [''],
-            pensum: [{ modulo: '', descripcion: '', horas: '' }],
-            objetivos: [''],
+            requisitos: [{ id: 'req_0', value: '' }],
+            pensum: [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
+            objetivos: [{ id: 'obj_0', value: '' }],
             metodologia: '',
             evaluacion: '',
             certificacion: '',
@@ -172,6 +228,7 @@ const ProgramasAcademicos = () => {
 
     const mapearDatosParaEnvio = (categoriaId) => ({
         nombre: formData.titulo,
+        tipo: formData.tipo || 'curso',
         descripcion: formData.descripcion,
         categoria: categoriaId,
         modalidad: formData.modalidad,
@@ -182,8 +239,16 @@ const ProgramasAcademicos = () => {
         cuposDisponibles: Number.parseInt(formData.cupos) || 0,
         profesor: formData.profesor,
         nivel: 'básico',
-        requisitos: formData.requisitos ? formData.requisitos.filter(req => req.trim() !== '') : [],
-        objetivos: formData.objetivos ? formData.objetivos.filter(obj => obj.trim() !== '') : [],
+        requisitos: Array.isArray(formData.requisitos) 
+            ? formData.requisitos
+                .filter(req => req && (req.value ? req.value.trim() !== '' : req.trim() !== ''))
+                .map(req => req.value || req)
+            : [],
+        objetivos: Array.isArray(formData.objetivos)
+            ? formData.objetivos
+                .filter(obj => obj && (obj.value ? obj.value.trim() !== '' : obj.trim() !== ''))
+                .map(obj => obj.value || obj)
+            : [],
         metodologia: formData.metodologia || '',
         evaluacion: formData.evaluacion || '',
         certificacion: formData.certificacion === 'si' || formData.certificacion === true,
@@ -191,71 +256,41 @@ const ProgramasAcademicos = () => {
         estado: 'activo'
     });
 
-    const ejecutarOperacionPrograma = async (dataToSend) => {
-        if (modoEdicion && programaSeleccionado) {
-            console.log('Actualizando programa:', programaSeleccionado._id);
-            return await programasAcademicosService.updatePrograma(programaSeleccionado._id, dataToSend);
-        } else {
-            console.log('Creando nuevo programa...');
-            return await programasAcademicosService.createPrograma(dataToSend);
-        }
-    };
 
-    const manejarErrorSubmit = (error) => {
-        console.error('Error completo al guardar programa:', error);
-        if (error.response) {
-            console.error('Respuesta de error:', error.response.data);
-           
-        } else {
-            console.error('Mensaje de error:', error.message);
-        }
-    };
 
     const handleSubmitModal = async (e) => {
-        e.preventDefault();
-        setCargando(true);
-        
-        try {
-            console.log('=== DEBUG MODAL SUBMIT ===');
-            console.log('FormData del modal:', formData);
-            console.log('Categorías disponibles:', categorias);
-
-            const categoriaId = encontrarCategoriaId();
-            
-            if (!categoriaId) {
-                console.error('No hay categorías disponibles. Por favor, contacte al administrador.');
-                return;
-            }
-
-            const dataToSend = mapearDatosParaEnvio(categoriaId);
-            console.log('Datos mapeados para enviar:', dataToSend);
-
-            const response = await ejecutarOperacionPrograma(dataToSend);
-            console.log('Respuesta del servidor:', response);
-
-            if (response.success) {
-                await cargarProgramas();
-                cerrarModal();
-                mostrarMensaje(
-                    modoEdicion ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente',
-                    'success'
-                );
-            } else {
-                console.error('Error al guardar el programa:', response.message);
-            }
-        } catch (error) {
-            manejarErrorSubmit(error);
-        } finally {
-            setCargando(false);
+        if (modoEdicion) {
+            await actualizarPrograma(e);
+        } else {
+            await crearPrograma(e);
         }
     };
 
+
+    // Filtrado de programas
+    const programasFiltrados = programas.filter(programa => {
+        const coincideBusqueda = !filtros.busqueda || 
+            programa.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+            programa.descripcion?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+            programa.profesor?.toLowerCase().includes(filtros.busqueda.toLowerCase());
+
+        const coincideTipo = !filtros.tipo || programa.tipo === filtros.tipo;
+
+        const coincideModalidad = !filtros.modalidad || programa.modalidad === filtros.modalidad;
+
+        return coincideBusqueda && coincideTipo && coincideModalidad;
+    });
+
+    // Resetear paginación cuando cambien los filtros
+    useEffect(() => {
+        setPaginaActual(1);
+    }, [filtros]);
 
     // Paginación para programas académicos
     const [paginaActual, setPaginaActual] = useState(1);
     const registrosPorPagina = 8;
-    const totalPaginas = Math.ceil(programas.length / registrosPorPagina);
-    const programasPaginados = programas.slice(
+    const totalPaginas = Math.ceil(programasFiltrados.length / registrosPorPagina);
+    const programasPaginados = programasFiltrados.slice(
         (paginaActual - 1) * registrosPorPagina,
         paginaActual * registrosPorPagina
     );
@@ -297,7 +332,7 @@ const ProgramasAcademicos = () => {
                     setSidebarAbierto={setSidebarAbierto}
                     seccionActiva={seccionActiva}
                 />
-                <div className="space-y-7 fade-in-up p-9">
+                <div>
                     {/* Header */}
                     <div  className="page-header-Academicos">
                         <div className="page-title-admin">
@@ -388,9 +423,11 @@ const ProgramasAcademicos = () => {
                                 onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
                                 className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                             >
-                                <option value="todos">Todos los tipos</option>
+                                <option value="">Todos los tipos</option>
                                 <option value="curso">Cursos</option>
                                 <option value="programa-tecnico">Programas Técnicos</option>
+                                <option value="diplomado">Diplomados</option>
+                                <option value="certificacion">Certificaciones</option>
                             </select>
 
                             <select
@@ -405,7 +442,7 @@ const ProgramasAcademicos = () => {
                             </select>
 
                             <div className="text-sm text-slate-600 flex items-center">
-                                <span className="font-medium">{/*programasFiltrados.length*/}</span> programa(s) encontrado(s)
+                                <span className="font-medium">{programasFiltrados.length}</span> programa(s) encontrado(s)
                             </div>
                         </div>
                     </div>

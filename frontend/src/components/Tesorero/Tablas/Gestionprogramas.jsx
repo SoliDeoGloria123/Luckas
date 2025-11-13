@@ -20,6 +20,21 @@ const Gestioncursos = () => {
   // --- CREAR Y EDITAR PROGRAMA ---
   // formData: { titulo, descripcion, tipo, modalidad, duracion, precio, fechaInicio, fechaFin, cupos, profesor, ... }
   const handleGuardarPrograma = async (formData, modoEdicion, idPrograma) => {
+    // Procesar arrays de objetos a arrays de strings
+    const procesarRequisitos = (requisitos) => {
+      if (!Array.isArray(requisitos)) return [];
+      return requisitos
+        .map(req => typeof req === 'object' ? req.value : req)
+        .filter(req => req && req.trim() !== '');
+    };
+
+    const procesarObjetivos = (objetivos) => {
+      if (!Array.isArray(objetivos)) return [];
+      return objetivos
+        .map(obj => typeof obj === 'object' ? obj.value : obj)
+        .filter(obj => obj && obj.trim() !== '');
+    };
+
     // Adaptar los campos del formulario al modelo del backend
     const payload = {
       nombre: formData.titulo,
@@ -32,16 +47,24 @@ const Gestioncursos = () => {
       fechaFin: formData.fechaFin,
       cuposDisponibles: Number(formData.cupos),
       profesor: formData.profesor,
-      requisitos: formData.requisitos || [],
+      profesorBio: formData.profesorBio || '',
+      requisitos: procesarRequisitos(formData.requisitos),
       pensum: formData.pensum || [],
-      objetivos: formData.objetivos || [],
+      objetivos: procesarObjetivos(formData.objetivos),
       metodologia: formData.metodologia || '',
       evaluacion: formData.evaluacion || '',
-      certificacion: formData.certificacion || false,
-      imagen: formData.imagen || '',
-      destacado: formData.destacado || false
-      // Puedes agregar más campos si tu modelo lo requiere
+      certificacion: Boolean(formData.certificacion) || false,
+      imagen: formData.imagen || ''
     };
+
+    // Solo agregar destacado si está definido
+    if (formData.destacado !== undefined) {
+      payload.destacado = formData.destacado;
+    }
+    
+    // Usar un ObjectId válido por defecto para categoría
+    // Este debe existir en la base de datos o el backend debe manejarlo
+    payload.categoria = '507f1f77bcf86cd799439011'; // ObjectId válido genérico
     try {
       setCargando(true);
       if (modoEdicion && idPrograma) {
@@ -78,6 +101,8 @@ const Gestioncursos = () => {
   const [modalMode, setModalMode] = useState('create');
   const [currentItem, setCurrentItem] = useState(null);
   const [cargando, setCargando] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
   const programas = cursos;
 
   // Estado para el formulario del modal
@@ -93,42 +118,20 @@ const Gestioncursos = () => {
     cupos: '',
     profesor: '',
     profesorBio: '',
-    requisitos: [''],
-    pensum: [{ modulo: '', descripcion: '', horas: '' }],
-    objetivos: [''],
+    requisitos: [{ id: 'req_0', value: '' }],
+    pensum: [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
+    objetivos: [{ id: 'obj_0', value: '' }],
     metodologia: '',
     evaluacion: '',
-    certificacion: '',
+    certificacion: false,
     imagen: '',
     destacado: false
   });
 
   // Funciones del modal
   const abrirModalVer = (programa) => {
-    setModalMode('view');
-    setCurrentItem(programa);
-    setFormData({
-      titulo: programa.nombre || '',
-      descripcion: programa.descripcion || '',
-      tipo: programa.tipo || 'curso',
-      modalidad: programa.modalidad || 'presencial',
-      duracion: programa.duracion || '',
-      precio: programa.precio || '',
-      fechaInicio: programa.fechaInicio ? programa.fechaInicio.split('T')[0] : '',
-      fechaFin: programa.fechaFin ? programa.fechaFin.split('T')[0] : '',
-      cupos: programa.cuposDisponibles || '',
-      profesor: programa.profesor || '',
-      profesorBio: programa.profesorBio || '',
-      requisitos: programa.requisitos || [''],
-      pensum: programa.pensum || [{ modulo: '', descripcion: '', horas: '' }],
-      objetivos: programa.objetivos || [''],
-      metodologia: programa.metodologia || '',
-      evaluacion: programa.evaluacion || '',
-      certificacion: programa.certificacion || '',
-      imagen: programa.imagen || '',
-      destacado: programa.destacado || false
-    });
-    setShowModal(true);
+    setSelectedProgram(programa);
+    setShowDetailModal(true);
   };
 
   const abrirModalEditar = (programa) => {
@@ -147,12 +150,18 @@ const Gestioncursos = () => {
       cupos: programa.cuposDisponibles || '',
       profesor: programa.profesor || '',
       profesorBio: programa.profesorBio || '',
-      requisitos: programa.requisitos || [''],
-      pensum: programa.pensum || [{ modulo: '', descripcion: '', horas: '' }],
-      objetivos: programa.objetivos || [''],
+      requisitos: Array.isArray(programa.requisitos) 
+        ? programa.requisitos.map((req, i) => ({ id: `req_${i}`, value: req }))
+        : [{ id: 'req_0', value: '' }],
+      pensum: Array.isArray(programa.pensum) 
+        ? programa.pensum.map((mod, i) => ({ id: `pen_${i}`, ...mod }))
+        : [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
+      objetivos: Array.isArray(programa.objetivos)
+        ? programa.objetivos.map((obj, i) => ({ id: `obj_${i}`, value: obj }))
+        : [{ id: 'obj_0', value: '' }],
       metodologia: programa.metodologia || '',
       evaluacion: programa.evaluacion || '',
-      certificacion: programa.certificacion || '',
+      certificacion: programa.certificacion || false,
       imagen: programa.imagen || '',
       destacado: programa.destacado || false
     });
@@ -175,12 +184,12 @@ const Gestioncursos = () => {
       cupos: '',
       profesor: '',
       profesorBio: '',
-      requisitos: [''],
-      pensum: [{ modulo: '', descripcion: '', horas: '' }],
-      objetivos: [''],
+      requisitos: [{ id: 'req_0', value: '' }],
+      pensum: [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
+      objetivos: [{ id: 'obj_0', value: '' }],
       metodologia: '',
       evaluacion: '',
-      certificacion: '',
+      certificacion: false,
       imagen: '',
       destacado: false
     });
@@ -205,7 +214,7 @@ const Gestioncursos = () => {
   //obtener cursos
 
   const cargarProgramas = async () => {
-    setLoading(true);
+  setCargando(true);
     try {
       const response = await programasAcademicosService.getAllProgramas(filtros);
       if (response.success) {
@@ -213,9 +222,8 @@ const Gestioncursos = () => {
       }
     } catch (error) {
       console.error('Error al cargar programas:', error);
-      setError('Error al cargar los programas académicos');
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
   useEffect(() => {
@@ -508,18 +516,86 @@ const Gestioncursos = () => {
           })()}
         </div>
 
+
+
         {/* Modal de Programas */}
         {showModal && (
           <ProgramaModal
             mostrar={showModal}
             modoEdicion={modalMode === 'edit'}
-            modoVista={modalMode === 'view'}
             programaSeleccionado={currentItem}
             formData={formData}
             setFormData={setFormData}
             onClose={() => setShowModal(false)}
             onSubmit={handleSubmitModal}
           />
+        )}
+
+        {/* Modal de Detalles del Programa */}
+        {showDetailModal && selectedProgram && (
+          <div className="modal-overlay-tesorero">
+            <div className="tesorero-modal">
+              <div className="modal-header-tesorero">
+                <h2>Detalle del Programa</h2>
+                <button className="close-btn" onClick={() => setShowDetailModal(false)}>×</button>
+              </div>
+              <div className="modal-body-tesorero">
+                <div className="programa-detalle-card">
+                  {selectedProgram.imagen && (
+                    <div className="programa-detalle-imagen">
+                      <img src={selectedProgram.imagen} alt="Imagen del programa" style={{maxWidth:'100%',borderRadius:'8px',marginBottom:'1rem'}} />
+                    </div>
+                  )}
+                  <div className="programa-detalle-info">
+                    <div className="detalle-row"><span className="detalle-label">Título:</span> <span>{selectedProgram.nombre}</span></div>
+                    <div className="detalle-row"><span className="detalle-label">Tipo:</span> <span>{selectedProgram.tipo === 'curso' ? 'Curso' : 'Programa Técnico'}</span></div>
+                    <div className="detalle-row"><span className="detalle-label">Descripción:</span> <span>{selectedProgram.descripcion}</span></div>
+                    <div className="detalle-row"><span className="detalle-label">Modalidad:</span> <span>{selectedProgram.modalidad}</span></div>
+                    <div className="detalle-row"><span className="detalle-label">Duración:</span> <span>{selectedProgram.duracion}</span></div>
+                    <div className="detalle-row"><span className="detalle-label">Fecha de Inicio:</span> <span>{selectedProgram.fechaInicio ? selectedProgram.fechaInicio.split('T')[0] : 'No definida'}</span></div>
+                    <div className="detalle-row"><span className="detalle-label">Fecha de Fin:</span> <span>{selectedProgram.fechaFin ? selectedProgram.fechaFin.split('T')[0] : 'No definida'}</span></div>
+                    <div className="detalle-row"><span className="detalle-label">Precio:</span> <span>${selectedProgram.precio}</span></div>
+                    <div className="detalle-row"><span className="detalle-label">Cupos Disponibles:</span> <span>{selectedProgram.cuposDisponibles}</span></div>
+                    <div className="detalle-row"><span className="detalle-label">Profesor:</span> <span>{selectedProgram.profesor}</span></div>
+                    {selectedProgram.profesorBio && <div className="detalle-row"><span className="detalle-label">Biografía del Profesor:</span> <span>{selectedProgram.profesorBio}</span></div>}
+                    {selectedProgram.metodologia && <div className="detalle-row"><span className="detalle-label">Metodología:</span> <span>{selectedProgram.metodologia}</span></div>}
+                    {selectedProgram.evaluacion && <div className="detalle-row"><span className="detalle-label">Sistema de Evaluación:</span> <span>{selectedProgram.evaluacion}</span></div>}
+                    {selectedProgram.certificacion && <div className="detalle-row"><span className="detalle-label">Certificación:</span> <span>{selectedProgram.certificacion}</span></div>}
+                    <div className="detalle-row"><span className="detalle-label">Programa Destacado:</span> <span>{selectedProgram.destacado ? 'Sí' : 'No'}</span></div>
+                    {selectedProgram.requisitos && selectedProgram.requisitos.length > 0 && (
+                      <div className="detalle-row">
+                        <span className="detalle-label">Requisitos:</span>
+                        <ul style={{margin:0,paddingLeft:'1.2em'}}>
+                          {selectedProgram.requisitos.map((req, index) => req && <li key={`req-${index}-${req.substring(0, 10)}`}>{req}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {selectedProgram.objetivos && selectedProgram.objetivos.length > 0 && (
+                      <div className="detalle-row">
+                        <span className="detalle-label">Objetivos:</span>
+                        <ul style={{margin:0,paddingLeft:'1.2em'}}>
+                          {selectedProgram.objetivos.map((obj, index) => obj && <li key={`obj-${index}-${obj.substring(0, 10)}`}>{obj}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {selectedProgram.pensum && selectedProgram.pensum.length > 0 && (
+                      <div className="detalle-row">
+                        <span className="detalle-label">Pensum Académico:</span>
+                        <ul style={{margin:0,paddingLeft:'1.2em'}}>
+                          {selectedProgram.pensum.map((mod, index) => (
+                            <li key={`pensum-${index}-${(mod.modulo || '').substring(0, 10)}`}><b>{mod.modulo}</b>: {mod.descripcion} ({mod.horas} horas)</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                  <div className="modal-footer-tesorero" style={{marginTop:'2rem'}}>
+                    <button type="button" className="cancel-btn" onClick={() => setShowDetailModal(false)}>Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
           <button

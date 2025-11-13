@@ -41,7 +41,12 @@ import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
 import Perfil from './components/Seminarista/Shared/MiPerfil';
 import Configuracion from './components/Seminarista/pages/configuracion';
-import PanelPrincipal from './components/Panel Principal/Panel'
+import PanelPrincipal from './components/Panel Principal/Panel';
+import CerrarSesion from './components/cerrar sesion/cerrarsesion';
+import Error404 from './components/Páginas de error/Error404';
+import Error400 from './components/Páginas de error/Error400';
+import Error500 from './components/Páginas de error/Error500';
+import Error503 from './components/Páginas de error/Error503';
 
 
 // Componente para usuarios externos
@@ -97,6 +102,13 @@ function App() {
         <Route path="/dashboard/seminarista/nueva-solicitud" element={<NuevaSolicitud />} />
         <Route path="/dashboard/seminarista/Mi-Perfil" element={<Perfil />} />
         <Route path="/dashboard/seminarista/Configuracion" element={<Configuracion />} />
+        {/* Ruta para cerrar sesión */}
+        <Route path="/cerrar-sesion" element={<CerrarSesion />} />
+        {/* Ruta para página de error 404 */}
+        <Route path="*" element={<Error404 />} />
+        <Route path="/error400" element={<Error400 />} />
+        <Route path="/error500" element={<Error500 />} />
+        <Route path="/error503" element={<Error503 />} />
       </Routes>
     </Router>
   );

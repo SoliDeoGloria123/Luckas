@@ -230,22 +230,32 @@ body {
     letter-spacing: 0.025em;
 }
 
-.status-badge.aprobada {
+.status-badge.Aprobada {
     background-color: #dcfce7;
     color: #16a34a;
 }
 
-.status-badge.revision {
+.status-badge.Completada {
+    background-color: #dcfce7;
+    color: #059669;
+}
+
+.status-badge.En.Revisión {
     background-color: #e0e7ff;
     color: #7c3aed;
 }
 
-.status-badge.pendiente {
+.status-badge.Nueva {
     background-color: #fef3c7;
     color: #f59e0b;
 }
 
-.status-badge.rechazada {
+.status-badge.Pendiente.Info {
+    background-color: #fef3c7;
+    color: #f59e0b;
+}
+
+.status-badge.Rechazada {
     background-color: #fee2e2;
     color: #dc2626;
 }
@@ -259,19 +269,31 @@ body {
     letter-spacing: 0.025em;
 }
 
-.priority-badge.normal {
+.priority-badge.Media {
     background-color: #f1f5f9;
     color: #64748b;
 }
 
-.priority-badge.alta {
+.priority-badge.Alta {
     background-color: #fee2e2;
     color: #dc2626;
 }
 
-.priority-badge.baja {
+.priority-badge.Baja {
     background-color: #f0f9ff;
     color: #0284c7;
+}
+
+.category-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
 }
 
 .request-meta {

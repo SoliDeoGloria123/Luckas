@@ -337,11 +337,7 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
   return (
     <div className="flex min-h-screen bg-gray-50">
       <div className="flex-1">{/* Sidebar removido temporalmente */}
-
-
-
         <main className="p-6">
-
           {activeReport && (
             <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
               <div className="mb-6 flex items-center justify-between">

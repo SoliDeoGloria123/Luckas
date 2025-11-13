@@ -24,6 +24,8 @@ export const cabanaService = {
   },
 
   create: async (cabana) => {
+
+    
     // Si es FormData (para imágenes), no agregamos Content-Type
     const headers = {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -32,15 +34,33 @@ export const cabanaService = {
     // Solo agregar Content-Type si no es FormData
     if (!(cabana instanceof FormData)) {
       headers["Content-Type"] = "application/json";
+   
+    } else {
+      console.log('CabanaService: Enviando FormData con imágenes');
     }
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: headers,
-      body: cabana instanceof FormData ? cabana : JSON.stringify(cabana),
-    });
-    if (!res.ok) throw new Error("Error al crear cabaña");
-    return await res.json();
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: headers,
+        body: cabana instanceof FormData ? cabana : JSON.stringify(cabana),
+      });
+      
+      console.log('CabanaService: Respuesta recibida, status:', res.status);
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('CabanaService: Error en respuesta:', errorText);
+        throw new Error(`Error al crear cabaña: ${res.status} ${errorText}`);
+      }
+      
+      const result = await res.json();
+      console.log('CabanaService: Cabaña creada exitosamente:', result);
+      return result;
+    } catch (error) {
+      console.error('CabanaService: Error en create:', error);
+      throw error;
+    }
   },
 
   update: async (id, cabana) => {
