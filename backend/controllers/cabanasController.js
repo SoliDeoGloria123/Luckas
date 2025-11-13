@@ -12,11 +12,11 @@ exports.crearCabana = async (req, res) => {
     const { categoria, capacidad, precio } = req.body;
     
     // Validar datos básicos
-    if (!req.body.nombre || !req.body.nombre.trim()) {
+    if (!req.body?.nombre?.trim()) {
       return res.status(400).json({ success: false, message: 'Nombre es obligatorio' });
     }
     
-    if (!req.body.descripcion || !req.body.descripcion.trim()) {
+    if (!req.body?.descripcion?.trim()) {
       return res.status(400).json({ success: false, message: 'Descripción es obligatoria' });
     }
     

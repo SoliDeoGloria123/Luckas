@@ -26,7 +26,7 @@ const uploadToCloudinary = async (req, res, next) => {
             if (result) {
               resolve(result);
             } else {
-              reject(error);
+              reject(new Error(error));
             }
           }
         );
@@ -62,7 +62,7 @@ const uploadMultipleToCloudinary = async (req, res, next) => {
               if (result) {
                 resolve(result);
               } else {
-                reject(error);
+                reject(new Error(error));
               }
             }
           );

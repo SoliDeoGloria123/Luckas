@@ -628,7 +628,7 @@
 
 .btn-action.eliminar {
   background: rgba(239, 68, 68, 0.1);
-  color: #991b1b;
+  color: #000;
 }
 
 .btn-action.eliminar:hover {
@@ -960,12 +960,12 @@
 
 .rol-tesorero {
   background: rgba(5, 150, 105, 0.1);
-  color: #042f2e;
+  color: #222;
 }
 
 .rol-seminarista {
   background: rgba(139, 92, 246, 0.1);
-  color: #4c1d95;
+  color: #222;
 }
 
 .estado-active,
@@ -1534,7 +1534,7 @@
 
 .btn-filtro {
   background: linear-gradient(135deg, #28a745, #20a13a);
-  color: white;
+  color: #222;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -1649,7 +1649,7 @@
 
 .stat-trend.neutral {
   background: rgba(100, 116, 139, 0.1);
-  color: #1e293b;
+  color: #222;
 }
 
 .stat-trend.warning {
@@ -2311,7 +2311,7 @@
 
 .btn-add-item {
   background: #10b981;
-  color: white;
+  color: #222;
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
@@ -2321,7 +2321,7 @@
 
 .btn-remove-item {
   background: #ef4444;
-  color: white;
+  color: #222;
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
@@ -2964,7 +2964,7 @@
 }
 
 .btn-ver-imagen:hover {
-  color: white;
+  color: #222;
   background-color: #007bff;
   border-radius: 50%;
   transform: scale(1.2);

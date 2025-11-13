@@ -1,0 +1,6 @@
+projectKey=luckas-backend
+serverUrl=http://localhost:9000
+serverVersion=25.11.0.114957
+dashboardUrl=http://localhost:9000/dashboard?id=luckas-backend
+ceTaskId=a32edae4-588b-4e00-bfbe-ac95d3bddbed
+ceTaskUrl=http://localhost:9000/api/ce/task?id=a32edae4-588b-4e00-bfbe-ac95d3bddbed

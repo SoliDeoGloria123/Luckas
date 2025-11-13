@@ -107,7 +107,9 @@ app.listen(PORT,()=>{
 }
 
 // Iniciar el servidor
-startServer().catch((error) => {
-    console.error('❌ Error al iniciar el servidor:', error);
-    process.exit(1);
-});
+try {
+  await startServer();
+} catch (error) {
+  console.error('❌ Error al iniciar el servidor:', error);
+  process.exit(1);
+}

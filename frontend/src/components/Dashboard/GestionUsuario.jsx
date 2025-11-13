@@ -14,7 +14,7 @@ import {
 
 const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, modoTesorero = false, userRole, readOnly = false, canCreate = true, canEdit = true, canDelete = true }) => {
     const [usuarios, setUsuarios] = useState([]);
-    const [cargando, setCargando] = useState(true);
+    const [setCargando] = useState(true);
     const [busqueda, setBusqueda] = useState("");
     const [mostrarModal, setMostrarModal] = useState(false);
     const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);

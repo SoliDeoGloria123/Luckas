@@ -81,7 +81,7 @@ const GestionEventos = () => {
     const formData = new globalThis.FormData();
     for (const [key, value] of Object.entries(nuevoEvento)) {
       if (key === 'etiquetas' && typeof value === 'string') {
-        value.split(',').map(et => formData.append('etiquetas', et.trim()));
+        value.split(',').forEach(et => formData.append('etiquetas', et.trim()));
       } else {
         formData.append(key, value);
       }
