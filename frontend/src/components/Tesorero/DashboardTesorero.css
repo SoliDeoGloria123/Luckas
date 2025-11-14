@@ -241,10 +241,6 @@ body {
     color: var(--color-gray-dark);
 }
 
-.stat-label {
-    color: #64748b;
-    font-size: 0.875rem;
-}
 
 .stat-detail {
     color: #64748b;
@@ -998,22 +994,22 @@ body {
 
 .stat-icon-solicitudes.purple {
     background: rgba(139, 92, 246, 0.1);
-    color: #8b5cf6;
+    color: #4B0082; /* Mejor contraste: índigo oscuro */
 }
 
 .stat-icon-solicitudes.orange {
     background: rgba(251, 146, 60, 0.1);
-    color: #fb923c;
+    color: #B45309; /* Mejor contraste: marrón oscuro */
 }
 
 .stat-icon-solicitudes.green {
     background: rgba(5, 150, 105, 0.1);
-    color: #059669;
+    color: #065F46; /* Mejor contraste: verde oscuro */
 }
 
 .stat-icon-solicitudes.red {
     background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    color: #7F1D1D; /* Mejor contraste: rojo oscuro */
 }
 
 

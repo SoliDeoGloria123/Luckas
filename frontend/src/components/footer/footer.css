@@ -222,7 +222,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #cbd5e1;
+    color: #F9FAFB; /* Blanco puro para mejor contraste */
   text-decoration: none;
   font-size: 18px;
   transition: all 0.3s;
@@ -230,7 +230,7 @@
 
 .footer-social a:hover {
   background: #2563eb;
-  color: white;
+  color: #F9FAFB;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }

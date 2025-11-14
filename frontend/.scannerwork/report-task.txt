@@ -1,6 +1,7 @@
+organization=solideogloria123
 projectKey=luckas-frontend
-serverUrl=http://localhost:9000
-serverVersion=25.11.0.114957
-dashboardUrl=http://localhost:9000/dashboard?id=luckas-frontend
-ceTaskId=7f59ec21-1143-4b1d-abed-13fc5f771c5d
-ceTaskUrl=http://localhost:9000/api/ce/task?id=7f59ec21-1143-4b1d-abed-13fc5f771c5d
+serverUrl=https://sonarcloud.io
+serverVersion=8.0.0.76487
+dashboardUrl=https://sonarcloud.io/dashboard?id=luckas-frontend
+ceTaskId=AZqDUPwvN78nC7rRFHLW
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZqDUPwvN78nC7rRFHLW

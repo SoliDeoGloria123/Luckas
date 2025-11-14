@@ -70,7 +70,7 @@ const validarCambioContrasena = (passwordData) => {
 };
 
 const ProfilePage = () => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Obtener usuario logueado desde localStorage
@@ -79,8 +79,13 @@ const ProfilePage = () => {
   // Estado para los datos editables
   const [datosEditados, setDatosEditados] = useState(() => crearEstadoInicialDatos(usuarioLogueado));
 
-  console.log('Estado isEditing:', isEditing);
-  console.log('Datos editados:', datosEditados);
+  useEffect(() => {
+    // ...existing code...
+  }, [isEditing]);
+
+  useEffect(() => {
+    // ...existing code...
+  }, [datosEditados]);
 
   // Estado para cambio de contraseña
   const [passwordData, setPasswordData] = useState({
@@ -92,7 +97,7 @@ const ProfilePage = () => {
   // Datos estáticos del perfil (solo lectura)
   const [profileData, setProfileData] = useState(() => crearPerfilPorDefecto(usuarioLogueado));
 
-  // const [formData, setFormData] = useState({}); // Variable comentada - no se usa actualmente
+  // Eliminado: variable comentada y no usada
   
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -131,7 +136,7 @@ const ProfilePage = () => {
   };
 
   const handleInputChange = (field, value) => {
-    console.log('handleInputChange llamado:', field, value);
+    // ...existing code...
     setDatosEditados((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -148,8 +153,7 @@ const ProfilePage = () => {
   };
 
   // const handlePasswordChange = (field, value) => {
-  //   setPasswordData(prev => ({ ...prev, [field]: value }));  
-  // }; // Función comentada - no se usa actualmente
+  // Eliminado: función comentada y no usada
 
   const cambiarContrasena = async () => {
     try {
@@ -197,19 +201,15 @@ const ProfilePage = () => {
 
   // useEffect para cargar datos del usuario al iniciar
   useEffect(() => {
-    if (usuarioLogueado) {
+    if (usuarioLogueado && !isEditing) {
       console.log("Datos del usuario logueado:", usuarioLogueado);
       setDatosEditados(crearEstadoInicialDatos(usuarioLogueado));
       setProfileData(crearPerfilPorDefecto(usuarioLogueado));
     }
-  }, [usuarioLogueado]);
+  }, [usuarioLogueado, isEditing]);
 
   // Formatea la fecha para mostrarla en formato legible
-  // const formatDate = (dateStr) => {
-  //   if (!dateStr) return "";
-  //   const date = new Date(dateStr);
-  //   return date.toLocaleDateString();
-  // }; // Función comentada - no se usa actualmente
+  // Eliminado: función comentada y no usada
 
 
   return (

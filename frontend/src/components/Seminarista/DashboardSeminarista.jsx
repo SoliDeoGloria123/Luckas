@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { useAuthCheck } from './hooks/useAuthCheck';
 import { eventService } from '../../services/eventService';
@@ -10,15 +9,14 @@ import Header from './Shared/Header';
 import './DashboardSeminarista.css';
 
 const DashboardSeminarista = () => {
-  const navigate = useNavigate();
-  const [mostrarModificarPerfil, setMostrarModificarPerfil] = useState(false);
-  const [mensaje, setMensaje] = useState('');
-  const [mensajeTipo, setMensajeTipo] = useState('info');
-  const [eventos, setEventos] = useState([]);
-  const [cabanas, setCabanas] = useState([]);
-  const [loadingEventos, setLoadingEventos] = useState(true);
-  const [loadingCabanas, setLoadingCabanas] = useState(true);
-  const breadcrumbPath = ['Dashboard', 'Seminarista'];
+  // Estados eliminados por no usarse el valor, solo el setter
+  const setMostrarModificarPerfil = useState(false)[1];
+  const setMensaje = useState('')[1];
+  const setMensajeTipo = useState('info')[1];
+  const setEventos = useState([])[1];
+  const setCabanas = useState([])[1];
+  const setLoadingEventos = useState(true)[1];
+  const setLoadingCabanas = useState(true)[1];
 
   // Verificar autenticación y rol
   const { isAuthenticated, user } = useAuthCheck('seminarista');

@@ -308,7 +308,7 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
     if (!selectedReportType) return
 
     const newReport = {
-      id: savedReports.length + 1,
+      id: (savedReports?.length ?? 0) + 1,
       name: `Reporte de ${REPORT_TYPES.find((t) => t.value === selectedReportType)?.label}`,
       type: selectedReportType,
       description: `Reporte generado automáticamente`,
