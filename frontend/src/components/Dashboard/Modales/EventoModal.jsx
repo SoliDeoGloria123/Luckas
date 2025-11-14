@@ -159,19 +159,19 @@ const EventoModal = ({
   // Función auxiliar para preparar FormData con imágenes
   const prepararFormDataConImagenes = () => {
     const formData = new FormData();
-    
+
     // Agregar campos básicos
     formData.append('nombre', nuevoEvento.nombre);
     formData.append('descripcion', nuevoEvento.descripcion);
     formData.append('precio', Number(nuevoEvento.precio));
     formData.append('categoria', String(nuevoEvento.categoria));
-    
+
     // Procesar etiquetas
-    const etiquetas = typeof nuevoEvento.etiquetas === 'string' 
-      ? nuevoEvento.etiquetas.split(',').map(e => e.trim()).filter(Boolean) 
+    const etiquetas = typeof nuevoEvento.etiquetas === 'string'
+      ? nuevoEvento.etiquetas.split(',').map(e => e.trim()).filter(Boolean)
       : [];
     formData.append('etiquetas', JSON.stringify(etiquetas));
-    
+
     // Agregar campos restantes
     formData.append('fechaEvento', nuevoEvento.fechaEvento);
     formData.append('horaInicio', nuevoEvento.horaInicio);
@@ -184,7 +184,7 @@ const EventoModal = ({
     formData.append('prioridad', nuevoEvento.prioridad);
     formData.append('observaciones', nuevoEvento.observaciones);
     formData.append('active', nuevoEvento.active);
-    
+
     return formData;
   };
 
@@ -200,17 +200,17 @@ const EventoModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const fecha = modoEdicion ? eventoSeleccionado?.fechaEvento : nuevoEvento.fechaEvento;
-      
+
       if (!validarFecha(fecha)) {
         setIsSubmitting(false);
         return;
       }
-      
+
       const tieneImagenes = !modoEdicion && selectedImages.length > 0;
-      
+
       if (tieneImagenes) {
         const formData = prepararFormDataConImagenes();
         agregarImagenesAFormData(formData);
@@ -446,46 +446,46 @@ const EventoModal = ({
                 <option value="Baja">Baja</option>
               </select>
             </div>
-            {!modoEdicion && (
-              <div className="form-grupo-admin">
-                <label htmlFor="observaciones-evento">Observaciones:</label>
-                <input
-                  id="observaciones-evento"
-                  type="text"
-                  value={nuevoEvento.observaciones}
-                  onChange={e =>
-                    setNuevoEvento({ ...nuevoEvento, observaciones: e.target.value })
-                  }
-                  placeholder="Observaciones del evento"
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="form-grupo-admin">
-            <label htmlFor="estado-evento">Estado:</label>
-            <select
-              id="estado-evento"
-              value={modoEdicion ? eventoSeleccionado?.active : nuevoEvento.active}
-              onChange={e =>
-                modoEdicion
-                  ? setEventoSeleccionado({ ...eventoSeleccionado, active: e.target.value })
-                  : setNuevoEvento({ ...nuevoEvento, active: e.target.value })
-              }
-            >
-              <option value="">Seleccione...</option>
-              <option value="true">Activo</option>
-              <option value="false">Inactivo</option>
-            </select>
+            <div className="form-grupo-admin">
+              <label htmlFor="estado-evento">Estado:</label>
+              <select
+                id="estado-evento"
+                value={modoEdicion ? eventoSeleccionado?.active : nuevoEvento.active}
+                onChange={e =>
+                  modoEdicion
+                    ? setEventoSeleccionado({ ...eventoSeleccionado, active: e.target.value })
+                    : setNuevoEvento({ ...nuevoEvento, active: e.target.value })
+                }
+              >
+                <option value="">Seleccione...</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+              </select>
+            </div>
           </div>
 
 
+
+          {!modoEdicion && (
+            <div className="form-grupo-admin">
+              <label htmlFor="observaciones-evento">Observaciones:</label>
+              <input
+                id="observaciones-evento"
+                type="text"
+                value={nuevoEvento.observaciones}
+                onChange={e =>
+                  setNuevoEvento({ ...nuevoEvento, observaciones: e.target.value })
+                }
+                placeholder="Observaciones del evento"
+              />
+            </div>
+          )}
           <div className="form-group-tesorero full-width">
             <label htmlFor="imagen-evento">Imagen</label>
             <div className="image-upload-container">
-              <button 
+              <button
                 type="button"
-                className="upload-area" 
+                className="upload-area"
                 onClick={() => !isUploading && document.getElementById('imageInput').click()}
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -508,12 +508,12 @@ const EventoModal = ({
                   <p>o <span className="browse-text">haz clic para seleccionar</span></p>
                   <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
                 </div>
-                <input 
-                  type="file" 
-                  id='imageInput' 
-                  multiple 
-                  accept="image/jpeg,image/jpg,image/png,image/gif" 
-                  hidden 
+                <input
+                  type="file"
+                  id='imageInput'
+                  multiple
+                  accept="image/jpeg,image/jpg,image/png,image/gif"
+                  hidden
                   onChange={(e) => {
                     const files = e.target?.files;
                     if (files && files.length > 0) {
@@ -521,7 +521,7 @@ const EventoModal = ({
                     }
                     // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
                     e.target.value = '';
-                  }} 
+                  }}
                 />
               </button>
 

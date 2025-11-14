@@ -11,17 +11,28 @@ const UsuarioModal = ({
   onClose,
   onSubmit
 }) => {
+  const [mostrarPassword, setMostrarPassword] = React.useState(false);
   if (!mostrar) return null;
 
-  // Extraer el valor de fechaNacimiento a una variable para evitar ternarios anidados
-  let fechaNacimientoValue = '';
-  if (modoEdicion) {
-    if (usuarioSeleccionado?.fechaNacimiento) {
-      fechaNacimientoValue = new Date(usuarioSeleccionado.fechaNacimiento).toISOString().split('T')[0];
+  // Funciones auxiliares para reducir complejidad
+  const getFieldValue = (field) => {
+    return modoEdicion ? usuarioSeleccionado?.[field] || '' : nuevoUsuario[field] || '';
+  };
+
+  const handleFieldChange = (field, value) => {
+    if (modoEdicion) {
+      setUsuarioSeleccionado({ ...usuarioSeleccionado, [field]: value });
+    } else {
+      setNuevoUsuario({ ...nuevoUsuario, [field]: value });
     }
-  } else {
-    fechaNacimientoValue = nuevoUsuario.fechaNacimiento;
-  }
+  };
+
+  const getFechaNacimientoValue = () => {
+    if (modoEdicion && usuarioSeleccionado?.fechaNacimiento) {
+      return new Date(usuarioSeleccionado.fechaNacimiento).toISOString().split('T')[0];
+    }
+    return nuevoUsuario.fechaNacimiento || '';
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -45,12 +56,8 @@ const UsuarioModal = ({
               <input
                 id="nombre"
                 type="text"
-                value={modoEdicion ? usuarioSeleccionado?.nombre : nuevoUsuario.nombre}
-                onChange={e =>
-                  modoEdicion
-                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, nombre: e.target.value })
-                    : setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })
-                }
+                value={getFieldValue('nombre')}
+                onChange={e => handleFieldChange('nombre', e.target.value)}
                 placeholder="Nombre"
                 required
               />
@@ -60,12 +67,8 @@ const UsuarioModal = ({
               <input
                 id="apellido"
                 type="text"
-                value={modoEdicion ? usuarioSeleccionado?.apellido : nuevoUsuario.apellido}
-                onChange={e =>
-                  modoEdicion
-                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, apellido: e.target.value })
-                    : setNuevoUsuario({ ...nuevoUsuario, apellido: e.target.value })
-                }
+                value={getFieldValue('apellido')}
+                onChange={e => handleFieldChange('apellido', e.target.value)}
                 placeholder="Apellido"
                 required
               />
@@ -78,12 +81,8 @@ const UsuarioModal = ({
               <input
                 id="correo"
                 type="email"
-                value={modoEdicion ? usuarioSeleccionado?.correo : nuevoUsuario.correo}
-                onChange={e =>
-                  modoEdicion
-                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, correo: e.target.value })
-                    : setNuevoUsuario({ ...nuevoUsuario, correo: e.target.value })
-                }
+                value={getFieldValue('correo')}
+                onChange={e => handleFieldChange('correo', e.target.value)}
                 placeholder="correo@ejemplo.com"
                 required
               />
@@ -92,13 +91,9 @@ const UsuarioModal = ({
               <label htmlFor="telefono"><i className="fas fa-phone"></i> Teléfono</label>
               <input
                 id="telefono"
-                type="text"
-                value={modoEdicion ? usuarioSeleccionado?.telefono : nuevoUsuario.telefono}
-                onChange={e =>
-                  modoEdicion
-                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, telefono: e.target.value })
-                    : setNuevoUsuario({ ...nuevoUsuario, telefono: e.target.value })
-                }
+                type="number"
+                value={getFieldValue('telefono')}
+                onChange={e => handleFieldChange('telefono', e.target.value)}
                 placeholder="Teléfono"
                 required
               />
@@ -109,12 +104,8 @@ const UsuarioModal = ({
               <label htmlFor="tipoDocumento"><i className="fas fa-id-card"></i> Tipo de Documento</label>
               <select
                 id="tipoDocumento"
-                value={modoEdicion ? usuarioSeleccionado?.tipoDocumento : nuevoUsuario.tipoDocumento}
-                onChange={e =>
-                  modoEdicion
-                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, tipoDocumento: e.target.value })
-                    : setNuevoUsuario({ ...nuevoUsuario, tipoDocumento: e.target.value })
-                }
+                value={getFieldValue('tipoDocumento')}
+                onChange={e => handleFieldChange('tipoDocumento', e.target.value)}
                 required
               >
                 <option value="">Seleccione...</option>
@@ -129,12 +120,8 @@ const UsuarioModal = ({
               <input
                 id="numeroDocumento"
                 type="text"
-                value={modoEdicion ? usuarioSeleccionado?.numeroDocumento : nuevoUsuario.numeroDocumento}
-                onChange={e =>
-                  modoEdicion
-                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, numeroDocumento: e.target.value })
-                    : setNuevoUsuario({ ...nuevoUsuario, numeroDocumento: e.target.value })
-                }
+                value={getFieldValue('numeroDocumento')}
+                onChange={e => handleFieldChange('numeroDocumento', e.target.value)}
                 placeholder="Número de documento"
                 required
               />
@@ -147,12 +134,8 @@ const UsuarioModal = ({
                 id="fechaNacimiento"
                 type="date"
                 className="input-fecha-moderno"
-                value={fechaNacimientoValue}
-                onChange={e =>
-                  modoEdicion
-                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, fechaNacimiento: e.target.value })
-                    : setNuevoUsuario({ ...nuevoUsuario, fechaNacimiento: e.target.value })
-                }
+                value={getFechaNacimientoValue()}
+                onChange={e => handleFieldChange('fechaNacimiento', e.target.value)}
                 required
               />
             </div>
@@ -162,7 +145,7 @@ const UsuarioModal = ({
 
                 <input
                   id="password"
-                  type="password"
+                  type={mostrarPassword ? "text" : "password"}
                   value={nuevoUsuario.password}
                   onChange={e =>
                     setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })
@@ -170,8 +153,14 @@ const UsuarioModal = ({
                   placeholder="Contraseña"
                   required={!modoEdicion}
                 />
-                <button type="button" className="password-toggle-admin" >
-                  <i className="fas fa-eye"></i>
+                <button
+                  type="button"
+                  className="password-toggle-admin"
+                  onClick={() => setMostrarPassword((prev) => !prev)}
+                  aria-label={mostrarPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  tabIndex={0}
+                >
+                  <i className={mostrarPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
                 </button>
                 <span className="error-message" id="passwordError"></span>
                 <div className="password-strength" id="passwordStrength"></div>
@@ -186,12 +175,8 @@ const UsuarioModal = ({
               </label>
               <select
                 id="role"
-                value={modoEdicion ? usuarioSeleccionado?.role : nuevoUsuario.role}
-                onChange={e =>
-                  modoEdicion
-                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, role: e.target.value })
-                    : setNuevoUsuario({ ...nuevoUsuario, role: e.target.value })
-                }
+                value={getFieldValue('role')}
+                onChange={e => handleFieldChange('role', e.target.value)}
                 required
               >
                 <option value="admin">Admin</option>
@@ -204,12 +189,8 @@ const UsuarioModal = ({
               <label htmlFor="estado"><i className="fas fa-toggle-on"></i> Estado</label>
               <select
                 id="estado"
-                value={modoEdicion ? usuarioSeleccionado?.estado : nuevoUsuario.estado}
-                onChange={e =>
-                  modoEdicion
-                    ? setUsuarioSeleccionado({ ...usuarioSeleccionado, estado: e.target.value })
-                    : setNuevoUsuario({ ...nuevoUsuario, estado: e.target.value })
-                }
+                value={getFieldValue('estado')}
+                onChange={e => handleFieldChange('estado', e.target.value)}
                 required
               >
                 <option value="activo">Activo</option>

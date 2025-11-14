@@ -4,10 +4,7 @@ import { userService } from '../../../services/userService'
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
-
 import { Edit } from "lucide-react"
-
-
 
 const Gestionusuarios = () => {
   // Datos de ejemplo
@@ -24,11 +21,12 @@ const Gestionusuarios = () => {
     apellido: '',
     correo: '',
     telefono: '',
-    role: '',
+    role: 'externo',
     fechaNacimiento: '',
     tipoDocumento: '',
     numeroDocumento: '',
-    password: ''
+    password: '',
+    estado: 'activo'
   });
 
   const handleCreate = () => {
@@ -39,11 +37,12 @@ const Gestionusuarios = () => {
       apellido: '',
       correo: '',
       telefono: '',
-      role: '',
+      role: 'externo',
       fechaNacimiento: '',
       tipoDocumento: '',
       numeroDocumento: '',
-      password: ''
+      password: '',
+      estado: 'activo'
     });
     setMostrarModal(true);
   };
@@ -57,13 +56,25 @@ const Gestionusuarios = () => {
   // Funciones para el modal del Dashboard
   const crearUsuario = async (e) => {
     e.preventDefault();
+    // Validación extra para tipoDocumento
+    if (!nuevoUsuario.tipoDocumento || nuevoUsuario.tipoDocumento === "") {
+      mostrarAlerta("Error", "Debes seleccionar un tipo de documento antes de crear el usuario.", "error");
+      return;
+    }
+    // Forzar el valor de tipoDocumento antes de enviar
+    const usuarioAEnviar = {
+      ...nuevoUsuario,
+      tipoDocumento: nuevoUsuario.tipoDocumento
+    };
     try {
-      await userService.createUser(nuevoUsuario);
-      mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
+      await userService.createUser(usuarioAEnviar);
+      mostrarAlerta("¡Éxito!", "Usuario creado exitosamente", "success");
       setMostrarModal(false);
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      // Mostrar el mensaje real del backend si existe
+      let mensaje = error.message || "Error al crear usuario";
+      mostrarAlerta("Error", mensaje, "error");
     }
   };
 
@@ -151,7 +162,7 @@ const Gestionusuarios = () => {
     } catch (error) {
       mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`);
     }
-  };
+  };  
 
 
   return (
@@ -160,7 +171,7 @@ const Gestionusuarios = () => {
       <main className="main-content-tesorero">
         <div className="page-header-tesorero">
           <div className="card-header-tesorero">
-            <button className="back-btn-tesorero">
+            <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
               <i className="fas fa-arrow-left"></i>
             </button>
             <div className="page-title-tesorero">

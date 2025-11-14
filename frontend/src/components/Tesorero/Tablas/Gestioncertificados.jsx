@@ -65,7 +65,7 @@ const CertificadosPage = () => {
                 {/* Back Button and Title */}
                 <div className="page-header-tesorero">
                     <div className="card-header-tesorero">
-                        <button className="back-btn-tesorero">
+                        <button className="back-btn-tesorero"onClick={() => globalThis.history.back()}>
                             <ChevronLeft className="h-4 w-4" />
                         </button>
                         <div className="page-title-tesorero">

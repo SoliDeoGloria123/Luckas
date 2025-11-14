@@ -70,6 +70,20 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
       setError("Todos los campos obligatorios deben estar completos.");
       return;
     }
+    // Validación adicional: fechaFin no puede ser menor a fechaInicio
+    if (form.fechaInicio && form.fechaFin) {
+      const inicio = new Date(form.fechaInicio);
+      const fin = new Date(form.fechaFin);
+      if (Number.isNaN(inicio.getTime()) || Number.isNaN(fin.getTime())) {
+        setError('Formato de fecha inválido.');
+        return;
+      }
+      if (fin < inicio) {
+        setError('La fecha fin no puede ser menor a la fecha inicio.');
+        return;
+      }
+    }
+
     // Construir objeto de datos para el backend
     setError("");
     const datosEnvio = buildSubmissionData(form);

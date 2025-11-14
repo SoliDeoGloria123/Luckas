@@ -159,7 +159,7 @@ const Reportes = () => {
     if (!confirmacion) return;
     try {
       await reporteService.eliminarReporte(id);
-      mostrarAlerta("¡Éxito!","Reporte eliminado correctamente");
+      mostrarAlerta("¡Éxito!", "Reporte eliminado correctamente");
       cargarReportesGuardados();
     } catch (err) {
       mostrarAlerta('Error al eliminar el reporte: ' + err.message, 'error');
@@ -273,47 +273,9 @@ const Reportes = () => {
         </div>
 
 
-        <div className="report-info-reporte-admin">
-          <div className="report-meta-reporte-admin">
-            <i className="fas fa-clock"></i>
-            <span>Fecha de generación: 2/9/2025, 10:38:05 p. m.</span>
-          </div>
-
-          <div className="report-actions-reporte-admin">
-            <button className="btn-reportea btn-sm-reportea btn-outline-reportea">
-              <i className="fas fa-refresh"></i> {' '}
-              Actualizar
-            </button>
-            <button className="btn-reportea btn-sm-reportea btn-outline-reportea">
-              <i className="fas fa-cog"></i> {' '}
-              Configurar
-            </button>
-          </div>
-        </div>
-
         <div className="reports-table-container-reporte">
-
-          <div className="table-filters-reporte">
-            <div className="search-container-reporte">
-              <i className="fas fa-search"></i>
-              <input type="text" placeholder="Buscar reportes..." id="reportSearch" />
-            </div>
-            <select >
-              <option value="">Todos los tipos</option>
-              <option value="financiero">Financiero</option>
-              <option value="usuarios">Usuarios</option>
-              <option value="eventos">Eventos</option>
-              <option value="reservas">Reservas</option>
-            </select>
-            <select >
-              <option value="">Todos los estados</option>
-              <option value="generado">Generado</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="archivado">Archivado</option>
-            </select>
-          </div>
-          <ReportesTabla 
-            reportesGuardados={reportesGuardados} 
+          <ReportesTabla
+            reportesGuardados={reportesGuardados}
             editarReporte={abrirModalEditar}
             eliminarReporte={eliminarReporte}
           />
@@ -479,7 +441,7 @@ const Reportes = () => {
         );
 
       default:
-        return <div>Selecciona un tipo de reporte</div>;
+        return <div>Selecciona un tipo de reporte</div>
     }
   };
 
@@ -498,14 +460,14 @@ const Reportes = () => {
           seccionActiva={seccionActiva}
         />
         <div className="reportes-container w-full max-w-full px-2 md:px-8">
-          
+
           {/* Page Header */}
           <div className="mb-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-            <div>
+            <div className='seccion-usuarios'>
               <h1 className="font-bold text-3xl text-gray-900 mb-2">Sistema de Reportes</h1>
               <p className="text-gray-600">Genera y administra reportes del sistema</p>
             </div>
-           <div className="flex flex-wrap items-center gap-2 md:gap-3 justify-end w-full md:w-auto">
+            <div className="flex flex-wrap items-center gap-2 md:gap-3 justify-end w-full md:w-auto">
               <button
                 //onClick={handleExportPDF}
                 className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
@@ -526,7 +488,7 @@ const Reportes = () => {
               >
                 + Nuevo Reporte
               </button>
-             
+
             </div>
           </div>
           {tipoReporte !== 'dashboard' && (
@@ -570,8 +532,6 @@ const Reportes = () => {
               </div>
             </div>
           )}
-
-
           <div className="reporte-content">
             {loading && <div className="loading">Cargando reporte...</div>}
             {error && <div className="error">{error}</div>}
@@ -583,6 +543,32 @@ const Reportes = () => {
 
               </div>
             )}
+          </div>
+
+          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <svg
+                className="w-5 h-5 text-[#2563eb] mt-0.5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div className="text-sm">
+                <p className="text-[#334155] font-medium mb-1">
+                  <span className="font-semibold">Fecha de generación:</span> {new Date().toLocaleString("es-ES")}
+                </p>
+                <p className="text-[#334155]">
+                  <span className="font-semibold">Tipo de reporte:</span> {/*selectedReport.replace("-", " ")*/}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

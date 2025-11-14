@@ -29,7 +29,7 @@ const TareaModal = ({
             ✕
           </button>
         </div>
-        <form className="modal-body-admin">
+        <form className="modal-body-admin" onSubmit={e => { e.preventDefault(); onSubmit(); }}>
           <div className="from-grid-admin">
             {/* Título */}
             <div className="form-grupo-admin">
@@ -164,11 +164,11 @@ const TareaModal = ({
             />
           </div>
           <div className="modal-action-admin">
-            <button className="btn-admin secondary-admin" onClick={onClose}>
+            <button type="button" className="btn-admin secondary-admin" onClick={onClose}>
                <i className="fas fa-times"></i> {' '}
               Cancelar
             </button>
-            <button className="btn-admin btn-primary" onClick={onSubmit}>
+            <button type="submit" className="btn-admin btn-primary">
                     <i className="fas fa-save"></i>
               {modoEdicion ? "Guardar Cambios" : "Crear Tarea"}
             </button>

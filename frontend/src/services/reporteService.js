@@ -16,9 +16,9 @@ export const reporteService = {
   // Reporte de reservas
   getReservas: async (filtros = {}) => {
     const params = new URLSearchParams();
-    Object.keys(filtros).forEach(key => {
+    for (const key of Object.keys(filtros)) {
       if (filtros[key]) params.append(key, filtros[key]);
-    });
+    }
 
     const res = await fetch(`${API_URL}/reservas?${params}`, {
       headers: {
@@ -33,9 +33,9 @@ export const reporteService = {
   // Reporte de inscripciones
   getInscripciones: async (filtros = {}) => {
     const params = new URLSearchParams();
-    Object.keys(filtros).forEach(key => {
+    for (const key of Object.keys(filtros)) {
       if (filtros[key]) params.append(key, filtros[key]);
-    });
+    }
 
     const res = await fetch(`${API_URL}/inscripciones?${params}`, {
       headers: {
@@ -50,9 +50,9 @@ export const reporteService = {
   // Reporte de solicitudes
   getSolicitudes: async (filtros = {}) => {
     const params = new URLSearchParams();
-    Object.keys(filtros).forEach(key => {
+    for (const key of Object.keys(filtros)) {
       if (filtros[key]) params.append(key, filtros[key]);
-    });
+    }
 
     const res = await fetch(`${API_URL}/solicitudes?${params}`, {
       headers: {
@@ -67,9 +67,9 @@ export const reporteService = {
   // Reporte de usuarios
   getUsuarios: async (filtros = {}) => {
     const params = new URLSearchParams();
-    Object.keys(filtros).forEach(key => {
+    for (const key of Object.keys(filtros)) {
       if (filtros[key]) params.append(key, filtros[key]);
-    });
+    }
 
     const res = await fetch(`${API_URL}/usuarios?${params}`, {
       headers: {
@@ -84,9 +84,9 @@ export const reporteService = {
   // Reporte de eventos
   getEventos: async (filtros = {}) => {
     const params = new URLSearchParams();
-    Object.keys(filtros).forEach(key => {
+    for (const key of Object.keys(filtros)) {
       if (filtros[key]) params.append(key, filtros[key]);
-    });
+    }
 
     const res = await fetch(`${API_URL}/eventos?${params}`, {
       headers: {
@@ -101,9 +101,9 @@ export const reporteService = {
   // Reporte financiero
   getFinanciero: async (filtros = {}) => {
     const params = new URLSearchParams();
-    Object.keys(filtros).forEach(key => {
+    for (const key of Object.keys(filtros)) {
       if (filtros[key]) params.append(key, filtros[key]);
-    });
+    }
 
     const res = await fetch(`${API_URL}/financiero?${params}`, {
       headers: {
@@ -118,9 +118,9 @@ export const reporteService = {
   // Reporte de actividad de usuarios
   getActividadUsuarios: async (filtros = {}) => {
     const params = new URLSearchParams();
-    Object.keys(filtros).forEach(key => {
+    for (const key of Object.keys(filtros)) {
       if (filtros[key]) params.append(key, filtros[key]);
-    });
+    }
 
     const res = await fetch(`${API_URL}/actividad-usuarios?${params}`, {
       headers: {
@@ -135,9 +135,9 @@ export const reporteService = {
   // Exportar reporte a PDF (funcionalidad futura)
   exportToPDF: async (tipoReporte, filtros = {}) => {
     const params = new URLSearchParams();
-    Object.keys(filtros).forEach(key => {
+    for (const key of Object.keys(filtros)) {
       if (filtros[key]) params.append(key, filtros[key]);
-    });
+    }
     params.append('format', 'pdf');
 
     const res = await fetch(`${API_URL}/${tipoReporte}?${params}`, {
@@ -155,15 +155,15 @@ export const reporteService = {
     document.body.appendChild(a);
     a.click();
     globalThis.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    a.remove();
   },
 
   // Exportar reporte a Excel (funcionalidad futura)
   exportToExcel: async (tipoReporte, filtros = {}) => {
     const params = new URLSearchParams();
-    Object.keys(filtros).forEach(key => {
+    for (const key of Object.keys(filtros)) {
       if (filtros[key]) params.append(key, filtros[key]);
-    });
+    }
     params.append('format', 'excel');
 
     const res = await fetch(`${API_URL}/${tipoReporte}?${params}`, {
@@ -181,7 +181,7 @@ export const reporteService = {
     document.body.appendChild(a);
     a.click();
     globalThis.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    a.remove();
   },
 
   guardarReporte: async (reporte) => {
