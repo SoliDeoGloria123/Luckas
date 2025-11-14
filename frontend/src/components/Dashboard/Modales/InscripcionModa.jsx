@@ -10,7 +10,7 @@ const defaultForm = {
   numeroDocumento: "",
   correo: "",
   telefono: "",
-  edad: "25",
+  edad: "",
   tipoReferencia: "",
   referencia: "",
   categoria: "",
@@ -98,7 +98,7 @@ const InscripcionModal = ({
       setUsuarioEncontrado(usuario);
 
       // Calcular edad a partir de la fecha de nacimiento
-      let edadCalculada = 25; // Edad por defecto
+      let edadCalculada = ""; // Edad vacía por defecto
       if (usuario.fechaNacimiento) {
         try {
           const hoy = new Date();
@@ -113,9 +113,10 @@ const InscripcionModal = ({
           }
         } catch (error) {
           console.log('❌ Error calculando edad:', error);
+          edadCalculada = ""; // Mantener vacío si hay error
         }
       } else {
-        console.log('⚠️ Usuario sin fecha de nacimiento, usando edad por defecto');
+        console.log('⚠️ Usuario sin fecha de nacimiento, edad vacía');
       }
 
       setForm(prev => ({
@@ -233,6 +234,48 @@ const InscripcionModal = ({
 
     // Actualización general del formulario
     setForm({ ...form, [name]: String(value) });
+  };
+
+  // Funci\u00f3n para validar si la edad coincide con la fecha de nacimiento
+  const validarEdad = () => {
+    // Si no hay usuario encontrado o no hay fecha de nacimiento, no validar
+    if (!usuarioEncontrado || !usuarioEncontrado.fechaNacimiento) {
+      return { esValida: true, esVacia: !form.edad };
+    }
+    
+    // Si el campo est\u00e1 vac\u00edo, no es error
+    if (!form.edad) {
+      return { esValida: true, esVacia: true };
+    }
+    
+    try {
+      const hoy = new Date();
+      const fechaNac = new Date(usuarioEncontrado.fechaNacimiento);
+      
+      if (Number.isNaN(fechaNac.getTime())) {
+        return { esValida: true, esVacia: false };
+      }
+      
+      let edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
+      const mes = hoy.getMonth() - fechaNac.getMonth();
+      if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+        edadCalculada--;
+      }
+      
+      const edadIngresada = Number.parseInt(form.edad);
+      const diferencia = Math.abs(edadCalculada - edadIngresada);
+      
+      // Permitir una diferencia de +/- 1 a\u00f1o
+      return { 
+        esValida: diferencia <= 1, 
+        esVacia: false,
+        edadCalculada,
+        edadIngresada
+      };
+    } catch (error) {
+      console.error('Error validando edad:', error);
+      return { esValida: true, esVacia: false };
+    }
   };
 
   const handleSubmit = e => {
@@ -381,16 +424,30 @@ const InscripcionModal = ({
                 min="1"
                 max="120"
                 style={{
-                  borderColor: !form.edad || Number.parseInt(form.edad) < 1 ? '#dc3545' : '#28a745',
-                  backgroundColor: !form.edad || Number.parseInt(form.edad) < 1 ? '#f8d7da' : '#d4edda'
+                  borderColor: validarEdad().esValida ? '#ced4da' : '#dc3545',
+                  backgroundColor: validarEdad().esValida ? '#ffffff' : '#f8d7da'
                 }}
                 title="La edad es calculada automáticamente desde la fecha de nacimiento, pero puede editarse si es necesario"
               />
-              {form.edad && Number.parseInt(form.edad) > 0 && (
-                <small style={{ marginTop: '5px', fontSize: '12px', color: '#28a745', display: 'block' }}>
-                  ✅ Edad válida
-                </small>
-              )}
+              {(() => {
+                const validacion = validarEdad();
+                if (validacion.esVacia) {
+                  return null;
+                }
+                if (validacion.esValida) {
+                  return (
+                    <small style={{ marginTop: '5px', fontSize: '12px', color: '#28a745', display: 'block' }}>
+                      ✅ Edad válida
+                    </small>
+                  );
+                } else {
+                  return (
+                    <small style={{ marginTop: '5px', fontSize: '12px', color: '#dc3545', display: 'block' }}>
+                      ⚠️ La edad no coincide con la fecha de nacimiento (edad calculada: {validacion.edadCalculada})
+                    </small>
+                  );
+                }
+              })()}
             </div>
             <div className="form-grupo-admin">
               <label htmlFor="tipo-referencia">Tipo de inscripción:</label>

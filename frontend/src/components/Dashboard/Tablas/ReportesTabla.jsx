@@ -32,9 +32,6 @@ import {
   ResponsiveContainer,
 } from "recharts"
 import PropTypes from "prop-types";
-
-
-
 const REPORT_TYPES = [
   { value: "usuarios", label: "Usuarios", icon: Users },
   { value: "inscripciones", label: "Inscripciones", icon: UserPlus },
@@ -193,7 +190,7 @@ const generarTendenciaTemporal = (dataArray) => {
 
   for (const item of dataArray) {
     const date = extraerFechaDelItem(item);
-    
+
     if (date && !Number.isNaN(date.getTime())) {
       const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`;
       monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
@@ -213,9 +210,9 @@ const generarTendenciaTemporal = (dataArray) => {
 const generateChartsFromRawData = (activeReport) => {
   const datos = activeReport.datos;
   const tipoReporte = activeReport.tipo || activeReport.type;
-  
+
   const dataArray = extraerDataArray(datos);
-  
+
   if (!dataArray || dataArray.length === 0) {
     return { trend: [], distribution: [] };
   }
@@ -310,13 +307,14 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
   const handleExportExcel = () => {
     alert("Exportando a Excel...")
   }
+  
 
   const COLORS = ["#2563eb", "#8b5cf6", "#059669", "#f59e0b", "#ef4444"]
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <>
       <div className="flex-1">{/* Sidebar removido temporalmente */}
-        <main className="p-6">
+        <main>
           {activeReport && (
             <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
               <div className="mb-6 flex items-center justify-between">
@@ -502,19 +500,69 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
           )}
 
           {/* Saved Reports Section */}
-          <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="font-bold text-xl text-gray-900">Reportes Generados</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-[#334155]">Reportes Generados</h3>
+              <button className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Nuevo Reporte
+              </button>
+            </div>
+
+            <div className="flex gap-4 mb-6">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Buscar reportes..."
+                  //value={searchQuery}
+                  //onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent"
+                />
+                <svg
+                  className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <select
+                // value={filterType}
+                //onChange={(e) => setFilterType(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
+              >
+                <option value="todos">Todos los tipos</option>
+                <option value="dashboard">Dashboard</option>
+                <option value="usuarios">Usuarios</option>
+                <option value="inscripciones">Inscripciones</option>
+              </select>
+              <select
+                // value={filterStatus}
+                //onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
+              >
+                <option value="todos">Todos los estados</option>
+                <option value="completado">Completado</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="error">Error</option>
+              </select>
             </div>
 
             {/* Reports Grid */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-
-
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {reportesGuardados.map((report) => (
                 <div
                   key={report.id}
-                  className="rounded-lg border border-gray-200 bg-white p-4 hover:shadow-md transition-shadow"
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                 >
                   <div className="mb-3 flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -526,13 +574,19 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
                           </div>
                         )
                       })()}
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{report.nombre}</h3>
-                        <p className="text-xs text-gray-500">{report.createdAt}</p>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-[#334155] mb-1">{report.nombre}</h4>
+                        <p className="text-sm text-gray-500"> {new Date(report.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
                   </div>
-                  <p className="mb-4 text-sm text-gray-600">{report.description}</p>
+                  <p className="mb-4 text-sm text-gray-600">{report.descripcion}</p>
+                  <div className="mb-3">
+                    <span className="inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
+                      {report.estado}
+                    </span>
+                  </div>
+
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => {
@@ -555,13 +609,13 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
                         setCurrentPage(1);
                         setSearchTerm("");
                       }}
-                      className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                      className="flex-1 px-4 py-2 bg-[#2563eb] text-white rounded-lg hover:bg-[#1d4ed8] transition-colors flex items-center justify-center gap-2 font-medium"
                     >
                       <Eye className="inline h-4 w-4 mr-1" />
                       Ver Reporte
                     </button>
                     <button
-                      onClick={() => {editarReporte(report);}}
+                      onClick={() => { editarReporte(report); }}
                       className="rounded-lg border border-gray-200 bg-white p-2 hover:bg-yellow-50 hover:border-yellow-200 transition-colors"
                       title="Editar"
                     >
@@ -697,9 +751,9 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
           </div>
         </div>
       )}
+    </>
 
-
-    </div>
+ 
   )
 }
 TablaReportes.propTypes = {

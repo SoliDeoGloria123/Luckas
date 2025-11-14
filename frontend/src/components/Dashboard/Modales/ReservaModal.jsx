@@ -133,7 +133,7 @@ const ReservasModal = ({
           <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
 
-        <form className="modal-body-admin" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <form className="modal-body-admin" style={{ maxHeight: '70vh', overflowY: 'auto' }} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
           {/* Usuario */}
           <div className="form-grupo-admin">
             <label htmlFor="usuario">Usuario:</label>
@@ -372,8 +372,8 @@ const ReservasModal = ({
           </div>
 
           <div className="modal-action-admin">
-            <button className="btn-admin secondary-admin" onClick={onClose}>Cancelar</button>
-            <button className="btn-admin btn-primary" onClick={onSubmit}>
+            <button type="button" className="btn-admin secondary-admin" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="btn-admin btn-primary">
               {modoEdicion ? "Guardar Cambios" : "Crear Reserva"}
             </button>
           </div>

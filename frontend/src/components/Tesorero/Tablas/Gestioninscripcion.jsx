@@ -113,10 +113,11 @@ const Gestioninscripcion = () => {
   };
 
   // Funciones para el modal del Dashboard
-  const crearInscripcion = async (e) => {
-    e.preventDefault();
+  const crearInscripcion = async (payload) => {
     try {
-      await inscripcionService.createInscripcion(nuevaInscripcion);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaInscripcion;
+      await inscripcionService.create(body);
       mostrarAlerta("¡Éxito!", "Inscripción creada exitosamente", 'success');
       setMostrarModal(false);
       obtenerInscripciones();
@@ -125,10 +126,16 @@ const Gestioninscripcion = () => {
     }
   };
 
-  const actualizarInscripcion = async (e) => {
-    e.preventDefault();
+  const actualizarInscripcion = async (payload) => {
     try {
-      await inscripcionService.updateInscripcion(inscripcionSeleccionada._id, nuevaInscripcion);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaInscripcion;
+      const id = (body && body._id) ? body._id : (inscripcionSeleccionada && inscripcionSeleccionada._id);
+      if (!id) {
+        mostrarAlerta('ERROR', 'No se encontró el ID de la inscripción a actualizar', 'error');
+        return;
+      }
+      await inscripcionService.update(id, body);
       mostrarAlerta("¡Éxito!", "Inscripción actualizada exitosamente", 'success');
       setMostrarModal(false);
       obtenerInscripciones();
@@ -157,7 +164,7 @@ const Gestioninscripcion = () => {
       <main className="main-content-tesorero">
         <div className="page-header-tesorero">
           <div className="card-header-tesorero">
-            <button className="back-btn-tesorero">
+            <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
               <i className="fas fa-arrow-left"></i>
             </button>
             <div className="page-title-tesorero">
@@ -330,16 +337,13 @@ const Gestioninscripcion = () => {
         {mostrarModal && (
           <InscripcionModal
             mostrar={mostrarModal}
-            modoEdicion={modoEdicion}
-            inscripcionSeleccionada={inscripcionSeleccionada}
-            setInscripcionSeleccionada={setInscripcionSeleccionada}
-            nuevaInscripcion={nuevaInscripcion}
-            setNuevaInscripcion={setNuevaInscripcion}
+            modo={modoEdicion ? "editar" : "crear"}
+            inscripcion={inscripcionSeleccionada}
             eventos={eventos}
             categorias={categorias}
             programas={programas}
             onClose={() => setMostrarModal(false)}
-            onSubmit={(e) => modoEdicion ? actualizarInscripcion(e) : crearInscripcion(e)}
+            onSubmit={modoEdicion ? actualizarInscripcion : crearInscripcion}
           />
         )}
       </main>

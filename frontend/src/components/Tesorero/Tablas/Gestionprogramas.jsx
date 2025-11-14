@@ -166,6 +166,12 @@ const Gestioncursos = () => {
     e.preventDefault();
     try {
       // Convertir la estructura del formulario a la estructura del backend
+      // Validaciones frontend: asegurar que categoría exista y que certificacion sea booleano
+      if (!nuevoPrograma.categoria) {
+        mostrarAlerta('ERROR', 'Seleccione una categoría para el programa', 'error');
+        return;
+      }
+      const certificacionBool = (nuevoPrograma.certificacion === true || String(nuevoPrograma.certificacion).toLowerCase() === 'true');
       const programaData = {
         nombre: nuevoPrograma.titulo,
         descripcion: nuevoPrograma.descripcion,
@@ -176,6 +182,7 @@ const Gestioncursos = () => {
         fechaInicio: nuevoPrograma.fechaInicio,
         fechaFin: nuevoPrograma.fechaFin,
         cuposDisponibles: Number(nuevoPrograma.cupos),
+        categoria: nuevoPrograma.categoria,
         profesor: nuevoPrograma.profesor,
         profesorBio: nuevoPrograma.profesorBio || '',
         requisitos: procesarRequisitos(nuevoPrograma.requisitos),
@@ -183,7 +190,7 @@ const Gestioncursos = () => {
         objetivos: procesarObjetivos(nuevoPrograma.objetivos),
         metodologia: nuevoPrograma.metodologia || '',
         evaluacion: nuevoPrograma.evaluacion || '',
-        certificacion: nuevoPrograma.certificacion || '',
+        certificacion: certificacionBool,
         imagen: nuevoPrograma.imagen || '',
         destacado: nuevoPrograma.destacado || false
       };
@@ -200,6 +207,7 @@ const Gestioncursos = () => {
     e.preventDefault();
     try {
       // Convertir la estructura del formulario a la estructura del backend
+      const certificacionBool = (nuevoPrograma.certificacion === true || String(nuevoPrograma.certificacion).toLowerCase() === 'true');
       const programaData = {
         nombre: nuevoPrograma.titulo,
         descripcion: nuevoPrograma.descripcion,
@@ -217,7 +225,8 @@ const Gestioncursos = () => {
         objetivos: procesarObjetivos(nuevoPrograma.objetivos),
         metodologia: nuevoPrograma.metodologia || '',
         evaluacion: nuevoPrograma.evaluacion || '',
-        certificacion: nuevoPrograma.certificacion || '',
+        certificacion: certificacionBool,
+        categoria: nuevoPrograma.categoria || (programaSeleccionado && programaSeleccionado.categoria),
         imagen: nuevoPrograma.imagen || '',
         destacado: nuevoPrograma.destacado || false
       };
@@ -233,22 +242,7 @@ const Gestioncursos = () => {
   //------------------------------------------------------------------------------------------------------------------------------------
   //obtener cursos
 
-  const cargarProgramas = async () => {
-  setCargando(true);
-    try {
-      const response = await programasAcademicosService.getAllProgramas(filtros);
-      if (response.success) {
-        setProgramas(response.data);
-      }
-    } catch (error) {
-      console.error('Error al cargar programas:', error);
-    } finally {
-      setCargando(false);
-    }
-  };
-  useEffect(() => {
-    cargarProgramas();
-  }, []);
+
 
   // Función de búsqueda por nombre, instructor o categoría
   const handleSearch = (searchValue) => {
@@ -303,7 +297,7 @@ const Gestioncursos = () => {
       <main className="main-content-tesorero">
         <div className="page-header-tesorero">
           <div className="card-header-tesorero">
-            <button className="back-btn-tesorero">
+            <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
               <i className="fas fa-arrow-left"></i>
             </button>
             <div className="page-title-tesorero">

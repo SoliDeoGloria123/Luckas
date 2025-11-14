@@ -108,6 +108,7 @@ app.listen(PORT,()=>{
 
 // Iniciar el servidor
 async function main() {
+<<<<<<< HEAD
   try {
     await startServer();
   } catch (error) {
@@ -116,4 +117,13 @@ async function main() {
   }
 }
 
+=======
+    try {
+        await startServer();
+    } catch (error) {
+        console.error('❌ Error al iniciar el servidor:', error);
+        process.exit(1);
+    }
+}
+>>>>>>> 83d56f08903fb5baaf0c4ca724e3fd5739b48397
 main();

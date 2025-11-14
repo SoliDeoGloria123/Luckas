@@ -22,7 +22,6 @@ const BaseNotificationPanel = ({
 
   // Configuración por defecto de clases CSS
   const defaultClasses = {
-    overlay: 'notification-overlay',
     panel: 'notification-panel',
     header: 'notification-header',
     title: 'notification-title',

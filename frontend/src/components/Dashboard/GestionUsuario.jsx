@@ -1,4 +1,4 @@
-import React, { useState,  useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import UsuarioModal from "./Modales/UsuarioModal";
 import TablaUsuarios from "./Tablas/UserTabla";
 import { userService } from "../../services/userService";
@@ -332,19 +332,12 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                             onEliminar={eliminarUsuario}
                             onToggleEstado={onToggleEstado}
                         />
+
+
                     </div>
 
                     {/* Modal */}
-                    <UsuarioModal
-                        mostrar={mostrarModal}
-                        modoEdicion={modoEdicion}
-                        usuarioSeleccionado={usuarioSeleccionado}
-                        setUsuarioSeleccionado={setUsuarioSeleccionado}
-                        nuevoUsuario={nuevoUsuario}
-                        setNuevoUsuario={setNuevoUsuario}
-                        onClose={() => setMostrarModal(false)}
-                        onSubmit={modoEdicion ? actualizarUsuario : crearUsuario}
-                    />
+
 
                     {/* Paginación funcional */}
                     <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
@@ -367,6 +360,16 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                         </button>
                     </div>
                 </div>
+                <UsuarioModal
+                    mostrar={mostrarModal}
+                    modoEdicion={modoEdicion}
+                    usuarioSeleccionado={usuarioSeleccionado}
+                    setUsuarioSeleccionado={setUsuarioSeleccionado}
+                    nuevoUsuario={nuevoUsuario}
+                    setNuevoUsuario={setNuevoUsuario}
+                    onClose={() => setMostrarModal(false)}
+                    onSubmit={modoEdicion ? actualizarUsuario : crearUsuario}
+                />
             </div>
         </div >
     )
