@@ -12,7 +12,7 @@ const TareasManagement = () => {
   const [filterEstado, setFilterEstado] = useState("todos")
   const [filterPrioridad, setFilterPrioridad] = useState("todas")
   const [usuarios, setUsuarios] = useState([]);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null); // Eliminado por no ser usado
   const [tareas, setTareas] = useState([]);
 
   const [formData, setFormData] = useState({

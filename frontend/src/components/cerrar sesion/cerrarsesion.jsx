@@ -23,7 +23,7 @@ const CerrarSesion = () => {
 
 
   const secureRandomWithIndex = (i) => {
-    if (typeof globalThis !== 'undefined' && globalThis.crypto && globalThis.crypto.getRandomValues) {
+    if (typeof globalThis !== 'undefined' && globalThis.crypto?.getRandomValues) {
       const arr = new Uint32Array(1)
       globalThis.crypto.getRandomValues(arr)
       return arr[0] / (0xffffffff + 1)
@@ -36,7 +36,7 @@ const CerrarSesion = () => {
   }
 
   const uniqueId = (i) => {
-    if (typeof globalThis !== 'undefined' && globalThis.crypto && globalThis.crypto.randomUUID) {
+    if (typeof globalThis !== 'undefined' && globalThis.crypto?.randomUUID) {
       return `particle-${globalThis.crypto.randomUUID()}`
     }
     return `particle-${Date.now()}-${i}`

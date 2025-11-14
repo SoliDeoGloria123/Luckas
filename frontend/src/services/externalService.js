@@ -24,7 +24,7 @@ const externalService = {
     try {
       const response = await api.get('/programas-academicos');
       // El backend responde con { data: [...] }
-      if (response.data && response.data.data) {
+      if (response.data?.data) {
         return response.data.data;
       } else if (Array.isArray(response.data)) {
         return response.data;
@@ -47,7 +47,7 @@ const externalService = {
       console.log('Making request to /programas-academicos...');
       const response = await api.get('/programas-academicos');
       console.log('Programas Académicos API response:', response.data);
-      if (response.data && response.data.success && response.data.data) {
+      if (response.data?.success && response.data?.data) {
         return response.data.data;
       } else if (Array.isArray(response.data)) {
         return response.data;
@@ -64,7 +64,7 @@ const externalService = {
       console.log('Making request to /cabanas...');
       const response = await api.get('/cabanas');
       console.log('Cabañas API response:', response.data);
-      if (response.data && response.data.success && response.data.data) {
+      if (response.data?.success && response.data?.data) {
         return response.data.data;
       } else if (Array.isArray(response.data)) {
         return response.data;

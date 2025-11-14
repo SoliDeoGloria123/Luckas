@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuthCheck } from './hooks/useAuthCheck';
 import { eventService } from '../../services/eventService';
@@ -9,17 +10,14 @@ import Header from './Shared/Header';
 import './DashboardSeminarista.css';
 
 const DashboardSeminarista = () => {
-  // Estados eliminados por no usarse el valor, solo el setter
-  const setMostrarModificarPerfil = useState(false)[1];
-  const setMensaje = useState('')[1];
-  const setMensajeTipo = useState('info')[1];
-  const setEventos = useState([])[1];
-  const setCabanas = useState([])[1];
-  const setLoadingEventos = useState(true)[1];
-  const setLoadingCabanas = useState(true)[1];
+    const navigate = useNavigate();
+    const [loadingCabanas, setLoadingCabanas] = useState(false);
+    const [loadingEventos, setLoadingEventos] = useState(false);
+    const [cabanas, setCabanas] = useState([]);
+    const [eventos, setEventos] = useState([]);
 
   // Verificar autenticación y rol
-  const { isAuthenticated, user } = useAuthCheck('seminarista');
+  const { isAuthenticated } = useAuthCheck('seminarista');
 
   // Escuchar evento de modificar perfil
   useEffect(() => {
@@ -82,14 +80,7 @@ const DashboardSeminarista = () => {
     return <div>Cargando...</div>;
   }
 
-  const handleSuccess = (mensaje, tipo = 'success') => {
-    setMensaje(mensaje);
-    setMensajeTipo(tipo);
-    setTimeout(() => {
-      setMensaje('');
-      setMensajeTipo('info');
-    }, 5000);
-  };
+  // ...existing code...
     return (
       <div className="dashboard-seminarista-contenedo">
         <Header/>
@@ -185,7 +176,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Eventos</h3>
                   <p>Explora y participa en eventos del seminario</p>
-                  <button className="service-btn">Explorar Eventos</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/eventos')}>Explorar Eventos</button>
                 </div>
               </div>
 
@@ -199,7 +190,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Cabañas</h3>
                   <p>Descubre y reserva cabañas disponibles</p>
-                  <button className="service-btn">Ver Cabañas</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/cabanas')}>Ver Cabañas</button>
                 </div>
               </div>
 
@@ -216,7 +207,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Mis Inscripciones</h3>
                   <p>Revisa tus inscripciones a eventos</p>
-                  <button className="service-btn">Ver Inscripciones</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/inscripciones')}>Ver Inscripciones</button>
                 </div>
               </div>
 
@@ -230,7 +221,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Mis Reservas</h3>
                   <p>Gestiona tus reservas de cabañas</p>
-                  <button className="service-btn">Ver Reservas</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/reservas')}>Ver Reservas</button>
                 </div>
               </div>
 
@@ -246,7 +237,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Mis Solicitudes</h3>
                   <p>Consulta el estado de tus solicitudes</p>
-                  <button className="service-btn">Ver Solicitudes</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/solicitudes')}>Ver Solicitudes</button>
                 </div>
               </div>
 
@@ -261,7 +252,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Nueva Solicitud</h3>
                   <p>Crea una nueva solicitud</p>
-                  <button className="service-btn">Crear Solicitud</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/nueva-solicitud')}>Crear Solicitud</button>
                 </div>
               </div>
             </div>

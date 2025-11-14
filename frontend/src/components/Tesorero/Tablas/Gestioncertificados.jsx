@@ -10,7 +10,6 @@ import { mostrarAlerta } from '../../utils/alertas';
 const CertificadosPage = () => {
 
     const [certificados, setCertificados] = useState([]);
-    const [loading, setLoading] = useState(true);
     
     useEffect(() => {
         // Obtener inscripciones con estado certificado o finalizado usando inscripcionService

@@ -251,7 +251,7 @@ const ProgramasAcademicos = () => {
             : [],
         metodologia: formData.metodologia || '',
         evaluacion: formData.evaluacion || '',
-        certificacion: formData.certificacion === 'si' || formData.certificacion === true,
+        certificacion: formData.certificacion == 'si' || formData.certificacion === true,
         destacado: formData.destacado || false,
         estado: 'activo'
     });

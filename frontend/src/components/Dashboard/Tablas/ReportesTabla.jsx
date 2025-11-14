@@ -101,28 +101,7 @@ const extraerDataArray = (datos) => {
   return [];
 };
 
-const generarDistribucionUsuarios = (dataArray) => {
-  const roleCount = {};
-  for (const user of dataArray) {
-    const role = user.rol || user.role || user.roles?.[0] || 'Sin rol';
-    roleCount[role] = (roleCount[role] || 0) + 1;
-  }
-  return Object.entries(roleCount).map(([name, value]) => ({ name, value }));
-};
-
-const generarDistribucionEventos = (dataArray) => {
-  const statusCount = { 'Activos': 0, 'Inactivos': 0 };
-  for (const evento of dataArray) {
-    if (evento.active || evento.activo) {
-      statusCount['Activos'] += 1;
-    } else {
-      statusCount['Inactivos'] += 1;
-    }
-  }
-  return Object.entries(statusCount)
-    .filter(([, value]) => value > 0)
-    .map(([name, value]) => ({ name, value }));
-};
+// ...no dejar código suelto aquí, solo funciones válidas...
 
 const generarDistribucionReservas = (dataArray) => {
   const statusCount = {};
@@ -178,9 +157,9 @@ const generarDistribucionProgramas = (dataArray) => {
       statusCount['Inactivos'] += 1;
     }
   }
-  return Object.entries(statusCount)
-    .filter(([, value]) => value > 0)
-    .map(([name, value]) => ({ name, value }));
+    return Object.entries(statusCount)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({ name, value }));
 };
 
 const obtenerDistribucionPorTipo = (tipoReporte, dataArray) => {
