@@ -10,7 +10,6 @@ import FormularioInscripcion from '../pages/FormularioInscripcion';
 const EventosSeminario = () => {
   const { user } = useAuthCheck('seminarista');
   const [eventos, setEventos] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
   const [inscripcionMsg, setInscripcionMsg] = useState(null);
@@ -48,8 +47,6 @@ const EventosSeminario = () => {
         setMisInscripciones(inscripcionesArray);
       } catch (err) {
         console.error('Error al cargar eventos o inscripciones:', err);
-      } finally {
-        setLoading(false);
       }
     };
 

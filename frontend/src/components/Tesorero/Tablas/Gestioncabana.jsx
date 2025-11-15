@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cabanaService } from '../../../services/cabanaService';
 import { categorizacionService } from '../../../services/categorizacionService';
-import { useNavigate } from "react-router-dom";
 import { mostrarAlerta } from '../../utils/alertas';
 import CabanaModal from '../../Dashboard/Modales/CabanaModal';
 import Header from '../Header/Header-tesorero';
@@ -69,14 +68,7 @@ const Gestioncabana = () => {
   const [cargando] = useState(false); // setCargando commented as unused
   const cabanasFiltradas = cabanas;
   const [categorias, setCategorias] = useState([]);
-  const navigate = useNavigate();
 
-
-
-
-  const ataras = () => {
-    navigate('/tesorero');
-  };
 
   // Funciones para navegación de imágenes
   const prevImg = (cabanaId, imagenes) => {
@@ -174,10 +166,12 @@ const Gestioncabana = () => {
   };
 
   // Funciones para el modal del Dashboard
-  const crearCabana = async (e) => {
-    e.preventDefault();
+  const crearCabana = async (payload) => {
+    // Soporta recibir event (desde submit directo) o un payload (FormData u objeto)
     try {
-      await cabanaService.createCabana(nuevaCabana);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaCabana;
+      await cabanaService.create(body);
       mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente", 'success');
       setMostrarModal(false);
       obtenerCabanas();
@@ -186,10 +180,16 @@ const Gestioncabana = () => {
     }
   };
 
-  const actualizarCabana = async (e) => {
-    e.preventDefault();
+  const actualizarCabana = async (payload) => {
     try {
-      await cabanaService.updateCabana(cabanaSeleccionada._id, nuevaCabana);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaCabana;
+      const id = (body && body._id) ? body._id : (cabanaSeleccionada && cabanaSeleccionada._id);
+      if (!id) {
+        mostrarAlerta('ERROR', 'No se encontró el ID de la cabaña a actualizar', 'error');
+        return;
+      }
+      await cabanaService.update(id, body);
       mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente", 'success');
       setMostrarModal(false);
       obtenerCabanas();
@@ -218,7 +218,7 @@ const Gestioncabana = () => {
       <main className="main-content-tesorero">
         <div className="page-header-tesorero">
           <div className="card-header-tesorero">
-            <button className="back-btn-tesorero" onClick={ataras}>
+            <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
               <i className="fas fa-arrow-left"></i>
             </button>
             <div className="page-title-tesorero">
@@ -547,7 +547,7 @@ const Gestioncabana = () => {
         )}
 
         {mostrarModal && (
-          <CabanaModal
+            <CabanaModal
             mostrar={mostrarModal}
             modoEdicion={modoEdicion}
             cabanaSeleccionada={cabanaSeleccionada}
@@ -555,7 +555,7 @@ const Gestioncabana = () => {
             nuevaCabana={nuevaCabana}
             setNuevaCabana={setNuevaCabana}
             onClose={() => setMostrarModal(false)}
-            onSubmit={(e) => modoEdicion ? actualizarCabana(e) : crearCabana(e)}
+              onSubmit={modoEdicion ? actualizarCabana : crearCabana}
             categorias={categorias}
             selectedImages={selectedImages}
             setSelectedImages={setSelectedImages}

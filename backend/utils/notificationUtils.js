@@ -22,7 +22,7 @@ async function enviarNotificacionAUsuariosConRol(title, message, icon = 'Bell', 
       filtro._id = { $ne: excludeUserId };
     }
     
-    const usuarios = await Usuario.find(filtro, '_id');
+    const usuarios = await Usuario.find(filtro).select('_id');
     
     if (usuarios.length === 0) {
       console.log('No se encontraron usuarios con los roles especificados:', targetRoles);

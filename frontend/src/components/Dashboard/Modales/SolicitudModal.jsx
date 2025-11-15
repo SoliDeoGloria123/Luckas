@@ -70,8 +70,8 @@ const SolicitudModal = ({
   };
 
   const handleFieldChange = (fieldName, value) => {
-    const { data, setData } = getSolicitudData();
-    setData({ ...data, [fieldName]: value });
+    const { setData } = getSolicitudData();
+    setData(prevData => ({ ...prevData, [fieldName]: value }));
   };
 
   // Detectar pegado en el campo de cédula SOLO en modo creación
@@ -205,6 +205,9 @@ const SolicitudModal = ({
     { value: 'Otra', label: 'Otra' }
   ];
 
+  // Debug para ver qué datos llegan
+  console.log("CATEGORIAS RECIBIDAS EN MODAL:", categorias);
+  
   const categoriaOptions = categorias ? categorias.map(cat => ({ value: cat._id, label: cat.nombre })) : [];
 
   if (!mostrar) return null;
@@ -267,10 +270,8 @@ const SolicitudModal = ({
                 value={getFieldValue('tipoSolicitud')}
                 onChange={(e) => {
                   const value = e.target.value;
-                  if (modoEdicion) {
-                    handleFieldChange('tipoSolicitud', value);
-                  } else {
-                    handleFieldChange('tipoSolicitud', value);
+                  handleFieldChange('tipoSolicitud', value);
+                  if (!modoEdicion) {
                     handleFieldChange('modeloReferencia', '');
                   }
                 }}
@@ -299,6 +300,22 @@ const SolicitudModal = ({
               </div>
             )}
             {renderSelectField('categoria', 'Categoría', categoriaOptions, true)}
+
+            {/* Input dinámico para referencia (evento, programa, etc.) */}
+            {getFieldValue('tipoSolicitud') === 'Inscripción' && getFieldValue('modeloReferencia') === 'Eventos' && getFieldValue('categoria') && (
+              <div className="form-grupo-admin">
+                <label htmlFor="referenciaNuevo">Evento:</label>
+                <input
+                  id="referenciaNuevo"
+                  type="text"
+                  value={getFieldValue('referencia')}
+                  onChange={e => handleFieldChange('referencia', e.target.value)}
+                  placeholder="ID o nombre del evento"
+                  required
+                />
+              </div>
+            )}
+            {/* Puedes agregar más condiciones para otros modelos de referencia aquí */}
           </div>
           <div className="from-grid-admin">
             {renderInputField('descripcion', 'Descripción', 'text', true, 'Descripción')}

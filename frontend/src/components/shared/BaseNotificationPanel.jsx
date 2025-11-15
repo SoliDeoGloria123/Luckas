@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import createNotificationCssClasses from './notificationCss';
 
 const BaseNotificationPanel = ({ 
   token, 
@@ -20,37 +21,8 @@ const BaseNotificationPanel = ({
     deleteNotification
   } = useNotifications(token, userRole);
 
-  // Configuración por defecto de clases CSS
-  const defaultClasses = {
-    overlay: 'notification-overlay',
-    panel: 'notification-panel',
-    header: 'notification-header',
-    title: 'notification-title',
-    titleText: 'title',
-    unreadCount: 'unread-count',
-    actions: 'notification-actions',
-    markAllBtn: 'mark-all-read-btn',
-    closeBtn: 'close-btn',
-    content: 'notification-content',
-    footer: 'notification-footer',
-    refreshBtn: 'refresh-btn',
-    loading: 'notification-loading',
-    spinner: 'spinner',
-    error: 'notification-error',
-    retryBtn: 'retry-btn',
-    empty: 'notification-empty',
-    emptyIcon: 'empty-icon',
-    list: 'notification-list',
-    item: 'notification-item',
-    iconItem: 'notification-icon',
-    contentItem: 'notification-content-item',
-    titleItem: 'notification-title-item',
-    message: 'notification-message',
-    date: 'notification-date',
-    actionsItem: 'notification-actions-item',
-    markReadBtn: 'mark-read-btn',
-    deleteBtn: 'delete-btn'
-  };
+  // Configuración por defecto de clases CSS (centralizada)
+  const defaultClasses = createNotificationCssClasses();
 
   // Fusionar clases CSS personalizadas con las por defecto
   const classes = { ...defaultClasses, ...cssClasses };

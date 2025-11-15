@@ -1,4 +1,4 @@
-import React, { useState,  useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import UsuarioModal from "./Modales/UsuarioModal";
 import TablaUsuarios from "./Tablas/UserTabla";
 import { userService } from "../../services/userService";
@@ -14,8 +14,8 @@ import {
 
 const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, modoTesorero = false, userRole, readOnly = false, canCreate = true, canEdit = true, canDelete = true }) => {
     const [usuarios, setUsuarios] = useState([]);
-    const [cargando, setCargando] = useState(true);
     const [busqueda, setBusqueda] = useState("");
+    const [cargando, setCargando] = useState(true);
     const [mostrarModal, setMostrarModal] = useState(false);
     const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
     const [modoEdicion, setModoEdicion] = useState(false);
@@ -226,6 +226,15 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
         );
     }
 
+    // Mostrar indicador mientras se obtienen usuarios
+    if (cargando) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <div>Cargando usuarios...</div>
+            </div>
+        );
+    }
+
 
     return (
         <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
@@ -332,19 +341,12 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                             onEliminar={eliminarUsuario}
                             onToggleEstado={onToggleEstado}
                         />
+
+
                     </div>
 
                     {/* Modal */}
-                    <UsuarioModal
-                        mostrar={mostrarModal}
-                        modoEdicion={modoEdicion}
-                        usuarioSeleccionado={usuarioSeleccionado}
-                        setUsuarioSeleccionado={setUsuarioSeleccionado}
-                        nuevoUsuario={nuevoUsuario}
-                        setNuevoUsuario={setNuevoUsuario}
-                        onClose={() => setMostrarModal(false)}
-                        onSubmit={modoEdicion ? actualizarUsuario : crearUsuario}
-                    />
+
 
                     {/* Paginación funcional */}
                     <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
@@ -367,6 +369,16 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                         </button>
                     </div>
                 </div>
+                <UsuarioModal
+                    mostrar={mostrarModal}
+                    modoEdicion={modoEdicion}
+                    usuarioSeleccionado={usuarioSeleccionado}
+                    setUsuarioSeleccionado={setUsuarioSeleccionado}
+                    nuevoUsuario={nuevoUsuario}
+                    setNuevoUsuario={setNuevoUsuario}
+                    onClose={() => setMostrarModal(false)}
+                    onSubmit={modoEdicion ? actualizarUsuario : crearUsuario}
+                />
             </div>
         </div >
     )

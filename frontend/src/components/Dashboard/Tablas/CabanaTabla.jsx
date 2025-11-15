@@ -22,8 +22,7 @@ import {
 const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, setNuevaCabana, onVerDetalle }) => {
 
   const [filtros, setFiltros] = useState({ busqueda: '', tipo: 'todos', estado: 'todos' });
-  const [cabanaSeleccionada, setCabanaSeleccionada] = useState(null);
-  const [cargando, setCargando] = useState(false);
+  const cargando = false;
   const [imgIndices, setImgIndices] = useState({});
 
   const tiposCabanas = [
@@ -46,18 +45,6 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
     { value: 'piscina', label: 'Acceso a Piscina', icon: '🏊' }
   ];
 
-  const amenidadesDisponibles = [
-    { value: 'tv', label: 'TV', icon: '📺' },
-    { value: 'aire_acondicionado', label: 'A/C', icon: '❄️' },
-    { value: 'ventilador', label: 'Ventilador', icon: '💨' },
-    { value: 'nevera', label: 'Nevera', icon: '🧊' },
-    { value: 'microondas', label: 'Microondas', icon: '📦' },
-    { value: 'cafetera', label: 'Cafetera', icon: '☕' },
-    { value: 'toallas', label: 'Toallas', icon: '🏖️' },
-    { value: 'sabanas', label: 'Sábanas', icon: '🛏️' },
-    { value: 'almohadas', label: 'Almohadas', icon: '😴' },
-    { value: 'secador', label: 'Secador de Pelo', icon: '💇' }
-  ];
 
   const cabanasFiltradas = cabanas.filter(cabana => {
     const cumpleBusqueda = cabana.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
@@ -81,37 +68,6 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
     return tiposCabanas.find(t => t.value === tipo) || tiposCabanas[0];
   };
 
-  const toggleServicio = (servicio, isEditing = false) => {
-    if (isEditing) {
-      const serviciosActuales = cabanaSeleccionada.servicios || [];
-      const nuevosServicios = serviciosActuales.includes(servicio)
-        ? serviciosActuales.filter(s => s !== servicio)
-        : [...serviciosActuales, servicio];
-      setCabanaSeleccionada({ ...cabanaSeleccionada, servicios: nuevosServicios });
-    } else {
-      const serviciosActuales = nuevaCabana.servicios;
-      const nuevosServicios = serviciosActuales.includes(servicio)
-        ? serviciosActuales.filter(s => s !== servicio)
-        : [...serviciosActuales, servicio];
-      setNuevaCabana({ ...nuevaCabana, servicios: nuevosServicios });
-    }
-  };
-
- /// const toggleAmenidad = (amenidad, isEditing = false) => {
- ///   if (isEditing) {
- ///     const amenidadesActuales = cabanaSeleccionada.amenidades || [];
- ///     const nuevasAmenidades = amenidadesActuales.includes(amenidad)
- ///       ? amenidadesActuales.filter(a => a !== amenidad)
- ///       : [...amenidadesActuales, amenidad];
- ///     setCabanaSeleccionada({ ...cabanaSeleccionada, amenidades: nuevasAmenidades });
- ///   } else {
- ///     const amenidadesActuales = nuevaCabana.amenidades;
- ///     const nuevasAmenidades = amenidadesActuales.includes(amenidad)
- ///       ? amenidadesActuales.filter(a => a !== amenidad)
- ///       : [...amenidadesActuales, amenidad];
- ///     setNuevaCabana({ ...nuevaCabana, amenidades: nuevasAmenidades });
- ///   }
- /// };
 
   // Renderizado condicional extraído para evitar ternarias anidadas en JSX
   let contenidoCabanas;
@@ -393,6 +349,7 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
     </>
   );
 };
+
 CabanaTabla.propTypes = {
   cabanas: PropTypes.array.isRequired,
   onEditar: PropTypes.func.isRequired,

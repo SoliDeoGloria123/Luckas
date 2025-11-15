@@ -115,10 +115,14 @@ const Gestionevento = () => {
   };
 
   // Funciones para el modal del Dashboard
-  const crearEvento = async (e) => {
-    e.preventDefault();
+  const crearEvento = async (payload) => {
+    // El modal puede llamar al handler pasando los datos (payload)
+    // o puede invocarlo como handler de formulario (event). Adaptamos ambos casos.
     try {
-      await eventService.createEvent(nuevoEvento);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevoEvento;
+      const isFormData = (typeof FormData !== 'undefined') && (body instanceof FormData);
+      await eventService.createEvent(body, isFormData);
       mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
       setMostrarModal(false);
       obtenerEventos();
@@ -127,10 +131,18 @@ const Gestionevento = () => {
     }
   };
 
-  const actualizarEvento = async (e) => {
-    e.preventDefault();
+  const actualizarEvento = async (payload) => {
+    // Soportar llamadas con event (desde un submit directo) o con datos (desde el modal)
     try {
-      await eventService.updateEvent(eventoSeleccionado._id, nuevoEvento);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : (eventoSeleccionado || nuevoEvento);
+      const isFormData = (typeof FormData !== 'undefined') && (body instanceof FormData);
+      const id = (body && body._id) ? body._id : (eventoSeleccionado && eventoSeleccionado._id);
+      if (!id) {
+        mostrarAlerta('Error', 'No se encontró el ID del evento a actualizar');
+        return;
+      }
+      await eventService.updateEvent(id, body, isFormData);
       mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
       setMostrarModal(false);
       obtenerEventos();
@@ -159,7 +171,7 @@ const Gestionevento = () => {
       <main className="main-content-tesorero">
         <div className="page-header-tesorero">
           <div className="card-header-tesorero">
-            <button className="back-btn-tesorero">
+            <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
               <i className="fas fa-arrow-left"></i>
             </button>
             <div className="page-title-tesorero">

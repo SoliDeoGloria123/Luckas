@@ -1,6 +1,7 @@
 
 import React, {useState, useEffect} from "react";
 import PropTypes from 'prop-types';
+import cabanaShape from './common/cabanaPropTypes';
 
 
 const CabanaModal = ({
@@ -434,27 +435,9 @@ const CabanaModal = ({
 CabanaModal.propTypes = {
   mostrar: PropTypes.bool.isRequired,
   modoEdicion: PropTypes.bool,
-  cabanaSeleccionada: PropTypes.shape({
-    nombre: PropTypes.string,
-    descripcion: PropTypes.string,
-    capacidad: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    categoria: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    estado: PropTypes.string,
-    imagen: PropTypes.array,
-    ubicacion: PropTypes.string
-  }),
+  cabanaSeleccionada: cabanaShape,
   setCabanaSeleccionada: PropTypes.func,
-  nuevaCabana: PropTypes.shape({
-    nombre: PropTypes.string,
-    descripcion: PropTypes.string,
-    capacidad: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    categoria: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    estado: PropTypes.string,
-    imagen: PropTypes.array,
-    ubicacion: PropTypes.string
-  }),
+  nuevaCabana: cabanaShape,
   setNuevaCabana: PropTypes.func,
   onClose: PropTypes.func,
   onSubmit: PropTypes.func,

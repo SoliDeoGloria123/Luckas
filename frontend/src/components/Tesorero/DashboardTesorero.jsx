@@ -8,7 +8,6 @@ import { Users, Home, Book, ClipboardList, UserCheck, Award, FileText, Calendar 
 const DashboardTesorero = () => {
   const [usuario, setUsuario] = useState(null);
   const navigate = useNavigate();
-  const [seccionActiva] = useState("dashboard"); // setSeccionActiva commented as unused
   useEffect(() => {
     const usuarioStorage = localStorage.getItem('usuario');
     const token = localStorage.getItem('token');

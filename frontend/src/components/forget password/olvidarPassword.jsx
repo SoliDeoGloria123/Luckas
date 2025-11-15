@@ -79,6 +79,16 @@ const OlvidarPassword = () => {
         navigate('/login')
     };
 
+    // Volver a la pantalla de email (para reingresar/modificar correo)
+    const goToEmailPage = () => {
+        setStep("email");
+        setError("");
+        setSuccessMsg("");
+        setCode("");
+        setNewPassword("");
+        setConfirmPassword("");
+    };
+
     return (
         <div className="princpial">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />

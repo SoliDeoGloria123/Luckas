@@ -17,77 +17,46 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Helper para realizar GETs con patrón común y reducir duplicación
+async function safeGet(path) {
+  try {
+    const response = await api.get(path);
+    console.log(`API response for ${path}:`, response.data);
+    if (response.data?.success && response.data?.data) {
+      return response.data.data;
+    }
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    return [];
+  } catch (error) {
+    console.error(`Error fetching ${path}:`, error);
+    return [];
+  }
+}
+
 const externalService = {
 
   // Obtener programas académicos disponibles
-  getProgramasAcademicos: async () => {
-    try {
-      const response = await api.get('/programas-academicos');
-      // El backend responde con { data: [...] }
-      if (response.data && response.data.data) {
-        return response.data.data;
-      } else if (Array.isArray(response.data)) {
-        return response.data;
-      } else {
-        return [];
-      }
-    } catch (error) {
-      console.error('Error al obtener programas académicos:', error);
-      return [];
-    }
+  getProgramasAcademicos: async () => safeGet('/programas-academicos'),
+
+  // Obtener cursos disponibles (legacy, alias a programas académicos)
+  getCursos: async () => {
+    console.log('Making request to /programas-academicos...');
+    return safeGet('/programas-academicos');
   },
 
   // Obtener cabañas disponibles
-  // (definido más abajo, eliminar duplicado)
-
-  // Obtener cursos disponibles (legacy, para compatibilidad)
-  // Obtener programas académicos (cursos y técnicos)
-  getCursos: async () => {
-    try {
-      console.log('Making request to /programas-academicos...');
-      const response = await api.get('/programas-academicos');
-      console.log('Programas Académicos API response:', response.data);
-      if (response.data && response.data.success && response.data.data) {
-        return response.data.data;
-      } else if (Array.isArray(response.data)) {
-        return response.data;
-      } else {
-        return [];
-      }
-    } catch (error) {
-      console.error('Error al obtener programas académicos:', error);
-      return [];
-    }
-  },
   getCabanas: async () => {
-    try {
-      console.log('Making request to /cabanas...');
-      const response = await api.get('/cabanas');
-      console.log('Cabañas API response:', response.data);
-      if (response.data && response.data.success && response.data.data) {
-        return response.data.data;
-      } else if (Array.isArray(response.data)) {
-        return response.data;
-      } else {
-        return [];
-      }
-    } catch (error) {
-      console.error('Error al obtener cabañas:', error);
-      return [];
-    }
+    console.log('Making request to /cabanas...');
+    return safeGet('/cabanas');
   },
 
-  // Obtener eventos disponibles (usando axios para enviar el token)
-  getEventos: async () => {
-    try {
-      const response = await api.get('/eventos');
-      console.log('Eventos API response:', response.data);
-      return response.data.data || response.data || [];
-    } catch (error) {
-      console.error('Error al obtener eventos:', error);
-      return [];
-    }
-  },
+  // Obtener eventos disponibles
+  getEventos: async () => safeGet('/eventos'),
 
   // Inscribirse a un curso
   inscribirCurso: async (cursoId, userId) => {
@@ -138,28 +107,10 @@ const externalService = {
   },
 
   // Obtener mis inscripciones
-  getInscripciones: async (userId) => {
-    try {
-      const response = await api.get(`/users/${userId}/inscripciones`);
-      console.log('Inscripciones API response:', response.data);
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error al obtener inscripciones:', error);
-      // En caso de error, retornar array vacío para no romper la UI
-      return [];
-    }
-  },
+  getInscripciones: async (userId) => safeGet(`/users/${userId}/inscripciones`),
 
   // Obtener mis inscripciones (alias para compatibilidad)
-  getMisInscripciones: async (userId) => {
-    try {
-      const response = await api.get('/users/inscripciones');
-      return response.data;
-    } catch (error) {
-      console.error('Error al obtener inscripciones:', error);
-      return { success: true, data: [] };
-    }
-  },
+  getMisInscripciones: async () => safeGet('/users/inscripciones'),
 
   // Actualizar perfil de usuario
   updateProfile: async (formData) => {

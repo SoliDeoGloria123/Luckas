@@ -1,26 +1,24 @@
-import { useState } from "react"
+import { useState } from "react";
 import { authService } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
 import { mostrarAlerta } from '../utils/alertas';
-import "./Login.css"
+import "./Login.css";
 
 const Login = () => {
   const [correo, setcorreo] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     // Limpiar espacios en blanco y normalizar correo
     const correoLimpio = correo.trim().toLowerCase();
     const passwordLimpio = password.trim();
-    
+
     try {
       const data = await authService.login(correoLimpio, passwordLimpio);
-      
+
       localStorage.setItem('token', data.token);
       localStorage.setItem('usuario', JSON.stringify(data.user));
 
@@ -39,20 +37,19 @@ const Login = () => {
       }
     } catch (err) {
       console.error('❌ Error durante el login:', err);
-      
+
       let errorMessage = 'Error al iniciar sesión';
       if (err.message) {
         errorMessage = err.message;
       }
-       mostrarAlerta('Error', errorMessage, 'error')
-      setError(errorMessage);
-     ;
+      mostrarAlerta('Error', errorMessage, 'error');
     }
   };
 
   const handleRegisterClick = () => {
     navigate('/signup/registro');
   };
+
   const handleOlvidarrClick = () => {
     navigate('/Olvidar-Contraseña');
   };
@@ -160,9 +157,11 @@ const Login = () => {
                   placeholder="Ingrese su contraseña"
                   required
                 />
-                <button type="button"
+                <button
+                  type="button"
                   className="btn btn-outline-secondary password-toggle"
-                  onClick={() => setShowPassword(!showPassword)} >
+                  onClick={() => setShowPassword(!showPassword)}
+                >
                   <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
                 </button>
               </div>
@@ -181,29 +180,37 @@ const Login = () => {
                   Recordarme
                 </label>
               </div>
-              <button type="button" className="forgot-password-link" onClick={handleOlvidarrClick}>
+              <button
+                type="button"
+                className="forgot-password-link"
+                onClick={handleOlvidarrClick}
+              >
                 ¿Olvidaste tu contraseña?
               </button>
             </div>
 
             {/* Botón de Login */}
-            <button type="submit" className=" login-btn-login w-100" >
+            <button type="submit" className="login-btn-login w-100">
               <span>Iniciar Sesión</span>
-
             </button>
           </form>
 
           {/* Footer */}
           <div className="form-footer">
-            <p >
-              ¿No tienes una cuenta? <button className="register-link" onClick={handleRegisterClick} >Registrate</button>
+            <p>
+              ¿No tienes una cuenta?{' '}
+              <button
+                className="register-link"
+                onClick={handleRegisterClick}
+              >
+                Registrate
+              </button>
             </p>
           </div>
         </div>
       </div>
-
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

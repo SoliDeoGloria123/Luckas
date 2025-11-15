@@ -64,16 +64,21 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
 
   // Obtener categorías de la base de datos
   const obtenerCategorias = async () => {
+    console.log("🚀 INICIANDO obtenerCategorias()");
     try {
+      console.log("📞 Llamando a categorizacionService.getAll()");
       const res = await categorizacionService.getAll();
+      console.log("✅ RESPUESTA DEL SERVICIO:", res);
+      console.log("📊 CATEGORIAS OBTENIDAS EN GESTION SOLICITUD:", res.data);
       setCategorias(res.data || []);
     } catch (error) {
+      console.error("❌ ERROR obteniendo categorías:", error);
       setCategorias([]);
-      console.error('Error obteniendo categorías:', error);
     }
   };
 
   useEffect(() => {
+    console.log("🔥 EJECUTANDO useEffect - CARGANDO SOLICITUDES Y CATEGORIAS");
     obtenerSolicitudes();
     obtenerCategorias();
   }, []);
@@ -287,6 +292,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
               eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
             />
           </div>
+          {/* Debug para ver las categorías antes de pasarlas al modal */}
+          {console.log("CATEGORIAS ANTES DE PASAR AL MODAL:", categorias)}
           <SolicitudModal
             mostrar={mostrarModal}
             modoEdicion={modoEdicionSolicitud}

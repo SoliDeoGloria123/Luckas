@@ -115,10 +115,12 @@ const Gestionreserva = () => {
   };
 
   // Funciones para el modal del Dashboard
-  const crearReserva = async (e) => {
-    e.preventDefault();
+  const crearReserva = async (payload) => {
+    // Soporta recibir event (desde un submit directo) o un payload (objeto)
     try {
-      await reservaService.createReserva(nuevaReserva);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaReserva;
+      await reservaService.create(body);
       mostrarAlerta("¡Éxito!", "Reserva creada exitosamente", 'success');
       setMostrarModal(false);
       obtenerReservas();
@@ -127,10 +129,16 @@ const Gestionreserva = () => {
     }
   };
 
-  const actualizarReserva = async (e) => {
-    e.preventDefault();
+  const actualizarReserva = async (payload) => {
     try {
-      await reservaService.updateReserva(reservaSeleccionada._id, nuevaReserva);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaReserva;
+      const id = (body && body._id) ? body._id : (reservaSeleccionada && reservaSeleccionada._id);
+      if (!id) {
+        mostrarAlerta('ERROR', 'No se encontró el ID de la reserva a actualizar', 'error');
+        return;
+      }
+      await reservaService.update(id, body);
       mostrarAlerta("¡Éxito!", "Reserva actualizada exitosamente", 'success');
       setMostrarModal(false);
       obtenerReservas();
@@ -162,7 +170,7 @@ const Gestionreserva = () => {
       <main className="main-content-tesorero">
         <div className="page-header-tesorero">
           <div className="card-header-tesorero">
-            <button className="back-btn-tesorero">
+            <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
               <i className="fas fa-arrow-left"></i>
             </button>
             <div className="page-title-tesorero">

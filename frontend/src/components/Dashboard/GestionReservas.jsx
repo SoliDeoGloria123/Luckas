@@ -8,6 +8,25 @@ import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import PropTypes from 'prop-types';
+import manejarOperacionAsync from './common/manejarOperacionAsync';
+
+const defaultReserva = {
+  usuario: "",
+  cabana: "",
+  fechaInicio: "",
+  fechaFin: "",
+  precio: "",
+  estado: "Pendiente",
+  observaciones: "",
+  nombre: "",
+  apellido: "",
+  tipoDocumento: "",
+  numeroDocumento: "",
+  correoElectronico: "",
+  telefono: "",
+  numeroPersonas: 1,
+  activo: true
+};
 
 const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [reservas, setReservas] = useState([]);
@@ -19,41 +38,10 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
-  const [nuevaReserva, setNuevaReserva] = useState({
-    usuario: "",
-    cabana: "",
-    fechaInicio: "",
-    fechaFin: "",
-    precio: "",
-    estado: "Pendiente",
-    observaciones: "",
-    nombre: "",
-    apellido: "",
-    tipoDocumento: "",
-    numeroDocumento: "",
-    correoElectronico: "",
-    telefono: "",
-    numeroPersonas: 1
-  });
+  const [nuevaReserva, setNuevaReserva] = useState({ ...defaultReserva });
   const [error, setError] = useState("");
 
-  // Función utilitaria para manejo de datos con try/catch
-  const manejarOperacionAsync = async (operacion, setEstado, mensajeError) => {
-    try {
-      const data = await operacion();
-      let resultado;
-      if (Array.isArray(data)) {
-        resultado = data;
-      } else if (Array.isArray(data.data)) {
-        resultado = data.data;
-      } else {
-        resultado = [];
-      }
-      setEstado(resultado);
-    } catch (err) {
-      setError(`${mensajeError}: ${err.message}`);
-    }
-  };
+  // Usar helper compartido `manejarOperacionAsync` (se pasa `setError` para preservar comportamiento)
 
   useEffect(() => {
     obtenerReservas();
@@ -64,19 +52,22 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   const obtenerReservas = () => manejarOperacionAsync(
     () => reservaService.getAll(),
     setReservas,
-    "Error al obtener reservas"
+    "Error al obtener reservas",
+    setError
   );
 
   const obtenerUsuarios = () => manejarOperacionAsync(
     () => userService.getAllUsers(),
     setUsuarios,
-    "Error al obtener usuarios"
+    "Error al obtener usuarios",
+    setError
   );
 
   const obtenerCabanas = () => manejarOperacionAsync(
     () => cabanaService.getAll(),
     setCabanas,
-    "Error al obtener cabañas"
+    "Error al obtener cabañas",
+    setError
   );
 
   // CRUD
@@ -92,23 +83,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
       await reservaService.create(reservaData);
       mostrarAlerta("¡Éxito!", "Reserva creada exitosamente");
       setMostrarModal(false);
-      setNuevaReserva({
-        usuario: "",
-        cabana: "",
-        fechaInicio: "",
-        fechaFin: "",
-        precio: "",
-        estado: "Pendiente",
-        observaciones: "",
-        activo: true,
-        nombre: "",
-        apellido: "",
-        tipoDocumento: "",
-        numeroDocumento: "",
-        correoElectronico: "",
-        telefono: "",
-        numeroPersonas: 1
-      });
+      setNuevaReserva({ ...defaultReserva });
       obtenerReservas();
     } catch (err) {
       mostrarAlerta("Error", "Error al crear la reserva: " + err.message);
@@ -154,22 +129,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   // Modal handlers
   const abrirModalCrear = () => {
     setModoEdicion(false);
-    setNuevaReserva({
-      usuario: "",
-      cabana: "",
-      fechaInicio: "",
-      fechaFin: "",
-      precio: "",
-      estado: "Pendiente",
-      observaciones: "",
-      nombre: "",
-      apellido: "",
-      tipoDocumento: "",
-      numeroDocumento: "",
-      correoElectronico: "",
-      telefono: "",
-      numeroPersonas: 1
-    });
+    setNuevaReserva({ ...defaultReserva });
     setMostrarModal(true);
   };
 

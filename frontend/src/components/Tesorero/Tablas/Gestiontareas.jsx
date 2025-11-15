@@ -83,10 +83,12 @@ const Gestiontarea = () => {
   };
 
   // Funciones para el modal del Dashboard
-  const crearTarea = async (e) => {
-    e.preventDefault();
+  const crearTarea = async (payload) => {
+    // Soporta recibir event (desde submit) o payload (objeto enviado por modal)
     try {
-      await tareaService.create(nuevaTarea);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaTarea;
+      await tareaService.create(body);
       mostrarAlerta("¡Éxito!", "Tarea creada exitosamente");
       setMostrarModal(false);
       obtenerTareas();
@@ -95,10 +97,16 @@ const Gestiontarea = () => {
     }
   };
 
-  const actualizarTarea = async (e) => {
-    e.preventDefault();
+  const actualizarTarea = async (payload) => {
     try {
-      await tareaService.update(tareaSeleccionada._id, tareaSeleccionada);
+      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : tareaSeleccionada;
+      const id = (body && body._id) ? body._id : (tareaSeleccionada && tareaSeleccionada._id);
+      if (!id) {
+        mostrarAlerta('Error', 'No se encontró el ID de la tarea a actualizar');
+        return;
+      }
+      await tareaService.update(id, body);
       mostrarAlerta("¡Éxito!", "Tarea actualizada exitosamente");
       setMostrarModal(false);
       obtenerTareas();
@@ -128,7 +136,7 @@ const Gestiontarea = () => {
       <main className="main-content-tesorero">
         <div className="page-header-tesorero">
           <div className="card-header-tesorero">
-            <button className="back-btn-tesorero">
+            <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
               <i className="fas fa-arrow-left"></i>
             </button>
             <div className="page-title-tesorero">

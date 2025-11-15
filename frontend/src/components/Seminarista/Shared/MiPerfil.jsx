@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, Calendar, BookOpen, GraduationCap, Award, Clock, Eye, EyeOff } from "lucide-react"
+import { User, Mail, Phone, Calendar, BookOpen, GraduationCap, Award, Clock } from "lucide-react"
 import './MiPerfil.css';
 import Header from './Header';
 import Footer from '../../footer/Footer';
 import { userService } from '../../../services/userService';
+import PropTypes from 'prop-types';
+import Field from './Field';
+import ToggleSwitch from './ToggleSwitch';
+import PasswordField from './PasswordField';
+import { datosEditadosShape, profileDataShape, passwordDataShape, securityDataShape } from './miPerfilPropTypes';
 
 // Función auxiliar para obtener usuario desde localStorage
 const obtenerUsuarioLogueado = () => {
@@ -54,49 +59,201 @@ const crearPerfilPorDefecto = (usuario) => ({
 
 // Función auxiliar para validar datos de contraseña
 const validarCambioContrasena = (passwordData) => {
-  if (!passwordData.currentPassword || !passwordData.newPassword) {
-    return { esValido: false, mensaje: 'Por favor, completa todos los campos de contraseña' };
+  const { currentPassword, newPassword, confirmPassword } = passwordData;
+
+  if (!currentPassword || !newPassword) {
+    return { esValido: false, mensaje: "Todos los campos son obligatorios." };
   }
 
-  if (passwordData.newPassword !== passwordData.confirmPassword) {
-    return { esValido: false, mensaje: 'Las contraseñas nuevas no coinciden' };
+  if (newPassword !== confirmPassword) {
+    return { esValido: false, mensaje: "Las contraseñas no coinciden." };
   }
 
-  if (passwordData.newPassword.length < 6) {
-    return { esValido: false, mensaje: 'La nueva contraseña debe tener al menos 6 caracteres' };
+  if (newPassword.length < 6) {
+    return { esValido: false, mensaje: "La nueva contraseña debe tener al menos 6 caracteres." };
   }
 
   return { esValido: true };
 };
 
+// Componente para mostrar información personal (extraído para reducir complejidad)
+const InformacionPersonal = ({ isEditing, datosEditados, handleInputChange }) => (
+  <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+    <div className="flex items-center space-x-2 mb-6">
+      <User className="w-5 h-5 text-blue-600" />
+      <h2 className="text-xl font-semibold text-gray-900">Información Personal</h2>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Field id="nombre" label="Nombre" isEditing={isEditing} value={datosEditados.nombre} onChange={(v) => handleInputChange('nombre', v)} placeholder="Escribe tu nombre aquí" />
+
+      <Field id="apellido" label="Apellido" isEditing={isEditing} value={datosEditados.apellido} onChange={(v) => handleInputChange('apellido', v)} />
+
+      <Field
+        id="tipoDocumento"
+        label="Tipo de Documento"
+        isEditing={isEditing}
+        value={datosEditados.tipoDocumento}
+        onChange={(v) => handleInputChange('tipoDocumento', v)}
+        options={[
+          'Cédula de Ciudadanía',
+          'Cédula de Extranjería',
+          'Pasaporte',
+          'Tarjeta de identidad',
+        ]}
+      />
+
+      <Field id="numeroDocumento" label="Número de Documento" isEditing={isEditing} value={datosEditados.numeroDocumento} onChange={(v) => handleInputChange('numeroDocumento', v)} />
+
+      <Field id="telefono" label="Teléfono" isEditing={isEditing} value={datosEditados.telefono} onChange={(v) => handleInputChange('telefono', v)} type="tel" />
+
+      <Field id="correo" label="Correo Electrónico" isEditing={isEditing} value={datosEditados.correo} onChange={(v) => handleInputChange('correo', v)} type="email" />
+
+      <Field id="fechaNacimiento" label="Fecha de Nacimiento" isEditing={isEditing} value={datosEditados.fechaNacimiento} onChange={(v) => handleInputChange('fechaNacimiento', v)} type="date" />
+
+      <Field id="direccion" label="Dirección" isEditing={isEditing} value={datosEditados.direccion} onChange={(v) => handleInputChange('direccion', v)} />
+    </div>
+  </div>
+);
+
+// Componente para mostrar información académica (extraído para reducir complejidad)
+const InformacionAcademica = ({ isEditing, datosEditados, profileData, handleInputChange }) => (
+  <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+    <div className="flex items-center space-x-2 mb-6">
+      <BookOpen className="w-5 h-5 text-green-600" />
+      <h2 className="text-xl font-semibold text-gray-900">Información Académica</h2>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Field
+        id="nivelActual"
+        label="Nivel Actual"
+        isEditing={isEditing}
+        value={datosEditados.nivelAcademico}
+        onChange={(v) => handleInputChange('nivelAcademico', v)}
+        options={['Filosofía I','Filosofía II','Teología I','Teología II','Teología III','Teología IV']}
+      />
+
+      <div>
+        <label htmlFor="fechaIngreso" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
+        <p className="text-gray-900 py-3">{new Date(profileData.fechaIngreso).toLocaleDateString()}</p>
+      </div>
+
+      <Field id="directorEspiritual" label="Director Espiritual" isEditing={isEditing} value={datosEditados.directorEspiritual} onChange={(v) => handleInputChange('directorEspiritual', v)} />
+
+      <Field id="idiomas" label="Idiomas" isEditing={isEditing} value={datosEditados.idiomas} onChange={(v) => handleInputChange('idiomas', v)} />
+
+      <div className="md:col-span-2">
+        <Field id="especialidad" label="Especialidad" isEditing={isEditing} value={datosEditados.especialidad} onChange={(v) => handleInputChange('especialidad', v)} />
+      </div>
+    </div>
+  </div>
+);
+
+// Componente para configuración de cuenta y seguridad
+const ConfiguracionCuenta = ({
+  passwordData,
+  setPasswordData,
+  showPassword,
+  setShowPassword,
+  showNewPassword,
+  setShowNewPassword,
+  showConfirmPassword,
+  setShowConfirmPassword,
+  manejarCambioContrasena,
+  securityData,
+  setSecurityData,
+}) => (
+  <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+    <div className="flex items-center space-x-2 mb-6">
+      <Award className="w-5 h-5 text-purple-600" />
+      <h2 className="text-xl font-semibold text-gray-900">Configuración de Cuenta</h2>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <PasswordField
+          id="currentPassword"
+          label="Contraseña Actual"
+          value={passwordData.currentPassword}
+          onChange={(v) => setPasswordData({ ...passwordData, currentPassword: v })}
+          show={showPassword}
+          toggleShow={setShowPassword}
+        />
+      </div>
+
+      <div>
+        <PasswordField
+          id="newPassword"
+          label="Nueva Contraseña"
+          value={passwordData.newPassword}
+          onChange={(v) => setPasswordData({ ...passwordData, newPassword: v })}
+          show={showNewPassword}
+          toggleShow={setShowNewPassword}
+        />
+      </div>
+
+      <div className="md:col-span-2">
+        <PasswordField
+          id="confirmPassword"
+          label="Confirmar Nueva Contraseña"
+          value={passwordData.confirmPassword}
+          onChange={(v) => setPasswordData({ ...passwordData, confirmPassword: v })}
+          show={showConfirmPassword}
+          toggleShow={setShowConfirmPassword}
+        />
+      </div>
+    </div>
+
+    <div className="mt-6 pt-6 border-t border-gray-200">
+      <button
+        onClick={manejarCambioContrasena}
+        className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+      >
+        <Award className="w-5 h-5" />
+        <span>Cambiar Contraseña</span>
+      </button>
+    </div>
+
+    <div className="mt-6 pt-6 border-t border-gray-200">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">Preferencias</h3>
+      <div className="space-y-4">
+        <ToggleSwitch
+          checked={securityData.emailNotifications}
+          onToggle={(val) => setSecurityData({ ...securityData, emailNotifications: val })}
+          label="Notificaciones por Email"
+          Icon={Mail}
+        />
+
+        <ToggleSwitch
+          checked={securityData.academicReminders}
+          onToggle={(val) => setSecurityData({ ...securityData, academicReminders: val })}
+          label="Recordatorios Académicos"
+          Icon={Clock}
+        />
+      </div>
+    </div>
+  </div>
+);
+
 const ProfilePage = () => {
-  const [isEditing, setIsEditing] = useState(false);
+  // Estados principales
+  const [isEditing, setIsEditing] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  // Obtener usuario logueado desde localStorage
   const usuarioLogueado = obtenerUsuarioLogueado();
-
-  // Estado para los datos editables
   const [datosEditados, setDatosEditados] = useState(() => crearEstadoInicialDatos(usuarioLogueado));
-
-  console.log('Estado isEditing:', isEditing);
-  console.log('Datos editados:', datosEditados);
-
-  // Estado para cambio de contraseña
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
-  });
-
-  // Datos estáticos del perfil (solo lectura)
+  const [passwordData, setPasswordData] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [profileData, setProfileData] = useState(() => crearPerfilPorDefecto(usuarioLogueado));
-
-  // const [formData, setFormData] = useState({}); // Variable comentada - no se usa actualmente
-  
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    if (usuarioLogueado && !isEditing) {
+      setDatosEditados(crearEstadoInicialDatos(usuarioLogueado));
+      setProfileData(crearPerfilPorDefecto(usuarioLogueado));
+    }
+  }, [usuarioLogueado, isEditing]);
 
   // Función para guardar cambios del perfil
   const actualizarPerfil = async () => {
@@ -131,7 +288,7 @@ const ProfilePage = () => {
   };
 
   const handleInputChange = (field, value) => {
-    console.log('handleInputChange llamado:', field, value);
+    // ...existing code...
     setDatosEditados((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -147,34 +304,19 @@ const ProfilePage = () => {
     setIsEditing(false);
   };
 
-  // const handlePasswordChange = (field, value) => {
-  //   setPasswordData(prev => ({ ...prev, [field]: value }));  
-  // }; // Función comentada - no se usa actualmente
+  const manejarCambioContrasena = async () => {
+    const validacion = validarCambioContrasena(passwordData);
 
-  const cambiarContrasena = async () => {
+    if (!validacion.esValido) {
+      alert(validacion.mensaje);
+      return;
+    }
+
     try {
-      const validacion = validarCambioContrasena(passwordData);
-      if (!validacion.esValido) {
-        alert(validacion.mensaje);
-        return;
-      }
-
-      await userService.changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
-      });
-
+      await userService.changePassword(passwordData);
       alert('Contraseña cambiada correctamente');
-      
-      // Resetear campos de contraseña
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: ""
-      });
-
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (error) {
-      console.error('Error al cambiar contraseña:', error);
       alert('Error al cambiar la contraseña: ' + (error.response?.data?.message || error.message));
     }
   };
@@ -195,21 +337,8 @@ const ProfilePage = () => {
     { label: "Inscripciones", value: "12", color: "bg-orange-500" },
   ];
 
-  // useEffect para cargar datos del usuario al iniciar
-  useEffect(() => {
-    if (usuarioLogueado) {
-      console.log("Datos del usuario logueado:", usuarioLogueado);
-      setDatosEditados(crearEstadoInicialDatos(usuarioLogueado));
-      setProfileData(crearPerfilPorDefecto(usuarioLogueado));
-    }
-  }, [usuarioLogueado]);
-
   // Formatea la fecha para mostrarla en formato legible
-  // const formatDate = (dateStr) => {
-  //   if (!dateStr) return "";
-  //   const date = new Date(dateStr);
-  //   return date.toLocaleDateString();
-  // }; // Función comentada - no se usa actualmente
+  // Eliminado: función comentada y no usada
 
 
   return (
@@ -308,336 +437,35 @@ const ProfilePage = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Personal Information */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-              <div className="flex items-center space-x-2 mb-6">
-                <User className="w-5 h-5 text-blue-600" />
-                <h2 className="text-xl font-semibold text-gray-900">Información Personal</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={datosEditados.nombre}
-                      onChange={(e) => {
-                        console.log('Cambiando nombre a:', e.target.value);
-                        handleInputChange('nombre', e.target.value);
-                      }}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Escribe tu nombre aquí"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.nombre}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={datosEditados.apellido}
-                      onChange={(e) => handleInputChange('apellido', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.apellido}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
-                  {isEditing ? (
-                    <select
-                      value={datosEditados.tipoDocumento}
-                      onChange={(e) => handleInputChange('tipoDocumento', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="Cédula de Ciudadanía">Cédula de Ciudadanía</option>
-                      <option value="Cédula de Extranjería">Cédula de Extranjería</option>
-                      <option value="Pasaporte">Pasaporte</option>
-                      <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-                    </select>
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.tipoDocumento}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={datosEditados.numeroDocumento}
-                      onChange={(e) => handleInputChange('numeroDocumento', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.numeroDocumento}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      value={datosEditados.telefono}
-                      onChange={(e) => handleInputChange('telefono', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.telefono}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="correo" className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={datosEditados.correo}
-                      onChange={(e) => handleInputChange('correo', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.correo}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
-                  {isEditing ? (
-                    <input
-                      type="date"
-                      value={datosEditados.fechaNacimiento}
-                      onChange={(e) => handleInputChange('fechaNacimiento', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.fechaNacimiento ? new Date(datosEditados.fechaNacimiento).toLocaleDateString() : ''}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="direccion" className="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={datosEditados.direccion}
-                      onChange={(e) => handleInputChange('direccion', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.direccion}</p>
-                  )}
-                </div>
-              </div>
-            </div>
+            <InformacionPersonal
+              isEditing={isEditing}
+              datosEditados={datosEditados}
+              handleInputChange={handleInputChange}
+            />
 
             {/* Academic Information */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-              <div className="flex items-center space-x-2 mb-6">
-                <BookOpen className="w-5 h-5 text-green-600" />
-                <h2 className="text-xl font-semibold text-gray-900">Información Académica</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="nivelActual" className="block text-sm font-medium text-gray-700 mb-2">Nivel Actual</label>
-                  {isEditing ? (
-                    <select
-                      value={datosEditados.nivelAcademico}
-                      onChange={(e) => handleInputChange('nivelAcademico', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option>Filosofía I</option>
-                      <option>Filosofía II</option>
-                      <option>Teología I</option>
-                      <option>Teología II</option>
-                      <option>Teología III</option>
-                      <option>Teología IV</option>
-                    </select>
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.nivelAcademico}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="fechaIngreso" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
-                  <p className="text-gray-900 py-3">{new Date(profileData.fechaIngreso).toLocaleDateString()}</p>
-                </div>
-
-                <div>
-                  <label htmlFor="directorEspiritual" className="block text-sm font-medium text-gray-700 mb-2">Director Espiritual</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={datosEditados.directorEspiritual}
-                      onChange={(e) => handleInputChange('directorEspiritual', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.directorEspiritual}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="idiomas" className="block text-sm font-medium text-gray-700 mb-2">Idiomas</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={datosEditados.idiomas}
-                      onChange={(e) => handleInputChange('idiomas', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.idiomas}</p>
-                  )}
-                </div>
-
-                <div className="md:col-span-2">
-                  <label htmlFor="especialidad" className="block text-sm font-medium text-gray-700 mb-2">Especialidad</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={datosEditados.especialidad}
-                      onChange={(e) => handleInputChange('especialidad', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{datosEditados.especialidad}</p>
-                  )}
-                </div>
-              </div>
-            </div>
+            <InformacionAcademica
+              isEditing={isEditing}
+              datosEditados={datosEditados}
+              profileData={profileData}
+              handleInputChange={handleInputChange}
+            />
 
             {/* Security Settings */}
             {isEditing && (
-              <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                <div className="flex items-center space-x-2 mb-6">
-                  <Award className="w-5 h-5 text-purple-600" />
-                  <h2 className="text-xl font-semibold text-gray-900">Configuración de Cuenta</h2>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        value={passwordData.currentPassword}
-                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
-                    <div className="relative">
-                      <input
-                        type={showNewPassword ? "text" : "password"}
-                        value={passwordData.newPassword}
-                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                    <div className="md:col-span-2">
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
-                    <div className="relative">
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={passwordData.confirmPassword}
-                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <button
-                    onClick={cambiarContrasena}
-                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
-                  >
-                    <Award className="w-5 h-5" />
-                    <span>Cambiar Contraseña</span>
-                  </button>
-                </div>
-
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Preferencias</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <Mail className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-700">Notificaciones por Email</span>
-                      </div>
-                      <button
-                        onClick={() =>
-                          setSecurityData({ ...securityData, emailNotifications: !securityData.emailNotifications })
-                        }
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          securityData.emailNotifications ? "bg-green-600" : "bg-gray-200"
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                            securityData.emailNotifications ? "translate-x-6" : "translate-x-1"
-                          }`}
-                        />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <Clock className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-700">Recordatorios Académicos</span>
-                      </div>
-                      <button
-                        onClick={() =>
-                          setSecurityData({ ...securityData, academicReminders: !securityData.academicReminders })
-                        }
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          securityData.academicReminders ? "bg-green-600" : "bg-gray-200"
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                            securityData.academicReminders ? "translate-x-6" : "translate-x-1"
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <ConfiguracionCuenta
+                passwordData={passwordData}
+                setPasswordData={setPasswordData}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                showNewPassword={showNewPassword}
+                setShowNewPassword={setShowNewPassword}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
+                manejarCambioContrasena={manejarCambioContrasena}
+                securityData={securityData}
+                setSecurityData={setSecurityData}
+              />
             )}
 
             {/* Action Buttons */}
@@ -664,6 +492,33 @@ const ProfilePage = () => {
       <Footer />
     </>
   );
+};
+
+InformacionPersonal.propTypes = {
+  isEditing: PropTypes.bool.isRequired,
+  datosEditados: datosEditadosShape.isRequired,
+  handleInputChange: PropTypes.func.isRequired,
+};
+
+InformacionAcademica.propTypes = {
+  isEditing: PropTypes.bool.isRequired,
+  datosEditados: datosEditadosShape.isRequired,
+  profileData: profileDataShape.isRequired,
+  handleInputChange: PropTypes.func.isRequired,
+};
+
+ConfiguracionCuenta.propTypes = {
+  passwordData: passwordDataShape.isRequired,
+  setPasswordData: PropTypes.func.isRequired,
+  showPassword: PropTypes.bool.isRequired,
+  setShowPassword: PropTypes.func.isRequired,
+  showNewPassword: PropTypes.bool.isRequired,
+  setShowNewPassword: PropTypes.func.isRequired,
+  showConfirmPassword: PropTypes.bool.isRequired,
+  setShowConfirmPassword: PropTypes.func.isRequired,
+  manejarCambioContrasena: PropTypes.func.isRequired,
+  securityData: securityDataShape.isRequired,
+  setSecurityData: PropTypes.func.isRequired,
 };
 
 export default ProfilePage;

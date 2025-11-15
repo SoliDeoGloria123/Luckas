@@ -3,27 +3,11 @@ import PropTypes from 'prop-types';
 import './NotificationPanel.css';
 import useNotifications from '../../hooks/useNotifications';
 import BaseNotificationPanel from '../../shared/BaseNotificationPanel';
+import createNotificationCssClasses from '../../shared/notificationCss';
 
 const NotificationPanel = ({ token, userRole, isOpen, onClose }) => {
-  // Configuración de clases CSS específicas para Dashboard
-  const dashboardCssClasses = {
-    loading: 'notification-loading',
-    spinner: 'spinner',
-    error: 'notification-error',
-    retryBtn: 'retry-btn',
-    empty: 'notification-empty',
-    emptyIcon: 'empty-icon',
-    list: 'notification-list',
-    item: 'notification-item',
-    iconItem: 'notification-icon',
-    contentItem: 'notification-content-item',
-    titleItem: 'notification-title-item',
-    message: 'notification-message',
-    date: 'notification-date',
-    actionsItem: 'notification-actions-item',
-    markReadBtn: 'mark-read-btn',
-    deleteBtn: 'delete-btn'
-  };
+  // Usar las clases centralizadas (evita duplicación)
+  const dashboardCssClasses = createNotificationCssClasses();
 
   return (
     <BaseNotificationPanel 

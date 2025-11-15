@@ -3,6 +3,8 @@ import { cabanaService } from "../../services/cabanaService";
 import { categorizacionService } from "../../services/categorizacionService";
 import CabanaTabla from "./Tablas/CabanaTabla";
 import CabanaModal from "./Modales/CabanaModal";
+import defaultCabana from './Modales/common/defaultCabana';
+import manejarOperacionAsync from './common/manejarOperacionAsync';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
@@ -27,35 +29,10 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   const [eventoDetalle, setEventoDetalle] = useState(null);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
-  const [nuevaCabana, setNuevaCabana] = useState({
-    nombre: "",
-    descripcion: "",
-    capacidad: "",
-    categoria: "",
-    precio: "",
-    estado: "disponible",
-    imagen: [],
-    ubicacion: ""
-  });
+  const [nuevaCabana, setNuevaCabana] = useState({ ...defaultCabana });
 
 
-  // Función utilitaria para manejo de datos con try/catch
-  const manejarOperacionAsync = async (operacion, setEstado, mensajeError) => {
-    try {
-      const data = await operacion();
-      let resultado = [];
-      if (Array.isArray(data)) {
-        resultado = data;
-      } else if (Array.isArray(data.data)) {
-        resultado = data.data;
-      } else {
-        resultado = [];
-      }
-      setEstado(resultado);
-    } catch (error) {
-      console.error(`${mensajeError}: ${error.message}`);
-    }
-  };
+  // Se usa helper compartido `manejarOperacionAsync` importado arriba
 
   useEffect(() => {
     obtenerCabanas();
@@ -93,16 +70,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       await cabanaService.create(formData);
       mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente");
       setMostrarModal(false);
-      setNuevaCabana({
-        nombre: "",
-        descripcion: "",
-        capacidad: "",
-        categoria: "",
-        precio: "",
-        estado: "disponible",
-        imagen: [],
-        ubicacion: ""
-      });
+      setNuevaCabana({ ...defaultCabana });
       setSelectedImages([]);
       obtenerCabanas();
     } catch (error) {
@@ -146,16 +114,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   // Modal handlers
   const abrirModalCrear = () => {
     setModoEdicion(false);
-    setNuevaCabana({
-      nombre: "",
-      descripcion: "",
-      capacidad: "",
-      categoria: "",
-      precio: "",
-      estado: "disponible",
-      imagen: [],
-      ubicacion: ""
-    });
+    setNuevaCabana({ ...defaultCabana });
     setSelectedImages([]);
     setMostrarModal(true);
   };

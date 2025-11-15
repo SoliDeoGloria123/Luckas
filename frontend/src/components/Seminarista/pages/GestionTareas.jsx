@@ -12,7 +12,6 @@ const TareasManagement = () => {
   const [filterEstado, setFilterEstado] = useState("todos")
   const [filterPrioridad, setFilterPrioridad] = useState("todas")
   const [usuarios, setUsuarios] = useState([]);
-  const [error, setError] = useState(null);
   const [tareas, setTareas] = useState([]);
 
   const [formData, setFormData] = useState({

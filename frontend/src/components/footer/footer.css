@@ -3,8 +3,8 @@
   padding: 80px 64px;
   flex-direction: column;
   gap: 80px;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -14,8 +14,8 @@
   display: flex;
   flex-direction: row;
   gap: 120px;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   position: relative;
 }
@@ -24,8 +24,8 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   flex: 1;
   position: relative;
 }
@@ -155,7 +155,7 @@
   max-width: 1400px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding-top: 32px;
   border-top: 1px solid #475569;
@@ -222,7 +222,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #cbd5e1;
+    color: #F9FAFB; /* Blanco puro para mejor contraste */
   text-decoration: none;
   font-size: 18px;
   transition: all 0.3s;
@@ -230,7 +230,7 @@
 
 .footer-social a:hover {
   background: #2563eb;
-  color: white;
+  color: #F9FAFB;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }

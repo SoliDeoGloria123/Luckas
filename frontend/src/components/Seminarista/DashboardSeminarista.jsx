@@ -1,97 +1,21 @@
-import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { useAuthCheck } from './hooks/useAuthCheck';
-import { eventService } from '../../services/eventService';
-import { cabanaService } from '../../services/cabanaService'
 import Footer from '../footer/Footer'
 import Header from './Shared/Header';
-
 import './DashboardSeminarista.css';
 
 const DashboardSeminarista = () => {
-  const navigate = useNavigate();
-  const [mostrarModificarPerfil, setMostrarModificarPerfil] = useState(false);
-  const [mensaje, setMensaje] = useState('');
-  const [mensajeTipo, setMensajeTipo] = useState('info');
-  const [eventos, setEventos] = useState([]);
-  const [cabanas, setCabanas] = useState([]);
-  const [loadingEventos, setLoadingEventos] = useState(true);
-  const [loadingCabanas, setLoadingCabanas] = useState(true);
-  const breadcrumbPath = ['Dashboard', 'Seminarista'];
+    const navigate = useNavigate();
 
   // Verificar autenticación y rol
-  const { isAuthenticated, user } = useAuthCheck('seminarista');
-
-  // Escuchar evento de modificar perfil
-  useEffect(() => {
-    const handleModificarPerfil = () => {
-      setMostrarModificarPerfil(true);
-    };
-
-    globalThis.addEventListener('modificar-perfil', handleModificarPerfil);
-    return () => {
-      globalThis.removeEventListener('modificar-perfil', handleModificarPerfil);
-    };
-  }, []);
-
-  // Fetch eventos y cabañas
-  useEffect(() => {
-    const fetchEventos = async () => {
-      try {
-        const data = await eventService.getAllEvents();
-        let eventosArray = [];
-        if (Array.isArray(data)) {
-          eventosArray = data;
-        } else if (data && Array.isArray(data.eventos)) {
-          eventosArray = data.eventos;
-        } else if (data && Array.isArray(data.data)) {
-          eventosArray = data.data;
-        }
-        setEventos(eventosArray);
-      } catch (err) {
-        setEventos([]);
-        console.error('Error fetching eventos:', err);
-      } finally {
-        setLoadingEventos(false);
-      }
-    };
-    fetchEventos();
-    const fetchCabanas = async () => {
-      try {
-        const data = await cabanaService.getAll();
-        let cabanasArray = [];
-        if (Array.isArray(data)) {
-          cabanasArray = data;
-        } else if (data && Array.isArray(data.cabanas)) {
-          cabanasArray = data.cabanas;
-        } else if (data && Array.isArray(data.data)) {
-          cabanasArray = data.data;
-        }
-        setCabanas(cabanasArray);
-      } catch (err) {
-        setCabanas([]);
-        console.error('Error fetching cabañas:', err);
-      } finally {
-        setLoadingCabanas(false);
-      }
-    };
-    fetchCabanas();
-  }, []);
+  const { isAuthenticated } = useAuthCheck('seminarista');
 
   // Si no está autenticado, el hook se encarga de la redirección
   if (!isAuthenticated) {
     return <div>Cargando...</div>;
   }
 
-  const handleSuccess = (mensaje, tipo = 'success') => {
-    setMensaje(mensaje);
-    setMensajeTipo(tipo);
-    setTimeout(() => {
-      setMensaje('');
-      setMensajeTipo('info');
-    }, 5000);
-  };
+  // ...existing code...
     return (
       <div className="dashboard-seminarista-contenedo">
         <Header/>
@@ -187,7 +111,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Eventos</h3>
                   <p>Explora y participa en eventos del seminario</p>
-                  <button className="service-btn">Explorar Eventos</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/eventos')}>Explorar Eventos</button>
                 </div>
               </div>
 
@@ -201,7 +125,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Cabañas</h3>
                   <p>Descubre y reserva cabañas disponibles</p>
-                  <button className="service-btn">Ver Cabañas</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/cabanas')}>Ver Cabañas</button>
                 </div>
               </div>
 
@@ -218,7 +142,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Mis Inscripciones</h3>
                   <p>Revisa tus inscripciones a eventos</p>
-                  <button className="service-btn">Ver Inscripciones</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/inscripciones')}>Ver Inscripciones</button>
                 </div>
               </div>
 
@@ -232,7 +156,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Mis Reservas</h3>
                   <p>Gestiona tus reservas de cabañas</p>
-                  <button className="service-btn">Ver Reservas</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/reservas')}>Ver Reservas</button>
                 </div>
               </div>
 
@@ -248,7 +172,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Mis Solicitudes</h3>
                   <p>Consulta el estado de tus solicitudes</p>
-                  <button className="service-btn">Ver Solicitudes</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/solicitudes')}>Ver Solicitudes</button>
                 </div>
               </div>
 
@@ -263,7 +187,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Nueva Solicitud</h3>
                   <p>Crea una nueva solicitud</p>
-                  <button className="service-btn">Crear Solicitud</button>
+                  <button className="service-btn" onClick={() => navigate('/seminarista/nueva-solicitud')}>Crear Solicitud</button>
                 </div>
               </div>
             </div>

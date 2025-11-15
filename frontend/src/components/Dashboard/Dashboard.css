@@ -628,7 +628,7 @@
 
 .btn-action.eliminar {
   background: rgba(239, 68, 68, 0.1);
-  color: #991b1b;
+  color: #000;
 }
 
 .btn-action.eliminar:hover {
@@ -959,13 +959,13 @@
 }
 
 .rol-tesorero {
-  background: rgba(5, 150, 105, 0.1);
-  color: #042f2e;
+  background: rgba(5, 150, 105, 0.18); /* mayor opacidad para contraste */
+  color: #000000; /* texto negro para garantizar contraste */
 }
 
 .rol-seminarista {
-  background: rgba(139, 92, 246, 0.1);
-  color: #4c1d95;
+  background: rgba(139, 92, 246, 0.18);
+  color: #000000; /* texto negro para garantizar contraste */
 }
 
 .estado-active,
@@ -1013,77 +1013,7 @@
   color: var(--gris-oscuro);
 }
 
-.table-filters-reporte {
-  padding: 20px 25px;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  flex-wrap: wrap;
-}
 
-.search-container-reporte {
-  position: relative;
-  flex: 1;
-  min-width: 200px;
-}
-
-.search-container-reporte i {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #475569;
-}
-
-.search-container-reporte input {
-  width: 100%;
-  padding: 8px 12px 8px 40px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.9rem;
-}
-
-.table-filters-reporte select {
-  padding: 8px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  background: var(--color-white);
-}
-
-.table-wrapper-reporte {
-  overflow-x: auto;
-}
-
-.reports-table-reporte {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.reports-table-reporte th,
-.reports-table-reporte td {
-  padding: 15px 25px;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.reports-table-reporte th {
-  background: #f8fafc;
-  font-weight: 600;
-  color: var(--color-gray-dark);
-  font-size: 0.9rem;
-}
-
-.report-name-reporte {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.report-name-reporte i {
-  color: var(--azul-principal);
-}
 
 .badge-reporte {
   padding: 4px 8px;
@@ -1534,7 +1464,7 @@
 
 .btn-filtro {
   background: linear-gradient(135deg, #28a745, #20a13a);
-  color: white;
+  color: #222;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -1648,8 +1578,8 @@
 }
 
 .stat-trend.neutral {
-  background: rgba(100, 116, 139, 0.1);
-  color: #1e293b;
+  background: #374151; /* fondo sólido gris oscuro */
+  color: #ffffff; /* texto blanco para máximo contraste */
 }
 
 .stat-trend.warning {
@@ -1659,31 +1589,16 @@
 
 
 /* Report Info */
-.report-info-reporte-admin {
-  background: var(--blanco);
-  border-radius: 0.75rem;
-  padding: 1rem 1.5rem;
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid #e2e8f0;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
 
 .report-meta-reporte-admin {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #64748b;
+  color: #0f172a; /* color oscuro para mejor lectura */
   font-size: 0.875rem;
 }
 
-.report-actions-reporte-admin {
-  display: flex;
-  gap: 0.5rem;
-}
+
 
 .stat-number {
   font-size: 2.5rem;
@@ -1900,7 +1815,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4338ca 0%, #581c87 100%); /* gradiente más oscuro */
   color: white;
 }
 
@@ -1964,7 +1879,7 @@
 }
 
 .filtro-item-Academicos input::placeholder {
-  color: #9ca3af;
+  color: #4b5563; /* placeholder más oscuro para contraste */
   font-style: italic;
 }
 
@@ -1976,7 +1891,7 @@
 }
 
 .btn-nuevo-programa {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%); /* verde mucho más oscuro */
   color: white;
   border: none;
   padding: 12px 20px;
@@ -2038,7 +1953,7 @@
 
 .programa-tipo {
   display: inline-block;
-  background: #667eea;
+  background: #3730a3; /* azul mucho más oscuro */
   color: white;
   padding: 4px 12px;
   border-radius: 20px;
@@ -2310,8 +2225,8 @@
 }
 
 .btn-add-item {
-  background: #10b981;
-  color: white;
+  background: #047857; /* verde aún más oscuro */
+  color: #ffffff; /* texto blanco para botones verdes */
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
@@ -2320,8 +2235,8 @@
 }
 
 .btn-remove-item {
-  background: #ef4444;
-  color: white;
+  background: #dc2626; /* rojo más oscuro para buen contraste */
+  color: #ffffff; /* texto blanco para botones rojos */
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
@@ -2348,7 +2263,7 @@
 }
 
 .btn-guardar {
-  background: #667eea;
+  background: #4f46e5; /* azul más oscuro */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -2465,7 +2380,7 @@
 }
 
 .badge-destacado {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  background: linear-gradient(135deg, #b45309 0%, #991b1b 100%); /* aún más oscuro */
   color: white;
   font-size: 10px;
   padding: 2px 8px;
@@ -2822,7 +2737,7 @@
 }
 
 .btn-guardar-curso {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: linear-gradient(135deg, #166534 0%, #047857 100%); /* verde más oscuro */
   color: white;
 }
 
@@ -2964,8 +2879,8 @@
 }
 
 .btn-ver-imagen:hover {
-  color: white;
-  background-color: #007bff;
+  color: #ffffff; /* texto blanco sobre fondo azul para buen contraste */
+  background-color: #0056b3; /* azul más oscuro */
   border-radius: 50%;
   transform: scale(1.2);
 }

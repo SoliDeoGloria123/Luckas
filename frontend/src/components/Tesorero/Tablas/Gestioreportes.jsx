@@ -140,7 +140,7 @@ const Gestionreportes = () => {
     const handleEditarReporte = (reporte) => {
         setReporteSeleccionado(reporte);
         setModoEdicion(true);
-        setShowModal(true);
+        setMostrarModal(true);
     };
 
     // Función para actualizar reporte
@@ -181,10 +181,11 @@ const Gestionreportes = () => {
 
 
     // Funciones para el modal del Dashboard
-    const crearReporte = async (e) => {
-        e.preventDefault();
+    const crearReporte = async (payload) => {
         try {
-            await reportesService.createReporte(nuevoReporte);
+            if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+            const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevoReporte;
+            await reporteService.guardarReporte(body);
             mostrarAlerta("¡Éxito!", "Reporte creado exitosamente", 'success');
             setMostrarModal(false);
             cargarReportesGuardados();
@@ -193,13 +194,21 @@ const Gestionreportes = () => {
         }
     };
 
-    const actualizarReporte = async (e) => {
-        e.preventDefault();
+    const actualizarReporte = async (payload) => {
         try {
-            await reportesService.updateReporte(reporteSeleccionado._id, nuevoReporte);
+            if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
+            const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevoReporte;
+            const id = (body && body._id) ? body._id : (reporteSeleccionado && reporteSeleccionado._id);
+            if (!id) {
+                mostrarAlerta('ERROR', 'No se encontró el ID del reporte a actualizar', 'error');
+                return;
+            }
+            await reporteService.editarReporte(id, body);
             mostrarAlerta("¡Éxito!", "Reporte actualizado exitosamente", 'success');
             setMostrarModal(false);
             cargarReportesGuardados();
+            setModoEdicion(false);
+            setReporteSeleccionado(null);
         } catch (error) {
             mostrarAlerta("ERROR", `Error al actualizar reporte: ${error.message}`, 'error');
         }
