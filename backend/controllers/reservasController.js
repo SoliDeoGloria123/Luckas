@@ -313,3 +313,63 @@ exports.obtenerReservasPorUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener reservas por usuario', details: error.message });
   }
 };
+
+// Obtener estadísticas de reservas para el dashboard
+exports.obtenerEstadisticasReservas = async (req, res) => {
+  try {
+    const totalReservas = await Reserva.countDocuments();
+    const activas = await Reserva.countDocuments({ activo: true });
+    const pendientes = await Reserva.countDocuments({ estado: 'Pendiente' });
+    const confirmadas = await Reserva.countDocuments({ estado: 'Confirmada' });
+    const canceladas = await Reserva.countDocuments({ estado: 'Cancelada' });
+    const finalizadas = await Reserva.countDocuments({ estado: 'finalizada' });
+
+    // Nuevas este mes
+    const now = new Date();
+    const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+    const inicioMesSiguiente = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const nuevasEsteMes = await Reserva.countDocuments({ createdAt: { $gte: inicioMes, $lt: inicioMesSiguiente } });
+
+    // Top 5 cabañas con más reservas
+    const reservasPorCabana = await Reserva.aggregate([
+      { $group: { _id: '$cabana', total: { $sum: 1 } } },
+      { $sort: { total: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: 'cabanas',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'cabana'
+        }
+      },
+      { $unwind: { path: '$cabana', preserveNullAndEmptyArrays: true } },
+      { $project: { _id: 0, cabanaId: '$_id', nombre: '$cabana.nombre', total: 1 } }
+    ]);
+
+    // Reservas por mes (últimos 6 meses)
+    const reservasPorMes = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const start = new Date(d.getFullYear(), d.getMonth(), 1);
+      const end = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      const count = await Reserva.countDocuments({ createdAt: { $gte: start, $lt: end } });
+      reservasPorMes.push({ month: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`, total: count });
+    }
+
+    res.status(200).json({
+      totalReservas,
+      activas,
+      pendientes,
+      confirmadas,
+      canceladas,
+      finalizadas,
+      nuevasEsteMes,
+      reservasPorCabana,
+      reservasPorMes
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas de reservas:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener estadísticas de reservas' });
+  }
+};

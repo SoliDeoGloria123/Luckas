@@ -1,13 +1,28 @@
 const API_URL = "http://localhost:3000/api/solicitudes";
 
+// Funciones auxiliares para evitar duplicación
+const getAuthHeaders = () => ({
+  Authorization: `Bearer ${localStorage.getItem("token")}`
+});
+
+const getJsonHeaders = () => ({
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${localStorage.getItem("token")}`
+});
+
+const fetchWithErrorHandling = async (url, options, errorMessage) => {
+  const res = await fetch(url, options);
+  if (!res.ok) throw new Error(errorMessage || `Error en la solicitud: ${res.statusText}`);
+  return await res.json();
+};
+
 export const solicitudService = {
   getAll: async () => {
-    const res = await fetch(API_URL, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    });
-    if (!res.ok) throw new Error("Error al obtener solicitudes en services");
-    return await res.json();
+    return await fetchWithErrorHandling(API_URL, {
+      headers: getAuthHeaders()
+    }, "Error al obtener solicitudes en services");
   },
+
   create: async (solicitud) => {
     // Limpiar datos antes de enviar
     const solicitudLimpia = { ...solicitud };
@@ -22,41 +37,38 @@ export const solicitudService = {
       solicitudLimpia.titulo = `Solicitud de ${solicitudLimpia.tipoSolicitud} - ${new Date().toLocaleDateString()}`;
     }
     
-    const res = await fetch(API_URL, {
+    return await fetchWithErrorHandling(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      },
+      headers: getJsonHeaders(),
       body: JSON.stringify(solicitudLimpia)
     });
-    return await res.json();
   },
+
   update: async (id, solicitud) => {
-    const res = await fetch(`${API_URL}/${id}`, {
+    return await fetchWithErrorHandling(`${API_URL}/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      },
+      headers: getJsonHeaders(),
       body: JSON.stringify(solicitud)
     });
-    return await res.json();
   },
+
   delete: async (id) => {
-    const res = await fetch(`${API_URL}/${id}`, {
+    return await fetchWithErrorHandling(`${API_URL}/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: getAuthHeaders()
     });
-    return await res.json();
   },
 
   // Obtener solicitudes por usuario
-   getSolicitudesPorUsuario: async (userId) => {
-    const res = await fetch(`${API_URL}/usuario/${userId}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    });
-    if (!res.ok) throw new Error("Error al obtener solicitudes por usuario");
-    return await res.json();
+  getSolicitudesPorUsuario: async (userId) => {
+    return await fetchWithErrorHandling(`${API_URL}/usuario/${userId}`, {
+      headers: getAuthHeaders()
+    }, "Error al obtener solicitudes por usuario");
+  },
+
+  getEstadisticasGenerales: async () => {
+    return await fetchWithErrorHandling(`${API_URL}/estadisticas`, {
+      headers: getAuthHeaders()
+    }, "Error al obtener estadísticas generales de solicitudes");
   }
 };

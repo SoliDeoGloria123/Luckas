@@ -15,15 +15,25 @@ axios.interceptors.request.use(
   }
 );
 export const generarCertificado = async (userId, cursoId) => {
-    try {
-        const response = await axios.post(
-            `${API_URL}/generar`,
-            { userId, cursoId },
-            { responseType: 'blob' }
-        );
-        return response.data; // Esto será el blob del PDF
-    } catch (error) {
-        console.error('Error generando certificado:', error);
-        throw error;
-    }
+  try {
+    const response = await axios.post(
+      `${API_URL}/generar`,
+      { userId, cursoId },
+      { responseType: 'blob' }
+    );
+    return response.data; // Esto será el blob del PDF
+  } catch (error) {
+    console.error('Error generando certificado:', error);
+    throw error;
+  }
+};
+
+export const estadisticasCertificados = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/estadisticas`);
+    return response.data;
+  } catch (error) {
+    console.error('Error obteniendo estadísticas de certificados:', error);
+    throw error;
+  }
 };

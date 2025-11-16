@@ -91,6 +91,14 @@ export const programasAcademicosService = {
       throw error;
     }
   },
-
-  
+  //obtener estadisticas
+  obtenerEstadisticasGenerales: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/estadisticas`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener estadísticas generales:', error);
+      throw error;
+    }
+  }
 };

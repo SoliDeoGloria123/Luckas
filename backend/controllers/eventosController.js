@@ -333,3 +333,41 @@ exports.obtenerEventos = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Obtener estadísticas de eventos
+exports.obtenerEstadisticasEventos = async (req, res) => {
+  try {
+    // Estadísticas simplificadas para dashboard (coincidir con UI)
+    const now = new Date();
+
+    const [
+      totalEvents,
+      upcomingEvents,
+      completedEvents,
+      cancelledEvents
+    ] = await Promise.all([
+      Evento.countDocuments(),
+      // Próximos: fechaEvento en el futuro y activo
+      Evento.countDocuments({ fechaEvento: { $gte: now }, active: true }),
+      // Completados: fechaEvento en el pasado y todavía marcados como activos
+      Evento.countDocuments({ fechaEvento: { $lt: now }, active: true }),
+      // Cancelados / deshabilitados: active = false
+      Evento.countDocuments({ active: false })
+    ]);
+
+    console.log('[EVENTOS] Estadísticas calculadas:', { totalEvents, upcomingEvents, completedEvents, cancelledEvents });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalEvents,
+        upcoming: upcomingEvents,
+        completed: completedEvents,
+        cancelled: cancelledEvents
+      }
+    });
+  } catch (error) {
+    console.error('[EVENTOS] Error al obtener estadísticas de eventos:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener estadísticas', error: error.message });
+  }
+};

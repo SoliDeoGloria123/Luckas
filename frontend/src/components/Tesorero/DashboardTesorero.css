@@ -220,10 +220,7 @@ body {
     flex-direction: column;
     gap: 1.2rem;
     align-items: flex-start;
-    font-size: 1.25rem;
     font-weight: 700;
-    color: var(--color-gray-dark);
-    margin-bottom: 0.5rem;
     font-size: 1rem;
     color: var(--color-gray-medium);
     margin-bottom: 0.5rem;
@@ -672,7 +669,7 @@ body {
 }
 .role-tesorero-externo {
     background-color: rgba(51, 65, 85, 0.1);
-    color: #111827; /* Gris más oscuro para mejor contraste */
+    color: #0000; 
     border: 1px solid rgba(51, 65, 85, 0.2);
 }
 
@@ -1007,23 +1004,23 @@ body {
 }
 
 .stat-icon-solicitudes.purple {
-    background: rgba(139, 92, 246, 0.1);
-    color: #2d004b; /* Índigo aún más oscuro */
+    background: #E5DBFD; /* color opaco equivalente a rgba(139,92,246,0.22) */
+    color: #0f1724; /* texto oscuro para buen contraste */
 }
 
 .stat-icon-solicitudes.orange {
-    background: rgba(251, 146, 60, 0.1);
-    color: #7c2d12; /* Marrón más oscuro */
+    background: #FEE7D4; /* color opaco equivalente a rgba(251,146,60,0.22) */
+    color: #0f1724; /* texto oscuro para buen contraste */
 }
 
 .stat-icon-solicitudes.green {
-    background: rgba(5, 150, 105, 0.1);
-    color: #023020; /* Verde aún más oscuro */
+    background: #C8E8DE; /* color opaco equivalente a rgba(5,150,105,0.22) */
+    color: #0f1724; /* texto oscuro para buen contraste */
 }
 
 .stat-icon-solicitudes.red {
-    background: rgba(239, 68, 68, 0.1);
-    color: #7F1D1D; /* Mejor contraste: rojo oscuro */
+    background: #FBD6D6; /* color opaco equivalente a rgba(239,68,68,0.22) */
+    color: #0f1724; /* texto oscuro para buen contraste */
 }
 
 
@@ -1989,7 +1986,7 @@ body {
 
 .report-status.in-progress {
     background-color: #fef3c7;
-    color: #d97706;
+    color: #92400e; /* texto más oscuro para mejor contraste */
 }
 
 .report-status.new {
@@ -1998,9 +1995,9 @@ body {
 }
 
 .report-action-tesorero {
-    color: var(--color-blue);
+    color: var(--color-blue-dark);
     font-size: 1.25rem;
-    opacity: 0.6;
+    opacity: 1;
     transition: all 0.3s ease;
 }
 

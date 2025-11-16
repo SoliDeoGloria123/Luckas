@@ -172,3 +172,39 @@ exports.generarCertificado = async (req, res) => {
     });
   }
 };
+
+exports.obtenerEstadisticasCertificados = async (req, res) => {
+  try {
+    // Número total de inscripciones (puedes ajustarlo si quieres contar solo certificados)
+    const totalInscripciones = await Inscripcion.countDocuments();
+
+    // Certificados emitidos -> estado 'certificado'
+    const certificadosEmitidos = await Inscripcion.countDocuments({ estado: 'certificado' });
+
+    // "Listos para descarga": en el esquema actual no existe un estado "listo para descarga".
+    // El estado relevante para certificados es 'certificado', por eso lo usamos aquí.
+    const listosParaDescarga = certificadosEmitidos;
+
+    // Descargas hoy: actualmente no hay un campo que registre cada descarga.
+    // Como aproximación contamos inscripciones con estado 'certificado' actualizadas hoy,
+    // pero esto puede no reflejar descargas reales. Mejor: añadir un campo `descargado` o
+    // un registro de descargas para contar con precisión.
+    const descargasHoy = await Inscripcion.countDocuments({
+      estado: 'certificado',
+      updatedAt: {
+        $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+        $lt: new Date(new Date().setHours(23, 59, 59, 999))
+      }
+    });
+
+    res.status(200).json({
+      totalInscripciones,
+      certificadosEmitidos,
+      descargasHoy,
+      listosParaDescarga
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas de certificados:', error);
+    res.status(500).json({ message: 'Error al obtener estadísticas de certificados' });
+  }
+};

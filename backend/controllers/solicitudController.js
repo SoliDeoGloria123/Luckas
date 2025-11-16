@@ -457,3 +457,40 @@ exports.obtenerSolicitudesPorUsuario = async (req, res) => {
   }
 };
 
+// Estadísticas generales para dashboard de solicitudes
+exports.obtenerEstadisticasGenerales = async (req, res) => {
+  try {
+    // Contar totales básicos y métricas solicitadas en paralelo
+    const [
+      totalSolicitudes,
+      pendientesCount,
+      aprobadasCount,
+      altaPrioridadCount,
+      byEstado
+    ] = await Promise.all([
+      Solicitud.countDocuments(),
+      Solicitud.countDocuments({ estado: { $in: ['Nueva', 'En Revisión', 'Pendiente Info', 'Pendiente'] } }),
+      Solicitud.countDocuments({ estado: { $in: ['Aprobada'] } }),
+      Solicitud.countDocuments({ prioridad: { $in: ['Alta', 'Urgente'] } }),
+      Solicitud.aggregate([{ $group: { _id: '$estado', count: { $sum: 1 } } }])
+    ]);
+
+    const estados = {};
+    for (const e of (byEstado || [])) estados[e._id || 'Sin estado'] = e.count;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalSolicitudes,
+        pendientes: pendientesCount,
+        aprobadas: aprobadasCount,
+        altaPrioridad: altaPrioridadCount,
+        estados
+      }
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas generales de solicitudes:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener estadísticas', error: error.message });
+  }
+};
+

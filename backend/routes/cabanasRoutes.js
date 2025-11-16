@@ -7,7 +7,8 @@ const {
   obtenerCabanaPorId,
   actualizarCabana,
   eliminarCabana,
-  categorizarCabana 
+  categorizarCabana,
+  obtenerEstadisticasCabanas
 } = require('../controllers/cabanasController');
 const { authJwt, role } = require('../middlewares');
 
@@ -16,6 +17,8 @@ router.use(authJwt.verifyToken);
 
 // Rutas de consulta (admin, tesorero, seminarista, externo)
 router.get('/', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), obtenerCabanas);
+// Ruta de estadísticas (debe ir antes de rutas con parámetros para no ser capturada por '/:id')
+router.get('/estadisticas', role.checkRole('admin', 'tesorero'), obtenerEstadisticasCabanas);
 router.get('/:id', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), obtenerCabanaPorId);
 
 // Rutas de creación y modificación (admin y tesorero)

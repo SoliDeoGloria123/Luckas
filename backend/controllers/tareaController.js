@@ -381,3 +381,36 @@ exports.agregarComentario = async (req, res) => {
         });
     }
 };
+
+// Obtener estadísticas de tareas para el dashboard
+exports.obtenerEstadisticasTareas = async (req, res) => {
+    try {
+        const total = await Tarea.countDocuments();
+        const pendientes = await Tarea.countDocuments({ estado: 'pendiente' });
+        const enProgreso = await Tarea.countDocuments({ estado: 'en_progreso' });
+        const completadas = await Tarea.countDocuments({ estado: 'completada' });
+
+        // Tareas vencidas: fechaLimite anterior a ahora y que no estén completadas
+        const vencidas = await Tarea.countDocuments({
+            estado: { $ne: 'completada' },
+            fechaLimite: { $lt: new Date() }
+        });
+
+        // Distribución por prioridad
+        const porPrioridad = await Tarea.aggregate([
+            { $group: { _id: '$prioridad', total: { $sum: 1 } } }
+        ]);
+
+        res.status(200).json({
+            total,
+            pendientes,
+            enProgreso,
+            completadas,
+            vencidas,
+            porPrioridad
+        });
+    } catch (error) {
+        console.error('Error al obtener estadísticas de tareas:', error);
+        res.status(500).json({ success: false, message: 'Error al obtener estadísticas de tareas' });
+    }
+};

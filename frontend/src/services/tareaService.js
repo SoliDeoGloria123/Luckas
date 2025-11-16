@@ -85,5 +85,14 @@ export const tareaService = {
     });
     if (!res.ok) throw new Error("Error al agregar comentario");
     return await res.json();
+  },
+
+  //estadisticas generales
+  estadisticasGenerales: async () => {
+    const res = await fetch(`${API_URL}/estadisticas`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
+    if (!res.ok) throw new Error("Error al obtener estadísticas generales de tareas");
+    return await res.json();
   }
 };

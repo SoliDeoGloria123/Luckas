@@ -33,8 +33,7 @@ const Gestioninscripcion = () => {
     categoria: '',
     estado: 'pendiente'
   });
-
-
+  const [estadisticas, setEstadisticas] = useState({totalInscripciones:0, nuevasEstaSemana:0, aprobadas:0, pendientes:0});
 
   //Obtener inscripciones eventos y ctaegorias
   const obtenerInscripciones = async () => {
@@ -73,6 +72,7 @@ const Gestioninscripcion = () => {
     try {
       const res = await categorizacionService.getAll();
       setCategorias(res.data || []);
+      Estadisticagenerales();
     } catch (error) {
       setCategorias([]);
       mostrarAlerta("ERROR", `Error al obtener categorías: ${error.message}`, 'error');
@@ -85,6 +85,16 @@ const Gestioninscripcion = () => {
     obtenerProgramas();
     obtenerCategorias();
   }, []);
+
+  //obtener estadísticas generales
+  const Estadisticagenerales =async () => {
+    try {
+      const data = await inscripcionService.gerEstadisticasGenerales();
+      setEstadisticas(data.data );  
+    } catch (error) {
+      console.error("ERROR", `Error al obtener estadísticas generales: ${error.message}`, 'error');
+    }
+   }  
 
 
   const handleCreate = () => {
@@ -184,7 +194,7 @@ const Gestioninscripcion = () => {
               <i className="fas fa-user-plus"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="totalUsers">5</div>
+              <div className="stat-number-usuarios" >{estadisticas.totalInscripciones}</div>
               <div className="stat-label-usuarios">Total Inscripciones</div>
             </div>
           </div>
@@ -193,7 +203,7 @@ const Gestioninscripcion = () => {
               <i className="fas fa-calendar-plus"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="activeUsers">4</div>
+              <div className="stat-number-usuarios" id="activeUsers">{estadisticas.nuevasEstaSemana}</div>
               <div className="stat-label-usuarios">Nuevas Esta Semana</div>
             </div>
           </div>
@@ -202,7 +212,7 @@ const Gestioninscripcion = () => {
               <i className="fas fa-check-double"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="adminUsers">1</div>
+              <div className="stat-number-usuarios" id="adminUsers">{estadisticas.aprobadas}</div>
               <div className="stat-label-usuarios">Aprobadas</div>
             </div>
           </div>
@@ -211,7 +221,7 @@ const Gestioninscripcion = () => {
               <i className="fas fa-hourglass-half"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="newUsers">12</div>
+              <div className="stat-number-usuarios" id="newUsers">{estadisticas.pendientes}</div>
               <div className="stat-label-usuarios">Pendientes</div>
             </div>
           </div>

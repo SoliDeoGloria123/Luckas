@@ -23,7 +23,6 @@ import {
 
 const Gestioncabana = () => {
   // Estado de carga y filtrado
-
   // Carrusel de imágenes: un índice por cabaña
   const [imgIndices, setImgIndices] = useState({});
   const [eventoDetalle, setEventoDetalle] = useState(null);
@@ -43,6 +42,7 @@ const Gestioncabana = () => {
     servicios: []
   });
   const [selectedImages, setSelectedImages] = useState([]);
+  const [estadisticas, setEstadisticas] = useState({totalCabanas:0, disponibles:0, ocupadas:0, mantenimiento:0});
 
   // Función para obtener el tipo de cabaña (dummy)
   const obtenerTipoCabana = (tipo) => ({ label: tipo || 'Cabaña', icon: <Home className="w-6 h-6" /> });
@@ -121,10 +121,22 @@ const Gestioncabana = () => {
         cabs = data.data;
       }
       setCabanas(cabs);
+      estadisticasIniciales();
     } catch (err) {
       console.log("Error al obtener cabañas: " + err.message);
     }
   };
+  //obtener estadisticas
+  const estadisticasIniciales = async () => {
+    try{
+      const stats = await cabanaService.getEstadisticasGenerales();
+     setEstadisticas(stats);
+
+    }
+    catch(err){
+      console.log("Error al obtener estadísticas generales: " + err.message);
+    }
+  }
   const obtenerCategorias = async () => {
     try {
       const data = await categorizacionService.getAll();
@@ -235,7 +247,7 @@ const Gestioncabana = () => {
         <div className="stats-grid-solicitudes">
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">4</div>
+              <div className="stat-number-solicitudes">{estadisticas.totalCabanas}</div>
               <div className="stat-label-solicitudes">Total Cabañas</div>
             </div>
             <div className="stat-icon-solicitudes purple">
@@ -245,7 +257,7 @@ const Gestioncabana = () => {
 
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">1</div>
+              <div className="stat-number-solicitudes">{estadisticas.disponibles}</div>
               <div className="stat-label-solicitudes">Disponibles</div>
             </div>
             <div className="stat-icon-solicitudes orange">
@@ -255,7 +267,7 @@ const Gestioncabana = () => {
 
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">1</div>
+              <div className="stat-number-solicitudes">{estadisticas.ocupadas}</div>
               <div className="stat-label-solicitudes">Ocupadas</div>
             </div>
             <div className="stat-icon-solicitudes green">
@@ -265,7 +277,7 @@ const Gestioncabana = () => {
 
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">2</div>
+              <div className="stat-number-solicitudes">{estadisticas.mantenimiento}</div>
               <div className="stat-label-solicitudes">En Mantenimiento</div>
             </div>
             <div className="stat-icon-solicitudes red">

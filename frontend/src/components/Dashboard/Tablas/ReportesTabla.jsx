@@ -100,64 +100,43 @@ const extraerDataArray = (datos) => {
 
 // ...no dejar código suelto aquí, solo funciones válidas...
 
-const generarDistribucionReservas = (dataArray) => {
-  const statusCount = {};
-  for (const reserva of dataArray) {
-    const status = reserva.estado || reserva.status || 'Sin estado';
-    statusCount[status] = (statusCount[status] || 0) + 1;
+// Helper genérico para contar por una clave derivada
+const countBy = (arr, keyFn) => {
+  const counts = {};
+  for (const item of arr) {
+    const key = keyFn(item);
+    counts[key] = (counts[key] || 0) + 1;
   }
-  return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+  return Object.entries(counts).map(([name, value]) => ({ name, value }));
 };
 
-const generarDistribucionInscripciones = (dataArray) => {
-  const programCount = {};
-  for (const inscripcion of dataArray) {
-    const programa = inscripcion.referencia?.name || inscripcion.referencia?.nombre || inscripcion.programa || inscripcion.evento?.name || inscripcion.evento?.nombre || 'Sin referencia';
-    programCount[programa] = (programCount[programa] || 0) + 1;
-  }
-  return Object.entries(programCount).map(([name, value]) => ({ name, value }));
-};
+const generarDistribucionReservas = (dataArray) =>
+  countBy(dataArray, (r) => r.estado || r.status || 'Sin estado');
 
-const generarDistribucionSolicitudes = (dataArray) => {
-  const statusCount = {};
-  for (const solicitud of dataArray) {
-    const status = solicitud.estado || 'Sin estado';
-    statusCount[status] = (statusCount[status] || 0) + 1;
-  }
-  return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-};
+const generarDistribucionInscripciones = (dataArray) =>
+  countBy(
+    dataArray,
+    (i) => i.referencia?.name || i.referencia?.nombre || i.programa || i.evento?.name || i.evento?.nombre || 'Sin referencia'
+  );
 
-const generarDistribucionCabanas = (dataArray) => {
-  const statusCount = {};
-  for (const cabana of dataArray) {
-    const status = cabana.disponible ? 'Disponibles' : 'No disponibles';
-    statusCount[status] = (statusCount[status] || 0) + 1;
-  }
-  return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-};
+const generarDistribucionSolicitudes = (dataArray) =>
+  countBy(dataArray, (s) => s.estado || 'Sin estado');
 
-const generarDistribucionTareas = (dataArray) => {
-  const statusCount = {};
-  for (const tarea of dataArray) {
-    const status = tarea.estado || tarea.completada ? 'Completadas' : 'Pendientes';
-    statusCount[status] = (statusCount[status] || 0) + 1;
-  }
-  return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-};
+const generarDistribucionCabanas = (dataArray) =>
+  countBy(dataArray, (c) => (c.disponible ? 'Disponibles' : 'No disponibles'));
 
-const generarDistribucionProgramas = (dataArray) => {
-  const statusCount = { 'Activos': 0, 'Inactivos': 0 };
-  for (const programa of dataArray) {
-    if (programa.activo) {
-      statusCount['Activos'] += 1;
-    } else {
-      statusCount['Inactivos'] += 1;
-    }
-  }
-    return Object.entries(statusCount)
-      .filter(([, value]) => value > 0)
-      .map(([name, value]) => ({ name, value }));
-};
+const generarDistribucionTareas = (dataArray) =>
+  countBy(dataArray, (t) => (t.estado || (t.completada ? 'Completadas' : 'Pendientes')));
+
+const generarDistribucionProgramas = (dataArray) =>
+  countBy(dataArray, (p) => (p.activo ? 'Activos' : 'Inactivos')).filter((d) => d.value > 0);
+
+// Distribuciones genéricas faltantes
+const generarDistribucionUsuarios = (dataArray) =>
+  countBy(dataArray, (u) => u.role || u.rol || u.tipo || 'Sin rol');
+
+const generarDistribucionEventos = (dataArray) =>
+  countBy(dataArray, (e) => e.estado || e.status || e.tipo || 'Sin estado');
 
 const obtenerDistribucionPorTipo = (tipoReporte, dataArray) => {
   const distribuidores = {
@@ -223,6 +202,41 @@ const generateChartsFromRawData = (activeReport) => {
   return { trend, distribution };
 };
 
+// Componentes reutilizables para filas y tarjetas móviles (evita duplicación y declara PropTypes)
+function TableRow({ row, idx }) {
+  const rowKey = row._id || row.id || Object.values(row).join('-') + '-' + idx;
+  return (
+    <tr className="hover:bg-gray-50">
+      {Object.entries(row).map(([colKey, value]) => (
+        <td key={rowKey + '-' + colKey} className="px-4 py-3 text-sm text-gray-900">
+          {String(value)}
+        </td>
+      ))}
+    </tr>
+  );
+}
+TableRow.propTypes = {
+  row: PropTypes.object.isRequired,
+  idx: PropTypes.number.isRequired,
+};
+
+function MobileCard({ row, idx }) {
+  return (
+    <div className="bg-white rounded-lg shadow p-3 mb-2 border md:hidden">
+      {Object.entries(row).map(([key, value]) => (
+        <div key={key} className="flex justify-between py-1 text-sm">
+          <span className="font-semibold text-gray-700">{key}:</span>
+          <span className="text-gray-900">{String(value)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+MobileCard.propTypes = {
+  row: PropTypes.object.isRequired,
+  idx: PropTypes.number.isRequired,
+};
+
 const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) => {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedReportType, setSelectedReportType] = useState("")
@@ -238,35 +252,13 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
   const [searchTerm, setSearchTerm] = useState("")
   const [alertaDatos, setAlertaDatos] = useState("")
   const itemsPerPage = 5
+  // Memoizar chartData para evitar cálculos repetidos
+  const chartData = useMemo(() => generateChartData(activeReport), [activeReport]);
 
   const filteredData = useMemo(() => {
     if (!activeReport) return [];
-
-
-    let data = [];
-    if (activeReport.datos) {
-      if (activeReport.datos.reservas) {
-        data = activeReport.datos.reservas;
-      } else if (activeReport.datos.inscripciones) {
-        data = activeReport.datos.inscripciones;
-      } else if (activeReport.datos.usuarios) {
-        data = activeReport.datos.usuarios;
-      } else if (activeReport.datos.eventos) {
-        data = activeReport.datos.eventos;
-      } else if (activeReport.datos.solicitudes) {
-        data = activeReport.datos.solicitudes;
-      } else if (activeReport.datos.cabanas) {
-        data = activeReport.datos.cabanas;
-      } else if (activeReport.datos.tareas) {
-        data = activeReport.datos.tareas;
-      } else if (activeReport.datos.certificaciones) {
-        data = activeReport.datos.certificaciones;
-      } else if (activeReport.datos.notificaciones) {
-        data = activeReport.datos.notificaciones;
-      } else if (Array.isArray(activeReport.datos)) {
-        data = activeReport.datos;
-      }
-    }
+    const datos = activeReport.datos || {};
+    const data = extraerDataArray(datos);
 
     return data.filter((item) =>
       Object.values(item).some((value) => String(value).toLowerCase().includes(searchTerm.toLowerCase()))
@@ -301,6 +293,8 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
   }
 
   const COLORS = ["#2563eb", "#8b5cf6", "#059669", "#f59e0b", "#ef4444"]
+
+  
 
   return (
     <>
@@ -355,15 +349,7 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
                       <tbody className="divide-y divide-gray-100 bg-white">
                         {paginatedData.map((row, idx) => {
                           const rowKey = row._id || row.id || Object.values(row).join('-') + '-' + idx;
-                          return (
-                            <tr key={rowKey} className="hover:bg-gray-50">
-                              {Object.entries(row).map(([colKey, value]) => (
-                                <td key={rowKey + '-' + colKey} className="px-4 py-3 text-sm text-gray-900">
-                                  {String(value)}
-                                </td>
-                              ))}
-                            </tr>
-                          );
+                          return <TableRow key={rowKey} row={row} idx={idx} />;
                         })}
                       </tbody>
                     </table>
@@ -371,16 +357,7 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
                     <div className="md:hidden">
                       {paginatedData.map((row, idx) => {
                         const rowKey = row._id || row.id || Object.values(row).join('-') + '-' + idx;
-                        return (
-                          <div key={rowKey} className="bg-white rounded-lg shadow p-3 mb-2 border">
-                            {Object.entries(row).map(([key, value]) => (
-                              <div key={key} className="flex justify-between py-1 text-sm">
-                                <span className="font-semibold text-gray-700">{key}:</span>
-                                <span className="text-gray-900">{String(value)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        );
+                        return <MobileCard key={rowKey} row={row} idx={idx} />;
                       })}
                     </div>
                   </>
@@ -432,9 +409,9 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
                     <TrendingUp className="h-5 w-5 text-blue-600" />
                     <h3 className="font-semibold text-gray-900">Tendencia</h3>
                   </div>
-                  {generateChartData(activeReport).trend.length > 0 ? (
+                  {chartData.trend.length > 0 ? (
                     <ResponsiveContainer width="100%" height={200}>
-                      <LineChart data={generateChartData(activeReport).trend}>
+                      <LineChart data={chartData.trend}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                         <XAxis dataKey="mes" stroke="#6b7280" fontSize={12} />
                         <YAxis stroke="#6b7280" fontSize={12} />
@@ -458,18 +435,18 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
                     <PieChartIcon className="h-5 w-5 text-purple-600" />
                     <h3 className="font-semibold text-gray-900">Distribución</h3>
                   </div>
-                  {generateChartData(activeReport).distribution.length > 0 ? (
+                  {chartData.distribution.length > 0 ? (
                     <ResponsiveContainer width="100%" height={200}>
                       <PieChart>
                         <Pie
-                          data={generateChartData(activeReport).distribution}
+                          data={chartData.distribution}
                           cx="50%"
                           cy="50%"
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
                         >
-                          {generateChartData(activeReport).distribution.map((entry, index) => (
+                          {chartData.distribution.map((entry, index) => (
                             <Cell key={`cell-${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>

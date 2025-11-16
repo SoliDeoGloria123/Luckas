@@ -85,6 +85,14 @@ const Gestioncursos = () => {
     imagen: '',
     destacado: false
   });
+  const [estadisticas, setEstadisticas] = useState({
+    totalProgramas: 0,
+    totalCursos: 0,
+    totalProgramasTecnicos: 0,
+    programasActivos: 0,
+    programasInactivos: 0,
+    nuevosProgramasEsteMes: 0
+  });
 
 
 
@@ -194,8 +202,21 @@ const Gestioncursos = () => {
       mostrarAlerta("¡Éxito!", "Programa creado exitosamente", 'success');
       setMostrarModal(false);
       obtenerCursos();
+      obtenerEstadisticas();
     } catch (error) {
       mostrarAlerta("ERROR", `Error al crear programa: ${error.message}`, 'error');
+    }
+  };
+
+  //obtener estadiscas de programas 
+  const obtenerEstadisticas = async () => {
+    try {
+      const stats = await programasAcademicosService.obtenerEstadisticasGenerales();
+      // El backend devuelve { success: true, data: { ... } }
+      const payload = stats && stats.data ? stats.data : stats;
+      setEstadisticas(payload || {});
+    } catch (err) {
+      console.error("Error al obtener estadísticas: " + err.message);
     }
   };
 
@@ -262,6 +283,7 @@ const Gestioncursos = () => {
 
   useEffect(() => {
     obtenerCursos();
+    obtenerEstadisticas();
   }, []);
 
   // Efecto para actualizar cursos filtrados cuando cambia la lista de cursos
@@ -314,7 +336,7 @@ const Gestioncursos = () => {
               <i className="fas fa-book"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="totalCursos">{cursos.length}</div>
+              <div className="stat-number-usuarios" id="totalCursos">{estadisticas.totalCursos}</div>
               <div className="stat-label-usuarios">Total Cursos</div>
             </div>
           </div>
@@ -335,7 +357,7 @@ const Gestioncursos = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="programasTecnicos">
-                {cursos.filter(c => c.tipo === 'programa').length}
+                {estadisticas.totalProgramasTecnicos}
               </div>
               <div className="stat-label-usuarios">Programas Técnicos</div>
             </div>

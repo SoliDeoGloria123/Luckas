@@ -86,6 +86,19 @@ class BaseService {
     });
     return this.handleResponse(response, 'actualizar parcialmente');
   }
+
+  // Obtener estadísticas generales
+  async getEstadisticasGenerales() {
+    try {
+      const response = await fetch(`${this.baseURL}/estadisticas`, {
+        headers: this.getDefaultHeaders(),
+      });
+      return this.handleResponse(response, 'obtener estadísticas generales');
+    } catch (error) {
+      console.error(`Error en getEstadisticasGenerales:`, error);
+      throw error;
+    }
+  }
 }
 
 export default BaseService;

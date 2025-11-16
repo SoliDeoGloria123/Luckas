@@ -11,7 +11,7 @@ const Gestionusuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -27,6 +27,12 @@ const Gestionusuarios = () => {
     numeroDocumento: '',
     password: '',
     estado: 'activo'
+  });
+  const [estadisticas, setEstadisticas] = useState({
+    totalUsuarios: 0,
+    usuariosActivos: 0,
+    administradores: 0,
+    nuevosHoy: 0,
   });
 
   const handleCreate = () => {
@@ -98,6 +104,7 @@ const Gestionusuarios = () => {
       const usuariosData = Array.isArray(data.data) ? data.data : [];
       setUsuarios(usuariosData);
       setUsuariosFiltrados(usuariosData);
+      obtenerEstadisticas();
     } catch (error) {
       console.error("Error al obtener los usuarios de la base de datos", error.mensage);
     }
@@ -162,7 +169,17 @@ const Gestionusuarios = () => {
     } catch (error) {
       mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`);
     }
-  };  
+  };
+
+  //estadiscas usuarios 
+  const obtenerEstadisticas = async () => {
+    try {
+      const stats = await userService.getUserStats();
+      setEstadisticas(stats);
+    } catch (error) {
+      console.error("Error al obtener estadísticas de usuarios:", error);
+    }
+  };
 
 
   return (
@@ -191,7 +208,7 @@ const Gestionusuarios = () => {
               <i className="fas fa-users"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="totalUsers">5</div>
+              <div className="stat-number-usuarios" id="totalUsers">{estadisticas.totalUsuarios}</div>
               <div className="stat-label-usuarios">Total Usuarios</div>
             </div>
           </div>
@@ -200,7 +217,7 @@ const Gestionusuarios = () => {
               <i className="fas fa-user-check"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="activeUsers">4</div>
+              <div className="stat-number-usuarios" id="activeUsers">{estadisticas.usuariosActivos}</div>
               <div className="stat-label-usuarios">Usuarios Activos</div>
             </div>
           </div>
@@ -209,7 +226,7 @@ const Gestionusuarios = () => {
               <i className="fas fa-user-shield"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="adminUsers">1</div>
+              <div className="stat-number-usuarios" id="adminUsers">{estadisticas.administradores}</div>
               <div className="stat-label-usuarios">Administradores</div>
             </div>
           </div>
@@ -218,7 +235,7 @@ const Gestionusuarios = () => {
               <i className="fas fa-user-plus"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="newUsers">12</div>
+              <div className="stat-number-usuarios" id="newUsers">{estadisticas.nuevosHoy || 0}</div>
               <div className="stat-label-usuarios">Nuevos Este Mes</div>
             </div>
           </div>

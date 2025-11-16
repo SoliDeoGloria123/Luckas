@@ -474,3 +474,34 @@ exports.obtenerInscripcionesPorUsuario = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Obtener estadísticas de inscripciones
+exports.obtenerEstadisticasInscripciones = async (req, res) => {
+  try {
+    const totalInscripciones = await Inscripcion.countDocuments();
+
+    const nuevasEstaSemana = await Inscripcion.countDocuments({
+      createdAt: {
+        $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+        $lt: new Date()
+      }
+    });
+
+    const aprobadas = await Inscripcion.countDocuments({ estado: 'aprobada' });
+
+    const pendientes = await Inscripcion.countDocuments({ estado: 'pendiente' });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalInscripciones,
+        nuevasEstaSemana,
+        aprobadas,
+        pendientes
+      }
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas de inscripciones:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener estadísticas de inscripciones' });
+  }
+};

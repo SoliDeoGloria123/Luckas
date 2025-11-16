@@ -38,6 +38,7 @@ const Gestionevento = () => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [eventoDetalle, setEventoDetalle] = useState(null);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
+  const [estadisticas, setEstadisticas] = useState({ totalEvents: 0, upcoming: 0, completed: 0, cancelled: 0 });
 
 
 
@@ -57,6 +58,7 @@ const Gestionevento = () => {
     try {
       const res = await categorizacionService.getAll();
       setCategorias(res.data || []);
+      obtenerEstadisticas();
     } catch (error) {
       setCategorias([]);
       mostrarAlerta("ERROR", `Error al obtener categorías: ${error.message}`, 'error');
@@ -67,6 +69,17 @@ const Gestionevento = () => {
     obtenerEventos();
     obtenerCategorias();
   }, []);
+
+  //estadisticas de eventos
+  const obtenerEstadisticas = async () => {
+    try {
+      const stats = await eventService.getEstadisticasGenerales();
+      setEstadisticas(stats?.data || stats);
+    } catch (error) {
+      mostrarAlerta("ERROR", `Error al obtener estadísticas: ${error.message}`, 'error');
+    }
+  };
+
   // Estado de carga y filtrado
   const [cargando] = useState(false); // setCargando commented as unused
   const eventosFiltrados = eventos; // Puedes aplicar filtros si lo necesitas
@@ -189,7 +202,7 @@ const Gestionevento = () => {
         <div className="stats-grid-solicitudes">
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">4</div>
+              <div className="stat-number-solicitudes">{estadisticas.totalEvents}</div>
               <div className="stat-label-solicitudes">Total Eventos</div>
             </div>
             <div className="stat-icon-solicitudes purple">
@@ -199,7 +212,7 @@ const Gestionevento = () => {
 
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">1</div>
+              <div className="stat-number-solicitudes">{estadisticas.upcoming}</div>
               <div className="stat-label-solicitudes">Próximos</div>
             </div>
             <div className="stat-icon-solicitudes orange">
@@ -209,7 +222,7 @@ const Gestionevento = () => {
 
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">1</div>
+              <div className="stat-number-solicitudes">{estadisticas.completed}</div>
               <div className="stat-label-solicitudes">Completados</div>
             </div>
             <div className="stat-icon-solicitudes green">
@@ -219,7 +232,7 @@ const Gestionevento = () => {
 
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">2</div>
+              <div className="stat-number-solicitudes">{estadisticas.cancelled}</div>
               <div className="stat-label-solicitudes">Cancelados</div>
             </div>
             <div className="stat-icon-solicitudes red">

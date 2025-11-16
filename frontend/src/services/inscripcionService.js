@@ -55,5 +55,12 @@ export const inscripcionService = {
     });
     if (!res.ok) throw new Error("Error al obtener inscripciones por usuario");
     return await res.json();
+  },
+  gerEstadisticasGenerales: async () => {
+    const res = await fetch(`${API_URL}/estadisticas`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    if (!res.ok) throw new Error("Error al obtener estadísticas generales de inscripciones");
+    return await res.json();
   }
 };

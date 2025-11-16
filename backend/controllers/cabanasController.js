@@ -169,3 +169,42 @@ exports.categorizarCabana = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+exports.obtenerEstadisticasCabanas = async (req, res) => {
+  try {
+    const totalCabanas = await Cabana.countDocuments();
+    const disponibles = await Cabana.countDocuments({ estado: 'disponible' });
+    const ocupadas = await Cabana.countDocuments({ estado: 'ocupada' });
+    const mantenimiento = await Cabana.countDocuments({ estado: 'mantenimiento' });
+
+    const capacidadTotal = await Cabana.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalCapacidad: { $sum: '$capacidad' }
+        }
+      }
+    ]);
+
+    const precioPromedio = await Cabana.aggregate([
+      {
+        $group: {
+          _id: null,
+          promedioPrecio: { $avg: '$precio' }
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      totalCabanas,
+      disponibles,
+      ocupadas,
+      mantenimiento,
+      capacidadTotal: capacidadTotal[0]?.totalCapacidad || 0,
+      precioPromedio: precioPromedio[0]?.promedioPrecio || 0
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas de cabañas:', error);
+    res.status(500).json({ message: 'Error al obtener estadísticas de cabañas' });
+  }
+};

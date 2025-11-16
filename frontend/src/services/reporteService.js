@@ -155,6 +155,11 @@ export const reporteService = {
     });
     if (!res.ok) throw new Error('Error al eliminar el reporte');
     return await res.json();
+  },
+  estadisticasreportes: async () => {
+    const res = await fetch(`${API_URL}/reportes/estadisticas`, { headers: getHeaders(true) });
+    if (!res.ok) throw new Error('Error al obtener estadísticas de reportes');
+    return await res.json();
   }
 
 };

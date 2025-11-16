@@ -31,6 +31,7 @@ const Gestionreserva = () => {
     propositoEstadia: '',
     estado: 'pendiente'
   });
+  const [estadisticas, setEstadisticas] = useState({totalReservas:0, pendientes:0, confirmadas:0, ingresosMes:0});
 
   //obtener reservas 
   const obtenerReservas = async () => {
@@ -45,8 +46,19 @@ const Gestionreserva = () => {
         resvs = [];
       }
       setReservas(resvs);
+      estadisticasIniciales();
     } catch (err) {
       console.log("Error al obtener reservas: " + err.message);
+    }
+  };
+  //obetner estadisticas
+  const estadisticasIniciales = async () => {
+    try {
+      const stats = await reservaService.getEstadisticasGenerales();
+      setEstadisticas(stats);
+      console.log("Estadísticas de reservas:", stats);
+    } catch (err) {
+      console.log("Error al obtener estadísticas: " + err.message);
     }
   };
   const obtenerUsuarios = async () => {
@@ -190,7 +202,7 @@ const Gestionreserva = () => {
               <i className="fas fa-calendar-check"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="totalUsers">5</div>
+              <div className="stat-number-usuarios" id="totalUsers">{estadisticas.totalReservas}</div>
               <div className="stat-label-usuarios">Total Reservas</div>
             </div>
           </div>
@@ -199,8 +211,17 @@ const Gestionreserva = () => {
               <i className="fas fa-clock"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="activeUsers">4</div>
+              <div className="stat-number-usuarios" id="activeUsers">{estadisticas.pendientes}</div>
               <div className="stat-label-usuarios">Pendientes</div>
+            </div>
+          </div>
+           <div className="stat-card-usuarios">
+            <div className="stat-icon-usuarios green">
+              <i className="fas fa-check-circle"></i>
+            </div>
+            <div className="stat-content">
+              <div className="stat-number-usuarios" id="newUsers">{estadisticas.confirmadas}</div>
+              <div className="stat-label-usuarios">Confirmadas</div>
             </div>
           </div>
           <div className="stat-card-usuarios">
@@ -208,19 +229,11 @@ const Gestionreserva = () => {
               <i className="fas fa-dollar-sign"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="adminUsers">$12,450</div>
+              <div className="stat-number-usuarios" id="adminUsers">{estadisticas.nuevasEsteMes}</div>
               <div className="stat-label-usuarios">Ingresos Mes</div>
             </div>
           </div>
-          <div className="stat-card-usuarios">
-            <div className="stat-icon-usuarios green">
-              <i className="fas fa-check-circle"></i>
-            </div>
-            <div className="stat-content">
-              <div className="stat-number-usuarios" id="newUsers">12</div>
-              <div className="stat-label-usuarios">Confirmadas</div>
-            </div>
-          </div>
+         
         </div>
 
         <div className="filters-section-tesorero">
@@ -318,13 +331,13 @@ const Gestionreserva = () => {
                             ? reser.solicitud?._id || "N/A"
                             : reser.solicitud || "N/A"}
                         </td>
-                       <td>
+                        <td>
                           <span className={`status-badge status-${reser.activo ? 'Activo' : 'Desactivado'}`}>
                             {reser.activo ? 'Activo' : 'Desactivado'}
                           </span>
                         </td>
-                       <td>{reser.createdAt ? new Date(reser.createdAt).toLocaleDateString() : "N/A"}</td>
-                       <td>{reser.updatedAt ? new Date(reser.updatedAt).toLocaleDateString() : "N/A"}</td>
+                        <td>{reser.createdAt ? new Date(reser.createdAt).toLocaleDateString() : "N/A"}</td>
+                        <td>{reser.updatedAt ? new Date(reser.updatedAt).toLocaleDateString() : "N/A"}</td>
                         <td className="whitespace-nowrap px-6 py-4">
                           <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(reser)}>
                             <Edit className="h-4 w-4" />

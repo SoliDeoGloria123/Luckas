@@ -15,6 +15,7 @@ router.get('/usuarios', role.checkRole('admin', 'tesorero'), reportesController.
 router.get('/eventos', role.checkRole('admin', 'tesorero'), reportesController.getEventosReport);
 router.get('/financiero', role.checkRole('admin', 'tesorero'), reportesController.getReporteFinanciero);
 router.get('/actividad-usuarios', role.checkRole('admin', 'tesorero'), reportesController.getActividadUsuarios);
+router.get('/estadisticas', role.checkRole('admin', 'tesorero'), reportesController.getTotalGestiones);
 router.get('/', role.checkRole('admin', 'tesorero'), reportesController.getReportesGuardados);
 router.post('/', role.checkRole('admin', 'tesorero'), reportesController.guardarReporte);
 router.put('/:id', role.checkRole('admin', 'tesorero'), reportesController.editarReporteGuardado);

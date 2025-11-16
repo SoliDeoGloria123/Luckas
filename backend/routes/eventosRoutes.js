@@ -11,8 +11,9 @@ router.use(authJwt.verifyToken);
 
 // Rutas de consulta (admin, tesorero, seminarista, externo)
 router.get('/', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), eventosController.getAllEvents);
-router.get('/:id', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), eventosController.getEventById);
 router.get('/categoria', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), eventosController.getEventosPorCategoria);
+router.get('/estadisticas', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), eventosController.obtenerEstadisticasEventos);
+router.get('/:id', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), eventosController.getEventById);
 
 // Ruta temporal para activar todos los eventos (solo admin)
 router.patch('/activar-todos', role.isAdmin, eventosController.activarTodosLosEventos);

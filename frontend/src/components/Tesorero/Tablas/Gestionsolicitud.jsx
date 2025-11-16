@@ -25,6 +25,7 @@ const Gestionsolicitud = () => {
     respuesta: '',
     prioridad: 'Media'
   });
+  const [estadisticas, setEstadisticas] = useState({ totalSolicitudes: 0, pendientes: 0, aprobadas: 0, rechazadas: 0 });
 
 
   // Obtener solicitudes
@@ -32,6 +33,7 @@ const Gestionsolicitud = () => {
     try {
       const data = await solicitudService.getAll();
       setSolicitudes(Array.isArray(data.data) ? data.data : []);
+      obtenerEstadiscas();
     } catch (error) {
       mostrarAlerta("Error", `Error al obtener solicitudes: ${error.message}`);
     }
@@ -86,6 +88,15 @@ const Gestionsolicitud = () => {
       mostrarAlerta("ERROR", `Error: ${error.message}`, 'error');
     }
   };
+  const obtenerEstadiscas = async () => {
+    try {
+      const stats = await solicitudService.getEstadisticasGenerales();
+      setEstadisticas(stats?.data || stats);
+    }
+    catch (error) {
+      console.error(`Error al obtener estadísticas: `, error);
+    }
+  }
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
@@ -125,7 +136,7 @@ const Gestionsolicitud = () => {
         <div className="stats-grid-solicitudes">
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">4</div>
+              <div className="stat-number-solicitudes">{estadisticas.totalSolicitudes}</div>
               <div className="stat-label-solicitudes">Total Solicitudes</div>
             </div>
             <div className="stat-icon-solicitudes purple">
@@ -135,7 +146,7 @@ const Gestionsolicitud = () => {
 
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">1</div>
+              <div className="stat-number-solicitudes">{estadisticas.pendientes}</div>
               <div className="stat-label-solicitudes">Pendientes</div>
             </div>
             <div className="stat-icon-solicitudes orange">
@@ -145,7 +156,7 @@ const Gestionsolicitud = () => {
 
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">1</div>
+              <div className="stat-number-solicitudes">{estadisticas.aprobadas}</div>
               <div className="stat-label-solicitudes">Aprobadas</div>
             </div>
             <div className="stat-icon-solicitudes green">
@@ -155,7 +166,7 @@ const Gestionsolicitud = () => {
 
           <div className="stat-card-solicitudes">
             <div className="stat--solicitudes">
-              <div className="stat-number-solicitudes">2</div>
+              <div className="stat-number-solicitudes">{estadisticas.altaPrioridad}</div>
               <div className="stat-label-solicitudes">Alta Prioridad</div>
             </div>
             <div className="stat-icon-solicitudes red">

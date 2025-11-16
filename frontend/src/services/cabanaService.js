@@ -12,4 +12,5 @@ export const cabanaService = {
   create: (cabana) => baseService.create(cabana), // BaseService maneja FormData automáticamente
   update: (id, cabana) => baseService.update(id, cabana),
   delete: (id) => baseService.delete(id),
+  getEstadisticasGenerales: () => baseService.getEstadisticasGenerales(),
 };

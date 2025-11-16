@@ -98,3 +98,35 @@ exports.eliminarProgramaAcademico = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error interno del servidor', error: error.message });
   }
 };
+
+// Obtener estadísticas de programas académicos
+exports.obtenerEstadisticasProgramas = async (req, res) => {
+  try {
+    const totalProgramas = await ProgramaAcademico.countDocuments();
+    const totalCursos = await ProgramaAcademico.countDocuments({ tipo: 'curso' });
+    const totalProgramasTecnicos = await ProgramaAcademico.countDocuments({ tipo: 'programa-tecnico' });
+    const programasActivos = await ProgramaAcademico.countDocuments({ estado: 'activo' });
+    const programasInactivos = await ProgramaAcademico.countDocuments({ estado: 'inactivo' });
+    const nuevosProgramasEsteMes = await ProgramaAcademico.countDocuments({
+      fechaInicio: {
+        $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        $lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalProgramas,
+        totalCursos,
+        totalProgramasTecnicos,
+        programasActivos,
+        programasInactivos,
+        nuevosProgramasEsteMes
+      }
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas de programas académicos:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor', error: error.message });
+  }
+};

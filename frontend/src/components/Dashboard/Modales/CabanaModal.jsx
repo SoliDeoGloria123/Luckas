@@ -2,8 +2,10 @@
 import React, {useState, useEffect} from "react";
 import PropTypes from 'prop-types';
 import cabanaShape from './common/cabanaPropTypes';
-
-
+import useImageUploader from './useImageUploader';
+import FormField from './shared/FormField';
+import ImageUploadArea from './shared/ImageUploadArea';
+import ModalFooter from './shared/ModalFooter';
 const CabanaModal = ({
   mostrar,
   modoEdicion,
@@ -17,107 +19,19 @@ const CabanaModal = ({
   selectedImages,
   setSelectedImages
 }) => {
-  const [progress, setProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Resetear estado cuando se abre el modal en modo crear
+  // extraer la lógica de imágenes al hook
+  const { progress, isUploading, handleFileSelection, removeImage } = useImageUploader({ selectedImages, setSelectedImages, mostrar, modoEdicion });
+
+  // Resetear isSubmitting cuando se abre el modal en modo crear
   useEffect(() => {
-    if (mostrar && !modoEdicion && setSelectedImages) {
-      setSelectedImages([]);
-      setProgress(0);
-      setIsUploading(false);
+    if (mostrar && !modoEdicion) {
       setIsSubmitting(false);
     }
-  }, [mostrar, modoEdicion, setSelectedImages]);
+  }, [mostrar, modoEdicion]);
 
-  // Función auxiliar para finalizar upload
-  const finishUpload = () => {
-    setTimeout(() => setIsUploading(false), 500);
-  };
-
-  // Función auxiliar para agregar imagen
-  const addImageToState = (imageData) => {
-    if (setSelectedImages && typeof setSelectedImages === 'function') {
-      setSelectedImages(prev => Array.isArray(prev) ? [...prev, imageData] : [imageData]);
-    }
-  };
-
-  // Manejo de archivos seleccionados
-  const handleFileSelection = (files) => {
-    const validFiles = [];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif']);
-
-    for (const file of Array.from(files)) {
-      if (!allowedTypes.has(file.type)) {
-        console.warn(`Tipo de archivo no permitido: ${file.type}`);
-        continue;
-      }
-      if (file.size > maxSize) {
-        console.warn(`Archivo muy grande: ${file.name} (${file.size} bytes)`);
-        continue;
-      }
-      validFiles.push(file);
-    }
-
-    if (validFiles.length > 0) {
-      uploadImages(validFiles);
-    } else {
-      alert('No se seleccionaron archivos válidos. Asegúrate de seleccionar imágenes JPG, PNG o GIF menores a 5MB.');
-    }
-  };
-
-  // Simulación de carga de imágenes
-  const uploadImages = (files) => {
-    if (isUploading) return;
-    setIsUploading(true);
-    setProgress(0);
-
-    let uploadedCount = 0;
-    const totalFiles = files.length;
-
-    const handleUploadComplete = () => {
-      uploadedCount++;
-      if (uploadedCount === totalFiles) {
-        finishUpload();
-      }
-    };
-
-    for (let index = 0; index < files.length; index++) {
-      const file = files[index];
-      const reader = new FileReader();
-      
-      reader.onload = (e) => {
-        try {
-          const imageData = {
-            id: Date.now() + index,
-            file,
-            url: e.target.result,
-            name: file.name
-          };
-          addImageToState(imageData);
-          handleUploadComplete();
-        } catch (error) {
-          console.error('Error procesando imagen:', error);
-          handleUploadComplete();
-        }
-      };
-      
-      reader.onerror = () => {
-        console.error('Error leyendo archivo');
-        handleUploadComplete();
-      };
-      
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeImage = (id) => {
-    if (setSelectedImages && typeof setSelectedImages === 'function') {
-      setSelectedImages(prev => Array.isArray(prev) ? prev.filter(img => img.id !== id) : []);
-    }
-  };
+  
 
   // Función auxiliar para obtener texto del botón
   const getButtonText = () => {
@@ -213,81 +127,22 @@ const CabanaModal = ({
         </div>
         <form className="modal-body-admin" onSubmit={handleSubmit}>
           <div className="from-grid-admin">
-            <div className="form-grupo-admin">
-              <label htmlFor="nombre-cabana">Nombre:</label>
-              <input
-                id="nombre-cabana"
-                type="text"
-                value={getFieldValue('nombre')}
-                onChange={e => handleFieldChange('nombre', e.target.value)}
-                placeholder="Nombre de la cabaña"
-                required
-              />
-            </div>
-            <div className="form-grupo-admin">
-              <label htmlFor="descripcion-cabana">Descripción:</label>
-              <input
-                id="descripcion-cabana"
-                type="text"
-                value={getFieldValue('descripcion')}
-                onChange={e => handleFieldChange('descripcion', e.target.value)}
-                placeholder="Descripción"
-              />
-            </div>
+            <FormField id="nombre-cabana" label="Nombre:" value={getFieldValue('nombre')} onChange={e => handleFieldChange('nombre', e.target.value)} required placeholder="Nombre de la cabaña" />
+            <FormField id="descripcion-cabana" label="Descripción:" value={getFieldValue('descripcion')} onChange={e => handleFieldChange('descripcion', e.target.value)} placeholder="Descripción" />
           </div>
           <div className="from-grid-admin">
-            <div className="form-grupo-admin">
-              <label htmlFor="capacidad-cabana">Capacidad:</label>
-              <input
-                id="capacidad-cabana"
-                type="number"
-                value={getFieldValue('capacidad')}
-                onChange={e => handleFieldChange('capacidad', e.target.value)}
-                placeholder="Capacidad"
-                required
-              />
-            </div>
-            <div className="form-grupo-admin">
-              <label htmlFor="categoria-cabana">Categoría:</label>
-              <select
-                id="categoria-cabana"
-                type="text"
-                value={getFieldValue('categoria')}
-                onChange={e => handleFieldChange('categoria', e.target.value)}
-                placeholder="Categoría"
-              >
-                <option value="">Seleccione...</option>
-                {categorias && categorias.map(cat => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <FormField id="capacidad-cabana" label="Capacidad:" type="number" value={getFieldValue('capacidad')} onChange={e => handleFieldChange('capacidad', e.target.value)} required placeholder="Capacidad" />
+            <FormField id="categoria-cabana" label="Categoría:" type="select" value={getFieldValue('categoria')} onChange={e => handleFieldChange('categoria', e.target.value)}>
+              <option value="">Seleccione...</option>
+              {categorias && categorias.map(cat => (
+                <option key={cat._id} value={cat._id}>{cat.nombre}</option>
+              ))}
+            </FormField>
           </div>
           <div className="from-grid-admin">
-            <div className="form-grupo-admin">
-              <label htmlFor="precio-cabana">Precio:</label>
-              <input
-                id="precio-cabana"
-                type="number"
-                value={getFieldValue('precio')}
-                onChange={e => handleFieldChange('precio', e.target.value)}
-                placeholder="Precio por noche"
-                required
-              />
-            </div>
+            <FormField id="precio-cabana" label="Precio:" type="number" value={getFieldValue('precio')} onChange={e => handleFieldChange('precio', e.target.value)} required placeholder="Precio por noche" />
             {!modoEdicion && (
-              <div className="form-grupo-admin">
-                <label htmlFor="ubicacion-cabana">Ubicacion:</label>
-                <input
-                  id="ubicacion-cabana"
-                  type="text"
-                  value={getFieldValue('ubicacion')}
-                  onChange={e => handleFieldChange('ubicacion', e.target.value)}
-                  placeholder="Ubicación"
-                />
-              </div>
+              <FormField id="ubicacion-cabana" label="Ubicacion:" value={getFieldValue('ubicacion')} onChange={e => handleFieldChange('ubicacion', e.target.value)} placeholder="Ubicación" />
             )}
           </div>
       
@@ -305,127 +160,12 @@ const CabanaModal = ({
               </select>
             </div>
         
-            <div className="form-group-tesorero full-width">
-              <label htmlFor="imageInput">Imagen</label>
-              <div className="image-upload-container">
-                <button 
-                  type="button"
-                  className="upload-area" 
-                  onClick={() => !isUploading && document.getElementById('imageInput').click()}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (isUploading) return;
-                    const files = e.dataTransfer?.files;
-                    if (files && files.length > 0) {
-                      handleFileSelection(files);
-                    }
-                  }}
-                  disabled={isUploading}
-                >
-                  <div className="upload-content">
-                    <i className="fas fa-cloud-upload-alt upload-icon"></i>
-                    <h3>Arrastra y suelta tus imágenes aquí</h3>
-                    <p>o <span className="browse-text">haz clic para seleccionar</span></p>
-                    <small>Formatos soportados: JPG, PNG, GIF (máx. 5MB cada una)</small>
-                  </div>
-                  <input 
-                    type="file" 
-                    id='imageInput' 
-                    multiple 
-                    accept="image/jpeg,image/jpg,image/png,image/gif" 
-                    hidden 
-                    onChange={(e) => {
-                      const files = e.target?.files;
-                      if (files && files.length > 0) {
-                        handleFileSelection(files);
-                      }
-                      // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
-                      e.target.value = '';
-                    }} 
-                  />
-                </button>
-
-                {/* Barra de progreso */}
-                {isUploading && (
-                  <div style={{
-                    margin: '10px 0',
-                    padding: '10px',
-                    background: '#f8f9fa',
-                    borderRadius: '8px',
-                    border: '1px solid #e9ecef'
-                  }}>
-                    <div style={{
-                      width: '100%',
-                      height: '8px',
-                      backgroundColor: '#e9ecef',
-                      borderRadius: '4px',
-                      overflow: 'hidden'
-                    }}>
-                      <div style={{
-                        width: `${progress}%`,
-                        height: '100%',
-                        backgroundColor: '#007bff',
-                        transition: 'width 0.3s ease'
-                      }}></div>
-                    </div>
-                    <p style={{
-                      margin: '8px 0 0 0',
-                      fontSize: '14px',
-                      color: '#6c757d',
-                      textAlign: 'center'
-                    }}>
-                      Procesando imágenes... {Math.round(progress)}%
-                    </p>
-                  </div>
-                )}
-
-                <div className="image-preview-grid" id="imagePreviewGrid">
-                  {Array.isArray(selectedImages) && selectedImages.map(img => (
-                    <div key={img.id} className="image-preview">
-                      <img src={img.url} alt={img.name || 'Imagen'} />
-                      <div className="image-overlay">
-                        <button type="button" className="remove-btn" onClick={() => removeImage(img.id)}>
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
-                      <div style={{
-                        position: 'absolute',
-                        bottom: '0',
-                        left: '0',
-                        right: '0',
-                        background: 'rgba(0,0,0,0.7)',
-                        color: 'white',
-                        padding: '4px 8px',
-                        fontSize: '11px',
-                        textAlign: 'center'
-                      }}>
-                        {img.name && img.name.length > 15 ? img.name.substring(0, 15) + '...' : (img.name || 'Sin nombre')}
-                      </div>
-                    </div>
-                  ))}
-
-                </div>
-              </div>
-            </div>
+            <ImageUploadArea isUploading={isUploading} progress={progress} selectedImages={selectedImages} handleFileSelection={handleFileSelection} removeImage={removeImage} />
       
           <small style={{ color: "#555", marginTop: "5px" }}>
             Puedes seleccionar varias imágenes manteniendo presionada la tecla Ctrl o Shift
           </small>
-          <div className="modal-action-admin">
-            <button className="btn-admin secondary-admin" type="button" onClick={onClose} disabled={isSubmitting}>
-              <i className="fas fa-times"></i> {' '}
-              Cancelar
-            </button>
-            <button className="btn-admin btn-primary" type="submit" disabled={isSubmitting}>
-              <i className="fas fa-save"></i>
-              {getButtonText()}
-            </button>
-          </div>
+          <ModalFooter isSubmitting={isSubmitting} onClose={onClose} getButtonText={getButtonText} />
         </form>
 
       </div>

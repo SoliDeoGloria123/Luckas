@@ -112,7 +112,11 @@ router.get('/unificado', async (req, res) => {
 });
 
 // Rutas de consulta - Solo admin y tesorero
-router.get('/',solicitudController.obtenerSolicitudes);
+// Estadísticas (dashboard) - solo admin y tesorero
+router.get('/estadisticas', role.checkRole('admin', 'tesorero'), solicitudController.obtenerEstadisticasGenerales);
+
+// Listado principal
+router.get('/', solicitudController.obtenerSolicitudes);
 router.get('/:id', validarId, solicitudController.obtenerSolicitudPorId);
 
 // Rutas de creación - Admin, tesorero, seminarista y externo pueden crear solicitudes

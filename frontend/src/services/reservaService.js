@@ -19,7 +19,9 @@ export const reservaService = {
     });
     if (!res.ok) throw new Error("Error al obtener reservas del usuario");
     return await res.json();
-  }
+  },
+  getEstadisticasGenerales: () => baseService.getEstadisticasGenerales(),
+
   
 };
 

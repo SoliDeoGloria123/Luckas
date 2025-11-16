@@ -1,5 +1,3 @@
-
-
 const mongoose = require('mongoose');
 const Reserva = require('../models/Reservas');
 const Inscripcion = require('../models/Inscripciones');
@@ -24,7 +22,7 @@ exports.getDashboardReport = async (req, res) => {
       totalTareas,
       solicitudesPendientes,
       reservasActivas,
-      eventosProximos
+      eventosProximos,
     ] = await Promise.all([
       Usuario.countDocuments(),
       Reserva.countDocuments({}), // Total de reservas sin filtro de fecha
@@ -37,7 +35,7 @@ exports.getDashboardReport = async (req, res) => {
       Reserva.countDocuments({ estado: { $in: ['Pendiente', 'Confirmada'] }, $or: [{ activo: true }, { activo: "true" }] }),// Activas por estado y activo
       Evento.countDocuments({
         fechaEvento: { $gte: new Date() },
-        active: true
+        active: true,
       })
     ]);
 
@@ -52,9 +50,9 @@ exports.getDashboardReport = async (req, res) => {
         totalTareas,
         solicitudesPendientes,
         reservasActivas,
-        eventosProximos
+        eventosProximos,
       },
-      fechaGeneracion: new Date()
+      fechaGeneracion: new Date(),
     };
 
     res.json({ success: true, data: dashboard });
@@ -154,15 +152,17 @@ exports.getInscripcionesReport = async (req, res) => {
         { $match: filtros },
         { $lookup: { from: 'eventos', localField: 'referencia', foreignField: '_id', as: 'eventoInfo' } },
         { $lookup: { from: 'programaacademicos', localField: 'referencia', foreignField: '_id', as: 'programaInfo' } },
-        { $project: {
-          referenciaNombre: {
-            $cond: [
-             { $eq: ['$tipoReferencia', 'Evento'] },
-             { $ifNull: [{ $arrayElemAt: ['$eventoInfo.name', 0] }, 'Evento sin nombre'] },
-             { $ifNull: [{ $arrayElemAt: ['$programaInfo.nombre', 0] }, 'Programa sin nombre'] }
-            ]
+        {
+          $project: {
+            referenciaNombre: {
+              $cond: [
+                { $eq: ['$tipoReferencia', 'Evento'] },
+                { $ifNull: [{ $arrayElemAt: ['$eventoInfo.name', 0] }, 'Evento sin nombre'] },
+                { $ifNull: [{ $arrayElemAt: ['$programaInfo.nombre', 0] }, 'Programa sin nombre'] }
+              ]
+            }
           }
-        }},
+        },
         { $group: { _id: '$referenciaNombre', count: { $sum: 1 } } }
       ]),
       porCategoria: await Inscripcion.aggregate([
@@ -526,7 +526,7 @@ function normalizarFiltros(filtrosInput) {
 // Función auxiliar para resolver categoría
 async function resolverCategoria(categoria) {
   if (!categoria) return { filtrosToSave: '', queryCategoriaForDB: null };
-  
+
   if (mongoose.Types.ObjectId.isValid(categoria)) {
     const categoriaObjById = await Categorizacion.findById(categoria).select('nombre');
     if (categoriaObjById) {
@@ -540,11 +540,11 @@ async function resolverCategoria(categoria) {
       queryCategoriaForDB: categoria
     };
   }
-  
-    const categoriaEscapada = String(categoria).replaceAll(/[.*+?^${}()|[\]\\]/g, '$&');
-    const categoriaObj = await Categorizacion.findOne({ 
-      nombre: { $regex: String.raw`^${categoriaEscapada}$`, $options: 'i' } 
-    });
+
+  const categoriaEscapada = String(categoria).replaceAll(/[.*+?^${}()|[\]\\]/g, '$&');
+  const categoriaObj = await Categorizacion.findOne({
+    nombre: { $regex: String.raw`^${categoriaEscapada}$`, $options: 'i' }
+  });
   return {
     filtrosToSave: String(categoria).trim(),
     queryCategoriaForDB: categoriaObj?._id || null
@@ -554,7 +554,7 @@ async function resolverCategoria(categoria) {
 // Función auxiliar para resolver usuario
 async function resolverUsuario(usuario) {
   if (!usuario) return { filtrosToSave: '', queryUsuarioForDB: null };
-  
+
   if (mongoose.Types.ObjectId.isValid(usuario)) {
     const usuarioObjById = await Usuario.findById(usuario).select('username email');
     if (usuarioObjById) {
@@ -568,7 +568,7 @@ async function resolverUsuario(usuario) {
       queryUsuarioForDB: usuario
     };
   }
-  
+
   const usuarioObj = await Usuario.findOne({ $or: [{ username: usuario }, { email: usuario }] }).select('_id');
   return {
     filtrosToSave: String(usuario).trim(),
@@ -750,24 +750,24 @@ exports.editarReporteGuardado = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-    
+
     if (!updateData || Object.keys(updateData).length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'No se proporcionaron datos para actualizar' 
+      return res.status(400).json({
+        success: false,
+        message: 'No se proporcionaron datos para actualizar'
       });
     }
-    
+
     const reporteActualizado = await Reporte.findOneAndUpdate(
       { _id: id },
       { $set: updateData },
       { new: true, runValidators: true }
     );
-    
+
     if (!reporteActualizado) {
       return res.status(404).json({ success: false, message: 'Reporte no encontrado' });
     }
-    
+
     res.json({ success: true, message: 'Reporte actualizado correctamente', data: reporteActualizado });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -784,6 +784,57 @@ exports.eliminarReporteGuardado = async (req, res) => {
     }
     res.json({ success: true, message: 'Reporte eliminado correctamente' });
   } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Endpoint para obtener el total de todas las gestiones en el sistema
+exports.getTotalGestiones = async (req, res) => {
+  try {
+    const [
+      totalUsuarios,
+      totalReservas,
+      totalInscripciones,
+      totalSolicitudes,
+      totalEventos,
+      totalCabanas,
+      totalTareas
+    ] = await Promise.all([
+      Usuario.countDocuments(),
+      Reserva.countDocuments(),
+      Inscripcion.countDocuments(),
+      Solicitud.countDocuments(),
+      Evento.countDocuments(),
+      Cabana.countDocuments(),
+      Tarea.countDocuments()
+    ]);
+
+    const totalGestiones =
+      totalUsuarios +
+      totalReservas +
+      totalInscripciones +
+      totalSolicitudes +
+      totalEventos +
+      totalCabanas +
+      totalTareas;
+
+    res.json({
+      success: true,
+      data: {
+        totalGestiones,
+        totalUsuarios,
+        totalReservas,
+        totalInscripciones,
+        totalSolicitudes,
+        totalEventos,
+        totalCabanas,
+        totalTareas,
+
+        fechaGeneracion: new Date()
+      }
+    });
+  } catch (error) {
+    console.error('Error en getTotalGestiones:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

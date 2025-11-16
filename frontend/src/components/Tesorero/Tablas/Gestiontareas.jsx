@@ -11,7 +11,7 @@ import { Edit } from "lucide-react"
 const Gestiontarea = () => {
   const [tareas, setTareas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
-  
+
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -26,6 +26,7 @@ const Gestiontarea = () => {
     asignadoPor: '',
     comentarios: []
   });
+  const [estadisticas, setEstadisticas] = useState({ total: 0, pendientes: 0, enProgreso: 0, completadas: 0, canceladas: 0 });
 
 
   // Obtener tareas y usuarios
@@ -42,6 +43,7 @@ const Gestiontarea = () => {
     try {
       const data = await userService.getAllUsers();
       setUsuarios(Array.isArray(data.data) ? data.data : []);
+      obenerEstasdisticas();
     } catch (err) {
       console.log("Error al obtener usuarios: " + err.message);
     }
@@ -50,6 +52,15 @@ const Gestiontarea = () => {
     obtenerTareas();
     obtenerUsuarios();
   }, []);
+
+  const obenerEstasdisticas = async () => {
+    try {
+      const data = await tareaService.estadisticasGenerales();
+      setEstadisticas(data);
+    } catch (err) {
+      console.error("Error al obtener estadísticas: " + err.message);
+    }
+  };
 
   const handleCreate = () => {
     setModoEdicion(false);
@@ -146,16 +157,16 @@ const Gestiontarea = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"/>Nueva Tarea
+            <i className="fas fa-plus" />Nueva Tarea
           </button>
         </div>
         <div className="stats-grid-usuarios">
           <div className="stat-card-usuarios">
             <div className="stat-icon-usuarios purple">
-              <i className="fas fa-tasks"/>
+              <i className="fas fa-tasks" />
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="totalUsers">5</div>
+              <div className="stat-number-usuarios" id="totalUsers">{estadisticas.total}</div>
               <div className="stat-label-usuarios">Total Tareas</div>
             </div>
           </div>
@@ -164,7 +175,7 @@ const Gestiontarea = () => {
               <i className="fas fa-clock"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="activeUsers">4</div>
+              <div className="stat-number-usuarios" id="activeUsers">{estadisticas.pendientes}</div>
               <div className="stat-label-usuarios">Pendientes</div>
             </div>
           </div>
@@ -173,7 +184,7 @@ const Gestiontarea = () => {
               <i className="fas fa-spinner"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="adminUsers">1</div>
+              <div className="stat-number-usuarios" id="adminUsers">{estadisticas.enProgreso}</div>
               <div className="stat-label-usuarios">En Progreso</div>
             </div>
           </div>
@@ -182,7 +193,7 @@ const Gestiontarea = () => {
               <i className="fas fa-check-circle"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios" id="newUsers">12</div>
+              <div className="stat-number-usuarios" id="newUsers">{estadisticas.completadas}</div>
               <div className="stat-label-usuarios">Completadas</div>
             </div>
           </div>
@@ -280,18 +291,18 @@ const Gestiontarea = () => {
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
-          disabled={paginaActual === 1}
+            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+            disabled={paginaActual === 1}
           >
             <i className="fas fa-chevron-left"></i>
           </button>
           <span className="pagination-info-admin">
-          Página {paginaActual} de {totalPaginas || 1}
+            Página {paginaActual} de {totalPaginas || 1}
           </span>
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-          disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+            disabled={paginaActual === totalPaginas || totalPaginas === 0}
           >
             <i className="fas fa-chevron-right"></i>
           </button>

@@ -2,25 +2,29 @@ import { useState, useEffect } from "react"
 import { Search, Download, Users, UserCheck, Shield, TrendingUp, ChevronLeft, ChevronDown } from "lucide-react"
 import Header from "../Header/Header-tesorero";
 import Footer from '../../footer/Footer'
-import { generarCertificado } from '../../../services/certificadoService';
+import { generarCertificado, estadisticasCertificados as fetchEstadisticasCertificados } from '../../../services/certificadoService';
 import { inscripcionService } from '../../../services/inscripcionService';
 import { mostrarAlerta } from '../../utils/alertas';
 
 
 const CertificadosPage = () => {
-
     const [certificados, setCertificados] = useState([]);
-    
+    const [estadisticasCertificados, setEstadisticasCertificados] = useState({
+        totalInscripciones: 0,
+        certificadosEmitidos: 0,
+        descargasHoy: 0,
+        listosParaDescarga: 0
+    });
+
     useEffect(() => {
         // Obtener inscripciones con estado certificado o finalizado usando inscripcionService
         const fetchCertificados = async () => {
-            setLoading(true);
             try {
                 const data = await inscripcionService.getAll();
                 if (data.success && Array.isArray(data.data)) {
-                    // Solo mostrar certificados de programas académicos (cursos)
+                    // Mostrar solo inscripciones de programas académicos cuyo estado sea exactamente 'certificado'
                     const filtrados = data.data.filter(
-                        insc => (insc.tipoReferencia === 'ProgramaAcademico') && (insc.estado === 'certificado' || insc.estado === 'finalizado')
+                        insc => (insc.tipoReferencia === 'ProgramaAcademico') && (insc.estado === 'certificado')
                     );
                     setCertificados(filtrados);
                 } else {
@@ -30,9 +34,23 @@ const CertificadosPage = () => {
                 setCertificados([]);
                 mostrarAlerta("ERROR", `Error al obtener certificados: ${err.message}`, 'error');
             }
-            setLoading(false);
         };
         fetchCertificados();
+    }, []);
+
+    // Obtener estadísticas de certificados
+    const obtenerEstadisticasCertificados = async () => {
+        try {
+            const data = await fetchEstadisticasCertificados();
+            // El servicio devuelve directamente el objeto { totalInscripciones, certificadosEmitidos, descargasHoy, listosParaDescarga }
+            setEstadisticasCertificados(data || {});
+        } catch (error) {
+            mostrarAlerta("ERROR", `Error al obtener estadísticas de certificados: ${error.message}`, 'error');
+        }
+    };
+
+    useEffect(() => {
+        obtenerEstadisticasCertificados();
     }, []);
 
     // Descargar certificado PDF
@@ -51,7 +69,7 @@ const CertificadosPage = () => {
             a.remove();
             globalThis.URL.revokeObjectURL(url);
         } catch (err) {
-            mostrarAlerta("ERROR", `Error al descargar certificado: ${err.message}`, 'error');  
+            mostrarAlerta("ERROR", `Error al descargar certificado: ${err.message}`, 'error');
         }
     };
 
@@ -60,11 +78,11 @@ const CertificadosPage = () => {
             {/* Header */}
             <Header />
             {/* Main Content */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Back Button and Title */}
                 <div className="page-header-tesorero">
                     <div className="card-header-tesorero">
-                        <button className="back-btn-tesorero"onClick={() => globalThis.history.back()}>
+                        <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
                             <ChevronLeft className="h-4 w-4" />
                         </button>
                         <div className="page-title-tesorero">
@@ -74,52 +92,41 @@ const CertificadosPage = () => {
                     </div>
                 </div>
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center">
-                                <Users className="h-6 w-6 text-blue-600" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-gray-900">156</p>
-                                <p className="text-sm text-gray-600">Total Usuarios</p>
-                            </div>
+                <div className="stats-grid-usuarios">
+                    <div className="stat-card-usuarios">
+                        <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                            <Users className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div className="stat-content">
+                            <div className="stat-number-usuarios" >{estadisticasCertificados.totalInscripciones}</div>
+                            <div className="stat-label-usuarios">Total Inscripciones</div>
                         </div>
                     </div>
-
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center">
+                    <div className="stat-card-usuarios">
+                        <div className="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center">
                                 <UserCheck className="h-6 w-6 text-green-600" />
                             </div>
-                            <div>
-                                <p className="text-2xl font-bold text-gray-900">142</p>
-                                <p className="text-sm text-gray-600">Usuarios Activos</p>
-                            </div>
+                        <div className="stat-content">
+                            <div className="stat-number-usuarios" id="activeUsers">{estadisticasCertificados.certificadosEmitidos}</div>
+                            <div className="stat-label-usuarios">Certificados Emitidos</div>
                         </div>
                     </div>
-
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <div className="stat-card-usuarios">
+                        <div className="h-12 w-12 rounded-lg bg-purple-100 flex items-center justify-center">
                                 <Shield className="h-6 w-6 text-purple-600" />
                             </div>
-                            <div>
-                                <p className="text-2xl font-bold text-gray-900">8</p>
-                                <p className="text-sm text-gray-600">Administradores</p>
-                            </div>
+                        <div className="stat-content">
+                            <div className="stat-number-usuarios" id="adminUsers">{estadisticasCertificados.descargasHoy}</div>
+                            <div className="stat-label-usuarios">Descargas Hoy</div>
                         </div>
                     </div>
-
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-lg bg-orange-100 flex items-center justify-center">
+                    <div className="stat-card-usuarios">
+                        <div className="h-12 w-12 rounded-lg bg-orange-100 flex items-center justify-center">
                                 <TrendingUp className="h-6 w-6 text-orange-600" />
                             </div>
-                            <div>
-                                <p className="text-2xl font-bold text-gray-900">23</p>
-                                <p className="text-sm text-gray-600">Nuevos Este Mes</p>
-                            </div>
+                        <div className="stat-content">
+                            <div className="stat-number-usuarios" id="newUsers">{estadisticasCertificados.listosParaDescarga}</div>
+                            <div className="stat-label-usuarios">Listos para Descarga</div>
                         </div>
                     </div>
                 </div>
@@ -132,7 +139,7 @@ const CertificadosPage = () => {
                             <input
                                 type="search"
                                 placeholder="Buscar por nombre, documento o correo..."
-                               // value={searchQuery}
+                                // value={searchQuery}
                                 //onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-9 h-10 bg-white border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
@@ -153,8 +160,8 @@ const CertificadosPage = () => {
                         </div>
                         <div className="relative w-full sm:w-[180px]">
                             <select
-                               // value={statusFilter}
-                               // onChange={(e) => setStatusFilter(e.target.value)}
+                                // value={statusFilter}
+                                // onChange={(e) => setStatusFilter(e.target.value)}
                                 className="w-full h-10 px-3 pr-8 bg-white border border-gray-200 rounded-md text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
                                 <option value="all">Todos los estados</option>
@@ -205,7 +212,7 @@ const CertificadosPage = () => {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <button
-                                              onClick={() => handleDescargar(cert)}
+                                                onClick={() => handleDescargar(cert)}
                                                 className="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                             >
                                                 <Download className="h-4 w-4 mr-2" />

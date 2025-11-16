@@ -9,7 +9,7 @@ import { Edit } from "lucide-react"
 
 const Gestioncategorizacion = () => {
   const [categorias, setCategorias] = useState([]);
-  
+
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -19,12 +19,15 @@ const Gestioncategorizacion = () => {
     descripcion: '',
     estado: 'activo'
   });
+  const [estadisticas, setEstadisticas] = useState({ totalCategorias: 0, categoriasActivas: 0, categoriasInactivas: 0, nuevasEsteMes: 0 });
+
 
   // Obtener categorías
   const obtenerCategorias = async () => {
     try {
       const res = await categorizacionService.getAll();
       setCategorias(res.data || []);
+      obtenerEstadisticas();
     } catch (error) {
       setCategorias([]);
       mostrarAlerta("ERROR", `Error al obtener categorías: ${error.message}`, 'error');
@@ -93,6 +96,15 @@ const Gestioncategorizacion = () => {
     }
   };
 
+  const obtenerEstadisticas = async () => {
+    try {
+      const stats = await categorizacionService.getStats();
+      setEstadisticas(stats);
+    } catch (error) {
+      console.error("Error al obtener estadísticas de categorías:", error);
+    }
+  };
+
 
 
   // Paginación
@@ -135,7 +147,7 @@ const Gestioncategorizacion = () => {
               <i className="fas fa-tags"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios">4</div>
+              <div className="stat-number-usuarios">{estadisticas.totalCategorias}</div>
               <div className="stat-label-usuarios">Total Categorías</div>
             </div>
           </div>
@@ -145,7 +157,7 @@ const Gestioncategorizacion = () => {
               <i className="fas fa-check-circle"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios">1</div>
+              <div className="stat-number-usuarios">{estadisticas.categoriasActivas}</div>
               <div className="stat-label-usuarios">Activas</div>
             </div>
 
@@ -156,8 +168,8 @@ const Gestioncategorizacion = () => {
               <i className="fas fa-star"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios">1</div>
-              <div className="stat-label-usuarios">Principales</div>
+              <div className="stat-number-usuarios">{estadisticas.categoriasInactivas}</div>
+              <div className="stat-label-usuarios">Inactivas</div>
             </div>
 
           </div>
@@ -167,7 +179,7 @@ const Gestioncategorizacion = () => {
               <i className="fas fa-user-plus"></i>
             </div>
             <div className="stat-content">
-              <div className="stat-number-usuarios">2</div>
+              <div className="stat-number-usuarios">{estadisticas.nuevasEsteMes}</div>
               <div className="stat-label-usuarios">Nuevas Este Mes</div>
             </div>
           </div>

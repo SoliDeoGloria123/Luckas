@@ -54,11 +54,19 @@ app.use('/Externo', express.static(path.join(__dirname, '../frontend/public/Exte
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 
 //Conexion a mongo 
+// Verificar variable de entorno antes de conectar
+if (!process.env.MONGODB_URI) {
+    console.error('❌ Error: la variable de entorno MONGODB_URI no está definida.');
+    console.error('Asegúrate de tener un archivo .env con MONGODB_URI=... o exportar la variable antes de iniciar.');
+    process.exit(1);
+}
+
 try {
+    console.log('🔌 Intentando conectar a MongoDB...');
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ MongoDB conectado');
 } catch (error) {
-    console.error('❌ Error de MongoDB:', error.message);
+    console.error('❌ Error de MongoDB:', error && error.message ? error.message : error);
     process.exit(1);
 }
 
@@ -108,12 +116,12 @@ app.listen(PORT,()=>{
 
 // Iniciar el servidor
 async function main() {
-  try {
-    await startServer();
-  } catch (error) {
-    console.error('❌ Error al iniciar el servidor:', error);
-    process.exit(1);
-  }
+    try {
+        await startServer();
+    } catch (error) {
+        console.error('❌ Error al iniciar el servidor:', error);
+        process.exit(1);
+    }
 }
 
-main();
+main(); /* NOSONAR */

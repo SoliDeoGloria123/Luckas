@@ -8,7 +8,7 @@ import '../Gestion.css';
 
 const Gestionreportes = () => {
 
-    const [dashboardData, setDashboardData] = useState(null);
+    const [setDashboardData] = useState(null);
     const [reportType, setReportType] = useState('dashboard');
     const [reportesGuardados, setReportesGuardados] = useState([]);
 
@@ -24,6 +24,7 @@ const Gestionreportes = () => {
         fechaFin: '',
         estado: 'borrador'
     });
+    const [estadisticas, setEstadisticas] = useState({ totalUsuarios: 0, totalReservas: 0, totalInscripciones: 0, totalSolicitudes: 0, totalEventos: 0, totalTareas: 0, totalCabanas: 0 });
 
 
     const cargarReportesGuardados = async () => {
@@ -39,6 +40,7 @@ const Gestionreportes = () => {
                 reportes = response.reportes;
             }
             setReportesGuardados(reportes);
+            obtenerestadisticas();
         } catch (error) {
             console.error("Error al cargar reportes guardados", error);
             setReportesGuardados([]);
@@ -61,7 +63,7 @@ const Gestionreportes = () => {
     // Cambiar tipo de reporte
     const handleReportTypeChange = async (type) => {
         setReportType(type);
-        
+
         try {
             let data;
             switch (type) {
@@ -144,27 +146,27 @@ const Gestionreportes = () => {
     };
 
     // Función para actualizar reporte
-     //const handleActualizarReporte = async (datosReporte) => {
-     //    try {
-     //        // El servicio en frontend usa editarReporte
-     //        await reporteService.editarReporte(reporteSeleccionado._id, datosReporte);
-     //        mostrarAlerta('Éxito', 'Reporte actualizado exitosamente');
-     //        setShowModal(false);
-     //        setModoEdicion(false);
-     //        setReporteSeleccionado(null);
-     //        cargarReportesGuardados();
-     //    } catch (error) {
-     //        mostrarAlerta('Error', `Error al actualizar reporte: ${error.message}`);
-     //    }
-     //};
- 
-     // Función para cerrar modal
+    //const handleActualizarReporte = async (datosReporte) => {
+    //    try {
+    //        // El servicio en frontend usa editarReporte
+    //        await reporteService.editarReporte(reporteSeleccionado._id, datosReporte);
+    //        mostrarAlerta('Éxito', 'Reporte actualizado exitosamente');
+    //        setShowModal(false);
+    //        setModoEdicion(false);
+    //        setReporteSeleccionado(null);
+    //        cargarReportesGuardados();
+    //    } catch (error) {
+    //        mostrarAlerta('Error', `Error al actualizar reporte: ${error.message}`);
+    //    }
+    //};
+
+    // Función para cerrar modal
     //const handleCerrarModal = () => {
     //    setMostrarModal(false);
     //    setModoEdicion(false);
     //    setReporteSeleccionado(null);
     //};
-//
+    //
     const handleCreate = () => {
         setModoEdicion(false);
         setReporteSeleccionado(null);
@@ -214,46 +216,57 @@ const Gestionreportes = () => {
         }
     };
 
+    //obtener las estadisticas 
+    const obtenerestadisticas = async () => {
+        try {
+            const resp = await reporteService.estadisticasreportes();
+            const payload = resp && resp.data ? resp.data : resp;
+            setEstadisticas(payload || {});
+        } catch (error) {
+            console.error("ERROR", `Error al obtener estadísticas: ${error.message}`, 'error');
+        }
+    }
+
 
     // Construir la sección de estadísticas siempre (usar 0 por defecto si no hay datos)
-    const resumen = dashboardData?.resumen || {};
+
     const statsContent = (
         <>
             <div className="stat-card-reporte">
                 <div className="stat-header-reporte">
                     <h4>Usuarios Totales</h4>
                 </div>
-                <div className="stat-number-reporte">{resumen.totalUsuarios || 0}</div>
+                <div className="stat-number-reporte">{estadisticas.totalUsuarios || 0}</div>
             </div>
             <div className="stat-card-reporte">
                 <div className="stat-header-reporte">
                     <h4>Reservas Totales</h4>
                 </div>
-                <div className="stat-number-reporte">{resumen.totalReservas || 0}</div>
+                <div className="stat-number-reporte">{estadisticas.totalReservas || 0}</div>
             </div>
             <div className="stat-card-reporte">
                 <div className="stat-header-reporte">
                     <h4>Inscripciones Totales</h4>
                 </div>
-                <div className="stat-number-reporte">{resumen.totalInscripciones || 0}</div>
+                <div className="stat-number-reporte">{estadisticas.totalInscripciones || 0}</div>
             </div>
             <div className="stat-card-reporte">
                 <div className="stat-header-reporte">
-                    <h4>Eventos Activos</h4>
+                    <h4>Eventos Totales</h4>
                 </div>
-                <div className="stat-number-reporte">{resumen.eventosProximos || 0}</div>
+                <div className="stat-number-reporte">{estadisticas.totalEventos || 0}</div>
             </div>
             <div className="stat-card-reporte">
                 <div className="stat-header-reporte">
-                    <h4>Solicitudes Pendientes</h4>
+                    <h4>Solicitudes Totales</h4>
                 </div>
-                <div className="stat-number-reporte">{resumen.solicitudesPendientes || 0}</div>
+                <div className="stat-number-reporte">{estadisticas.totalSolicitudes || 0}</div>
             </div>
             <div className="stat-card-reporte">
                 <div className="stat-header-reporte">
-                    <h4>Cabañas Disponibles</h4>
+                    <h4>Cabañas Totales</h4>
                 </div>
-                <div className="stat-number-reporte">{resumen.totalCabanas || 0}</div>
+                <div className="stat-number-reporte">{estadisticas.totalCabanas || 0}</div>
             </div>
         </>
     );
@@ -279,7 +292,7 @@ const Gestionreportes = () => {
                             <option value="reservas">Reportes de Reservas</option>
                             <option value="inscripciones">Reportes de Inscripciones</option>
                         </select>
-                        <button 
+                        <button
                             onClick={exportarPDF}
                             className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#334155] font-medium"
                         >
@@ -293,7 +306,7 @@ const Gestionreportes = () => {
                             </svg>
                             Exportar PDF
                         </button>
-                        <button 
+                        <button
                             onClick={exportarExcel}
                             className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#334155] font-medium"
                         >
@@ -316,34 +329,58 @@ const Gestionreportes = () => {
                 </div>
 
                 {/*Tabla de resportes*/}
-                <div className="reports-table-container-reporte">
-                    <div className="rounded-xl border border-gray-200 bg-white p-6">
-                        <div className="mb-6 flex items-center justify-between">
-                            <h2 className="font-bold text-xl text-gray-900">Reportes Generados</h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6    ">
+                    <div className="flex items-center justify-between mb-6">
+                            <h3 className="font-bold text-xl text-gray-900">Reportes Generados</h3>
                             <button className="btn-primary-reporte" id="newReportBtn" onClick={handleCreate}>
                                 <i className="fas fa-plus"></i> {''}
                                 Nuevo Reporte
                             </button>
-                        </div>
+                
                     </div>
 
-                    <div className="table-filters-reporte">
-                        <div className="search-container-reporte">
-                            <i className="fas fa-search"></i>
-                            <input type="text" placeholder="Buscar reportes..." id="reportSearch" />
+                    <div className="flex gap-4 mb-6">
+                        <div className="flex-1 relative">
+                            <input
+                                type="text"
+                                placeholder="Buscar reportes..."
+                                //value={searchQuery}
+                                //onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent"
+                            />
+                            <svg
+                                className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                />
+                            </svg>
                         </div>
-                        <select >
-                            <option value="">Todos los tipos</option>
-                            <option value="financiero">Financiero</option>
+                        <select
+                            //value={filterType}
+                            //onChange={(e) => setFilterType(e.target.value)}
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
+                        >
+                            <option value="todos">Todos los tipos</option>
+                            <option value="dashboard">Dashboard</option>
                             <option value="usuarios">Usuarios</option>
-                            <option value="eventos">Eventos</option>
-                            <option value="reservas">Reservas</option>
+                            <option value="inscripciones">Inscripciones</option>
                         </select>
-                        <select >
-                            <option value="">Todos los estados</option>
-                            <option value="generado">Generado</option>
+                        <select
+                            //value={filterStatus}
+                            //onChange={(e) => setFilterStatus(e.target.value)}
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
+                        >
+                            <option value="todos">Todos los estados</option>
+                            <option value="completado">Completado</option>
                             <option value="pendiente">Pendiente</option>
-                            <option value="archivado">Archivado</option>
+                            <option value="error">Error</option>
                         </select>
                     </div>
 

@@ -13,6 +13,9 @@ router.use(authJwt.verifyToken);
 // Obtener todos los programas académicos (admin, tesorero, seminarista, externo)
 router.get('/', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), programaAcademicoController.obtenerProgramasAcademicos);
 
+// Obtener estadísticas de programas académicos
+router.get('/estadisticas', programaAcademicoController.obtenerEstadisticasProgramas);
+
 // Obtener programa académico por ID (admin, tesorero, seminarista, externo)
 router.get('/:id', role.checkRole('admin', 'tesorero', 'seminarista', 'externo'), programaAcademicoController.obtenerProgramaAcademicoPorId);
 
@@ -21,5 +24,6 @@ router.put('/:id', programaAcademicoController.actualizarProgramaAcademico);
 
 // Eliminar programa académico
 router.delete('/:id', programaAcademicoController.eliminarProgramaAcademico);
+
 
 module.exports = router;
