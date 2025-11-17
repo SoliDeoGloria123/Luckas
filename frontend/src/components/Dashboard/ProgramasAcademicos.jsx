@@ -27,8 +27,6 @@ const ProgramasAcademicos = () => {
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
     const [programaDetalle, setProgramaDetalle] = useState(null);
     const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
-
-
     const [formData, setFormData] = useState({
         titulo: '',
         descripcion: '',
@@ -50,6 +48,14 @@ const ProgramasAcademicos = () => {
         imagen: '',
         destacado: false
     });
+      const [estadisticas, setEstadisticas] = useState({
+        totalProgramas: 0,
+        totalCursos: 0,
+        totalProgramasTecnicos: 0,
+        programasActivos: 0,
+        programasInactivos: 0,
+        nuevosProgramasEsteMes: 0
+      });
 
 
     useEffect(() => {
@@ -68,6 +74,7 @@ const ProgramasAcademicos = () => {
             const response = await programasAcademicosService.getAllProgramas(filtros);
             if (response.success) {
                 setProgramas(response.data);
+                obtenerEstadisticas();
             }
         } catch (error) {
             console.error('Error al cargar programas:', error);
@@ -76,6 +83,21 @@ const ProgramasAcademicos = () => {
             setLoading(false);
         }
     };
+
+    //obtener estadiscas de programas 
+      const obtenerEstadisticas = async () => {
+        try {
+          const stats = await programasAcademicosService.obtenerEstadisticasGenerales();
+          // El backend devuelve { success: true, data: { ... } }
+          const payload = stats && stats.data ? stats.data : stats;
+          setEstadisticas(payload || {});
+        } catch (err) {
+          console.error("Error al obtener estadísticas: " + err.message);
+        }
+      };
+    
+
+
 
     const cargarCategorias = async () => {
         try {
@@ -354,7 +376,7 @@ const ProgramasAcademicos = () => {
                                 <i className="fas fa-users"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>5</h3>
+                                <h3>{estadisticas.totalProgramas}</h3>
                                 <p>Total de programas académicos</p>
                             </div>
                         </div>
@@ -363,7 +385,7 @@ const ProgramasAcademicos = () => {
                                 <i className="fas fa-user-check"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>4</h3>
+                                <h3>{estadisticas.totalCursos}</h3>
                                 <p>Total de cursos</p>
                             </div>
                         </div>
@@ -372,7 +394,7 @@ const ProgramasAcademicos = () => {
                                 <i className="fas fa-user-shield"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>1</h3>
+                                <h3>{estadisticas.totalProgramasTecnicos}</h3>
                                 <p>Total de programas técnicos</p>
                             </div>
                         </div>
@@ -381,7 +403,7 @@ const ProgramasAcademicos = () => {
                                 <i className="fas fa-user-shield"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>1</h3>
+                                <h3>{estadisticas.programasActivos}</h3>
                                 <p>Programas activos</p>
                             </div>
                         </div>
@@ -390,7 +412,7 @@ const ProgramasAcademicos = () => {
                                 <i className="fas fa-user-shield"></i>
                             </div>
                             <div className="stat-info-admin">
-                                <h3>1</h3>
+                                <h3>{estadisticas.programasInactivos}</h3>
                                 <p>Programas inactivos</p>
                             </div>
                         </div>

@@ -5,7 +5,7 @@ import Header from './Sidebar/Header';
 import CertificacionTabla from './Tablas/CertificacionTabla';
 import StatsCard from './Shared/StatsCard';
 import SearchAndFilters from './Shared/SearchAndFilters';
-import { generarCertificado } from '../../services/certificadoService';
+import { generarCertificado, estadisticasCertificados as fetchEstadisticasCertificados } from '../../services/certificadoService';
 import { inscripcionService } from '../../services/inscripcionService';
 
 
@@ -16,6 +16,12 @@ const GestionCertificacion = () => {
     const [loading, setLoading] = useState(true);
     const [busqueda, setBusqueda] = useState('');
     const [filtroEstado, setFiltroEstado] = useState('todos');
+      const [estadisticasCertificados, setEstadisticasCertificados] = useState({
+        totalInscripciones: 0,
+        certificadosEmitidos: 0,
+        descargasHoy: 0,
+        listosParaDescarga: 0
+    });
 
     useEffect(() => {
         // Obtener inscripciones con estado certificado o finalizado usando inscripcionService
@@ -41,6 +47,20 @@ const GestionCertificacion = () => {
         fetchCertificados();
     }, []);
 
+      // Obtener estadísticas de certificados
+        const obtenerEstadisticasCertificados = async () => {
+            try {
+                const data = await fetchEstadisticasCertificados();
+                // El servicio devuelve directamente el objeto { totalInscripciones, certificadosEmitidos, descargasHoy, listosParaDescarga }
+                setEstadisticasCertificados(data || {});
+            } catch (error) {
+                console.error("ERROR", `Error al obtener estadísticas de certificados: ${error.message}`, 'error');
+            }
+        };
+
+         useEffect(() => {
+        obtenerEstadisticasCertificados();
+    }, []);
     // Descargar certificado PDF
     const handleDescargar = async (cert) => {
         try {
@@ -61,15 +81,12 @@ const GestionCertificacion = () => {
         };
     };
 
-    // Calcular estadísticas reales basadas en certificados (solo estado "certificado")
-    const totalCertificados = certificados.length;
-
-    // Configuración de stats cards con datos reales
+    // Configuración de stats cards usando los valores devueltos por la API
     const statsCards = [
-        { icon: 'fa-certificate', value: totalCertificados, label: 'Total Certificados', type: 'users' },
-        { icon: 'fa-check-circle', value: totalCertificados, label: 'Certificados Emitidos', type: 'active' },
-        { icon: 'fa-download', value: 0, label: 'Descargas Hoy', type: 'admins' },
-        { icon: 'fa-graduation-cap', value: totalCertificados, label: 'Listos para Descarga', type: 'new' }
+        { icon: 'fa-certificate', value: estadisticasCertificados.totalInscripciones || certificados.length, label: 'Total Inscripciones', type: 'users' },
+        { icon: 'fa-check-circle', value: estadisticasCertificados.certificadosEmitidos || certificados.length, label: 'Certificados Emitidos', type: 'active' },
+        { icon: 'fa-download', value: estadisticasCertificados.descargasHoy || 0, label: 'Descargas Hoy', type: 'admins' },
+        { icon: 'fa-graduation-cap', value: estadisticasCertificados.listosParaDescarga || certificados.length, label: 'Listos para Descarga', type: 'new' }
     ];
 
     return (

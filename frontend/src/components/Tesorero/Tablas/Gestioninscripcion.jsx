@@ -33,7 +33,7 @@ const Gestioninscripcion = () => {
     categoria: '',
     estado: 'pendiente'
   });
-  const [estadisticas, setEstadisticas] = useState({totalInscripciones:0, nuevasEstaSemana:0, aprobadas:0, pendientes:0});
+  const [estadisticas, setEstadisticas] = useState({ totalInscripciones: 0, nuevasEstaSemana: 0, aprobadas: 0, pendientes: 0 });
 
   //Obtener inscripciones eventos y ctaegorias
   const obtenerInscripciones = async () => {
@@ -87,14 +87,14 @@ const Gestioninscripcion = () => {
   }, []);
 
   //obtener estadísticas generales
-  const Estadisticagenerales =async () => {
+  const Estadisticagenerales = async () => {
     try {
       const data = await inscripcionService.gerEstadisticasGenerales();
-      setEstadisticas(data.data );  
+      setEstadisticas(data.data);
     } catch (error) {
       console.error("ERROR", `Error al obtener estadísticas generales: ${error.message}`, 'error');
     }
-   }  
+  };
 
 
   const handleCreate = () => {

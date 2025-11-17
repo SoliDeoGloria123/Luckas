@@ -25,6 +25,8 @@ const GestionEventos = () => {
   const [eventoDetalle, setEventoDetalle] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
+  const [estadisticas, setEstadisticas] = useState({ totalEvents: 0, upcoming: 0, completed: 0, cancelled: 0 });
+
 
 
   const [nuevoEvento, setNuevoEvento] = useState({
@@ -65,6 +67,7 @@ const GestionEventos = () => {
     try {
       const res = await categorizacionService.getAll();
       setCategorias(res.data || []);
+      obtenerEstadisticas();
     } catch (error) {
       setCategorias([]);
       mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`);
@@ -75,6 +78,16 @@ const GestionEventos = () => {
     obtenerEventos();
     obtenerCategorias();
   }, []);
+
+  //estadisticas de eventos
+  const obtenerEstadisticas = async () => {
+    try {
+      const stats = await eventService.getEstadisticasGenerales();
+      setEstadisticas(stats?.data || stats);
+    } catch (error) {
+      mostrarAlerta("ERROR", `Error al obtener estadísticas: ${error.message}`, 'error');
+    }
+  };
 
   // Función auxiliar para preparar FormData del evento
   const prepararFormDataEvento = () => {
@@ -244,8 +257,8 @@ const GestionEventos = () => {
                 <i className="fas fa-users"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>5</h3>
-                <p>Total Usuarios</p>
+                <h3>{estadisticas.totalEvents}</h3>
+                <p>Total Eventos</p>
               </div>
             </div>
             <div className="stat-card-reporte-admin">
@@ -253,8 +266,8 @@ const GestionEventos = () => {
                 <i className="fas fa-user-check"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>4</h3>
-                <p>Usuarios Activos</p>
+                <h3>{estadisticas.upcoming}</h3>
+                <p>Próximos</p>
               </div>
             </div>
             <div className="stat-card-reporte-admin">
@@ -262,8 +275,8 @@ const GestionEventos = () => {
                 <i className="fas fa-user-shield"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>1</h3>
-                <p>Administradores</p>
+                <h3>{estadisticas.completed}</h3>
+                <p>Completados</p>
               </div>
             </div>
             <div className="stat-card-reporte-admin">
@@ -271,8 +284,8 @@ const GestionEventos = () => {
                 <i className="fas fa-user-plus"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>12</h3>
-                <p>Nuevos Este Mes</p>
+                <h3>{estadisticas.cancelled}</h3>
+                <p>Cancelados</p>
               </div>
             </div>
           </div>

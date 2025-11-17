@@ -20,6 +20,7 @@ const GestionIscripcion = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [programas, setProgramas] = useState([]); // 1. Estado para programas
+  const [estadisticas, setEstadisticas] = useState({ totalInscripciones: 0, nuevasEstaSemana: 0, aprobadas: 0, pendientes: 0 });
   const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
   const {
     busqueda: busquedaInscripciones,
@@ -100,6 +101,7 @@ const GestionIscripcion = () => {
   const obtenerProgramas = () => manejarOperacionAsync(
     () => programasAcademicosService.getAllProgramas(),
     setProgramas,
+    
     [],
     "No se pudieron obtener los programas académicos"
   );
@@ -109,7 +111,25 @@ const GestionIscripcion = () => {
     obtenerEventos();
     obtenerCategorias();
     obtenerProgramas();
+    // Obtener estadísticas generales al montar
+    Estadisticagenerales();
   }, []);
+
+    //obtener estadísticas generales
+    const Estadisticagenerales = async () => {
+      try {
+        const data = await inscripcionService.gerEstadisticasGenerales();
+        const payload = data?.data || {};
+        setEstadisticas({
+          totalInscripciones: payload.totalInscripciones || payload.total || 0,
+          nuevasEstaSemana: payload.nuevasEstaSemana || payload.newThisWeek || 0,
+          aprobadas: payload.aprobadas || payload.approved || 0,
+          pendientes: payload.pendientes || payload.pending || 0,
+        });
+      } catch (error) {
+        console.error("ERROR", `Error al obtener estadísticas generales: ${error.message}`);
+      }
+    };
 
   // Crear inscripción
   const crearInscripcion = async (payload) => {
@@ -227,38 +247,38 @@ const GestionIscripcion = () => {
           <div className="dashboard-grid-reporte-admin">
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin users">
-                <i className="fas fa-users"></i>
+                  <i className="fas fa-user-plus"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>5</h3>
-                <p>Total Usuarios</p>
+                <h3>{estadisticas.totalInscripciones || 0}</h3>
+                <p>Total Inscripciones</p>
               </div>
             </div>
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin active">
-                <i className="fas fa-user-check"></i>
+                <i className="fas fa-calendar-plus"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>4</h3>
-                <p>Usuarios Activos</p>
+                <h3>{estadisticas.nuevasEstaSemana || 0}</h3>
+                <p>Nuevas Esta Semana</p>
               </div>
             </div>
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin admins">
-                <i className="fas fa-user-shield"></i>
+                <i className="fas fa-check-double"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>1</h3>
-                <p>Administradores</p>
+                <h3>{estadisticas.aprobadas || 0}</h3>
+                <p>Aprobadas</p>
               </div>
             </div>
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin new">
-                <i className="fas fa-user-plus"></i>
+                <i className="fas fa-hourglass-half"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>12</h3>
-                <p>Nuevos Este Mes</p>
+                <h3>{estadisticas.pendientes || 0}</h3>
+                <p>Pendientes</p>
               </div>
             </div>
           </div>

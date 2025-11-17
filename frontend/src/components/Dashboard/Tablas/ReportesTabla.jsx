@@ -14,8 +14,6 @@ import {
   Filter,
   Eye,
   Trash2,
-  ChevronLeft,
-  ChevronRight,
   Pencil
 } from "lucide-react"
 import {
@@ -32,6 +30,10 @@ import {
   ResponsiveContainer,
 } from "recharts"
 import PropTypes from "prop-types";
+import { generateChartData, extraerDataArray } from './reportHelpers';
+import { TableRow, MobileCard } from './commonComponents';
+import Pagination from '../Shared/Pagination';
+import SearchAndFilters from '../Shared/SearchAndFilters';
 const REPORT_TYPES = [
   { value: "usuarios", label: "Usuarios", icon: Users },
   { value: "inscripciones", label: "Inscripciones", icon: UserPlus },
@@ -44,198 +46,10 @@ const REPORT_TYPES = [
   { value: "cabanas", label: "Cabañas", icon: Home },
   { value: "notificaciones", label: "Notificaciones", icon: FileText },
 ]
-const generateChartData = (activeReport) => {
-  if (!activeReport || !activeReport.datos) return { trend: [], distribution: [] };
-  const est = activeReport.datos.estadisticas || {};
+// Helpers y lógica de generación de datos han sido extraídos a `reportHelpers.js`
+// `generateChartData` y `extraerDataArray` se importan arriba.
 
-  // Si no hay estadísticas pre-calculadas, intentar generar desde los datos directos
-  if (!est || Object.keys(est).length === 0) {
-    return generateChartsFromRawData(activeReport);
-  }
-
-  // Distribución - buscar cualquier tipo de distribución disponible
-  let distribution = [];
-  if (est.porRol) {
-    distribution = est.porRol.map(e => ({ name: e._id, value: e.count }));
-  } else if (est.porEstado) {
-    distribution = est.porEstado.map(e => ({ name: e._id, value: e.count }));
-  } else if (est.porCategoria) {
-    distribution = est.porCategoria.map(e => ({ name: e._id, value: e.count }));
-  } else if (est.porEvento) {
-    distribution = est.porEvento.map(e => ({ name: e._id, value: e.count }));
-  } else if (est.porReferencia) {
-    distribution = est.porReferencia.map(e => ({ name: e._id, value: e.count }));
-  } else if (est.porTipoReferencia) {
-    distribution = est.porTipoReferencia.map(e => ({ name: e._id, value: e.count }));
-  } else if (est.porTipo) {
-    distribution = est.porTipo.map(e => ({ name: e._id, value: e.count }));
-  }
-
-  // Tendencia - buscar cualquier tipo de tendencia temporal disponible
-  let trend = [];
-  if (est.registrosPorMes) {
-    trend = est.registrosPorMes.map(e => ({
-      mes: e._id.mes ? `${e._id.mes}/${e._id.año}` : e._id,
-      total: e.count
-    }));
-  } else if (est.registrosPorFecha) {
-    trend = est.registrosPorFecha.map(e => ({
-      mes: e._id,
-      total: e.count
-    }));
-  }
-  return { trend, distribution };
-};
-
-// Funciones auxiliares para reducir complejidad cognitiva
-const extraerDataArray = (datos) => {
-  if (datos.usuarios) return datos.usuarios;
-  if (datos.inscripciones) return datos.inscripciones;
-  if (datos.reservas) return datos.reservas;
-  if (datos.eventos) return datos.eventos;
-  if (datos.solicitudes) return datos.solicitudes;
-  if (Array.isArray(datos)) return datos;
-  return [];
-};
-
-// ...no dejar código suelto aquí, solo funciones válidas...
-
-// Helper genérico para contar por una clave derivada
-const countBy = (arr, keyFn) => {
-  const counts = {};
-  for (const item of arr) {
-    const key = keyFn(item);
-    counts[key] = (counts[key] || 0) + 1;
-  }
-  return Object.entries(counts).map(([name, value]) => ({ name, value }));
-};
-
-const generarDistribucionReservas = (dataArray) =>
-  countBy(dataArray, (r) => r.estado || r.status || 'Sin estado');
-
-const generarDistribucionInscripciones = (dataArray) =>
-  countBy(
-    dataArray,
-    (i) => i.referencia?.name || i.referencia?.nombre || i.programa || i.evento?.name || i.evento?.nombre || 'Sin referencia'
-  );
-
-const generarDistribucionSolicitudes = (dataArray) =>
-  countBy(dataArray, (s) => s.estado || 'Sin estado');
-
-const generarDistribucionCabanas = (dataArray) =>
-  countBy(dataArray, (c) => (c.disponible ? 'Disponibles' : 'No disponibles'));
-
-const generarDistribucionTareas = (dataArray) =>
-  countBy(dataArray, (t) => (t.estado || (t.completada ? 'Completadas' : 'Pendientes')));
-
-const generarDistribucionProgramas = (dataArray) =>
-  countBy(dataArray, (p) => (p.activo ? 'Activos' : 'Inactivos')).filter((d) => d.value > 0);
-
-// Distribuciones genéricas faltantes
-const generarDistribucionUsuarios = (dataArray) =>
-  countBy(dataArray, (u) => u.role || u.rol || u.tipo || 'Sin rol');
-
-const generarDistribucionEventos = (dataArray) =>
-  countBy(dataArray, (e) => e.estado || e.status || e.tipo || 'Sin estado');
-
-const obtenerDistribucionPorTipo = (tipoReporte, dataArray) => {
-  const distribuidores = {
-    'usuarios': generarDistribucionUsuarios,
-    'eventos': generarDistribucionEventos,
-    'reservas': generarDistribucionReservas,
-    'inscripciones': generarDistribucionInscripciones,
-    'solicitudes': generarDistribucionSolicitudes,
-    'cabañas': generarDistribucionCabanas,
-    'cabanas': generarDistribucionCabanas,
-    'tareas': generarDistribucionTareas,
-    'programas': generarDistribucionProgramas
-  };
-
-  const distribuidor = distribuidores[tipoReporte];
-  return distribuidor ? distribuidor(dataArray) : [];
-};
-
-const extraerFechaDelItem = (item) => {
-  if (item.fechaEvento) return new Date(item.fechaEvento);
-  if (item.createdAt) return new Date(item.createdAt);
-  if (item.fechaRegistro) return new Date(item.fechaRegistro);
-  if (item.fecha) return new Date(item.fecha);
-  if (item.fechaInicio) return new Date(item.fechaInicio);
-  return null;
-};
-
-const generarTendenciaTemporal = (dataArray) => {
-  const monthCount = {};
-
-  for (const item of dataArray) {
-    const date = extraerFechaDelItem(item);
-
-    if (date && !Number.isNaN(date.getTime())) {
-      const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`;
-      monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
-    }
-  }
-
-  return Object.entries(monthCount)
-    .sort(([a], [b]) => {
-      const [aMonth, aYear] = a.split('/').map(Number);
-      const [bMonth, bYear] = b.split('/').map(Number);
-      return aYear - bYear || aMonth - bMonth;
-    })
-    .map(([mes, total]) => ({ mes, total }));
-};
-
-// Función principal simplificada para generar gráficas desde datos directos
-const generateChartsFromRawData = (activeReport) => {
-  const datos = activeReport.datos;
-  const tipoReporte = activeReport.tipo || activeReport.type;
-
-  const dataArray = extraerDataArray(datos);
-
-  if (!dataArray || dataArray.length === 0) {
-    return { trend: [], distribution: [] };
-  }
-
-  const distribution = obtenerDistribucionPorTipo(tipoReporte, dataArray);
-  const trend = generarTendenciaTemporal(dataArray);
-
-  return { trend, distribution };
-};
-
-// Componentes reutilizables para filas y tarjetas móviles (evita duplicación y declara PropTypes)
-function TableRow({ row, idx }) {
-  const rowKey = row._id || row.id || Object.values(row).join('-') + '-' + idx;
-  return (
-    <tr className="hover:bg-gray-50">
-      {Object.entries(row).map(([colKey, value]) => (
-        <td key={rowKey + '-' + colKey} className="px-4 py-3 text-sm text-gray-900">
-          {String(value)}
-        </td>
-      ))}
-    </tr>
-  );
-}
-TableRow.propTypes = {
-  row: PropTypes.object.isRequired,
-  idx: PropTypes.number.isRequired,
-};
-
-function MobileCard({ row, idx }) {
-  return (
-    <div className="bg-white rounded-lg shadow p-3 mb-2 border md:hidden">
-      {Object.entries(row).map(([key, value]) => (
-        <div key={key} className="flex justify-between py-1 text-sm">
-          <span className="font-semibold text-gray-700">{key}:</span>
-          <span className="text-gray-900">{String(value)}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-MobileCard.propTypes = {
-  row: PropTypes.object.isRequired,
-  idx: PropTypes.number.isRequired,
-};
+// Componentes `TableRow` y `MobileCard` movidos a `commonComponents.js` para evitar duplicación entre tablas
 
 const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) => {
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -252,6 +66,10 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
   const [searchTerm, setSearchTerm] = useState("")
   const [alertaDatos, setAlertaDatos] = useState("")
   const itemsPerPage = 5
+  // Estados para búsqueda/filtrado de la sección "Reportes Generados"
+  const [savedSearch, setSavedSearch] = useState("")
+  const [savedFilterType, setSavedFilterType] = useState("todos")
+  const [savedFilterStatus, setSavedFilterStatus] = useState("todos")
   // Memoizar chartData para evitar cálculos repetidos
   const chartData = useMemo(() => generateChartData(activeReport), [activeReport]);
 
@@ -377,28 +195,14 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
               {/* Pagination */}
               <div className="mb-6 flex items-center justify-between">
                 <div className="text-sm text-gray-600">
-                  Mostrando {(currentPage - 1) * itemsPerPage + 1} a{" "}
-                  {Math.min(currentPage * itemsPerPage, filteredData.length)} de {filteredData.length} resultados
+                  Mostrando {(currentPage - 1) * itemsPerPage + 1} a {Math.min(currentPage * itemsPerPage, filteredData.length)} de {filteredData.length} resultados
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="rounded-lg border border-gray-200 bg-white p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <span className="text-sm text-gray-600">
-                    Página {currentPage} de {totalPages}
-                  </span>
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="rounded-lg border border-gray-200 bg-white p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPrevious={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  onNext={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                />
               </div>
 
               {/* Charts */}
@@ -481,48 +285,33 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
             </div>
 
             <div className="flex gap-4 mb-6">
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  placeholder="Buscar reportes..."
-                  //value={searchQuery}
-                  //onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent"
-                />
-                <svg
-                  className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-              <select
-                // value={filterType}
-                //onChange={(e) => setFilterType(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
-              >
-                <option value="todos">Todos los tipos</option>
-                <option value="dashboard">Dashboard</option>
-                <option value="usuarios">Usuarios</option>
-                <option value="inscripciones">Inscripciones</option>
-              </select>
-              <select
-                // value={filterStatus}
-                //onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
-              >
-                <option value="todos">Todos los estados</option>
-                <option value="completado">Completado</option>
-                <option value="pendiente">Pendiente</option>
-                <option value="error">Error</option>
-              </select>
+              <SearchAndFilters
+                searchPlaceholder="Buscar reportes..."
+                searchValue={savedSearch}
+                onSearchChange={(e) => setSavedSearch(e.target.value)}
+                filters={[
+                  {
+                    value: savedFilterType,
+                    onChange: (e) => setSavedFilterType(e.target.value),
+                    options: [
+                      { value: 'todos', label: 'Todos los tipos' },
+                      { value: 'dashboard', label: 'Dashboard' },
+                      { value: 'usuarios', label: 'Usuarios' },
+                      { value: 'inscripciones', label: 'Inscripciones' },
+                    ]
+                  },
+                  {
+                    value: savedFilterStatus,
+                    onChange: (e) => setSavedFilterStatus(e.target.value),
+                    options: [
+                      { value: 'todos', label: 'Todos los estados' },
+                      { value: 'completado', label: 'Completado' },
+                      { value: 'pendiente', label: 'Pendiente' },
+                      { value: 'error', label: 'Error' },
+                    ]
+                  }
+                ]}
+              />
             </div>
 
             {/* Reports Grid */}

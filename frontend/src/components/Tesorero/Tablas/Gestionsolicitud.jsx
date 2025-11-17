@@ -96,7 +96,7 @@ const Gestionsolicitud = () => {
     catch (error) {
       console.error(`Error al obtener estadísticas: `, error);
     }
-  }
+  };
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);

@@ -47,15 +47,15 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
     observaciones: ""
   });
   const [categorias, setCategorias] = useState([]);
+  const [estadisticas, setEstadisticas] = useState({ totalSolicitudes: 0, pendientes: 0, aprobadas: 0, rechazadas: 0 });
+  
 
   // Obtener solicitudes
   const obtenerSolicitudes = async () => {
     try {
-      console.log('=== OBTENIENDO SOLICITUDES ===');
       const data = await solicitudService.getAll();
-      console.log('Datos recibidos:', data);
-      console.log('Array de solicitudes:', data.data);
       setSolicitudes(Array.isArray(data.data) ? data.data : []);
+      obtenerEstadiscas();
     } catch (error) {
       console.error('Error obteniendo solicitudes:', error);
       mostrarAlerta("Error", "Error al obtener solicitudes");
@@ -64,21 +64,17 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
 
   // Obtener categorías de la base de datos
   const obtenerCategorias = async () => {
-    console.log("🚀 INICIANDO obtenerCategorias()");
+
     try {
-      console.log("📞 Llamando a categorizacionService.getAll()");
-      const res = await categorizacionService.getAll();
-      console.log("✅ RESPUESTA DEL SERVICIO:", res);
-      console.log("📊 CATEGORIAS OBTENIDAS EN GESTION SOLICITUD:", res.data);
+     const res = await categorizacionService.getAll();
       setCategorias(res.data || []);
     } catch (error) {
-      console.error("❌ ERROR obteniendo categorías:", error);
+      console.error(" ERROR obteniendo categorías:", error);
       setCategorias([]);
     }
   };
 
   useEffect(() => {
-    console.log("🔥 EJECUTANDO useEffect - CARGANDO SOLICITUDES Y CATEGORIAS");
     obtenerSolicitudes();
     obtenerCategorias();
   }, []);
@@ -111,10 +107,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
   // Actualizar solicitud
   const actualizarSolicitud = async () => {
     try {
-      console.log('Actualizando solicitud:', solicitudSeleccionada);
       const resultado = await solicitudService.update(solicitudSeleccionada._id, solicitudSeleccionada);
-      console.log('Resultado actualización:', resultado);
-
       if (resultado.success) {
         mostrarAlerta("¡Éxito!", "Solicitud actualizada exitosamente");
         setMostrarModal(false);
@@ -146,6 +139,15 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       mostrarAlerta("Error", `Error: ${error.message}`);
     }
   };
+    const obtenerEstadiscas = async () => {
+      try {
+        const stats = await solicitudService.getEstadisticasGenerales();
+        setEstadisticas(stats?.data || stats);
+      }
+      catch (error) {
+        console.error(`Error al obtener estadísticas: `, error);
+      }
+    };
 
   // Abrir modal para crear solicitud
   const abrirModalCrearSolicitud = () => {
@@ -168,17 +170,10 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
 
   // Abrir modal para editar solicitud
   const abrirModalEditarSolicitud = (solicitud) => {
-    console.log('=== ABRIENDO MODAL EDITAR SOLICITUD ===');
-    console.log('Solicitud recibida:', solicitud);
-    console.log('canEdit:', canEdit);
-    console.log('readOnly:', readOnly);
-
     setModoEdicionSolicitud(true);
     setSolicitudSeleccionada({ ...solicitud });
     setMostrarModal(true);
 
-    console.log('Modal configurado - modoEdicion:', true);
-    console.log('Modal configurado - mostrar:', true);
   };
 
   // Paginación para solicitudes filtradas
@@ -225,8 +220,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
                 <i className="fas fa-users"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>5</h3>
-                <p>Total Usuarios</p>
+                <h3>{estadisticas.totalSolicitudes}</h3>
+                <p>Total Solicitudes</p>
               </div>
             </div>
             <div className="stat-card-reporte-admin">
@@ -234,8 +229,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
                 <i className="fas fa-user-check"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>4</h3>
-                <p>Usuarios Activos</p>
+                <h3>{estadisticas.pendientes}</h3>
+                <p>Pendientes</p>
               </div>
             </div>
             <div className="stat-card-reporte-admin">
@@ -243,8 +238,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
                 <i className="fas fa-user-shield"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>1</h3>
-                <p>Administradores</p>
+                <h3>{estadisticas.aprobadas}</h3>
+                <p>Aprobadas</p>
               </div>
             </div>
             <div className="stat-card-reporte-admin">
@@ -252,8 +247,8 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
                 <i className="fas fa-user-plus"></i>
               </div>
               <div className="stat-info-admin">
-                <h3>12</h3>
-                <p>Nuevos Este Mes</p>
+                <h3>{estadisticas.altaPrioridad}</h3>
+                <p>Alta Prioridad</p>
               </div>
             </div>
           </div>
