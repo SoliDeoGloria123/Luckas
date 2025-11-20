@@ -37,7 +37,7 @@
 
 .save-btn {
     background: #6366f1;
-    color: white;
+    
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
@@ -83,7 +83,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    
 }
 
 .notifications-icon {
@@ -270,7 +270,7 @@ input:checked + .slider:before {
 .theme-option.active {
     border-color: #6366f1;
     background: #6366f1;
-    color: white;
+    
 }
 
 /* Form Elements */
@@ -328,7 +328,7 @@ input:checked + .slider:before {
 
 .change-password-btn {
     background: #ef4444;
-    color: white;
+    
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 6px;
@@ -374,7 +374,7 @@ input:checked + .slider:before {
 
 .danger-btn {
     background: #dc2626;
-    color: white;
+    
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 6px;
@@ -389,7 +389,7 @@ input:checked + .slider:before {
 
 .export-btn {
     background: #f59e0b;
-    color: white;
+    
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 6px;
@@ -444,7 +444,6 @@ input:checked + .slider:before {
 
 .cancel-btn {
     background: #f1f5f9;
-    color: #64748b;
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 6px;
@@ -458,7 +457,7 @@ input:checked + .slider:before {
 
 .confirm-delete-btn {
     background: #dc2626;
-    color: white;
+    
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 6px;
@@ -478,7 +477,7 @@ input:checked + .slider:before {
 
 .ok-btn {
     background: #6366f1;
-    color: white;
+    
     border: none;
     padding: 0.75rem 2rem;
     border-radius: 6px;

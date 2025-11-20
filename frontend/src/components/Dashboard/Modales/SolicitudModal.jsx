@@ -136,11 +136,28 @@ const SolicitudModal = ({
   }, [mostrar]);
 
   // Funciones auxiliares para renderizar campos
-  const renderInputField = (fieldName, label, type = "text", required = false, placeholder = "") => {
+  const renderInputField = (fieldName, label, type = "text", required = false, placeholder = "", rows = 3) => {
     const idSuffix = modoEdicion ? "Edit" : "Nuevo";
     const fieldId = `${fieldName}${idSuffix}`;
     const isReadOnly = !modoEdicion && !!usuarioEncontrado && ['correo', 'telefono', 'solicitante'].includes(fieldName);
-    
+
+    if (type === 'textarea') {
+      return (
+        <div className="form-grupo-admin">
+          <label htmlFor={fieldId}>{label}:</label>
+          <textarea
+            id={fieldId}
+            value={getFieldValue(fieldName)}
+            onChange={e => handleFieldChange(fieldName, e.target.value)}
+            placeholder={placeholder}
+            required={required}
+            rows={rows}
+            readOnly={isReadOnly}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="form-grupo-admin">
         <label htmlFor={fieldId}>{label}:</label>
@@ -256,8 +273,8 @@ const SolicitudModal = ({
               </div>
             )}
             {renderInputField('solicitante', 'Solicitante (ID)', 'text', false, 'ID del solicitante')}
-            {renderInputField('titulo', 'Título de la Solicitud', 'text', true, 'Título descriptivo de la solicitud')}
           </div>
+          {renderInputField('titulo', 'Título de la Solicitud', 'text', true, 'Título descriptivo de la solicitud')}
           <div className="from-grid-admin">
             {renderInputField('correo', 'Correo', 'email', true, 'correo@ejemplo.com')}
             {renderInputField('telefono', 'Teléfono', 'text', true, 'Teléfono')}
@@ -350,7 +367,7 @@ const SolicitudModal = ({
               </small>
             </div>
           </div>
-          {renderInputField('observaciones', 'Observaciones', 'text', false, 'Observaciones')}
+          {renderInputField('observaciones', 'Observaciones', 'textarea', false, 'Observaciones')}
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" type="button" onClick={onClose}>
               <i className="fas fa-times"></i> {' '}

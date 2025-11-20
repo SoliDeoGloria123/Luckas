@@ -62,22 +62,22 @@ body {
 
 .stat-icon-inscripciones-semianrista.confirmed {
     background: #dcfce7;
-    color: #16a34a;
+    color: #166534;
 }
 
 .stat-icon-inscripciones-semianrista.pending {
     background: #fef3c7;
-    color: #d97706;
+    color: #92400e;
 }
 
 .stat-icon-inscripciones-semianrista.cancelled {
     background: #fee2e2;
-    color: #dc2626;
+    color: #991b1b;
 }
 
 .stat-icon-inscripciones-semianrista.total {
     background: #dbeafe;
-    color: #2563eb;
+    color: #1d4ed8;
 }
 
 .stat-number {
@@ -138,7 +138,7 @@ body {
 
 .filter-btn-inscripciones-semianrista.active {
     background: #2563eb;
-    color: white;
+    
 }
 
 /* Inscripciones Container */
@@ -219,19 +219,19 @@ body {
 
 .status-badge-misinscripciones.confirmada {
     background: #dcfce7;
-    color: #16a34a;
+    color: #166534;
     border-color: #bbf7d0;
 }
 
 .status-badge-misinscripciones.pendiente {
     background: #fef3c7;
-    color: #d97706;
+    color: #92400e;
     border-color: #fde68a;
 }
 
 .status-badge-misinscripciones.cancelada {
     background: #fee2e2;
-    color: #dc2626;
+    color: #991b1b;
     border-color: #fecaca;
 }
 
@@ -249,7 +249,7 @@ body {
 
 .categoria-badge.conferencia {
     background: #dcfce7;
-    color: #16a34a;
+    color: #166534;
 }
 
 .categoria-badge.taller {
@@ -259,7 +259,7 @@ body {
 
 .categoria-badge.oracion {
     background: #fed7aa;
-    color: #ea580c;
+    color: #7c2d12;
 }
 
 .inscripcion-price-section-misinscripciones {
@@ -361,7 +361,7 @@ body {
 .btn-danger-misinscripciones {
     padding: 0.5rem 1rem;
     background: #dc2626;
-    color: white;
+    
     border: none;
     border-radius: 0.5rem;
     font-size: 0.875rem;
@@ -401,7 +401,7 @@ body {
 .btn-primary {
     padding: 0.75rem 1.5rem;
     background: #2563eb;
-    color: white;
+    
     border: none;
     border-radius: 0.5rem;
     font-weight: 500;

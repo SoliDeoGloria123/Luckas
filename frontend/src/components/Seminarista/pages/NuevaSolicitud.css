@@ -73,7 +73,7 @@
     height: 40px;
     border-radius: 50%;
     background-color: #e2e8f0;
-    color: #94a3b8;
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -89,8 +89,8 @@
 }
 
 .step-nuevasolicitud.completed .step-number-nuevasolicitud {
-    background-color: #22c55e;
-    color: white;
+    background-color: #16a34a;
+ 
 }
 
 .step-nuevasolicitud.completed .step-label-nuevasolicitud {
@@ -98,7 +98,7 @@
 }
 
 .step-nuevasolicitud.active .step-number-nuevasolicitud {
-    background-color: #2563eb;
+    background-color: #1d4ed8;
     color: white;
 }
 
@@ -550,8 +550,8 @@
 }
 
 .btn-success-nuevasolicitud {
-    background-color: #22c55e;
-    color: white;
+    background-color: #16a34a;
+  
 }
 
 .btn-success-nuevasolicitud:hover {
@@ -648,7 +648,7 @@
 
 .toast-close:hover {
     background-color: #f3f4f6;
-    color: #6b7280;
+    color: #374151;
 }
 
 /* Responsive Design */

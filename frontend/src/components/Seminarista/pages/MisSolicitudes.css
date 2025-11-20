@@ -77,22 +77,22 @@ body {
 
 .stat-card-misolicitudes.approved .stat-icon-misolicitudes {
     background-color: #dcfce7;
-    color: #16a34a;
+    color: #166534;
 }
 
 .stat-card-misolicitudes.review .stat-icon-misolicitudes {
     background-color: #e0e7ff;
-    color: #7c3aed;
+    color: #5b21b6;
 }
 
 .stat-card-misolicitudes.pending .stat-icon-misolicitudes {
     background-color: #fef3c7;
-    color: #f59e0b;
+    color: #92400e;
 }
 
 .stat-card-misolicitudes.total .stat-icon-misolicitudes {
     background-color: #dbeafe;
-    color: #2563eb;
+    color: #1d4ed8;
 }
 
 .stat-number {
@@ -232,32 +232,32 @@ body {
 
 .status-badge.Aprobada {
     background-color: #dcfce7;
-    color: #16a34a;
+    color: #166534;
 }
 
 .status-badge.Completada {
     background-color: #dcfce7;
-    color: #059669;
+    color: #065f46;
 }
 
 .status-badge.En.Revisión {
     background-color: #e0e7ff;
-    color: #7c3aed;
+    color: #5b21b6;
 }
 
 .status-badge.Nueva {
     background-color: #fef3c7;
-    color: #f59e0b;
+    color: #92400e;
 }
 
 .status-badge.Pendiente.Info {
     background-color: #fef3c7;
-    color: #f59e0b;
+    color: #92400e;
 }
 
 .status-badge.Rechazada {
     background-color: #fee2e2;
-    color: #dc2626;
+    color: #991b1b;
 }
 
 .priority-badge {
@@ -271,17 +271,17 @@ body {
 
 .priority-badge.Media {
     background-color: #f1f5f9;
-    color: #64748b;
+    color: #374151;
 }
 
 .priority-badge.Alta {
     background-color: #fee2e2;
-    color: #dc2626;
+    color: #991b1b;
 }
 
 .priority-badge.Baja {
     background-color: #f0f9ff;
-    color: #0284c7;
+    color: #0c4a6e;
 }
 
 .category-badge {
@@ -367,7 +367,7 @@ body {
 
 .btn-secondary-misolicitudes {
     background: #f1f5f9;
-    color: #64748b;
+    color: #374151;
     border: 1px solid #e2e8f0;
 }
 
@@ -552,7 +552,7 @@ body {
 
 .toast-close:hover {
     background: #f1f5f9;
-    color: #64748b;
+    color: #374151;
 }
 
 /* Empty State */

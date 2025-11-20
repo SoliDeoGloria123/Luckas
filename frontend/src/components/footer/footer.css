@@ -21,7 +21,6 @@
 }
 
 .footer-column {
-  display: flex;
   flex-direction: column;
   gap: 32px;
   align-items: center;
@@ -222,7 +221,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-    color: #F9FAFB; /* Blanco puro para mejor contraste */
   text-decoration: none;
   font-size: 18px;
   transition: all 0.3s;

@@ -46,7 +46,6 @@
 
 .unread-count-tesorero {
   background: #ef4444;
-  color: white;
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -79,7 +78,7 @@
 
 .close-btn-tesorero:hover {
   background: #fecaca;
-  color: #dc2626;
+  color: #000000;
 }
 
 /* Content */
@@ -123,7 +122,6 @@
 
 .retry-btn-tesorero {
   background: #3b82f6;
-  color: white;
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
@@ -248,7 +246,6 @@
 .refresh-btn-tesorero {
   width: 100%;
   background: #3b82f6;
-  color: white;
   border: none;
   padding: 10px;
   border-radius: 6px;

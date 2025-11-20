@@ -61,6 +61,12 @@
 .nav-links-panel-princiapl {
     display: flex;
     gap: 2rem;
+    /* Allow links area to occupy available space but limit its max width
+       so action buttons on the right don't stretch the nav labels. */
+    flex: 1 1 auto;
+    max-width: 720px;
+    justify-content: center;
+    align-items: center;
 }
 
 .nav-links-panel-princiapl a {
@@ -93,6 +99,10 @@
 .nav-actions-panel-princiapl {
     display: flex;
     gap: 1rem;
+    /* Keep actions to the right without expanding the center nav.
+       Ensure actions don't shrink the centered nav-links. */
+    flex: 0 0 auto;
+    margin-left: 1rem;
 }
 
 /* Buttons */
@@ -147,7 +157,6 @@
 
 .btn-service-panel-princiapl {
     background: linear-gradient(135deg, var(--purple), #a855f7);
-    color: white;
     width: 100%;
     justify-content: center;
     margin-top: 1rem;
@@ -432,7 +441,7 @@
 .stat-number-panel-princiapl {
     font-size: 2.5rem;
     font-weight: 700;
-    color: white;
+    color: #f8fafc;
     margin-bottom: 0.5rem;
 }
 
@@ -520,3 +529,119 @@
         justify-content: center;
     }
 }
+
+/* Botón de menú móvil */
+.mobile-menu-btn {
+    display: none;
+    background: #ffffff;
+    border: 1px solid rgba(37,99,235,0.12);
+    font-size: 1.1rem;
+    padding: 6px 10px;
+    color: var(--primary-blue);
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(2,6,23,0.06);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+    .nav-links-panel-princiapl {
+        display: block;
+        position: absolute;
+        top: 64px;
+        right: 1rem;
+        background: #ffffff;
+        color: var(--dark-gray);
+        padding: 8px 0;
+        box-shadow: 0 8px 24px rgba(2,6,23,0.12);
+        border-radius: 8px;
+        flex-direction: column;
+        gap: 0;
+        z-index: 1001;
+        min-width: 200px;
+        opacity: 0;
+        transform: translateY(-6px);
+        transition: opacity 180ms ease, transform 180ms ease;
+        pointer-events: none;
+    }
+    .nav-links-panel-princiapl.mobile-open {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+    .nav-links-panel-princiapl a {
+        display: block;
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        color: var(--dark-gray);
+        text-decoration: none;
+    }
+    .nav-links-panel-princiapl a:hover {
+        background: #f8fafc;
+    }
+    .nav-links-panel-princiapl .nav-actions-inside {
+        padding: 8px 12px;
+        border-top: 1px solid #eef2ff;
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+    .nav-actions-panel-princiapl {
+        gap: 0.5rem;
+    }
+    .icono-luckas {
+        font-size: 44px;
+        height: 40px;
+    }
+    .hero-content-panel-princiapl {
+        grid-template-columns: 1fr;
+        padding: 1.25rem;
+        gap: 1.5rem;
+    }
+    .hero-visual-panel-princiapl {
+        display: none;
+    }
+    .hero-title-panel-princiapl {
+        font-size: 2.25rem;
+        text-align: left;
+    }
+    .hero-subtitle-panel-princiapl {
+        font-size: 1rem;
+    }
+    .services-grid-panel-princiapl {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-links-panel-princiapl {
+        right: 0.5rem;
+        left: 0.5rem;
+        top: 64px;
+    }
+    .icono-luckas {
+        font-size: 36px;
+        height: 36px;
+    }
+    .hero-title-panel-princiapl {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+    /* En móviles muy pequeños queremos que los botones de acción sigan
+       siendo accesibles. Mostrar en una fila centrada dentro del header. */
+    .nav-actions-panel-princiapl {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        gap: 0.5rem;
+        margin: 0.5rem 0 0 0;
+    }
+    .btn-primary-panel-princiapl, .btn-secondary-panel-princiapl {
+        width: 100%;
+    }
+}
+

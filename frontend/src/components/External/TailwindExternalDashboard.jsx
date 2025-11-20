@@ -650,7 +650,7 @@ const TailwindExternalDashboard = () => {
     localStorage.removeItem('usuario');
     localStorage.removeItem('externalUser');
     localStorage.removeItem('token');
-    navigate('/');
+    navigate('/cerrar-sesion');
   };
 
   const handleInscribirse = (item, tipo) => {
