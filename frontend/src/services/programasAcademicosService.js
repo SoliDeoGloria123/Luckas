@@ -41,7 +41,7 @@ export const programasAcademicosService = {
       if (filtros.busqueda) params.append('busqueda', filtros.busqueda);
 
       const response = await axios.get(`${API_URL}?${params}`);
-      return response.data;
+      return response.data && response.data.data ? response.data.data : response.data;
     } catch (error) {
       console.error('Error al obtener programas académicos:', error);
       throw error;
@@ -52,7 +52,7 @@ export const programasAcademicosService = {
   getProgramaById: async (id) => {
     try {
       const response = await axios.get(`${API_URL}/${id}`);
-      return response.data;
+      return response.data && response.data.data ? response.data.data : response.data;
     } catch (error) {
       console.error('Error al obtener programa académico:', error);
       throw error;
@@ -63,7 +63,7 @@ export const programasAcademicosService = {
   createPrograma: async (programaData) => {
     try {
       const response = await axios.post(`${API_URL}`, programaData);
-      return response.data;
+      return response.data && response.data.data ? response.data.data : response.data;
     } catch (error) {
       console.error('Error al crear programa académico:', error);
       throw error;
@@ -74,7 +74,7 @@ export const programasAcademicosService = {
   updatePrograma: async (id, programaData) => {
     try {
       const response = await axios.put(`${API_URL}/${id}`, programaData);
-      return response.data;
+      return response.data && response.data.data ? response.data.data : response.data;
     } catch (error) {
       console.error('Error al actualizar programa académico:', error);
       throw error;
@@ -85,7 +85,7 @@ export const programasAcademicosService = {
   deletePrograma: async (id) => {
     try {
       const response = await axios.delete(`${API_URL}/${id}`);
-      return response.data;
+      return response.data && response.data.data ? response.data.data : response.data;
     } catch (error) {
       console.error('Error al eliminar programa académico:', error);
       throw error;
@@ -95,7 +95,7 @@ export const programasAcademicosService = {
   obtenerEstadisticasGenerales: async () => {
     try {
       const response = await axios.get(`${API_URL}/estadisticas`);
-      return response.data;
+      return response.data && response.data.data ? response.data.data : response.data;
     } catch (error) {
       console.error('Error al obtener estadísticas generales:', error);
       throw error;

@@ -6,6 +6,9 @@ const { body } = require('express-validator');
 // INCORRECTO
 const { uploadMultiple, uploadMultipleToCloudinary } = require('../middlewares/uploadCloudinary');
 
+//Ruta publica para obtener eventos 
+router.get('/', eventosController.getAllEvents);
+
 // Middleware de autenticación para todas las rutas
 router.use(authJwt.verifyToken);
 
@@ -40,4 +43,6 @@ router.patch('/:id/categorizar', role.checkRole('admin', 'tesorero'), eventosCon
 
 // Rutas de eliminación (solo admin)
 router.delete('/:id', role.isAdmin, eventosController.deleteEvent);
+
+
 module.exports = router;

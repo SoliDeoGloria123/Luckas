@@ -20,25 +20,37 @@ class BaseService {
 
   // Manejar errores de respuesta
   async handleResponse(response, operation = 'operación') {
-    if (!response.ok) {
-      throw new Error(`Error al ${operation} ${this.resourceName}`);
+    // Respuestas sin cuerpo o no modificadas
+    if (response.status === 204 || response.status === 304) return null;
+
+    const contentType = response.headers.get('content-type') || '';
+    let json = null;
+    if (contentType.includes('application/json')) {
+      json = await response.json();
     }
-    return await response.json();
+
+    if (!response.ok) {
+      const message = (json && json.message) || `Error al ${operation} ${this.resourceName}`;
+      throw new Error(message);
+    }
+
+    // Si la API retorna { success: true, data: [...] } devolver directamente data
+    if (json && typeof json === 'object' && Object.hasOwn(json, 'data')) {
+      return json.data;
+    }
+
+    return json;
   }
 
   // GET ALL - Obtener todos los recursos
   async getAll() {
-    const response = await fetch(this.baseURL, {
-      headers: this.getDefaultHeaders(),
-    });
+    const response = await fetch(this.baseURL, { cache: 'no-cache', headers: this.getDefaultHeaders() });
     return this.handleResponse(response, 'obtener');
   }
 
   // GET BY ID - Obtener un recurso por ID
   async getById(id) {
-    const response = await fetch(`${this.baseURL}/${id}`, {
-      headers: this.getDefaultHeaders(),
-    });
+    const response = await fetch(`${this.baseURL}/${id}`, { cache: 'no-cache', headers: this.getDefaultHeaders() });
     return this.handleResponse(response, 'obtener');
   }
 
@@ -48,6 +60,7 @@ class BaseService {
     const headers = this.getDefaultHeaders(isFormData);
     
     const response = await fetch(this.baseURL, {
+      cache: 'no-cache',
       method: "POST",
       headers: headers,
       body: isFormData ? data : JSON.stringify(data),
@@ -61,6 +74,7 @@ class BaseService {
     const headers = this.getDefaultHeaders(isFormData);
     
     const response = await fetch(`${this.baseURL}/${id}`, {
+      cache: 'no-cache',
       method: "PUT",
       headers: headers,
       body: isFormData ? data : JSON.stringify(data),
@@ -70,29 +84,20 @@ class BaseService {
 
   // DELETE - Eliminar un recurso
   async delete(id) {
-    const response = await fetch(`${this.baseURL}/${id}`, {
-      method: "DELETE",
-      headers: this.getDefaultHeaders(),
-    });
+    const response = await fetch(`${this.baseURL}/${id}`, { cache: 'no-cache', method: "DELETE", headers: this.getDefaultHeaders() });
     return this.handleResponse(response, 'eliminar');
   }
 
   // PATCH - Actualización parcial
   async patch(id, data) {
-    const response = await fetch(`${this.baseURL}/${id}`, {
-      method: "PATCH",
-      headers: this.getDefaultHeaders(),
-      body: JSON.stringify(data),
-    });
+    const response = await fetch(`${this.baseURL}/${id}`, { cache: 'no-cache', method: "PATCH", headers: this.getDefaultHeaders(), body: JSON.stringify(data) });
     return this.handleResponse(response, 'actualizar parcialmente');
   }
 
   // Obtener estadísticas generales
   async getEstadisticasGenerales() {
     try {
-      const response = await fetch(`${this.baseURL}/estadisticas`, {
-        headers: this.getDefaultHeaders(),
-      });
+      const response = await fetch(`${this.baseURL}/estadisticas`, { cache: 'no-cache', headers: this.getDefaultHeaders() });
       return this.handleResponse(response, 'obtener estadísticas generales');
     } catch (error) {
       console.error(`Error en getEstadisticasGenerales:`, error);

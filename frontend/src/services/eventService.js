@@ -1,14 +1,37 @@
 const API_URL = "http://localhost:3000/api/eventos";
 
-const getHeaders = () => ({
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("token")}`
-});
+const getHeaders = () => {
+  const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+};
 
 const fetchWithErrorHandling = async (url, options) => {
-  const res = await fetch(url, options);
-  if (!res.ok) throw new Error(`Error en la solicitud: ${res.statusText}`);
-  return await res.json();
+  // Evitar respuestas 304/304 cacheadas en desarrollo forzando no-cache
+  const fetchOptions = { cache: 'no-cache', ...options };
+  const res = await fetch(url, fetchOptions);
+
+  // Si la respuesta no tiene cuerpo (204 No Content) o no fue modificada (304), devolver null
+  if (res.status === 204 || res.status === 304) return null;
+
+  let json = null;
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    json = await res.json();
+  }
+
+  if (!res.ok) {
+    const message = (json && json.message) || res.statusText || 'Error en la solicitud';
+    throw new Error(message);
+  }
+
+  // Si la API responde con la estructura { success: true, data: [...] }, retornar data directamente
+  if (json && typeof json === 'object' && Object.hasOwn(json, 'data')) {
+    return json.data;
+  }
+
+  return json;
 };
 
 export const eventService = {

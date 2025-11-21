@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../footer/Footer";
 import './Panel.css'
+import EventosCarousel from "../EventosCarousel/EventosCarousel";
 
 import {
     Calendar,
@@ -76,29 +77,7 @@ const PanelPrincipal = () => {
         },
     ]
 
-    const upcomingEvents = [
-        {
-            title: "Retiro de Oración y Ayuno",
-            date: "15-17 Febrero 2025",
-            type: "Retiro Espiritual",
-            capacity: "50 personas",
-            status: "Disponible",
-        },
-        {
-            title: "Seminario de Liderazgo",
-            date: "8-10 Marzo 2025",
-            type: "Curso Intensivo",
-            capacity: "30 personas",
-            status: "Disponible",
-        },
-        {
-            title: "Conferencia de Familia",
-            date: "22-24 Abril 2025",
-            type: "Evento Familiar",
-            capacity: "100 personas",
-            status: "Inscripciones Abiertas",
-        },
-    ]
+
 
     const testimonials = [
         {
@@ -347,43 +326,8 @@ const PanelPrincipal = () => {
                         </h2>
                     </div>
 
-                    <div className="grid gap-6 md:grid-cols-3">
-                        {upcomingEvents.map((event) => (
-                            <div
-                                key={event.title}
-                                className="overflow-hidden rounded-lg border-2 border-gray-200 bg-white shadow-sm transition-all hover:border-[#2563eb] hover:shadow-lg"
-                            >
-                                <div className="h-48 bg-gradient-to-br from-[#2563eb] to-[#1d4ed8]">
-                                    <img
-                                        src="/spiritual-event.jpg"
-                                        alt={event.title}
-                                        className="h-full w-full object-cover opacity-20"
-                                    />
-                                </div>
-                                <div className="p-6">
-                                    <span className="mb-3 inline-block rounded-full bg-[#8b5cf6] px-3 py-1 text-xs font-medium text-white">
-                                        {event.type}
-                                    </span>
-                                    <h3 className="mb-2 text-xl font-bold text-[#334155]">{event.title}</h3>
-                                    <div className="mb-4 space-y-2 text-sm text-[#64748b]">
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4" />
-                                            {event.date}
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Users className="h-4 w-4" />
-                                            {event.capacity}
-                                        </div>
-                                    </div>
-                                    <span className="mb-4 inline-block rounded-full bg-[#059669] px-3 py-1 text-xs font-medium text-white">
-                                        {event.status}
-                                    </span>
-                                    <button className="mt-2 w-full rounded-lg border-2 border-[#2563eb] bg-transparent px-4 py-2.5 text-sm font-medium text-[#2563eb] transition-colors hover:bg-[#2563eb] hover:text-white" onClick={handlLogin}>
-                                        Inscribirme Ahora
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                    <div>
+                        <EventosCarousel/>
                     </div>
                 </div>
             </section>
