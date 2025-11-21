@@ -634,7 +634,7 @@ tep-header-registro {
   }
 
   .form-group-registro.full-width {
-    grid-column: 1 / -1;
+    grid-column: 1/-1;
   }
 
   .registro-form {

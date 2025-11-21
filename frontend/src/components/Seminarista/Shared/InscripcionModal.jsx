@@ -73,7 +73,7 @@ const InscripcionModal = ({ inscripcion, isOpen, onClose, onCancel }) => {
              inscripcion.referencia.imagen[0] ? (
               <img
                 src={
-                  inscripcion.referencia.imagen[0].startsWith('http')
+                  inscripcion.referencia.imagen[0].startsWith('https')
                     ? inscripcion.referencia.imagen[0]
                     : `http://localhost:3000/uploads/eventos/${inscripcion.referencia.imagen[0]}`
                 }

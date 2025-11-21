@@ -286,7 +286,8 @@ body {
     color: var(--dark-blue);
 }
 
-* Bottom Section */ .bottom-section {
+/* Bottom Section */
+.bottom-section {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 2rem;
@@ -1406,7 +1407,7 @@ body {
 }
 
 .form-group-tesorero.full-width {
-    grid-column: 1 / -1;
+    grid-column: 1/-1;
 }
 
 

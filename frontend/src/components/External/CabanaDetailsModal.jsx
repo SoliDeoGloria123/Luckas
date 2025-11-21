@@ -26,7 +26,7 @@ const CabanaDetailsModal = ({ cabana, onClose, onReservar }) => {
           className="absolute top-4 right-4 z-50 text-gray-500 hover:text-black text-2xl flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <span className="sr-only">Cerrar</span>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+          <svg xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>

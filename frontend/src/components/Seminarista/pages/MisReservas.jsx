@@ -176,7 +176,7 @@ const MisReservas = () => {
                 {Array.isArray(reserva.cabana?.imagen) && reserva.cabana.imagen.length > 0 ? (
                   <img
                     src={
-                      reserva.cabana.imagen[0].startsWith('http')
+                      reserva.cabana.imagen[0].startsWith('https')
                         ? reserva.cabana.imagen[0]
                         : `http://localhost:3000/uploads/cabanas/${reserva.cabana.imagen[0]}`
                     }
@@ -269,7 +269,7 @@ const MisReservas = () => {
                 {Array.isArray(currentInscripcion.cabana?.imagen) && currentInscripcion.cabana.imagen.length > 0 ? (
                   <img
                     src={
-                      currentInscripcion.cabana.imagen[0].startsWith('http')
+                      currentInscripcion.cabana.imagen[0].startsWith('https')
                         ? currentInscripcion.cabana.imagen[0]
                         : `http://localhost:3000/uploads/cabanas/${currentInscripcion.cabana.imagen[0]}`
                     }

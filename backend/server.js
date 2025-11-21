@@ -37,6 +37,7 @@ app.disable('x-powered-by');
 app.use(morgan('dev')); // Logging
 app.use(cors({
     origin: [
+        'https://luckas.zapto.org',
         'http://localhost:3000',     // Frontend estático (desarrollo)
         'http://localhost:3001',     // Frontend React (desarrollo)
         'http://localhost:19006',    // App móvil Expo (desarrollo)

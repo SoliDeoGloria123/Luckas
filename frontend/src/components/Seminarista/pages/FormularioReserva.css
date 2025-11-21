@@ -246,7 +246,7 @@
 }
 
 .form-group-reservation-seminario.full-width {
-    grid-column: 1 / -1;
+    grid-column: 1/-1;
 }
 
 .form-label-reservation-seminario {

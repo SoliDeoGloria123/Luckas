@@ -41,7 +41,7 @@ import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
 import Perfil from './components/Seminarista/Shared/MiPerfil';
 import Configuracion from './components/Seminarista/pages/configuracion';
-import PanelPrincipal from './components/Panel Principal/Panel';
+import PanelPrincipal from './components/Panel Principal/Panel.jsx';
 import CerrarSesion from './components/cerrar sesion/cerrarsesion';
 import Error404 from './components/Páginas de error/Error404';
 import Error400 from './components/Páginas de error/Error400';
