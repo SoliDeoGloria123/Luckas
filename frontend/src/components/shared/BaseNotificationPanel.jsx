@@ -41,12 +41,8 @@ const BaseNotificationPanel = ({
     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 
-  // Manejar tecla Escape
-  const handleKeyDown = (event) => {
-    if (event.key === 'Escape') {
-      onClose();
-    }
-  };
+  // Nota: se usa el manejo de teclado en elementos individuales (onKeyDown inline).
+  // La gestión global de Escape se mantiene a nivel del componente si es necesario.
 
   // Estados de renderizado
   const renderLoadingState = () => (
@@ -80,33 +76,51 @@ const BaseNotificationPanel = ({
       <div className={classes.iconItem}>
         {getNotificationIcon(notification.icon)}
       </div>
-      
+
       <div className={classes.contentItem}>
-        <div className={classes.titleItem}>
-          {notification.title}
-        </div>
-        <div className={classes.message}>
-          {notification.message}
-        </div>
-        <div className={classes.date}>
-          {formatDate(notification.createdAt)}
-        </div>
+        {/* Botón nativo para la acción principal (marca como leída y abre enlace) */}
+        <button
+          type="button"
+          className="notification-main-btn"
+          onClick={async () => {
+            try {
+              if (!notification.read) await markAsRead(notification._id);
+            } catch (e) {
+              console.error('Error marcando como leída', e);
+            }
+            if (notification.link) {
+              try { window.open(notification.link, '_blank'); } catch (e) { console.error(e); }
+            }
+          }}
+        >
+          <div className={classes.titleItem}>
+            {notification.title}
+          </div>
+          <div className={classes.message}>
+            {notification.message}
+          </div>
+          <div className={classes.date}>
+            {formatDate(notification.createdAt)}
+          </div>
+        </button>
       </div>
 
       <div className={classes.actionsItem}>
         {!notification.read && (
           <button 
-            onClick={() => markAsRead(notification._id)}
+            onClick={(ev) => { ev.stopPropagation(); markAsRead(notification._id); }}
             className={classes.markReadBtn}
             title="Marcar como leída"
+            type="button"
           >
             👁️
           </button>
         )}
         <button 
-          onClick={() => deleteNotification(notification._id)}
+          onClick={(ev) => { ev.stopPropagation(); deleteNotification(notification._id); }}
           className={classes.deleteBtn}
           title="Eliminar"
+          type="button"
         >
           🗑️
         </button>
@@ -149,19 +163,20 @@ const BaseNotificationPanel = ({
 
   return (
     <>
-      {/* Overlay */}
-      {isOpen && (
-        <button
-          className={classes.overlay} 
-          onClick={onClose}
-          onKeyDown={handleKeyDown}
-          aria-label="Cerrar panel de notificaciones"
-          type="button"
-        />
-      )}
+      {/* Overlay para cerrar al hacer click fuera */}
+      {/*isOpen && (
+      //  <div
+      //    className={classes.overlay}
+      //    onClick={onClose}
+      //    role="button"
+      //    tabIndex={-1}
+      //    aria-label="Cerrar panel de notificaciones"
+      //  />
+      )*/}
 
-      {/* Panel de notificaciones */}
-      <div className={`${classes.panel} ${isOpen ? 'open' : ''}`}>
+      {/* Panel de notificaciones (se renderiza solo cuando está abierto) */}
+      {isOpen && (
+        <div className={`${classes.panel} open`}>
         {/* Header */}
         <div className={classes.header}>
           <div className={classes.title}>
@@ -172,42 +187,37 @@ const BaseNotificationPanel = ({
           </div>
           
           <div className={classes.actions}>
-            {unreadCount > 0 && (
+              {unreadCount > 0 && (
+                <button 
+                  onClick={markAllAsRead}
+                  className={classes.markAllBtn}
+                  title="Marcar todas como leídas"
+                >
+                  ✓
+                </button>
+              )}
+              {/* Eliminado botón de cierre por petición del usuario; el panel se cierra con overlay o al pulsar la campana */}
+          </div>
+          </div>
+
+          {/* Content */}
+          <div className={classes.content}>
+            {renderContent()}
+          </div>
+
+          {/* Footer */}
+          {notifications.length > 0 && (
+            <div className={classes.footer}>
               <button 
-                onClick={markAllAsRead}
-                className={classes.markAllBtn}
-                title="Marcar todas como leídas"
+                onClick={fetchNotifications} 
+                className={classes.refreshBtn}
               >
-                ✓
+                🔄 Actualizar
               </button>
-            )}
-            <button 
-              onClick={onClose}
-              className={classes.closeBtn}
-              title="Cerrar"
-            >
-              ✕
-            </button>
-          </div>
+            </div>
+          )}
         </div>
-
-        {/* Content */}
-        <div className={classes.content}>
-          {renderContent()}
-        </div>
-
-        {/* Footer */}
-        {notifications.length > 0 && (
-          <div className={classes.footer}>
-            <button 
-              onClick={fetchNotifications} 
-              className={classes.refreshBtn}
-            >
-              🔄 Actualizar
-            </button>
-          </div>
-        )}
-      </div>
+      )}
     </>
   );
 };

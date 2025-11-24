@@ -1,8 +1,389 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import PropTypes from 'prop-types';
 import './Dashboard.css';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import { userService } from "../../services/userService";
+
+// Subcomponente: Información Personal (extraído para reducir complejidad)
+const PersonalInfoSection = ({ isEditing, datosEditados, handleInputChange, errors, usuarioLogueado }) => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                </svg>
+            </div>
+            <div>
+                <h3 className="text-lg font-semibold text-gray-900">Información Personal</h3>
+                <p className="text-sm text-gray-600">Datos básicos del administrador</p>
+            </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                {isEditing ? (
+                    <input
+                        id="nombre"
+                        type="text"
+                        value={datosEditados.nombre}
+                        onChange={(e) => handleInputChange("nombre", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    />
+                ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.nombre}</p>
+                )}
+                {isEditing && errors.nombre && (
+                    <p className="text-sm text-red-600 mt-1">{errors.nombre}</p>
+                )}
+            </div>
+
+            <div>
+                <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+                {isEditing ? (
+                    <input
+                        id="apellido"
+                        type="text"
+                        value={datosEditados.apellido}
+                        onChange={(e) => handleInputChange("apellido", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    />
+                ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.apellido}</p>
+                )}
+                {isEditing && errors.apellido && (
+                    <p className="text-sm text-red-600 mt-1">{errors.apellido}</p>
+                )}
+            </div>
+
+            <div>
+                <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
+                {isEditing ? (
+                    <select
+                        id="tipoDocumento"
+                        value={datosEditados.tipoDocumento}
+                        onChange={(e) => handleInputChange("tipoDocumento", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    >
+                        <option value="Cédula de ciudadanía">Cédula de Ciudadanía</option>
+                        <option value="Cédula de extranjería">Cédula de Extranjería</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                        <option value="Tarjeta de identidad">Tarjeta de Identidad</option>
+                    </select>
+                ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.tipoDocumento}</p>
+                )}
+                {isEditing && errors.tipoDocumento && (
+                    <p className="text-sm text-red-600 mt-1">{errors.tipoDocumento}</p>
+                )}
+            </div>
+
+            <div>
+                <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
+                {isEditing ? (
+                    <input
+                        id="numeroDocumento"
+                        type="text"
+                        value={datosEditados.numeroDocumento}
+                        onChange={(e) => handleInputChange("numeroDocumento", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    />
+                ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.numeroDocumento}</p>
+                )}
+                {isEditing && errors.numeroDocumento && (
+                    <p className="text-sm text-red-600 mt-1">{errors.numeroDocumento}</p>
+                )}
+            </div>
+
+            <div>
+                <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                {isEditing ? (
+                    <input
+                        id="telefono"
+                        type="tel"
+                        value={datosEditados.telefono}
+                        onChange={(e) => handleInputChange("telefono", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    />
+                ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.telefono}</p>
+                )}
+                {isEditing && errors.telefono && (
+                    <p className="text-sm text-red-600 mt-1">{errors.telefono}</p>
+                )}
+            </div>
+
+            <div>
+                <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
+                {isEditing ? (
+                    <input
+                        id="fechaNacimiento"
+                        type="date"
+                        value={datosEditados.fechaNacimiento ? datosEditados.fechaNacimiento.split('T')[0] : ''}
+                        onChange={(e) => handleInputChange("fechaNacimiento", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    />
+                ) : (
+                    <p className="text-gray-900 py-3">{new Date(usuarioLogueado.fechaNacimiento).toLocaleDateString()}</p>
+                )}
+                {isEditing && errors.fechaNacimiento && (
+                    <p className="text-sm text-red-600 mt-1">{errors.fechaNacimiento}</p>
+                )}
+            </div>
+
+            <div className="md:col-span-2">
+                <label htmlFor="correo" className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                {isEditing ? (
+                    <input
+                        id="correo"
+                        type="email"
+                        value={datosEditados.correo}
+                        onChange={(e) => handleInputChange("correo", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    />
+                ) : (
+                    <p className="text-gray-900 py-3">{usuarioLogueado.correo}</p>
+                )}
+                {isEditing && errors.correo && (
+                    <p className="text-sm text-red-600 mt-1">{errors.correo}</p>
+                )}
+            </div>
+        </div>
+    </div>
+);
+
+
+// Subcomponente: Información Profesional
+const ProfessionalInfoSection = ({ usuarioLogueado, adminData }) => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2h8z"
+                    />
+                </svg>
+            </div>
+            <div>
+                <h3 className="text-lg font-semibold text-gray-900">Información Profesional</h3>
+                <p className="text-sm text-gray-600">Datos administrativos y permisos</p>
+            </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label htmlFor="cargo" className="block text-sm font-medium text-gray-700 mb-2">Cargo</label>
+                <p className="text-gray-900 py-3">{usuarioLogueado.role} del Sistema</p>
+            </div>
+
+            <div>
+                <label htmlFor="departamento" className="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
+                <p className="text-gray-900 py-3">{adminData.departamento}</p>
+            </div>
+
+            <div>
+                <label htmlFor="fechaIngreso" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
+                <p className="text-gray-900 py-3">{new Date(adminData.fechaIngreso).toLocaleDateString()}</p>
+            </div>
+
+            <div>
+                <label htmlFor="nivelPermisos" className="block text-sm font-medium text-gray-700 mb-2">Nivel de Permisos</label>
+                <p className="text-gray-900 py-3">
+                    <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {usuarioLogueado.role} Total
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+);
+
+// PropTypes for ProfessionalInfoSection
+ProfessionalInfoSection.propTypes = {
+    usuarioLogueado: PropTypes.shape({
+        role: PropTypes.string,
+    }).isRequired,
+    adminData: PropTypes.shape({
+        departamento: PropTypes.string,
+        fechaIngreso: PropTypes.string,
+    }).isRequired,
+};
+
+// Subcomponente: Seguridad (cambio de contraseña)
+const SecuritySection = ({ passwordData, handlePasswordChange, cambiarContrasena }) => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2h8z"
+                    />
+                </svg>
+            </div>
+            <div>
+                <h3 className="text-lg font-semibold text-gray-900">Seguridad de la Cuenta</h3>
+                <p className="text-sm text-gray-600">Actualiza tu contraseña para mantener tu cuenta segura</p>
+            </div>
+        </div>
+
+        <div className="space-y-4">
+            <div>
+                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+                <input
+                    id="currentPassword"
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Ingresa tu contraseña actual"
+                />
+            </div>
+
+            <div>
+                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                <input
+                    id="newPassword"
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Ingresa tu nueva contraseña"
+                />
+            </div>
+
+            <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
+                <input
+                    id="confirmPassword"
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Confirma tu nueva contraseña"
+                />
+            </div>
+
+            <div className="pt-4">
+                <button
+                    onClick={cambiarContrasena}
+                    className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2-2v6a2 2 0 002 2h6z" />
+                    </svg>
+                    Cambiar Contraseña
+                </button>
+            </div>
+        </div>
+    </div>
+);
+
+// Subcomponente: Preferencias
+const PreferencesSection = ({ usuarioLogueado, handleInputChange }) => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                </svg>
+            </div>
+            <div>
+                <h3 className="text-lg font-semibold text-gray-900">Preferencias</h3>
+                <p className="text-sm text-gray-600">Personaliza tu experiencia en el sistema</p>
+            </div>
+        </div>
+
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label htmlFor="tema" className="block text-sm font-medium text-gray-700 mb-2">Tema de la Interfaz</label>
+                    <select
+                        id="tema"
+                        value={usuarioLogueado.tema}
+                        onChange={(e) => handleInputChange("tema", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    >
+                        <option>Claro</option>
+                        <option>Oscuro</option>
+                        <option>Automático</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label htmlFor="idioma" className="block text-sm font-medium text-gray-700 mb-2">Idioma</label>
+                    <select
+                        id="idioma"
+                        value={usuarioLogueado.idioma}
+                        onChange={(e) => handleInputChange("idioma", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    >
+                        <option>Español</option>
+                        <option>English</option>
+                        <option>Português</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <h4 className="font-medium text-gray-900">Notificaciones Push</h4>
+                        <p className="text-sm text-gray-600">Recibe notificaciones en tiempo real</p>
+                    </div>
+                    <button
+                        onClick={() => handleInputChange("notificacionesPush", !usuarioLogueado.notificacionesPush)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${usuarioLogueado.notificacionesPush ? "bg-blue-600" : "bg-gray-200"}`}
+                    >
+                        <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${usuarioLogueado.notificacionesPush ? "translate-x-6" : "translate-x-1"}`}
+                        />
+                    </button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <h4 className="font-medium text-gray-900">Notificaciones por Email</h4>
+                        <p className="text-sm text-gray-600">Recibe resúmenes y alertas por correo</p>
+                    </div>
+                    <button
+                        onClick={() => handleInputChange("notificacionesEmail", !usuarioLogueado.notificacionesEmail)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${usuarioLogueado.notificacionesEmail ? "bg-blue-600" : "bg-gray-200"}`}
+                    >
+                        <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${usuarioLogueado.notificacionesEmail ? "translate-x-6" : "translate-x-1"}`}
+                        />
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
+
 
 const Perfil = () => {
     const [sidebarAbierto, setSidebarAbierto] = useState(true);
@@ -28,6 +409,14 @@ const Perfil = () => {
     })
 
     const handleSave = async () => {
+        // Validar antes de intentar guardar
+        const valid = validarDatos(datosEditados);
+        if (!valid.ok) {
+            // Mostrar todos los mensajes de error al usuario
+            alert(valid.message);
+            return;
+        }
+
         try {
             await actualizarPerfil();
             setShowSuccess(true);
@@ -37,6 +426,61 @@ const Perfil = () => {
             console.error('Error al guardar el perfil:', error);
             alert('Error al guardar los cambios');
         }
+    }
+
+    // Validación básica de los campos del perfil (devuelve errores por campo)
+    const validarDatos = (datos) => {
+        const required = [
+            { key: 'nombre', label: 'Nombre' },
+            { key: 'apellido', label: 'Apellido' },
+            { key: 'correo', label: 'Correo electrónico' },
+            { key: 'telefono', label: 'Teléfono' },
+            { key: 'tipoDocumento', label: 'Tipo de documento' },
+            { key: 'numeroDocumento', label: 'Número de documento' },
+            { key: 'fechaNacimiento', label: 'Fecha de nacimiento' },
+        ];
+
+        const fieldErrors = {};
+
+        // Requeridos
+        for (const field of required) {
+            const val = datos[field.key];
+            if (val === undefined || val === null || String(val).trim() === '') {
+                fieldErrors[field.key] = `${field.label} es obligatorio.`;
+            }
+        }
+
+        // Helper: añadir error si no existe
+        const addIfMissing = (key, msg) => {
+            if (!fieldErrors[key]) fieldErrors[key] = msg;
+        };
+
+        // Email
+        addIfMissing('correo', (() => {
+            const correo = String(datos.correo || '').trim();
+            // eslint-disable-next-line no-useless-escape
+            const emailRe = /^\S+@\S+\.\S+$/;
+            return emailRe.test(correo) ? null : 'Ingrese un correo electrónico válido.';
+        })());
+
+        // Teléfono (elimino no-dígitos usando replaceAll para sonar)
+        addIfMissing('telefono', (() => {
+            const tel = String(datos.telefono || '').replaceAll(/\D/g, '');
+            return tel.length >= 7 ? null : 'Ingrese un número de teléfono válido (al menos 7 dígitos).';
+        })());
+
+        // Fecha
+        addIfMissing('fechaNacimiento', (() => {
+            return (datos.fechaNacimiento && String(datos.fechaNacimiento).trim() !== '') ? null : 'Seleccione una fecha de nacimiento válida.';
+        })());
+
+        const keys = Object.keys(fieldErrors);
+        if (keys.length) {
+            const message = keys.map(k => fieldErrors[k]).join(' ');
+            return { ok: false, message, fieldErrors };
+        }
+
+        return { ok: true, fieldErrors: {} };
     }
 
     // Obtener usuario logueado desde localStorage
@@ -68,6 +512,17 @@ const Perfil = () => {
         confirmPassword: ""
     });
 
+    // Estado para errores en tiempo real y validez del formulario
+    const [errors, setErrors] = useState({});
+    const [formValid, setFormValid] = useState(true);
+
+    // Inicializar validación al cargar datos
+    useEffect(() => {
+        const valid = validarDatos(datosEditados);
+        setErrors(valid.fieldErrors || {});
+        setFormValid(Boolean(valid.ok));
+    }, []);
+
 
     // Función para guardar cambios
     const actualizarPerfil = async () => {
@@ -88,7 +543,13 @@ const Perfil = () => {
 
 
     const handleInputChange = (field, value) => {
-        setDatosEditados((prev) => ({ ...prev, [field]: value }))
+        const newDatos = { ...datosEditados, [field]: value };
+        setDatosEditados(newDatos);
+
+        // Validación en tiempo real
+        const valid = validarDatos(newDatos);
+        setErrors(valid.fieldErrors || {});
+        setFormValid(Boolean(valid.ok));
     }
 
     const handleCancelEdit = () => {
@@ -151,6 +612,9 @@ const Perfil = () => {
             alert(error.message || 'Error al cambiar la contraseña');
         }
     }
+
+    // Determina si el botón Guardar debe estar deshabilitado (evita negación directa en JSX)
+    const isDisabled = !formValid;
 
 
     return (
@@ -235,350 +699,24 @@ const Perfil = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Main Content */}
                             <div className="lg:col-span-2 space-y-6">
-                                {/* Personal Information */}
-                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                                />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">Información Personal</h3>
-                                            <p className="text-sm text-gray-600">Datos básicos del administrador</p>
-                                        </div>
-                                    </div>
+                                {/* Personal Information (extracted) */}
+                                <PersonalInfoSection
+                                    isEditing={isEditing}
+                                    datosEditados={datosEditados}
+                                    handleInputChange={handleInputChange}
+                                    errors={errors}
+                                    usuarioLogueado={usuarioLogueado}
+                                />
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
-                                            {isEditing ? (
-                                                <input
-                                                    id="nombre"
-                                                    type="text"
-                                                    value={datosEditados.nombre}
-                                                    onChange={(e) => handleInputChange("nombre", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                />
-                                            ) : (
-                                                <p className="text-gray-900 py-3">{usuarioLogueado.nombre}</p>
-                                            )}
-                                        </div>
+                                <ProfessionalInfoSection usuarioLogueado={usuarioLogueado} adminData={adminData} />
 
-                                        <div>
-                                            <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
-                                            {isEditing ? (
-                                                <input
-                                                    id="apellido"
-                                                    type="text"
-                                                    value={datosEditados.apellido}
-                                                    onChange={(e) => handleInputChange("apellido", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                />
-                                            ) : (
-                                                <p className="text-gray-900 py-3">{usuarioLogueado.apellido}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
-                                            {isEditing ? (
-                                                <select
-                                                    id="tipoDocumento"
-                                                    value={datosEditados.tipoDocumento}
-                                                    onChange={(e) => handleInputChange("tipoDocumento", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                >
-                                                    <option value="Cédula de ciudadanía">Cédula de Ciudadanía</option>
-                                                    <option value="Cédula de extranjería">Cédula de Extranjería</option>
-                                                    <option value="Pasaporte">Pasaporte</option>
-                                                    <option value="Tarjeta de identidad">Tarjeta de Identidad</option>
-                                                </select>
-                                            ) : (
-                                                <p className="text-gray-900 py-3">{usuarioLogueado.tipoDocumento}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700 mb-2">Número de Documento</label>
-                                            {isEditing ? (
-                                                <input
-                                                    id="numeroDocumento"
-                                                    type="text"
-                                                    value={datosEditados.numeroDocumento}
-                                                    onChange={(e) => handleInputChange("numeroDocumento", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                />
-                                            ) : (
-                                                <p className="text-gray-900 py-3">{usuarioLogueado.numeroDocumento}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
-                                            {isEditing ? (
-                                                <input
-                                                    id="telefono"
-                                                    type="tel"
-                                                    value={datosEditados.telefono}
-                                                    onChange={(e) => handleInputChange("telefono", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                />
-                                            ) : (
-                                                <p className="text-gray-900 py-3">{usuarioLogueado.telefono}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
-                                            {isEditing ? (
-                                                <input
-                                                    id="fechaNacimiento"
-                                                    type="date"
-                                                    value={datosEditados.fechaNacimiento ? datosEditados.fechaNacimiento.split('T')[0] : ''}
-                                                    onChange={(e) => handleInputChange("fechaNacimiento", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                />
-                                            ) : (
-                                                <p className="text-gray-900 py-3">{new Date(usuarioLogueado.fechaNacimiento).toLocaleDateString()}</p>
-                                            )}
-                                        </div>
-
-                                        <div className="md:col-span-2">
-                                            <label htmlFor="correo" className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
-                                            {isEditing ? (
-                                                <input
-                                                    id="correo"
-                                                    type="email"
-                                                    value={datosEditados.correo}
-                                                    onChange={(e) => handleInputChange("correo", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                />
-                                            ) : (
-                                                <p className="text-gray-900 py-3">{usuarioLogueado.correo}</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Professional Information */}
-                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                            <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2h8z"
-                                                />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">Información Profesional</h3>
-                                            <p className="text-sm text-gray-600">Datos administrativos y permisos</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label  htmlFor="cargo" className="block text-sm font-medium text-gray-700 mb-2">Cargo</label>
-                                            <p className="text-gray-900 py-3">{usuarioLogueado.role} del Sistema</p>
-                                        </div>
-
-                                        <div>
-                                            <label  htmlFor="departamento" className="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
-                                            <p className="text-gray-900 py-3">{adminData.departamento}</p>
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="fechaIngreso" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
-                                            <p className="text-gray-900 py-3">{new Date(adminData.fechaIngreso).toLocaleDateString()}</p>
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="nivelPermisos" className="block text-sm font-medium text-gray-700 mb-2">Nivel de Permisos</label>
-                                            <p className="text-gray-900 py-3">
-                                                <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                                                    {usuarioLogueado.role} Total
-                                                </span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Security Section */}
                                 {isEditing && (
-                                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                                                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2h8z"
-                                                    />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <h3 className="text-lg font-semibold text-gray-900">Seguridad de la Cuenta</h3>
-                                                <p className="text-sm text-gray-600">Actualiza tu contraseña para mantener tu cuenta segura</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            <div>
-                                                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
-                                                <input
-                                                    id="currentPassword"
-                                                    type="password"
-                                                    value={passwordData.currentPassword}
-                                                    onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                    placeholder="Ingresa tu contraseña actual"
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
-                                                <input
-                                                    id="newPassword"
-                                                    type="password"
-                                                    value={passwordData.newPassword}
-                                                    onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                    placeholder="Ingresa tu nueva contraseña"
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
-                                                <input
-                                                    id="confirmPassword"
-                                                    type="password"
-                                                    value={passwordData.confirmPassword}
-                                                    onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                    placeholder="Confirma tu nueva contraseña"
-                                                />
-                                            </div>
-
-                                            {/* Botón para cambiar contraseña */}
-                                            <div className="pt-4">
-                                                <button
-                                                    onClick={cambiarContrasena}
-                                                    className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2-2v6a2 2 0 002 2h6z" />
-                                                    </svg>
-                                                    Cambiar Contraseña
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <SecuritySection passwordData={passwordData} handlePasswordChange={handlePasswordChange} cambiarContrasena={cambiarContrasena} />
                                 )}
 
                                 {/* Preferences */}
                                 {isEditing && (
-                                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                                                    />
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                    />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <h3 className="text-lg font-semibold text-gray-900">Preferencias</h3>
-                                                <p className="text-sm text-gray-600">Personaliza tu experiencia en el sistema</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <div>
-                                                    <label htmlFor="tema" className="block text-sm font-medium text-gray-700 mb-2">Tema de la Interfaz</label>
-                                                    <select
-                                                        id="tema"
-                                                        value={usuarioLogueado.tema}
-                                                        onChange={(e) => handleInputChange("tema", e.target.value)}
-                                                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                    >
-                                                        <option>Claro</option>
-                                                        <option>Oscuro</option>
-                                                        <option>Automático</option>
-                                                    </select>
-                                                </div>
-
-                                                <div>
-                                                    <label htmlFor="idioma" className="block text-sm font-medium text-gray-700 mb-2">Idioma</label>
-                                                    <select
-                                                        id="idioma"
-                                                        value={usuarioLogueado.idioma}
-                                                        onChange={(e) => handleInputChange("idioma", e.target.value)}
-                                                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                    >
-                                                        <option>Español</option>
-                                                        <option>English</option>
-                                                        <option>Português</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-4">
-                                                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                                    <div>
-                                                        <h4 className="font-medium text-gray-900">Notificaciones Push</h4>
-                                                        <p className="text-sm text-gray-600">Recibe notificaciones en tiempo real</p>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => handleInputChange("notificacionesPush", !usuarioLogueado.notificacionesPush)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${usuarioLogueado.notificacionesPush ? "bg-blue-600" : "bg-gray-200"
-                                                            }`}
-                                                    >
-                                                        <span
-                                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${usuarioLogueado.notificacionesPush ? "translate-x-6" : "translate-x-1"
-                                                                }`}
-                                                        />
-                                                    </button>
-                                                </div>
-
-                                                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                                    <div>
-                                                        <h4 className="font-medium text-gray-900">Notificaciones por Email</h4>
-                                                        <p className="text-sm text-gray-600">Recibe resúmenes y alertas por correo</p>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => handleInputChange("notificacionesEmail", !usuarioLogueado.notificacionesEmail)}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${usuarioLogueado.notificacionesEmail ? "bg-blue-600" : "bg-gray-200"
-                                                            }`}
-                                                    >
-                                                        <span
-                                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${usuarioLogueado.notificacionesEmail ? "translate-x-6" : "translate-x-1"
-                                                                }`}
-                                                        />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <PreferencesSection usuarioLogueado={usuarioLogueado} handleInputChange={handleInputChange} />
                                 )}
 
                                 {/* Action Buttons */}
@@ -586,7 +724,8 @@ const Perfil = () => {
                                     <div className="flex gap-4">
                                         <button
                                             onClick={handleSave}
-                                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                                            disabled={isDisabled}
+                                            className={`flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -673,5 +812,57 @@ const Perfil = () => {
         </div>
     )
 };
+
+// PropTypes para PreferencesSection
+PreferencesSection.propTypes = {
+    usuarioLogueado: PropTypes.shape({
+        tema: PropTypes.string,
+        idioma: PropTypes.string,
+        notificacionesPush: PropTypes.bool,
+        notificacionesEmail: PropTypes.bool,
+    }).isRequired,
+    handleInputChange: PropTypes.func.isRequired,
+};
+
+// PropTypes para PersonalInfoSection
+PersonalInfoSection.propTypes = {
+    isEditing: PropTypes.bool.isRequired,
+    datosEditados: PropTypes.shape({
+        nombre: PropTypes.string,
+        apellido: PropTypes.string,
+        tipoDocumento: PropTypes.string,
+        numeroDocumento: PropTypes.string,
+        telefono: PropTypes.string,
+        fechaNacimiento: PropTypes.string,
+        correo: PropTypes.string,
+    }).isRequired,
+    handleInputChange: PropTypes.func.isRequired,
+    errors: PropTypes.object,
+    usuarioLogueado: PropTypes.shape({
+        nombre: PropTypes.string,
+        apellido: PropTypes.string,
+        tipoDocumento: PropTypes.string,
+        numeroDocumento: PropTypes.string,
+        telefono: PropTypes.string,
+        fechaNacimiento: PropTypes.string,
+        correo: PropTypes.string,
+    }).isRequired,
+};
+
+PersonalInfoSection.defaultProps = {
+    errors: {},
+};
+
+// PropTypes para SecuritySection
+SecuritySection.propTypes = {
+    passwordData: PropTypes.shape({
+        currentPassword: PropTypes.string,
+        newPassword: PropTypes.string,
+        confirmPassword: PropTypes.string,
+    }).isRequired,
+    handlePasswordChange: PropTypes.func.isRequired,
+    cambiarContrasena: PropTypes.func.isRequired,
+};
+
 
 export default Perfil;

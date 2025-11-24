@@ -4,9 +4,9 @@ import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import CertificacionTabla from './Tablas/CertificacionTabla';
 import StatsCard from './Shared/StatsCard';
-import SearchAndFilters from './Shared/SearchAndFilters';
 import { generarCertificado, estadisticasCertificados as fetchEstadisticasCertificados } from '../../services/certificadoService';
 import { inscripcionService } from '../../services/inscripcionService';
+import {Search,} from 'lucide-react';
 
 
 const GestionCertificacion = () => {
@@ -16,7 +16,10 @@ const GestionCertificacion = () => {
     const [loading, setLoading] = useState(true);
     const [busqueda, setBusqueda] = useState('');
     const [filtroEstado, setFiltroEstado] = useState('todos');
-      const [estadisticasCertificados, setEstadisticasCertificados] = useState({
+    const [filtroPrograma, setFiltroPrograma] = useState('');
+    const [paginaActual, setPaginaActual] = useState(1);
+    const itemsPorPagina = 10;
+    const [estadisticasCertificados, setEstadisticasCertificados] = useState({
         totalInscripciones: 0,
         certificadosEmitidos: 0,
         descargasHoy: 0,
@@ -30,10 +33,8 @@ const GestionCertificacion = () => {
             try {
                 const data = await inscripcionService.getAll();
                 if (data.success && Array.isArray(data.data)) {
-                    // Solo mostrar certificados con estado "certificado" de programas académicos
-                    const filtrados = data.data.filter(
-                        insc => (insc.tipoReferencia === 'ProgramaAcademico') && (insc.estado === 'certificado')
-                    );
+                    // Obtener inscripciones de tipo ProgramaAcademico (dejamos el filtrado por estado para la UI)
+                    const filtrados = data.data.filter(insc => insc.tipoReferencia === 'ProgramaAcademico');
                     setCertificados(filtrados);
                 } else {
                     setCertificados([]);
@@ -47,20 +48,62 @@ const GestionCertificacion = () => {
         fetchCertificados();
     }, []);
 
-      // Obtener estadísticas de certificados
-        const obtenerEstadisticasCertificados = async () => {
-            try {
-                const data = await fetchEstadisticasCertificados();
-                // El servicio devuelve directamente el objeto { totalInscripciones, certificadosEmitidos, descargasHoy, listosParaDescarga }
-                setEstadisticasCertificados(data || {});
-            } catch (error) {
-                console.error("ERROR", `Error al obtener estadísticas de certificados: ${error.message}`, 'error');
-            }
-        };
+    // Obtener estadísticas de certificados
+    const obtenerEstadisticasCertificados = async () => {
+        try {
+            const data = await fetchEstadisticasCertificados();
+            // El servicio devuelve directamente el objeto { totalInscripciones, certificadosEmitidos, descargasHoy, listosParaDescarga }
+            setEstadisticasCertificados(data || {});
+        } catch (error) {
+            console.error("ERROR", `Error al obtener estadísticas de certificados: ${error.message}`, 'error');
+        }
+    };
 
-         useEffect(() => {
+    useEffect(() => {
         obtenerEstadisticasCertificados();
     }, []);
+
+    // Filtrado, búsqueda y paginación
+    const programasUnicos = React.useMemo(() => {
+        const map = new Map();
+        for (const c of certificados) {
+            const ref = c.referencia;
+            if (!ref) continue;
+            const id = ref._id || ref.id || ref;
+            const nombre = ref.nombre || ref.titulo || String(ref);
+            if (!map.has(id)) map.set(id, { id, nombre });
+        }
+        return Array.from(map.values());
+    }, [certificados]);
+
+    const certificadosFiltrados = React.useMemo(() => {
+        const q = (busqueda || '').toString().trim().toLowerCase();
+        return certificados.filter(c => {
+            // filtro por estado
+            if (filtroEstado && filtroEstado !== 'todos') {
+                if ((c.estado || '') !== filtroEstado) return false;
+            }
+            // filtro por programa (referencia)
+            if (filtroPrograma) {
+                const refId = c.referencia?._id || c.referencia || '';
+                if (String(refId) !== String(filtroPrograma)) return false;
+            }
+            if (!q) return true;
+            const partes = [
+                ...(c.usuario ? [c.usuario.nombre || c.usuario.nombreCompleto || c.usuario.nombres || c.usuario.apellidos || '', c.usuario.email || ''] : []),
+                ...(c.referencia ? [c.referencia.nombre || c.referencia.titulo || ''] : []),
+                c.nombre || ''
+            ];
+            const hay = partes.join(' ').toLowerCase().includes(q);
+            return hay;
+        });
+    }, [certificados, busqueda, filtroEstado, filtroPrograma]);
+
+    const totalPaginas = Math.max(1, Math.ceil(certificadosFiltrados.length / itemsPorPagina));
+    const certificadosPaginated = React.useMemo(() => {
+        const start = (paginaActual - 1) * itemsPorPagina;
+        return certificadosFiltrados.slice(start, start + itemsPorPagina);
+    }, [certificadosFiltrados, paginaActual]);
     // Descargar certificado PDF
     const handleDescargar = async (cert) => {
         try {
@@ -103,7 +146,7 @@ const GestionCertificacion = () => {
                     setSidebarAbierto={setSidebarAbierto}
                     seccionActiva={seccionActiva}
                 />
-                <div className="p-8">
+                <div className="space-y-7 fade-in-up p-9">
                     <div className="page-header-Academicos">
                         <div className="page-title-admin">
                             <h1>Gestión de Certificaciones</h1>
@@ -122,26 +165,65 @@ const GestionCertificacion = () => {
                             />
                         ))}
                     </div>
-                    <SearchAndFilters 
-                        searchPlaceholder="Buscar Certificados..."
-                        searchValue={busqueda}
-                        onSearchChange={(e) => setBusqueda(e.target.value)}
-                        filters={[
-                            {
-                                value: filtroEstado,
-                                onChange: (e) => setFiltroEstado(e.target.value),
-                                options: [
-                                    { value: 'todos', label: 'Todos los Certificados' },
-                                    { value: 'certificado', label: 'Certificados Emitidos' }
-                                ]
-                            }
-                        ]}
-                    />
-                    {loading ? (
-                        <div className="text-center py-12 text-gray-400">Cargando certificados...</div>
-                    ) : (
-                        <CertificacionTabla certificados={certificados} onDescargar={handleDescargar} />
-                    )}
+
+                    <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                            <div className="relative flex-1 max-w-md">
+                                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                                <input
+                                    placeholder="Buscar certificados por usuario o programa..."
+                                    value={busqueda}
+                                    onChange={(e) => { setBusqueda(e.target.value); setPaginaActual(1); }}
+                                    className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all"
+                                />
+                            </div>
+                            <div className="flex space-x-3">
+                                <select
+                                    className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                                    value={filtroPrograma}
+                                    onChange={(e) => { setFiltroPrograma(e.target.value); setPaginaActual(1); }}
+                                >
+                                    <option value="">Todos los Programas</option>
+                                    {programasUnicos.map(p => (
+                                        <option key={p.id} value={p.id}>{p.nombre}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                                    value={filtroEstado}
+                                    onChange={(e) => { setFiltroEstado(e.target.value); setPaginaActual(1); }}
+                                >
+                                    <option value="todos">Todos los Estados</option>
+                                    <option value="certificado">Certificado</option>
+                                    <option value="finalizado">Finalizado</option>
+                                    <option value="pendiente">Pendiente</option>
+                                </select>
+                            </div>
+                        
+                        </div>
+                    </div>
+                    <div className="p-6 glass-card rounded-2xl border border-white/20 shadow-lg overflow-hidden user-card">
+                        {loading ? (
+                            <div className="text-center py-12 text-gray-400">Cargando certificados...</div>
+                        ) : (
+                            <>
+                                <CertificacionTabla certificados={certificadosPaginated} onDescargar={handleDescargar} />
+                                <div className="mt-4 flex items-center justify-end space-x-2">
+                                    <button
+                                        className="px-3 py-1 bg-white/10 rounded-lg"
+                                        disabled={paginaActual <= 1}
+                                        onClick={() => setPaginaActual(p => Math.max(1, p - 1))}
+                                    >Anterior</button>
+                                    <div className="text-sm text-slate-300">Página {paginaActual} / {totalPaginas}</div>
+                                    <button
+                                        className="px-3 py-1 bg-white/10 rounded-lg"
+                                        disabled={paginaActual >= totalPaginas}
+                                        onClick={() => setPaginaActual(p => Math.min(totalPaginas, p + 1))}
+                                    >Siguiente</button>
+                                </div>
+                            </>
+                        )}
+                    </div>
 
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
+import { mostrarAlerta } from "../../utils/alertas";
 // Actualizar el precio automáticamente al seleccionar una cabaña
 
 const ReservasModal = ({
@@ -40,6 +41,14 @@ const ReservasModal = ({
     actualizarPrecioCabana(reservaActual, setReserva);
     // eslint-disable-next-line
   }, [modoEdicion, reservaSeleccionada?.cabana, nuevaReserva.cabana, cabanas]);
+
+  const getTodayString = () => {
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
 
   if (!mostrar) return null;
 
@@ -119,6 +128,39 @@ const ReservasModal = ({
     setReserva({ ...reservaActual, [name]: value });
   };
 
+  const handleSubmit = () => {
+    const fechaInicio = modoEdicion
+      ? reservaSeleccionada?.fechaInicio?.substring(0, 10)
+      : nuevaReserva.fechaInicio;
+    const fechaFin = modoEdicion
+      ? reservaSeleccionada?.fechaFin?.substring(0, 10)
+      : nuevaReserva.fechaFin;
+
+    const hoyStr = getTodayString();
+
+    if (!fechaInicio || !fechaFin) {
+      mostrarAlerta('Error', 'Por favor complete ambas fechas.');
+      return;
+    }
+
+    if (fechaInicio < hoyStr) {
+      mostrarAlerta('Error', 'La fecha de inicio debe ser hoy o en el futuro.');
+      return;
+    }
+
+    if (fechaFin < hoyStr) {
+      mostrarAlerta('Error', 'La fecha de fin debe ser hoy o en el futuro.');
+      return;
+    }
+
+    if (fechaFin < fechaInicio) {
+      mostrarAlerta('Error', 'La fecha de fin no puede ser anterior a la fecha de inicio.');
+      return;
+    }
+
+    onSubmit();
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
@@ -133,7 +175,7 @@ const ReservasModal = ({
           <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
 
-        <form className="modal-body-admin" style={{ maxHeight: '70vh', overflowY: 'auto' }} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
+        <form className="modal-body-admin" style={{ maxHeight: '70vh', overflowY: 'auto' }} onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
           {/* Usuario */}
           <div className="form-grupo-admin">
             <label htmlFor="usuario">Usuario:</label>
@@ -198,6 +240,7 @@ const ReservasModal = ({
                 }
                 onChange={e => handleFieldChange('fechaInicio', e.target.value)}
                 required
+                min={getTodayString()}
               />
             </div>
 
@@ -215,6 +258,7 @@ const ReservasModal = ({
                 }
                 onChange={e => handleFieldChange('fechaFin', e.target.value)}
                 required
+                min={getTodayString()}
               />
             </div>
           </div>

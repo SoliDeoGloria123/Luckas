@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../footer/Footer";
 import './Panel.css'
-import EventosCarousel from "../EventosCarousel/EventosCarousel";
-
+import EventosCarousel from "./EventosCarousel/EventosCarousel";
 import {
     Calendar,
     BookOpen,
@@ -133,7 +132,6 @@ const PanelPrincipal = () => {
 
     return (
         <>
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
             <header className="header-panel-princiapl">
                 <nav className="nav-panel-princiapl">
                     <div className="nav-brand-panel-princiapl">
@@ -319,7 +317,7 @@ const PanelPrincipal = () => {
                 <div className="container mx-auto px-4">
                     <div className="mb-12 text-center">
                         <span className="mb-4 inline-block rounded-full bg-[#059669] px-3 py-1 text-xs font-medium text-white">
-                            Próximos Eventos
+                            Próximos Eventos e Programas Académicos
                         </span>
                         <h2 className="text-balance text-3xl font-bold text-[#334155] md:text-4xl">
                             No Te Pierdas Nuestras Actividades

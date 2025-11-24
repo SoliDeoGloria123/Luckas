@@ -33,7 +33,6 @@ import PropTypes from "prop-types";
 import { generateChartData, extraerDataArray } from './reportHelpers';
 import { TableRow, MobileCard } from './commonComponents';
 import Pagination from '../Shared/Pagination';
-import SearchAndFilters from '../Shared/SearchAndFilters';
 const REPORT_TYPES = [
   { value: "usuarios", label: "Usuarios", icon: Users },
   { value: "inscripciones", label: "Inscripciones", icon: UserPlus },
@@ -65,11 +64,9 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const [alertaDatos, setAlertaDatos] = useState("")
-  const itemsPerPage = 5
-  // Estados para búsqueda/filtrado de la sección "Reportes Generados"
-  const [savedSearch, setSavedSearch] = useState("")
-  const [savedFilterType, setSavedFilterType] = useState("todos")
-  const [savedFilterStatus, setSavedFilterStatus] = useState("todos")
+  const itemsPerPage = 5;
+
+
   // Memoizar chartData para evitar cálculos repetidos
   const chartData = useMemo(() => generateChartData(activeReport), [activeReport]);
 
@@ -275,44 +272,9 @@ const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) =>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-[#334155]">Reportes Generados</h3>
-              <button className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Nuevo Reporte
-              </button>
+
             </div>
 
-            <div className="flex gap-4 mb-6">
-              <SearchAndFilters
-                searchPlaceholder="Buscar reportes..."
-                searchValue={savedSearch}
-                onSearchChange={(e) => setSavedSearch(e.target.value)}
-                filters={[
-                  {
-                    value: savedFilterType,
-                    onChange: (e) => setSavedFilterType(e.target.value),
-                    options: [
-                      { value: 'todos', label: 'Todos los tipos' },
-                      { value: 'dashboard', label: 'Dashboard' },
-                      { value: 'usuarios', label: 'Usuarios' },
-                      { value: 'inscripciones', label: 'Inscripciones' },
-                    ]
-                  },
-                  {
-                    value: savedFilterStatus,
-                    onChange: (e) => setSavedFilterStatus(e.target.value),
-                    options: [
-                      { value: 'todos', label: 'Todos los estados' },
-                      { value: 'completado', label: 'Completado' },
-                      { value: 'pendiente', label: 'Pendiente' },
-                      { value: 'error', label: 'Error' },
-                    ]
-                  }
-                ]}
-              />
-            </div>
 
             {/* Reports Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

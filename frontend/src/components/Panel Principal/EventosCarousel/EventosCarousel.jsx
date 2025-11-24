@@ -5,8 +5,8 @@ import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { eventService } from "../../services/eventService";
-import { programasAcademicosService } from "../../services/programasAcademicosService";
+import { eventService } from "../../../services/eventService";
+import { programasAcademicosService } from "../../../services/programasAcademicosService";
 import {
   Calendar,
   Users,
@@ -21,6 +21,63 @@ const EventosCarousel = () => {
   const handlLogin = () => {
     navigate('/login');
   };
+  // Helpers para normalizar imágenes y campos (fuera de useEffect para evitar anidación profunda)
+  const toArray = (v) => {
+    if (Array.isArray(v)) return v;
+    if (v) return [v];
+    return [];
+  };
+  const firstOr = (arr, fallback) => (arr && arr.length ? arr[0] : fallback);
+
+  const normalizeEvent = (e) => {
+    const categoria = e.categoria;
+    const categoriaTexto = typeof categoria === 'string' ? categoria : (categoria && (categoria.nombre || categoria.tipo)) || null;
+    const imagenRaw = e.imagen || e.image;
+    const imagenesArray = toArray(imagenRaw);
+    const imagen = firstOr(imagenesArray, "/spiritual-event.jpg");
+
+    let statusText = '';
+    if (e.estado) statusText = e.estado;
+    else if (e.status) statusText = e.status;
+    else if (e.disponible) statusText = 'Disponible';
+    else if (e.active !== undefined) statusText = e.active ? 'Disponible' : 'No disponible';
+
+    return {
+      id: e._id || e.id || e.uuid || Math.random(),
+      title: e.titulo || e.title || e.nombre || "Evento",
+      date: e.fecha || e.date || e.fechaEvento || e.fecha_evento || e.createdAt || "--",
+      type: e.tipo || e.type || categoriaTexto || "Evento",
+      capacity: e.capacidad ? String(e.capacidad) : (e.cupo || e.cuposDisponibles || e.cuposTotales || "-"),
+      status: statusText,
+      images: imagenesArray.length ? imagenesArray : [imagen],
+      image: imagen,
+      createdAt: e.createdAt,
+      category: "evento",
+    };
+  };
+
+  const normalizePrograma = (p) => {
+    const imagenesArray = toArray(p.imagen || p.image);
+    return {
+      id: p._id || p.id || Math.random(),
+      title: p.titulo || p.nombre || p.title || "Programa",
+      date: p.fecha_inicio || p.date || p.duracion || p.createdAt || "--",
+      type: 'Curso',
+      capacity: p.cupos ? String(p.cupos) : p.cupo || "-",
+      status: p.estado || p.status || "Disponible",
+      images: imagenesArray.length ? imagenesArray : ["/course.jpg"],
+      image: firstOr(imagenesArray, "/course.jpg"),
+      createdAt: p.createdAt,
+      category: "programa",
+    };
+  };
+
+  const sortByCreatedDesc = (arr) =>
+    (arr || []).filter(Boolean).slice().sort((a, b) => {
+      const da = a.createdAt ? new Date(a.createdAt) : new Date(0);
+      const db = b.createdAt ? new Date(b.createdAt) : new Date(0);
+      return db - da;
+    });
   // No es necesario registrar módulos cuando se pasan en la prop `modules` del componente Swiper
 
   useEffect(() => {
@@ -32,72 +89,20 @@ const EventosCarousel = () => {
           programasAcademicosService.getAllProgramas().catch(() => []),
         ]);
 
-        // Helpers para normalizar imágenes y campos
-        const toArray = (v) => {
-          if (Array.isArray(v)) return v;
-          if (v) return [v];
-          return [];
-        };
-        const firstOr = (arr, fallback) => (arr && arr.length ? arr[0] : fallback);
-
-        const normalizeEvent = (e) => {
-          const categoria = e.categoria;
-          const categoriaTexto = typeof categoria === 'string' ? categoria : (categoria && (categoria.nombre || categoria.tipo)) || null;
-          const imagenRaw = e.imagen || e.image;
-          const imagenesArray = toArray(imagenRaw);
-          const imagen = firstOr(imagenesArray, "/spiritual-event.jpg");
-
-          let statusText = '';
-          if (e.estado) statusText = e.estado;
-          else if (e.status) statusText = e.status;
-          else if (e.disponible) statusText = 'Disponible';
-          else if (e.active !== undefined) statusText = e.active ? 'Disponible' : 'No disponible';
-
-          return {
-            id: e._id || e.id || e.uuid || Math.random(),
-            title: e.titulo || e.title || e.nombre || "Evento",
-            date: e.fecha || e.date || e.fechaEvento || e.fecha_evento || e.createdAt || "--",
-            type: e.tipo || e.type || categoriaTexto || "Evento",
-            capacity: e.capacidad ? String(e.capacidad) : (e.cupo || e.cuposDisponibles || e.cuposTotales || "-"),
-            status: statusText,
-            images: imagenesArray.length ? imagenesArray : [imagen],
-            image: imagen,
-            createdAt: e.createdAt,
-            category: "evento",
-          };
-        };
-
-        const normalizePrograma = (p) => {
-          const imagenesArray = toArray(p.imagen || p.image);
-          return {
-            id: p._id || p.id || Math.random(),
-            title: p.titulo || p.nombre || p.title || "Programa",
-            date: p.fecha_inicio || p.date || p.duracion || p.createdAt || "--",
-            type: 'Curso',
-            capacity: p.cupos ? String(p.cupos) : p.cupo || "-",
-            status: p.estado || p.status || "Disponible",
-            images: imagenesArray.length ? imagenesArray : ["/course.jpg"],
-            image: firstOr(imagenesArray, "/course.jpg"),
-            createdAt: p.createdAt,
-            category: "programa",
-          };
-        };
+        console.debug('Eventos raw:', events);
+        console.debug('Programas raw:', programas);
 
         const normalizedEvents = (events || []).map(normalizeEvent);
         const normalizedProgramas = (programas || []).map(normalizePrograma);
 
-        const combined = [...normalizedEvents, ...normalizedProgramas];
+        // Ordenar cada lista por createdAt descendente y tomar los últimos 4 de cada una
+        const latestEvents = sortByCreatedDesc(normalizedEvents).slice(0, 4);
+        const latestProgramas = sortByCreatedDesc(normalizedProgramas).slice(0, 4);
 
-        const sorted = combined
-          .filter(Boolean)
-          .sort((a, b) => {
-            const da = a.createdAt ? new Date(a.createdAt) : new Date(0);
-            const db = b.createdAt ? new Date(b.createdAt) : new Date(0);
-            return db - da;
-          })
-          .slice(0, 4);
+        // Combinar: primero eventos, luego programas (puedes invertir si prefieres otra orden)
+        const combined = [...latestEvents, ...latestProgramas];
 
-        setItems(sorted);
+        setItems(combined);
       } catch (err) {
         setError(err.message || "Error al cargar items");
       } finally {
@@ -114,6 +119,7 @@ const EventosCarousel = () => {
 
   return (
     <div>
+      
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         spaceBetween={20}

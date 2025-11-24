@@ -3,11 +3,14 @@ import { categorizacionService } from "../../services/categorizacionService";
 import TablaCategorias from "./Tablas/CategorizacionTabla";
 import CategorizacionModal from "./Modales/CategorizacionModal";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import { Search } from 'lucide-react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 
 const GestionCategorizacion = () => {
     const [categorias, setCategorias] = useState([]);
+    const [busqueda, setBusqueda] = useState("");
+    const [filtroEstado, setFiltroEstado] = useState("");
     const [mostrarModal, setMostrarModal] = useState(false);
     const [modoEdicion, setModoEdicion] = useState(false);
     const [sidebarAbierto, setSidebarAbierto] = useState(true);
@@ -20,7 +23,13 @@ const GestionCategorizacion = () => {
     const obtenerCategorias = async () => {
         try {
             const res = await categorizacionService.getAll();
-            setCategorias(res.data || []);
+            let lista = [];
+            if (res) {
+                if (Array.isArray(res)) lista = res;
+                else if (res.data && Array.isArray(res.data)) lista = res.data;
+                else if (res.data) lista = res.data;
+            }
+            setCategorias(lista);
             obtenerEstadisticas();
         } catch (error) {
             setCategorias([]);
@@ -110,11 +119,22 @@ const GestionCategorizacion = () => {
         setMostrarModal(true);
     };
 
-    // Paginación para categorías
+    // Filtrado y paginación para categorías
+    const categoriasFiltradas = Array.isArray(categorias)
+        ? categorias.filter((cat) => {
+            const texto = (busqueda || '').toLowerCase();
+            const matchBusqueda =
+                String(cat.nombre || '').toLowerCase().includes(texto) ||
+                String(cat.codigo || '').toLowerCase().includes(texto);
+            const matchEstado = !filtroEstado || String(cat.estado || '') === filtroEstado;
+            return matchBusqueda && matchEstado;
+        })
+        : [];
+
     const [paginaActual, setPaginaActual] = useState(1);
     const registrosPorPagina = 10;
-    const totalPaginas = Math.ceil(categorias.length / registrosPorPagina);
-    const categoriasPaginadas = categorias.slice(
+    const totalPaginas = Math.max(1, Math.ceil(categoriasFiltradas.length / registrosPorPagina));
+    const categoriasPaginadas = categoriasFiltradas.slice(
         (paginaActual - 1) * registrosPorPagina,
         paginaActual * registrosPorPagina
     );
@@ -133,11 +153,11 @@ const GestionCategorizacion = () => {
                     setSidebarAbierto={setSidebarAbierto}
                     seccionActiva={seccionActiva}
                 />
-                <div className="seccion-usuarios">
+                <div className="space-y-7 fade-in-up p-9">
                     <div className="page-header-Academicos">
                         <div className="page-title-admin">
                             <h1>Gestión de Categorización</h1>
-                            <p>Administra las cuentas de usuario del sistema</p>
+                            <p>Administra las categorías del sistema</p>
                         </div>
                         <button className="btn-admin btn-primary-admin" onClick={abrirModalCrear}>
                             + Nueva Categoría
@@ -181,49 +201,40 @@ const GestionCategorizacion = () => {
                             </div>
                         </div>
                     </div>
-                    <section className="filtros-section-admin">
-                        <div className="busqueda-contenedor">
-                            <i className="fas fa-search"></i>
-                            <input
-                                type="text"
-                                placeholder="Buscar Categorizacion..."
-                                //value={busqueda}
-                                //onChange={(e) => setBusqueda(e.target.value)}
-                                className="input-busqueda"
-                            />
+                    <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                            <div className="relative flex-1 max-w-md">
+                                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar categorías..."
+                                    value={busqueda}
+                                    onChange={(e) => { setBusqueda(e.target.value); setPaginaActual(1); }}
+                                    className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all"
+                                />
+                            </div>
+                            <div className="flex space-x-3">
+                                <select
+                                    className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                                    value={filtroEstado}
+                                    onChange={(e) => { setFiltroEstado(e.target.value); setPaginaActual(1); }}
+                                >
+                                    <option value="">Todos los Estados</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                            </div>
                         </div>
-                        <div className="filtro-grupo-admin">
-                            <select className="filtro-dropdown">
-                                <option>Todos los Roles</option>
-                                <option>Administrador</option>
-                                <option>Seminarista</option>
-                                <option>Tesorero</option>
-                                <option>Usuario Externo</option>
-                            </select>
-                            <select className="filtro-dropdown">
-                                <option>Todos los Estados</option>
-                                <option>Activo</option>
-                                <option>Inactivo</option>
-                                <option>Pendiente</option>
-                            </select>
-                        </div>
-                    </section>
-                    <TablaCategorias
-                        categorias={categoriasPaginadas}
-                        onEditar={abrirModalEditar}
-                        onEliminar={eliminarCategoria}
-                        onToggleEstado={handleToggleEstado}
-                    />
-                    <CategorizacionModal
-                        mostrar={mostrarModal}
-                        modoEdicion={modoEdicion}
-                        categoriaSeleccionada={categoriaSeleccionada}
-                        setCategoriaSeleccionada={setCategoriaSeleccionada}
-                        nuevaCategoria={nuevaCategoria}
-                        setNuevaCategoria={setNuevaCategoria}
-                        onClose={() => setMostrarModal(false)}
-                        onSubmit={modoEdicion ? actualizarCategoria : crearCategoria}
-                    />
+                    </div>
+
+                    <div className="p-6 glass-card rounded-2xl border border-white/20 shadow-lg overflow-hidden user-card">
+                        <TablaCategorias
+                            categorias={categoriasPaginadas}
+                            onEditar={abrirModalEditar}
+                            onEliminar={eliminarCategoria}
+                            onToggleEstado={handleToggleEstado}
+                        />
+                    </div>
 
                     <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
                         <button
@@ -245,6 +256,16 @@ const GestionCategorizacion = () => {
                         </button>
                     </div>
                 </div>
+                 <CategorizacionModal
+                        mostrar={mostrarModal}
+                        modoEdicion={modoEdicion}
+                        categoriaSeleccionada={categoriaSeleccionada}
+                        setCategoriaSeleccionada={setCategoriaSeleccionada}
+                        nuevaCategoria={nuevaCategoria}
+                        setNuevaCategoria={setNuevaCategoria}
+                        onClose={() => setMostrarModal(false)}
+                        onSubmit={modoEdicion ? actualizarCategoria : crearCategoria}
+                    />
             </div>
 
         </div>

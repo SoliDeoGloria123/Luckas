@@ -5,15 +5,11 @@ import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import ProgramaModal from './Modales/ProgramaModal';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
-import {
-    Plus,
-    Search
-} from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 
 const ProgramasAcademicos = () => {
     const [programas, setProgramas] = useState([]);
     const [categorias, setCategorias] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [sidebarAbierto, setSidebarAbierto] = useState(true);
     const [seccionActiva, setSeccionActiva] = useState("dashboard");
     const [mostrarModal, setMostrarModal] = useState(false);
@@ -21,6 +17,7 @@ const ProgramasAcademicos = () => {
     const [filtros, setFiltros] = useState({
         tipo: '',
         modalidad: '',
+        estado: 'todos',
         busqueda: ''
     });
     const [modoEdicion, setModoEdicion] = useState(false);
@@ -48,14 +45,14 @@ const ProgramasAcademicos = () => {
         imagen: '',
         destacado: false
     });
-      const [estadisticas, setEstadisticas] = useState({
+    const [estadisticas, setEstadisticas] = useState({
         totalProgramas: 0,
         totalCursos: 0,
         totalProgramasTecnicos: 0,
         programasActivos: 0,
         programasInactivos: 0,
         nuevosProgramasEsteMes: 0
-      });
+    });
 
 
     useEffect(() => {
@@ -69,33 +66,41 @@ const ProgramasAcademicos = () => {
     };
 
     const cargarProgramas = async () => {
-        setLoading(true);
         try {
             const response = await programasAcademicosService.getAllProgramas(filtros);
-            if (response.success) {
-                setProgramas(response.data);
-                obtenerEstadisticas();
+            // El servicio puede devolver directamente un array o un objeto { success, data }
+            let lista = [];
+            if (response) {
+                if (Array.isArray(response)) lista = response;
+                else if (response.success && Array.isArray(response.data)) lista = response.data;
+                else if (response.data && Array.isArray(response.data)) lista = response.data;
+                else if (response.data) lista = response.data;
             }
+                // Ordenar por fecha de creación ascendente para que los programas nuevos aparezcan al final
+                const listaOrdenada = Array.isArray(lista)
+                    ? lista.slice().sort((a, b) => (Date.parse(a.createdAt) || 0) - (Date.parse(b.createdAt) || 0))
+                    : lista;
+                setProgramas(listaOrdenada);
+            // Obtener estadísticas aunque la lista venga vacía
+            obtenerEstadisticas();
         } catch (error) {
             console.error('Error al cargar programas:', error);
-        
-        } finally {
-            setLoading(false);
+
         }
     };
 
     //obtener estadiscas de programas 
-      const obtenerEstadisticas = async () => {
+    const obtenerEstadisticas = async () => {
         try {
-          const stats = await programasAcademicosService.obtenerEstadisticasGenerales();
-          // El backend devuelve { success: true, data: { ... } }
-          const payload = stats && stats.data ? stats.data : stats;
-          setEstadisticas(payload || {});
+            const stats = await programasAcademicosService.obtenerEstadisticasGenerales();
+            // El backend devuelve { success: true, data: { ... } }
+            const payload = stats && stats.data ? stats.data : stats;
+            setEstadisticas(payload || {});
         } catch (err) {
-          console.error("Error al obtener estadísticas: " + err.message);
+            console.error("Error al obtener estadísticas: " + err.message);
         }
-      };
-    
+    };
+
 
 
 
@@ -124,16 +129,16 @@ const ProgramasAcademicos = () => {
     const crearPrograma = async (e) => {
         if (e) e.preventDefault();
         setCargando(true);
-        
+
         try {
             const categoriaId = encontrarCategoriaId();
-            
+
             if (!categoriaId) {
                 mostrarMensaje('No hay categorías disponibles. Por favor, contacte al administrador.', 'error');
                 return;
             }
             const dataToSend = mapearDatosParaEnvio(categoriaId);
-             await programasAcademicosService.createPrograma(dataToSend);
+            await programasAcademicosService.createPrograma(dataToSend);
             mostrarAlerta('¡Éxito!', 'Programa creado exitosamente');
             cerrarModal();
             cargarProgramas();
@@ -148,10 +153,10 @@ const ProgramasAcademicos = () => {
     const actualizarPrograma = async (e) => {
         if (e) e.preventDefault();
         setCargando(true);
-        
+
         try {
             const categoriaId = encontrarCategoriaId();
-            
+
             if (!categoriaId) {
                 mostrarMensaje('No hay categorías disponibles. Por favor, contacte al administrador.', 'error');
                 return;
@@ -169,7 +174,7 @@ const ProgramasAcademicos = () => {
         }
     };
 
-        // Eliminar programa
+    // Eliminar programa
     const eliminarPrograma = async (id) => {
         const confirmado = await mostrarConfirmacion(
             "¿Estás seguro?",
@@ -180,7 +185,7 @@ const ProgramasAcademicos = () => {
 
         try {
             await programasAcademicosService.deletePrograma(id);
-           mostrarAlerta('¡Éxito!', 'Programa eliminado exitosamente');
+            mostrarAlerta('¡Éxito!', 'Programa eliminado exitosamente');
             cargarProgramas();
         } catch (error) {
             console.error('Error al eliminar programa:', error);
@@ -239,12 +244,12 @@ const ProgramasAcademicos = () => {
         if (!formData.tipo || !categorias.length) {
             return categorias.length > 0 ? categorias[0]._id : null;
         }
-        
+
         const categoriaEncontrada = categorias.find(cat =>
             cat.tipo === 'programa' && formData.tipo.includes('programa') ||
             cat.tipo === 'curso' && formData.tipo === 'curso'
         );
-        
+
         return categoriaEncontrada ? categoriaEncontrada._id : categorias[0]._id;
     };
 
@@ -261,7 +266,7 @@ const ProgramasAcademicos = () => {
         cuposDisponibles: Number.parseInt(formData.cupos) || 0,
         profesor: formData.profesor,
         nivel: 'básico',
-        requisitos: Array.isArray(formData.requisitos) 
+        requisitos: Array.isArray(formData.requisitos)
             ? formData.requisitos
                 .filter(req => req && (req.value ? req.value.trim() !== '' : req.trim() !== ''))
                 .map(req => req.value || req)
@@ -291,7 +296,7 @@ const ProgramasAcademicos = () => {
 
     // Filtrado de programas
     const programasFiltrados = programas.filter(programa => {
-        const coincideBusqueda = !filtros.busqueda || 
+        const coincideBusqueda = !filtros.busqueda ||
             programa.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
             programa.descripcion?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
             programa.profesor?.toLowerCase().includes(filtros.busqueda.toLowerCase());
@@ -300,7 +305,9 @@ const ProgramasAcademicos = () => {
 
         const coincideModalidad = !filtros.modalidad || programa.modalidad === filtros.modalidad;
 
-        return coincideBusqueda && coincideTipo && coincideModalidad;
+        const coincideEstado = !filtros.estado || filtros.estado === 'todos' || programa.estado === filtros.estado;
+
+        return coincideBusqueda && coincideTipo && coincideModalidad && coincideEstado;
     });
 
     // Resetear paginación cuando cambien los filtros
@@ -330,16 +337,7 @@ const ProgramasAcademicos = () => {
         return new Date(fecha).toLocaleDateString('es-ES');
     };
 
-    if (loading) {
-        return (
-            <div className="loading-container">
-                <div className="loading-spinner">
-                    <i className="fas fa-spinner fa-spin"></i>
-                    <p>Cargando programas académicos...</p>
-                </div>
-            </div>
-        );
-    }
+
     return (
         <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
             <Sidebar
@@ -354,9 +352,9 @@ const ProgramasAcademicos = () => {
                     setSidebarAbierto={setSidebarAbierto}
                     seccionActiva={seccionActiva}
                 />
-                <div className='seccion-usuarios'>
+                <div className='space-y-7 fade-in-up  p-9'>
                     {/* Header */}
-                    <div  className="page-header-Academicos">
+                    <div className="page-header-Academicos">
                         <div className="page-title-admin">
                             <h1>Gestión de Programas Académicos</h1>
                             <p>Administra cursos y programas técnicos del seminario</p>
@@ -428,95 +426,151 @@ const ProgramasAcademicos = () => {
                     </div>
                     {/* Filtros */}
                     <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div className="relative">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                            <div className="relative flex-1 max-w-md">
                                 <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
                                 <input
                                     type="text"
                                     placeholder="Buscar programas..."
                                     value={filtros.busqueda}
-                                    onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
+                                    onChange={(e) => { setFiltros({ ...filtros, busqueda: e.target.value }); setPaginaActual(1); }}
                                     className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                 />
                             </div>
+                            <div className="flex space-x-3">
+                                <select
+                                    value={filtros.tipo}
+                                    onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
+                                    className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                >
+                                    <option value="">Todos los tipos</option>
+                                    <option value="curso">Cursos</option>
+                                    <option value="programa-tecnico">Programas Técnicos</option>
+                                </select>
 
-                            <select
-                                value={filtros.tipo}
-                                onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
-                                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                            >
-                                <option value="">Todos los tipos</option>
-                                <option value="curso">Cursos</option>
-                                <option value="programa-tecnico">Programas Técnicos</option>
-                                <option value="diplomado">Diplomados</option>
-                                <option value="certificacion">Certificaciones</option>
-                            </select>
-
-                            <select
-                                value={filtros.estado}
-                                onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
-                                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                            >
-                                <option value="todos">Todos los estados</option>
-                                <option value="activo">Activo</option>
-                                <option value="inactivo">Inactivo</option>
-                                <option value="borrador">Borrador</option>
-                            </select>
-
-                            <div className="text-sm text-slate-600 flex items-center">
-                                <span className="font-medium">{programasFiltrados.length}</span> programa(s) encontrado(s)
+                                <select
+                                    value={filtros.estado}
+                                    onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
+                                    className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                >
+                                    <option value="todos">Todos los estados</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                    <option value="borrador">Borrador</option>
+                                </select>
                             </div>
+
+
                         </div>
                     </div>
 
                     {mostrarModalDetalle && programaDetalle && (
-                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                            <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8">
-                                <h2 className="text-2xl font-bold mb-4">{programaDetalle.nombre}</h2>
-                                <p className="mb-2"><strong>Descripción:</strong> {programaDetalle.descripcion}</p>
-                                <p className="mb-2"><strong>Categoría:</strong> {programaDetalle.categoria?.nombre || programaDetalle.categoria}</p>
-                                <p className="mb-2"><strong>Modalidad:</strong> {programaDetalle.modalidad}</p>
-                                <p className="mb-2"><strong>Duración:</strong> {programaDetalle.duracion}</p>
-                                <p className="mb-2"><strong>Precio:</strong> {formatearPrecio(programaDetalle.precio)}</p>
-                                <p className="mb-2"><strong>Fecha de inicio:</strong> {programaDetalle.fechaInicio ? new Date(programaDetalle.fechaInicio).toLocaleDateString() : 'Por definir'}</p>
-                                <p className="mb-2"><strong>Fecha de fin:</strong> {programaDetalle.fechaFin ? new Date(programaDetalle.fechaFin).toLocaleDateString() : 'Por definir'}</p>
-                                <p className="mb-2"><strong>Cupos disponibles:</strong> {programaDetalle.cuposDisponibles}</p>
-                                <p className="mb-2"><strong>Cupos ocupados:</strong> {programaDetalle.cuposOcupados}</p>
-                                <p className="mb-2"><strong>Profesor:</strong> {programaDetalle.profesor}</p>
-                                <p className="mb-2"><strong>Nivel:</strong> {programaDetalle.nivel}</p>
-                                <p className="mb-2"><strong>Requisitos:</strong> {programaDetalle.requisitos && programaDetalle.requisitos.length > 0 ? (
-                                    <ul className="list-disc ml-6">
-                                        {programaDetalle.requisitos.map((req, idx) => <li key={req + '-' + idx}>{req}</li>)}
-                                    </ul>
-                                ) : 'Ninguno'}</p>
-                                <p className="mb-2"><strong>Objetivos:</strong> {programaDetalle.objetivos && programaDetalle.objetivos.length > 0 ? (
-                                    <ul className="list-disc ml-6">
-                                        {programaDetalle.objetivos.map((obj, idx) => <li key={obj + '-' + idx}>{obj}</li>)}
-                                    </ul>
-                                ) : 'Ninguno'}</p>
-                                <p className="mb-2"><strong>Metodología:</strong> {programaDetalle.metodologia}</p>
-                                <p className="mb-2"><strong>Evaluación:</strong> {programaDetalle.evaluacion}</p>
-                                <p className="mb-2"><strong>Certificación:</strong> {programaDetalle.certificacion ? 'Sí' : 'No'}</p>
-                                <p className="mb-2"><strong>Destacado:</strong> {programaDetalle.destacado ? 'Sí' : 'No'}</p>
-                                <p className="mb-2"><strong>Estado:</strong> {programaDetalle.estado}</p>
-                                <p className="mb-2"><strong>Fecha de creación:</strong> {programaDetalle.createdAt ? new Date(programaDetalle.createdAt).toLocaleDateString() : ''}</p>
-                                <p className="mb-2"><strong>Fecha de actualización:</strong> {programaDetalle.updatedAt ? new Date(programaDetalle.updatedAt).toLocaleDateString() : ''}</p>
-                                <p className="mb-2"><strong>Inscripciones:</strong> {programaDetalle.inscripciones && programaDetalle.inscripciones.length > 0 ? (
-                                    <ul className="list-disc ml-6">
-                                        {programaDetalle.inscripciones.map((insc, idx) => (
-                                            <li key={(insc.usuario?._id || insc.usuario || '') + '-' + (insc.fechaInscripcion || idx)}>
-                                                Usuario: {insc.usuario?.nombre || insc.usuario} | Estado: {insc.estado} | Fecha: {insc.fechaInscripcion ? new Date(insc.fechaInscripcion).toLocaleDateString() : ''}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : 'Ninguna'}
-                                </p>
-                                <button
-                                    onClick={() => setMostrarModalDetalle(false)}
-                                    className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    Cerrar
-                                </button>
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">
+                                <div className="flex items-start justify-between p-6 border-b">
+                                    <div>
+                                        <h2 className="text-2xl font-semibold text-slate-800">{programaDetalle.nombre}</h2>
+                                        <p className="text-sm text-slate-500 mt-1">{programaDetalle.tipo ? String(programaDetalle.tipo).replace('-', ' ') : ''} • {programaDetalle.modalidad}</p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2">
+                                            <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">{programaDetalle.estado || '—'}</span>
+                                            <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm">{programaDetalle.certificacion ? 'Con certificación' : 'Sin certificación'}</span>
+                                            {programaDetalle.destacado && <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-sm">Destacado</span>}
+                                        </div>
+                                        <button onClick={() => setMostrarModalDetalle(false)} className="text-slate-400 hover:text-slate-600 p-2 rounded-md">
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="p-6 overflow-y-auto" style={{ maxHeight: '70vh' }}>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            {programaDetalle.imagen && (
+                                                <img src={programaDetalle.imagen} alt="Imagen del programa" className="w-full h-44 object-cover rounded-lg mb-4" />
+                                            )}
+
+                                            <p className="text-sm text-slate-700 leading-relaxed">{programaDetalle.descripcion || 'Sin descripción'}</p>
+
+                                            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                                                <li><strong className="text-slate-800">Profesor:</strong> {programaDetalle.profesor || '—'}</li>
+                                                <li><strong className="text-slate-800">Duración:</strong> {programaDetalle.duracion || '—'}</li>
+                                                <li><strong className="text-slate-800">Precio:</strong> {formatearPrecio(programaDetalle.precio || 0)}</li>
+                                                <li><strong className="text-slate-800">Cupos disponibles:</strong> {programaDetalle.cuposDisponibles ?? '—'}</li>
+                                                <li><strong className="text-slate-800">Cupos ocupados:</strong> {programaDetalle.cuposOcupados ?? '—'}</li>
+                                            </ul>
+                                        </div>
+
+                                        <div>
+                                            <div className="mb-4">
+                                                <h4 className="font-semibold text-slate-800">Objetivos</h4>
+                                                {programaDetalle.objetivos && programaDetalle.objetivos.length > 0 ? (
+                                                    <ul className="list-disc ml-5 mt-2 text-sm text-slate-700 space-y-1">
+                                                        {programaDetalle.objetivos.map((obj) => (
+                                                            <li key={String(obj)}>{obj}</li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-sm text-slate-500 mt-2">Ninguno</p>
+                                                )}
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <h4 className="font-semibold text-slate-800">Requisitos</h4>
+                                                {programaDetalle.requisitos && programaDetalle.requisitos.length > 0 ? (
+                                                    <ul className="list-disc ml-5 mt-2 text-sm text-slate-700 space-y-1">
+                                                        {programaDetalle.requisitos.map((req) => (
+                                                            <li key={String(req)}>{req}</li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-sm text-slate-500 mt-2">Ninguno</p>
+                                                )}
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <h4 className="font-semibold text-slate-800">Metodología</h4>
+                                                <p className="text-sm text-slate-700 mt-2">{programaDetalle.metodologia || 'No especificada'}</p>
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <h4 className="font-semibold text-slate-800">Evaluación</h4>
+                                                <p className="text-sm text-slate-700 mt-2">{programaDetalle.evaluacion || 'No especificada'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6">
+                                        <h4 className="font-semibold text-slate-800">Inscripciones</h4>
+                                        {programaDetalle.inscripciones && programaDetalle.inscripciones.length > 0 ? (
+                                            <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                                                {programaDetalle.inscripciones.map((insc) => (
+                                                    <li key={insc._id || insc.usuario?._id || `${String(insc.usuario || '')}-${String(insc.fechaInscripcion || '')}` } className="p-2 rounded-md bg-slate-50">
+                                                        <div className="flex items-center justify-between">
+                                                            <div>
+                                                                <div className="text-sm font-medium text-slate-800">{insc.usuario?.nombre || insc.usuario || 'Usuario anónimo'}</div>
+                                                                <div className="text-xs text-slate-500">{insc.fechaInscripcion ? new Date(insc.fechaInscripcion).toLocaleDateString() : ''}</div>
+                                                            </div>
+                                                            <div className="text-sm text-slate-700">{insc.estado}</div>
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-sm text-slate-500 mt-2">Ninguna</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="p-4 border-t flex justify-end">
+                                    <button
+                                        onClick={() => setMostrarModalDetalle(false)}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -534,8 +588,8 @@ const ProgramasAcademicos = () => {
                     <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
                         <button
                             className="pagination-btn-admin"
-                        onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
-                    disabled={paginaActual === 1}
+                            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+                            disabled={paginaActual === 1}
                         >
                             <i className="fas fa-chevron-left"></i>
                         </button>
@@ -544,8 +598,8 @@ const ProgramasAcademicos = () => {
                         </span>
                         <button
                             className="pagination-btn-admin"
-                        onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-                        disabled={paginaActual === totalPaginas || totalPaginas === 0}
+                            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+                            disabled={paginaActual === totalPaginas || totalPaginas === 0}
                         >
                             <i className="fas fa-chevron-right"></i>
                         </button>

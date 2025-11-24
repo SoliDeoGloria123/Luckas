@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { solicitudService } from "../../services/solicirudService";
 import { categorizacionService } from "../../services/categorizacionService";
+import { eventService } from "../../services/eventService";
+import { cabanaService } from "../../services/cabanaService";
+import { reservaService } from "../../services/reservaService";
+import { programasAcademicosService } from "../../services/programasAcademicosService";
 import TablaUnificadaSolicitudes from "./Tablas/SolicitudTabla";
 import SolicitudModal from "./Modales/SolicitudModal";
 import useBusqueda from "./Busqueda/useBusqueda";
+import { Search } from 'lucide-react';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
@@ -47,8 +52,16 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
     observaciones: ""
   });
   const [categorias, setCategorias] = useState([]);
+  const [filtroCategoria, setFiltroCategoria] = useState('todos');
+  const [filtroEstado, setFiltroEstado] = useState('todos');
   const [estadisticas, setEstadisticas] = useState({ totalSolicitudes: 0, pendientes: 0, aprobadas: 0, rechazadas: 0 });
   
+  // Estados para referencias dinámicas
+  const [eventos, setEventos] = useState([]);
+  const [cabanas, setCabanas] = useState([]);
+  const [reservas, setReservas] = useState([]);
+  const [programasAcademicos, setProgramasAcademicos] = useState([]);
+
 
   // Obtener solicitudes
   const obtenerSolicitudes = async () => {
@@ -64,13 +77,101 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
 
   // Obtener categorías de la base de datos
   const obtenerCategorias = async () => {
-
     try {
-     const res = await categorizacionService.getAll();
-      setCategorias(res.data || []);
+      const res = await categorizacionService.getAll();
+      let lista = [];
+      if (res) {
+        if (Array.isArray(res)) lista = res;
+        else if (res.data && Array.isArray(res.data)) lista = res.data;
+        else if (res.data) lista = res.data;
+      }
+      setCategorias(lista || []);
     } catch (error) {
       console.error(" ERROR obteniendo categorías:", error);
       setCategorias([]);
+    }
+  };
+
+  // Obtener eventos
+  const obtenerEventos = async () => {
+    try {
+      const data = await eventService.getAllEvents();
+      console.log('Eventos obtenidos:', data);
+      let listaEventos = [];
+      if (!data) listaEventos = [];
+      else if (Array.isArray(data)) listaEventos = data;
+      else if (data.data && Array.isArray(data.data)) listaEventos = data.data;
+      setEventos(listaEventos);
+    } catch (error) {
+      console.error('Error obteniendo eventos:', error);
+      setEventos([]);
+    }
+  };
+
+  // Obtener cabañas
+  const obtenerCabanas = async () => {
+    try {
+      const data = await cabanaService.getAll();
+      console.log('Cabañas obtenidas:', data);
+      let listaCabanas = [];
+      if (!data) listaCabanas = [];
+      else if (Array.isArray(data)) listaCabanas = data;
+      else if (data.data && Array.isArray(data.data)) listaCabanas = data.data;
+      setCabanas(listaCabanas);
+    } catch (error) {
+      console.error('Error obteniendo cabañas:', error);
+      setCabanas([]);
+    }
+  };
+
+  // Obtener reservas
+  const obtenerReservas = async () => {
+    try {
+      const data = await reservaService.getAll();
+      let listaReservas = [];
+      if (!data) listaReservas = [];
+      else if (Array.isArray(data)) listaReservas = data;
+      else if (data.data && Array.isArray(data.data)) listaReservas = data.data;
+      setReservas(listaReservas);
+    } catch (error) {
+      console.error('Error obteniendo reservas:', error);
+      setReservas([]);
+    }
+  };
+
+  // Obtener programas académicos
+  const obtenerProgramasAcademicos = async () => {
+    try {
+      // El servicio expone `getAllProgramas`.
+      const data = await programasAcademicosService.getAllProgramas();
+      let listaProgramas = [];
+      if (!data) listaProgramas = [];
+      else if (Array.isArray(data)) listaProgramas = data;
+      else if (data.data && Array.isArray(data.data)) listaProgramas = data.data;
+      setProgramasAcademicos(listaProgramas);
+    } catch (error) {
+      console.error('Error obteniendo programas académicos:', error);
+      setProgramasAcademicos([]);
+    }
+  };
+
+  // Obtener referencias según el modelo
+  const obtenerReferencias = async (modelo) => {
+    switch (modelo) {
+      case 'Eventos':
+        await obtenerEventos();
+        break;
+      case 'Cabana':
+        await obtenerCabanas();
+        break;
+      case 'Reserva':
+        await obtenerReservas();
+        break;
+      case 'ProgramaAcademico':
+        await obtenerProgramasAcademicos();
+        break;
+      default:
+        break;
     }
   };
 
@@ -139,15 +240,15 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       mostrarAlerta("Error", `Error: ${error.message}`);
     }
   };
-    const obtenerEstadiscas = async () => {
-      try {
-        const stats = await solicitudService.getEstadisticasGenerales();
-        setEstadisticas(stats?.data || stats);
-      }
-      catch (error) {
-        console.error(`Error al obtener estadísticas: `, error);
-      }
-    };
+  const obtenerEstadiscas = async () => {
+    try {
+      const stats = await solicitudService.getEstadisticasGenerales();
+      setEstadisticas(stats?.data || stats);
+    }
+    catch (error) {
+      console.error(`Error al obtener estadísticas: `, error);
+    }
+  };
 
   // Abrir modal para crear solicitud
   const abrirModalCrearSolicitud = () => {
@@ -176,11 +277,23 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
 
   };
 
-  // Paginación para solicitudes filtradas
+  // Paginación para solicitudes filtradas (aplicar filtros adicionales: categoria, estado)
   const [paginaActual, setPaginaActual] = useState(1);
   const registrosPorPagina = 10;
-  const totalPaginas = Math.ceil(solicitudesFiltradas.length / registrosPorPagina);
-  const solicitudesPaginadas = solicitudesFiltradas.slice(
+
+  const solicitudesFiltradasPorFiltros = solicitudesFiltradas.filter((s) => {
+    // Filtrar por categoría (comparar id o campo)
+    const catId = s.categoria && (s.categoria._id || s.categoria);
+    const cumpleCategoria = filtroCategoria === 'todos' || String(catId) === String(filtroCategoria);
+
+    // Filtrar por estado (modelo usa campo 'estado')
+    const cumpleEstado = filtroEstado === 'todos' || String(s.estado) === String(filtroEstado);
+
+    return cumpleCategoria && cumpleEstado;
+  });
+
+  const totalPaginas = Math.ceil(solicitudesFiltradasPorFiltros.length / registrosPorPagina);
+  const solicitudesPaginadas = solicitudesFiltradasPorFiltros.slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
@@ -204,7 +317,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
           setSidebarAbierto={setSidebarAbierto}
           seccionActiva={seccionActiva}
         />
-        <div className="seccion-usuarios">
+        <div className="space-y-7 fade-in-up p-9">
           <div className="page-header-Academicos">
             <div className="page-title-admin">
               <h1>Gestión de Solicitudes</h1>
@@ -252,34 +365,49 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
               </div>
             </div>
           </div>
-          <section className="filtros-section-admin">
-            <div className="busqueda-contenedor">
-              <i className="fas fa-search"></i>
-              <input
-                type="text"
-                placeholder="Buscar por nombre, apellido, cédula, correo..."
-                value={busquedaSolicitudes}
-                onChange={e => setBusquedaSolicitudes(e.target.value)}
-                className="input-busqueda"
-                style={{ marginLeft: 10, width: 300 }}
-              />
+
+
+          <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar solicitudes..."
+                  value={busquedaSolicitudes}
+                  onChange={(e) => { setBusquedaSolicitudes(e.target.value); setPaginaActual(1); }}
+                  className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all"
+                />
+              </div>
+              <div className="flex space-x-3">
+                <select
+                  className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  value={filtroCategoria}
+                  onChange={(e) => { setFiltroCategoria(e.target.value); setPaginaActual(1); }}
+                >
+                  <option value="todos">Todas las categorías</option>
+                  {Array.isArray(categorias) && categorias.map((cat) => (
+                    <option key={cat._id || cat.id || cat.codigo} value={cat._id || cat.id || cat.codigo}>
+                      {cat.nombre || cat.label || cat.codigo}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  value={filtroEstado}
+                  onChange={(e) => { setFiltroEstado(e.target.value); setPaginaActual(1); }}
+                >
+                  <option value="todos">Todos los estados</option>
+                  <option value="Nueva">Nueva</option>
+                  <option value="En Revisión">En Revisión</option>
+                  <option value="Aprobada">Aprobada</option>
+                  <option value="Rechazada">Rechazada</option>
+                  <option value="Completada">Completada</option>
+                  <option value="Pendiente Info">Pendiente Info</option>
+                </select>
+              </div>
             </div>
-            <div className="filtro-grupo-admin">
-              <select className="filtro-dropdown">
-                <option>Todos los Roles</option>
-                <option>Administrador</option>
-                <option>Seminarista</option>
-                <option>Tesorero</option>
-                <option>Usuario Externo</option>
-              </select>
-              <select className="filtro-dropdown">
-                <option>Todos los Estados</option>
-                <option>Activo</option>
-                <option>Inactivo</option>
-                <option>Pendiente</option>
-              </select>
-            </div>
-          </section>
+          </div>
           <div className="p-6 glass-card rounded-2xl border border-white/20 shadow-lg overflow-hidden user-card">
             <TablaUnificadaSolicitudes
               datosUnificados={{ solicitudes: solicitudesPaginadas, inscripciones: [], reservas: [] }}
@@ -287,19 +415,6 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
               eliminarSolicitud={(canDelete && !modoTesorero && !readOnly) ? eliminarSolicitud : null}
             />
           </div>
-          {/* Debug para ver las categorías antes de pasarlas al modal */}
-          {console.log("CATEGORIAS ANTES DE PASAR AL MODAL:", categorias)}
-          <SolicitudModal
-            mostrar={mostrarModal}
-            modoEdicion={modoEdicionSolicitud}
-            solicitudSeleccionada={solicitudSeleccionada}
-            setSolicitudSeleccionada={setSolicitudSeleccionada}
-            nuevaSolicitud={nuevaSolicitud}
-            setNuevaSolicitud={setNuevaSolicitud}
-            onClose={() => setMostrarModal(false)}
-            onSubmit={modoEdicionSolicitud ? actualizarSolicitud : crearSolicitud}
-            categorias={categorias}
-          />
 
           <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
             <button
@@ -321,6 +436,23 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
             </button>
           </div>
         </div>
+        <SolicitudModal
+          mostrar={mostrarModal}
+          modoEdicion={modoEdicionSolicitud}
+          solicitudSeleccionada={solicitudSeleccionada}
+          setSolicitudSeleccionada={setSolicitudSeleccionada}
+          nuevaSolicitud={nuevaSolicitud}
+          setNuevaSolicitud={setNuevaSolicitud}
+          onClose={() => setMostrarModal(false)}
+          onSubmit={modoEdicionSolicitud ? actualizarSolicitud : crearSolicitud}
+          categorias={categorias}
+          eventos={eventos}
+          cabanas={cabanas}
+          reservas={reservas}
+          programasAcademicos={programasAcademicos}
+          obtenerReferencias={obtenerReferencias}
+        />
+
       </div>
     </div>
   );

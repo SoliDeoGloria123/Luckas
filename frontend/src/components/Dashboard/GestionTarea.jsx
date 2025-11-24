@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { Search } from 'lucide-react';
 import { tareaService } from "../../services/tareaService";
 import { userService } from "../../services/userService";
 import TablaTareas from "./Tablas/TareaTabla";
 import TareaModal from "./Modales/TareaModal";
 import StatsCard from "./Shared/StatsCard";
-import SearchAndFilters from "./Shared/SearchAndFilters";
 import Pagination from "./Shared/Pagination";
 import { usePagination } from "./hooks/usePagination";
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
@@ -33,7 +33,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
     fechaLimite: "",
     comentarios: []
   });
-  const [error, setError] = useState("");
+
 
   // Fetch tasks and users
   useEffect(() => {
@@ -46,7 +46,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
       const response = await tareaService.getAll();
       setTareas(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-      setError("Error al obtener tareas: " + err.message);
+      mostrarAlerta('Error', 'Error al obtener tareas: ' + (err?.message || err));
     }
   };
 
@@ -55,7 +55,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
       const data = await userService.getAllUsers();
       setUsuarios(Array.isArray(data.data) ? data.data : []);
     } catch (err) {
-      setError("Error al obtener usuarios: " + err.message);
+      mostrarAlerta('Error', 'Error al obtener usuarios: ' + (err?.message || err));
     }
   };
 
@@ -119,7 +119,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
       await tareaService.cambiarEstado(id, nuevoEstado);
       obtenerTareas();
     } catch (err) {
-      setError("Error al cambiar estado: " + err.message);
+      mostrarAlerta('Error', 'Error al cambiar estado: ' + (err?.message || err));
     }
   };
 
@@ -150,12 +150,12 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
 
   // Search and filter
   const tareasFiltradas = tareas.filter(t => {
-    const matchesSearch = !busqueda || 
+    const matchesSearch = !busqueda ||
       `${t.titulo} ${t.descripcion} ${t.estado} ${t.prioridad}`.toLowerCase().includes(busqueda.toLowerCase());
-    
+
     const matchesEstado = filtroEstado === 'todos' || t.estado === filtroEstado;
     const matchesPrioridad = filtroPrioridad === 'todas' || t.prioridad?.toLowerCase() === filtroPrioridad;
-    
+
     return matchesSearch && matchesEstado && matchesPrioridad;
   });
 
@@ -165,7 +165,8 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
     totalPages,
     paginatedData: tareasPaginadas,
     nextPage,
-    prevPage
+    prevPage,
+    resetToFirstPage
   } = usePagination(tareasFiltradas, 10);
 
   // Calcular estadísticas dinámicas
@@ -197,7 +198,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
           setSidebarAbierto={setSidebarAbierto}
           seccionActiva={seccionActiva}
         />
-        <div className="seccion-usuarios">
+        <div className="space-y-7 fade-in-up p-9">
           <div className="page-header-Academicos">
             <div className="page-title-admin">
               <h1>Gestión de Tareas</h1>
@@ -220,54 +221,53 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
               />
             ))}
           </div>
-          <SearchAndFilters 
-            searchPlaceholder="Buscar Tareas..."
-            searchValue={busqueda}
-            onSearchChange={(e) => setBusqueda(e.target.value)}
-            filters={[
-              {
-                value: filtroEstado,
-                onChange: (e) => setFiltroEstado(e.target.value),
-                options: [
-                  { value: 'todos', label: 'Todos los Estados' },
-                  { value: 'pendiente', label: 'Pendiente' },
-                  { value: 'en_progreso', label: 'En Progreso' },
-                  { value: 'completada', label: 'Completada' },
-                  { value: 'cancelada', label: 'Cancelada' }
-                ]
-              },
-              {
-                value: filtroPrioridad,
-                onChange: (e) => setFiltroPrioridad(e.target.value),
-                options: [
-                  { value: 'todas', label: 'Todas las Prioridades' },
-                  { value: 'baja', label: 'Baja' },
-                  { value: 'media', label: 'Media' },
-                  { value: 'alta', label: 'Alta' },
-                  { value: 'urgente', label: 'Urgente' }
-                ]
-              }
-            ]}
-          />
-          {error && <div className="error-message">{error}</div>}
-          <TablaTareas
-            tareas={tareasPaginadas}
-            onEditar={canEdit && !readOnly ? abrirModalEditar : null}
-            onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarTarea : null}
-            onCambiarEstado={canEdit && !readOnly ? cambiarEstadoTarea : null}
-          />
-          <TareaModal
-            mostrar={mostrarModal}
-            modoEdicion={modoEdicion}
-            tareaSeleccionada={tareaSeleccionada}
-            setTareaSeleccionada={setTareaSeleccionada}
-            nuevaTarea={nuevaTarea}
-            setNuevaTarea={setNuevaTarea}
-            onClose={() => setMostrarModal(false)}
-            onSubmit={modoEdicion ? actualizarTarea : crearTarea}
-            usuarios={usuarios}
-          />
 
+          <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar tareas..."
+                  value={busqueda}
+                  onChange={(e) => { setBusqueda(e.target.value); resetToFirstPage(); }}
+                  className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all"
+                />
+              </div>
+              <div className="flex space-x-3">
+                <select
+                  className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  value={filtroPrioridad}
+                  onChange={(e) => { setFiltroPrioridad(e.target.value); resetToFirstPage(); }}
+                >
+                  <option value="todas">Todas las Prioridades</option>
+                  <option value="alta">Alta</option>
+                  <option value="media">Media</option>
+                  <option value="baja">Baja</option>
+                </select>
+                <select
+                  className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  value={filtroEstado}
+                  onChange={(e) => { setFiltroEstado(e.target.value); resetToFirstPage(); }}
+                >
+                  <option value="todos">Todos los Estados</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="en_progreso">En Progreso</option>
+                  <option value="completada">Completada</option>
+                  <option value="cancelada">Cancelada</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 glass-card rounded-2xl border border-white/20 shadow-lg overflow-hidden user-card">
+            <TablaTareas
+              tareas={tareasPaginadas}
+              onEditar={canEdit && !readOnly ? abrirModalEditar : null}
+              onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarTarea : null}
+              onCambiarEstado={canEdit && !readOnly ? cambiarEstadoTarea : null}
+            />
+          </div>
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -276,6 +276,17 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
           />
         </div>
       </div>
+      <TareaModal
+        mostrar={mostrarModal}
+        modoEdicion={modoEdicion}
+        tareaSeleccionada={tareaSeleccionada}
+        setTareaSeleccionada={setTareaSeleccionada}
+        nuevaTarea={nuevaTarea}
+        setNuevaTarea={setNuevaTarea}
+        onClose={() => setMostrarModal(false)}
+        onSubmit={modoEdicion ? actualizarTarea : crearTarea}
+        usuarios={usuarios}
+      />
     </div>
   );
 };

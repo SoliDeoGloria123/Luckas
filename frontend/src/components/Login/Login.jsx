@@ -56,7 +56,6 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
       {/* Lado Izquierdo - Información del Sistema */}
       <div className="col-lg-6 login-left-side">
         <div className="login-info-content">

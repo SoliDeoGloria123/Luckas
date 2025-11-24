@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import useImageUploader from './useImageUploader';
 import FormField from './shared/FormField';
@@ -36,8 +36,8 @@ const EventoModal = ({
   selectedImages,
   setSelectedImages
 }) => {
-  const todayStr = getTodayString();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const originalFechaRef = useRef(null);
 
   // Reutilizar hook centralizado para subir imágenes (maneja progreso, selección, eliminación)
   const { progress: uploaderProgress, isUploading: uploaderUploading, handleFileSelection, removeImage } = useImageUploader({ selectedImages, setSelectedImages, mostrar, modoEdicion });
@@ -51,7 +51,23 @@ const EventoModal = ({
     }
   };
 
-  const getFieldValue = (fieldName) => (modoEdicion ? eventoSeleccionado?.[fieldName] : nuevoEvento[fieldName]);
+  const getFieldValue = (fieldName) => {
+    const raw = modoEdicion ? eventoSeleccionado?.[fieldName] : nuevoEvento[fieldName];
+    if (fieldName === 'fechaEvento') {
+      return formatToInputDate(raw);
+    }
+    if (fieldName === 'etiquetas') {
+      // Si en el modelo vienen como array, convertir a string separado por comas
+      if (Array.isArray(raw)) return raw.join(', ');
+      return raw || '';
+    }
+    if (fieldName === 'categoria') {
+      // Si la categoría viene como objeto, devolver el id para el select
+      if (raw && typeof raw === 'object') return raw._id || raw.id || '';
+      return raw || '';
+    }
+    return raw;
+  };
 
   // (Los estados de upload/progress los proporciona `useImageUploader`)
 
@@ -62,6 +78,9 @@ const EventoModal = ({
       setSelectedImages([]);
       setIsSubmitting(false);
     }
+    if (mostrar && modoEdicion) {
+      originalFechaRef.current = formatToInputDate(eventoSeleccionado?.fechaEvento);
+    }
   }, [mostrar, modoEdicion, setSelectedImages]);
 
 
@@ -70,11 +89,47 @@ const EventoModal = ({
 
   // Función auxiliar para validar fecha
   const validarFecha = (fecha) => {
-    if (fecha && fecha < todayStr) {
-      alert('La fecha del evento no puede ser anterior a hoy');
-      return false;
+    if (!fecha) return true;
+    try {
+      const d = new Date(String(fecha));
+      const time = d.getTime();
+      if (Number.isNaN(time)) return true;
+      const hoy = new Date();
+      d.setHours(0,0,0,0);
+      hoy.setHours(0,0,0,0);
+      if (d < hoy) {
+        alert('La fecha del evento no puede ser anterior a hoy');
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('validarFecha error:', err);
+      return true;
     }
-    return true;
+  };
+
+  // Normalizar varios formatos de fecha a yyyy-mm-dd para el input type=date
+  const formatToInputDate = (value) => {
+    if (!value && value !== 0) return '';
+    try {
+      const str = String(value).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+      if (str.includes('T')) {
+        const d = new Date(str);
+        if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0,10);
+      }
+      const d = new Date(str);
+      if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0,10);
+      // intentar dd/mm/yyyy o dd-mm-yyyy
+      const parts = str.includes('/') ? str.split('/') : str.split('-');
+      if (parts.length === 3 && parts[2].length === 4) {
+        const [dd, mm, yyyy] = parts.map(p => p.trim());
+        return `${yyyy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+      }
+    } catch (err) {
+      console.error('formatToInputDate error:', err);
+    }
+    return '';
   };
 
   // Función auxiliar para preparar FormData con imágenes
@@ -123,9 +178,13 @@ const EventoModal = ({
     setIsSubmitting(true);
 
     try {
-      const fecha = modoEdicion ? eventoSeleccionado?.fechaEvento : nuevoEvento.fechaEvento;
+      const fechaRaw = modoEdicion ? eventoSeleccionado?.fechaEvento : nuevoEvento.fechaEvento;
+      const fecha = formatToInputDate(fechaRaw);
 
-      if (!validarFecha(fecha)) {
+      // Validar fecha: en edición solo si el usuario la cambió; en creación siempre
+      const original = originalFechaRef.current || '';
+      const fechaCambio = modoEdicion ? (fecha && fecha !== original) : true;
+      if (fechaCambio && !validarFecha(fecha)) {
         setIsSubmitting(false);
         return;
       }
@@ -178,10 +237,8 @@ const EventoModal = ({
             </FormField>
           </div>
           <div className="from-grid-admin">
-            {!modoEdicion && (
-              <FormField id="etiquetas-evento" label="Etiquetas Evento:" value={getFieldValue('etiquetas')} onChange={e => handleFieldChange('etiquetas', e.target.value)} placeholder="Etiquetas" />
-            )}
-            <FormField id="fecha-evento" label="Fecha del Evento:" type="date" value={getFieldValue('fechaEvento')} onChange={e => handleFieldChange('fechaEvento', e.target.value)} placeholder="Fecha" />
+            <FormField id="etiquetas-evento" label="Etiquetas Evento:" value={getFieldValue('etiquetas')} onChange={e => handleFieldChange('etiquetas', e.target.value)} placeholder="Etiquetas (separadas por coma)" />
+            <FormField id="fecha-evento" label="Fecha del Evento:" type="date" value={getFieldValue('fechaEvento')} onChange={e => handleFieldChange('fechaEvento', e.target.value)} placeholder="Fecha" inputProps={{ min: getTodayString() }} />
           </div>
           <div className="from-grid-admin">
             <FormField id="hora-inicio" label="Hora de Inicio:" type="time" value={getFieldValue('horaInicio')} onChange={e => handleFieldChange('horaInicio', e.target.value)} />
@@ -189,9 +246,7 @@ const EventoModal = ({
           </div>
           <div className="from-grid-admin">
             <FormField id="lugar-evento" label="Lugar:" value={getFieldValue('lugar')} onChange={e => handleFieldChange('lugar', e.target.value)} placeholder="Ej: Auditorio Principal" />
-            {!modoEdicion && (
-              <FormField id="direccion-evento" label="Dirección:" value={getFieldValue('direccion')} onChange={e => handleFieldChange('direccion', e.target.value)} placeholder="Ej: Carrera 45 #50-12, Bogotá" />
-            )}
+            <FormField id="direccion-evento" label="Dirección:" value={getFieldValue('direccion')} onChange={e => handleFieldChange('direccion', e.target.value)} placeholder="Ej: Carrera 45 #50-12, Bogotá" />
           </div>
           <div className="from-grid-admin">
             <FormField id="cupos-totales" label="Cupos Totales:" type="number" value={getFieldValue('cuposTotales')} onChange={e => handleFieldChange('cuposTotales', e.target.value)} />

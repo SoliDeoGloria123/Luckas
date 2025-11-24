@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 
@@ -16,6 +16,8 @@ import {
 import './Dashboard.css';
 // Hooks optimizados
 import { useDashboardAdmin } from './hooks/useDashboardAdmin';
+import { eventService } from '../../services/eventService';
+import { programasAcademicosService } from '../../services/programasAcademicosService';
 
 
 // Componentes
@@ -33,8 +35,60 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
   const {
     cargando,
     estadisticas,
-    usuarioActual
+    usuarioActual,
+    usuarios
   } = useDashboardAdmin(usuarioProp, onCerrarSesionProp);
+
+  const [eventosRecientes, setEventosRecientes] = useState([]);
+  const [programasRecientes, setProgramasRecientes] = useState([]);
+
+  const formatDate = (iso) => {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleDateString();
+    } catch (e) {
+      return '';
+    }
+  };
+
+  const displayValue = (val) => {
+    if (val === null || val === undefined) return '';
+    if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') return String(val);
+    // If it's an object, try common fields
+    if (typeof val === 'object') {
+      if (val.nombre) return String(val.nombre);
+      if (val.titulo) return String(val.titulo);
+      if (val.correo) return String(val.correo);
+      try {
+        return JSON.stringify(val);
+      } catch (e) {
+        return String(val);
+      }
+    }
+    return String(val);
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchRecientes = async () => {
+      try {
+        const ev = await eventService.getAllEvents();
+        const evArr = Array.isArray(ev) ? ev : (ev && ev.data) || [];
+        const sortedE = evArr.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
+        if (mounted) setEventosRecientes(sortedE);
+
+        const pr = await programasAcademicosService.getAllProgramas();
+        const prArr = Array.isArray(pr) ? pr : (pr && pr.data) || [];
+        const sortedP = prArr.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
+        if (mounted) setProgramasRecientes(sortedP);
+      } catch (error) {
+        console.error('Error cargando recientes del dashboard:', error);
+      }
+    };
+
+    fetchRecientes();
+    return () => { mounted = false; };
+  }, []);
 
   // Hook para operaciones de usuarios (comentado porque no se usa actualmente)
   // const {
@@ -138,11 +192,11 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
                   return (
                     <div
                       key={stat.title}
-                      className={`stat-card-dashboard-admin glass-card ${stat.bgColor} rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up`}
+                      className={`stat-card-dashboard-admin glass-card ${stat.bgColor} rounded-2xl p-6 border border-white/20 fade-in-up bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm`}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       <div className="flex items-center justify-between mb-4">
-                        <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg icon-bounce`}>
+                        <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg icon-bounce` + ' ' + 'shadow-blue-lg'}>
                           <Icon className="w-6 h-6 text-white" />
                         </div>
                         <div className={`flex items-center text-sm font-medium ${stat.trend === "up" ? "text-emerald-600" : "text-rose-600"
@@ -158,6 +212,77 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
                     </div>
                   );
                 })}
+              </div>
+              {/* Recientes: usuarios, eventos y programas */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up col-span-1 md:col-span-1">
+                  <div className="card-header flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-slate-800">Usuarios recientes</h3>
+                    <button className={`card-action inline-flex px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-sm`} onClick={() => setSeccionActiva('usuarios')}>Ver todos</button>
+                  </div>
+                  <ul className="usuarios-recientes-list space-y-3 bg-white/5 p-2 rounded-lg">
+                    {(Array.isArray(usuarios) ? usuarios.slice(0, 6) : []).map((u) => {
+                      const label = displayValue(u.nombre || u.correo || u.email || u.username || 'U');
+                      const avatarChar = label && label.length ? label.charAt(0).toUpperCase() : 'U';
+                      return (
+                        <li key={u._id || u.id || displayValue(u)} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded-full avatar-gradient flex items-center justify-center text-white font-medium">{avatarChar}</div>
+                            <div>
+                              <div className="font-medium text-slate-800">{label}</div>
+                              <div className="text-xs text-slate-500">{formatDate(u.createdAt)}</div>
+                            </div>
+                          </div>
+                          <div className="text-sm text-slate-500">{displayValue(u.role) || ''}</div>
+                        </li>
+                      );
+                    })}
+                    {(!usuarios || usuarios.length === 0) && (
+                      <li className="text-slate-500">No hay usuarios recientes</li>
+                    )}
+                  </ul>
+                </div>
+
+                <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up col-span-2">
+                  <div className="card-header flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-slate-800">Últimos eventos y programas</h3>
+                    <div>
+                      <button className={`card-action inline-flex px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-sm mr-2`} onClick={() => setSeccionActiva('eventos')}>Ver eventos</button>
+                      <button className={`card-action inline-flex px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-sm`} onClick={() => setSeccionActiva('programas-academicos')}>Ver programas</button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-600 mb-2">Eventos</h4>
+
+                      <ul className="recientes-list space-y-2 bg-white/5 p-2 rounded-lg">
+                        {eventosRecientes.length > 0 ? eventosRecientes.map((ev) => (
+                          <li key={ev._id || ev.id || displayValue(ev)} className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-slate-800">{displayValue(ev.titulo || ev.nombre) || 'Evento'}</div>
+                              <div className="text-xs text-slate-500">{formatDate(ev.createdAt)}</div>
+                            </div>
+                            <div className="text-xs text-slate-500">{displayValue(ev.categoria) || ''}</div>
+                          </li>
+                        )) : <li className="text-slate-500">No hay eventos</li>}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-600 mb-2">Programas</h4>
+                      <ul className="recientes-list space-y-2 bg-white/5 p-2 rounded-lg">
+                        {programasRecientes.length > 0 ? programasRecientes.map((p) => (
+                          <li key={p._id || p.id || displayValue(p)} className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-slate-800">{displayValue(p.titulo || p.nombre || p.nombrePrograma) || 'Programa'}</div>
+                              <div className="text-xs text-slate-500">{formatDate(p.createdAt)}</div>
+                            </div>
+                            <div className="text-xs text-slate-500">{displayValue(p.modalidad) || ''}</div>
+                          </li>
+                        )) : <li className="text-slate-500">No hay programas</li>}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Activity Chart con efectos premium */}

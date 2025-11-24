@@ -17,7 +17,7 @@ const TablaUnificadaSolicitudes = ({
       <table className="tabla-usuarios-admin">
         <thead>
           <tr>
-            <th>ID</th>
+            
             <th>Nombre Solicitante</th>
             <th>Cédula</th>
             <th>Correo</th>
@@ -37,7 +37,7 @@ const TablaUnificadaSolicitudes = ({
           {/* Solicitudes */}
           {(datosUnificados.solicitudes || []).map((sol) => (
             <tr key={`solicitud-${sol._id}`}>
-              <td style={{ padding: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>{sol._id.substring(0, 8)}...</td>
+            
 
               {/* Nombre del solicitante */}
               <td >
@@ -91,7 +91,7 @@ const TablaUnificadaSolicitudes = ({
                 })()}
               </td>
               <td>
-                <span className={`estado-${(sol.estado || "activo").toLowerCase()}`}>
+                <span className={`badge-estado estado-${(sol.estado || "activo").toLowerCase()}`}>
                   {sol.estado || "Activo"}
                 </span>
               </td>
@@ -102,18 +102,20 @@ const TablaUnificadaSolicitudes = ({
               </td>
 
               <td>{sol.fechaSolicitud ? new Date(sol.fechaSolicitud).toLocaleDateString() : "N/A"}</td>
-              <div className="flex flex-col">
-                <span className="font-medium">
-                  {sol.responsable?.nombre && sol.responsable?.apellido
-                    ? `${sol.responsable.nombre} ${sol.responsable.apellido}`
-                    : sol.responsable?.username || sol.responsable?.nombre || "N/A"}
-                </span>
-                {sol.responsable?.role && (
-                  <span className={`text-xs role-badge-tesorero role-tesorero-${sol.responsable.role} mt-1`}>
-                    {sol.responsable.role}
+              <td className="responsable-cell">
+                <div className="flex flex-col">
+                  <span className="font-medium">
+                    {sol.responsable?.nombre && sol.responsable?.apellido
+                      ? `${sol.responsable.nombre} ${sol.responsable.apellido}`
+                      : sol.responsable?.username || sol.responsable?.nombre || "N/A"}
                   </span>
-                )}
-              </div>
+                  {sol.responsable?.role && (
+                    <span className={`text-xs badge-rol rol-${sol.responsable.role ? sol.responsable.role.toLowerCase() : ''} mt-1`}>
+                      {sol.responsable.role}
+                    </span>
+                  )}
+                </div>
+              </td>
               <td>
                 <div className="acciones-botones">
                   {abrirModalEditarSolicitud && (

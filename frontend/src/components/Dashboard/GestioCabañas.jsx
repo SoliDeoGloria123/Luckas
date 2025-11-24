@@ -11,6 +11,7 @@ import Header from './Sidebar/Header';
 import {
   Plus,
   X,
+  Search,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
@@ -20,7 +21,7 @@ import PropTypes from 'prop-types';
 const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = true, canEdit = true, canDelete = true }) => {
   const [cabanas, setCabanas] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [busqueda] = useState("");
+  const [filtros, setFiltros] = useState({ busqueda: '', categoria: 'todos', estado: 'todos' });
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -29,6 +30,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   const [eventoDetalle, setEventoDetalle] = useState(null);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
+  const [carouselIndex, setCarouselIndex] = useState(0);
   const [nuevaCabana, setNuevaCabana] = useState({ ...defaultCabana });
 
 
@@ -125,10 +127,36 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     setMostrarModal(true);
   };
 
-  // Search filter
+  // Helpers para el carrusel de imágenes en el modal de detalle
+  const getImagesFromDetalle = (detalle) => {
+    if (!detalle) return [];
+    if (Array.isArray(detalle.imagen)) return detalle.imagen;
+    if (detalle.imagen) return [detalle.imagen];
+    return [];
+  };
+
+  useEffect(() => {
+    setCarouselIndex(0);
+  }, [eventoDetalle]);
+
+  // Search filter (filtra por nombre, descripción, categoría y estado según el modelo)
   const cabanasFiltradas = cabanas.filter(c => {
-    const texto = `${c.nombre} ${c.descripcion} ${c.estado}`.toLowerCase();
-    return texto.includes(busqueda.toLowerCase());
+    const q = (filtros.busqueda || '').toString().trim().toLowerCase();
+
+    // filtro por categoria (acepta población o id)
+    if (filtros.categoria && filtros.categoria !== 'todos') {
+      const catId = c.categoria?._id || c.categoria || '';
+      if (String(catId) !== String(filtros.categoria)) return false;
+    }
+
+    // filtro por estado (según enum en modelo)
+    if (filtros.estado && filtros.estado !== 'todos') {
+      if ((c.estado || '') !== filtros.estado) return false;
+    }
+
+    if (!q) return true;
+    const texto = `${c.nombre || ''} ${c.descripcion || ''} ${c.ubicacion || ''} ${c.precio || ''}`.toLowerCase();
+    return texto.includes(q);
   });
 
   const [paginaActual, setPaginaActual] = useState(1);
@@ -207,51 +235,138 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
               </div>
             </div>
           </div>
+
+
+                <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar cabañas..."
+                    value={filtros.busqueda}
+                    onChange={(e) => { setFiltros({ ...filtros, busqueda: e.target.value }); setPaginaActual(1); }}
+                    className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+
+                <select
+                  value={filtros.categoria}
+                  onChange={(e) => { setFiltros({ ...filtros, categoria: e.target.value }); setPaginaActual(1); }}
+                  className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                >
+                  <option value="todos">Todas las Categorías</option>
+                  {categorias.map(cat => (
+                    <option key={cat._id || cat.id} value={cat._id || cat.id}>{cat.nombre || cat.nombreCategoria || cat.codigo || cat._id}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={filtros.estado}
+                  onChange={(e) => { setFiltros({ ...filtros, estado: e.target.value }); setPaginaActual(1); }}
+                  className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                >
+                  <option value="todos">Todos los estados</option>
+                  <option value="disponible">Disponible</option>
+                  <option value="ocupada">Ocupada</option>
+                  <option value="mantenimiento">Mantenimiento</option>
+                </select>
+
+                <div className="text-sm text-slate-600 flex items-center">
+                  <span className="font-medium">{cabanasFiltradas.length}</span> cabaña(s) encontrada(s)
+                </div>
+              </div>
+            </div>
           {mostrarModalDetalle && eventoDetalle && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8">
-                <button
-                  className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
-                  onClick={() => setMostrarModalDetalle(false)}
-                >
-                  <X size={24} />
-                </button>
-                <h2 className="text-2xl font-bold mb-4">{eventoDetalle.nombre}</h2>
-                <p className="mb-2"><strong>Descripción:</strong> {eventoDetalle.descripcion}</p>
-                <p className="mb-2"><strong>Categoría:</strong> {eventoDetalle.categoria?.nombre || eventoDetalle.categoria}</p>
-                <p className="mb-2"><strong>Capacidad:</strong> {eventoDetalle.capacidad}</p>
-                <p className="mb-2"><strong>Precio:</strong> ${eventoDetalle.precio}</p>
-                <p className="mb-2"><strong>Ubicación:</strong> {eventoDetalle.ubicacion}</p>
-                <p className="mb-2"><strong>Estado:</strong> {eventoDetalle.estado}</p>
-                <p className="mb-2"><strong>Creado por:</strong> {eventoDetalle.creadoPor?.nombre || eventoDetalle.creadoPor}</p>
-                <div className="flex flex-wrap gap-2 my-4">
-                  {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.length > 0 ? (
-                    eventoDetalle.imagen.map((img, index) => {
-                      // Usar el nombre de archivo o el string completo como key única
-                      const key = typeof img === 'string' ? img : (img?.name || `imagen-${index}`);
-                      return (
-                        <img
-                          key={key}
-                          src={img}
-                          alt={typeof img === 'string' ? `Imagen` : (img?.name || 'Imagen')}
-                          className="w-32 h-32 object-cover rounded-lg border"
-                        />
-                      );
-                    })
-                  ) : (
-                    <span className="text-gray-400">Sin imágenes</span>
-                  )}
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">
+                <div className="flex items-start justify-between p-6 border-b">
+                  <div>
+                    <h2 className="text-2xl font-semibold text-slate-800">{eventoDetalle.nombre}</h2>
+                    <p className="text-sm text-slate-500 mt-1">{eventoDetalle.categoria?.nombre || eventoDetalle.categoria} • {eventoDetalle.ubicacion || ''}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`px-3 py-1 rounded-full text-sm ${eventoDetalle.estado === 'disponible' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700'}`}>{eventoDetalle.estado || '—'}</span>
+                    <button onClick={() => setMostrarModalDetalle(false)} className="text-slate-400 hover:text-slate-600 p-2 rounded-md"><X size={20} /></button>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-400">
-                  <span>Creado: {eventoDetalle.createdAt ? new Date(eventoDetalle.createdAt).toLocaleString() : "N/A"}</span>
-                  <span className="ml-4">Actualizado: {eventoDetalle.updatedAt ? new Date(eventoDetalle.updatedAt).toLocaleString() : "N/A"}</span>
+
+                <div className="p-6 overflow-y-auto" style={{ maxHeight: '70vh' }}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      {/* Carrusel */}
+                      {getImagesFromDetalle(eventoDetalle).length > 0 ? (
+                        <div>
+                          <div className="relative mb-3">
+                            <img
+                              src={getImagesFromDetalle(eventoDetalle)[carouselIndex]}
+                              alt={`Imagen cabaña ${carouselIndex + 1}`}
+                              className="w-full h-56 object-cover rounded-lg"
+                            />
+                            {getImagesFromDetalle(eventoDetalle).length > 1 && (
+                              <>
+                                <button
+                                  onClick={() => setCarouselIndex(i => Math.max(i - 1, 0))}
+                                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                                  aria-label="Imagen anterior"
+                                >◀</button>
+                                <button
+                                  onClick={() => setCarouselIndex(i => Math.min(i + 1, getImagesFromDetalle(eventoDetalle).length - 1))}
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                                  aria-label="Imagen siguiente"
+                                >▶</button>
+                              </>
+                            )}
+                          </div>
+
+                          <div className="flex gap-2">
+                            {getImagesFromDetalle(eventoDetalle).map((img) => (
+                              <button
+                                key={typeof img === 'string' ? img : (img?.name || String(img))}
+                                type="button"
+                                onClick={() => setCarouselIndex(getImagesFromDetalle(eventoDetalle).indexOf(img))}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCarouselIndex(getImagesFromDetalle(eventoDetalle).indexOf(img)); } }}
+                                aria-label={`Mostrar imagen`}
+                                className={`p-0 border-0 bg-transparent ${getImagesFromDetalle(eventoDetalle).indexOf(img) === carouselIndex ? 'ring-2 ring-blue-500 rounded' : ''}`}
+                              >
+                                <img
+                                  src={typeof img === 'string' ? img : img?.url || ''}
+                                  alt={`Thumb`}
+                                  className="w-20 h-14 object-cover rounded cursor-pointer"
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="h-56 flex items-center justify-center bg-slate-100 rounded-lg mb-3 text-sm text-slate-500">Sin imágenes</div>
+                      )}
+
+                      <p className="text-sm text-slate-700 leading-relaxed mt-4">{eventoDetalle.descripcion || 'Sin descripción'}</p>
+                    </div>
+
+                    <div>
+                      <ul className="mt-2 text-sm text-slate-700 space-y-2">
+                        <li><strong className="text-slate-800">Capacidad:</strong> {eventoDetalle.capacidad ?? '—'}</li>
+                        <li><strong className="text-slate-800">Precio:</strong> ${eventoDetalle.precio ?? 0}</li>
+                        <li><strong className="text-slate-800">Ubicación:</strong> {eventoDetalle.ubicacion || '—'}</li>
+                        <li><strong className="text-slate-800">Estado:</strong> {eventoDetalle.estado || '—'}</li>
+                        <li><strong className="text-slate-800">Creado por:</strong> {eventoDetalle.creadoPor?.nombre || eventoDetalle.creadoPor || '—'}</li>
+                        <li><strong className="text-slate-800">Creado:</strong> {eventoDetalle.createdAt ? new Date(eventoDetalle.createdAt).toLocaleString() : '—'}</li>
+                        <li><strong className="text-slate-800">Actualizado:</strong> {eventoDetalle.updatedAt ? new Date(eventoDetalle.updatedAt).toLocaleString() : '—'}</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setMostrarModalDetalle(false)}
-                  className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Cerrar
-                </button>
+
+                <div className="p-4 border-t flex justify-end">
+                  <button
+                    onClick={() => setMostrarModalDetalle(false)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Cerrar
+                  </button>
+                </div>
               </div>
             </div>
           )}

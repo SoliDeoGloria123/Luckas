@@ -6,7 +6,6 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
     <table className="tabla-usuarios-admin">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Nombre completo</th>
           <th>Tipo Doc.</th>
           <th>Número Doc.</th>
@@ -54,20 +53,22 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
               eventoPrograma = ins.referencia?.nombre || "N/A";
             }
 
+            // Sanitizar estado para clases CSS (reemplazar espacios por guiones)
+            const estadoClass = (ins.estado || "pendiente").toLowerCase().trim().split(/\s+/).join('-');
+
             return (
               <tr key={ins._id}>
-                <td>{ins._id}</td>
-                <td>{nombreCompleto}</td>
+                <td >{nombreCompleto}</td>
                 <td>{ins.tipoDocumento || "N/A"}</td>
                 <td>{ins.numeroDocumento || "N/A"}</td>
                 <td>{ins.correo || "N/A"}</td>
                 <td>{ins.telefono || "N/A"}</td>
                 <td>{ins.edad || "N/A"}</td>
-                <td>{tipoInscripcion}</td>
+                <td >{tipoInscripcion}</td>
                 <td>{eventoPrograma}</td>
                 <td>{ins.categoria?.nombre || "N/A"}</td>
                 <td>
-                  <span className={`badge-estado estado-${(ins.estado || "pendiente").toLowerCase()}`}>
+                  <span className={`badge-estado estado-${estadoClass}`}>
                     {ins.estado || "Pendiente"}
                   </span>
                 </td>

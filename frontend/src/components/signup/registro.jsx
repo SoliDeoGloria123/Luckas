@@ -19,19 +19,100 @@ const Registro = () => {
     confirmPassword: ''
   });
 
+  const [errors, setErrors] = useState({});
+
   const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    const { name, value } = e.target;
+    // Construimos el nuevo estado inmediatamente para validar dependencias (ej: confirmar contraseña)
+    setFormData(prev => {
+      const next = { ...prev, [name]: value };
+      // Validación en tiempo real por campo
+      const fieldError = validateField(name, value, next);
+      setErrors(prevErr => ({ ...prevErr, [name]: fieldError }));
+      // Si estamos actualizando la contraseña, también validar confirmPassword en tiempo real
+      if (name === 'password' && next.confirmPassword) {
+        const confirmErr = validateField('confirmPassword', next.confirmPassword, next);
+        setErrors(prevErr => ({ ...prevErr, confirmPassword: confirmErr, [name]: fieldError }));
+      }
+      // Si estamos actualizando tipoDocumento, revalidar numeroDocumento
+      if (name === 'tipoDocumento' && next.numeroDocumento) {
+        const numErr = validateField('numeroDocumento', next.numeroDocumento, next);
+        setErrors(prevErr => ({ ...prevErr, numeroDocumento: numErr }));
+      }
+      return next;
+    });
+  };
+
+  // Helpers más pequeños para reducir la complejidad de validación
+  const validateDocumentNumber = (v, tipo) => {
+    if (!v) return 'Número de documento es requerido';
+    if ((tipo || '').trim() === 'Pasaporte') {
+      return /^[A-Za-z0-9]{5,20}$/.test(v)
+        ? undefined
+        : 'Pasaporte inválido (5-20 caracteres alfanuméricos)';
+    }
+    return /^\d{6,15}$/.test(v) ? undefined : 'Número inválido (solo dígitos, 6-15)';
+  };
+
+  const validatePassword = (v) => {
+    const problems = [];
+    if (v.length < 8) problems.push('al menos 8 caracteres');
+    if (!/[A-Z]/.test(v)) problems.push('una mayúscula');
+    if (!/[a-z]/.test(v)) problems.push('una minúscula');
+    if (!/\d/.test(v)) problems.push('un número');
+    return problems.length ? 'Contraseña debe contener: ' + problems.join(', ') : undefined;
+  };
+
+  const validatePersonalField = (name, v, data) => {
+    switch (name) {
+      case 'nombre':
+        return v ? undefined : 'Nombre es requerido';
+      case 'apellido':
+        return v ? undefined : 'Apellido es requerido';
+      case 'tipoDocumento':
+        return v ? undefined : 'Seleccione un tipo de documento';
+      case 'numeroDocumento':
+        return validateDocumentNumber(v, data.tipoDocumento);
+      case 'telefono':
+        if (!v) return 'Teléfono es requerido';
+        return /^\d{7,15}$/.test(v) ? undefined : 'Teléfono inválido (solo dígitos, 7-15)';
+      case 'fechaNacimiento':
+        return v ? undefined : 'Fecha de nacimiento es requerida';
+      default:
+        return undefined;
+    }
+  };
+
+  const validateCredentialField = (name, v, data) => {
+    switch (name) {
+      case 'correo':
+        if (!v) return 'Correo es requerido';
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? undefined : 'Correo inválido';
+      case 'password':
+        return validatePassword(v);
+      case 'confirmPassword':
+        return v === (data.password || '') ? undefined : 'Las contraseñas no coinciden';
+      default:
+        return undefined;
+    }
+  };
+
+  // Valida un único campo en base a su nombre y devuelve mensaje de error o undefined
+  const validateField = (name, value, allValues) => {
+    const v = (value || '').toString().trim();
+    const data = allValues || formData;
+    // Campos personales
+    const personalFields = ['nombre', 'apellido', 'tipoDocumento', 'numeroDocumento', 'telefono', 'fechaNacimiento'];
+    const credentialFields = ['correo', 'password', 'confirmPassword'];
+    if (personalFields.includes(name)) return validatePersonalField(name, v, data);
+    if (credentialFields.includes(name)) return validateCredentialField(name, v, data);
+    return undefined;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Las contraseñas no coinciden");
-      return;
-    }
+    // validar el paso 2 antes de enviar
+    if (!validateStep(2)) return;
     try {
       // Llama al servicio de registro
       await signupService.signup({
@@ -62,14 +143,51 @@ const Registro = () => {
   const prevStep = () => {
     setCurrentStep(currentStep - 1);
   };
-  const validateStep = (step) => {
-    if (step === 1) {
-      return formData.nombre && formData.apellido && formData.tipoDocumento &&
-        formData.numeroDocumento && formData.telefono;
-    } else {
-      alert("Por favor, complete todos los campos requeridos en el paso actual.");
+  const validatePersonal = () => {
+    const newErrors = {};
+    if (!formData.nombre || !formData.nombre.trim()) newErrors.nombre = 'Nombre es requerido';
+    if (!formData.apellido || !formData.apellido.trim()) newErrors.apellido = 'Apellido es requerido';
+    if (!formData.tipoDocumento) newErrors.tipoDocumento = 'Seleccione un tipo de documento';
+
+    const num = (formData.numeroDocumento || '').trim();
+    if (!num) {
+      newErrors.numeroDocumento = 'Número de documento es requerido';
+    } else if (formData.tipoDocumento === 'Pasaporte') {
+      if (!/^[A-Za-z0-9]{5,20}$/.test(num)) newErrors.numeroDocumento = 'Pasaporte inválido (5-20 caracteres alfanuméricos)';
+    } else if (!/^\d{6,15}$/.test(num)) {
+      newErrors.numeroDocumento = 'Número inválido (solo dígitos, 6-15)';
     }
-    return true;
+
+    const tel = (formData.telefono || '').trim();
+    if (!tel) {
+      newErrors.telefono = 'Teléfono es requerido';
+    } else if (!/^\d{7,15}$/.test(tel)) {
+      newErrors.telefono = 'Teléfono inválido (solo dígitos, 7-15)';
+    }
+
+    return newErrors;
+  };
+
+  const validateCredentials = () => {
+    const newErrors = {};
+    if (!formData.correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo)) newErrors.correo = 'Correo inválido';
+    const pwd = formData.password || '';
+    const pwdProblems = [];
+    if (pwd.length < 8) pwdProblems.push('al menos 8 caracteres');
+    if (!/[A-Z]/.test(pwd)) pwdProblems.push('una mayúscula');
+    if (!/[a-z]/.test(pwd)) pwdProblems.push('una minúscula');
+    if (!/\d/.test(pwd)) pwdProblems.push('un número');
+    if (pwdProblems.length) newErrors.password = 'Contraseña debe contener: ' + pwdProblems.join(', ');
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    return newErrors;
+  };
+
+  const validateStep = (step) => {
+    let newErrors = {};
+    if (step === 1) newErrors = validatePersonal();
+    if (step === 2) newErrors = validateCredentials();
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
   const progressPercentage = (currentStep / 3) * 100;
 
@@ -105,15 +223,17 @@ const Registro = () => {
                     <label htmlFor="nombre">Nombre</label>
                     <div className="input-group-registro">
                       <FaUser className="input-icon" />
-                      <input type="text" name="nombre" placeholder="Ingrese su nombre" required onChange={handleChange} />
+                      <input type="text" name="nombre" placeholder="Ingrese su nombre" required onChange={handleChange} value={formData.nombre} />
                     </div>
+                    {errors.nombre && <div className="field-error">{errors.nombre}</div>}
                   </div>
                   <div className="form-group-registro">
                     <label htmlFor="apellido">Apellido</label>
                     <div className="input-group-registro">
                       <FaUser className="input-icon" />
-                      <input type="text" name="apellido" placeholder="Ingrese su apellido" required onChange={handleChange} />
+                      <input type="text" name="apellido" placeholder="Ingrese su apellido" required onChange={handleChange} value={formData.apellido} />
                     </div>
+                    {errors.apellido && <div className="field-error">{errors.apellido}</div>}
                   </div>
                 </div>
                 <div className='form-row-registro'>
@@ -125,7 +245,7 @@ const Registro = () => {
                         name="tipoDocumento"
                         required
                         onChange={handleChange}
-                        defaultValue=""
+                        value={formData.tipoDocumento}
                       >
                         <option value="">Seleccione...</option>
                         <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
@@ -134,28 +254,31 @@ const Registro = () => {
                         <option value="Tarjeta de identidad">Tarjeta de identidad</option>
                       </select>
                     </div>
+                    {errors.tipoDocumento && <div className="field-error">{errors.tipoDocumento}</div>}
                   </div>
 
                   <div className="form-group-registro">
                     <label htmlFor="numeroDocumento">Numero De Documento </label>
                     <div className="input-group-registro">
                       <FaHashtag className="input-icon" />
-                      <input type="text" name="numeroDocumento" placeholder="Ingrese su Documneto " required onChange={handleChange} />
+                      <input type="text" name="numeroDocumento" placeholder="Ingrese su Documneto " required onChange={handleChange} value={formData.numeroDocumento} />
                     </div>
+                    {errors.numeroDocumento && <div className="field-error">{errors.numeroDocumento}</div>}
                   </div>
 
                   <div className='form-group-registro'>
                     <label htmlFor="telefono">Teléfono</label>
                     <div className="input-group-registro">
                       <FaUser className="input-icon" />
-                      <input type="text" name="telefono" placeholder="Ingrese su teléfono" required onChange={handleChange} />
+                      <input type="text" name="telefono" placeholder="Ingrese su teléfono" required onChange={handleChange} value={formData.telefono} />
                     </div>
+                    {errors.telefono && <div className="field-error">{errors.telefono}</div>}
                   </div>
                   <div className="form-group-registro">
                     <label htmlFor="fechaNacimiento">Fecha de Nacimiento</label>
                     <div className="input-group-registro">
                       <FaUser className="input-icon" />
-                      <input type="date" name="fechaNacimiento" required onChange={handleChange} />
+                      <input type="date" name="fechaNacimiento" required onChange={handleChange} value={formData.fechaNacimiento} />
                     </div>
                   </div>
 
@@ -173,21 +296,23 @@ const Registro = () => {
                   <label htmlFor="correo">Correo Electrónico</label>
                   <div className="input-group-registro">
                     <FaEnvelope className="input-icon" />
-                    <input type="correo" name="correo" placeholder="Ingrese su correo electrónico" required onChange={handleChange} />
+                    <input type="email" name="correo" placeholder="Ingrese su correo electrónico" required onChange={handleChange} value={formData.correo} />
                   </div>
+                  {errors.correo && <div className="field-error">{errors.correo}</div>}
                 </div>
 
                 <div className="form-group-registro">
                   <label htmlFor="password">Contraseña</label>
                   <div className="input-group-registro">
                     <FaLock className="input-icon" />
-                    <input type={showPassword ? "text": "password"} name="password" placeholder="Ingrese su contraseña" required onChange={handleChange} />
+                    <input type={showPassword ? "text": "password"} name="password" placeholder="Ingrese su contraseña" required onChange={handleChange} value={formData.password} />
                     <button type="button"
                       className="toggle-password"
                       onClick={() => setShowPassword(!showPassword)} >
                       <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
                     </button>
                   </div>
+                  {errors.password && <div className="field-error">{errors.password}</div>}
                   <small className="password-hint">
                     Mínimo 8 caracteres, incluya mayúsculas, minúsculas y números
                   </small>
@@ -196,13 +321,14 @@ const Registro = () => {
                   <label htmlFor="confirmPassword">Confirmar Contraseña</label>
                   <div className="input-group-registro">
                     <FaLock className="input-icon" />
-                    <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="Reingrese su contraseña" required onChange={handleChange} />
+                    <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="Reingrese su contraseña" required onChange={handleChange} value={formData.confirmPassword} />
                       <button type="button"
                       className="toggle-password"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)} >
                       <i className={showConfirmPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
                     </button>
                   </div>
+                  {errors.confirmPassword && <div className="field-error">{errors.confirmPassword}</div>}
                 </div>
               </div>
             )}

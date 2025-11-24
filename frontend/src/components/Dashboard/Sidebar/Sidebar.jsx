@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Users,
-    Settings,
     BarChart3,
     Calendar,
     Home,
@@ -37,8 +36,7 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
             section: "PRINCIPAL",
             items: [
                 { id: "dashboard", icon: Activity, label: "Dashboard", color: "text-blue-500", bg: "bg-blue-50", iconColor: "text-blue-600" },
-                { id: "usuarios", icon: Users, label: "Usuarios", color: "text-purple-500", bg: "bg-purple-50", iconColor: "text-purple-600" },
-                { id: "configuracion", icon: Settings, label: "Configuración", color: "text-gray-500", bg: "bg-gray-50", iconColor: "text-gray-600" },
+                { id: "usuarios", icon: Users, label: "Usuarios", color: "text-purple-500", bg: "bg-purple-50", iconColor: "text-purple-600" }
             ]
         },
         {
@@ -107,7 +105,7 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
                                             <li key={item.id} style={{ animationDelay: `${(sectionIndex * 4 + itemIndex) * 0.05}s` }}>
                                                 <button
                                                     onClick={() => {
-                                                        if (["dashboard", "usuarios", "categorizacion", "programas-academicos", "solicitudes", "inscripciones", "certificaciones", "tareas", "cabanas", "reservas", "reportes", "eventos"].includes(item.id)) {
+                                                        if (["dashboard", "usuarios","configuracion", "categorizacion", "programas-academicos", "solicitudes", "inscripciones", "certificaciones", "tareas", "cabanas", "reservas", "reportes", "eventos"].includes(item.id)) {
                                                             navigate(`/admin/${item.id}`);
                                                         }
                                                         setSeccionActiva(item.id);

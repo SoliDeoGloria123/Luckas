@@ -1,14 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-import { Menu, Search, Sun, Moon } from 'lucide-react';
-import { useTheme } from '../hooks/useTheme';
+import { Menu, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import NotificationButton from '../Shared/NotificationButton';
 
 
 
 const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard", onCerrarSesion: onCerrarSesionProp }) => {
-  const { toggleTema, esTemaOscuro } = useTheme();
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const [mostrarMenu, setMostrarMenu] = useState(false);
@@ -64,7 +62,8 @@ const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard"
 
   return (
     <header
-      className="glass-card border-b px-6 py-4 sticky top-0 z-20" style={{ borderColor: 'var(--border-color)' }}
+      className="glass-card no-lift border-b px-6 py-4 sticky top-0 z-20"
+      style={{ borderColor: 'var(--border-color)' }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -95,20 +94,7 @@ const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard"
             />
           </div>
 
-          {/* Toggle de tema */}
-          <button
-            onClick={toggleTema}
-            className="p-2 rounded-xl glass-card transition-all duration-300 icon-bounce"
-            style={{ color: 'var(--text-secondary)' }}
-            title={`Cambiar a modo ${esTemaOscuro ? 'claro' : 'oscuro'}`}
-          >
-            {esTemaOscuro ? (
-              <Sun className="w-5 h-5" />
-            ) : (
-              <Moon className="w-5 h-5" />
-            )}
-          </button>
-
+         
           {/* Notifications con sistema de notificaciones */}
           <NotificationButton 
             token={localStorage.getItem('token')} 
@@ -134,9 +120,6 @@ const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard"
 
             {mostrarMenu && (
               <div className="absolute right-0 mt-2 w-48 glass-card rounded-xl shadow-xl border border-white/20 py-2 z-50 fade-in-up">
-                <button className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-100/80 transition-colors">
-                  Configuración
-                </button>
                 <button className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-100/80 transition-colors" onClick={perfil}>
                   Perfil
                 </button>

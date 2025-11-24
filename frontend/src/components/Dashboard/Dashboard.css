@@ -7,7 +7,7 @@
 
 @layer base {
   :root {
-    --color-blue-principal: #2563eb;
+     --color-blue-principal: #2563eb;
     /* Azul Principal */
     --color-blue-oscuro: #1d4ed8;
     /* Azul Oscuro */
@@ -260,6 +260,88 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+/* Dashboard visual refinements appended */
+.stat-number {
+  font-size: 1.9rem;
+  color: var(--text-primary);
+}
+
+.usuarios-recientes-list li,
+.recientes-list li {
+  padding: 0.45rem 0.25rem;
+  border-bottom: 1px dashed rgba(0,0,0,0.04);
+  transition: all 160ms ease;
+}
+
+.usuarios-recientes-list .w-10,
+.avatar-small {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+/* Avatar gradient for nicer look */
+.avatar-gradient {
+  background: linear-gradient(135deg, #6d28d9 0%, #2563eb 50%, #06b6d4 100%);
+  box-shadow: 0 6px 18px rgba(37,99,235,0.12);
+}
+
+/* Card header with actions */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 6px 10px;
+  background: rgba(37,99,235,0.08);
+  color: var(--color-blue-principal);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid rgba(37,99,235,0.12);
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.card-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37,99,235,0.12);
+  background: linear-gradient(90deg,#2563eb22,#8b5cf622);
+}
+
+/* List hover and accent */
+.usuarios-recientes-list li:hover,
+.recientes-list li:hover {
+  background: rgba(255,255,255,0.03);
+  transform: translateY(-2px);
+}
+
+.recientes-list li {
+  border-left: 3px solid transparent;
+  padding-left: 0.75rem;
+}
+
+.recientes-list li:hover {
+  border-left-color: rgba(37,99,235,0.18);
+}
+
+/* Responsive tweak to ensure lists stack nicely on small screens */
+@media (max-width: 900px) {
+  .grid.grid-cols-1.md\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .glass-card {
@@ -398,7 +480,52 @@
     Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFang SC",
     "Hiragino Sans GB", "Microsoft Yahei UI", "Microsoft Yahei",
     "Source Han Sans CN", sans-serif;
+
+  /* Estilos para el input de contraseña y el icono dentro */
 }
+
+/* Password input with eye inside (Dashboard scope) */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+.password-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 2.6rem; /* espacio para el icono dentro */
+}
+.password-toggle-admin {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 0.25rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b; /* gris suave similar al diseño */
+  border-radius: 4px;
+  transition: var(--transition, color 150ms ease);
+  z-index: 2;
+}
+.password-toggle-admin i {
+  font-size: 1rem;
+  line-height: 1;
+}
+.password-toggle-admin:focus {
+  outline: none;
+  box-shadow: none;
+}
+.password-toggle-admin:hover { color: var(--primary-blue, #374151); }
+@media (max-width: 420px) {
+  .password-input { padding-right: 2.2rem; }
+  .password-toggle-admin { right: 0.4rem; }
+}
+
 
 
 .logo {
@@ -948,58 +1075,114 @@
   color: var(--color-gray-dark);
 }
 
-/* Badges */
-.badge-rol,
-.badge-estado {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+/* Badges: roles y estados (mejor contraste y diseño) */
+/* Badges base: fondo blanco con punto de color a la izquierda + texto oscuro */
+.badge-rol {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.04);
 }
 
-.rol-admin {
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--color-primary);
+.badge-rol::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--role-color, #64748b);
+  display: inline-block;
 }
 
-.rol-externo {
-  background: rgba(245, 158, 11, 0.1);
-  color: #451a03;
+.badge-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.04);
 }
 
-.rol-tesorero {
-  background: rgba(5, 150, 105, 0.18); /* mayor opacidad para contraste */
-  color: #000000; /* texto negro para garantizar contraste */
+.badge-estado::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--estado-color, #64748b);
+  display: inline-block;
 }
 
-.rol-seminarista {
-  background: rgba(139, 92, 246, 0.18);
-  color: #000000; /* texto negro para garantizar contraste */
+/* Role variants (clases: rol-<role>) */
+.rol-admin { --role-color: #2563eb; }
+.rol-externo { --role-color: #b45309; }
+.rol-tesorero { --role-color: #047857; }
+.rol-seminarista { --role-color: #7c3aed; }
+.rol-na { --role-color: #64748b; }
+
+/* Aplicar color a elementos con clase 'estado-*' usando la variable definida en cada selector */
+[class*="estado-"] {
+  color: var(--estado-color, #334155);
+  font-weight: 700;
 }
 
+/* Estados comunes: definir variable --estado-color que usa .badge-estado::before */
+.estado-inscrito { --estado-color: #059669; }
+.estado-no-inscrito { --estado-color: #94a3b8; }
+.estado-preinscrito { --estado-color: #d97706; }
+.estado-certificado { --estado-color: #2563eb; }
+.estado-pendiente { --estado-color: #6b7280; }
+.estado-revision { --estado-color: #f59e0b; }
+.estado-aprobada { --estado-color: #10b981; }
+.estado-rechazada { --estado-color: #ef4444; }
+
+
+
+.col-actions {
+  width: 96px;
+  text-align: center;
+}
+
+/* Estado variants (clases existentes: estado-*) mejoradas */
+.estado-nueva,
+.estado-nuevo,
 .estado-active,
-.estado-activo {
-  background: #dcfce7;
-  color: #15803d;
-}
+.estado-activo { --estado-color: #059669; }
 
+.estado-pendiente,
 .estado-inactive,
-.estado-inactivo {
-  background: #fee2e2;
-  color: #991b1b;
-}
+.estado-inactivo { --estado-color: #d97706; }
 
+.estado-rechazada,
 .estado-suspended,
-.estado-suspendido {
-  background: #fef3c7;
-  color: #451a03;
+.estado-suspendido { --estado-color: #dc2626; }
+
+/* Celda responsable: ajustar ancho y alineado para mejor legibilidad */
+.responsable-cell {
+  min-width: 170px;
+  max-width: 260px;
+  white-space: normal;
+  vertical-align: middle;
 }
 
 .acciones-botones {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 /* Reports Table */
@@ -1292,23 +1475,7 @@
   opacity: 1;
 }
 
-.password-toggle-admin {
-  position: absolute;
-  right: 3rem;
-  top: 64%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 4px;
-  transition: var(--transition);
-}
-
-.password-toggle-admin:hover {
-  color: var(--primary-blue);
-}
+/* duplicate password-toggle-admin removed (consolidated above) */
 
 .password-strength {
   height: 4px;
@@ -1711,51 +1878,57 @@
   transform: translateY(0);
 }
 
-/* Estilos para indicadores de estado */
-.estado-nueva {
-  color: #007bff;
-  font-weight: bold;
-}
+/* Estilos para indicadores de estado: usan la variable --estado-color definida arriba */
+/* Los colores de estado se aplican vía la variable --estado-color definida en cada selector (ver arriba). */
 
-.estado-revision {
-  color: #d97706;
-  font-weight: bold;
-}
-
-.estado-aprobada {
-  color: #28a745;
-  font-weight: bold;
-}
-
-.estado-rechazada {
-  color: #dc3545;
-  font-weight: bold;
-}
-
-.estado-pendiente {
-  color: #6c757d;
-  font-weight: bold;
-}
-
-.prioridad-alta {
-  color: #dc3545;
-  font-weight: bold;
-}
-
-.prioridad-media {
-  color: #d97706;
-  font-weight: bold;
-}
-
+/* Prioridad: badge con punto de color (coherente con badge-estado) */
+.prioridad-alta,
+.prioridad-media,
 .prioridad-baja {
-  color: #28a745;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  font-weight: 700;
 }
+
+.prioridad-alta::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #dc2626; display: inline-block; }
+.prioridad-media::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #d97706; display: inline-block; }
+.prioridad-baja::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #059669; display: inline-block; }
 
 
 
 /*Estilo de Programas Academicos*/
 /* Estilos para el componente ProgramasAcademicos */
+
+/* Aumentar tamaño y espaciado de badges en la tabla de usuarios */
+/* Mejora de legibilidad para columnas 'Rol' y 'Estado' en la tabla */
+.tabla-usuarios-admin .badge-rol,
+.tabla-usuarios-admin .badge-estado {
+  font-size: 1rem; /* aumentar tamaño de letra */
+  padding: 0.38rem 0.7rem; /* un poco más de espacio interno */
+  border-radius: 9999px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tabla-usuarios-admin td .badge-rol::before,
+.tabla-usuarios-admin td .badge-estado::before {
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+}
+
+.usuario-inactivo-blur td .badge-rol,
+.usuario-inactivo-blur td .badge-estado {
+  opacity: 0.9;
+}
 
 /* Header mejorado de la página */
 .page-header-Academicos {
@@ -3260,6 +3433,15 @@
   transform: translateY(-2px);
   box-shadow: 0 25px 50px -12px var(--shadow-heavy);
   border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Anular lift para headers u otros elementos que no deben moverse al hacer hover */
+.glass-card.no-lift:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  /* mantener el blur igual que en estado normal si se desea */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 /* Responsive breakpoints */

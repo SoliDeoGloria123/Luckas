@@ -225,6 +225,13 @@ tep-header-registro {
   margin-top: 0.25rem;
 }
 
+/* Estilo para errores inline */
+.field-error {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+
 /* Checkboxes */
 .checkbox-group {
   margin: 1.5rem 0;

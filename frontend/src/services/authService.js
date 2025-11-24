@@ -14,14 +14,12 @@ export const signupService = {
 export const authService = {
   login: async (correo, password) => {
     try {
-      console.log('🚀 Enviando petición de login:', { correo, url: `${API_BASE_URL}/auth/signin` });
-      
+    
       const response = await axios.post(`${API_BASE_URL}/auth/signin`, {
         correo,
         password,
       });
-      
-      console.log('✅ Respuesta del servidor:', response.data);
+  
       return response.data;
       
     } catch (error) {
@@ -45,12 +43,19 @@ export const enviarCodigoRecuperacion = {
   },
 };
 
+// Verificar código de recuperación sin cambiar la contraseña
+export const verificarCodigoService = {
+  verificarCodigo: async (correo, code) => {
+    const response = await axios.post(`${API_BASE_URL}/auth/verify-reset-code`, { correo, code });
+    return response.data;
+  }
+};
+
 //cambiar contraseña
 export const cambiarContraseñaService = {
-  cambiarContraseña: async (correo, code, newPassword) => {
+  cambiarContraseña: async (resetToken, newPassword) => {
     const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, {
-      correo,
-      code,
+      resetToken,
       newPassword
     });
     return response.data;

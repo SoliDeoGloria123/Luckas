@@ -16,7 +16,7 @@ const BaseNotificationButton = ({
   const [isOpen, setIsOpen] = useState(false);
   const { unreadCount, fetchUnreadCount } = useNotificationsHook(token, userRole);
 
-  // Abrir/cerrar panel
+  // Abrir/cerrar panel (comportamiento tipo Facebook)
   const togglePanel = () => {
     setIsOpen(prev => !prev);
   };
@@ -64,7 +64,7 @@ const BaseNotificationButton = ({
           type="button"
         >
           <div className={cssClasses.icon}>🔔</div>
-          {unreadCount > 0 && (
+          {unreadCount > 0 && !isOpen && (
             <div className={cssClasses.badge}>{unreadCount > 99 ? '99+' : unreadCount}</div>
           )}
         </button>

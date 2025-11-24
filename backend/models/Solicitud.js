@@ -32,7 +32,7 @@ const solicitudSchema = new mongoose.Schema({
   },
   modeloReferencia: {
     type: String,
-    enum: ['Eventos', 'Cabana', 'Inscripcion', 'Reserva', 'ProgramaAcademico', 'Comedor'],
+    enum: ['Eventos', 'Cabana', 'Inscripcion',  'ProgramaAcademico'],
     required: function () {
       return this.tipoSolicitud === 'Inscripción' || this.tipoSolicitud === 'Hospedaje';
     }

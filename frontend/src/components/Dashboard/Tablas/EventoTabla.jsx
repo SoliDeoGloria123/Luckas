@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
 import {
   Plus,
   Edit,
@@ -49,17 +48,48 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
           const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
           const imgIndex = imgIndices[evento._id] || 0;
 
-          // Extraer lógica de clase del estado para evitar ternarias anidadas
-          let estadoClass = '';
-          if (evento.estado === 'activo') {
-            estadoClass = 'bg-emerald-500/90 text-white';
-          } else if (evento.estado === 'inactivo') {
-            estadoClass = 'bg-red-500/90 text-white';
-          } else if (evento.estado === 'finalizado') {
-            estadoClass = 'bg-gray-500/90 text-white';
-          } else {
-            estadoClass = 'bg-amber-500/90 text-white';
+          // Helper local para formatear fecha y seguridad de campos
+          const formatFecha = (f) => {
+            if (!f && f !== 0) return '';
+            const str = String(f).trim();
+            // intentar parse estándar
+            const d = new Date(str);
+            if (!Number.isNaN(d.getTime())) return d.toLocaleDateString('es-ES');
+
+            // intentar formatos dd/mm/yyyy o dd-mm-yyyy
+            let sep = null;
+            if (str.includes('/')) {
+              sep = '/';
+            } else if (str.includes('-')) {
+              sep = '-';
+            }
+            if (sep) {
+              const parts = str.split(sep).map(p => p.trim());
+              if (parts.length === 3 && parts[2].length === 4) {
+                const [dd, mm, yyyy] = parts;
+                const reconstructed = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+                const d2 = new Date(reconstructed);
+                if (!Number.isNaN(d2.getTime())) return d2.toLocaleDateString('es-ES');
+              }
+            }
+            return str;
+          };
+
+          const categoriaNombre = (() => {
+            const c = evento.categoria;
+            if (!c) return '';
+            if (typeof c === 'object') return c.nombre || c.title || '';
+            return '';
+          })();
+
+          let etiquetas = [];
+          if (Array.isArray(evento.etiquetas)) {
+            etiquetas = evento.etiquetas;
+          } else if (evento.etiquetas) {
+            etiquetas = String(evento.etiquetas).split(',').map(s => s.trim()).filter(Boolean);
           }
+
+          // (Se eliminó la variable `estadoClass` porque ahora usamos clases inline donde se requiere)
 
           return (
             <div key={evento._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
@@ -111,15 +141,18 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                   <span className="px-3 py-1 bg-white/90 text-slate-800 text-xs font-medium rounded-full">
                     {/*tipoEvento.label*/}
                   </span>
+                  {categoriaNombre && (
+                    <span className="px-3 py-1 bg-indigo-600/90 text-white text-xs font-medium rounded-full">
+                      {categoriaNombre}
+                    </span>
+                  )}
                   {evento.destacado && (
                     <span className="px-3 py-1 bg-yellow-500/90 text-white text-xs font-medium rounded-full flex items-center">
                       <Star className="w-3 h-3 mr-1" />
                       Destacado
                     </span>
                   )}
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClass}`}>
-                    {evento.estado}
-                  </span>
+                  
                 </div>
 
                 {/* Botones de acción */}
@@ -160,10 +193,10 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                   {/* Fechas */}
                   <div className="flex items-center space-x-2 text-sm">
                     <Calendar className="w-4 h-4 text-blue-600" />
-                    <span className="text-slate-600">
-                      {evento.fechaEvento}
+                      <span className="text-slate-600">
+                        {formatFecha(evento.fechaEvento)}
 
-                    </span>
+                      </span>
                   </div>
 
                   {/* Ubicación */}
@@ -195,7 +228,7 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
 
                   <div className="flex items-center space-x-2 text-sm">
                     <Users className="w-4 h-4 text-green-600" />
-                    <span className="text-slate-600">Máximo {evento.cuposDisponibles} participantes</span>
+                    <span className="text-slate-600">Máximo {evento.cuposTotales ?? evento.cuposDisponibles} participantes</span>
                   </div>
 
 
@@ -207,9 +240,14 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                       {evento.precio}
                     </span>
                   </div>
-                  <span className="text-xs">
-                    Estado: {evento.active ? 'Activo' : 'Inactivo'}
-                  </span>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <span className="text-slate-600">Estado:</span>
+                    <span className={`px-3 py-1 text-base font-medium rounded-full shadow-md ${
+                      evento.active ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
+                    }`}>
+                      {evento.active ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </div>
 
 
                   {/* Servicios incluidos */}
@@ -225,6 +263,15 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
                       </span>
                     )}
                   </div>
+                  {etiquetas.length > 0 && (
+                    <div className="pt-2">
+                      <div className="flex flex-wrap gap-2">
+                        {etiquetas.slice(0, 6).map((tag, i) => (
+                          <span key={`tag-${evento._id}-${i}`} className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">#{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Coordinador */}

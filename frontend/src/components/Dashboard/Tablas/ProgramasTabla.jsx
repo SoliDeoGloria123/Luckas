@@ -127,7 +127,7 @@ const ProgramasTabla = ({
                 <div className="flex items-center space-x-2">
                   <Users className="w-4 h-4 text-blue-600" />
                   <span className="text-slate-600">
-                    Max. {programa.capacidadMaxima || 'N/A'}
+                    Disponibles: {programa.cuposDisponibles ?? 'N/A'} / Ocupados: {programa.cuposOcupados ?? 0}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -146,18 +146,30 @@ const ProgramasTabla = ({
                 <div className="flex items-center space-x-2">
                   <Calendar className="w-4 h-4 text-amber-600" />
                   <span className="text-slate-600">
-                    {programa.fechaInicio ? new Date(programa.fechaInicio).toLocaleDateString() : 'Por definir'}
+                    {programa.fechaInicio ? formatearFecha(programa.fechaInicio) : 'Por definir'}
+                    {programa.fechaFin ? ` — ${formatearFecha(programa.fechaFin)}` : ''}
                   </span>
                 </div>
               </div>
-
-              {programa.instructor && (
-                <div className="pt-3 border-t border-slate-200/50">
-                  <p className="text-sm text-slate-600">
-                    <span className="font-medium">Instructor:</span> {programa.instructor}
-                  </p>
-                </div>
-              )}
+              <div className="pt-3 border-t border-slate-200/50">
+                <p className="text-sm text-slate-600">
+                  <span className="font-medium">Profesor:</span> {programa.profesor || '—'}
+                </p>
+                <p className="text-sm text-slate-600">
+                  <span className="font-medium">Modalidad:</span> {programa.modalidad || '—'}
+                </p>
+                <p className="text-sm text-slate-600">
+                  <span className="font-medium">Nivel:</span> {programa.nivel || '—'}</p>
+                <p className="text-sm text-slate-600">
+                  <span className="font-medium">Inscripciones:</span> {Array.isArray(programa.inscripciones) ? programa.inscripciones.length : 0}
+                </p>
+                {programa.certificacion && (
+                  <p className="text-sm mt-2 inline-block px-2 py-1 rounded bg-blue-100 text-blue-800">Certificación disponible</p>
+                )}
+                {programa.destacado && (
+                  <p className="text-sm mt-2 inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 ml-2">Destacado</p>
+                )}
+              </div>
             </div>
           </div>
         ))

@@ -9,7 +9,10 @@ const handleResponse = async (response) => {
   }
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error en la petición");
+    const err = new Error(errorData.message || "Error en la petición");
+    // Adjuntar detalles del error (por ejemplo validaciones) para que el frontend pueda mostrarlos
+    err.details = errorData;
+    throw err;
   }
   return response.json();
 };

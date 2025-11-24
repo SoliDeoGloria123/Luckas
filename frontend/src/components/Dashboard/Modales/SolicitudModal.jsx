@@ -11,7 +11,12 @@ const SolicitudModal = ({
   setNuevaSolicitud,
   onClose,
   onSubmit,
-  categorias
+  categorias,
+  eventos = [],
+  cabanas = [],
+  reservas = [],
+  programasAcademicos = [],
+  obtenerReferencias
 }) => {
   const [cedulaBusqueda, setCedulaBusqueda] = useState("");
   const [cargandoUsuario, setCargandoUsuario] = useState(false);
@@ -66,12 +71,71 @@ const SolicitudModal = ({
 
   const getFieldValue = (fieldName) => {
     const { data } = getSolicitudData();
-    return data?.[fieldName] || '';
+    const raw = data?.[fieldName];
+    // Normalizar categoría: si viene como objeto poblado devolver su id
+    if (fieldName === 'categoria') {
+      if (!raw && raw !== 0) return '';
+      if (typeof raw === 'object') return raw._id || raw.id || '';
+      return raw;
+    }
+    return raw || '';
   };
 
   const handleFieldChange = (fieldName, value) => {
     const { setData } = getSolicitudData();
-    setData(prevData => ({ ...prevData, [fieldName]: value }));
+    
+    if (fieldName === 'modeloReferencia' && !modoEdicion) {
+      // Limpiar referencia y categoría al cambiar modelo
+      setData(prevData => ({ 
+        ...prevData, 
+        [fieldName]: value,
+        referencia: '',
+        categoria: ''
+      }));
+      // Obtener referencias según el modelo seleccionado
+      if (obtenerReferencias) {
+        obtenerReferencias(value);
+      }
+    } else if (fieldName === 'referencia' && !modoEdicion) {
+      // Asignar categoría automáticamente según la referencia
+      const modelo = getFieldValue('modeloReferencia');
+      let referenciaSeleccionada = null;
+      let categoriaAsignada = '';
+      
+      
+      
+      switch (modelo) {
+        case 'Eventos':
+          referenciaSeleccionada = eventos.find(item => item._id === value);
+         
+          categoriaAsignada = referenciaSeleccionada?.categoria?._id || referenciaSeleccionada?.categoria || '';
+          break;
+        case 'Cabana':
+          referenciaSeleccionada = cabanas.find(item => item._id === value);
+         
+          categoriaAsignada = referenciaSeleccionada?.categoria?._id || referenciaSeleccionada?.categoria || '';
+          break;
+        case 'Reserva':
+          referenciaSeleccionada = reservas.find(item => item._id === value);
+          // Las reservas pueden no tener categoría directa
+          categoriaAsignada = referenciaSeleccionada?.categoria?._id || referenciaSeleccionada?.categoria || '';
+          break;
+        case 'ProgramaAcademico':
+          referenciaSeleccionada = programasAcademicos.find(item => item._id === value);
+          categoriaAsignada = referenciaSeleccionada?.categoria?._id || referenciaSeleccionada?.categoria || '';
+          break;
+        default:
+          break;
+      }
+      
+      setData(prevData => ({ 
+        ...prevData, 
+        [fieldName]: value,
+        categoria: categoriaAsignada
+      }));
+    } else {
+      setData(prevData => ({ ...prevData, [fieldName]: value }));
+    }
   };
 
   // Detectar pegado en el campo de cédula SOLO en modo creación
@@ -202,7 +266,7 @@ const SolicitudModal = ({
     if (tipoSolicitud === 'Inscripción') {
       options.push(
         { value: 'Eventos', label: 'Eventos' },
-        { value: 'ProgramaTecnico', label: 'Programa Técnico' }
+        { value: 'ProgramaAcademico', label: 'Programa Académico' }
       );
     } else if (tipoSolicitud === 'Hospedaje') {
       options.push(
@@ -215,16 +279,48 @@ const SolicitudModal = ({
     return options;
   };
 
+  // Función para obtener opciones de referencia según el modelo
+  const getReferenciaOptions = (modelo) => {
+    
+    switch (modelo) {
+      case 'Eventos':
+      
+        return (eventos || []).map(evento => ({ 
+          value: evento._id, 
+          label: evento.nombre || evento.titulo || `Evento ${evento._id}`
+        }));
+      case 'Cabana':
+       
+        return (cabanas || []).map(cabana => ({ 
+          value: cabana._id, 
+          label: cabana.nombre || `Cabaña ${cabana._id}`
+        }));
+      case 'Reserva':
+        
+        return (reservas || []).map(reserva => ({ 
+          value: reserva._id, 
+          label: reserva.nombre || `Reserva ${reserva._id}` // O el campo que identifique la reserva
+        }));
+      case 'ProgramaAcademico':
+       
+        return (programasAcademicos || []).map(programa => ({ 
+          value: programa._id, 
+          label: programa.nombre || programa.titulo || `Programa ${programa._id}`
+        }));
+      default:
+       
+        return [];
+    }
+  };
+
   const tipoSolicitudOptions = [
     { value: 'Inscripción', label: 'Inscripción' },
     { value: 'Hospedaje', label: 'Hospedaje' },
-    { value: 'Alimentación', label: 'Alimentación' },
     { value: 'Otra', label: 'Otra' }
   ];
 
-  // Debug para ver qué datos llegan
-  console.log("CATEGORIAS RECIBIDAS EN MODAL:", categorias);
-  
+
+
   const categoriaOptions = categorias ? categorias.map(cat => ({ value: cat._id, label: cat.nombre })) : [];
 
   if (!mostrar) return null;
@@ -272,7 +368,26 @@ const SolicitudModal = ({
                 )}
               </div>
             )}
-            {renderInputField('solicitante', 'Solicitante (ID)', 'text', false, 'ID del solicitante')}
+            {/* Solicitante: en modo edición mostrar nombre/ID en readonly; en creación permitir búsqueda por cédula arriba */}
+            {modoEdicion ? (
+              <div className="form-grupo-admin">
+                <label htmlFor="solicitante">Solicitante:</label>
+                <div style={{ padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '6px', border: '1px solid #e6e6e6' }}>
+                  {(() => {
+                    const val = getFieldValue('solicitante');
+                    if (!val) return '—';
+                    // Si el solicitante viene como objeto poblado, mostrar nombre y cedula/email si existen
+                    if (typeof val === 'object') {
+                      return `${val.nombre || val.nombreCompleto || ''}${val.apellido ? ' ' + val.apellido : ''}${val._id ? ' (' + val._id + ')' : ''}`.trim();
+                    }
+                    // Si es string (id), mostrar id pero intentar mantener legible
+                    return String(val);
+                  })()}
+                </div>
+              </div>
+            ) : (
+              renderInputField('solicitante', 'Solicitante (ID)', 'text', false, 'ID del solicitante')
+            )}
           </div>
           {renderInputField('titulo', 'Título de la Solicitud', 'text', true, 'Título descriptivo de la solicitud')}
           <div className="from-grid-admin">
@@ -316,24 +431,29 @@ const SolicitudModal = ({
                 </select>
               </div>
             )}
-            {renderSelectField('categoria', 'Categoría', categoriaOptions, true)}
 
-            {/* Input dinámico para referencia (evento, programa, etc.) */}
-            {getFieldValue('tipoSolicitud') === 'Inscripción' && getFieldValue('modeloReferencia') === 'Eventos' && getFieldValue('categoria') && (
+            {/* Campo de referencia dinámico */}
+            {!modoEdicion && getFieldValue('modeloReferencia') && (
               <div className="form-grupo-admin">
-                <label htmlFor="referenciaNuevo">Evento:</label>
-                <input
+                <label htmlFor="referenciaNuevo">Referencia:</label>
+                <select
                   id="referenciaNuevo"
-                  type="text"
                   value={getFieldValue('referencia')}
                   onChange={e => handleFieldChange('referencia', e.target.value)}
-                  placeholder="ID o nombre del evento"
                   required
-                />
+                >
+                  <option value="">Seleccione...</option>
+                  {getReferenciaOptions(getFieldValue('modeloReferencia')).map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
               </div>
             )}
-            {/* Puedes agregar más condiciones para otros modelos de referencia aquí */}
-          </div>
+            
+            {renderSelectField('categoria', 'Categoría', categoriaOptions, true)}
+
+           
+                     </div>
           <div className="from-grid-admin">
             {renderInputField('descripcion', 'Descripción', 'text', true, 'Descripción')}
             {renderSelectField('estado', 'Estado', [
@@ -419,7 +539,12 @@ SolicitudModal.propTypes = {
   categorias: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string,
     nombre: PropTypes.string
-  })).isRequired
+  })).isRequired,
+  eventos: PropTypes.arrayOf(PropTypes.object),
+  cabanas: PropTypes.arrayOf(PropTypes.object),
+  reservas: PropTypes.arrayOf(PropTypes.object),
+  programasAcademicos: PropTypes.arrayOf(PropTypes.object),
+  obtenerReferencias: PropTypes.func
 };
 
 export default SolicitudModal;

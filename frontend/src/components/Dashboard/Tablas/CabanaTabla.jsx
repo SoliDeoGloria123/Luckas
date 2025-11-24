@@ -4,7 +4,6 @@ import {
   Plus,
   Edit,
   Trash2,
-  Search,
   Home,
   Users,
   Wifi,
@@ -19,9 +18,9 @@ import {
 } from 'lucide-react';
 
 
-const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, setNuevaCabana, onVerDetalle }) => {
+const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, onVerDetalle }) => {
 
-  const [filtros, setFiltros] = useState({ busqueda: '', tipo: 'todos', estado: 'todos' });
+  // Se reciben `cabanas` ya filtradas desde el padre; no mantener `setFiltros` aquí
   const cargando = false;
   const [imgIndices, setImgIndices] = useState({});
 
@@ -46,15 +45,8 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
   ];
 
 
-  const cabanasFiltradas = cabanas.filter(cabana => {
-    const cumpleBusqueda = cabana.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
-      cabana.ubicacion?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
-      cabana.tipo?.toLowerCase().includes(filtros.busqueda.toLowerCase());
-    const cumpleTipo = filtros.tipo === 'todos' || cabana.tipo === filtros.tipo;
-    const cumpleEstado = filtros.estado === 'todos' || cabana.estado === filtros.estado;
-
-    return cumpleBusqueda && cumpleTipo && cumpleEstado;
-  });
+  // Si el padre ya aplicó filtros/paginación, usamos la lista tal cual
+  const cabanasFiltradas = Array.isArray(cabanas) ? cabanas : [];
 
   const formatearPrecio = (precio) => {
     return new Intl.NumberFormat('es-CO', {
@@ -97,6 +89,16 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
         }));
       };
 
+      // Extraer lógica de datos desde el modelo (compatibilidad con campos anteriores)
+      const capacidad = cabana.capacidad ?? cabana.capacidadMaxima ?? null;
+      const precio = cabana.precio ?? cabana.precioPorNoche ?? null;
+      const categoria = cabana.categoria && typeof cabana.categoria === 'object'
+        ? (cabana.categoria.nombre || cabana.categoria.name || '')
+        : (cabana.categoria || '');
+      const creadoPor = cabana.creadoPor && typeof cabana.creadoPor === 'object'
+        ? (cabana.creadoPor.nombre || cabana.creadoPor.name || cabana.creadoPor.email || '')
+        : (cabana.creadoPor || '');
+
       // Extraer lógica de clase del estado para evitar ternarias anidadas
       let estadoClass = '';
       if (cabana.estado === 'disponible') {
@@ -108,6 +110,24 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
       } else {
         estadoClass = 'bg-gray-500/90 text-white';
       }
+
+      // Lógica de visualización simple para la disponibilidad (mapa para evitar reasignaciones redundantes)
+      const estadoVisual = {
+        disponible: {
+          cls: 'text-emerald-600',
+          node: (<><Check className="w-4 h-4 mr-1" /> Disponible</>)
+        },
+        ocupada: {
+          cls: 'text-red-600',
+          node: (<><X className="w-4 h-4 mr-1" /> Ocupada</>)
+        },
+        mantenimiento: {
+          cls: 'text-amber-600',
+          node: (<><X className="w-4 h-4 mr-1" /> En mantenimiento</>)
+        }
+      };
+
+      const { cls: disponibilidadClass, node: disponibilidadNode } = estadoVisual[cabana.estado] || { cls: 'text-red-600', node: (<><X className="w-4 h-4 mr-1" /> No disponible</>) };
 
       return (
         <div key={cabana._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
@@ -166,7 +186,7 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
                 </span>
               )}
               <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClass}`}>
-                {cabana.estado}
+                {cabana.estado || '—'}
               </span>
             </div>
 
@@ -208,7 +228,7 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
               <div className="flex items-center space-x-4 text-sm">
                 <div className="flex items-center space-x-1">
                   <Users className="w-4 h-4 text-blue-600" />
-                  <span className="text-slate-600">Hasta {cabana.capacidadMaxima} personas</span>
+                  <span className="text-slate-600">Hasta {capacidad ?? '—'} personas</span>
                 </div>
                 {cabana.numeroCuartos && (
                   <div className="flex items-center space-x-1">
@@ -228,11 +248,11 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
 
               {/* Precios */}
               <div className="space-y-1">
-                {cabana.precioPorNoche && (
+                {precio != null && (
                   <div className="flex items-center space-x-2 text-sm">
                     <DollarSign className="w-4 h-4 text-emerald-600" />
                     <span className="font-semibold text-emerald-600">
-                      {formatearPrecio(cabana.precioPorNoche)} / noche
+                      {formatearPrecio(precio)}{(cabana.precio || cabana.precioPorNoche) ? ' / noche' : ''}
                     </span>
                   </div>
                 )}
@@ -241,6 +261,18 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
                     <span className="text-slate-600">
                       {formatearPrecio(cabana.precioPorPersona)} / persona
                     </span>
+                  </div>
+                )}
+                {categoria && (
+                  <div className="flex items-center space-x-2 text-sm">
+                    <span className="text-slate-500 italic">Categoría:</span>
+                    <span className="text-slate-700 font-medium">{categoria}</span>
+                  </div>
+                )}
+                {creadoPor && (
+                  <div className="flex items-center space-x-2 text-sm">
+                    <span className="text-slate-500 italic">Creado por:</span>
+                    <span className="text-slate-700">{creadoPor}</span>
                   </div>
                 )}
               </div>
@@ -263,16 +295,12 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
                 )}
               </div>
 
-              {/* Disponibilidad */}
+              {/* Disponibilidad (usando campo `estado` del modelo) */}
               <div className="pt-3 border-t border-slate-200/50">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-600">Disponibilidad:</span>
-                  <span className={`flex items-center text-sm font-medium ${cabana.disponibilidad ? 'text-emerald-600' : 'text-red-600'}`}>
-                    {cabana.disponibilidad ? (
-                      <><Check className="w-4 h-4 mr-1" /> Disponible</>
-                    ) : (
-                      <><X className="w-4 h-4 mr-1" /> No Disponible</>
-                    )}
+                  <span className={`flex items-center text-sm font-medium ${disponibilidadClass}`}>
+                    {disponibilidadNode}
                   </span>
                 </div>
               </div>
@@ -300,47 +328,6 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
 
   return (
     <>
-      <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Buscar cabañas..."
-              value={filtros.busqueda}
-              onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
-              className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            />
-          </div>
-
-          <select
-            value={filtros.tipo}
-            onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
-            className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-          >
-            <option value="todos">Todos los tipos</option>
-            {tiposCabanas.map(tipo => (
-              <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
-            ))}
-          </select>
-
-          <select
-            value={filtros.estado}
-            onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
-            className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-          >
-            <option value="todos">Todos los estados</option>
-            <option value="disponible">Disponible</option>
-            <option value="ocupada">Ocupada</option>
-            <option value="mantenimiento">Mantenimiento</option>
-            <option value="inactiva">Inactiva</option>
-          </select>
-
-          <div className="text-sm text-slate-600 flex items-center">
-            <span className="font-medium">{cabanasFiltradas.length}</span> cabaña(s) encontrada(s)
-          </div>
-        </div>
-      </div>
 
       {/* Lista de Cabañas */}
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -351,32 +338,11 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, nuevaCabana, s
 };
 
 CabanaTabla.propTypes = {
-  cabanas: PropTypes.array.isRequired,
+  cabanas: PropTypes.arrayOf(PropTypes.object).isRequired,
   onEditar: PropTypes.func.isRequired,
   onEliminar: PropTypes.func.isRequired,
   onInsertar: PropTypes.func.isRequired,
-  nuevaCabana: PropTypes.shape({
-    nombre: PropTypes.string,
-    descripcion: PropTypes.string,
-    tipo: PropTypes.string,
-    estado: PropTypes.string,
-    capacidadMaxima: PropTypes.number,
-    numeroCuartos: PropTypes.number,
-    ubicacion: PropTypes.string,
-    precioPorNoche: PropTypes.number,
-    precioPorPersona: PropTypes.number,
-    servicios: PropTypes.array,
-    amenidades: PropTypes.array,
-    imagen: PropTypes.oneOfType([
-      PropTypes.array,
-      PropTypes.string
-    ]),
-    disponibilidad: PropTypes.bool,
-    destacada: PropTypes.bool,
-    _id: PropTypes.string
-  }).isRequired,
-  setNuevaCabana: PropTypes.func.isRequired,
-  onVerDetalle: PropTypes.func.isRequired
+  onVerDetalle: PropTypes.func.isRequired,
 };
 
 export default CabanaTabla;

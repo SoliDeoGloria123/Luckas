@@ -7,7 +7,6 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar, onToggleEstado }) =
     <table className="tabla-usuarios-admin">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Nombre</th>
           <th>Tipo de categoria</th>
           <th>Codigo</th>
@@ -18,12 +17,12 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar, onToggleEstado }) =
       <tbody>
         {categorias.length === 0 ? (
           <tr>
-            <td colSpan={5}>No hay categorías para mostrar</td>
+            <td colSpan={6}>No hay categorías para mostrar</td>
           </tr>
         ) : (
           categorias.map((cat) => (
             <tr key={cat._id}>
-              <td>{cat._id}</td>
+          
               <td>{cat.nombre}</td>
               <td>{cat.tipo}</td>
               <td>{cat.codigo}</td>
@@ -44,9 +43,9 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar, onToggleEstado }) =
                     onClick={() => onToggleEstado(cat)}
                   >
                     {cat.estado === "activo" ? (
-                      <i className="fas fa-ban"></i> // ícono para desactivar
+                      <i className="fas fa-ban"></i>
                     ) : (
-                      <i className="fas fa-check"></i> // ícono para activar
+                      <i className="fas fa-check"></i>
                     )}
                   </button>
                 </div>

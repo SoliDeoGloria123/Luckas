@@ -7,14 +7,13 @@ import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import PropTypes from 'prop-types';
 import "./Dashboard.css";
-import {
-    Search,
-
-} from 'lucide-react';
+import {Search,} from 'lucide-react';
 
 const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp, modoTesorero = false, userRole, readOnly = false, canCreate = true, canEdit = true, canDelete = true }) => {
     const [usuarios, setUsuarios] = useState([]);
     const [busqueda, setBusqueda] = useState("");
+    const [filtroRole, setFiltroRole] = useState("");
+    const [filtroEstado, setFiltroEstado] = useState("");
     const [cargando, setCargando] = useState(true);
     const [mostrarModal, setMostrarModal] = useState(false);
     const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
@@ -38,6 +37,27 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
             }
         }
     }, [usuarioProp]);
+
+    // Helper para extraer mensajes de validación desde error.details
+    const extractFieldMessages = (details) => {
+        const fieldMsgs = [];
+        if (!details) return fieldMsgs;
+        try {
+            const errs = details.errors;
+            if (Array.isArray(errs)) {
+                for (const e of errs) {
+                    fieldMsgs.push(e.msg || e.message || JSON.stringify(e));
+                }
+            } else if (typeof errs === 'object') {
+                for (const v of Object.values(errs)) {
+                    fieldMsgs.push(v);
+                }
+            }
+        } catch (error_) {
+            console.error('Error parsing validation details', error_);
+        }
+        return fieldMsgs;
+    };
 
     const [nuevoUsuario, setNuevoUsuario] = useState({
         nombre: "",
@@ -83,7 +103,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
     const crearUsuario = async (e) => {
         if (e) e.preventDefault();
         try {
-            console.log("Datos enviados al backend:", nuevoUsuario); // <-- Agrega esto
+
             await userService.createUser(nuevoUsuario);
             mostrarAlerta("¡Éxito!", "Usuario creado exitosamente");
             setMostrarModal(false);
@@ -101,7 +121,17 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
             });
             obtenerUsuarios();
         } catch (error) {
-            mostrarAlerta("Error", `Error al crear el usuario: ${error.message}`);
+            // Extraer mensaje útil del error del servidor si existe (userService adjunta .details)
+            const serverMsg = (error && (error.details?.message || error.details?.error)) || error.message || 'Error desconocido';
+            console.error('Error creando usuario:', error, error.details || null);
+            // Si hay detalles de validación por campo, construir mensaje más claro
+            if (error.details && error.details.errors) {
+                const fieldMsgs = extractFieldMessages(error.details);
+                const detailText = fieldMsgs.length ? fieldMsgs.join('; ') : serverMsg;
+                mostrarAlerta("Error", `Error al crear el usuario: ${detailText}`, 'error');
+            } else {
+                mostrarAlerta("Error", `Error al crear el usuario: ${serverMsg}`, 'error');
+            }
         }
     };
 
@@ -143,7 +173,15 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
             }
             obtenerUsuarios();
         } catch (error) {
-            mostrarAlerta("Error", `Error: ${error.message}`);
+            const serverMsg = (error && (error.details?.message || error.details?.error)) || error.message || 'Error desconocido';
+            console.error('Error actualizando usuario:', error, error.details || null);
+            if (error.details && error.details.errors) {
+                const fieldMsgs = extractFieldMessages(error.details);
+                const detailText = fieldMsgs.length ? fieldMsgs.join('; ') : serverMsg;
+                mostrarAlerta("Error", `Error: ${detailText}`, 'error');
+            } else {
+                mostrarAlerta("Error", `Error: ${serverMsg}`, 'error');
+            }
         }
     };
 
@@ -186,12 +224,16 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
 
     // Filtrar usuarios
     const usuariosFiltrados = Array.isArray(usuarios)
-        ? usuarios.filter(
-            (user) =>
-                user.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-                user.correo?.toLowerCase().includes(busqueda.toLowerCase()) ||
-                user.role?.toLowerCase().includes(busqueda.toLowerCase())
-        )
+        ? usuarios.filter((user) => {
+            const texto = busqueda.toLowerCase();
+            const matchBusqueda =
+                user.nombre?.toLowerCase().includes(texto) ||
+                user.correo?.toLowerCase().includes(texto) ||
+                (user.role && String(user.role).toLowerCase().includes(texto));
+            const matchRole = !filtroRole || (user.role && String(user.role) === filtroRole);
+            const matchEstado = !filtroEstado || (user.estado && String(user.estado) === filtroEstado);
+            return matchBusqueda && matchRole && matchEstado;
+        })
         : [];
 
     // Paginación
@@ -314,22 +356,27 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                                 />
                             </div>
                             <div className="flex space-x-3">
-                                <select className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
-                                    <option>Todos los Roles</option>
-                                    <option>Administrador</option>
-                                    <option>Seminarista</option>
-                                    <option>Tesorero</option>
-                                    <option>Usuario Externo</option>
+                                <select
+                                    className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                                    value={filtroRole}
+                                    onChange={(e) => { setFiltroRole(e.target.value); setPaginaActual(1); }}
+                                >
+                                    <option value="">Todos los Roles</option>
+                                    <option value="admin">Administrador</option>
+                                    <option value="seminarista">Seminarista</option>
+                                    <option value="tesorero">Tesorero</option>
+                                    <option value="externo">Usuario Externo</option>
                                 </select>
-                                <select className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
-                                    <option>Todos los Estados</option>
-                                    <option>Activo</option>
-                                    <option>Inactivo</option>
-                                    <option>Pendiente</option>
+                                <select
+                                    className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                                    value={filtroEstado}
+                                    onChange={(e) => { setFiltroEstado(e.target.value); setPaginaActual(1); }}
+                                >
+                                    <option value="">Todos los Estados</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
                                 </select>
-
                             </div>
-
                         </div>
                     </div>
 
@@ -341,11 +388,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
                             onEliminar={eliminarUsuario}
                             onToggleEstado={onToggleEstado}
                         />
-
-
                     </div>
-
-                    {/* Modal */}
 
 
                     {/* Paginación funcional */}

@@ -43,6 +43,9 @@ router.post('/signin', authController.signin);
 // Recuperar contraseña: enviar código al correo
 router.post('/forgot-password', authController.forgotPassword);
 
+// Verificar código de recuperación (no modifica contraseña)
+router.post('/verify-reset-code', authController.verifyResetCode);
+
 // Restablecer contraseña: validar código y cambiar password
 router.post('/reset-password', authController.resetPassword);
 

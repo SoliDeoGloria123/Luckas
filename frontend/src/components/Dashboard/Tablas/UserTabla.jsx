@@ -7,7 +7,6 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar, onToggleEstado }) => (
     <table className="tabla-usuarios-admin">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Nombre</th>
           <th>Apellido</th>
           <th>Correo</th>
@@ -28,7 +27,7 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar, onToggleEstado }) => (
         ) : (
           usuarios.map((user) => (
             <tr key={user._id} className={user.estado === 'inactivo' ? 'usuario-inactivo-blur' : ''}>
-              <td>{user._id}</td>
+      
               <td>
                 <div className="user-info-admin">
                   <div className="user-avatar">{user.nombre?.substring(0, 2).toUpperCase()}</div>

@@ -6,7 +6,6 @@ const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => 
     <table className="tabla-usuarios-admin">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Título</th>
           <th>Descripción</th>
           <th>Estado</th>
@@ -28,7 +27,6 @@ const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => 
         ) : (
           tareas.map((tarea) => (
             <tr key={tarea._id}>
-              <td>{tarea._id}</td>
               <td>{tarea.titulo}</td>
               <td>{tarea.descripcion?.substring(0, 100)}...</td>
               <td>

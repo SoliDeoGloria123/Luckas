@@ -242,32 +242,32 @@ const InscripcionModal = ({
     if (!usuarioEncontrado || !usuarioEncontrado.fechaNacimiento) {
       return { esValida: true, esVacia: !form.edad };
     }
-    
+
     // Si el campo est\u00e1 vac\u00edo, no es error
     if (!form.edad) {
       return { esValida: true, esVacia: true };
     }
-    
+
     try {
       const hoy = new Date();
       const fechaNac = new Date(usuarioEncontrado.fechaNacimiento);
-      
+
       if (Number.isNaN(fechaNac.getTime())) {
         return { esValida: true, esVacia: false };
       }
-      
+
       let edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
       const mes = hoy.getMonth() - fechaNac.getMonth();
       if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
         edadCalculada--;
       }
-      
+
       const edadIngresada = Number.parseInt(form.edad);
       const diferencia = Math.abs(edadCalculada - edadIngresada);
-      
+
       // Permitir una diferencia de +/- 1 a\u00f1o
-      return { 
-        esValida: diferencia <= 1, 
+      return {
+        esValida: diferencia <= 1,
         esVacia: false,
         edadCalculada,
         edadIngresada
@@ -325,38 +325,39 @@ const InscripcionModal = ({
           <button className="modal-cerrar" onClick={onClose}>✕</button>
         </div>
         <form className="modal-body-admin" onSubmit={handleSubmit}>
-          <div className="from-grid-admin">
-            <div className="form-grupo-admin">
-              <label htmlFor="cedula-usuario">Cédula del Usuario:</label>
-              <input
-                id="cedula-usuario"
-                type="text"
-                value={cedulaBusqueda}
-                onChange={handleChangeCedula}
-                onPaste={handlePasteCedula}
-                placeholder="Ingrese o pegue la cédula"
-                style={{ paddingRight: cargandoUsuario ? '40px' : '10px' }}
-                disabled={modo === "editar"}
-              />
-              {modo === "crear" && cargandoUsuario && (
-                <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: '#666' }}>🔄</div>
-              )}
-              {modo === "crear" && usuarioEncontrado && (
-                <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#d4edda', border: '1px solid #c3e6cb', borderRadius: '4px', fontSize: '14px', color: '#155724' }}>
-                  ✅ Usuario encontrado: {usuarioEncontrado.nombre} {usuarioEncontrado.apellido} - {usuarioEncontrado.correo}
+
+          <div className="form-grupo-admin">
+            <label htmlFor="cedula-usuario">Cédula del Usuario:</label>
+            <input
+              id="cedula-usuario"
+              type="text"
+              value={cedulaBusqueda}
+              onChange={handleChangeCedula}
+              onPaste={handlePasteCedula}
+              placeholder="Ingrese o pegue la cédula"
+              style={{ paddingRight: cargandoUsuario ? '40px' : '10px' }}
+              disabled={modo === "editar"}
+            />
+            {modo === "crear" && cargandoUsuario && (
+              <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: '#666' }}>🔄</div>
+            )}
+            {modo === "crear" && usuarioEncontrado && (
+              <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#d4edda', border: '1px solid #c3e6cb', borderRadius: '4px', fontSize: '14px', color: '#155724' }}>
+                ✅ Usuario encontrado: {usuarioEncontrado.nombre} {usuarioEncontrado.apellido} - {usuarioEncontrado.correo}
+              </div>
+            )}
+            {modo === "crear" && cedulaBusqueda && !usuarioEncontrado && !cargandoUsuario && (
+              <>
+                <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
+                  ❌ Usuario no encontrado con esta cédula
                 </div>
-              )}
-              {modo === "crear" && cedulaBusqueda && !usuarioEncontrado && !cargandoUsuario && (
-                <>
-                  <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
-                    ❌ Usuario no encontrado con esta cédula
-                  </div>
-                  <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '4px', fontSize: '14px', color: '#856404' }}>
-                    💡 Puede llenar los campos manualmente para crear una nueva inscripción
-                  </div>
-                </>
-              )}
-            </div>
+                <div style={{ marginTop: '5px', padding: '8px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '4px', fontSize: '14px', color: '#856404' }}>
+                  💡 Puede llenar los campos manualmente para crear una nueva inscripción
+                </div>
+              </>
+            )}
+          </div>
+          <div className="from-grid-admin">
             <div className="form-grupo-admin">
               <label htmlFor="nombre-usuario">
                 Nombre:
@@ -527,10 +528,10 @@ const InscripcionModal = ({
                 ))}
               </select>
             </div>
-            <div className="form-grupo-admin">
-              <label htmlFor="observaciones-referencia">Observaciones:</label>
-              <input id="observaciones-referencia" name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones" />
-            </div>
+          </div>
+          <div className="form-grupo-admin">
+            <label htmlFor="observaciones-referencia">Observaciones:</label>
+            <textarea id="observaciones-referencia" name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones" />
           </div>
           <div className="modal-action-admin">
             <button className="btn-admin secondary-admin" type="button" onClick={onClose}>

@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ModalWrapper from './common/ModalWrapper';
+import { mostrarAlerta } from "../../utils/alertas";
 
 const TareaModal = ({
   mostrar,
@@ -23,12 +24,50 @@ const TareaModal = ({
     }
   };
 
+  // Helper: fecha mínima (hoy) en formato yyyy-mm-dd
+  const getTodayString = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  // Validación local del submit: asegurar fecha límite en futuro (>= hoy)
+  const handleSubmitInternal = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const fecha = getValue('fechaLimite');
+    if (!fecha) {
+      // campo requerido en el form, dejar que el navegador lo valide
+      if (onSubmit) onSubmit(e);
+      return;
+    }
+    try {
+      const fechaSel = new Date(fecha);
+      const hoy = new Date();
+      // normalizar horas a 00:00 para comparar solo fecha
+      fechaSel.setHours(0,0,0,0);
+      hoy.setHours(0,0,0,0);
+      if (fechaSel < hoy) {
+        // Usar mostrarAlerta con título y mensaje para consistencia
+        mostrarAlerta('Error', 'La fecha límite debe ser hoy o en el futuro. Por favor elija una fecha válida.');
+        return;
+      }
+    } catch (err) {
+      console.error('Error validando fecha límite:', err);
+      // si hay error, prevenir submit por seguridad
+      return;
+    }
+
+    if (onSubmit) onSubmit(e);
+  };
+
   return (
     <ModalWrapper
       mostrar={mostrar}
       title={modoEdicion ? "Editar Tarea" : "Crear Nueva Tarea"}
       onClose={onClose}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmitInternal}
       submitLabel={modoEdicion ? 'Guardar Cambios' : 'Crear Tarea'}
       submitIcon="fas fa-save"
     >
@@ -54,6 +93,7 @@ const TareaModal = ({
             value={getValue('fechaLimite') || ''}
             onChange={e => handleChange('fechaLimite', e.target.value)}
             required
+            min={getTodayString()}
           />
         </div>
       </div>

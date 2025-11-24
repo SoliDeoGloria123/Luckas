@@ -5,6 +5,8 @@ const config = require('../config/auth.config');
 const { normalizeTipoDocumento } = require('../utils/userValidation');
 const sendEmail = require('../utils/sendEmail');
 const crypto = require('node:crypto');
+const path = require('node:path');
+const fs = require('node:fs');
 
 
 //roles del sistema 
@@ -17,7 +19,7 @@ const ROLES = {
 
 
 //funcion para vcerificar permisos 
-const checkpermissions = (userRole, requiredRoles) => {
+const checkpermissions  = (userRole, requiredRoles) => {
   return requiredRoles.includes(userRole);
 };
 
@@ -106,7 +108,7 @@ exports.signup = async (req, res) => {
 exports.signin = async (req, res) => {
   try {
     const { correo, password } = req.body;
-    
+
     console.log('[AUTH] Intento de login para:', correo);
 
     // 1. Validación básica
@@ -120,7 +122,7 @@ exports.signin = async (req, res) => {
 
     // 2. Buscar usuario incluyendo el password (que normalmente está oculto)
     const user = await User.findOne({ correo }).select('+password');
-    
+
     console.log('[AUTH] Usuario encontrado:', user ? 'Sí' : 'No');
     if (user) {
       console.log('[AUTH] Correo del usuario:', user.correo);
@@ -229,7 +231,7 @@ exports.updateUser = async (req, res) => {
         filteredUpdates[key] = updates[key];
       }
     };
-    
+
     // Si se actualiza password, hacer hash
     if (updates.password) {
       filteredUpdates.password = bcrypt.hashSync(updates.password, 8);
@@ -256,7 +258,7 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     // Verificar que sea admin
-    if (!checkPermission(req.userRole, [ROLES.ADMIN])) {
+    if (!checkpermissions(req.userRole, [ROLES.ADMIN])) {
       return res.status(403).json({
         success: false,
         message: 'Solo administradores pueden eliminar usuarios'
@@ -303,9 +305,52 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
 
-    // Enviar el código por email
+    // Enviar el código por email: usamos logo adjunto (CID) para asegurar la tipografía
     try {
-      await sendEmail(user.correo, 'Código de recuperación', `Tu código es: ${code}`);
+      const subject = 'Luckas - Código de recuperación';
+      const plainText = `Tu código es: ${code}`;
+
+      // Cabecera tipográfica para el correo: usar Bebas Neue y NO incluir imágenes.
+      let attachments;
+      const headerHtml = `
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+        <div style="text-align:center;margin-bottom:12px;">
+          <h1 style="margin:0 auto;color:#2563eb;font-family:'Bebas Neue', Arial, Helvetica, sans-serif;font-size:56px;font-weight:400;line-height:1;letter-spacing:2px;">LUCKAS</h1>
+          <div style="font-size:13px;color:#64748b;margin-top:6px;font-family:Arial, Helvetica, sans-serif;">Sistema de Gestión Integral</div>
+        </div>`;
+
+      const html = `
+        <div style="font-family: Arial, Helvetica, sans-serif; color:#1f2937;">
+          <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+              <td align="center" style="padding:20px 0;">
+                <div style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;padding:24px;box-shadow:0 6px 18px rgba(16,24,40,0.06);">
+                  ${headerHtml}
+
+                  <div style="border-top:1px solid #eef2ff;padding-top:18px;margin-top:12px;">
+                    <p style="margin:0 0 12px 0;color:#334155;">Hola,</p>
+                    <p style="margin:0 0 18px 0;color:#334155;">Has solicitado recuperar la contraseña. Usa el siguiente código para continuar:</p>
+
+                    <div style="display:inline-block;padding:18px 28px;border-radius:10px;background:linear-gradient(90deg,#eef2ff,#f8fafc);border:1px solid rgba(37,99,235,0.12);margin-bottom:16px;font-weight:700;font-size:28px;letter-spacing:6px;color:#0b1220;">
+                      ${code}
+                    </div>
+
+                    <p style="margin:0;color:#64748b;font-size:13px;">Este código expira en 10 minutos. Si no fuiste tú, ignora este correo.</p>
+
+                    <div style="margin-top:20px;padding-top:18px;border-top:1px dashed #e6edf9;display:flex;gap:12px;align-items:center;">
+                      <div style="font-size:13px;color:#94a3b8;">Equipo Luckas</div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+
+      await sendEmail(user.correo, subject, plainText, html, attachments);
     } catch (err) {
       return res.status(500).json({ message: 'Error al enviar el correo', error: err.message });
     }
@@ -317,8 +362,70 @@ exports.forgotPassword = async (req, res) => {
 };
 
 exports.resetPassword = async (req, res) => {
-  const { correo, code, newPassword } = req.body;
+  const { resetToken, newPassword } = req.body;
   try {
+    // Validar parámetros requeridos
+    if (!resetToken || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Token de restablecimiento y nueva contraseña son requeridos' 
+      });
+    }
+
+    // Verificar y decodificar el token temporal
+    let tokenData;
+    try {
+      tokenData = jwt.verify(resetToken, config.secret);
+      if (tokenData.purpose !== 'password-reset') {
+        throw new Error('Token inválido para este propósito');
+      }
+    } catch (jwtError) {
+      console.warn('[RESET PASSWORD] Error verificando resetToken:', jwtError && jwtError.message ? jwtError.message : jwtError);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Token inválido o expirado' 
+      });
+    }
+
+    // Buscar el usuario por ID del token
+    const user = await User.findById(tokenData.userId);
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Usuario no encontrado' 
+      });
+    }
+
+    // Asignar nueva contraseña (el middleware pre('save') se encarga del hash)
+    user.password = newPassword;
+    user.resetPasswordCode = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    console.log('[RESET PASSWORD] Contraseña actualizada para usuario:', user.correo);
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Contraseña actualizada correctamente' 
+    });
+  } catch (error) {
+    console.error('[AuthController] Error resetPassword:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Error en el servidor', 
+      error: error.message 
+    });
+  }
+};
+
+// Verificar que un código de recuperación sea válido (sin cambiar la contraseña)
+exports.verifyResetCode = async (req, res) => {
+  const { correo, code } = req.body;
+  try {
+    if (!correo || !code) {
+      return res.status(400).json({ success: false, message: 'Correo y código son requeridos' });
+    }
+
     const user = await User.findOne({
       correo,
       resetPasswordCode: code,
@@ -326,18 +433,28 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'Código inválido o expirado' });
+      return res.status(400).json({ success: false, message: 'Código inválido o expirado' });
     }
 
-    // Cambiar la contraseña
-    user.password = newPassword; // <-- sin hash aquí
-    user.resetPasswordCode = undefined;
-    user.resetPasswordExpires = undefined;
-    await user.save();
+    // Generar token temporal válido por 10 minutos para resetPassword
+    const resetToken = jwt.sign(
+      { 
+        userId: user._id, 
+        correo: user.correo,
+        purpose: 'password-reset'
+      },
+      config.secret,
+      { expiresIn: '10m' }
+    );
 
-    res.json({ message: 'Contraseña actualizada correctamente' });
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Código válido',
+      resetToken: resetToken
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error en el servidor', error });
+    console.error('[AuthController] Error verifyResetCode:', error);
+    return res.status(500).json({ success: false, message: 'Error en el servidor', error: error.message });
   }
 };
 

@@ -12,7 +12,6 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
       <table className="tabla-usuarios-admin">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Usuario</th>
             <th>Cabaña</th>
             <th>Fecha Inicio</th>
@@ -39,7 +38,6 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
           ) : (
             reservas.map((reserva) => (
               <tr key={reserva._id}>
-                <td>{reserva._id}</td>
                 <td>
                   {typeof reserva.usuario === "object"
                     ? `${reserva.usuario?.nombre || ""} ${reserva.usuario?.apellido || ""}`.trim() ||
