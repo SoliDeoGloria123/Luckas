@@ -333,19 +333,21 @@ const Reportes = () => {
               editarReporte={abrirModalEditar}
               eliminarReporte={eliminarReporte}
             />
-            <div className="mt-4 flex items-center justify-end gap-3">
-              <button
-                className="pagination-btn-admin"
-                onClick={() => setPaginaActual(prev => Math.max(prev - 1, 1))}
-                disabled={paginaActual === 1}
-              >Anterior</button>
-              <span className="text-sm">Página {paginaActual} de {totalPaginas}</span>
-              <button
-                className="pagination-btn-admin"
-                onClick={() => setPaginaActual(prev => Math.min(prev + 1, totalPaginas))}
-                disabled={paginaActual === totalPaginas}
-              >Siguiente</button>
-            </div>
+
+          </div>
+
+          <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual(prev => Math.max(prev - 1, 1))}
+              disabled={paginaActual === 1}
+            ><i className="fas fa-chevron-left"/></button>
+            <span className="text-sm">Página {paginaActual} de {totalPaginas}</span>
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual(prev => Math.min(prev + 1, totalPaginas))}
+              disabled={paginaActual === totalPaginas}
+            >  <i className="fas fa-chevron-right"/></button>
           </div>
 
 
@@ -374,25 +376,25 @@ const Reportes = () => {
               </div>
             </div>
           </div>
-          </div>
-          <ReporteModal
-            mostrar={mostrarModal}
-            onClose={() => {
-              setMostrarModal(false);
-              setReporteEditando(null);
-              setModoEdicion(false);
-            }}
-            onSubmit={(data) => {
-              if (modoEdicion && reporteEditando) {
-                editarReporte(reporteEditando._id || reporteEditando.id, data);
-              } else {
-                crearReporte(data);
-              }
-            }}
-            datosIniciales={reporteEditando}
-            modoEdicion={modoEdicion}
-          />
         </div>
+        <ReporteModal
+          mostrar={mostrarModal}
+          onClose={() => {
+            setMostrarModal(false);
+            setReporteEditando(null);
+            setModoEdicion(false);
+          }}
+          onSubmit={(data) => {
+            if (modoEdicion && reporteEditando) {
+              editarReporte(reporteEditando._id || reporteEditando.id, data);
+            } else {
+              crearReporte(data);
+            }
+          }}
+          datosIniciales={reporteEditando}
+          modoEdicion={modoEdicion}
+        />
+      </div>
     </div>
 
 

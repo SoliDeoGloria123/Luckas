@@ -2,26 +2,20 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
-
 import {
   Users,
-  BarChart3,
   UserPlus,
   Activity,
-  TrendingUp,
-  TrendingDown,
-  Shield,
+  TrendingUp
 
 } from 'lucide-react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import './Dashboard.css';
-// Hooks optimizados
 import { useDashboardAdmin } from './hooks/useDashboardAdmin';
 import { eventService } from '../../services/eventService';
 import { programasAcademicosService } from '../../services/programasAcademicosService';
-
-
-// Componentes
 import { PremiumLoader } from './LazyComponents';
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -30,6 +24,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
   //const [busqueda] = useState("");
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
+  const navigate = useNavigate();
 
   // Hook principal del dashboard
   const {
@@ -41,14 +36,107 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
 
   const [eventosRecientes, setEventosRecientes] = useState([]);
   const [programasRecientes, setProgramasRecientes] = useState([]);
+  const [activityData, setActivityData] = useState([]);
+  const [selectedRange, setSelectedRange] = useState('day'); // 'day' | 'month' | 'year'
+
+  // Construye datos de actividad a partir de usuarios y rango
+  const buildActivityByMonth = (usuariosList) => {
+    // últimos 12 meses, agrupado por mes
+    const now = new Date();
+    const months = [];
+    const map = new Map();
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = d.toLocaleString(undefined, { month: 'short', year: 'numeric' });
+      const obj = { date: key, label, count: 0 };
+      months.push(obj);
+      map.set(key, obj);
+    }
+
+    for (const u of usuariosList || []) {
+      if (!u || !u.createdAt) continue;
+      const d = new Date(u.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const found = map.get(key);
+      if (found) found.count += 1;
+    }
+
+    return months;
+  };
+
+  const handleEventos = () => {
+    navigate('/admin/eventos');
+  };
+
+  const handleProgramas = () => {
+    navigate('/admin/programas-academicos');
+  };
+
+
+
+  const buildActivityByYear = (usuariosList, years = 5) => {
+    // últimos `years` años, agrupado por año
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const yearsArr = [];
+    const map = new Map();
+    for (let i = years - 1; i >= 0; i--) {
+      const y = currentYear - i;
+      const key = String(y);
+      const label = String(y);
+      const obj = { date: key, label, count: 0 };
+      yearsArr.push(obj);
+      map.set(key, obj);
+    }
+
+    for (const u of usuariosList || []) {
+      if (!u || !u.createdAt) continue;
+      const d = new Date(u.createdAt);
+      const key = String(d.getFullYear());
+      const found = map.get(key);
+      if (found) found.count += 1;
+    }
+
+    return yearsArr;
+  };
+
+  const buildActivityByDays = (usuariosList, days) => {
+    // últimos `days` días, agrupado por día
+    const result = [];
+    const map = new Map();
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split('T')[0];
+      const label = d.toLocaleDateString();
+      const obj = { date: key, label, count: 0 };
+      result.push(obj);
+      map.set(key, obj);
+    }
+
+    for (const u of usuariosList || []) {
+      if (!u || !u.createdAt) continue;
+      const createdKey = new Date(u.createdAt).toISOString().split('T')[0];
+      const found = map.get(createdKey);
+      if (found) found.count += 1;
+    }
+
+    return result;
+  };
+
+  const buildActivityData = (usuariosList, range) => {
+    if (!Array.isArray(usuariosList)) return [];
+    if (range === 'year') return buildActivityByYear(usuariosList, 5); // últimos 5 años
+    if (range === 'month') return buildActivityByMonth(usuariosList);
+    return buildActivityByDays(usuariosList, 7);
+  };
 
   const formatDate = (iso) => {
-    try {
-      const d = new Date(iso);
-      return d.toLocaleDateString();
-    } catch (e) {
-      return '';
-    }
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toLocaleDateString();
   };
 
   const displayValue = (val) => {
@@ -59,11 +147,19 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
       if (val.nombre) return String(val.nombre);
       if (val.titulo) return String(val.titulo);
       if (val.correo) return String(val.correo);
-      try {
-        return JSON.stringify(val);
-      } catch (e) {
-        return String(val);
-      }
+      // Safe stringify to avoid circular reference exceptions
+      const safeStringify = (obj) => {
+        const seen = new WeakSet();
+        return JSON.stringify(obj, (_k, v) => {
+          if (typeof v === 'object' && v !== null) {
+            if (seen.has(v)) return '[Circular]';
+            seen.add(v);
+          }
+          return v;
+        });
+      };
+
+      return safeStringify(val);
     }
     return String(val);
   };
@@ -90,36 +186,13 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
     return () => { mounted = false; };
   }, []);
 
-  // Hook para operaciones de usuarios (comentado porque no se usa actualmente)
-  // const {
-  //   mostrarModal,
-  //   usuarioSeleccionado,
-  //   setUsuarioSeleccionado,
-  //   modoEdicion,
-  //   nuevoUsuario,
-  //   setNuevoUsuario,
-  //   crearUsuario,
-  //   actualizarUsuario,
-  //   eliminarUsuario,
-  //   abrirModalCrear,
-  //   abrirModalEditar,
-  //   cerrarModal
-  // } = useUsuariosAdmin(obtenerUsuarios, usuarioActual, setUsuarioActual);
-
-  // Configuración del menú
+  // Reconstruir activityData cuando cambian usuarios o el rango seleccionado
+  useEffect(() => {
+    const data = buildActivityData(usuarios, selectedRange);
+    setActivityData(data);
+  }, [usuarios, selectedRange]);
 
 
-  // Filtros de usuarios (comentado porque no se usa actualmente)
-  // const usuariosFiltrados = Array.isArray(usuarios)
-  //   ? usuarios.filter(
-  //     (user) =>
-  //       user.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-  //       user.correo?.toLowerCase().includes(busqueda.toLowerCase()) ||
-  //       user.role?.toLowerCase().includes(busqueda.toLowerCase())
-  //   )
-  //   : [];
-
-  // Loading states
   if (cargando) {
     return <PremiumLoader />;
   }
@@ -148,114 +221,99 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
           {seccionActiva === "dashboard" && (
             <div className="space-y-6">
               {/* Stats Grid con animaciones */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                  {
-                    title: "Usuarios Totales",
-                    value: estadisticas.totalUsuarios,
-                    change: "+12.4%",
-                    trend: "up",
-                    icon: Users,
-                    color: "from-blue-600 to-blue-700",
-                    bgColor: "bg-blue-50/50"
-                  },
-                  {
-                    title: "Usuarios Activos",
-                    value: estadisticas.usuariosActivos,
-                    change: "+40.9%",
-                    trend: "up",
-                    icon: Activity,
-                    color: "from-emerald-600 to-emerald-700",
-                    bgColor: "bg-emerald-50/50"
-                  },
-                  {
-                    title: "Administradores",
-                    value: estadisticas.administradores,
-                    change: "+84.7%",
-                    trend: "up",
-                    icon: Shield,
-                    color: "from-purple-600 to-purple-700",
-                    bgColor: "bg-purple-50/50"
-                  },
-                  {
-                    title: "Nuevos Hoy",
-                    value: estadisticas.nuevosHoy,
-                    change: "-23.6%",
-                    trend: "down",
-                    icon: UserPlus,
-                    color: "from-rose-600 to-rose-700",
-                    bgColor: "bg-rose-50/50"
-                  }
-                ].map((stat, index) => {
-                  const Icon = stat.icon;
-                  const TrendIcon = stat.trend === "up" ? TrendingUp : TrendingDown;
-                  return (
-                    <div
-                      key={stat.title}
-                      className={`stat-card-dashboard-admin glass-card ${stat.bgColor} rounded-2xl p-6 border border-white/20 fade-in-up bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm`}
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg icon-bounce` + ' ' + 'shadow-blue-lg'}>
-                          <Icon className="w-6 h-6 text-white" />
-                        </div>
-                        <div className={`flex items-center text-sm font-medium ${stat.trend === "up" ? "text-emerald-600" : "text-rose-600"
-                          }`}>
-                          <TrendIcon className="w-4 h-4 mr-1 icon-bounce" />
-                          {stat.change}
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-slate-800 mb-1 stat-number">{stat.value}</h3>
-                        <p className="text-slate-600 text-sm">{stat.title}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              {/* Recientes: usuarios, eventos y programas */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up col-span-1 md:col-span-1">
-                  <div className="card-header flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-slate-800">Usuarios recientes</h3>
-                    <button className={`card-action inline-flex px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-sm`} onClick={() => setSeccionActiva('usuarios')}>Ver todos</button>
+              {/* Mini KPIs compactos - evitar duplicar las tarjetas superiores */}
+              <div className="flex flex-col md:flex-row gap-4 mb-10">
+                <div className="flex-1 flex items-center p-7 rounded-2xl bg-gradient-to-r from-indigo-500 to-blue-500 text-white shadow-sm">
+                  <div className="p-3 rounded-lg bg-white/10 mr-3">
+                    <Users className="w-5 h-5 text-white" />
                   </div>
-                  <ul className="usuarios-recientes-list space-y-3 bg-white/5 p-2 rounded-lg">
-                    {(Array.isArray(usuarios) ? usuarios.slice(0, 6) : []).map((u) => {
-                      const label = displayValue(u.nombre || u.correo || u.email || u.username || 'U');
-                      const avatarChar = label && label.length ? label.charAt(0).toUpperCase() : 'U';
-                      return (
-                        <li key={u._id || u.id || displayValue(u)} className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-full avatar-gradient flex items-center justify-center text-white font-medium">{avatarChar}</div>
-                            <div>
-                              <div className="font-medium text-slate-800">{label}</div>
-                              <div className="text-xs text-slate-500">{formatDate(u.createdAt)}</div>
-                            </div>
-                          </div>
-                          <div className="text-sm text-slate-500">{displayValue(u.role) || ''}</div>
-                        </li>
-                      );
-                    })}
-                    {(!usuarios || usuarios.length === 0) && (
-                      <li className="text-slate-500">No hay usuarios recientes</li>
-                    )}
-                  </ul>
+                  <div>
+                    <div className="text-xs opacity-90">Usuarios</div>
+                    <div className="text-xl font-bold">{Array.isArray(usuarios) ? usuarios.length : 0}</div>
+                  </div>
                 </div>
 
+                <div className="flex-1 flex items-center p-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-white shadow-sm">
+                  <div className="p-3 rounded-lg bg-white/10 mr-3">
+                    <Activity className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-xs opacity-90">Eventos recientes</div>
+                    <div className="text-xl font-bold">{Array.isArray(eventosRecientes) ? eventosRecientes.length : 0}</div>
+                  </div>
+                </div>
+
+                <div className="flex-1 flex items-center p-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm">
+                  <div className="p-3 rounded-lg bg-white/10 mr-3">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-xs opacity-90">Programas recientes</div>
+                    <div className="text-xl font-bold">{Array.isArray(programasRecientes) ? programasRecientes.length : 0}</div>
+                  </div>
+                </div>
+
+                <div className="flex-1 flex items-center p-4 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-400 text-white shadow-sm">
+                  <div className="p-3 rounded-lg bg-white/10 mr-3">
+                    <UserPlus className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-xs opacity-90">Nuevos Hoy</div>
+                    <div className="text-xl font-bold">{estadisticas && estadisticas.nuevosHoy ? estadisticas.nuevosHoy : 0}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Activity Chart con efectos premium */}
+              <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-slate-800">Actividad de Usuarios</h2>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setSelectedRange('day')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium shadow-md ${selectedRange === 'day' ? 'btn-premium text-white' : 'glass-card text-slate-600 hover:shadow-md'}`}>
+                      Día
+                    </button>
+                    <button
+                      onClick={() => setSelectedRange('month')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium ${selectedRange === 'month' ? 'btn-premium text-white' : 'glass-card text-slate-600 hover:shadow-md'}`}>
+                      Mes
+                    </button>
+                    <button
+                      onClick={() => setSelectedRange('year')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium ${selectedRange === 'year' ? 'btn-premium text-white' : 'glass-card text-slate-600 hover:shadow-md'}`}>
+                      Año
+                    </button>
+                  </div>
+                </div>
+                <div className="h-64 bg-gradient-to-r from-blue-50/50 to-purple-50/50 rounded-xl border border-slate-200/50 shimmer p-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={activityData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#edf2ff" />
+                      <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+                      <YAxis allowDecimals={false} />
+                      <Tooltip />
+                      <Area type="monotone" dataKey="count" stroke="#3b82f6" fill="url(#colorCount)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up col-span-2">
                   <div className="card-header flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-slate-800">Últimos eventos y programas</h3>
-                    <div>
-                      <button className={`card-action inline-flex px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-sm mr-2`} onClick={() => setSeccionActiva('eventos')}>Ver eventos</button>
-                      <button className={`card-action inline-flex px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-sm`} onClick={() => setSeccionActiva('programas-academicos')}>Ver programas</button>
-                    </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 recientes-grid-md gap-6">
                     <div>
                       <h4 className="text-sm font-medium text-slate-600 mb-2">Eventos</h4>
 
-                      <ul className="recientes-list space-y-2 bg-white/5 p-2 rounded-lg">
+                      <ul className="recientes-list space-y-2 bg-white/5 p-4 rounded-lg">
                         {eventosRecientes.length > 0 ? eventosRecientes.map((ev) => (
                           <li key={ev._id || ev.id || displayValue(ev)} className="flex items-center justify-between">
                             <div>
@@ -266,10 +324,11 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
                           </li>
                         )) : <li className="text-slate-500">No hay eventos</li>}
                       </ul>
+                      <button className={`card-action inline-flex px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-sm mr-2`} onClick={handleEventos}>Ver eventos</button>
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-slate-600 mb-2">Programas</h4>
-                      <ul className="recientes-list space-y-2 bg-white/5 p-2 rounded-lg">
+                      <ul className="recientes-list space-y-2 bg-white/5 p-4 rounded-lg">
                         {programasRecientes.length > 0 ? programasRecientes.map((p) => (
                           <li key={p._id || p.id || displayValue(p)} className="flex items-center justify-between">
                             <div>
@@ -280,59 +339,15 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
                           </li>
                         )) : <li className="text-slate-500">No hay programas</li>}
                       </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                      <button className={`card-action inline-flex px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-sm`} onClick={handleProgramas}>Ver programas</button>
 
-              {/* Activity Chart con efectos premium */}
-              <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg fade-in-up">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-slate-800">Actividad de Usuarios</h2>
-                  <div className="flex space-x-2">
-                    <button className="btn-premium px-4 py-2 text-white rounded-lg text-sm font-medium shadow-md">
-                      Día
-                    </button>
-                    <button className="px-4 py-2 glass-card text-slate-600 rounded-lg text-sm font-medium hover:shadow-md transition-all">
-                      Mes
-                    </button>
-                    <button className="px-4 py-2 glass-card text-slate-600 rounded-lg text-sm font-medium hover:shadow-md transition-all">
-                      Año
-                    </button>
-                  </div>
-                </div>
-                <div className="h-64 bg-gradient-to-r from-blue-50/50 to-purple-50/50 rounded-xl flex items-center justify-center border border-slate-200/50 shimmer">
-                  <div className="text-center">
-                    <BarChart3 className="w-12 h-12 text-slate-400 mx-auto mb-4 icon-bounce" />
-                    <p className="text-slate-600">Gráfico de actividad de usuarios en tiempo real</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-
-
-          {seccionActiva !== "dashboard" && seccionActiva !== "usuarios" && (
-            <>
-              {/* Debug - mostrar la sección activa */}
-              <div className="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded">
-                <small>Debug: Sección activa = "{seccionActiva}"</small>
-              </div>
-              {/* Secciones no implementadas aún */}
-              {!["programas-academicos", "eventos", "cabanas"].includes(seccionActiva) && (
-                <div className="glass-card rounded-2xl p-8 border border-white/20 shadow-lg fade-in-up">
-                  <h2 className="text-2xl font-bold text-slate-800 mb-4">
-                    {seccionActiva.charAt(0).toUpperCase() + seccionActiva.slice(1).replace('-', ' ')}
-                  </h2>
-                  <p className="text-slate-600">Esta sección está disponible con lazy loading para mejor rendimiento.</p>
-                  <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded">
-                    <small>Debug: Esta sección no está implementada aún. Sección: "{seccionActiva}"</small>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
         </main>
       </div>
     </div>

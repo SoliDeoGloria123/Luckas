@@ -506,9 +506,6 @@ const GestionEventos = () => {
                           
                         </div>
                       </div>
-
-                  
-
                       <div>
                         <h4 className="font-semibold text-slate-800">Observaciones</h4>
                         <p className="text-sm text-slate-700 mt-2">{eventoDetalle.observaciones || '—'}</p>

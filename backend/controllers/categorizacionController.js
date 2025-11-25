@@ -1,6 +1,10 @@
-const mongoose = require('mongoose'); // 👈 IMPORTANTE
+const mongoose = require('mongoose'); 
 const Categorizacion = require('../models/categorizacion');
 const Solicitud = require('../models/Solicitud');
+const Eventos = require('../models/Eventos');
+const Cabana = require('../models/Cabana');
+const ProgramaAcademico = require('../models/ProgramaAcademico');
+const Inscripcion = require('../models/Inscripciones');
 
 // CREAR nueva categoría
 const crearCategoria = async (req, res) => {
@@ -307,14 +311,47 @@ const activarDesactivarCategoria = async (req, res) => {
     if (!['activo', 'inactivo'].includes(estado)) {
       return res.status(400).json({ success: false, message: 'El campo "estado" debe ser "activo" o "inactivo".' });
     }
+    // Si intentan desactivar, comprobar asociaciones en modelos que usan categoría
+    if (estado === 'inactivo') {
+      const asociaciones = await obtenerAsociacionesCategoria(id);
+      if (asociaciones.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No se puede desactivar la categoría porque está asociada a otras entidades',
+          asociaciones
+        });
+      }
+    }
+
     const categoria = await Categorizacion.findByIdAndUpdate(id, { estado }, { new: true });
     if (!categoria) {
       return res.status(404).json({ success: false, message: 'Categoría no encontrada' });
     }
+
     res.json({ success: true, message: `Categoría actualizada a ${estado}`, data: categoria });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al actualizar estado', error: error.message });
   }
+};
+
+// Helper: retorna lista de asociaciones encontradas para una categoría
+const obtenerAsociacionesCategoria = async (categoriaId) => {
+  const asociaciones = [];
+  const [countSolicitudes, countEventos, countCabanas, countProgramas, countInscripciones] = await Promise.all([
+    Solicitud.countDocuments({ categoria: categoriaId }),
+    Eventos.countDocuments({ categoria: categoriaId }),
+    Cabana.countDocuments({ categoria: categoriaId }),
+    ProgramaAcademico.countDocuments({ categoria: categoriaId }),
+    Inscripcion.countDocuments({ categoria: categoriaId })
+  ]);
+
+  if (countSolicitudes > 0) asociaciones.push({ entidad: 'Solicitudes', count: countSolicitudes });
+  if (countEventos > 0) asociaciones.push({ entidad: 'Eventos', count: countEventos });
+  if (countCabanas > 0) asociaciones.push({ entidad: 'Cabañas', count: countCabanas });
+  if (countProgramas > 0) asociaciones.push({ entidad: 'Programas', count: countProgramas });
+  if (countInscripciones > 0) asociaciones.push({ entidad: 'Inscripciones', count: countInscripciones });
+
+  return asociaciones;
 };
 
 // ESTADÍSTICAS de categorías

@@ -377,16 +377,14 @@ const GestionIscripcion = () => {
               onEliminar={eliminarInscripcion}
             />
           </div>
-       
-
-
+      
           <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
             <button
               className="pagination-btn-admin"
               onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
               disabled={paginaActual === 1}
             >
-              <i className="fas fa-chevron-left"></i>
+              <i className="fas fa-chevron-left"/>
             </button>
             <span className="pagination-info-admin">
               Página {paginaActual} de {totalPaginas}
@@ -396,7 +394,7 @@ const GestionIscripcion = () => {
               onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
               disabled={paginaActual === totalPaginas || totalPaginas === 0}
             >
-              <i className="fas fa-chevron-right"></i>
+              <i className="fas fa-chevron-right"/>
             </button>
           </div>
         </div>

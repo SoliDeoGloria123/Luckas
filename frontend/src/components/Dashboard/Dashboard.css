@@ -261,10 +261,7 @@
 }
 
 /* Dashboard visual refinements appended */
-.stat-number {
-  font-size: 1.9rem;
-  color: var(--text-primary);
-}
+/* Dashboard visual refinements appended */
 
 .usuarios-recientes-list li,
 .recientes-list li {
@@ -400,6 +397,23 @@
 .search-results-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
 }
+
+/* Grid for recientes: left column wider on md+ */
+@media (min-width: 768px) {
+  .recientes-grid-md {
+    display: grid;
+    /* columnas iguales en md+ para que Eventos y Programas queden a la par */
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+}
+
+/* Forzar altura mínima en las listas recientes para que queden visualmente parejas */
+.recientes-list {
+  min-height: 220px;
+}
+
 
 /* Destacar texto de búsqueda */
 .search-highlight {

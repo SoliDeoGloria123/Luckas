@@ -65,6 +65,21 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
             ]
         }
     ];
+    // Mapa explícito de rutas para evitar inconsistencias de mayúsculas u otras diferencias
+    const routeMap = {
+        dashboard: '/admin/Dashboard', // coincide con App.js
+        usuarios: '/admin/usuarios',
+        categorizacion: '/admin/categorizacion',
+        'programas-academicos': '/admin/programas-academicos',
+        eventos: '/admin/eventos',
+        solicitudes: '/admin/solicitudes',
+        inscripciones: '/admin/inscripciones',
+        certificaciones: '/admin/certificaciones',
+        tareas: '/admin/tareas',
+        cabanas: '/admin/cabanas',
+        reservas: '/admin/reservas',
+        reportes: '/admin/reportes'
+    };
     return (
         <>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap" />
@@ -105,8 +120,11 @@ const Sidebar = ({ sidebarAbierto, setSidebarAbierto, seccionActiva, setSeccionA
                                             <li key={item.id} style={{ animationDelay: `${(sectionIndex * 4 + itemIndex) * 0.05}s` }}>
                                                 <button
                                                     onClick={() => {
-                                                        if (["dashboard", "usuarios","configuracion", "categorizacion", "programas-academicos", "solicitudes", "inscripciones", "certificaciones", "tareas", "cabanas", "reservas", "reportes", "eventos"].includes(item.id)) {
-                                                            navigate(`/admin/${item.id}`);
+                                                        const route = routeMap[item.id] || `/admin/${item.id}`;
+                                                        if (typeof route === 'string' && route.length) {
+                                                            navigate(route);
+                                                        } else {
+                                                            navigate('/admin/Dashboard');
                                                         }
                                                         setSeccionActiva(item.id);
                                                         // Mantener la barra colapsada después de seleccionar

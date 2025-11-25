@@ -503,19 +503,21 @@ const InscripcionModal = ({
             )}
             <div className="form-grupo-admin">
               <label htmlFor="categoria-referencia">Categoría:</label>
-              <select
-                id="categoria-referencia"
-                name="categoria"
-                value={form.categoria}
-                onChange={handleChange}
-                required
-                disabled={true}
-              >
-                <option value="">Seleccione categoría</option>
-                {categorias.map(cat => (
-                  <option key={cat._id} value={cat._id}>{cat.nombre}</option>
-                ))}
-              </select>
+                <select
+                  id="categoria-referencia"
+                  name="categoria"
+                  value={form.categoria}
+                  onChange={handleChange}
+                  required
+                  disabled={true}
+                >
+                  <option value="">Seleccione categoría</option>
+                  {(categorias || [])
+                    .filter(cat => String(cat.estado || '').toLowerCase() === 'activo')
+                    .map(cat => (
+                      <option key={cat._id} value={cat._id}>{cat.nombre}</option>
+                    ))}
+                </select>
             </div>
             <div className="form-grupo-admin">
               <label htmlFor="estado-referencia">Estado:</label>

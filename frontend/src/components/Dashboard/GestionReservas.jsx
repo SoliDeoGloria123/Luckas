@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search } from 'lucide-react';
+import { Search, Calendar, CheckCircle, Clock, BarChart } from 'lucide-react';
 import { reservaService } from "../../services/reservaService";
 import { userService } from "../../services/userService";
 import { cabanaService } from "../../services/cabanaService";
@@ -33,6 +33,15 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   const [reservas, setReservas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [cabanas, setCabanas] = useState([]);
+  const [estadisticasReservas, setEstadisticasReservas] = useState({
+    totalReservas: 0,
+    activas: 0,
+    pendientes: 0,
+    confirmadas: 0,
+    canceladas: 0,
+    finalizadas: 0,
+    nuevasEsteMes: 0,
+  });
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
   const [busqueda, setBusqueda] = useState("");
@@ -51,6 +60,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
     obtenerReservas();
     obtenerUsuarios();
     obtenerCabanas();
+    obtenerEstadisticasReservas();
   }, []);
 
   const obtenerReservas = () => manejarOperacionAsync(
@@ -73,6 +83,28 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
     "Error al obtener cabañas",
     setError
   );
+
+  const obtenerEstadisticasReservas = async () => {
+    try {
+      const stats = await reservaService.getEstadisticasGenerales();
+      let payload = stats;
+      if (stats && typeof stats === 'object' && !Array.isArray(stats)) {
+        if (stats.data) {
+          payload = stats.data;
+        } else {
+          payload = stats;
+        }
+      }
+      setEstadisticasReservas(payload || {});
+    } catch (error) {
+      console.error('Error al obtener estadísticas de reservas:', error);
+      mostrarAlerta('Error', 'No se pudieron cargar las estadísticas de reservas: ' + (error.message || error), 'error');
+    }
+  };
+
+  const formatNumber = (v) => {
+    try { return new Intl.NumberFormat('es-ES').format(Number(v || 0)); } catch { return v; }
+  };
 
   // CRUD
   const crearReserva = async () => {
@@ -210,41 +242,44 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
               </button>
             )}
           </div>
-          <div className="dashboard-grid-reporte-admin">
-            <div className="stat-card-reporte-admin">
-              <div className="stat-icon-reporte-admin-admin users">
-                <i className="fas fa-users"></i>
+          <div className="dashboard-grid-reporte-admin grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="stat-card-reporte-admin flex items-center gap-4 p-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-600">
+                <Calendar className="w-6 h-6 text-white" aria-hidden />
               </div>
               <div className="stat-info-admin">
-                <h3>5</h3>
-                <p>Total Usuarios</p>
+                <h3>{formatNumber(estadisticasReservas.totalReservas)}</h3>
+                <p>Total Reservas</p>
               </div>
             </div>
-            <div className="stat-card-reporte-admin">
-              <div className="stat-icon-reporte-admin-admin active">
-                <i className="fas fa-user-check"></i>
+
+            <div className="stat-card-reporte-admin flex items-center gap-4 p-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-emerald-600">
+                <CheckCircle className="w-6 h-6 text-white" aria-hidden />
               </div>
               <div className="stat-info-admin">
-                <h3>4</h3>
-                <p>Usuarios Activos</p>
+                <h3>{formatNumber(estadisticasReservas.activas)}</h3>
+                <p>Activas</p>
               </div>
             </div>
-            <div className="stat-card-reporte-admin">
-              <div className="stat-icon-reporte-admin-admin admins">
-                <i className="fas fa-user-shield"></i>
+
+            <div className="stat-card-reporte-admin flex items-center gap-4 p-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-amber-500">
+                <Clock className="w-6 h-6 text-white" aria-hidden />
               </div>
               <div className="stat-info-admin">
-                <h3>1</h3>
-                <p>Administradores</p>
+                <h3>{formatNumber(estadisticasReservas.pendientes)}</h3>
+                <p>Pendientes</p>
               </div>
             </div>
-            <div className="stat-card-reporte-admin">
-              <div className="stat-icon-reporte-admin-admin new">
-                <i className="fas fa-user-plus"></i>
+
+            <div className="stat-card-reporte-admin flex items-center gap-4 p-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-violet-600">
+                <BarChart className="w-6 h-6 text-white" aria-hidden />
               </div>
               <div className="stat-info-admin">
-                <h3>12</h3>
-                <p>Nuevos Este Mes</p>
+                <h3>{formatNumber(estadisticasReservas.nuevasEsteMes)}</h3>
+                <p>Nuevas este mes</p>
               </div>
             </div>
           </div>

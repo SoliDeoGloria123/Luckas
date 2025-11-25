@@ -18,7 +18,6 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
           <th>Estado</th>
           <th>Observaciones</th>
           <th>Fecha inscripción</th>
-          <th>Solicitud</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -78,7 +77,6 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
                     ? new Date(ins.fechaInscripcion).toLocaleString()
                     : "N/A"}
                 </td>
-                <td>{ins.solicitud?._id || ins.solicitud || ""}</td>
                 <td>
                   <div className="acciones-botones">
                     <button className="btn-action editar" onClick={() => onEditar(ins)}><i className="fas fa-edit"></i></button>

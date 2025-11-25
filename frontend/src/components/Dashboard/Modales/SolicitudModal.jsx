@@ -321,7 +321,9 @@ const SolicitudModal = ({
 
 
 
-  const categoriaOptions = categorias ? categorias.map(cat => ({ value: cat._id, label: cat.nombre })) : [];
+  const categoriaOptions = categorias ? categorias
+    .filter(cat => String(cat.estado || '').toLowerCase() === 'activo')
+    .map(cat => ({ value: cat._id, label: cat.nombre })) : [];
 
   if (!mostrar) return null;
   return (

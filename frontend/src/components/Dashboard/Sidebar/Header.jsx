@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Menu, Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import NotificationButton from '../Shared/NotificationButton';
 
 
@@ -9,6 +9,7 @@ import NotificationButton from '../Shared/NotificationButton';
 const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard", onCerrarSesion: onCerrarSesionProp }) => {
   const menuRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const [mostrarMenu, setMostrarMenu] = useState(false);
   // Fallback para evitar error si no se pasa la función
   const safeSetSidebarAbierto = typeof setSidebarAbierto === 'function' ? setSidebarAbierto : () => { };
@@ -60,6 +61,32 @@ const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard"
     navigate('/admin/perfil');
   };
 
+  // Derivar la sección actual desde la ruta (fallback a la prop seccionActiva)
+  const deriveSectionFromPath = () => {
+    const path = (location && location.pathname) || '';
+    const match = path.match(/^\/admin\/(?:([^/]+))/);
+    return (match && match[1]) ? match[1] : seccionActiva;
+  };
+
+  const currentSectionId = deriveSectionFromPath();
+
+  const labelMap = {
+    dashboard: 'Dashboard',
+    usuarios: 'Usuarios',
+    categorizacion: 'Categorización',
+    'programas-academicos': 'Programas Académicos',
+    eventos: 'Eventos',
+    solicitudes: 'Solicitudes',
+    inscripciones: 'Inscripciones',
+    certificaciones: 'Certificaciones',
+    tareas: 'Tareas',
+    cabanas: 'Cabañas',
+    reservas: 'Reservas',
+    reportes: 'Reportes'
+  };
+
+  const currentLabel = labelMap[currentSectionId] || (seccionActiva.charAt(0).toUpperCase() + seccionActiva.slice(1));
+
   return (
     <header
       className="glass-card no-lift border-b px-6 py-4 sticky top-0 z-20"
@@ -78,7 +105,7 @@ const Header = ({ sidebarAbierto, setSidebarAbierto, seccionActiva = "dashboard"
             <Menu className="w-5 h-5" />
           </button>
           <div className="text-sm fade-in-up" style={{ color: 'var(--text-muted)' }}>
-            Dashboard / {seccionActiva.charAt(0).toUpperCase() + seccionActiva.slice(1)}
+            Dashboard / {currentLabel}
           </div>
         </div>
 

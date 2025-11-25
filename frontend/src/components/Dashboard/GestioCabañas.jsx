@@ -12,6 +12,10 @@ import {
   Plus,
   X,
   Search,
+  Home,
+  Check,
+  Users,
+  AlertCircle,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
@@ -32,6 +36,14 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   const [selectedImages, setSelectedImages] = useState([]);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [nuevaCabana, setNuevaCabana] = useState({ ...defaultCabana });
+  const [estadisticasCabanas, setEstadisticasCabanas] = useState({
+    totalCabanas: 0,
+    disponibles: 0,
+    ocupadas: 0,
+    mantenimiento: 0,
+    capacidadTotal: 0,
+    precioPromedio: 0,
+  });
 
 
   // Se usa helper compartido `manejarOperacionAsync` importado arriba
@@ -39,6 +51,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
   useEffect(() => {
     obtenerCabanas();
     obtenerCategorias();
+    obtenerEstadisticas();
   }, []);
 
   const obtenerCabanas = () => manejarOperacionAsync(
@@ -52,6 +65,25 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     setCategorias,
     "Error al obtener categorías"
   );
+
+  const obtenerEstadisticas = async () => {
+    try {
+      const stats = await cabanaService.getEstadisticasGenerales();
+      // La API devuelve un objeto con las métricas. Algunos servicios devuelven { success,data } o un objeto directo.
+      let payload = stats;
+      if (stats && typeof stats === 'object' && !Array.isArray(stats)) {
+        if (stats.data) {
+          payload = stats.data;
+        } else {
+          payload = stats;
+        }
+      }
+      setEstadisticasCabanas(payload || {});
+    } catch (error) {
+      console.error('Error al cargar estadísticas de cabañas:', error);
+      mostrarAlerta('Error', 'No se pudieron obtener las estadísticas de cabañas: ' + (error.message || error), 'error');
+    }
+  };
   // CRUD
   const crearCabana = async () => {
     try {
@@ -200,38 +232,41 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
           <div className="dashboard-grid-reporte-admin">
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin users">
-                <i className="fas fa-users"></i>
+                <Home className="w-6 h-6 text-white" />
               </div>
               <div className="stat-info-admin">
-                <h3>5</h3>
-                <p>Total Usuarios</p>
+                <h3>{estadisticasCabanas.totalCabanas ?? 0}</h3>
+                <p>Total Cabañas</p>
               </div>
             </div>
+
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin active">
-                <i className="fas fa-user-check"></i>
+                <Check className="w-6 h-6 text-white" />
               </div>
               <div className="stat-info-admin">
-                <h3>4</h3>
-                <p>Usuarios Activos</p>
+                <h3>{estadisticasCabanas.disponibles ?? 0}</h3>
+                <p>Disponibles</p>
               </div>
             </div>
+
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin admins">
-                <i className="fas fa-user-shield"></i>
+                <Users className="w-6 h-6 text-white" />
               </div>
               <div className="stat-info-admin">
-                <h3>1</h3>
-                <p>Administradores</p>
+                <h3>{estadisticasCabanas.ocupadas ?? 0}</h3>
+                <p>Ocupadas</p>
               </div>
             </div>
+
             <div className="stat-card-reporte-admin">
               <div className="stat-icon-reporte-admin-admin new">
-                <i className="fas fa-user-plus"></i>
+                <AlertCircle className="w-6 h-6 text-white" />
               </div>
               <div className="stat-info-admin">
-                <h3>12</h3>
-                <p>Nuevos Este Mes</p>
+                <h3>{estadisticasCabanas.mantenimiento ?? 0}</h3>
+                <p>Mantenimiento</p>
               </div>
             </div>
           </div>

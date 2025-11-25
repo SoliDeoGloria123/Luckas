@@ -52,7 +52,16 @@ const CabanaModal = ({
 
   // Función utilitaria para obtener valores de campos
   const getFieldValue = (fieldName) => {
-    return modoEdicion ? cabanaSeleccionada?.[fieldName] : nuevaCabana[fieldName];
+    // En modo edición algunos campos pueden venir como objetos (ej. categoria)
+    if (modoEdicion) {
+      const val = cabanaSeleccionada?.[fieldName];
+      if (fieldName === 'categoria') {
+        if (!val) return '';
+        return typeof val === 'object' ? val._id : val;
+      }
+      return val;
+    }
+    return nuevaCabana[fieldName];
   };
 
   // Función auxiliar para preparar FormData con imágenes
@@ -65,11 +74,16 @@ const CabanaModal = ({
     formData.append('nombre', cabanaData.nombre);
     formData.append('descripcion', cabanaData.descripcion);
     formData.append('capacidad', Number(cabanaData.capacidad));
-    formData.append('categoria', String(cabanaData.categoria));
+    // Normalizar categoría: puede venir como id (string) o como objeto poblado
+    const categoriaId = cabanaData?.categoria && typeof cabanaData.categoria === 'object'
+      ? cabanaData.categoria._id
+      : cabanaData?.categoria;
+    formData.append('categoria', String(categoriaId || ''));
     formData.append('precio', Number(cabanaData.precio));
     formData.append('estado', cabanaData.estado);
-    
-    if (!modoEdicion && cabanaData.ubicacion) {
+
+    // Incluir ubicación si existe (permitir editarla también)
+    if (cabanaData.ubicacion) {
       formData.append('ubicacion', cabanaData.ubicacion);
     }
     
@@ -134,16 +148,17 @@ const CabanaModal = ({
             <FormField id="capacidad-cabana" label="Capacidad:" type="number" value={getFieldValue('capacidad')} onChange={e => handleFieldChange('capacidad', e.target.value)} required placeholder="Capacidad" />
             <FormField id="categoria-cabana" label="Categoría:" type="select" value={getFieldValue('categoria')} onChange={e => handleFieldChange('categoria', e.target.value)}>
               <option value="">Seleccione...</option>
-              {categorias && categorias.map(cat => (
-                <option key={cat._id} value={cat._id}>{cat.nombre}</option>
-              ))}
+              {categorias && categorias
+                .filter(cat => String(cat.estado || '').toLowerCase() === 'activo')
+                .map(cat => (
+                  <option key={cat._id} value={cat._id}>{cat.nombre}</option>
+                ))}
             </FormField>
           </div>
           <div className="from-grid-admin">
             <FormField id="precio-cabana" label="Precio:" type="number" value={getFieldValue('precio')} onChange={e => handleFieldChange('precio', e.target.value)} required placeholder="Precio por noche" />
-            {!modoEdicion && (
-              <FormField id="ubicacion-cabana" label="Ubicacion:" value={getFieldValue('ubicacion')} onChange={e => handleFieldChange('ubicacion', e.target.value)} placeholder="Ubicación" />
-            )}
+            {/* Mostrar ubicación tanto en creación como en edición */}
+            <FormField id="ubicacion-cabana" label="Ubicacion:" value={getFieldValue('ubicacion')} onChange={e => handleFieldChange('ubicacion', e.target.value)} placeholder="Ubicación" />
           </div>
       
             <div className="form-grupo-admin">

@@ -6,7 +6,7 @@ import CertificacionTabla from './Tablas/CertificacionTabla';
 import StatsCard from './Shared/StatsCard';
 import { generarCertificado, estadisticasCertificados as fetchEstadisticasCertificados } from '../../services/certificadoService';
 import { inscripcionService } from '../../services/inscripcionService';
-import {Search,} from 'lucide-react';
+import { Search, } from 'lucide-react';
 
 
 const GestionCertificacion = () => {
@@ -15,7 +15,7 @@ const GestionCertificacion = () => {
     const [certificados, setCertificados] = useState([]);
     const [loading, setLoading] = useState(true);
     const [busqueda, setBusqueda] = useState('');
-    const [filtroEstado, setFiltroEstado] = useState('todos');
+    const [filtroEstado, setFiltroEstado] = useState('certificado');
     const [filtroPrograma, setFiltroPrograma] = useState('');
     const [paginaActual, setPaginaActual] = useState(1);
     const itemsPorPagina = 10;
@@ -199,32 +199,32 @@ const GestionCertificacion = () => {
                                     <option value="pendiente">Pendiente</option>
                                 </select>
                             </div>
-                        
+
                         </div>
                     </div>
                     <div className="p-6 glass-card rounded-2xl border border-white/20 shadow-lg overflow-hidden user-card">
                         {loading ? (
                             <div className="text-center py-12 text-gray-400">Cargando certificados...</div>
                         ) : (
-                            <>
-                                <CertificacionTabla certificados={certificadosPaginated} onDescargar={handleDescargar} />
-                                <div className="mt-4 flex items-center justify-end space-x-2">
-                                    <button
-                                        className="px-3 py-1 bg-white/10 rounded-lg"
-                                        disabled={paginaActual <= 1}
-                                        onClick={() => setPaginaActual(p => Math.max(1, p - 1))}
-                                    >Anterior</button>
-                                    <div className="text-sm text-slate-300">Página {paginaActual} / {totalPaginas}</div>
-                                    <button
-                                        className="px-3 py-1 bg-white/10 rounded-lg"
-                                        disabled={paginaActual >= totalPaginas}
-                                        onClick={() => setPaginaActual(p => Math.min(totalPaginas, p + 1))}
-                                    >Siguiente</button>
-                                </div>
-                            </>
+
+                            <CertificacionTabla certificados={certificadosPaginated} onDescargar={handleDescargar} />
                         )}
                     </div>
-
+                    <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+                        <button
+                            className="pagination-btn-admin"
+                            disabled={paginaActual <= 1}
+                            onClick={() => setPaginaActual(p => Math.max(1, p - 1))}
+                        > <i className="fas fa-chevron-left"/>
+                        </button>
+                        <div className="pagination-info-admin">Página {paginaActual} / {totalPaginas}</div>
+                        <button
+                            className="pagination-btn-admin"
+                            disabled={paginaActual >= totalPaginas}
+                            onClick={() => setPaginaActual(p => Math.min(totalPaginas, p + 1))}
+                        > <i className="fas fa-chevron-right"/>
+                            </button>
+                    </div>
                 </div>
             </div>
         </div>

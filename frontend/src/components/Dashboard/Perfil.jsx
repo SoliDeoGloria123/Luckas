@@ -4,6 +4,7 @@ import './Dashboard.css';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Sidebar/Header';
 import { userService } from "../../services/userService";
+import { mostrarAlerta } from "../utils/alertas";
 
 // Subcomponente: Información Personal (extraído para reducir complejidad)
 const PersonalInfoSection = ({ isEditing, datosEditados, handleInputChange, errors, usuarioLogueado }) => (
@@ -389,7 +390,6 @@ const Perfil = () => {
     const [sidebarAbierto, setSidebarAbierto] = useState(true);
     const [seccionActiva, setSeccionActiva] = useState("dashboard");
     const [isEditing, setIsEditing] = useState(false)
-    const [showSuccess, setShowSuccess] = useState(false)
     const [adminData] = useState({
         nombre: "Steven",
         apellido: "Pedraza",
@@ -413,18 +413,16 @@ const Perfil = () => {
         const valid = validarDatos(datosEditados);
         if (!valid.ok) {
             // Mostrar todos los mensajes de error al usuario
-            alert(valid.message);
+            mostrarAlerta('Error', valid.message, 'error');
             return;
         }
 
         try {
             await actualizarPerfil();
-            setShowSuccess(true);
             setIsEditing(false);
-            setTimeout(() => setShowSuccess(false), 3000);
         } catch (error) {
             console.error('Error al guardar el perfil:', error);
-            alert('Error al guardar los cambios');
+            mostrarAlerta('Error', 'Error al guardar los cambios', 'error');
         }
     }
 
@@ -450,9 +448,11 @@ const Perfil = () => {
             }
         }
 
-        // Helper: añadir error si no existe
+        // Helper: añadir error sólo si el mensaje existe (no añadir claves con `null`)
         const addIfMissing = (key, msg) => {
-            if (!fieldErrors[key]) fieldErrors[key] = msg;
+            if (msg) {
+                if (!fieldErrors[key]) fieldErrors[key] = msg;
+            }
         };
 
         // Email
@@ -534,7 +534,7 @@ const Perfil = () => {
             const usuarioActualizado = { ...usuarioLogueado, ...datosEditados };
             localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
             
-            alert('Perfil actualizado correctamente');
+            mostrarAlerta('Perfil actualizado correctamente');
         } catch (error) {
             console.error('Error al actualizar el perfil:', error);
             throw error;
@@ -579,17 +579,17 @@ const Perfil = () => {
     const cambiarContrasena = async () => {
         try {
             if (!passwordData.currentPassword || !passwordData.newPassword) {
-                alert('Por favor complete todos los campos de contraseña');
+                mostrarAlerta('Error', 'Por favor complete todos los campos de contraseña', 'error');
                 return;
             }
 
             if (passwordData.newPassword !== passwordData.confirmPassword) {
-                alert('Las contraseñas nuevas no coinciden');
+                mostrarAlerta('Error', 'Las contraseñas nuevas no coinciden', 'error');
                 return;
             }
 
             if (passwordData.newPassword.length < 6) {
-                alert('La nueva contraseña debe tener al menos 6 caracteres');
+                mostrarAlerta('Error', 'La nueva contraseña debe tener al menos 6 caracteres', 'error');
                 return;
             }
 
@@ -599,7 +599,7 @@ const Perfil = () => {
             });
 
             console.log('Contraseña cambiada:', response);
-            alert('Contraseña cambiada correctamente');
+            mostrarAlerta('Éxito', 'Contraseña cambiada correctamente', 'success');
             
             // Limpiar campos de contraseña
             setPasswordData({
@@ -609,7 +609,7 @@ const Perfil = () => {
             });
         } catch (error) {
             console.error('Error al cambiar contraseña:', error);
-            alert(error.message || 'Error al cambiar la contraseña');
+            mostrarAlerta('Error', error.message || 'Error al cambiar la contraseña', 'error');
         }
     }
 
@@ -633,16 +633,6 @@ const Perfil = () => {
                     seccionActiva={seccionActiva}
                 />
                 <div className="min-h-screen bg-gray-50">
-                    {/* Success Notification */}
-                    {showSuccess && (
-                        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            Perfil actualizado exitosamente
-                        </div>
-                    )}
-
                     {/* Header */}
                     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                         <div className="max-w-7xl mx-auto px-6 py-8">

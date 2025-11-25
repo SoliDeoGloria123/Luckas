@@ -231,9 +231,11 @@ const EventoModal = ({
             <FormField id="precio-evento" label="Precio Evento:" type="number" value={getFieldValue('precio')} onChange={e => handleFieldChange('precio', e.target.value)} placeholder="Precio" />
             <FormField id="categoria-evento" label="Categoría:" type="select" value={getFieldValue('categoria')} onChange={e => handleFieldChange('categoria', e.target.value)}>
               <option value="">Seleccione...</option>
-              {categorias && categorias.map(cat => (
-                <option key={cat._id} value={cat._id}>{cat.nombre}</option>
-              ))}
+              {categorias && categorias
+                .filter(cat => String(cat.estado || '').toLowerCase() === 'activo')
+                .map(cat => (
+                  <option key={cat._id} value={cat._id}>{cat.nombre}</option>
+                ))}
             </FormField>
           </div>
           <div className="from-grid-admin">
