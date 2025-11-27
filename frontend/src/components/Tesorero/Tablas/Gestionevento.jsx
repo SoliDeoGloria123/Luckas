@@ -21,7 +21,7 @@ import {
 const Gestionevento = () => {
   const [eventos, setEventos] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  
+
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -45,11 +45,21 @@ const Gestionevento = () => {
   // Obtener eventos
   const obtenerEventos = async () => {
     try {
-      const data = await eventService.getAllEvents();
-      setEventos(Array.isArray(data.data) ? data.data : []);
+      const res = await eventService.getAllEvents();
+      // Aceptar respuesta en varios formatos: array directo o { success, data }
+      let lista = [];
+      if (res) {
+        if (Array.isArray(res)) lista = res;
+        else if (res.data && Array.isArray(res.data)) lista = res.data;
+        else if (res.success && Array.isArray(res.data)) lista = res.data;
+        else if (res.data) lista = res.data;
+      }
+      console.debug('EVENTOS RECIBIDOS:', lista);
+      setEventos(lista);
     } catch (error) {
       setEventos([]);
-      mostrarAlerta("ERROR", `Error al obtener eventos: ${error.message}`);
+      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`);
+
     }
   };
 
@@ -57,11 +67,17 @@ const Gestionevento = () => {
   const obtenerCategorias = async () => {
     try {
       const res = await categorizacionService.getAll();
-      setCategorias(res.data || []);
+      let lista = [];
+      if (res) {
+        if (Array.isArray(res)) lista = res;
+        else if (res.data && Array.isArray(res.data)) lista = res.data;
+        else if (res.data) lista = res.data;
+      }
+      setCategorias(lista || []);
       obtenerEstadisticas();
     } catch (error) {
       setCategorias([]);
-      mostrarAlerta("ERROR", `Error al obtener categorías: ${error.message}`, 'error');
+      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`);
     }
   };
 
@@ -81,7 +97,6 @@ const Gestionevento = () => {
   };
 
   // Estado de carga y filtrado
-  const [cargando] = useState(false); // setCargando commented as unused
   const eventosFiltrados = eventos; // Puedes aplicar filtros si lo necesitas
 
   // Carrusel de imágenes: un índice por evento
@@ -270,15 +285,7 @@ const Gestionevento = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(() => {
-            if (cargando) {
-              return (
-                <div className="col-span-full text-center py-12">
-                  <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-slate-600">Cargando eventos...</p>
-                </div>
-              );
-            }
-
+        
             if (eventosFiltrados.length > 0) {
               return eventosPaginados.map((evento) => {
                 const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
@@ -407,9 +414,9 @@ const Gestionevento = () => {
                             <span className="text-slate-600">
                               {evento.horaInicio} {evento.horaFin && `- ${evento.horaFin}`}
                             </span>
-                             <span className="ml-2 text-xs text-slate-500">
-                      ({evento.duracionDias} día{evento.duracionDias > 1 ? 's' : ''})
-                    </span>
+                            <span className="ml-2 text-xs text-slate-500">
+                              ({evento.duracionDias} día{evento.duracionDias > 1 ? 's' : ''})
+                            </span>
                           </div>
                         )}
 
@@ -431,7 +438,7 @@ const Gestionevento = () => {
                         </div>
 
                         <div className="flex items-center space-x-2 text-sm">
-                    
+
                           <span className="text-xs">
                             Estado: {evento.active ? 'Activo' : 'Inactivo'}
                           </span>

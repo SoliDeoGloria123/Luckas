@@ -170,8 +170,36 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
   };
 
   const abrirModalEditar = (reserva) => {
+    // Normalizar la reserva para que el modal reciba valores compatibles
+    const normalizeId = (val) => {
+      if (!val && val !== 0) return '';
+      if (typeof val === 'string') return val;
+      if (typeof val === 'object') return val._id || val.id || '';
+      return String(val);
+    };
+
+    const formatDate = (d) => {
+      if (!d) return '';
+      try {
+        if (typeof d === 'string') return d.substring(0, 10);
+        const dt = new Date(d);
+        if (Number.isNaN(dt.getTime())) return '';
+        return dt.toISOString().substring(0, 10);
+      } catch { return ''; }
+    };
+
+    const normalized = {
+      ...reserva,
+      usuario: normalizeId(reserva.usuario),
+      cabana: normalizeId(reserva.cabana),
+      fechaInicio: formatDate(reserva.fechaInicio),
+      fechaFin: formatDate(reserva.fechaFin),
+      precio: reserva.precio !== undefined && reserva.precio !== null ? reserva.precio : '',
+      activo: typeof reserva.activo === 'boolean' ? reserva.activo : (String(reserva.activo) === 'true')
+    };
+
     setModoEdicion(true);
-    setReservaSeleccionada(reserva);
+    setReservaSeleccionada(normalized);
     setMostrarModal(true);
   };
 

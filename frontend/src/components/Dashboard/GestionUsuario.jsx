@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import UsuarioModal from "./Modales/UsuarioModal";
 import TablaUsuarios from "./Tablas/UserTabla";
 import { userService } from "../../services/userService";
@@ -14,7 +15,6 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
     const [busqueda, setBusqueda] = useState("");
     const [filtroRole, setFiltroRole] = useState("");
     const [filtroEstado, setFiltroEstado] = useState("");
-    const [cargando, setCargando] = useState(true);
     const [mostrarModal, setMostrarModal] = useState(false);
     const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
     const [modoEdicion, setModoEdicion] = useState(false);
@@ -27,7 +27,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
         nuevosHoy: 0,
     });
     const [usuarioActual, setUsuarioActual] = useState(usuarioProp);
-
+    const navigate = useNavigate();
     // Si no se pasa usuario como prop, obtenerlo desde localStorage
     useEffect(() => {
         if (!usuarioProp) {
@@ -37,6 +37,20 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
             }
         }
     }, [usuarioProp]);
+
+    // Redirigir si el usuario no tiene rol de admin o tesorero
+    useEffect(() => {
+        try {
+            const rol = usuarioActual && usuarioActual.role ? String(usuarioActual.role).toLowerCase() : null;
+            if (rol && rol !== 'admin' && rol !== 'tesorero') {
+                if (rol === 'seminarista') navigate('/seminarista', { replace: true });
+                else if (rol === 'externo') navigate('/external', { replace: true });
+                else navigate('/', { replace: true });
+            }
+        } catch (e) {
+            console.error('Error comprobando rol para redirección:', e);
+        }
+    }, [usuarioActual, navigate]);
 
     // Helper para extraer mensajes de validación desde error.details
     const extractFieldMessages = (details) => {
@@ -83,8 +97,6 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
             if (error.message === "Unauthorized") {
                 localStorage.removeItem("token");
             }
-        } finally {
-            setCargando(false);
         }
     };
 
@@ -257,25 +269,6 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
         }
     };
 
-
-
-    // Si no hay usuario y no se está pasando como prop, mostrar loading
-    if (!usuarioActual && !usuarioProp) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <div>Cargando...</div>
-            </div>
-        );
-    }
-
-    // Mostrar indicador mientras se obtienen usuarios
-    if (cargando) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <div>Cargando usuarios...</div>
-            </div>
-        );
-    }
 
 
     return (

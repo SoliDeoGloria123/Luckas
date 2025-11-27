@@ -17,6 +17,7 @@ import { inscripcionService } from '../../../services/inscripcionService';
 
 
 
+
 const MisInscripciones = () => {
   // Estados
   const [inscripciones, setInscripciones] = useState([]);
@@ -71,13 +72,13 @@ const MisInscripciones = () => {
 
   // Calcular estadísticas en tiempo real basadas en los estados reales del backend
   const stats = {
-    confirmadas: inscripciones.filter(i => 
+    confirmadas: inscripciones.filter(i =>
       ['inscrito', 'matriculado', 'en_curso', 'certificado', 'finalizado'].includes(i.estado)
     ).length,
-    pendientes: inscripciones.filter(i => 
+    pendientes: inscripciones.filter(i =>
       ['no inscrito', 'preinscrito'].includes(i.estado)
     ).length,
-    canceladas: inscripciones.filter(i => 
+    canceladas: inscripciones.filter(i =>
       ['rechazada', 'cancelada academico'].includes(i.estado)
     ).length,
     total: inscripciones.length
@@ -110,87 +111,89 @@ const MisInscripciones = () => {
     ? inscripciones
     : inscripciones.filter(i => i.estado === activeFilter);
   return (
+    <>
+      <main className="main-content-seminario-inscripciones">
+        <Header />
+        <div className="container-seminario-inscripciones">
+          <div className="page-header-seminario-inscripciones">
+            <h1 className="page-title-seminario-inscripciones">Mis Inscripciones</h1>
+            <p className="page-subtitle">Gestiona y revisa el estado de tus inscripciones a eventos</p>
+          </div>
 
-    <main className="main-content-seminario-inscripciones">
-      <Header />
-      <div className="container-seminario-inscripciones">
-        {/* Encabezado */}
-        <div className="page-header-seminario-inscripciones">
-          <h1 className="page-title-seminario-inscripciones">Mis Inscripciones</h1>
-          <p className="page-subtitle">Gestiona y revisa el estado de tus inscripciones a eventos</p>
+          {/* Tarjetas de estadísticas */}
+          <StatsGridSeminarista
+            stats={[
+              {
+                icon: faCheckCircle,
+                count: stats.confirmadas,
+                label: 'Confirmadas',
+                className: 'confirmed'
+              },
+              {
+                icon: faExclamationTriangle,
+                count: stats.pendientes,
+                label: 'Pendientes',
+                className: 'pending'
+              },
+              {
+                icon: faTimesCircle,
+                count: stats.canceladas,
+                label: 'Canceladas',
+                className: 'cancelled'
+              },
+              {
+                icon: faCalendar,
+                count: stats.total,
+                label: 'Total',
+                className: 'total'
+              }
+            ]}
+          />
+
+          {/* Filtros */}
+          <FilterButtonsSeminarista
+            activeFilter={activeFilter}
+            onFilterChange={filterInscripciones}
+            filterOptions={[
+              { value: 'Todas', label: 'Todas' },
+              { value: 'inscrito', label: 'Inscrito' },
+              { value: 'preinscrito', label: 'Preinscrito' },
+              { value: 'matriculado', label: 'Matriculado' },
+              { value: 'en_curso', label: 'En Curso' },
+              { value: 'finalizado', label: 'Finalizado' },
+              { value: 'rechazada', label: 'Rechazada' }
+            ]}
+          />
+          {/* Lista de inscripciones */}
+          {filteredInscripciones.length === 0 && (
+            <EmptyState
+              title="No tienes inscripciones registradas"
+              subtitle="¡Haz tu primera inscripción y disfruta la experiencia!"
+              icon="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
+            />
+          )}
+
+          {/* Lista de inscripciones */}
+          {filteredInscripciones.map((inscripcion) => (
+            <InscripcionCard
+              key={`inscripcion-${inscripcion.id || inscripcion._id}-${inscripcion.estado}`}
+              inscripcion={inscripcion}
+              onViewDetails={openModal}
+            />
+          ))}
+          {/* Modal de Detalles */}
+
         </div>
-
-        {/* Tarjetas de estadísticas */}
-        <StatsGridSeminarista 
-          stats={[
-            { 
-              icon: faCheckCircle, 
-              count: stats.confirmadas, 
-              label: 'Confirmadas', 
-              className: 'confirmed' 
-            },
-            { 
-              icon: faExclamationTriangle, 
-              count: stats.pendientes, 
-              label: 'Pendientes', 
-              className: 'pending' 
-            },
-            { 
-              icon: faTimesCircle, 
-              count: stats.canceladas, 
-              label: 'Canceladas', 
-              className: 'cancelled' 
-            },
-            { 
-              icon: faCalendar, 
-              count: stats.total, 
-              label: 'Total', 
-              className: 'total' 
-            }
-          ]}
-        />
-
-        {/* Filtros */}
-        <FilterButtonsSeminarista
-          activeFilter={activeFilter}
-          onFilterChange={filterInscripciones}
-          filterOptions={[
-            { value: 'Todas', label: 'Todas' },
-            { value: 'inscrito', label: 'Inscrito' },
-            { value: 'preinscrito', label: 'Preinscrito' },
-            { value: 'matriculado', label: 'Matriculado' },
-            { value: 'en_curso', label: 'En Curso' },
-            { value: 'finalizado', label: 'Finalizado' },
-            { value: 'rechazada', label: 'Rechazada' }
-          ]}
-        />
-        {/* Lista de inscripciones */}
-        {filteredInscripciones.length === 0 && (
-          <EmptyState 
-            title="No tienes inscripciones registradas"
-            subtitle="¡Haz tu primera inscripción y disfruta la experiencia!"
-            icon="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
-          />
-        )}
-
-        {/* Lista de inscripciones */}
-        {filteredInscripciones.map((inscripcion) => (
-          <InscripcionCard 
-            key={`inscripcion-${inscripcion.id || inscripcion._id}-${inscripcion.estado}`}
-            inscripcion={inscripcion}
-            onViewDetails={openModal}
-          />
-        ))}
-        {/* Modal de Detalles */}
-        <InscripcionModal
-          inscripcion={currentInscripcion}
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onCancel={cancelarInscripcion}
-        />
-      </div>
+      </main>
+      <InscripcionModal
+        inscripcion={currentInscripcion}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onCancel={cancelarInscripcion}
+      />
       <Footer />
-    </main>
+    </>
+
   );
 };
 

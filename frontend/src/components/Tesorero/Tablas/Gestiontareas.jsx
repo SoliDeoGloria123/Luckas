@@ -80,14 +80,27 @@ const Gestiontarea = () => {
 
   const handleEdit = (item) => {
     // Normalizar valores para el modal
+    // Normalizamos fechaLimite a yyyy-mm-dd si viene en formato ISO con hora
+    let fechaNorm = '';
+    if (item && item.fechaLimite) {
+      if (typeof item.fechaLimite === 'string' && item.fechaLimite.includes('T')) {
+        fechaNorm = item.fechaLimite.split('T')[0];
+      } else {
+        fechaNorm = item.fechaLimite;
+      }
+    }
+
     const normalizado = {
       ...item,
       prioridad: item.prioridad && ['Alta', 'Media', 'Baja'].includes(item.prioridad) ? item.prioridad : 'Media',
       estado: item.estado && ['pendiente', 'en_progreso', 'completada', 'cancelada'].includes(item.estado) ? item.estado : 'pendiente',
       comentarios: Array.isArray(item.comentarios) ? item.comentarios : [],
       asignadoA: item.asignadoA?._id || item.asignadoA || '',
-      asignadoPor: item.asignadoPor?._id || item.asignadoPor || ''
+      asignadoPor: item.asignadoPor?._id || item.asignadoPor || '',
+      fechaLimite: fechaNorm || ''
     };
+    // Mostrar la fecha normalizada en la consola para depuración
+    console.debug('fechaLimite (solo fecha):', fechaNorm || '');
     setModoEdicion(true);
     setTareaSeleccionada(normalizado);
     setMostrarModal(true);
@@ -234,7 +247,6 @@ const Gestiontarea = () => {
               <table className="users-table-tesorero">
                 <thead>
                   <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]" >
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >ID</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >TITULO</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >DESCRIPCION</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]" >ESTADO</th>
@@ -249,15 +261,8 @@ const Gestiontarea = () => {
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
-                  {tareas.length === 0 ? (
-                    <tr>
-                      <td colSpan={6}>No hay tareas para mostrar</td>
-                    </tr>
-                  ) : (
-                    tareasPaginadas.map((tarea) => (
+                    {tareasPaginadas.map((tarea) => (
                       <tr key={tarea._id}>
-
-                        <td>{tarea._id}</td>
                         <td>{tarea.titulo}</td>
                         <td>{tarea.descripcion}</td>
                         <td>
@@ -281,8 +286,8 @@ const Gestiontarea = () => {
 
                         </td>
                       </tr>
-                    ))
-                  )}
+                  
+                  ))}
                 </tbody>
               </table>
             </div>

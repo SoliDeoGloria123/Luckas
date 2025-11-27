@@ -21,7 +21,18 @@ export const inscripcionService = {
       },
       body: JSON.stringify(inscripcion),
     });
-    if (!res.ok) throw new Error("Error al crear inscripción");
+    if (!res.ok) {
+      // Intentar extraer detalle del error devuelto por el servidor
+      let errText = 'Error al crear inscripción';
+      try {
+        const payload = await res.json();
+        if (payload && payload.message) errText = payload.message;
+        else if (payload && typeof payload === 'string') errText = payload;
+      } catch (e) {
+        console.error('inscripcionService.create: error parsing error body', e);
+      }
+      throw new Error(errText);
+    }
     return await res.json();
   },
 
@@ -34,7 +45,16 @@ export const inscripcionService = {
       },
       body: JSON.stringify(inscripcion),
     });
-    if (!res.ok) throw new Error("Error al actualizar inscripción");
+    if (!res.ok) {
+      let errText = 'Error al actualizar inscripción';
+      try {
+        const payload = await res.json();
+        if (payload && payload.message) errText = payload.message;
+      } catch (e) {
+        console.error('inscripcionService.update: error parsing error body', e);
+      }
+      throw new Error(errText);
+    }
     return await res.json();
   },
 

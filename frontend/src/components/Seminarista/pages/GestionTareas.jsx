@@ -4,6 +4,7 @@ import Header from "../../Seminarista/Shared/Header";
 import Footer from "../../footer/Footer";
 import { tareaService } from '../../../services/tareaService';
 import { userService } from '../../../services/userService';
+import { mostrarAlerta } from "../../utils/alertas";
 
 const TareasManagement = () => {
   const [showModal, setShowModal] = useState(false)
@@ -13,6 +14,7 @@ const TareasManagement = () => {
   const [filterPrioridad, setFilterPrioridad] = useState("todas")
   const [usuarios, setUsuarios] = useState([]);
   const [tareas, setTareas] = useState([]);
+
 
   const [formData, setFormData] = useState({
     titulo: "",
@@ -24,12 +26,20 @@ const TareasManagement = () => {
     fechaLimite: "",
   })
 
+  // Fecha mínima (hoy) para inputs de tipo date - devuelve YYYY-MM-DD
+  const getMinDateString = () => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString().split('T')[0];
+  }
+  const minFecha = getMinDateString();
+
   const obtenerUsuarios = async () => {
     try {
       const data = await userService.getAllUsers();
       setUsuarios(Array.isArray(data.data) ? data.data : []);
     } catch (err) {
-      setError("Error al obtener usuarios: " + err.message);
+      console.error("Error al obtener usuarios: " + err.message);
     }
   };
 
@@ -38,7 +48,7 @@ const TareasManagement = () => {
       const response = await tareaService.getAll();
       setTareas(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-      setError("Error al obtener tareas: " + err.message);
+      console.error("Error al obtener tareas: " + err.message);
     }
   };
 
@@ -80,7 +90,7 @@ const TareasManagement = () => {
       prioridad: "Media",
       asignadoA: "",
       asignadoARol: "seminarista",
-      fechaLimite: "",
+      fechaLimite: minFecha,
     })
     setShowModal(true)
   }
@@ -112,8 +122,24 @@ const TareasManagement = () => {
 
   const handleSaveTask = async () => {
     if (!formData.titulo || !formData.asignadoA || !formData.fechaLimite) {
-      alert("Por favor completa todos los campos requeridos")
+      mostrarAlerta("Error", "Por favor completa todos los campos requeridos", "error");
       return
+    }
+
+    // Validar que la fecha límite no sea anterior a hoy
+    try {
+      const selected = new Date(formData.fechaLimite);
+      selected.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selected < today) {
+        mostrarAlerta('Error', 'La fecha límite debe ser hoy o una fecha futura', 'error');
+        return;
+      }
+    } catch (e) {
+      // Si la fecha no es válida, prevenir envío
+      mostrarAlerta('Error', 'Fecha límite inválida', 'error');
+      return;
     }
 
     try {
@@ -140,11 +166,11 @@ const TareasManagement = () => {
       if (editingTask) {
         // Actualizar tarea existente
         await tareaService.update(editingTask._id, tareaData);
-        alert('Tarea actualizada exitosamente');
+        mostrarAlerta('Exito', 'Tarea actualizada exitosamente');
       } else {
         // Crear nueva tarea
         await tareaService.create(tareaData);
-        alert('Tarea creada exitosamente');
+        mostrarAlerta('Exito', 'Tarea creada exitosamente');
       }
 
       // Recargar las tareas
@@ -177,6 +203,29 @@ const TareasManagement = () => {
     pendientes: tareas.filter((t) => t.estado === "pendiente").length,
     completadas: tareas.filter((t) => t.estado === "completada").length,
   }
+
+  // Aplicar buscador y filtros localmente
+  const filteredTareas = tareas.filter((t) => {
+    // búsqueda por título, descripción o nombre asignado
+    const q = (searchTerm || '').trim().toLowerCase();
+    if (q) {
+      const inTitle = String(t.titulo || '').toLowerCase().includes(q);
+      const inDesc = String(t.descripcion || '').toLowerCase().includes(q);
+      const assignedName = (typeof t.asignadoA === 'object'
+        ? `${t.asignadoA?.nombre || ''} ${t.asignadoA?.apellido || ''}`
+        : '')
+        .toLowerCase();
+      if (!(inTitle || inDesc || assignedName.includes(q))) return false;
+    }
+
+    // filtro por estado
+    if (filterEstado && filterEstado !== 'todos' && t.estado !== filterEstado) return false;
+
+    // filtro por prioridad
+    if (filterPrioridad && filterPrioridad !== 'todas' && t.prioridad !== filterPrioridad) return false;
+
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 w-full">
@@ -320,8 +369,8 @@ const TareasManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {tareas.map((tarea) => (
-                  <tr key={tarea.id} className="hover:bg-gray-50 transition-colors">
+                {filteredTareas.map((tarea) => (
+                  <tr key={tarea._id || tarea.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-4">
                       <div className="text-sm font-medium text-gray-900">{tarea.titulo}</div>
                       <div className="text-xs text-gray-500 lg:hidden mt-1">{tarea.descripcion}</div>
@@ -376,7 +425,7 @@ const TareasManagement = () => {
             </table>
           </div>
 
-          {tareas.length === 0 && (
+          {filteredTareas.length === 0 && (
             <div className="text-center py-12">
               <AlertCircle className="mx-auto text-gray-400 mb-4" size={48} />
               <p className="text-gray-600">No se encontraron tareas</p>
@@ -480,6 +529,7 @@ const TareasManagement = () => {
                 </label>
                 <input
                   type="date"
+                  min={minFecha}
                   value={formData.fechaLimite}
                   onChange={(e) => setFormData({ ...formData, fechaLimite: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

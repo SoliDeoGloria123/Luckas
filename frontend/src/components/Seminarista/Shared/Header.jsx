@@ -96,6 +96,16 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
         </div>
 
         <nav className={`header-nav-seminario ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+          {isMobileMenuOpen && (
+            <button
+              type="button"
+              className="mobile-menu-close"
+              aria-label="Cerrar menú"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              ✕
+            </button>
+          )}
           <a
             href="/seminarista"
             className={`nav-item-seminario${globalThis.location.pathname === '/seminarista' ? ' active' : ''}`}
@@ -185,9 +195,6 @@ const Header = ({ user, breadcrumbPath, onTabChange }) => {
             <div className={`user-dropdown-header ${showUserDropdown ? "show" : ""}`}>
               <a href="/dashboard/seminarista/Mi-Perfil" className="dropdown-item">
                 <span>Mi Perfil</span>
-              </a>
-              <a href="/dashboard/seminarista/Configuracion" className="dropdown-item">
-                <span>Configuración</span>
               </a>
               <hr className="dropdown-divider" />
               <button type="button" className="dropdown-item" onClick={handleLogout}>

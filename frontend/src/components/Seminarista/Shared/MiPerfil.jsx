@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, Calendar, BookOpen, GraduationCap, Award, Clock } from "lucide-react"
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Mail, Phone, Calendar,  GraduationCap, Award, Clock } from "lucide-react"
 import './MiPerfil.css';
 import Header from './Header';
 import Footer from '../../footer/Footer';
@@ -8,14 +8,14 @@ import PropTypes from 'prop-types';
 import Field from './Field';
 import ToggleSwitch from './ToggleSwitch';
 import PasswordField from './PasswordField';
-import { datosEditadosShape, profileDataShape, passwordDataShape, securityDataShape } from './miPerfilPropTypes';
+import { datosEditadosShape,  passwordDataShape, securityDataShape } from './miPerfilPropTypes';
+import { mostrarAlerta } from '../../utils/alertas';
 
 // Función auxiliar para obtener usuario desde localStorage
 const obtenerUsuarioLogueado = () => {
   try {
     const usuarioStorage = localStorage.getItem('usuario');
     const usuario = usuarioStorage ? JSON.parse(usuarioStorage) : null;
-    console.log('Usuario logueado:', usuario);
     return usuario;
   } catch (error) {
     console.error('Error al obtener usuario de localStorage:', error);
@@ -77,7 +77,7 @@ const validarCambioContrasena = (passwordData) => {
 };
 
 // Componente para mostrar información personal (extraído para reducir complejidad)
-const InformacionPersonal = ({ isEditing, datosEditados, handleInputChange }) => (
+const InformacionPersonal = ({ isEditing, datosEditados, handleInputChange, errors }) => (
   <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
     <div className="flex items-center space-x-2 mb-6">
       <User className="w-5 h-5 text-blue-600" />
@@ -85,9 +85,9 @@ const InformacionPersonal = ({ isEditing, datosEditados, handleInputChange }) =>
     </div>
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Field id="nombre" label="Nombre" isEditing={isEditing} value={datosEditados.nombre} onChange={(v) => handleInputChange('nombre', v)} placeholder="Escribe tu nombre aquí" />
+      <Field id="nombre" label="Nombre" isEditing={isEditing} value={datosEditados.nombre} onChange={(v) => handleInputChange('nombre', v)} placeholder="Escribe tu nombre aquí" error={errors?.nombre} />
 
-      <Field id="apellido" label="Apellido" isEditing={isEditing} value={datosEditados.apellido} onChange={(v) => handleInputChange('apellido', v)} />
+      <Field id="apellido" label="Apellido" isEditing={isEditing} value={datosEditados.apellido} onChange={(v) => handleInputChange('apellido', v)} error={errors?.apellido} />
 
       <Field
         id="tipoDocumento"
@@ -102,53 +102,28 @@ const InformacionPersonal = ({ isEditing, datosEditados, handleInputChange }) =>
           'Tarjeta de identidad',
         ]}
       />
+      {/** pasar error inline al Field */}
+      <Field id="tipoDocumento" label="Tipo de Documento" isEditing={isEditing} value={datosEditados.tipoDocumento} onChange={(v) => handleInputChange('tipoDocumento', v)} options={[
+          'Cédula de Ciudadanía',
+          'Cédula de Extranjería',
+          'Pasaporte',
+          'Tarjeta de identidad',
+        ]} error={errors?.tipoDocumento} />
 
-      <Field id="numeroDocumento" label="Número de Documento" isEditing={isEditing} value={datosEditados.numeroDocumento} onChange={(v) => handleInputChange('numeroDocumento', v)} />
+      <Field id="numeroDocumento" label="Número de Documento" isEditing={isEditing} value={datosEditados.numeroDocumento} onChange={(v) => handleInputChange('numeroDocumento', v)} error={errors?.numeroDocumento} />
 
-      <Field id="telefono" label="Teléfono" isEditing={isEditing} value={datosEditados.telefono} onChange={(v) => handleInputChange('telefono', v)} type="tel" />
+      <Field id="telefono" label="Teléfono" isEditing={isEditing} value={datosEditados.telefono} onChange={(v) => handleInputChange('telefono', v)} type="tel" error={errors?.telefono} />
 
-      <Field id="correo" label="Correo Electrónico" isEditing={isEditing} value={datosEditados.correo} onChange={(v) => handleInputChange('correo', v)} type="email" />
+      <Field id="correo" label="Correo Electrónico" isEditing={isEditing} value={datosEditados.correo} onChange={(v) => handleInputChange('correo', v)} type="email" error={errors?.correo} />
 
-      <Field id="fechaNacimiento" label="Fecha de Nacimiento" isEditing={isEditing} value={datosEditados.fechaNacimiento} onChange={(v) => handleInputChange('fechaNacimiento', v)} type="date" />
+      <Field id="fechaNacimiento" label="Fecha de Nacimiento" isEditing={isEditing} value={datosEditados.fechaNacimiento} onChange={(v) => handleInputChange('fechaNacimiento', v)} type="date" error={errors?.fechaNacimiento} />
+      
 
-      <Field id="direccion" label="Dirección" isEditing={isEditing} value={datosEditados.direccion} onChange={(v) => handleInputChange('direccion', v)} />
     </div>
   </div>
 );
 
-// Componente para mostrar información académica (extraído para reducir complejidad)
-const InformacionAcademica = ({ isEditing, datosEditados, profileData, handleInputChange }) => (
-  <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-    <div className="flex items-center space-x-2 mb-6">
-      <BookOpen className="w-5 h-5 text-green-600" />
-      <h2 className="text-xl font-semibold text-gray-900">Información Académica</h2>
-    </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Field
-        id="nivelActual"
-        label="Nivel Actual"
-        isEditing={isEditing}
-        value={datosEditados.nivelAcademico}
-        onChange={(v) => handleInputChange('nivelAcademico', v)}
-        options={['Filosofía I','Filosofía II','Teología I','Teología II','Teología III','Teología IV']}
-      />
-
-      <div>
-        <label htmlFor="fechaIngreso" className="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
-        <p className="text-gray-900 py-3">{new Date(profileData.fechaIngreso).toLocaleDateString()}</p>
-      </div>
-
-      <Field id="directorEspiritual" label="Director Espiritual" isEditing={isEditing} value={datosEditados.directorEspiritual} onChange={(v) => handleInputChange('directorEspiritual', v)} />
-
-      <Field id="idiomas" label="Idiomas" isEditing={isEditing} value={datosEditados.idiomas} onChange={(v) => handleInputChange('idiomas', v)} />
-
-      <div className="md:col-span-2">
-        <Field id="especialidad" label="Especialidad" isEditing={isEditing} value={datosEditados.especialidad} onChange={(v) => handleInputChange('especialidad', v)} />
-      </div>
-    </div>
-  </div>
-);
 
 // Componente para configuración de cuenta y seguridad
 const ConfiguracionCuenta = ({
@@ -163,6 +138,8 @@ const ConfiguracionCuenta = ({
   manejarCambioContrasena,
   securityData,
   setSecurityData,
+  passwordErrors,
+  isPasswordValid,
 }) => (
   <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
     <div className="flex items-center space-x-2 mb-6">
@@ -179,6 +156,7 @@ const ConfiguracionCuenta = ({
           onChange={(v) => setPasswordData({ ...passwordData, currentPassword: v })}
           show={showPassword}
           toggleShow={setShowPassword}
+          error={passwordErrors.currentPassword}
         />
       </div>
 
@@ -190,6 +168,7 @@ const ConfiguracionCuenta = ({
           onChange={(v) => setPasswordData({ ...passwordData, newPassword: v })}
           show={showNewPassword}
           toggleShow={setShowNewPassword}
+          error={passwordErrors.newPassword}
         />
       </div>
 
@@ -201,6 +180,7 @@ const ConfiguracionCuenta = ({
           onChange={(v) => setPasswordData({ ...passwordData, confirmPassword: v })}
           show={showConfirmPassword}
           toggleShow={setShowConfirmPassword}
+          error={passwordErrors.confirmPassword}
         />
       </div>
     </div>
@@ -208,7 +188,8 @@ const ConfiguracionCuenta = ({
     <div className="mt-6 pt-6 border-t border-gray-200">
       <button
         onClick={manejarCambioContrasena}
-        className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+        disabled={!isPasswordValid}
+        className={`bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 ${isPasswordValid ? '' : 'opacity-60 cursor-not-allowed'}`}
       >
         <Award className="w-5 h-5" />
         <span>Cambiar Contraseña</span>
@@ -238,12 +219,29 @@ const ConfiguracionCuenta = ({
 
 const ProfilePage = () => {
   // Estados principales
-  const [isEditing, setIsEditing] = useState(true);
-  const [showSuccess, setShowSuccess] = useState(false);
+  // Por defecto abrir en modo vista (no en edición)
+  const [isEditing, setIsEditing] = useState(false);
   const usuarioLogueado = obtenerUsuarioLogueado();
+  const getInitials = (user) => {
+    if (!user) return '';
+    const full = `${user.nombre || ''} ${user.apellido || ''}`.trim();
+    if (!full) return '';
+    const parts = full.split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+  const initials = getInitials(usuarioLogueado);
   const [datosEditados, setDatosEditados] = useState(() => crearEstadoInicialDatos(usuarioLogueado));
   const [passwordData, setPasswordData] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
-  const [profileData, setProfileData] = useState(() => crearPerfilPorDefecto(usuarioLogueado));
+  // perfil mostrado / auxiliar (se usa más abajo para actualizar valores tras guardar)
+  const profileRef = useRef(crearPerfilPorDefecto(usuarioLogueado));
+  const setProfileData = (updater) => {
+    if (typeof updater === 'function') {
+      profileRef.current = updater(profileRef.current);
+    } else {
+      profileRef.current = updater;
+    }
+  };
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -255,20 +253,121 @@ const ProfilePage = () => {
     }
   }, [usuarioLogueado, isEditing]);
 
+  // Estado para validaciones en tiempo real
+  const [errors, setErrors] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
+  // helpers para validación
+  const isEmpty = (v) => !v || String(v).trim() === '';
+  const validateEmail = (v) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+    return re.test(String(v).toLowerCase());
+  };
+  const validateDate = (v) => {
+    if (!v) return false;
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return false;
+    const today = new Date();
+    if (d > today) return false;
+    return true;
+  };
+  const validatePhone = (v) => {
+    return !v || /^\+?[0-9\s-]{6,20}$/.test(String(v));
+  };
+  // Estado para validación de contraseña en tiempo real
+  const [passwordErrors, setPasswordErrors] = useState({});
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  const validateField = (field, value) => {
+    const requiredFields = ['nombre', 'apellido', 'tipoDocumento', 'numeroDocumento'];
+    if (requiredFields.includes(field)) {
+      return isEmpty(value) ? 'Este campo es obligatorio.' : '';
+    }
+
+    const fieldValidators = {
+      direccion: (v) => {
+        if (isEmpty(v)) return 'La dirección es obligatoria.';
+        if (String(v).trim().length < 5) return 'La dirección es demasiado corta.';
+        return '';
+      },
+      correo: (v) => {
+        if (isEmpty(v)) return 'El correo es obligatorio.';
+        if (!validateEmail(v)) return 'Formato de correo inválido.';
+        return '';
+      },
+      fechaNacimiento: (v) => {
+        if (!v) return 'La fecha de nacimiento es obligatoria.';
+        if (!validateDate(v)) return 'Fecha inválida o futura.';
+        return '';
+      },
+      telefono: (v) => {
+        if (!validatePhone(v)) return 'Teléfono inválido.';
+        return '';
+      },
+    };
+
+    if (field in fieldValidators) return fieldValidators[field](value);
+    return '';
+  };
+
+  // Validaciones para contraseña en tiempo real
+  const validatePasswordField = (field, value, { currentPassword, newPassword, confirmPassword }) => {
+    if (field === 'currentPassword') {
+      if ((newPassword || confirmPassword) && (!value || String(value).trim() === '')) return 'Contraseña actual requerida.';
+    }
+    if (field === 'newPassword') {
+      if (!value || String(value).trim() === '') return 'La nueva contraseña es obligatoria.';
+      if (String(value).length < 6) return 'La nueva contraseña debe tener al menos 6 caracteres.';
+    }
+    if (field === 'confirmPassword') {
+      if (!value || String(value).trim() === '') return 'Confirma la nueva contraseña.';
+      if (newPassword && value !== newPassword) return 'Las contraseñas no coinciden.';
+    }
+    return '';
+  };
+
+  // Comprobar y validar el formulario cuando cambian los datos editados
+  useEffect(() => {
+    const required = ['nombre', 'apellido', 'tipoDocumento', 'numeroDocumento', 'correo', 'direccion', 'fechaNacimiento'];
+    const newErrors = {};
+    for (const f of required) {
+      const msg = validateField(f, datosEditados[f]);
+      if (msg) newErrors[f] = msg;
+    }
+    if (datosEditados.telefono) {
+      const telMsg = validateField('telefono', datosEditados.telefono);
+      if (telMsg) newErrors.telefono = telMsg;
+    }
+    setErrors(newErrors);
+    setIsFormValid(Object.keys(newErrors).length === 0);
+  }, [datosEditados]);
+
+  // Efecto para validar contraseña en tiempo real cuando cambian los inputs
+  useEffect(() => {
+    const { currentPassword, newPassword, confirmPassword } = passwordData;
+    const newPwdErrors = {};
+    const fields = ['currentPassword', 'newPassword', 'confirmPassword'];
+    for (const f of fields) {
+      const val = passwordData[f];
+      const msg = validatePasswordField(f, val, { currentPassword, newPassword, confirmPassword });
+      if (msg) newPwdErrors[f] = msg;
+    }
+    setPasswordErrors(newPwdErrors);
+    // password valid only if all three present and no errors
+    const allPresent = currentPassword && newPassword && confirmPassword;
+    setIsPasswordValid(allPresent && Object.keys(newPwdErrors).length === 0);
+  }, [passwordData]);
+
   // Función para guardar cambios del perfil
   const actualizarPerfil = async () => {
     try {
-      const response = await userService.updateOwnProfile(datosEditados);
-      console.log('Perfil actualizado:', response);
-      
+      await userService.updateOwnProfile(datosEditados);
       // Actualizar localStorage con los nuevos datos
       const usuarioActualizado = { ...usuarioLogueado, ...datosEditados };
       localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
-      
       // Actualizar los datos mostrados
       setProfileData(prev => ({ ...prev, ...datosEditados }));
-      
-      alert('Perfil actualizado correctamente');
+  
+      mostrarAlerta('Exito', 'Perfil actualizado correctamente');
     } catch (error) {
       console.error('Error al actualizar el perfil:', error);
       throw error;
@@ -276,20 +375,28 @@ const ProfilePage = () => {
   };
 
   const handleSave = async () => {
+    if (!isFormValid) {
+      mostrarAlerta('Error', 'Corrige los errores del formulario antes de guardar.', 'error');
+      return;
+    }
     try {
       await actualizarPerfil();
-      setShowSuccess(true);
       setIsEditing(false);
-      setTimeout(() => setShowSuccess(false), 3000);
+    
     } catch (error) {
       console.error('Error al guardar el perfil:', error);
-      alert('Error al guardar los cambios');
+      mostrarAlerta('Error', 'Error al guardar los cambios', 'error');
     }
   };
 
   const handleInputChange = (field, value) => {
-    // ...existing code...
     setDatosEditados((prev) => ({ ...prev, [field]: value }));
+    const msg = validateField(field, value);
+    setErrors(prev => {
+      const next = { ...prev };
+      if (msg) next[field] = msg; else delete next[field];
+      return next;
+    });
   };
 
   const handleCancelEdit = () => {
@@ -308,16 +415,16 @@ const ProfilePage = () => {
     const validacion = validarCambioContrasena(passwordData);
 
     if (!validacion.esValido) {
-      alert(validacion.mensaje);
+      mostrarAlerta('Error', validacion.mensaje, 'error');
       return;
     }
 
     try {
       await userService.changePassword(passwordData);
-      alert('Contraseña cambiada correctamente');
+      mostrarAlerta('Exito', 'Contraseña cambiada correctamente');
       setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
-    } catch (error) {
-      alert('Error al cambiar la contraseña: ' + (error.response?.data?.message || error.message));
+    } catch  {
+      mostrarAlerta('Error', 'Error al cambiar la contraseña: ','error');
     }
   };
 
@@ -345,12 +452,7 @@ const ProfilePage = () => {
     <>
       <Header />
        <div className="min-h-screen bg-gray-50">
-      {/* Success Notification */}
-      {showSuccess && (
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in">
-          ✓ Perfil actualizado exitosamente
-        </div>
-      )}
+  
 
       {/* Header */}
       <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white">
@@ -359,7 +461,7 @@ const ProfilePage = () => {
             <div className="flex items-center space-x-6">
               <div className="relative">
                 <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-3xl font-bold">
-                  LM
+                  {initials || (usuarioLogueado && ((usuarioLogueado.nombre || '').charAt(0) + (usuarioLogueado.apellido || '').charAt(0)).toUpperCase()) || 'LM'}
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                   <GraduationCap className="w-4 h-4 text-white" />
@@ -441,15 +543,10 @@ const ProfilePage = () => {
               isEditing={isEditing}
               datosEditados={datosEditados}
               handleInputChange={handleInputChange}
+              errors={errors}
             />
 
-            {/* Academic Information */}
-            <InformacionAcademica
-              isEditing={isEditing}
-              datosEditados={datosEditados}
-              profileData={profileData}
-              handleInputChange={handleInputChange}
-            />
+      
 
             {/* Security Settings */}
             {isEditing && (
@@ -465,6 +562,8 @@ const ProfilePage = () => {
                 manejarCambioContrasena={manejarCambioContrasena}
                 securityData={securityData}
                 setSecurityData={setSecurityData}
+                passwordErrors={passwordErrors}
+                isPasswordValid={isPasswordValid}
               />
             )}
 
@@ -479,7 +578,8 @@ const ProfilePage = () => {
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  disabled={!isFormValid}
+                  className={`px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors ${isFormValid ? '' : 'opacity-60 cursor-not-allowed'}`}
                 >
                   Guardar Cambios
                 </button>
@@ -498,14 +598,9 @@ InformacionPersonal.propTypes = {
   isEditing: PropTypes.bool.isRequired,
   datosEditados: datosEditadosShape.isRequired,
   handleInputChange: PropTypes.func.isRequired,
+  errors: PropTypes.object,
 };
 
-InformacionAcademica.propTypes = {
-  isEditing: PropTypes.bool.isRequired,
-  datosEditados: datosEditadosShape.isRequired,
-  profileData: profileDataShape.isRequired,
-  handleInputChange: PropTypes.func.isRequired,
-};
 
 ConfiguracionCuenta.propTypes = {
   passwordData: passwordDataShape.isRequired,
@@ -519,6 +614,8 @@ ConfiguracionCuenta.propTypes = {
   manejarCambioContrasena: PropTypes.func.isRequired,
   securityData: securityDataShape.isRequired,
   setSecurityData: PropTypes.func.isRequired,
+  passwordErrors: PropTypes.object,
+  isPasswordValid: PropTypes.bool,
 };
 
 export default ProfilePage;

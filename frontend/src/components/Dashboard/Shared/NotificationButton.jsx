@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import BaseNotificationButton from '../../Tesorero/shared/BaseNotificationButton';
+import BaseNotificationButton from './BaseNotificationButton';
 import NotificationPanel from './NotificationPanel';
 import useNotifications from '../../hooks/useNotifications';
 import './NotificationButton.css';

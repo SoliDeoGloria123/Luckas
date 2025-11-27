@@ -22,12 +22,8 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
         </tr>
       </thead>
       <tbody>
-        {inscripciones.length === 0 ? (
-          <tr>
-            <td colSpan={10}>No hay inscripciones para mostrar</td>
-          </tr>
-        ) : (
-          inscripciones.map((ins) => {
+        
+          {inscripciones.map((ins) => {
             // Extraer ternarias anidadas a variables
             let nombreCompleto = "N/A";
             if (ins.nombre && ins.apellido) {
@@ -87,8 +83,7 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
                 </td>
               </tr>
             );
-          })
-        )}
+          })}
       </tbody>
     </table>
   </div>

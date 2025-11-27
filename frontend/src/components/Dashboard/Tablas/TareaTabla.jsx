@@ -20,12 +20,8 @@ const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => 
         </tr>
       </thead>
       <tbody>
-        {tareas.length === 0 ? (
-          <tr>
-            <td colSpan={10}>No hay tareas para mostrar</td>
-          </tr>
-        ) : (
-          tareas.map((tarea) => (
+       
+          {tareas.map((tarea) => (
             <tr key={tarea._id}>
               <td>{tarea.titulo}</td>
               <td>{tarea.descripcion?.substring(0, 100)}...</td>
@@ -62,8 +58,7 @@ const TablaTareas = ({ tareas = [], onEditar, onEliminar, onCambiarEstado }) => 
                 </div>
               </td>
             </tr>
-          ))
-        )}
+        ))}
       </tbody>
     </table>
   </div>

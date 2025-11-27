@@ -15,12 +15,8 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar, onToggleEstado }) =
         </tr>
       </thead>
       <tbody>
-        {categorias.length === 0 ? (
-          <tr>
-            <td colSpan={6}>No hay categorías para mostrar</td>
-          </tr>
-        ) : (
-          categorias.map((cat) => (
+        
+          {categorias.map((cat) => (
             <tr key={cat._id}>
           
               <td>{cat.nombre}</td>
@@ -51,8 +47,8 @@ const TablaCategorias = ({ categorias, onEditar, onEliminar, onToggleEstado }) =
                 </div>
               </td>
             </tr>
-          ))
-        )}
+         
+        ))}
       </tbody>
     </table>
   </div>

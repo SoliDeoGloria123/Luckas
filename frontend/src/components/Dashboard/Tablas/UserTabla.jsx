@@ -20,12 +20,8 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar, onToggleEstado }) => (
         </tr>
       </thead>
       <tbody>
-        {usuarios.length === 0 ? (
-          <tr>
-            <td colSpan={9}>No hay usuarios para mostrar</td>
-          </tr>
-        ) : (
-          usuarios.map((user) => (
+        
+          {usuarios.map((user) => (
             <tr key={user._id} className={user.estado === 'inactivo' ? 'usuario-inactivo-blur' : ''}>
       
               <td>
@@ -73,8 +69,7 @@ const TablaUsuarios = ({ usuarios, onEditar, onEliminar, onToggleEstado }) => (
                 </div>
               </td>
             </tr>
-          ))
-        )}
+        ))}
       </tbody>
     </table>
   </div>

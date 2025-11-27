@@ -65,7 +65,6 @@ const Gestioncabana = () => {
     setMostrarModalDetalle(true);
   };
   const [cabanas, setCabanas] = useState([]);
-  const [cargando] = useState(false); // setCargando commented as unused
   const cabanasFiltradas = cabanas;
   const [categorias, setCategorias] = useState([]);
 
@@ -318,14 +317,7 @@ const Gestioncabana = () => {
         {/* Lista de Cabañas */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(() => {
-            if (cargando) {
-              return (
-                <div className="col-span-full text-center py-12">
-                  <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-slate-600">Cargando cabañas...</p>
-                </div>
-              );
-            }
+           
             
             if (cabanasFiltradas.length > 0) {
               return cabanasPaginadas.map((cabana) => {

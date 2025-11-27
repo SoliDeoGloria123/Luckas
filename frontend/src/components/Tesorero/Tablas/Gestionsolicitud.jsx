@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import SolicitudModal from '../../Dashboard/Modales/SolicitudModal';
 import { solicitudService } from '../../../services/solicirudService';
+import { categorizacionService } from '../../../services/categorizacionService';
+import { eventService } from "../../../services/eventService";
+import { cabanaService } from "../../../services/cabanaService";
+import { reservaService } from "../../../services/reservaService";
+import { programasAcademicosService } from "../../../services/programasAcademicosService";
 import { mostrarAlerta } from '../../utils/alertas';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
@@ -10,6 +15,11 @@ import { Edit } from "lucide-react"
 const Gestionsolicitud = () => {
 
   const [solicitudes, setSolicitudes] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [eventos, setEventos] = useState([]);
+  const [cabanas, setCabanas] = useState([]);
+  const [reservas, setReservas] = useState([]);
+  const [programasAcademicos, setProgramasAcademicos] = useState([]);
   
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -42,6 +52,111 @@ const Gestionsolicitud = () => {
     obtenerSolicitudes();
   }, []);
 
+  // Obtener categorías para el modal
+  const obtenerCategorias = async () => {
+    try {
+      const res = await categorizacionService.getAll();
+      let lista = [];
+      if (res) {
+        if (Array.isArray(res)) lista = res;
+        else if (res.data && Array.isArray(res.data)) lista = res.data;
+        else if (res.data) lista = res.data;
+      }
+      setCategorias(lista || []);
+    } catch (error) {
+      console.error('Error obteniendo categorías:', error);
+      setCategorias([]);
+    }
+  };
+
+  useEffect(() => {
+    obtenerCategorias();
+  }, []);
+
+   // Obtener eventos
+    const obtenerEventos = async () => {
+      try {
+        const data = await eventService.getAllEvents();
+        console.log('Eventos obtenidos:', data);
+        let listaEventos = [];
+        if (!data) listaEventos = [];
+        else if (Array.isArray(data)) listaEventos = data;
+        else if (data.data && Array.isArray(data.data)) listaEventos = data.data;
+        setEventos(listaEventos);
+      } catch (error) {
+        console.error('Error obteniendo eventos:', error);
+        setEventos([]);
+      }
+    };
+  
+    // Obtener cabañas
+    const obtenerCabanas = async () => {
+      try {
+        const data = await cabanaService.getAll();
+        console.log('Cabañas obtenidas:', data);
+        let listaCabanas = [];
+        if (!data) listaCabanas = [];
+        else if (Array.isArray(data)) listaCabanas = data;
+        else if (data.data && Array.isArray(data.data)) listaCabanas = data.data;
+        setCabanas(listaCabanas);
+      } catch (error) {
+        console.error('Error obteniendo cabañas:', error);
+        setCabanas([]);
+      }
+    };
+  
+    // Obtener reservas
+    const obtenerReservas = async () => {
+      try {
+        const data = await reservaService.getAll();
+        let listaReservas = [];
+        if (!data) listaReservas = [];
+        else if (Array.isArray(data)) listaReservas = data;
+        else if (data.data && Array.isArray(data.data)) listaReservas = data.data;
+        setReservas(listaReservas);
+      } catch (error) {
+        console.error('Error obteniendo reservas:', error);
+        setReservas([]);
+      }
+    };
+  
+    // Obtener programas académicos
+    const obtenerProgramasAcademicos = async () => {
+      try {
+        // El servicio expone `getAllProgramas`.
+        const data = await programasAcademicosService.getAllProgramas();
+        let listaProgramas = [];
+        if (!data) listaProgramas = [];
+        else if (Array.isArray(data)) listaProgramas = data;
+        else if (data.data && Array.isArray(data.data)) listaProgramas = data.data;
+        setProgramasAcademicos(listaProgramas);
+      } catch (error) {
+        console.error('Error obteniendo programas académicos:', error);
+        setProgramasAcademicos([]);
+      }
+    };
+  
+    // Obtener referencias según el modelo
+    const obtenerReferencias = async (modelo) => {
+      switch (modelo) {
+        case 'Eventos':
+          await obtenerEventos();
+          break;
+        case 'Cabana':
+          await obtenerCabanas();
+          break;
+        case 'Reserva':
+          await obtenerReservas();
+          break;
+        case 'ProgramaAcademico':
+          await obtenerProgramasAcademicos();
+          break;
+        default:
+          break;
+      }
+    };
+  
+
   const handleCreate = () => {
     setModoEdicion(false);
     setSolicitudSeleccionada(null);
@@ -65,8 +180,7 @@ const Gestionsolicitud = () => {
   };
 
   // Funciones para el modal del Dashboard
-  const crearSolicitud = async (e) => {
-    e.preventDefault();
+  const crearSolicitud = async () => {
     try {
       await solicitudService.create(nuevaSolicitud);
       mostrarAlerta("¡EXITO!", "Solicitud creada exitosamente");
@@ -77,8 +191,7 @@ const Gestionsolicitud = () => {
     }
   };
 
-  const actualizarSolicitud = async (e) => {
-    e.preventDefault();
+  const actualizarSolicitud = async () => {
     try {
       await solicitudService.update(solicitudSeleccionada._id, solicitudSeleccionada);
       mostrarAlerta("¡EXITO!", "Solicitud actualizada exitosamente");
@@ -209,7 +322,7 @@ const Gestionsolicitud = () => {
                 <thead>
                   <tr>
 
-                    <th>ID</th>
+                    
                     <th>Nombre Solicitante</th>
                     <th>Cédula</th>
                     <th>Correo</th>
@@ -228,8 +341,6 @@ const Gestionsolicitud = () => {
                 <tbody id="usersTableBody">
                   {(solicitudesPaginadas || []).map((soli) => (
                     <tr key={soli._id}>
-
-                      <td>{soli._id}</td>
                       <td >
                         {soli.solicitante?.nombre && soli.solicitante?.apellido
                           ? `${soli.solicitante.nombre} ${soli.solicitante.apellido}`
@@ -319,6 +430,12 @@ const Gestionsolicitud = () => {
             setNuevaSolicitud={setNuevaSolicitud}
             onClose={() => setMostrarModal(false)}
             onSubmit={modoEdicion ? actualizarSolicitud : crearSolicitud}
+            categorias={categorias}
+            eventos={eventos}
+            cabanas={cabanas}
+            reservas={reservas}
+            programasAcademicos={programasAcademicos}
+            obtenerReferencias={obtenerReferencias}
           />
         )}
       </main>

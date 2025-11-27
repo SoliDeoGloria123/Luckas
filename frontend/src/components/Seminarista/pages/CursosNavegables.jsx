@@ -4,20 +4,17 @@ import './CursosSeminario.css'; // Estilos específicos para cursos
 import './CabanasSeminario.css'; // Estilos base reutilizados
 import Header from '../Shared/Header';
 import Footer from '../../footer/Footer';
-import { Heart, Star, BookOpen, Calendar, Users, Clock } from 'lucide-react';
+import {  Star, BookOpen, Calendar, Users, Clock, Search, Eye } from 'lucide-react';
 import { programasAcademicosService } from '../../../services/programasAcademicosService';
 import FormularioInscripcion from '../pages/FormularioInscripcion';
 
 const CursosSeminario = () => {
   const { user } = useAuthCheck('seminarista');
   const [cursos, setCursos] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [activeFilter, setActiveFilter] = useState('todos');
-  const [favorites, setFavorites] = useState({});
-  const [notification, setNotification] = useState({ show: false, message: '' });
   const [inscripcionLoading] = useState(false);
 
   // Effect para manejar el cierre del modal con la tecla Escape
@@ -45,7 +42,6 @@ const CursosSeminario = () => {
   useEffect(() => {
   const cargarCursos = async () => {
     try {
-      setLoading(true);
       // Obtener programas académicos reales de la base de datos
       const response = await programasAcademicosService.getAllProgramas();
       // Si la respuesta es un objeto con .data, usa .data, si es array, úsalo directo
@@ -55,26 +51,13 @@ const CursosSeminario = () => {
     } catch (err) {
       console.error('Error al cargar programas:', err);
       setError('No se pudieron cargar los programas.');
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
   cargarCursos();
 }, []);
 
-  const showNotification = (message) => {
-    setNotification({ show: true, message });
-    setTimeout(() => setNotification({ show: false, message: '' }), 3000);
-  };
 
-  const toggleFavorite = (cursoId) => {
-    setFavorites(prev => ({
-      ...prev,
-      [cursoId]: !prev[cursoId]
-    }));
-    showNotification('Curso agregado a favoritos');
-  };
-
+  
   const verDetalles = (curso) => {
     setCursoSeleccionado(curso);
   };
@@ -83,9 +66,53 @@ const CursosSeminario = () => {
     setActiveFilter(categoria);
   };
 
-  const cursosFiltrados = activeFilter === 'todos' 
-    ? cursos 
+  // Filtrado según categoría seleccionada
+  const cursosFiltrados = activeFilter === 'todos'
+    ? cursos
     : cursos.filter(curso => curso.categoria?.nombre?.toLowerCase().includes(activeFilter.toLowerCase()));
+
+  // Paginación (se coloca después de cursosFiltrados para evitar TDZ)
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
+
+  // Cuando cambia el filtro, volver a la página 1
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [activeFilter]);
+
+  // Ajustar página si la cantidad de elementos cambia
+  useEffect(() => {
+    const newTotal = cursosFiltrados.length === 0 ? 0 : Math.ceil(cursosFiltrados.length / registrosPorPagina);
+    setPaginaActual((prev) => {
+      if (newTotal === 0) return 1;
+      return Math.min(prev, newTotal);
+    });
+  }, [cursosFiltrados.length]);
+
+  const totalPaginas = cursosFiltrados.length === 0 ? 0 : Math.ceil(cursosFiltrados.length / registrosPorPagina);
+  const cursosPaginados = cursosFiltrados.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+
+  // Placeholder SVG data URL (uses project palette colors)
+  const getPlaceholderDataUrl = (title = '') => {
+    const svg = `
+      <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'>
+        <defs>
+          <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+            <stop offset='0' stop-color='#2563eb'/>
+            <stop offset='1' stop-color='#8b5cf6'/>
+          </linearGradient>
+        </defs>
+        <rect width='100%' height='100%' fill='url(#g)' />
+        <g fill='rgba(255,255,255,0.95)' font-family='Segoe UI, Roboto, Arial' font-weight='600'>
+          <text x='50%' y='45%' fill='rgba(255,255,255,0.95)' text-anchor='middle' font-size='48'>📚</text>
+          <text x='50%' y='62%' fill='rgba(255,255,255,0.95)' text-anchor='middle' font-size='28'>${title ? title.substring(0,30) : 'Sin imagen'}</text>
+        </g>
+      </svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  };
 
   const getNivelColor = (nivel) => {
     switch (nivel) {
@@ -105,20 +132,7 @@ const CursosSeminario = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <>
-        <Header user={user} breadcrumbPath={[{ name: 'Cursos', path: '/dashboard/seminarista/cursos' }]} />
-        <div className="seminario-container">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Cargando cursos...</p>
-          </div>
-        </div>
-        <Footer />
-      </>
-    );
-  }
+
 
   if (error) {
     return (
@@ -138,82 +152,71 @@ const CursosSeminario = () => {
   }
 
   return (
-    <div className="cabanas-seminario">
-      <Header user={user} breadcrumbPath={[{ name: 'Cursos', path: '/dashboard/seminarista/cursos' }]} />
-      
-      <main className="main-content">
-        {/* Notification */}
-        {notification.show && (
-          <div className="notification-banner">
-            <p>{notification.message}</p>
-          </div>
-        )}
-
+    <div className="cursos-seminario">
+      <Header/>
+      <main className="main-content-cursos">
         {/* Page Header */}
-        <div className="page-header">
-          <div className="page-title">
+        <div className="page-header-cursos">
+          <div className="page-title-seminarista">
             <h1>Cursos Académicos</h1>
             <p>Descubre y participa en los cursos de formación académica y espiritual</p>
           </div>
-          <div className="page-stats-seminario">
-            <div className="stat-item-seminario">
-              <span className="stat-number-seminario">{cursos.length}</span>
-              <span className="stat-label-seminario">Cursos Totales</span>
+          <div className="page-stats-cursos">
+            <div className="stat-item-cursos">
+              <span className="stat-number-cursos">{cursos.length}</span>
+              <span className="stat-label-cursos">Cursos Totales</span>
             </div>
-            <div className="stat-item-seminario">
-              <span className="stat-number-seminario">{cursos.filter(c => c.categoria?.tipo === 'curso').length}</span>
-              <span className="stat-label-seminario">Cursos</span>
+            <div className="stat-item-cursos">
+              <span className="stat-number-cursos">{cursos.filter(c => c.categoria?.tipo === 'curso').length}</span>
+              <span className="stat-label-cursos">Cursos</span>
             </div>
-            <div className="stat-item-seminario">
-              <span className="stat-number-seminario">{cursos.filter(c => c.categoria?.tipo === 'programa').length}</span>
-              <span className="stat-label-seminario">Programas</span>
+            <div className="stat-item-cursos">
+              <span className="stat-number-cursos">{cursos.filter(c => c.categoria?.tipo === 'programa').length}</span>
+              <span className="stat-label-cursos">Programas</span>
             </div>
           </div>
         </div>
 
         {/* Filters and Search */}
-        <div className="filters-section-seminario">
-          <div className="search-bar">
-            <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
+        <div className="filters-section-cursos">
+          <div className="search-bar-cursos">
+            <Search className="search-icon-cursos" size={20} />
             <input type="text" placeholder="Buscar cursos..." id="searchInput" />
           </div>
 
-          <div className="filter-buttons">
+          <div className="filter-buttons-cursos">
             <button
-              className={`filter-btn ${activeFilter === 'todos' ? 'active' : ''}`}
+              className={`filter-btn-cursos ${activeFilter === 'todos' ? 'active' : ''}`}
               onClick={() => filterCursos('todos')}
             >
               Todos
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'tecnologia' ? 'active' : ''}`}
+              className={`filter-btn-cursos ${activeFilter === 'tecnologia' ? 'active' : ''}`}
               onClick={() => filterCursos('tecnologia')}
             >
               Tecnología
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'idiomas' ? 'active' : ''}`}
+              className={`filter-btn-cursos ${activeFilter === 'idiomas' ? 'active' : ''}`}
               onClick={() => filterCursos('idiomas')}
             >
               Idiomas
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'negocios' ? 'active' : ''}`}
+              className={`filter-btn-cursos ${activeFilter === 'negocios' ? 'active' : ''}`}
               onClick={() => filterCursos('negocios')}
             >
               Negocios
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'arte' ? 'active' : ''}`}
+              className={`filter-btn-cursos ${activeFilter === 'arte' ? 'active' : ''}`}
               onClick={() => filterCursos('arte')}
             >
               Arte
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'salud' ? 'active' : ''}`}
+              className={`filter-btn-cursos ${activeFilter === 'salud' ? 'active' : ''}`}
               onClick={() => filterCursos('salud')}
             >
               Salud
@@ -222,8 +225,8 @@ const CursosSeminario = () => {
         </div>
 
         {/* Courses Grid */}
-        <div className="cabins-grid">
-          {cursosFiltrados.map((curso) => {
+        <div className="cabins-grid-cursos">
+          {cursosPaginados.map((curso) => {
             // Precompute labels to avoid nested ternaries / IIFEs inside JSX (mejora SonarQube)
             const tipoLabel = (() => {
               if (curso.categoria?.tipo === 'curso') return '📚 Curso';
@@ -248,103 +251,96 @@ const CursosSeminario = () => {
             })();
 
             return (
-            <div key={curso._id} className="cabin-card">
-              <div className="cabin-image">
+            <div key={curso._id} className="cabin-card-cursos">
+              <div className="cabin-image-cursos">
                 <img
-                  src={curso.imagen || '/api/placeholder/300/200'}
+                  src={curso.imagen || getPlaceholderDataUrl(curso.nombre)}
                   alt={curso.nombre}
+                  onError={(e) => {
+                    // evitar bucle si el placeholder falla
+                    e.target.onerror = null;
+                    e.target.src = getPlaceholderDataUrl(curso.nombre);
+                  }}
                 />
                 <div className={`cabin-status ${curso.estado === 'activo' ? 'available' : 'reserved'}`}>
                   {curso.estado === 'activo' ? 'Disponible' : 'No Disponible'}
                 </div>
-                <button
-                  type="button"
-                  className={`cabin-favorite ${favorites[curso._id] ? 'active' : ''}`}
-                  aria-pressed={!!favorites[curso._id]}
-                  tabIndex={0}
-                  onClick={() => toggleFavorite(curso._id)}
-                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') toggleFavorite(curso._id); }}
-                >
-                  <Heart/>
-                </button>
-                <div className="cabin-gallery">
-                  <span className="gallery-count">
+               
+                <div className="cabin-gallery-cursos">
+                  <span className="gallery-count-cursos">
                     {tipoLabel}
                   </span>
                 </div>
               </div>
               
-              <div className="cabin-content">
-                <div className="cabin-header">
-                  <div className="cabin-category">
+              <div className="cabin-content-cursos">
+                <div className="cabin-header-cursos">
+                  <div className="cabin-category-cursos">
                     {curso.categoria?.nombre}
                   </div>
-                  <div className="cabin-rating">
+                  <div className="cabin-rating-cursos">
                     <Star size={15} />
                     <span>4.5</span>
                   </div>
                 </div>
 
-                <h3 className="cabin-title-cabana">{curso.nombre}</h3>
-                <p className="cabin-description">{descripcionText}</p>
+                <h3 className="cabin-title-cursos">{curso.nombre}</h3>
+                <p className="cabin-description-cursos">{descripcionText}</p>
 
-                <div className="cabin-features">
-                  <div className="feature-item">
+                <div className="cabin-features-cursos">
+                  <div className="feature-item-cursos">
                     <BookOpen size={16} />
                     <span className={getNivelColor(curso.nivel)}>{curso.nivel}</span>
                   </div>
-                  <div className="feature-item">
+                  <div className="feature-item-cursos">
                     <Users size={16} />
                     <span>{curso.cuposDisponibles || 'N/A'} cupos</span>
                   </div>
-                  <div className="feature-item">
+                  <div className="feature-item-cursos">
                     <Clock size={16} />
                     <span>{curso.duracion || 'N/A'}</span>
                   </div>
-                  <div className="feature-item">
+                  <div className="feature-item-cursos">
                     <Calendar size={16} />
                     <span>{getModalidadIcon(curso.modalidad)} {curso.modalidad}</span>
                   </div>
                 </div>
 
-                <div className="cabin-amenities">
-                  <div className="amenity-tag">
+                <div className="cabin-amenities-cursos">
+                  <div className="amenity-tag-cursos">
                     👨‍🏫 {curso.profesor || 'No asignado'}
                   </div>
                   {curso.fechaInicio && (
-                    <div className="amenity-tag">
+                    <div className="amenity-tag-cursos">
                       📅 {new Date(curso.fechaInicio).toLocaleDateString()}
                     </div>
                   )}
                 </div>
 
-                  <div className="cabin-footer">
-                  <div className="cabin-price">
-                    <span className="price">
+                  <div className="cabin-footer-cursos">
+                  <div className="cabin-price-cursos">
+                    <span className="price-cursos">
                       ${curso.precio || 'Gratis'}
                     </span>
-                    {curso.precio && <span className="price-period">/ curso</span>}
+                    {curso.precio && <span className="price-period-cursos">/ curso</span>}
                   </div>
-                  <div className="cabin-availability">
+                  <div className="cabin-availability-cursos">
                     <span className={`availability-text ${availabilityClass}`}>
                       {availabilityText}
                     </span>
                   </div>
                 </div>
 
-                <div className="cabin-actions">
+                <div className="cabin-actions-cursos">
                   <button 
-                    className="cabin-btn secondary" 
+                    className="cabin-btn-cursos secondary" 
                     onClick={() => verDetalles(curso)}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
+                      <Eye size={16} />
                     Ver Detalles
                   </button>
                   <button 
-                    className="cabin-btn primary"
+                    className="cabin-btn-cursos primary"
                     onClick={() => {
                       setCursoSeleccionado(curso);
                       setMostrarFormulario(true);
@@ -357,6 +353,8 @@ const CursosSeminario = () => {
               </div>
             </div>
           )})}
+
+          
         </div>
 
         {cursosFiltrados.length === 0 && (
@@ -366,6 +364,40 @@ const CursosSeminario = () => {
             <p>No se encontraron cursos para la categoría seleccionada.</p>
           </div>
         )}
+        {totalPaginas > 1 && (
+        <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+          <button
+            className="pagination-btn-admin"
+            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+            disabled={paginaActual === 1}
+          >
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          <span className="pagination-info-admin">
+            Página {paginaActual} de {totalPaginas}
+          </span>
+          <button
+            className="pagination-btn-admin"
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+            disabled={paginaActual >= totalPaginas}
+          >
+            <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        )}
+      </main>
+      {/* Formulario de Inscripción */}
+      {mostrarFormulario && cursoSeleccionado && (
+        <FormularioInscripcion
+          programa={cursoSeleccionado}
+          usuario={user}
+          loading={inscripcionLoading}
+          onClose={() => {
+            setMostrarFormulario(false);
+            setCursoSeleccionado(null);
+          }}
+        />
+      )}
 
       {/* Modal de Detalles del Curso */}
       {cursoSeleccionado && !mostrarFormulario && (() => {
@@ -433,19 +465,7 @@ const CursosSeminario = () => {
             </div>
             
             <div className="modal-body-programas">
-              <div className="modal-image-container-programas">
-                <img
-                  src={cursoSeleccionado.imagen || '/api/placeholder/400/250'}
-                  alt={cursoSeleccionado.nombre}
-                  className="modal-image-programas"
-                />
-                <div className="modal-rating-programas">
-                  <Star size={20} fill="currentColor" />
-                  <span>4.5</span>
-                </div>
-              </div>
-              
-              <div className="modal-info-programas">
+              <div className="modal-info-programas modal-info-noimage">
                 <div className="info-section-programas">
                   <h3>📝 Descripción</h3>
                   <p>{cursoSeleccionado.descripcion}</p>
@@ -499,13 +519,7 @@ const CursosSeminario = () => {
                 )}
 
                 <div className="modal-actions">
-                  <button
-                    className="btn-modal-secondary-programas"
-                    onClick={() => toggleFavorite(cursoSeleccionado._id)}
-                  >
-                    <Heart size={16} />
-                    {favorites[cursoSeleccionado._id] ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
-                  </button>
+              
                   <button
                     className="btn-modal-primary-programas"
                     onClick={() => {
@@ -523,21 +537,6 @@ const CursosSeminario = () => {
         </div>
         );
       })()}
-
-      {/* Formulario de Inscripción */}
-      {mostrarFormulario && cursoSeleccionado && (
-        <FormularioInscripcion
-          programa={cursoSeleccionado}
-          usuario={user}
-          loading={inscripcionLoading}
-          onClose={() => {
-            setMostrarFormulario(false);
-            setCursoSeleccionado(null);
-          }}
-        />
-      )}
-
-      </main>
       <Footer />
     </div>
   );

@@ -447,3 +447,35 @@
         padding: 0.6rem 1.2rem;
     }
 }
+
+/* Mobile navigation (visible en pantallas pequeñas) */
+.mobile-nav {
+    position: relative;
+    width: 100%;
+    z-index: 40;
+}
+.mobile-nav .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+.mobile-nav button {
+    width: 100%;
+    text-align: left;
+    font-size: 0.95rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+}
+
+/* Improve header logo sizing on very small screens */
+@media (max-width: 420px) {
+    .luckas-tesorero {
+        font-size: 28px;
+        line-height: 26px;
+        height: 26px;
+    }
+}
+
+/* Ensure the mobile nav is hidden on md+ */
+@media (min-width: 768px) {
+    .mobile-nav { display: none; }
+}

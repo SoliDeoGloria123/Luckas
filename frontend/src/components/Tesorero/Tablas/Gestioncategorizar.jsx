@@ -24,17 +24,24 @@ const Gestioncategorizacion = () => {
 
   // Obtener categorías
   const obtenerCategorias = async () => {
-    try {
+   try {
       const res = await categorizacionService.getAll();
-      setCategorias(res.data || []);
-      obtenerEstadisticas();
+      let lista = [];
+      if (res) {
+        if (Array.isArray(res)) lista = res;
+        else if (res.data && Array.isArray(res.data)) lista = res.data;
+        else if (res.data) lista = res.data;
+      }
+      setCategorias(lista || []);
     } catch (error) {
+      console.error(" ERROR obteniendo categorías:", error);
       setCategorias([]);
-      mostrarAlerta("ERROR", `Error al obtener categorías: ${error.message}`, 'error');
     }
   };
   useEffect(() => {
+    // Cargar categorías y estadísticas al montar
     obtenerCategorias();
+    obtenerEstadisticas();
   }, []);
 
 
@@ -99,13 +106,11 @@ const Gestioncategorizacion = () => {
   const obtenerEstadisticas = async () => {
     try {
       const stats = await categorizacionService.getStats();
-      setEstadisticas(stats);
+      setEstadisticas(stats || {});
     } catch (error) {
       console.error("Error al obtener estadísticas de categorías:", error);
     }
   };
-
-
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
@@ -230,42 +235,36 @@ const Gestioncategorizacion = () => {
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
-                  {categorias.length === 0 ? (
-                    <tr>
-                      <td colSpan={6}>no hay categorias para mostrar</td>
+                  {categorizacionPaginados.map((cate) => (
+                    <tr key={cate._id}>
+                      <td>{cate._id}</td>
+                      <td>{cate.nombre}</td>
+                      <td>{cate.tipo}</td>
+                      <td>{cate.codigo}</td>
+                      <td>
+                        <span className={`badge-tesorero badge-tesorero-${cate.estado === 'activo' ? 'activo' : 'desactivado'}`}>
+                          {cate.estado === 'activo' ? 'ACTIVO' : 'INACTIVO'}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(cate)} size="icon">
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            className={`btn-action ${cate.estado === 'activo' ? 'desactivar' : 'activar'} text-red-600 hover:bg-red-50 rounded transition-colors`}
+                            onClick={() => handleToggleEstado(cate)}
+                          >
+                            {cate.estado === 'activo' ? (
+                              <i className="fas fa-ban"></i>
+                            ) : (
+                              <i className="fas fa-check"></i>
+                            )}
+                          </button>
+                        </div>
+                      </td>
                     </tr>
-                  ) : (
-                    categorizacionPaginados.map((cate) => (
-                      <tr key={cate._id}>
-                        <td>{cate._id}</td>
-                        <td>{cate.nombre}</td>
-                        <td>{cate.tipo}</td>
-                        <td>{cate.codigo}</td>
-                        <td>
-                          <span className={`badge-tesorero badge-tesorero-${cate.estado === 'activo' ? 'activo' : 'desactivado'}`}>
-                            {cate.estado === 'activo' ? 'ACTIVO' : 'INACTIVO'}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(cate)} size="icon">
-                              <Edit className="h-4 w-4" />
-                            </button>
-                            <button
-                              className={`btn-action ${cate.estado === 'activo' ? 'desactivar' : 'activar'} text-red-600 hover:bg-red-50 rounded transition-colors`}
-                              onClick={() => handleToggleEstado(cate)}
-                            >
-                              {cate.estado === 'activo' ? (
-                                <i className="fas fa-ban"></i>
-                              ) : (
-                                <i className="fas fa-check"></i>
-                              )}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                  ))}
                 </tbody>
               </table>
             </div>

@@ -7,17 +7,12 @@ const TablaUnificadaSolicitudes = ({
   eliminarSolicitud,
 }) => {
 
-  console.log('=== DEBUG TABLA SOLICITUDES ===');
-  console.log('abrirModalEditarSolicitud function:', typeof abrirModalEditarSolicitud);
-  console.log('eliminarSolicitud function:', typeof eliminarSolicitud);
-  console.log('Número de solicitudes:', datosUnificados.solicitudes?.length || 0);
 
   return (
     <div className="tabla-contenedor-admin">
       <table className="tabla-usuarios-admin">
         <thead>
           <tr>
-            
             <th>Nombre Solicitante</th>
             <th>Cédula</th>
             <th>Correo</th>
@@ -37,8 +32,7 @@ const TablaUnificadaSolicitudes = ({
           {/* Solicitudes */}
           {(datosUnificados.solicitudes || []).map((sol) => (
             <tr key={`solicitud-${sol._id}`}>
-            
-
+          
               {/* Nombre del solicitante */}
               <td >
                 {sol.solicitante?.nombre && sol.solicitante?.apellido

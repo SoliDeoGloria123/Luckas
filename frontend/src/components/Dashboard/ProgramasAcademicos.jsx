@@ -6,6 +6,7 @@ import Header from './Sidebar/Header';
 import ProgramaModal from './Modales/ProgramaModal';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import { Plus, Search } from 'lucide-react';
+import {categorizacionService} from '../../services/categorizacionService';
 
 const ProgramasAcademicos = () => {
     const [programas, setProgramas] = useState([]);
@@ -13,7 +14,6 @@ const ProgramasAcademicos = () => {
     const [sidebarAbierto, setSidebarAbierto] = useState(true);
     const [seccionActiva, setSeccionActiva] = useState("dashboard");
     const [mostrarModal, setMostrarModal] = useState(false);
-    const [cargando, setCargando] = useState(false);
     const [filtros, setFiltros] = useState({
         tipo: '',
         modalidad: '',
@@ -106,7 +106,7 @@ const ProgramasAcademicos = () => {
 
     const cargarCategorias = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/categorizacion', {
+            const response = await categorizacionService.getAllCategorias({
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -128,7 +128,6 @@ const ProgramasAcademicos = () => {
     // Crear programa
     const crearPrograma = async (e) => {
         if (e) e.preventDefault();
-        setCargando(true);
 
         try {
             const categoriaId = encontrarCategoriaId();
@@ -144,15 +143,13 @@ const ProgramasAcademicos = () => {
             cargarProgramas();
         } catch (error) {
             console.error('Error al crear programa:', error);
-        } finally {
-            setCargando(false);
         }
     };
 
     // Actualizar programa
     const actualizarPrograma = async (e) => {
         if (e) e.preventDefault();
-        setCargando(true);
+     
 
         try {
             const categoriaId = encontrarCategoriaId();
@@ -169,9 +166,7 @@ const ProgramasAcademicos = () => {
         } catch (error) {
             console.error('Error al actualizar programa:', error);
             mostrarMensaje(`Error al actualizar el programa: ${error.message}`, 'error');
-        } finally {
-            setCargando(false);
-        }
+        } 
     };
 
     // Eliminar programa
@@ -580,7 +575,6 @@ const ProgramasAcademicos = () => {
                         eliminarPrograma={eliminarPrograma}
                         formatearPrecio={formatearPrecio}
                         formatearFecha={formatearFecha}
-                        cargando={cargando}
                         abrirModalCrear={abrirModalCrear}
                         abrirModalEditar={abrirModalEditar}
                         abrirModalVer={abrirModalVer}

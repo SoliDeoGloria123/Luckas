@@ -39,7 +39,13 @@ const Gestioninscripcion = () => {
   const obtenerInscripciones = async () => {
     try {
       const data = await inscripcionService.getAll();
-      setInscripciones(Array.isArray(data.data) ? data.data : []);
+      // Aceptar varias formas de respuesta: array directo o { data: [...] }
+      let listaIns = [];
+      if (!data) listaIns = [];
+      else if (Array.isArray(data)) listaIns = data;
+      else if (Array.isArray(data.data)) listaIns = data.data;
+      else if (Array.isArray(data.results)) listaIns = data.results;
+      setInscripciones(listaIns);
     } catch (error) {
       setInscripciones([]);
       mostrarAlerta("ERROR", `Error al obtener inscripciones: ${error.message}`, 'error');
@@ -50,7 +56,12 @@ const Gestioninscripcion = () => {
   const obtenerEventos = async () => {
     try {
       const data = await eventService.getAllEvents();
-      setEventos(Array.isArray(data.data) ? data.data : []);
+      let lista = [];
+      if (!data) lista = [];
+      else if (Array.isArray(data)) lista = data;
+      else if (Array.isArray(data.data)) lista = data.data;
+      else if (Array.isArray(data.results)) lista = data.results;
+      setEventos(lista);
     } catch (error) {
       setEventos([]);
       mostrarAlerta("ERROR", `Error al obtener eventos: ${error.message}`, 'error');
@@ -61,7 +72,12 @@ const Gestioninscripcion = () => {
   const obtenerProgramas = async () => {
     try {
       const data = await programasAcademicosService.getAllProgramas();
-      setProgramas(Array.isArray(data.data) ? data.data : []);
+      let lista = [];
+      if (!data) lista = [];
+      else if (Array.isArray(data)) lista = data;
+      else if (Array.isArray(data.data)) lista = data.data;
+      else if (Array.isArray(data.results)) lista = data.results;
+      setProgramas(lista);
     } catch (error) {
       setProgramas([]);
       mostrarAlerta("ERROR", `Error al obtener programas académicos: ${error.message}`, 'error');
@@ -71,7 +87,12 @@ const Gestioninscripcion = () => {
   const obtenerCategorias = async () => {
     try {
       const res = await categorizacionService.getAll();
-      setCategorias(res.data || []);
+      let lista = [];
+      if (!res) lista = [];
+      else if (Array.isArray(res)) lista = res;
+      else if (Array.isArray(res.data)) lista = res.data;
+      else if (Array.isArray(res.results)) lista = res.results;
+      setCategorias(lista);
       Estadisticagenerales();
     } catch (error) {
       setCategorias([]);
@@ -184,7 +205,7 @@ const Gestioninscripcion = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"></i> {' '}
+            <i className="fas fa-plus"/>
             Nueva Inscripción{' '}
           </button>
         </div>
@@ -262,7 +283,6 @@ const Gestioninscripcion = () => {
               <table className="users-table-tesorero">
                 <thead>
                   <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
-                    <th>ID</th>
                     <th>Nombre completo</th>
                     <th>Tipo Doc.</th>
                     <th>Número Doc.</th>
@@ -280,15 +300,9 @@ const Gestioninscripcion = () => {
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
-                  {inscripciones.length === 0 ? (
-                    <tr>
-                      <td colSpan="14">No hay inscripciones disponibles.</td>
-                    </tr>
-                  ) : (
-                    inscripcionesPaginadas.map((ins) => (
+  
+                    {inscripcionesPaginadas.map((ins) => (
                       <tr key={ins._id}>
-
-                        <td>{ins._id}</td>
                         <td>{(ins.nombre && ins.apelledio) ? `${ins.nombre} ${ins.apellido}` : ins.nombre || ins.apellido || "N/A"}</td>
                         <td>{ins.tipoDocumento}</td>
                         <td>{ins.numeroDocumento}</td>
@@ -316,8 +330,7 @@ const Gestioninscripcion = () => {
                           </button>
                         </td>
                       </tr>
-                    ))
-                  )};
+                  ))}
 
                 </tbody>
               </table>

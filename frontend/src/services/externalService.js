@@ -2,6 +2,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = "http://localhost:3000/api"; // Usar URL completa temporalmente
+const UPLOADS_EVENTS_BASE = "http://localhost:3000/uploads/eventos";
 
 // Configurar axios con el token
 const api = axios.create({
@@ -137,6 +138,14 @@ const externalService = {
       throw error;
     }
   }
+};
+
+export const getEventImageUrl = (imgPath) => {
+  if (!imgPath) return null;
+  if (typeof imgPath === 'string' && (imgPath.startsWith('http://') || imgPath.startsWith('https://'))) {
+    return imgPath;
+  }
+  return `${UPLOADS_EVENTS_BASE}/${imgPath}`;
 };
 
 export default externalService;

@@ -4,26 +4,13 @@ import Header from '../Shared/Header';
 import { cabanaService } from '../../../services/cabanaService';
 import Footer from '../../footer/Footer'
 import Reserva from '../pages/FormularioReserva';
-import { Heart, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 const CabanasSeminario = () => {
   const [activeFilter, setActiveFilter] = useState('todas');
-  const [notification, setNotification] = useState({ show: false, message: '' });
 
   const [cabanas, setCabanas] = useState([]);
-
   const [cabanaSeleccionada, setCabanaSeleccionada] = useState(null);
-
-  // UI state
-  const [loading, setLoading] = useState(true);
-  const [favorites, setFavorites] = useState({});
-
-  const toggleFavorite = (id) => {
-    setFavorites(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
-
-
   const [selectedCabana, setSelectedCabana] = useState(null);
   const [isReservaOpen, setIsReservaOpen] = useState(false);
   const [mostrarFormularioReserva, setMostrarFormularioReserva] = useState(false);
@@ -32,12 +19,7 @@ const CabanasSeminario = () => {
     setSelectedCabana(cabana);
     setIsReservaOpen(true);
   };
-
-  const showNotification = (message) => {
-    setNotification({ show: true, message });
-    setTimeout(() => setNotification({ show: false, message: '' }), 3000);
-  };
-
+ 
   const verDetalles = (cabana) => {
     setCabanaSeleccionada(cabana);
   };
@@ -69,10 +51,10 @@ const CabanasSeminario = () => {
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
-  const loadMoreCabins = () => {
-    showNotification('Cargando más cabañas...');
-    // Aquí iría la lógica para cargar más cabañas
-  };
+  //const loadMoreCabins = () => {
+  //  showNotification('Cargando más cabañas...');
+  //   Aquí iría la lógica para cargar más cabañas
+  //};
 
   const goBack = () => {
     globalThis.history.back();
@@ -98,9 +80,7 @@ const CabanasSeminario = () => {
         setCabanas(cabanasArray);
       } catch (err) {
         console.error('Error fetching cabins:', err);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
     fetchCabanas();
   }, []);
@@ -111,14 +91,9 @@ const CabanasSeminario = () => {
   return (
     <div className="cabanas-seminario">
       <Header />
-
-      <main className="main-content">
-        {loading && (
-          <div className="loading-overlay">Cargando cabañas...</div>
-        )}
-        {/* Breadcrumb */}
-        <div className="breadcrumb">
-          <button className="back-btn" onClick={goBack}>
+      <main className="main-content-cabañas">
+        <div className="breadcrumb-cabañas">
+          <button className="back-btn-cabañas" onClick={goBack}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 12H5" />
               <path d="M12 19l-7-7 7-7" />
@@ -128,8 +103,8 @@ const CabanasSeminario = () => {
         </div>
 
         {/* Page Header */}
-        <div className="page-header">
-          <div className="page-title">
+        <div className="page-header-cabañas">
+          <div className="page-title-seminarista">
             <h1>Cabañas Disponibles</h1>
             <p>Encuentra el lugar perfecto para tu retiro espiritual y descanso</p>
           </div>
@@ -208,7 +183,7 @@ const CabanasSeminario = () => {
         </div>
 
         {/* Cabins Grid */}
-        <div className="cabins-grid" >
+        <div className="cabins-grid-cabañas" >
           {cabanasPaginados.map((cab) => (
             <div className="cabin-card" key={cab.id}>  {/*data-category={`${cabin.status === 'available' ? 'disponible ' : ''}${cabin.category}`}*/}
               <div className="cabin-image">
@@ -216,13 +191,7 @@ const CabanasSeminario = () => {
                 <div className={`cabin-status ${cab.estado === 'available' ? 'available' : 'reserved'}`}>
                   {cab.estado === 'available' ? 'Disponible' : 'Reservada'}
                 </div>
-                <button
-                  type="button"
-                  className={`cabin-favorite ${favorites[cab.id] ? 'active' : ''}`}
-                  onClick={() => toggleFavorite(cab.id)}
-                >
-                  <Heart />
-                </button>
+               
                 <div className="cabin-gallery-cabana">
                   <span className="gallery-count-cabana">
                     +{cab.imagen ? cab.imagen.length : 5} fotos
@@ -366,7 +335,7 @@ const CabanasSeminario = () => {
             </div>
           ))}
         </div>
-        {/* Load More Button */}
+        {/* Load More Button 
         <div className="load-more-section">
           <button className="load-more-btn" onClick={loadMoreCabins}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -375,7 +344,7 @@ const CabanasSeminario = () => {
             </svg>
             Cargar más cabañas
           </button>
-        </div>
+        </div>*/}
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
           <button
             className="pagination-btn-admin"
@@ -397,14 +366,7 @@ const CabanasSeminario = () => {
         </div>
       </main>
       {/* Notification Toast */}
-      <div id="notification" className={`notification ${notification.show ? 'show' : ''}`}>
-        <div className="notification-content">
-          <svg className="notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 12l2 2 4-4" />
-          </svg>
-          <span className="notification-message">{notification.message}</span>
-        </div>
-      </div>
+      
       {cabanaSeleccionada && (
         <div id="detailsModal" className="modal-semianrio active">
           <div className="modalContent-semianrio">

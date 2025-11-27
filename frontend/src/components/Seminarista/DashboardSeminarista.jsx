@@ -19,17 +19,16 @@ const DashboardSeminarista = () => {
     return (
       <div className="dashboard-seminarista-contenedo">
         <Header/>
-        <main className="main-content">
+        <main className="main-content-dashboard-seminarista">
           {/* Hero Section */}
-
-            <div className="hero-content">
-              <div className="hero-text">
-                <h1>¡Bienvenido, <span className="highlight">Seminarista</span>!</h1>
+            <div className="hero-content-dashboard-seminarista">
+              <div className="hero-text-dashboard-seminarista">
+                <h1>¡Bienvenido, <span className="highlight-dashboard-seminarista">Seminarista</span>!</h1>
                 <p>Tu panel de control moderno y centralizado. Gestiona eventos, reservas de cabañas, solicitudes y mantén un seguimiento completo de todas tus actividades seminariales con estilo y eficiencia.</p>
               </div>
-              <div className="hero-stats">
-                <div className="stat-card">
-                  <div className="stat-icon system">
+              <div className="hero-stats-dashboard-seminarista">
+                <div className="stat-card-dashboard-seminarista">
+                  <div className="stat-icon-dashboard-seminarista system">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M9 12l2 2 4-4" />
                       <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" />
@@ -38,7 +37,7 @@ const DashboardSeminarista = () => {
                       <path d="M11 12H8a2 2 0 0 0-2 2v1" />
                     </svg>
                   </div>
-                  <div className="stat-info">
+                  <div className="stat-info-dashboard-seminarista">
                     <h3>Sistema Activo</h3>
                     <p>Dashboard en línea</p>
                     <span className="status-badge active">✓ Funcionando correctamente</span>

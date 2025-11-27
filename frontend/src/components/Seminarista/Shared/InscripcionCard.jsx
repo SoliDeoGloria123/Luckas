@@ -1,5 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { getEventImageUrl } from '../../../services/eventService';
+
 
 const InscripcionCard = ({ inscripcion, onViewDetails }) => {
   // Función para obtener el texto correcto del estado
@@ -39,16 +45,53 @@ const InscripcionCard = ({ inscripcion, onViewDetails }) => {
       <div className="inscripcion-card-misinscripciones">
         <div className="inscripcion-content-misinscripciones">
           {/* Carrusel de imágenes en la tarjeta */}
-          <div className="inscripcion-image-gallery">
-            {inscripcion.tipoReferencia === 'Eventos' && Array.isArray(inscripcion.referencia?.imagen) && inscripcion.referencia.imagen.length > 0 ? (
-              <img
-                src={inscripcion.referencia.imagen[0]}
-                alt={inscripcion.referencia?.nombre || 'Imagen del evento'}
-                className="inscripcion-image-misinscripciones"
-              />
-            ) : (
-              <p>Imagen no disponible</p>
-            )}
+          <div className="inscripcion-image-gallery" style={{ width: 360, flex: '0 0 360px' }}>
+            {(() => {
+              const imgs = Array.isArray(inscripcion.referencia?.imagen) ? inscripcion.referencia.imagen.filter(Boolean) : [];
+              const multiple = inscripcion.tipoReferencia === 'Eventos' && imgs.length > 1;
+              const single = inscripcion.tipoReferencia === 'Eventos' && imgs.length === 1;
+
+              if (multiple) {
+                return (
+                  <Swiper
+                    modules={[Pagination]}
+                    pagination={{ clickable: true }}
+                    spaceBetween={6}
+                    slidesPerView={1}
+                    className="inscripcion-swiper-misinscripciones"
+                  >
+                    {imgs.map((imgSrc, idx) => {
+                    const src = getEventImageUrl(imgSrc);
+                      const key = `${inscripcion._id || inscripcion.id || 'insc'}-img-${idx}`;
+                      return (
+                        <SwiperSlide key={key}>
+                          <img
+                            src={src}
+                            alt={`${inscripcion.referencia?.nombre || 'Imagen'} - ${idx + 1}`}
+                            className="inscripcion-image-misinscripciones"
+                          />
+                        </SwiperSlide>
+                      );
+                    })}
+                  </Swiper>
+                );
+              }
+
+              if (single) {
+                const img0 = imgs[0];
+                const src = getEventImageUrl(img0);
+                return (
+                  <img
+                    src={src}
+                    alt={inscripcion.referencia?.nombre || 'Imagen del evento'}
+                    className="inscripcion-image-misinscripciones"
+                   
+                  />
+                );
+              }
+
+              return <div className="inscripcion-placeholder-image">Imagen no disponible</div>;
+            })()}
           </div>
           <div className="inscripcion-body-misinscripciones">
             <div className="header-misinscripciones">

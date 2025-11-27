@@ -10,6 +10,12 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { reservaService } from '../../../services/reservaService';
 import { useUsuarioLogueado } from '../hooks/useUsuarioLogueado';
 import PropTypes from 'prop-types';
+import { getCabanaImageUrl } from '../../../services/cabanaService';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+// Nota: usamos `getCabanaImageUrl` para las imágenes de cabañas (import arriba)
 
 // Carrusel simple para el modal
 const ModalImageCarousel = ({ images }) => {
@@ -20,7 +26,7 @@ const ModalImageCarousel = ({ images }) => {
     <div className="modal-carousel-wrapper">
       <button className="carousel-arrow left" onClick={prev}>&lt;</button>
       <img
-        src={`http://localhost:3000/uploads/cabanas/${images[index]}`}
+        src={getCabanaImageUrl(images[index])}
         alt={`Imagen ${index + 1}`}
         className="modal-image-reservas"
       />
@@ -110,18 +116,18 @@ const MisReservas = () => {
 
     try {
       // Actualizar el estado localmente
-      const updatedReservas = reservas.map(reserva => 
-        reserva._id === currentInscripcion._id 
+      const updatedReservas = reservas.map(reserva =>
+        reserva._id === currentInscripcion._id
           ? { ...reserva, estado: 'Cancelada', observaciones: 'Cancelada por el usuario' }
           : reserva
       );
-      
+
       setReservas(updatedReservas);
       closeModal();
-      
+
       // Aquí puedes agregar la llamada al backend para actualizar la reserva
       // await reservaService.update(currentInscripcion._id, { estado: 'Cancelada', observaciones: 'Cancelada por el usuario' });
-      
+
       alert(`Reserva de "${currentInscripcion.cabana?.nombre}" cancelada exitosamente`);
     } catch (error) {
       console.error('Error al cancelar reserva:', error);
@@ -156,14 +162,14 @@ const MisReservas = () => {
         <StatsGridSeminarista data={reservas} type="reservas" />
 
         {/* Filtros */}
-        <FilterButtonsSeminarista 
+        <FilterButtonsSeminarista
           activeFilter={activeFilter}
           onFilterChange={filterInscripciones}
         />
 
         {/* Lista de reservas */}
         {filteredReservas.length === 0 && (
-          <EmptyState 
+          <EmptyState
             title="No tienes reservas registradas."
             subtitle="¡Haz tu primera reserva y disfruta la experiencia!"
             iconAlt="Sin reservas"
@@ -173,20 +179,55 @@ const MisReservas = () => {
           <div className="inscripciones-container-misinscripciones" key={reserva.id || reserva._id}>
             <div className="inscripcion-card-misinscripciones">
               <div className="inscripcion-content-misinscripciones">
-                {Array.isArray(reserva.cabana?.imagen) && reserva.cabana.imagen.length > 0 ? (
-                  <img
-                    src={
-                      reserva.cabana.imagen[0].startsWith('https')
-                        ? reserva.cabana.imagen[0]
-                        : `http://localhost:3000/uploads/cabanas/${reserva.cabana.imagen[0]}`
+                <div className="inscripcion-image-gallery" style={{ width: 360, flex: '0 0 360px' }}>
+                  {(() => {
+                    // Las reservas muestran imágenes en `reserva.cabana.imagen`
+                    const imgs = Array.isArray(reserva.cabana?.imagen) ? reserva.cabana.imagen.filter(Boolean) : [];
+                    if (imgs.length === 0) return <div className="inscripcion-placeholder-image">Imagen no disponible</div>;
+
+                    if (imgs.length > 1) {
+                      return (
+                        <Swiper
+                          modules={[Pagination]}
+                          pagination={{ clickable: true }}
+                          spaceBetween={6}
+                          slidesPerView={1}
+                          className="inscripcion-swiper-misinscripciones"
+                        >
+                          {imgs.map((imgSrc, idx) => {
+                            const src = getCabanaImageUrl(imgSrc);
+                            const key = `${reserva._id || reserva.id || 'res'}-img-${idx}`;
+                            return (
+                              <SwiperSlide key={key}>
+                                {src ? (
+                                  <img
+                                    src={src}
+                                    alt={`${reserva.cabana?.nombre || 'Imagen'} - ${idx + 1}`}
+                                    className="inscripcion-image-misinscripciones"
+                                  />
+                                ) : (
+                                  <div className="inscripcion-placeholder-image">Imagen no disponible</div>
+                                )}
+                              </SwiperSlide>
+                            );
+                          })}
+                        </Swiper>
+                      );
                     }
-                    alt={reserva.cabana?.nombre || 'Imagen de la cabaña'}
-                    className="modal-image-misinscripciones"
-                     
-                  />
-                ) : (
-                  <p>Imagen no disponible</p>
-                )}
+
+                    // Single image
+                    const srcSingle = getCabanaImageUrl(imgs[0]);
+                    return srcSingle ? (
+                      <img
+                        src={srcSingle}
+                        alt={reserva.cabana?.nombre || 'Imagen de la cabaña'}
+                        className="inscripcion-image-misinscripciones"
+                      />
+                    ) : (
+                      <div className="inscripcion-placeholder-image">Imagen no disponible</div>
+                    );
+                  })()}
+                </div>
                 <div className="inscripcion-body-misinscripciones">
                   <div className="header-misinscripciones">
                     <div className="inscripcion-title-section-misinscripciones">
@@ -241,44 +282,82 @@ const MisReservas = () => {
         ))}
         {/* Modal de Detalles */}
         {isModalOpen && currentInscripcion && (
-          <div className="modal-overlay-misinscripciones show">
+          <div className="modal-overlay-misinscripciones show"
+            style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 9999 }}>
             <button
               type="button"
               className="modal-backdrop"
               onClick={closeModal}
-              style={{ 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                width: '100%', 
-                height: '100%', 
-                background: 'transparent', 
-                border: 'none', 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                background: 'transparent',
+                border: 'none',
                 cursor: 'default',
                 zIndex: 1
               }}
               aria-label="Cerrar modal"
             />
-            <dialog 
-              className="modal-container-misinscripciones" 
+            <dialog
+              className="modal-container-misinscripciones"
               open
               aria-labelledby="modalTitle"
               style={{ position: 'relative', zIndex: 2 }}
             >
               <div className="modal-header-misinscripciones">
-                {Array.isArray(currentInscripcion.cabana?.imagen) && currentInscripcion.cabana.imagen.length > 0 ? (
-                  <img
-                    src={
-                      currentInscripcion.cabana.imagen[0].startsWith('https')
-                        ? currentInscripcion.cabana.imagen[0]
-                        : `http://localhost:3000/uploads/cabanas/${currentInscripcion.cabana.imagen[0]}`
-                    }
-                    alt={currentInscripcion.cabana?.nombre || 'Imagen de la cabaña'}
-                    className="modal-image-reservas"
-                  />
-                ) : (
-                  <p>Imagen no disponible</p>
-                )}
+                <div className="modal-image-gallery">
+                  {Array.isArray(currentInscripcion.cabana?.imagen) ? (
+                    (() => {
+                      const imgs = currentInscripcion.cabana.imagen.filter(Boolean);
+                      if (imgs.length === 0) return <div className="modal-image-placeholder">Imagen no disponible</div>;
+                      if (imgs.length > 1) {
+                        return (
+                          <Swiper
+                            modules={[Pagination]}
+                            pagination={{ clickable: true }}
+                            spaceBetween={6}
+                            slidesPerView={1}
+                            className="modal-swiper-misinscripciones"
+                          >
+                            {imgs.map((imgSrc, idx) => {
+                              const src = getCabanaImageUrl(imgSrc);
+                              const key = `${currentInscripcion._id || currentInscripcion.id || 'res'}-img-${idx}`;
+                              return (
+                                <SwiperSlide key={key}>
+                                  {src ? (
+                                    <img
+                                      src={src}
+                                      alt={`${currentInscripcion.cabana?.nombre || 'Imagen'} - ${idx + 1}`}
+                                      className="modal-image-reservas"
+                                    />
+                                  ) : (
+                                    <div className="modal-image-placeholder">Imagen no disponible</div>
+                                  )}
+                                </SwiperSlide>
+                              );
+                            })}
+                          </Swiper>
+                        );
+                      }
+
+                      const srcSingle = getCabanaImageUrl(imgs[0]);
+                      return srcSingle ? (
+                        <img
+                          src={srcSingle}
+                          alt={currentInscripcion.cabana?.nombre || 'Imagen de la cabaña'}
+                          className="modal-image-reservas"
+                        />
+                      ) : (
+                        <div className="modal-image-placeholder">Imagen no disponible</div>
+                      );
+                    })()
+                  ) : (
+                    <div className="modal-image-placeholder">Imagen no disponible</div>
+                  )}
+                </div>
                 <button className="modal-close-misinscripciones" onClick={closeModal}>
                   <FontAwesomeIcon icon={faTimes} />
                 </button>

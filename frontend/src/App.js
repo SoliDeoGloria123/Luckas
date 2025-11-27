@@ -40,7 +40,11 @@ import MisReservas from "./components/Seminarista/pages/MisReservas";
 import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
 import Perfil from './components/Seminarista/Shared/MiPerfil';
-import Configuracion from './components/Seminarista/pages/configuracion';
+import Contactanos from './components/Pages/Contactanos';
+import AyudaOnline from './components/Pages/AyudaOnline';
+import PoliticaPrivacidad from './components/Pages/PoliticaPrivacidad';
+import TerminosUso from './components/Pages/TerminosUso';
+import SoporteTecnico from './components/Pages/SoporteTecnico';
 import PanelPrincipal from './components/Panel Principal/Panel';
 import CerrarSesion from './components/cerrar sesion/cerrarsesion';
 import Error404 from './components/Páginas de error/Error404';
@@ -101,7 +105,11 @@ function App() {
         <Route path="/dashboard/seminarista/mis-solicitudes" element={<MisSolicitudes />} />
         <Route path="/dashboard/seminarista/nueva-solicitud" element={<NuevaSolicitud />} />
         <Route path="/dashboard/seminarista/Mi-Perfil" element={<Perfil />} />
-        <Route path="/dashboard/seminarista/Configuracion" element={<Configuracion />} />
+        <Route path="/contactanos" element={<Contactanos />} />
+        <Route path="/ayuda" element={<AyudaOnline />} />
+        <Route path="/politica" element={<PoliticaPrivacidad />} />
+        <Route path="/terminos" element={<TerminosUso />} />
+        <Route path="/soporte" element={<SoporteTecnico />} />
         {/* Ruta para cerrar sesión */}
         <Route path="/cerrar-sesion" element={<CerrarSesion />} />
         {/* Ruta para página de error 404 */}

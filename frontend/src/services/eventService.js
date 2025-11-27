@@ -113,3 +113,13 @@ export const eventService = {
     });
   }
 };
+
+export const UPLOADS_EVENTS_BASE = "http://localhost:3000/uploads/eventos";
+
+export const getEventImageUrl = (imgPath) => {
+  if (!imgPath) return null;
+  if (typeof imgPath === 'string' && (imgPath.startsWith('http://') || imgPath.startsWith('https://'))) {
+    return imgPath;
+  }
+  return `${UPLOADS_EVENTS_BASE}/${imgPath}`;
+};

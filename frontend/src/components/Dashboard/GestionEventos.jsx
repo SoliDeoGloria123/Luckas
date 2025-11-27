@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+  import { useState, useEffect } from "react";
 import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaEventos from "./Tablas/EventoTabla";
@@ -27,9 +27,6 @@ const GestionEventos = () => {
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [estadisticas, setEstadisticas] = useState({ totalEvents: 0, upcoming: 0, completed: 0, cancelled: 0 });
-
-
-
   const [nuevoEvento, setNuevoEvento] = useState({
     nombre: "",
     descripcion: "",
@@ -63,7 +60,6 @@ const GestionEventos = () => {
         else if (res.success && Array.isArray(res.data)) lista = res.data;
         else if (res.data) lista = res.data;
       }
-      console.debug('EVENTOS RECIBIDOS:', lista);
       setEventos(lista);
     } catch (error) {
       setEventos([]);

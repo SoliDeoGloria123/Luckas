@@ -280,9 +280,7 @@ const Gestionusuarios = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
-                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
-                        ID
-                      </th>
+                  
                       <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
                         Nombre
                       </th>
@@ -316,16 +314,9 @@ const Gestionusuarios = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#334155]/10">
-                    {usuariosFiltrados.length === 0 ? (
-                      <tr>
-                        <td colSpan={11}>
-                          {searchTerm ? 'No se encontraron usuarios con ese número de cédula' : 'No hay usuarios para mostrar'}
-                        </td>
-                      </tr>
-                    ) : (
-                      usuariosPaginados.map((user) => (
+  
+                      {usuariosPaginados.map((user) => (
                         <tr key={user.id} className="transition-colors hover:bg-[#f1f5f9]/50">
-                          <td className="whitespace-nowrap px-6 py-4 text-base font-medium text-[#334155]">{user._id}</td>
                           <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.nombre}</td>
                           <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.apellido}</td>
                           <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.tipoDocumento}</td>
@@ -363,8 +354,8 @@ const Gestionusuarios = () => {
                             </div>
                           </td>
                         </tr>
-                      ))
-                    )}
+          
+                    ))}
                   </tbody>
                 </table>
               </div>

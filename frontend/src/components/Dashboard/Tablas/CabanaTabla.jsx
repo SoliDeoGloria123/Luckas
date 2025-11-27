@@ -20,8 +20,6 @@ import {
 
 const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, onVerDetalle }) => {
 
-  // Se reciben `cabanas` ya filtradas desde el padre; no mantener `setFiltros` aquí
-  const cargando = false;
   const [imgIndices, setImgIndices] = useState({});
 
   const tiposCabanas = [
@@ -63,14 +61,7 @@ const CabanaTabla = ({ cabanas, onEditar, onEliminar, onInsertar, onVerDetalle }
 
   // Renderizado condicional extraído para evitar ternarias anidadas en JSX
   let contenidoCabanas;
-  if (cargando) {
-    contenidoCabanas = (
-      <div className="col-span-full text-center py-12">
-        <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-slate-600">Cargando cabañas...</p>
-      </div>
-    );
-  } else if (cabanasFiltradas.length > 0) {
+  if (cabanasFiltradas.length > 0) {
     contenidoCabanas = cabanasFiltradas.map((cabana) => {
       const tipoCabana = obtenerTipoCabana(cabana.tipo);
       // Definir variables y funciones dentro del map

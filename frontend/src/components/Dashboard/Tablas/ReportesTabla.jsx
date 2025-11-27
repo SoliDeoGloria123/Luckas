@@ -45,10 +45,7 @@ const REPORT_TYPES = [
   { value: "cabanas", label: "Cabañas", icon: Home },
   { value: "notificaciones", label: "Notificaciones", icon: FileText },
 ]
-// Helpers y lógica de generación de datos han sido extraídos a `reportHelpers.js`
-// `generateChartData` y `extraerDataArray` se importan arriba.
 
-// Componentes `TableRow` y `MobileCard` movidos a `commonComponents.js` para evitar duplicación entre tablas
 
 const TablaReportes = ({ reportesGuardados, editarReporte, eliminarReporte }) => {
   const [showCreateModal, setShowCreateModal] = useState(false)

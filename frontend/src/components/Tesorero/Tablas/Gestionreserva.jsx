@@ -38,13 +38,10 @@ const Gestionreserva = () => {
     try {
       const data = await reservaService.getAll();
       let resvs = [];
-      if (Array.isArray(data)) {
-        resvs = data;
-      } else if (Array.isArray(data.data)) {
-        resvs = data.data;
-      } else {
-        resvs = [];
-      }
+      if (Array.isArray(data)) resvs = data;
+      else if (Array.isArray(data.data)) resvs = data.data;
+      else if (Array.isArray(data.reservas)) resvs = data.reservas;
+      else resvs = [];
       setReservas(resvs);
       estadisticasIniciales();
     } catch (err) {
@@ -65,14 +62,12 @@ const Gestionreserva = () => {
     try {
       const data = await userService.getAllUsers();
       let users = [];
-      if (Array.isArray(data)) {
-        users = data;
-      } else if (Array.isArray(data.data)) {
-        users = data.data;
-      } else {
-        users = [];
-      }
+      if (Array.isArray(data)) users = data;
+      else if (Array.isArray(data.data)) users = data.data;
+      else if (Array.isArray(data.users)) users = data.users;
+      else users = [];
       setUsuarios(users);
+      console.debug('[Gestionreserva] usuarios cargados:', users.length, users[0] || null);
     } catch (err) {
       console.log("Error al obtener usuarios: " + err.message);
     }
@@ -82,14 +77,12 @@ const Gestionreserva = () => {
     try {
       const data = await cabanaService.getAll();
       let cabs = [];
-      if (Array.isArray(data)) {
-        cabs = data;
-      } else if (Array.isArray(data.data)) {
-        cabs = data.data;
-      } else {
-        cabs = [];
-      }
+      if (Array.isArray(data)) cabs = data;
+      else if (Array.isArray(data.data)) cabs = data.data;
+      else if (Array.isArray(data.cabanas)) cabs = data.cabanas;
+      else cabs = [];
       setCabanas(cabs);
+      console.debug('[Gestionreserva] cabañas cargadas:', cabs.length, cabs[0] || null);
     } catch (err) {
       console.log("Error al obtener cabañas: " + err.message);
     }
@@ -272,7 +265,7 @@ const Gestionreserva = () => {
                 <thead>
                   <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
 
-                    <th>ID</th>
+                   
                     <th>Usuario</th>
                     <th>Cabaña</th>
                     <th>Fecha Inicio</th>
@@ -293,12 +286,9 @@ const Gestionreserva = () => {
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
-                  {reservas.length === 0 ? (
-                    <td colSpan={12} >No hay reservas</td>
-                  ) : (
-                    reservasPaginadas.map((reser) => (
+                    {reservasPaginadas.map((reser) => (
                       <tr key={reser._id}>
-                        <td>{reser._id}</td>
+                    
                         <td>
                           {typeof reser.usuario === "object"
                             ? reser.usuario?.username || reser.usuario?.nombre || reser.usuario?.correo || reser.usuario?._id || "N/A"
@@ -344,8 +334,8 @@ const Gestionreserva = () => {
                           </button>
                         </td>
                       </tr>
-                    ))
-                  )}
+                 
+                  ))}
                 </tbody>
               </table>
             </div>

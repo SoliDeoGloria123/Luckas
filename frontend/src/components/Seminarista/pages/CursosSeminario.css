@@ -1,11 +1,10 @@
-/* Estilos específicos para cursos - Basados en el diseño de cabañas */
 
 /* Variables CSS para la paleta de colores */
 :root {
   --color-blue-primary: #2563eb;
   --color-blue-dark: #1d4ed8;
   --color-purple: #8b5cf6;
-  --color-green: #059669;
+  --color-green: #2563eb;
   --color-gray-dark: #334155;
   --color-gray-light: #f1f5f9;
   --color-white: #ffffff;
@@ -14,7 +13,7 @@
   /* Colores adicionales para gradientes y efectos */
   --color-blue-light: #3b82f6;
   --color-purple-light: #a78bfa;
-  --color-green-light: #10b981;
+  --color-green-light: #3b82f6;
   --color-gray-50: #f8fafc;
   --color-gray-100: #f1f5f9;
   --color-gray-200: #e2e8f0;
@@ -49,47 +48,226 @@
   --border-radius-2xl: 24px;
 }
 
+.cursos-seminario body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-gray-100) 100%);
+  color: var(--color-gray-900);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Main Content */
+.cursos-seminario .main-content-cursos {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+/* Breadcrumb */
+.cursos-seminario .breadcrumb-cursos {
+  margin-bottom: var(--spacing-lg);
+}
+
+.cursos-seminario .back-btn-cursos {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  color: var(--color-gray-600);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.cursos-seminario .back-btn-cursos:hover {
+  background: var(--color-gray-50);
+  color: var(--color-blue-primary);
+  border-color: var(--color-blue-primary);
+  transform: translateX(-2px);
+}
+
+/* Page Header */
+.cursos-seminario .page-header-cursos {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-2xl);
+  background: var(--color-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-2xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-gray-200);
+}
+
+
+.cursos-seminario .page-title p {
+  font-size: 1.125rem;
+  color: var(--color-gray-600);
+  max-width: 600px;
+}
+
+.cursos-seminario .page-stats-cursos {
+  display: flex;
+  gap: 2rem;
+}
+
+.cursos-seminario .stat-item-cursos {
+  text-align: center;
+}
+
+.cursos-seminario .stat-number-cursos {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-blue-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.cursos-seminario .stat-label-cursos {
+  font-size: 0.875rem;
+  color: var(--color-gray-700);
+  font-weight: 500;
+}
+
+/* Filters Section */
+.cursos-seminario .filters-section-cursos {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+  margin-bottom: var(--spacing-2xl);
+  background: var(--color-white);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-gray-200);
+  flex-wrap: wrap;
+}
+
+.cursos-seminario .search-bar-cursos {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+}
+
+.cursos-seminario .search-icon-cursos {
+  position: absolute;
+  left: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-gray-400);
+  pointer-events: none;
+}
+
+.cursos-seminario .search-bar-cursos input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 48px;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  background: var(--color-gray-50);
+  color: var(--color-gray-900);
+  transition: all 0.3s ease;
+}
+
+.cursos-seminario .search-bar-cursos input:focus {
+  outline: none;
+  border-color: var(--color-blue-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  background: var(--color-white);
+}
+
+.cursos-seminario .filter-buttons-cursos {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.cursos-seminario .filter-btn-cursos {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-gray-300);
+  background: var(--color-white);
+  color: var(--color-gray-600);
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.cursos-seminario .filter-btn-cursos:hover {
+  border-color: var(--color-blue-primary);
+  color: var(--color-blue-primary);
+}
+
+.cursos-seminario .filter-btn-cursos.active {
+  background: var(--color-blue-primary);
+  color: var(--color-white);
+  border-color: var(--color-blue-primary);
+}
+
+.cursos-seminario .sort-dropdown-cursos select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  background: var(--color-white);
+  color: var(--color-gray-700);
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.cursos-seminario .sort-dropdown-cursos select:focus {
+  outline: none;
+  border-color: var(--color-blue-primary);
+}
+
 /* Cabins Grid */
-.cabins-grid {
+.cursos-seminario .cabins-grid-cursos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: var(--spacing-xl);
   margin-bottom: var(--spacing-2xl);
 }
 
-/* Course Card - Usando las mismas clases que cabañas */
-.cabin-card {
+/* Cabin Card */
+.cabin-card-cursos {
   background: var(--color-white);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: var(--color-blue-primary);
   overflow: hidden;
   transition: all 0.3s;
   cursor: pointer;
 }
 
-.cabin-card:hover {
+.cabin-card-cursos:hover {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
 }
 
-.cabin-image {
+.cabin-image-cursos {
   position: relative;
   height: 250px;
   overflow: hidden;
 }
 
-.cabin-image img {
+.cabin-image-cursos img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s;
 }
 
-.cabin-card:hover .cabin-image img {
+.cabin-card-cursos:hover .cabin-image-cursos img {
   transform: scale(1.05);
 }
 
-.cabin-status {
+.cabin-status-cursos {
   position: absolute;
   top: var(--spacing-md);
   left: var(--spacing-md);
@@ -100,111 +278,106 @@
   color: var(--color-white);
 }
 
-.cabin-status.available {
-  background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
+.cabin-status-cursos.available {
+  background: linear-gradient(135deg, var(--color-blue-primary), var(--color-blue-light));
 }
 
-.cabin-status.reserved {
+.cabin-status-cursos.reserved {
   background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
-.cabin-favorite {
+
+.cabin-gallery-cursos {
   position: absolute;
-  top: var(--spacing-md);
+  bottom: var(--spacing-md);
   right: var(--spacing-md);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  color: var(--color-white);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.cursos-seminario .gallery-count-cursos {
   display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: var(--color-gray-400);
+  gap: var(--spacing-xs);
 }
 
-.cabin-favorite:hover {
-  background: var(--color-white);
-  transform: scale(1.1);
-}
-
-.cabin-favorite.active {
-  color: #ef4444;
-  background: var(--color-white);
-}
-
-.cabin-gallery {
+.cursos-seminario .premium-badge-cursos {
   position: absolute;
   bottom: var(--spacing-md);
   left: var(--spacing-md);
-}
-
-.gallery-count {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: var(--color-white);
   padding: var(--spacing-xs) var(--spacing-sm);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
   border-radius: var(--border-radius-md);
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-gray-700);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
-/* Cabin Content */
-.cabin-content {
-  padding: var(--spacing-lg);
+.cursos-seminario .cabin-content-cursos {
+  padding: var(--spacing-xl);
 }
 
-.cabin-header {
+.cursos-seminario .cabin-header-cursos {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: var(--spacing-md);
 }
 
-.cabin-category {
+.cursos-seminario .cabin-category-cursos {
+  display: inline-block;
   padding: var(--spacing-xs) var(--spacing-sm);
-  background: linear-gradient(135deg, var(--color-blue-primary), var(--color-blue-light));
-  color: var(--color-white);
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-blue-primary);
   border-radius: var(--border-radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
-.cabin-rating {
+.cabin-rating-cursos {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  color: #fbbf24;
+  color: #f59e0b;
   font-weight: 600;
   font-size: 0.875rem;
 }
 
-.cabin-title-cabana {
-  font-size: 1.25rem;
+.cabin-title-cursos {
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-gray-900);
   margin-bottom: var(--spacing-sm);
-  line-height: 1.4;
+  line-height: 1.3;
+  text-transform: capitalize;
 }
 
-.cabin-description {
+
+
+.cabin-description-cursos {
   color: var(--color-gray-600);
   margin-bottom: var(--spacing-lg);
   line-height: 1.6;
 }
 
-.cabin-features {
+.cabin-features-cursos {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-lg);
 }
 
-.feature-item {
+.feature-item-cursos {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -212,8 +385,8 @@
   font-size: 0.875rem;
 }
 
-.feature-item svg {
-  color: var(--color-green);
+.feature-item-cursos svg {
+  color: var(--color-blue-primary);
   flex-shrink: 0;
 }
 
@@ -240,7 +413,7 @@
   color: var(--color-blue-primary);
 }
 
-.cabin-footer {
+.cursos-seminario .cabin-footer-cursos {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -249,44 +422,44 @@
   border-top: 1px solid var(--color-gray-200);
 }
 
-.cabin-price {
+.cursos-seminario .cabin-price-cursos {
   display: flex;
   align-items: baseline;
   gap: var(--spacing-xs);
 }
 
-.price {
+.cursos-seminario .price-cursos {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--color-green);
+  color: var(--color-blue-primary);
 }
 
-.price-period {
+.cursos-seminario .price-period-cursos {
   font-size: 0.875rem;
   color: var(--color-gray-500);
   font-weight: 500;
 }
 
-.cabin-availability {
+.cursos-seminario .cabin-availability-cursos {
   text-align: right;
 }
 
-.availability-text {
+.cursos-seminario .availability-text-cursos {
   font-size: 0.875rem;
-  color: var(--color-green);
+  color: var(--color-blue-primary);
   font-weight: 500;
 }
 
-.availability-text.reserved {
+.cursos-seminario .availability-text-cursos.reserved {
   color: #ef4444;
 }
 
-.cabin-actions {
+.cursos-seminario .cabin-actions-cursos {
   display: flex;
   gap: var(--spacing-sm);
 }
 
-.cabin-btn {
+.cursos-seminario .cabin-btn-cursos {
   flex: 1;
   padding: var(--spacing-md);
   border-radius: var(--border-radius-md);
@@ -302,63 +475,66 @@
   border: none;
 }
 
-.cabin-btn.primary {
-  background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
+.cursos-seminario .cabin-btn-cursos.primary {
+  background: linear-gradient(135deg, var(--color-blue-primary), var(--color-blue-light));
   color: var(--color-white);
 }
 
-.cabin-btn.primary:hover:not(:disabled) {
+.cursos-seminario .cabin-btn-cursos.primary:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
-.cabin-btn.secondary {
+.cursos-seminario .cabin-btn-cursos.secondary {
   background: var(--color-white);
   color: var(--color-gray-700);
   border: 1px solid var(--color-gray-300);
 }
 
-.cabin-btn.secondary:hover {
-  background: var(--color-gray-50);
-  border-color: var(--color-green);
-  color: var(--color-green);
+.cursos-seminario .cabin-btn-cursos.secondary:hover {
+  background: var(--color_gray-50);
+  border-color: var(--color-blue-primary);
+  color: var(--color-blue-primary);
 }
 
-.cabin-btn:disabled {
+.cursos-seminario .cabin-btn-cursos.disabled {
+  background: var(--color-gray-200);
+  color: var(--color-gray-500);
+  cursor: not-allowed;
+}
+
+.cursos-seminario .cabin-btn-cursos:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Spinner para loading */
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* No Results */
-.no-results {
+/* Load More Section */
+.cursos-seminario .load-more-section-cursos {
   text-align: center;
-  padding: var(--spacing-3xl);
-  color: var(--color-gray-500);
+  margin-top: var(--spacing-2xl);
 }
 
-.no-results svg {
-  margin-bottom: var(--spacing-lg);
-  opacity: 0.5;
+.cursos-seminario .load-more-btn-cursos {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--color-white);
+  border: 2px solid var(--color-blue-primary);
+  color: var(--color-blue-primary);
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-family: inherit;
+  font-size: 1rem;
 }
 
-.no-results h3 {
-  margin-bottom: var(--spacing-sm);
-  color: var(--color-gray-700);
+.cursos-seminario .load-more-btn-cursos:hover {
+  background: var(--color-blue-primary);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Modal Styles */
@@ -504,11 +680,27 @@
 }
 
 .modal-close-programas:hover {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, var(--color-blue-primary), var(--color-blue-dark));
   color: var(--color-white);
   transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-  border-color: #ef4444;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
+  border-color: var(--color-blue-primary);
+}
+
+/* Nivel badge: usar paleta azul para consistencia */
+.modal-badge-programas.nivel {
+  background: linear-gradient(135deg, var(--color-blue-primary), var(--color-blue-light));
+  color: var(--color-white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Overlay gradient en la imagen del modal para reforzar paleta */
+.modal-image-container-programas::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(37,99,235,0.10), rgba(139,92,246,0.06));
+  pointer-events: none;
 }
 
 .modal-body-programas {
@@ -538,7 +730,7 @@
     45deg,
     rgba(37, 99, 235, 0.1) 0%,
     rgba(139, 92, 246, 0.1) 50%,
-    rgba(5, 150, 105, 0.1) 100%
+    rgba(37, 99, 235, 0.1) 100%
   );
   z-index: 1;
   pointer-events: none;
@@ -585,7 +777,7 @@
 .info-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  border-left-color: var(--color-green);
+  border-left-color: var(--color-blue-primary);
 }
 
 .info-item-programas h4 {
@@ -612,110 +804,150 @@
   font-weight: 500;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .cabin-features {
-    grid-template-columns: 1fr;
-  }
-  
-  .cabin-actions {
-    flex-direction: column;
-  }
-  
-  .modal-content {
-    margin: var(--spacing-md);
-    max-height: calc(100vh - 32px);
-    border-radius: var(--border-radius-xl);
-  }
-  
-  .modal-header {
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
-  }
-  
-  .modal-title-section h2 {
-    font-size: 1.75rem;
-  }
-  
-  .modal-body {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
-  }
-  
-  .info-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-  
-  .modal-badges {
-    gap: var(--spacing-sm);
-  }
-  
-  .modal-badge {
-    font-size: 0.75rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
-  }
-}
-
-/* Botones mejorados del modal */
+/* Botón principal del modal de programas */
 .btn-modal-primary-programas {
-  background: linear-gradient(135deg, var(--color-green), var(--color-green-light), #22c55e);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--color-blue-primary), var(--color-blue-light));
   color: var(--color-white);
   border: none;
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
+  border-radius: 10px;
   font-weight: 700;
-  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
-  position: relative;
-  overflow: hidden;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.btn-modal-primary-programas::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s;
-}
-
-.btn-modal-primary-programas:hover::before {
-  left: 100%;
-}
-
-.btn-modal-primary-programas:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+  box-shadow: 0 8px 20px rgba(37,99,235,0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-modal-primary-programas:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
-/* Efectos adicionales para el modal */
-.modal-content-programas::-webkit-scrollbar {
-  width: 8px;
+/* Ajustes cuando no hay imagen en el modal */
+.modal-info-noimage {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-2xl);
 }
 
-.modal-content-programas::-webkit-scrollbar-track {
-  background: var(--color-gray-100);
-  border-radius: 4px;
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  margin-top: 8px;
 }
 
-.modal-content-programas::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, var(--color-blue-primary), var(--color-purple));
-  border-radius: 4px;
+
+
+@media (max-width: 768px) {
+  .cursos-seminario .header-container {
+    padding: 0 var(--spacing-md);
+  }
+
+  .cursos-seminario .main-content-cabañas {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .cursos-seminario .page-title h1 {
+    font-size: 2rem;
+  }
+
+  .cursos-seminario .page-stats {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .cursos-seminario .filter-buttons {
+    justify-content: center;
+  }
+
+  .cursos-seminario .cabins-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cursos-seminario .cabin-content {
+    padding: var(--spacing-lg);
+  }
+
+  .cursos-seminario .cabin-features {
+    grid-template-columns: 1fr;
+  }
+
+  .cursos-seminario .cabin-actions {
+    flex-direction: column;
+  }
 }
 
-.modal-content-programas::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, var(--color-blue-dark), var(--color-purple));
+@media (max-width: 480px) {
+  .cursos-seminario .logo-text {
+    font-size: 1.5rem;
+  }
+
+  .cursos-seminario .role-badge {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .cursos-seminario .page-title h1 {
+    font-size: 1.75rem;
+  }
+
+  .cursos-seminario .cabin-image {
+    height: 200px;
+  }
+
+  .cursos-seminario .cabin-footer {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
+  }
+
+  .cursos-seminario .cabin-availability {
+    text-align: left;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cursos-seminario .cabin-card {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.cursos-seminario .cabin-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.cursos-seminario .cabin-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.cursos-seminario .cabin-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.cursos-seminario .cabin-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.cursos-seminario .cabin-card:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.cursos-seminario .cabin-card:nth-child(6) {
+  animation-delay: 0.6s;
 }

@@ -89,6 +89,9 @@ const GestionCategorizacion = () => {
             setEstadisticas(stats);
         } catch (error) {
             console.error("Error al obtener estadísticas de categorías:", error);
+            // Manejar la excepción: notificar al usuario y restablecer estadísticas por defecto
+            mostrarAlerta("Error", `No se pudieron obtener las estadísticas: ${error.message}`);
+            setEstadisticas({ totalCategorias: 0, categoriasActivas: 0, categoriasInactivas: 0, nuevasEsteMes: 0 });
         }
     };
 
@@ -99,7 +102,8 @@ const GestionCategorizacion = () => {
             mostrarAlerta("¡Éxito!", `Categoría actualizada a ${nuevoEstado}`);
             obtenerCategorias(); // refresca la lista
         } catch (error) {
-            mostrarAlerta("Error", `No se pudo actualizar el estado: ${error.message}`);
+            console.error("Error al cambiar estado de categoría:", error);
+            mostrarAlerta("Error", `No se pudo actualizar el estado: ${error.message}`, 'error');
         }
     };
 

@@ -161,7 +161,7 @@ async function createUsers() {
             {
                 nombre: 'Administrador',
                 apellido: 'Sistema',
-                correo: 'admin@luckas.com',
+                correo: 'admin3@luckas.com',
                 password: await bcrypt.hash('admin123', 12),
                 role: 'admin',
                 telefono: '1234567890',
@@ -174,7 +174,7 @@ async function createUsers() {
             {
                 nombre: 'Carlos',
                 apellido: 'Tesorero',
-                correo: 'tesorero@luckas.com',
+                correo: 'tesorero3@luckas.com',
                 password: await bcrypt.hash('tesorero123', 12),
                 role: 'tesorero',
                 telefono: '1234567891',
@@ -187,7 +187,7 @@ async function createUsers() {
             {
                 nombre: 'Juan',
                 apellido: 'Seminarista',
-                correo: 'seminarista@luckas.com',
+                correo: 'seminarista3@luckas.com',
                 password: await bcrypt.hash('seminarista123', 12),
                 role: 'seminarista',
                 telefono: '1234567892',
@@ -199,8 +199,8 @@ async function createUsers() {
             },
             {
                 nombre: 'María',
-                apellido: 'Externa',
-                correo: 'externa@luckas.com',
+                apellido: 'External',
+                correo: 'externa3@luckas.com',
                 password: await bcrypt.hash('externa123', 12),
                 role: 'externo',
                 telefono: '1234567893',
@@ -363,7 +363,7 @@ async function createProgramasAcademicos(categorias) {
                 nombre: 'Administración de Empresas',
                 descripcion: 'Fundamentos de administración para emprendedores',
                 categoria: categorias[2]._id, // Negocios
-                modalidad: 'semipresencial',
+                modalidad: 'virtual',
                 duracion: '16 semanas',
                 precio: 350000,
                 fechaInicio: new Date('2025-11-01'),
@@ -755,7 +755,7 @@ async function createReportes(usuarios) {
             },
             {
                 nombre: 'Reporte de Ocupación de Cabañas - Q3 2025',
-                tipo: 'ocupacion',
+                tipo: 'reservas',
                 descripcion: 'Análisis de ocupación de cabañas en el tercer trimestre',
                 datos: {
                     tasaOcupacion: 75,
@@ -837,10 +837,12 @@ function mostrarResumen() {
 }
 
 
-// Ejecutar la función principal usando top-level await
-try {
-    await main();
-} catch (error) {
-    console.error('💥 Error durante la población:', error);
-    process.exit(1);
-}
+// Ejecutar la función principal
+(async () => {
+    try {
+        await main();
+    } catch (error) {
+        console.error('💥 Error fatal durante la población:', error);
+        process.exit(1);
+    }
+})();

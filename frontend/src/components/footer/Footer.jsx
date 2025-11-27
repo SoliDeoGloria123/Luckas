@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './footer.css';
 
 const Footer = () => {
@@ -11,26 +12,26 @@ const Footer = () => {
             <p>Sistema integral de gestión académica y administrativa para el Seminario Bautista de Colombia. Optimiza procesos y mejora la experiencia educativa.</p>
           </div>
           <div className="footer-actions">
-            <button className="footer-btn-primary">Explorar Sistema</button>
-            <button className="footer-btn-secondary">Soporte Tecnico</button>
+            <Link to="/" className="footer-btn-primary">Explorar Sistema</Link>
+            <Link to="/soporte" className="footer-btn-secondary">Soporte Técnico</Link>
           </div>
         </div>
         <div className="footer-links-column">
           <div className="footer-link-list">
             <div className="footer-link-item">
-              <button type="button" className="footer-link">Inicio</button>
+              <Link to="/" className="footer-link">Inicio</Link>
             </div>
             <div className="footer-link-item">
-              <button type="button" className="footer-link">Contáctanos</button>
+              <Link to="/contactanos" className="footer-link">Contáctanos</Link>
             </div>
             <div className="footer-link-item">
-              <button type="button" className="footer-link">Ayuda Online</button>
+              <Link to="/ayuda" className="footer-link">Ayuda Online</Link>
             </div>
             <div className="footer-link-item">
-              <button type="button" className="footer-link">Política de Privacidad</button>
+              <Link to="/politica" className="footer-link">Política de Privacidad</Link>
             </div>
             <div className="footer-link-item">
-              <button type="button" className="footer-link">Términos de Uso</button>
+              <Link to="/terminos" className="footer-link">Términos de Uso</Link>
             </div>
           </div>
         </div>
@@ -43,10 +44,10 @@ const Footer = () => {
           <p>© 2024 LUCKAS - Seminario Bautista de Colombia. Todos los derechos reservados.</p>
         </div>
         <div className="footer-social">
-          <button type="button" className="footer-link" aria-label="Facebook"><i className="fab fa-facebook"></i></button>
-          <button type="button" className="footer-link" aria-label="Instagram"><i className="fab fa-instagram"></i></button>
-          <button type="button" className="footer-link" aria-label="YouTube"><i className="fab fa-youtube"></i></button>
-          <button type="button" className="footer-link" aria-label="Email"><i className="fas fa-envelope"></i></button>
+          <a href="https://facebook.com" className="footer-link" aria-label="Facebook" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook"></i></a>
+          <a href="https://instagram.com" className="footer-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i></a>
+          <a href="https://youtube.com" className="footer-link" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube"></i></a>
+          <a href="mailto:soporte@luckas.example" className="footer-link" aria-label="Email"><i className="fas fa-envelope"></i></a>
         </div>
       </div>
     </footer>

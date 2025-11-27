@@ -14,7 +14,7 @@ import './Dashboard.css';
 import { useDashboardAdmin } from './hooks/useDashboardAdmin';
 import { eventService } from '../../services/eventService';
 import { programasAcademicosService } from '../../services/programasAcademicosService';
-import { PremiumLoader } from './LazyComponents';
+
 import { useNavigate } from "react-router-dom";
 
 
@@ -28,9 +28,7 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
 
   // Hook principal del dashboard
   const {
-    cargando,
     estadisticas,
-    usuarioActual,
     usuarios
   } = useDashboardAdmin(usuarioProp, onCerrarSesionProp);
 
@@ -192,14 +190,6 @@ const Dashboard = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionProp })
     setActivityData(data);
   }, [usuarios, selectedRange]);
 
-
-  if (cargando) {
-    return <PremiumLoader />;
-  }
-
-  if (!usuarioActual && !usuarioProp) {
-    return <PremiumLoader />;
-  }
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>

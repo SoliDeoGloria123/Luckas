@@ -16,49 +16,14 @@ import {
   Calendar
 } from 'lucide-react';
 
-const Gestioncursos = () => {
-
-
-  const obtenerCursos = async () => {
-    setCargando(true);
-    try {
-      const response = await programasAcademicosService.getAllProgramas();
-      if (response.success || response.data) {
-        const programasData = response.data || response;
-        setCursos(Array.isArray(programasData) ? programasData : []);
-      }
-    } catch (error) {
-      console.error('Error al cargar programas:', error);
-      setCursos([]);
-    } finally {
-      setCargando(false);
-    }
-  };
-  const formatearPrecio = (precio) => `$${precio}`;
-  
-  // Funciones auxiliares para procesar datos del formulario
-  const procesarRequisitos = (requisitos) => {
-    if (!Array.isArray(requisitos)) return [];
-    return requisitos
-      .map(req => typeof req === 'object' ? req.value : req)
-      .filter(req => req && req.trim() !== '');
-  };
-
-  const procesarObjetivos = (objetivos) => {
-    if (!Array.isArray(objetivos)) return [];
-    return objetivos
-      .map(obj => typeof obj === 'object' ? obj.value : obj)
-      .filter(obj => obj && obj.trim() !== '');
-  };
-  // (nota) anteriormente se intentó usar `filtros` pero no se utiliza en este componente;
-  // eliminar la constante para evitar advertencias del analizador.
-  const [cursos, setCursos] = useState([]);
-  const [cursosFiltrados, setCursosFiltrados] = useState([]);
+const Gestionprogramas = () => {
+  // Usamos nombres coherentes: `programas` en lugar de `cursos`.
+  const [programas, setProgramas] = useState([]);
+  const [programasFiltrados, setProgramasFiltrados] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [cargando, setCargando] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const programas = cursos;
+  // `programas` es la lista principal (ya definida arriba).
 
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -93,8 +58,50 @@ const Gestioncursos = () => {
     programasInactivos: 0,
     nuevosProgramasEsteMes: 0
   });
+  const formatearPrecio = (precio) => `$${precio}`;
 
 
+  const obtenerCursos = async () => {
+    try {
+      // No dependemos de una variable `filtros` no declarada.
+      const response = await programasAcademicosService.getAllProgramas();
+      // El servicio puede devolver directamente un array o un objeto { success, data }
+      let lista = [];
+      if (response) {
+        if (Array.isArray(response)) lista = response;
+        else if (response.success && Array.isArray(response.data)) lista = response.data;
+        else if (response.data && Array.isArray(response.data)) lista = response.data;
+        else if (response.data) lista = response.data;
+      }
+      // Ordenar por fecha de creación ascendente para que los programas nuevos aparezcan al final
+      const listaOrdenada = Array.isArray(lista)
+        ? lista.slice().sort((a, b) => (Date.parse(a.createdAt) || 0) - (Date.parse(b.createdAt) || 0))
+        : lista;
+      setProgramas(listaOrdenada);
+      // Obtener estadísticas aunque la lista venga vacía
+      obtenerEstadisticas();
+    } catch (error) {
+      console.error('Error al cargar programas:', error);
+
+    }
+  };
+  
+
+  // Funciones auxiliares para procesar datos del formulario
+  const procesarRequisitos = (requisitos) => {
+    if (!Array.isArray(requisitos)) return [];
+    return requisitos
+      .map(req => typeof req === 'object' ? req.value : req)
+      .filter(req => req && req.trim() !== '');
+  };
+
+  const procesarObjetivos = (objetivos) => {
+    if (!Array.isArray(objetivos)) return [];
+    return objetivos
+      .map(obj => typeof obj === 'object' ? obj.value : obj)
+      .filter(obj => obj && obj.trim() !== '');
+  };
+ 
 
   // Funciones del modal
   const abrirModalVer = (programa) => {
@@ -147,10 +154,10 @@ const Gestioncursos = () => {
       cupos: programa.cuposDisponibles || '',
       profesor: programa.profesor || '',
       profesorBio: programa.profesorBio || '',
-      requisitos: Array.isArray(programa.requisitos) 
+      requisitos: Array.isArray(programa.requisitos)
         ? programa.requisitos.map((req, i) => ({ id: `req_${i}`, value: req }))
         : [{ id: 'req_0', value: '' }],
-      pensum: Array.isArray(programa.pensum) 
+      pensum: Array.isArray(programa.pensum)
         ? programa.pensum.map((mod, i) => ({ id: `pen_${i}`, ...mod }))
         : [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
       objetivos: Array.isArray(programa.objetivos)
@@ -266,11 +273,11 @@ const Gestioncursos = () => {
     setSearchTerm(searchValue);
     const trimmedValue = searchValue.trim();
     if (trimmedValue.length === 0) {
-      setCursosFiltrados(cursos);
+      setProgramasFiltrados(programas);
       return;
     }
     const searchLower = trimmedValue.toLowerCase();
-    const filteredCursos = cursos.filter(curso => {
+    const filteredProgramas = programas.filter(curso => {
       const nombre = curso.nombre?.toLowerCase();
       const instructor = curso.instructor?.toLowerCase();
       const categoria = curso.categoria?.toLowerCase();
@@ -278,7 +285,7 @@ const Gestioncursos = () => {
         instructor?.includes(searchLower) ||
         categoria?.includes(searchLower);
     });
-    setCursosFiltrados(filteredCursos);
+    setProgramasFiltrados(filteredProgramas);
   };
 
   useEffect(() => {
@@ -291,15 +298,15 @@ const Gestioncursos = () => {
     if (searchTerm) {
       handleSearch(searchTerm);
     } else {
-      setCursosFiltrados(cursos);
+      setProgramasFiltrados(programas);
     }
-  }, [cursos]);
+  }, [programas]);
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
   const registrosPorPagina = 6;
-  const totalPaginas = Math.ceil(cursosFiltrados.length / registrosPorPagina);
-  const cursosPaginados = cursosFiltrados.slice(
+  const totalPaginas = Math.ceil(programasFiltrados.length / registrosPorPagina);
+  const programasPaginados = programasFiltrados.slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
@@ -307,7 +314,7 @@ const Gestioncursos = () => {
   // Reiniciar a la página 1 si cambia el filtro de usuarios
   useEffect(() => {
     setPaginaActual(1);
-  }, [cursosFiltrados]);
+  }, [programasFiltrados]);
 
   return (
     <>
@@ -346,7 +353,7 @@ const Gestioncursos = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="activeCursos">
-                {cursos.filter(c => c.estado === 'activo').length}
+                {programas.filter(c => c.estado === 'activo').length}
               </div>
               <div className="stat-label-usuarios">Cursos Activos</div>
             </div>
@@ -368,7 +375,7 @@ const Gestioncursos = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number-usuarios" id="totalInscritos">
-                {cursos.reduce((total, curso) => total + (curso.inscritos || 0), 0)}
+                {programas.reduce((total, curso) => total + (curso.inscritos || 0), 0)}
               </div>
               <div className="stat-label-usuarios">Total Inscritos</div>
             </div>
@@ -414,17 +421,10 @@ const Gestioncursos = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(() => {
-            if (cargando) {
-              return (
-                <div className="col-span-full text-center py-12">
-                  <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-slate-600">Cargando programas académicos...</p>
-                </div>
-              );
-            }
-            
+           
+
             if (programas.length > 0) {
-              return cursosPaginados.map((programa) => {
+              return programasPaginados.map((programa) => {
                 // Determinar clases para el tipo de programa
                 const tipoClases = programa.tipo === 'curso'
                   ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
@@ -443,94 +443,94 @@ const Gestioncursos = () => {
                 }
 
                 return (
-                <div key={programa._id} className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-                  {/* Header del programa */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className={`p-3 rounded-xl ${tipoClases}`}>
-                        {programa.tipo === 'curso' ? (
-                          <BookOpen className="w-6 h-6 text-white" />
-                        ) : (
-                          <GraduationCap className="w-6 h-6 text-white" />
-                        )}
+                  <div key={programa._id} className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                    {/* Header del programa */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className={`p-3 rounded-xl ${tipoClases}`}>
+                          {programa.tipo === 'curso' ? (
+                            <BookOpen className="w-6 h-6 text-white" />
+                          ) : (
+                            <GraduationCap className="w-6 h-6 text-white" />
+                          )}
+                        </div>
+                        <div>
+                          <span className={`px-2 py-1 text-xs font-medium rounded-lg ${tipoLabelClases}`}>
+                            {programa.tipo === 'curso' ? 'Curso' : 'Programa Técnico'}
+                          </span>
+                          <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-lg ${estadoClases}`}>
+                            {programa.estado}
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <span className={`px-2 py-1 text-xs font-medium rounded-lg ${tipoLabelClases}`}>
-                          {programa.tipo === 'curso' ? 'Curso' : 'Programa Técnico'}
-                        </span>
-                        <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-lg ${estadoClases}`}>
-                          {programa.estado}
-                        </span>
+
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => abrirModalVer(programa)}
+                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          title="Ver detalles"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEdit(programa)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Editar"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+
                       </div>
                     </div>
 
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => abrirModalVer(programa)}
-                      className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                      title="Ver detalles"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleEdit(programa)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Editar"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
+                    {/* Contenido del programa */}
+                    <div className="space-y-3">
+                      <h3 className="font-bold text-lg text-slate-800 line-clamp-2">{programa.nombre}</h3>
+                      <p className="text-slate-600 text-sm line-clamp-3">{programa.descripcion}</p>
 
-                  </div>
-                </div>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div className="flex items-center space-x-2">
+                          <DollarSign className="w-4 h-4 text-emerald-600" />
+                          <span className="font-semibold text-emerald-600">
+                            {formatearPrecio(programa.precio)}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Users className="w-4 h-4 text-blue-600" />
+                          <span className="text-slate-600">
+                            Max. {programa.capacidadMaxima || 'N/A'}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="w-4 h-4 text-purple-600" />
+                          <span className="text-slate-600">
+                            {typeof programa.duracion === 'object'
+                              ? `${programa.duracion?.horas || 0}h - ${programa.duracion?.semanas || 0} sem`
+                              : programa.duracion || 'N/A'
+                            }
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="w-4 h-4 text-amber-600" />
+                          <span className="text-slate-600">
+                            {programa.fechaInicio ? new Date(programa.fechaInicio).toLocaleDateString() : 'Por definir'}
+                          </span>
+                        </div>
+                      </div>
 
-                {/* Contenido del programa */}
-                <div className="space-y-3">
-                  <h3 className="font-bold text-lg text-slate-800 line-clamp-2">{programa.nombre}</h3>
-                  <p className="text-slate-600 text-sm line-clamp-3">{programa.descripcion}</p>
-
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="w-4 h-4 text-emerald-600" />
-                      <span className="font-semibold text-emerald-600">
-                        {formatearPrecio(programa.precio)}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-blue-600" />
-                      <span className="text-slate-600">
-                        Max. {programa.capacidadMaxima || 'N/A'}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Clock className="w-4 h-4 text-purple-600" />
-                      <span className="text-slate-600">
-                        {typeof programa.duracion === 'object'
-                          ? `${programa.duracion?.horas || 0}h - ${programa.duracion?.semanas || 0} sem`
-                          : programa.duracion || 'N/A'
-                        }
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4 text-amber-600" />
-                      <span className="text-slate-600">
-                        {programa.fechaInicio ? new Date(programa.fechaInicio).toLocaleDateString() : 'Por definir'}
-                      </span>
+                      {programa.instructor && (
+                        <div className="pt-3 border-t border-slate-200/50">
+                          <p className="text-sm text-slate-600">
+                            <span className="font-medium">Instructor:</span> {programa.instructor}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {programa.instructor && (
-                    <div className="pt-3 border-t border-slate-200/50">
-                      <p className="text-sm text-slate-600">
-                        <span className="font-medium">Instructor:</span> {programa.instructor}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
                 );
               });
             }
-            
+
             return (
               <div className="col-span-full text-center py-12">
                 <BookOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
@@ -575,7 +575,7 @@ const Gestioncursos = () => {
                 <div className="programa-detalle-card">
                   {selectedProgram.imagen && (
                     <div className="programa-detalle-imagen">
-                      <img src={selectedProgram.imagen} alt="Imagen del programa" style={{maxWidth:'100%',borderRadius:'8px',marginBottom:'1rem'}} />
+                      <img src={selectedProgram.imagen} alt="Imagen del programa" style={{ maxWidth: '100%', borderRadius: '8px', marginBottom: '1rem' }} />
                     </div>
                   )}
                   <div className="programa-detalle-info">
@@ -597,7 +597,7 @@ const Gestioncursos = () => {
                     {selectedProgram.requisitos && selectedProgram.requisitos.length > 0 && (
                       <div className="detalle-row">
                         <span className="detalle-label">Requisitos:</span>
-                        <ul style={{margin:0,paddingLeft:'1.2em'}}>
+                        <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
                           {selectedProgram.requisitos.map((req, index) => req && <li key={`req-${index}-${req.substring(0, 10)}`}>{req}</li>)}
                         </ul>
                       </div>
@@ -605,7 +605,7 @@ const Gestioncursos = () => {
                     {selectedProgram.objetivos && selectedProgram.objetivos.length > 0 && (
                       <div className="detalle-row">
                         <span className="detalle-label">Objetivos:</span>
-                        <ul style={{margin:0,paddingLeft:'1.2em'}}>
+                        <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
                           {selectedProgram.objetivos.map((obj, index) => obj && <li key={`obj-${index}-${obj.substring(0, 10)}`}>{obj}</li>)}
                         </ul>
                       </div>
@@ -613,7 +613,7 @@ const Gestioncursos = () => {
                     {selectedProgram.pensum && selectedProgram.pensum.length > 0 && (
                       <div className="detalle-row">
                         <span className="detalle-label">Pensum Académico:</span>
-                        <ul style={{margin:0,paddingLeft:'1.2em'}}>
+                        <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
                           {selectedProgram.pensum.map((mod, index) => (
                             <li key={`pensum-${index}-${(mod.modulo || '').substring(0, 10)}`}><b>{mod.modulo}</b>: {mod.descripcion} ({mod.horas} horas)</li>
                           ))}
@@ -621,7 +621,7 @@ const Gestioncursos = () => {
                       </div>
                     )}
                   </div>
-                  <div className="modal-footer-tesorero" style={{marginTop:'2rem'}}>
+                  <div className="modal-footer-tesorero" style={{ marginTop: '2rem' }}>
                     <button type="button" className="cancel-btn" onClick={() => setShowDetailModal(false)}>Cerrar</button>
                   </div>
                 </div>
@@ -632,8 +632,8 @@ const Gestioncursos = () => {
         <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
-          disabled={paginaActual === 1}
+            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+            disabled={paginaActual === 1}
           >
             <i className="fas fa-chevron-left"></i>
           </button>
@@ -642,8 +642,8 @@ const Gestioncursos = () => {
           </span>
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-          disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+            disabled={paginaActual === totalPaginas || totalPaginas === 0}
           >
             <i className="fas fa-chevron-right"></i>
           </button>
@@ -654,4 +654,4 @@ const Gestioncursos = () => {
   );
 };
 
-export default Gestioncursos;
+export default Gestionprogramas;

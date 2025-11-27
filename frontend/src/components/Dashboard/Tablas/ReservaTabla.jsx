@@ -31,12 +31,8 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
           </tr>
         </thead>
         <tbody>
-          {reservas.length === 0 ? (
-            <tr>
-              <td colSpan={19}>No hay reservas para mostrar</td>
-            </tr>
-          ) : (
-            reservas.map((reserva) => (
+         
+            {reservas.map((reserva) => (
               <tr key={reserva._id}>
                 <td>
                   {typeof reserva.usuario === "object"
@@ -86,8 +82,8 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => (
                   </div>
                 </td>
               </tr>
-            ))
-          )}
+          
+          ))}
         </tbody>
       </table>
     </div>

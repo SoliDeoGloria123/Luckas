@@ -294,7 +294,7 @@ exports.changePassword = async (req, res) => {
 
         // Actualizar con la nueva contraseña
         user.password = newPassword; // El middleware pre('save') se encargará del hashing
-        await user.save();
+        await user.save({ validateBeforeSave: false });
 
         console.log('[CONTROLLER] Contraseña cambiada exitosamente para usuario:', req.userId);
         res.status(200).json({

@@ -10,7 +10,6 @@ import { programasAcademicosService } from "../../../services/programasAcademico
 import {
   Calendar,
   Users,
-
 } from "lucide-react"
 
 const EventosCarousel = () => {

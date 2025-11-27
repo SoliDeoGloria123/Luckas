@@ -4,6 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
+import { getEventImageUrl } from '../../../services/eventService';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { Pagination } from 'swiper/modules';
 
 const InscripcionModal = ({ inscripcion, isOpen, onClose, onCancel }) => {
   if (!isOpen || !inscripcion) return null;
@@ -41,47 +46,61 @@ const InscripcionModal = ({ inscripcion, isOpen, onClose, onCancel }) => {
   };
 
   return (
-    <div className="modal-overlay-misinscripciones show">
+    <div
+      className="modal-overlay-misinscripciones show"
+      style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 9999 }}
+    >
       <button
         type="button"
         className="modal-backdrop"
         onClick={onClose}
-        style={{ 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          width: '100%', 
-          height: '100%', 
-          background: 'transparent', 
-          border: 'none', 
-          cursor: 'default',
-          zIndex: 1
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0.45)',
+          border: 'none',
+          cursor: 'pointer',
+          zIndex: 9999
         }}
         aria-label="Cerrar modal"
       />
-      <dialog 
-        className="modal-container-misinscripciones" 
+      <dialog
+        className="modal-container-misinscripciones"
         open
         aria-labelledby="modal-title"
-        style={{ position: 'relative', zIndex: 2 }}
+        style={{ position: 'relative', zIndex: 10000 }}
       >
         <div className="modal-header-misinscripciones">
           <div className="modal-image-gallery">
-            {inscripcion.tipoReferencia === 'Eventos' && 
-             Array.isArray(inscripcion.referencia?.imagen) && 
-             inscripcion.referencia.imagen.length > 0 && 
-             inscripcion.referencia.imagen[0] ? (
-              <img
-                src={
-                  inscripcion.referencia.imagen[0].startsWith('https')
-                    ? inscripcion.referencia.imagen[0]
-                    : `http://localhost:3000/uploads/eventos/${inscripcion.referencia.imagen[0]}`
-                }
-                alt={inscripcion.referencia?.nombre || 'Imagen del evento'}
-                className="modal-image-misinscripciones"
-              />
+            {inscripcion.tipoReferencia === 'Eventos' && Array.isArray(inscripcion.referencia?.imagen) ? (
+              (() => {
+                const imgs = inscripcion.referencia.imagen.filter(Boolean);
+                if (imgs.length === 0) return <div className="modal-image-placeholder">Imagen no disponible</div>;
+                return (
+                  <Swiper
+                    modules={[Pagination]}
+                    pagination={{ clickable: true }}
+                    spaceBetween={10}
+                    slidesPerView={1}
+                    className="modal-swiper-misinscripciones"
+                  >
+                    {imgs.map((img, idx) => (
+                      <SwiperSlide key={img || `${inscripcion.referencia?._id || inscripcion._id || 'ins'}-${idx}`}>
+                        <img
+                          src={getEventImageUrl(img)}
+                          alt={inscripcion.referencia?.nombre || `Imagen ${idx + 1}`}
+                          className="modal-image-misinscripciones"
+                        />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                );
+              })()
             ) : (
-              <p>Imagen no disponible</p>
+              <div className="modal-image-placeholder">Imagen no disponible</div>
             )}
           </div>
           <button className="modal-close-misinscripciones" onClick={onClose}>

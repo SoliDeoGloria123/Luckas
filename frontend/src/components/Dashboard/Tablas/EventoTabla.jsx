@@ -13,11 +13,10 @@ import {
   Star
 } from 'lucide-react';
 
-const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabilitar, onVerDetalle }) => {
+const TablaEventos = ({ eventos = [], onEditar, onEliminar, onDeshabilitar, onVerDetalle }) => {
 
   // Estado para manejar el índice de imagen de cada evento
   const [imgIndices, setImgIndices] = useState({});
-
   // Funciones para navegar en el carrusel
   const prevImg = (eventoId, totalImages) => {
     setImgIndices(prev => ({
@@ -33,16 +32,9 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
     }));
   };
 
-  // Renderizado condicional extraído para evitar ternarias anidadas en JSX
-  let contenidoEventos;
-  if (cargando) {
-    contenidoEventos = (
-      <div className="col-span-full text-center py-12">
-        <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-slate-600">Cargando eventos...</p>
-      </div>
-    );
-  } else if (eventos.length > 0) {
+    // Renderizado condicional extraído para evitar ternarias anidadas en JSX
+    let contenidoEventos;
+    if (eventos.length > 0) {
     contenidoEventos = (
         eventos.map((evento) => {
           const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
@@ -311,7 +303,7 @@ const TablaEventos = ({ cargando, eventos = [], onEditar, onEliminar, onDeshabil
   );
 };
 TablaEventos.propTypes = {
-  cargando: PropTypes.bool,
+
   eventos: PropTypes.array.isRequired,
   onEditar: PropTypes.func.isRequired,
   onEliminar: PropTypes.func.isRequired,

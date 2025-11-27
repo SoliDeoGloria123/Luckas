@@ -4,7 +4,7 @@
   --color-blue-primary: #2563eb;
   --color-blue-dark: #1d4ed8;
   --color-purple: #8b5cf6;
-  --color-green: #059669;
+  --color-green: #2563eb;
   --color-gray-dark: #334155;
   --color-gray-light: #f1f5f9;
   --color-white: #ffffff;
@@ -13,7 +13,7 @@
   /* Colores adicionales para gradientes y efectos */
   --color-blue-light: #3b82f6;
   --color-purple-light: #a78bfa;
-  --color-green-light: #10b981;
+  --color-green-light: #3b82f6;
   --color-gray-50: #f8fafc;
   --color-gray-100: #f1f5f9;
   --color-gray-200: #e2e8f0;
@@ -57,18 +57,18 @@
 }
 
 /* Main Content */
-.cabanas-seminario .main-content {
+.cabanas-seminario .main-content-cabañas {
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
 }
 
 /* Breadcrumb */
-.cabanas-seminario .breadcrumb {
+.cabanas-seminario .breadcrumb-cabañas {
   margin-bottom: var(--spacing-lg);
 }
 
-.cabanas-seminario .back-btn {
+.cabanas-seminario .back-btn-cabañas {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -85,7 +85,7 @@
   font-size: inherit;
 }
 
-.cabanas-seminario .back-btn:hover {
+.cabanas-seminario .back-btn-cabañas:hover {
   background: var(--color-gray-50);
   color: var(--color-blue-primary);
   border-color: var(--color-blue-primary);
@@ -93,7 +93,7 @@
 }
 
 /* Page Header */
-.cabanas-seminario .page-header {
+.cabanas-seminario .page-header-cabañas {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -182,8 +182,8 @@
 
 .cabanas-seminario .search-bar input:focus {
   outline: none;
-  border-color: var(--color-green);
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+  border-color: var(--color-blue-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   background: var(--color-white);
 }
 
@@ -230,11 +230,11 @@
 
 .cabanas-seminario .sort-dropdown select:focus {
   outline: none;
-  border-color: var(--color-green);
+  border-color: var(--color-blue-primary);
 }
 
 /* Cabins Grid */
-.cabanas-seminario .cabins-grid {
+.cabanas-seminario .cabins-grid-cabañas {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: var(--spacing-xl);
@@ -285,7 +285,7 @@
 }
 
 .cabin-status.available {
-  background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
+  background: linear-gradient(135deg, var(--color-blue-primary), var(--color-blue-light));
 }
 
 .cabin-status.reserved {
@@ -368,8 +368,8 @@
 .cabanas-seminario .cabin-category {
   display: inline-block;
   padding: var(--spacing-xs) var(--spacing-sm);
-  background: rgba(5, 150, 105, 0.1);
-  color: var(--color-green);
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-blue-primary);
   border-radius: var(--border-radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
@@ -419,7 +419,7 @@
 }
 
 .feature-item svg {
-  color: var(--color-green);
+  color: var(--color-blue-primary);
   flex-shrink: 0;
 }
 
@@ -464,7 +464,7 @@
 .cabanas-seminario .price {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--color-green);
+  color: var(--color-blue-primary);
 }
 
 .cabanas-seminario .price-period {
@@ -479,7 +479,7 @@
 
 .cabanas-seminario .availability-text {
   font-size: 0.875rem;
-  color: var(--color-green);
+  color: var(--color-blue-primary);
   font-weight: 500;
 }
 
@@ -509,8 +509,7 @@
 }
 
 .cabanas-seminario .cabin-btn.primary {
-  background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
-  color: var(--color-white);
+background: linear-gradient(135deg, var(--color-blue-primary), var(--color-blue-light));  color: var(--color-white);
 }
 
 .cabanas-seminario .cabin-btn.primary:hover:not(:disabled) {
@@ -526,8 +525,8 @@
 
 .cabanas-seminario .cabin-btn.secondary:hover {
   background: var(--color-gray-50);
-  border-color: var(--color-green);
-  color: var(--color-green);
+  border-color: var(--color-blue-primary);
+  color: var(--color-blue-primary);
 }
 
 .cabanas-seminario .cabin-btn.disabled {
@@ -550,8 +549,8 @@
 .cabanas-seminario .load-more-btn {
   padding: var(--spacing-md) var(--spacing-xl);
   background: var(--color-white);
-  border: 2px solid var(--color-green);
-  color: var(--color-green);
+  border: 2px solid var(--color-blue-primary);
+  color: var(--color-blue-primary);
   border-radius: var(--border-radius-md);
   font-weight: 600;
   cursor: pointer;
@@ -564,7 +563,7 @@
 }
 
 .cabanas-seminario .load-more-btn:hover {
-  background: var(--color-green);
+  background: var(--color-blue-primary);
   color: var(--color-white);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
@@ -575,7 +574,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
+  background: linear-gradient(135deg, var(--color-blue-primary), var(--color-blue-light));
   color: white;
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--border-radius-md);
@@ -811,8 +810,8 @@
 }
 
 .availability {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: #dbeafe;
+  color: var(--color-blue-dark);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 14px;
@@ -864,7 +863,7 @@
 }
 
 .capacity-icon-seminario {
-    color: var(--color-green);
+  color: var(--color-blue-primary);
     font-size: 24px;
     width: 32px;
     display: flex;
@@ -917,12 +916,12 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background-color: rgba(5, 150, 105, 0.1);
+    background-color: rgba(37, 99, 235, 0.1);
     border-radius: 8px;
 }
 
 .feature-icon {
-    color: var(--color-green);
+  color: var(--color-blue-primary);
     font-size: 16px;
 }
 
@@ -942,7 +941,7 @@
 }
 
 .policy-item i {
-    color: var(--color-green);
+  color: var(--color-blue-primary);
     width: 16px;
 }
 
@@ -1075,7 +1074,7 @@
     padding: 0 var(--spacing-md);
   }
 
-  .cabanas-seminario .main-content {
+  .cabanas-seminario .main-content-cabañas {
     padding: var(--spacing-lg) var(--spacing-md);
   }
 

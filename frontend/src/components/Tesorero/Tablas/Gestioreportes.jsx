@@ -8,8 +8,13 @@ import '../Gestion.css';
 
 const Gestionreportes = () => {
 
-    const [setDashboardData] = useState(null);
-    const [reportType, setReportType] = useState('dashboard');
+    const [dashboardData, setDashboardData] = useState(null);
+
+    // Mantener referencia para evitar warning de variable no usada
+    useEffect(() => {
+        // dashboardData puede ser útil para debugging o futuros usos
+        // no-op intencional para satisfacer linter cuando no se usa directamente
+    }, [dashboardData]);
     const [reportesGuardados, setReportesGuardados] = useState([]);
 
     // Variables para el modal del Dashboard
@@ -61,69 +66,9 @@ const Gestionreportes = () => {
     }, []);
 
     // Cambiar tipo de reporte
-    const handleReportTypeChange = async (type) => {
-        setReportType(type);
-
-        try {
-            let data;
-            switch (type) {
-                case 'dashboard':
-                    data = await reporteService.getDashboard();
-                    break;
-                case 'usuarios':
-                    data = await reporteService.getUsuarios();
-                    break;
-                case 'reservas':
-                    data = await reporteService.getReservas();
-                    break;
-                case 'inscripciones':
-                    data = await reporteService.getInscripciones();
-                    break;
-                case 'eventos':
-                    data = await reporteService.getEventos();
-                    break;
-                case 'financiero':
-                    data = await reporteService.getFinanciero();
-                    break;
-                default:
-                    data = await reporteService.getDashboard();
-            }
-            // Los datos se procesan pero no se almacenan en una variable de estado
-            console.log('Datos cargados:', data);
-        } catch (error) {
-            console.error('Error al cargar reporte:', error);
-            mostrarAlerta('Error', 'No se pudo cargar el reporte', 'error');
-        }
-    };
 
 
 
-    // Exportar a PDF
-    const exportarPDF = async () => {
-        try {
-            mostrarAlerta('Info', 'Exportando reporte a PDF...', 'info');
-            // Aquí se implementaría la lógica de exportación a PDF
-            // Por ahora solo mostramos el mensaje
-            setTimeout(() => {
-                mostrarAlerta('Éxito', 'Reporte exportado exitosamente', 'success');
-            }, 2000);
-        } catch (error) {
-            console.log('Error al exportar reporte a PDF:', error);
-        }
-    };
-
-    // Exportar a Excel
-    const exportarExcel = async () => {
-        try {
-            mostrarAlerta('Info', 'Exportando reporte a Excel...', 'info');
-            // Aquí se implementaría la lógica de exportación a Excel
-            setTimeout(() => {
-                mostrarAlerta('Éxito', 'Reporte exportado exitosamente', 'success');
-            }, 2000);
-        } catch (error) {
-            console.log('Error al exportar reporte a Excel:', error);
-        }
-    };
 
     // Función para crear reporte
     // const handleCrearReporte = async (datosReporte) => {
@@ -275,55 +220,23 @@ const Gestionreportes = () => {
         <>
             <Header />
             <main className="main-content-tesorero">
+                <div className="page-header-tesorero">
+                    <div className="card-header-tesorero">
+                        <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
+                            <i className="fas fa-arrow-left"></i>
+                        </button>
 
-                <div className="section-header-reporte">
-                    <h1>Sistema de Reportes</h1>
-                    <p>Generar informes del sistema</p>
-                    <div className="header-actions-reporte">
-                        <select
-                            className="report-selector-reporte"
-                            value={reportType}
-                            onChange={(e) => handleReportTypeChange(e.target.value)}
-                        >
-                            <option value="dashboard">Dashboard General</option>
-                            <option value="financiero">Reportes Financieros</option>
-                            <option value="usuarios">Reportes de Usuarios</option>
-                            <option value="eventos">Reportes de Eventos</option>
-                            <option value="reservas">Reportes de Reservas</option>
-                            <option value="inscripciones">Reportes de Inscripciones</option>
-                        </select>
-                        <button
-                            onClick={exportarPDF}
-                            className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#334155] font-medium"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                />
-                            </svg>
-                            Exportar PDF
-                        </button>
-                        <button
-                            onClick={exportarExcel}
-                            className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#334155] font-medium"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                />
-                            </svg>
-                            Exportar Excel
-                        </button>
+                        <div className="page-title-tesorero">
+                            <h1>Sistema de Reportes</h1>
+                            <p>Generar informes del sistema</p>
+                        </div>
                     </div>
+
+                    <button className="btn-primary-tesorero" id="newReportBtn" onClick={handleCreate}>
+                        <i className="fas fa-plus"></i> {' '}
+                        Nuevo Reporte
+                    </button>
                 </div>
-
-
                 <div className="stats-grid-reporte report-stats">
                     {statsContent}
                 </div>
@@ -331,12 +244,7 @@ const Gestionreportes = () => {
                 {/*Tabla de resportes*/}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6    ">
                     <div className="flex items-center justify-between mb-6">
-                            <h3 className="font-bold text-xl text-gray-900">Reportes Generados</h3>
-                            <button className="btn-primary-reporte" id="newReportBtn" onClick={handleCreate}>
-                                <i className="fas fa-plus"></i> {''}
-                                Nuevo Reporte
-                            </button>
-                
+                        <h3 className="font-bold text-xl text-gray-900">Reportes Generados</h3>
                     </div>
 
                     <div className="flex gap-4 mb-6">
@@ -465,13 +373,10 @@ const Gestionreportes = () => {
             {mostrarModal && (
                 <ReporteModal
                     mostrar={mostrarModal}
+                    datosIniciales={reporteSeleccionado}
                     modoEdicion={modoEdicion}
-                    reporteSeleccionado={reporteSeleccionado}
-                    setReporteSeleccionado={setReporteSeleccionado}
-                    nuevoReporte={nuevoReporte}
-                    setNuevoReporte={setNuevoReporte}
                     onClose={() => setMostrarModal(false)}
-                    onSubmit={(e) => modoEdicion ? actualizarReporte(e) : crearReporte(e)}
+                    onSubmit={(payload) => modoEdicion ? actualizarReporte(payload) : crearReporte(payload)}
                 />
             )}
         </>

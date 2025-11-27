@@ -5,6 +5,7 @@ import { inscripcionService } from '../../../services/inscripcionService';
 import './EventosSeminario.css';
 import Header from '../Shared/Header';
 import Footer from '../../footer/Footer'
+import { ArrowLeft, Search, Calendar, Clock, MapPin, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import FormularioInscripcion from '../pages/FormularioInscripcion';
 
 const EventosSeminario = () => {
@@ -53,13 +54,37 @@ const EventosSeminario = () => {
     fetchEventosEInscripciones();
   }, []);
 
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
+
+  // Para futuras mejoras se puede filtrar eventos; por ahora usamos el array completo
+  const eventosFiltrados = eventos;
+
+  // Ajustar página si cambia la cantidad de eventos filtrados
+  useEffect(() => {
+    const newTotal = eventosFiltrados.length === 0 ? 0 : Math.ceil(eventosFiltrados.length / registrosPorPagina);
+    setPaginaActual((prev) => {
+      if (newTotal === 0) return 1;
+      return Math.min(prev, newTotal);
+    });
+  }, [eventosFiltrados.length]);
+
+  const totalPaginas = eventosFiltrados.length === 0 ? 0 : Math.ceil(eventosFiltrados.length / registrosPorPagina);
+  const eventosPaginados = eventosFiltrados.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
+
   const estaInscrito = (eventoId) => {
     return misInscripciones.some(
       insc =>
-        (insc.tipoReferencia === 'Eventos' &&
-         (insc.referencia === eventoId || insc.referencia?._id === eventoId))
+      (insc.tipoReferencia === 'Eventos' &&
+        (insc.referencia === eventoId || insc.referencia?._id === eventoId))
     );
   };
+  
+
 
   const handleInscribir = (evento) => {
     if (estaInscrito(evento._id)) {
@@ -119,10 +144,7 @@ const EventosSeminario = () => {
       <main className="main-content-seminarista">
         <div className="breadcrumb-seminarista">
           <button className="back-btn-seminarista">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5" />
-              <path d="M12 19l-7-7 7-7" />
-            </svg>
+            <ArrowLeft size={20} />
             Volver al Dashboard
           </button>
         </div>
@@ -150,10 +172,7 @@ const EventosSeminario = () => {
 
         <div className="filters-section-seminarista">
           <div className="search-bar-seminarista">
-            <svg className="search-icon-seminarista" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
+            <Search className="search-icon-seminarista" size={20} />
             <input type="text" placeholder="Buscar eventos..." id="searchInput" />
           </div>
 
@@ -175,10 +194,8 @@ const EventosSeminario = () => {
         </div>
 
         <div className="events-grid" id="eventsGrid">
-          {eventos.length === 0 ? (
-            <p>No hay eventos disponibles en este momento.</p>
-          ) : (
-            eventos.map(ev => {
+          
+           {eventosPaginados.map(ev => {
               const inscrito = estaInscrito(ev._id);
               return (
                 <div
@@ -201,26 +218,15 @@ const EventosSeminario = () => {
                     <p className="event-description">{ev.descripcion}</p>
                     <div className="event-details">
                       <div className="detail-item--seminarista">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                          <line x1="16" y1="2" x2="16" y2="6" />
-                          <line x1="8" y1="2" x2="8" y2="6" />
-                          <line x1="3" y1="10" x2="21" y2="10" />
-                        </svg>
+                        <Calendar size={16} />
                         <span>{new Date(ev.fechaEvento).toLocaleDateString()}</span>
                       </div>
                       <div className="detail-item--seminarista">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="12" r="10" />
-                          <polyline points="12,6 12,12 16,14" />
-                        </svg>
+                        <Clock size={16} />
                         <span>{ev.horaInicio}-{ev.horaFin}</span>
                       </div>
                       <div className="detail-item--seminarista">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                          <circle cx="12" cy="10" r="3" />
-                        </svg>
+                        <MapPin size={16} />
                         <span>{ev.lugar}</span>
                       </div>
                     </div>
@@ -240,20 +246,18 @@ const EventosSeminario = () => {
                     </div>
                     {inscrito && (
                       <div className="inscrito-msg">
-                        <span style={{fontSize: '1.1em', fontWeight: 700}}>Estás inscrito a este evento</span>
+                        <span style={{ fontSize: '1.1em', fontWeight: 700 }}>Estás inscrito a este evento</span>
                       </div>
                     )}
                     <button className="evento-btn" onClick={() => handleInscribir(ev)} disabled={inscrito}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M9 12l2 2 4-4" />
-                      </svg>
+                      <Check size={16} />
                       {inscrito ? "Ya inscrito" : "Inscribirme"}
                     </button>
                   </div>
                 </div>
-              );
-            })
-          )}
+                );
+           
+              })}
           {eventoSeleccionado && (
             <FormularioInscripcion
               evento={eventoSeleccionado}
@@ -266,8 +270,30 @@ const EventosSeminario = () => {
           )}
 
         </div>
+       
 
-        <div className="load-more-section">
+        {totalPaginas > 1 && (
+          <div className="pagination-admin flex items-center justify-center gap-4 mt-6">
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+              disabled={paginaActual === 1}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span className="pagination-info-admin">
+              Página {paginaActual} de {totalPaginas}
+            </span>
+            <button
+              className="pagination-btn-admin"
+              onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+              disabled={paginaActual >= totalPaginas}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
+        {/*<div className="load-more-section">
           <button className="load-more-btn" >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 5v14" />
@@ -275,18 +301,10 @@ const EventosSeminario = () => {
             </svg>
             Cargar más eventos
           </button>
-        </div>
+        </div>*/}
       </main>
 
-      <div id="notification" className="notification">
-        <div className="notification-content">
-          <svg className="notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 12l2 2 4-4" />
-          </svg>
-          <span className="notification-message"></span>
-        </div>
-      </div>
-      <Footer></Footer>
+      <Footer />
     </div>
   );
 };
