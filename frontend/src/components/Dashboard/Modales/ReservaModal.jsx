@@ -52,7 +52,6 @@ const ReservasModal = ({
 
   if (!mostrar) return null;
 
-  const { reservaActual, setReserva } = getReservaData();
 
   const actualizarDatosUsuario = (userId) => {
     const usuarioSeleccionado = usuarios.find(u => u._id === userId);
@@ -69,34 +68,37 @@ const ReservasModal = ({
 
   const handleUsuarioChange = (userId) => {
     const datosUsuario = actualizarDatosUsuario(userId);
-    if (modoEdicion) {
-      setReservaSeleccionada({ ...reservaSeleccionada, ...datosUsuario });
-    } else {
-      setNuevaReserva({ ...nuevaReserva, ...datosUsuario });
-    }
+    const { reservaActual, setReserva } = getReservaData();
+    setReserva({ ...reservaActual, ...datosUsuario });
   };
 
   const handleCabanaChange = (cabanaId) => {
-    const cabanaSeleccionada = cabanas.find(c => c._id === cabanaId);
-    const nuevoPrecio = cabanaSeleccionada ? cabanaSeleccionada.precio : "";
-
-    if (modoEdicion) {
-      setReservaSeleccionada({
-        ...reservaSeleccionada,
-        cabana: cabanaId,
-        precio: nuevoPrecio
-      });
-    } else {
-      setNuevaReserva({
-        ...nuevaReserva,
-        cabana: cabanaId,
-        precio: nuevoPrecio
-      });
-    }
+    const cabanaSeleccionadaObj = cabanas.find(c => c._id === cabanaId);
+    const nuevoPrecio = cabanaSeleccionadaObj ? cabanaSeleccionadaObj.precio : "";
+    const { reservaActual, setReserva } = getReservaData();
+    setReserva({ ...reservaActual, cabana: cabanaId, precio: nuevoPrecio });
   };
 
   const getFieldValue = (fieldName) => {
-    return modoEdicion ? reservaSeleccionada?.[fieldName] : nuevaReserva[fieldName];
+    const val = modoEdicion ? reservaSeleccionada?.[fieldName] : nuevaReserva[fieldName];
+    // Normalizar precio cuando no está directamente en la reserva pero sí en la cabaña poblada
+    if (fieldName === 'precio') {
+      if (modoEdicion) {
+        if (val !== undefined && val !== null && val !== '') return val;
+        const cab = reservaSeleccionada?.cabana;
+        return (cab && typeof cab === 'object' && cab.precio) ? cab.precio : '';
+      }
+      return val || '';
+    }
+    return val;
+  };
+
+  const getSelectValue = (fieldName) => {
+    const val = modoEdicion ? reservaSeleccionada?.[fieldName] : nuevaReserva[fieldName];
+    if (typeof val === 'object' && val !== null) {
+      return val._id || val.id || '';
+    }
+    return val ?? '';
   };
 
   const handleFieldChange = (fieldName, value) => {
@@ -125,6 +127,7 @@ const ReservasModal = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const { reservaActual, setReserva } = getReservaData();
     setReserva({ ...reservaActual, [name]: value });
   };
 
@@ -158,7 +161,9 @@ const ReservasModal = ({
       return;
     }
 
-    onSubmit();
+    // Pasar la reserva actualizada al onSubmit (para que el handler en el padre la procese)
+    const { reservaActual } = getReservaData();
+    onSubmit(reservaActual);
   };
 
   return (
@@ -182,7 +187,7 @@ const ReservasModal = ({
             <select
               id="usuario"
               name="usuario"
-              value={modoEdicion ? reservaSeleccionada?.usuario : nuevaReserva.usuario}
+              value={getSelectValue('usuario')}
               onChange={e => handleUsuarioChange(e.target.value)}
               required
             >
@@ -201,7 +206,7 @@ const ReservasModal = ({
               <select
                 id="cabana"
                 name="cabana"
-                value={modoEdicion ? reservaSeleccionada?.cabana : nuevaReserva.cabana}
+                value={getSelectValue('cabana')}
                 onChange={e => handleCabanaChange(e.target.value)}
                 required
               >
@@ -219,7 +224,7 @@ const ReservasModal = ({
                 id="precio"
                 name="precio"
                 type="number"
-                value={modoEdicion ? reservaSeleccionada?.precio : nuevaReserva.precio}
+                value={getFieldValue('precio')}
                 readOnly
                 required
               />

@@ -191,15 +191,18 @@ const Gestioncabana = () => {
     }
   };
 
+  // Función auxiliar para manejar la actualización con FormData o sin él
+  const procesarActualizacionCabana = (payload) => {
+    const id = (payload && payload._id) ? payload._id : (cabanaSeleccionada && cabanaSeleccionada._id);
+    if (!id) throw new Error('No se encontró el ID de la cabaña a actualizar');
+    return id;
+  };
+
   const actualizarCabana = async (payload) => {
     try {
       if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
       const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaCabana;
-      const id = (body && body._id) ? body._id : (cabanaSeleccionada && cabanaSeleccionada._id);
-      if (!id) {
-        mostrarAlerta('ERROR', 'No se encontró el ID de la cabaña a actualizar', 'error');
-        return;
-      }
+      const id = procesarActualizacionCabana(body);
       await cabanaService.update(id, body);
       mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente", 'success');
       setMostrarModal(false);

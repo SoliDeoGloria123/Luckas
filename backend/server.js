@@ -36,22 +36,55 @@ app.disable('x-powered-by');
 // Configuración de middlewares
 app.use(morgan('dev')); // Logging
 app.use(cors({
-    origin: [
-        'https://luckas.zapto.org',
+      origin: [ // ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ PRESENTE Y SIN CAMBIOS!
+        'https://luckas.zapto.org',   // Frontend en producción
         'http://localhost:3000',     // Frontend estático (desarrollo)
         'http://localhost:3001',     // Frontend React (desarrollo)
         'http://localhost:19006',    // App móvil Expo (desarrollo)
-        'https://localhost:3000',    // Frontend estático (HTTPS)
-        'https://localhost:3001',    // Frontend React (HTTPS)
-        'https://localhost:19006'    // App móvil Expo (HTTPS)
+        // Las versiones HTTPS de localhost son opcionales pero buenas para tener
+        'https://localhost:3000',
+        'https://localhost:3001',
+        'https://localhost:19006',
     ],
     credentials: true
 }));
 app.use(express.json({ limit: '50mb' })); // Para parsear JSON con límite aumentado
 app.use(express.urlencoded({ extended: true, limit: '50mb' })); // Para parsear URL-encoded con límite aumentado
 
-// Servir archivos estáticos del frontend
-app.use('/Externo', express.static(path.join(__dirname, '../frontend/public/Externo')));
+// Proteger rutas del panel antes de servir archivos estáticos
+// Esto evita que el middleware estático entregue el `index.html` del frontend
+// para rutas como `/admin`, `/tesorero`, `/seminarista` o `/externo` sin pasar por la verificación.
+const { authJwt, role } = require('./middlewares');
+
+// Proteger rutas de admin - solo admin puede acceder
+app.use(['/admin', '/admin/*'], (req, res, next) => {
+    authJwt.verifyToken(req, res, () => {
+        role.isAdmin(req, res, next);
+    });
+});
+
+// Proteger rutas de tesorero - solo admin y tesorero pueden acceder
+app.use(['/tesorero', '/tesorero/*'], (req, res, next) => {
+    authJwt.verifyToken(req, res, () => {
+        role.checkRole('admin', 'tesorero')(req, res, next);
+    });
+});
+
+// Proteger rutas de seminarista - solo admin, tesorero y seminarista pueden acceder
+app.use(['/seminarista', '/seminarista/*'], (req, res, next) => {
+    authJwt.verifyToken(req, res, () => {
+        role.checkRole('admin', 'tesorero', 'seminarista')(req, res, next);
+    });
+});
+
+// Proteger rutas de externo - todos los roles autenticados pueden acceder
+app.use(['/externo', '/externo/*'], (req, res, next) => {
+    authJwt.verifyToken(req, res, () => {
+        role.checkRole('admin', 'tesorero', 'seminarista', 'externo')(req, res, next);
+    });
+});
+
+// Servir archivos estáticos del frontend (carpeta `public` generada por React)
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 
 //Conexion a mongo 
@@ -89,12 +122,16 @@ app.use('/api/certificados', certificadoRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 // Ruta para el login/admin - redirigir al frontend React
-app.get('/admin', (req, res) => {
-    res.redirect('http://localhost:3001/login');
+app.get('/login', (req, res) => {
+    res.redirect('http://localhost/login');
 });
 
-app.get('/login', (req, res) => {
-    res.redirect('http://localhost:3001/login');
+// Proteger el acceso a las páginas del panel administrativo en el servidor
+// Si el cliente no envía token, redirigimos al login para evitar que
+// usuarios sin autenticación vean el HTML del panel.
+app.get(['/admin*', '/tesorero*'], authJwt.verifyToken, role.checkRole('admin', 'tesorero'), (req, res) => {
+    // Servir el SPA protegido (misma página que el fallback)
+    res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
 });
 
 // Manejo de rutas no encontradas
@@ -103,7 +140,7 @@ app.get('*', (req, res) => {
     if (req.path.startsWith('/api/')) {
         res.status(404).json({ message: 'Ruta de API no encontrada' });
     } else {
-        res.sendFile(path.join(__dirname, '../frontend/public/Externo/templates/home.html'));
+        res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
     }
 });
 

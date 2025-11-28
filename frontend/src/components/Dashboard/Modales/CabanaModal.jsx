@@ -31,6 +31,19 @@ const CabanaModal = ({
     }
   }, [mostrar, modoEdicion]);
 
+  // Pre-popular selectedImages con las imágenes existentes cuando estamos en modo edición
+  useEffect(() => {
+    if (mostrar && modoEdicion && cabanaSeleccionada && Array.isArray(cabanaSeleccionada.imagen) && setSelectedImages) {
+      const existing = cabanaSeleccionada.imagen.map((url, idx) => ({
+        id: `existing_${idx}_${Date.now()}`,
+        url,
+        name: typeof url === 'string' ? url.split('/').pop() : `img_${idx}`,
+        file: null // indica que es una imagen ya subida
+      }));
+      setSelectedImages(existing);
+    }
+  }, [mostrar, modoEdicion, cabanaSeleccionada, setSelectedImages]);
+
   
 
   // Función auxiliar para obtener texto del botón
@@ -78,13 +91,20 @@ const CabanaModal = ({
     const categoriaId = cabanaData?.categoria && typeof cabanaData.categoria === 'object'
       ? cabanaData.categoria._id
       : cabanaData?.categoria;
-    formData.append('categoria', String(categoriaId || ''));
+    if (categoriaId) {
+      formData.append('categoria', String(categoriaId));
+    }
     formData.append('precio', Number(cabanaData.precio));
     formData.append('estado', cabanaData.estado);
 
     // Incluir ubicación si existe (permitir editarla también)
     if (cabanaData.ubicacion) {
       formData.append('ubicacion', cabanaData.ubicacion);
+    }
+    // Si estamos en modo edición, incluir las URLs existentes para que el servidor
+    // sepa cuáles mantener y cuáles eliminar (cliente envía un array JSON)
+    if (modoEdicion && Array.isArray(cabanaData.imagen)) {
+      formData.append('existingImages', JSON.stringify(cabanaData.imagen));
     }
     
     return formData;
@@ -103,18 +123,29 @@ const CabanaModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      const tieneImagenes = !modoEdicion && selectedImages.length > 0;
-      
-      if (tieneImagenes) {
+      // Detectar si hay nuevas imágenes en selectedImages (tienen la propiedad `file`)
+      const nuevasImagenes = Array.isArray(selectedImages) && selectedImages.some(img => img && img.file);
+
+      if (nuevasImagenes) {
         const formData = prepararFormDataConImagenes();
         agregarImagenesAFormData(formData);
-        console.log('Enviando cabaña CON imágenes:', selectedImages.length, 'archivos');
-        await onSubmit(formData, true);
-      } else {
-        await onSubmit();
+        console.log('Enviando cabaña CON nuevas imágenes:', selectedImages.filter(i => i.file).length, 'archivos');
+        // En creación o edición enviamos FormData al onSubmit para que el servicio lo procese
+        await onSubmit(formData);
+        return;
       }
+
+      // Si no hay nuevas imágenes, enviar el objeto correspondiente según el modo
+      if (modoEdicion) {
+        // enviar la cabaña editada (cabanaSeleccionada)
+        await onSubmit(cabanaSeleccionada);
+        return;
+      }
+
+      // enviar nuevaCabana para creación
+      await onSubmit(nuevaCabana);
     } catch (error) {
       console.error('Error en handleSubmit:', error);
     } finally {

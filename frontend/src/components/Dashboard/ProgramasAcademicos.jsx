@@ -6,7 +6,7 @@ import Header from './Sidebar/Header';
 import ProgramaModal from './Modales/ProgramaModal';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
 import { Plus, Search } from 'lucide-react';
-import {categorizacionService} from '../../services/categorizacionService';
+import { categorizacionService } from '../../services/categorizacionService';
 
 const ProgramasAcademicos = () => {
     const [programas, setProgramas] = useState([]);
@@ -28,6 +28,7 @@ const ProgramasAcademicos = () => {
         titulo: '',
         descripcion: '',
         tipo: 'curso',
+        categoria: '', // Categoría del programa (obligatorio)
         modalidad: 'presencial',
         duracion: '',
         precio: '',
@@ -76,11 +77,11 @@ const ProgramasAcademicos = () => {
                 else if (response.data && Array.isArray(response.data)) lista = response.data;
                 else if (response.data) lista = response.data;
             }
-                // Ordenar por fecha de creación ascendente para que los programas nuevos aparezcan al final
-                const listaOrdenada = Array.isArray(lista)
-                    ? lista.slice().sort((a, b) => (Date.parse(a.createdAt) || 0) - (Date.parse(b.createdAt) || 0))
-                    : lista;
-                setProgramas(listaOrdenada);
+            // Ordenar por fecha de creación ascendente para que los programas nuevos aparezcan al final
+            const listaOrdenada = Array.isArray(lista)
+                ? lista.slice().sort((a, b) => (Date.parse(a.createdAt) || 0) - (Date.parse(b.createdAt) || 0))
+                : lista;
+            setProgramas(listaOrdenada);
             // Obtener estadísticas aunque la lista venga vacía
             obtenerEstadisticas();
         } catch (error) {
@@ -106,14 +107,15 @@ const ProgramasAcademicos = () => {
 
     const cargarCategorias = async () => {
         try {
-            const response = await categorizacionService.getAllCategorias({
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            const data = await response.json();
-            if (data.success) {
-                setCategorias(data.data.filter(cat => cat.tipo === 'programa' || cat.tipo === 'curso'));
+            // Usar el servicio base que ya maneja headers y parseo
+            const lista = await categorizacionService.getAll();
+            if (Array.isArray(lista)) {
+                // Filtrar por tipos relevantes para programas
+                const filtradas = lista.filter(cat => cat.tipo === 'programa' || cat.tipo === 'curso' || cat.tipo === 'categoria');
+                setCategorias(filtradas);
+            } else if (lista && Array.isArray(lista.data)) {
+                const filtradas = lista.data.filter(cat => cat.tipo === 'programa' || cat.tipo === 'curso' || cat.tipo === 'categoria');
+                setCategorias(filtradas);
             }
         } catch (error) {
             console.error('Error al cargar categorías:', error);
@@ -130,43 +132,40 @@ const ProgramasAcademicos = () => {
         if (e) e.preventDefault();
 
         try {
-            const categoriaId = encontrarCategoriaId();
-
-            if (!categoriaId) {
-                mostrarMensaje('No hay categorías disponibles. Por favor, contacte al administrador.', 'error');
+            if (!formData.categoria) {
+                mostrarAlerta('Error', 'Por favor seleccione una categoría', 'error');
                 return;
             }
-            const dataToSend = mapearDatosParaEnvio(categoriaId);
+            const dataToSend = mapearDatosParaEnvio(formData.categoria);
             await programasAcademicosService.createPrograma(dataToSend);
             mostrarAlerta('¡Éxito!', 'Programa creado exitosamente');
             cerrarModal();
             cargarProgramas();
         } catch (error) {
             console.error('Error al crear programa:', error);
+            mostrarAlerta('Error', `No se pudo crear el programa: ${error.message}`, 'error');
         }
     };
 
     // Actualizar programa
     const actualizarPrograma = async (e) => {
         if (e) e.preventDefault();
-     
+
 
         try {
-            const categoriaId = encontrarCategoriaId();
-
-            if (!categoriaId) {
-                mostrarMensaje('No hay categorías disponibles. Por favor, contacte al administrador.', 'error');
+            if (!formData.categoria) {
+                mostrarAlerta('Error', 'Por favor seleccione una categoría', 'error');
                 return;
             }
-            const dataToSend = mapearDatosParaEnvio(categoriaId);
+            const dataToSend = mapearDatosParaEnvio(formData.categoria);
             await programasAcademicosService.updatePrograma(programaSeleccionado._id, dataToSend);
             mostrarAlerta('Éxito!', 'Programa actualizado exitosamente');
             cerrarModal();
             cargarProgramas();
         } catch (error) {
             console.error('Error al actualizar programa:', error);
-            mostrarMensaje(`Error al actualizar el programa: ${error.message}`, 'error');
-        } 
+            mostrarAlerta('Error', `Error al actualizar el programa: ${error.message}`, 'error');
+        }
     };
 
     // Eliminar programa
@@ -198,6 +197,7 @@ const ProgramasAcademicos = () => {
             titulo: '',
             descripcion: '',
             tipo: 'curso',
+            categoria: encontrarCategoriaId(), // Pre-seleccionar categoría basada en tipo/tipo disponible
             modalidad: 'presencial',
             duracion: '',
             precio: '',
@@ -235,18 +235,18 @@ const ProgramasAcademicos = () => {
     };
 
     // Funciones auxiliares para reducir complejidad cognitiva
-    const encontrarCategoriaId = () => {
+    function encontrarCategoriaId() {
         if (!formData.tipo || !categorias.length) {
-            return categorias.length > 0 ? categorias[0]._id : null;
+            return categorias.length > 0 ? categorias[0]._id : '';
         }
 
         const categoriaEncontrada = categorias.find(cat =>
-            cat.tipo === 'programa' && formData.tipo.includes('programa') ||
-            cat.tipo === 'curso' && formData.tipo === 'curso'
+            (cat.tipo === 'programa' && String(formData.tipo).includes('programa')) ||
+            (cat.tipo === 'curso' && formData.tipo === 'curso')
         );
 
-        return categoriaEncontrada ? categoriaEncontrada._id : categorias[0]._id;
-    };
+        return categoriaEncontrada ? (categoriaEncontrada._id || '') : (categorias[0]?._id || '');
+    }
 
     const mapearDatosParaEnvio = (categoriaId) => ({
         nombre: formData.titulo,
@@ -459,116 +459,7 @@ const ProgramasAcademicos = () => {
                         </div>
                     </div>
 
-                    {mostrarModalDetalle && programaDetalle && (
-                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">
-                                <div className="flex items-start justify-between p-6 border-b">
-                                    <div>
-                                        <h2 className="text-2xl font-semibold text-slate-800">{programaDetalle.nombre}</h2>
-                                        <p className="text-sm text-slate-500 mt-1">{programaDetalle.tipo ? String(programaDetalle.tipo).replace('-', ' ') : ''} • {programaDetalle.modalidad}</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex items-center gap-2">
-                                            <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">{programaDetalle.estado || '—'}</span>
-                                            <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm">{programaDetalle.certificacion ? 'Con certificación' : 'Sin certificación'}</span>
-                                            {programaDetalle.destacado && <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-sm">Destacado</span>}
-                                        </div>
-                                        <button onClick={() => setMostrarModalDetalle(false)} className="text-slate-400 hover:text-slate-600 p-2 rounded-md">
-                                            ✕
-                                        </button>
-                                    </div>
-                                </div>
 
-                                <div className="p-6 overflow-y-auto" style={{ maxHeight: '70vh' }}>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            {programaDetalle.imagen && (
-                                                <img src={programaDetalle.imagen} alt="Imagen del programa" className="w-full h-44 object-cover rounded-lg mb-4" />
-                                            )}
-
-                                            <p className="text-sm text-slate-700 leading-relaxed">{programaDetalle.descripcion || 'Sin descripción'}</p>
-
-                                            <ul className="mt-4 space-y-2 text-sm text-slate-700">
-                                                <li><strong className="text-slate-800">Profesor:</strong> {programaDetalle.profesor || '—'}</li>
-                                                <li><strong className="text-slate-800">Duración:</strong> {programaDetalle.duracion || '—'}</li>
-                                                <li><strong className="text-slate-800">Precio:</strong> {formatearPrecio(programaDetalle.precio || 0)}</li>
-                                                <li><strong className="text-slate-800">Cupos disponibles:</strong> {programaDetalle.cuposDisponibles ?? '—'}</li>
-                                                <li><strong className="text-slate-800">Cupos ocupados:</strong> {programaDetalle.cuposOcupados ?? '—'}</li>
-                                            </ul>
-                                        </div>
-
-                                        <div>
-                                            <div className="mb-4">
-                                                <h4 className="font-semibold text-slate-800">Objetivos</h4>
-                                                {programaDetalle.objetivos && programaDetalle.objetivos.length > 0 ? (
-                                                    <ul className="list-disc ml-5 mt-2 text-sm text-slate-700 space-y-1">
-                                                        {programaDetalle.objetivos.map((obj) => (
-                                                            <li key={String(obj)}>{obj}</li>
-                                                        ))}
-                                                    </ul>
-                                                ) : (
-                                                    <p className="text-sm text-slate-500 mt-2">Ninguno</p>
-                                                )}
-                                            </div>
-
-                                            <div className="mb-4">
-                                                <h4 className="font-semibold text-slate-800">Requisitos</h4>
-                                                {programaDetalle.requisitos && programaDetalle.requisitos.length > 0 ? (
-                                                    <ul className="list-disc ml-5 mt-2 text-sm text-slate-700 space-y-1">
-                                                        {programaDetalle.requisitos.map((req) => (
-                                                            <li key={String(req)}>{req}</li>
-                                                        ))}
-                                                    </ul>
-                                                ) : (
-                                                    <p className="text-sm text-slate-500 mt-2">Ninguno</p>
-                                                )}
-                                            </div>
-
-                                            <div className="mb-4">
-                                                <h4 className="font-semibold text-slate-800">Metodología</h4>
-                                                <p className="text-sm text-slate-700 mt-2">{programaDetalle.metodologia || 'No especificada'}</p>
-                                            </div>
-
-                                            <div className="mb-4">
-                                                <h4 className="font-semibold text-slate-800">Evaluación</h4>
-                                                <p className="text-sm text-slate-700 mt-2">{programaDetalle.evaluacion || 'No especificada'}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-6">
-                                        <h4 className="font-semibold text-slate-800">Inscripciones</h4>
-                                        {programaDetalle.inscripciones && programaDetalle.inscripciones.length > 0 ? (
-                                            <ul className="mt-3 space-y-2 text-sm text-slate-700">
-                                                {programaDetalle.inscripciones.map((insc) => (
-                                                    <li key={insc._id || insc.usuario?._id || `${String(insc.usuario || '')}-${String(insc.fechaInscripcion || '')}` } className="p-2 rounded-md bg-slate-50">
-                                                        <div className="flex items-center justify-between">
-                                                            <div>
-                                                                <div className="text-sm font-medium text-slate-800">{insc.usuario?.nombre || insc.usuario || 'Usuario anónimo'}</div>
-                                                                <div className="text-xs text-slate-500">{insc.fechaInscripcion ? new Date(insc.fechaInscripcion).toLocaleDateString() : ''}</div>
-                                                            </div>
-                                                            <div className="text-sm text-slate-700">{insc.estado}</div>
-                                                        </div>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <p className="text-sm text-slate-500 mt-2">Ninguna</p>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="p-4 border-t flex justify-end">
-                                    <button
-                                        onClick={() => setMostrarModalDetalle(false)}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                    >
-                                        Cerrar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                     {/* Tabla de programas */}
                     <ProgramasTabla
                         programas={programasPaginados}
@@ -609,9 +500,121 @@ const ProgramasAcademicos = () => {
                 programaSeleccionado={programaSeleccionado}
                 formData={formData}
                 setFormData={setFormData}
+                categorias={categorias}
                 onClose={cerrarModal}
                 onSubmit={handleSubmitModal}
             />
+
+            {mostrarModalDetalle && programaDetalle && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">
+                        <div className="flex items-start justify-between p-6 border-b">
+                            <div>
+                                <h2 className="text-2xl font-semibold text-slate-800">{programaDetalle.nombre}</h2>
+                                <p className="text-sm text-slate-500 mt-1">{programaDetalle.tipo ? String(programaDetalle.tipo).replace('-', ' ') : ''} • {programaDetalle.modalidad}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">{programaDetalle.estado || '—'}</span>
+                                    <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm">{programaDetalle.certificacion ? 'Con certificación' : 'Sin certificación'}</span>
+                                    {programaDetalle.destacado && <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-sm">Destacado</span>}
+                                </div>
+                                <button onClick={() => setMostrarModalDetalle(false)} className="text-slate-400 hover:text-slate-600 p-2 rounded-md">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6 overflow-y-auto" style={{ maxHeight: '70vh' }}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    {programaDetalle.imagen && (
+                                        <img src={programaDetalle.imagen} alt="Imagen del programa" className="w-full h-44 object-cover rounded-lg mb-4" />
+                                    )}
+
+                                    <p className="text-sm text-slate-700 leading-relaxed">{programaDetalle.descripcion || 'Sin descripción'}</p>
+
+                                    <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                                        <li><strong className="text-slate-800">Profesor:</strong> {programaDetalle.profesor || '—'}</li>
+                                        <li><strong className="text-slate-800">Duración:</strong> {programaDetalle.duracion || '—'}</li>
+                                        <li><strong className="text-slate-800">Precio:</strong> {formatearPrecio(programaDetalle.precio || 0)}</li>
+                                        <li><strong className="text-slate-800">Cupos disponibles:</strong> {programaDetalle.cuposDisponibles ?? '—'}</li>
+                                        <li><strong className="text-slate-800">Cupos ocupados:</strong> {programaDetalle.cuposOcupados ?? '—'}</li>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <div className="mb-4">
+                                        <h4 className="font-semibold text-slate-800">Objetivos</h4>
+                                        {programaDetalle.objetivos && programaDetalle.objetivos.length > 0 ? (
+                                            <ul className="list-disc ml-5 mt-2 text-sm text-slate-700 space-y-1">
+                                                {programaDetalle.objetivos.map((obj) => (
+                                                    <li key={String(obj)}>{obj}</li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-sm text-slate-500 mt-2">Ninguno</p>
+                                        )}
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <h4 className="font-semibold text-slate-800">Requisitos</h4>
+                                        {programaDetalle.requisitos && programaDetalle.requisitos.length > 0 ? (
+                                            <ul className="list-disc ml-5 mt-2 text-sm text-slate-700 space-y-1">
+                                                {programaDetalle.requisitos.map((req) => (
+                                                    <li key={String(req)}>{req}</li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-sm text-slate-500 mt-2">Ninguno</p>
+                                        )}
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <h4 className="font-semibold text-slate-800">Metodología</h4>
+                                        <p className="text-sm text-slate-700 mt-2">{programaDetalle.metodologia || 'No especificada'}</p>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <h4 className="font-semibold text-slate-800">Evaluación</h4>
+                                        <p className="text-sm text-slate-700 mt-2">{programaDetalle.evaluacion || 'No especificada'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-6">
+                                <h4 className="font-semibold text-slate-800">Inscripciones</h4>
+                                {programaDetalle.inscripciones && programaDetalle.inscripciones.length > 0 ? (
+                                    <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                                        {programaDetalle.inscripciones.map((insc) => (
+                                            <li key={insc._id || insc.usuario?._id || `${String(insc.usuario || '')}-${String(insc.fechaInscripcion || '')}`} className="p-2 rounded-md bg-slate-50">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <div className="text-sm font-medium text-slate-800">{insc.usuario?.nombre || insc.usuario || 'Usuario anónimo'}</div>
+                                                        <div className="text-xs text-slate-500">{insc.fechaInscripcion ? new Date(insc.fechaInscripcion).toLocaleDateString() : ''}</div>
+                                                    </div>
+                                                    <div className="text-sm text-slate-700">{insc.estado}</div>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-sm text-slate-500 mt-2">Ninguna</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="p-4 border-t flex justify-end">
+                            <button
+                                onClick={() => setMostrarModalDetalle(false)}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

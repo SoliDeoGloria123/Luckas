@@ -110,6 +110,71 @@ async function eliminarImagenesCloudinary(imagenes, cloudinary) {
   }
 }
 
+// Helper: parsear existingImages que envía el cliente
+function parseExistingImages(req) {
+  if (!req.body || !req.body.existingImages) return [];
+  try {
+    const parsed = JSON.parse(req.body.existingImages);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.warn('[UPLOAD] existingImages JSON parse error:', err && err.message ? err.message : err);
+    return [];
+  }
+}
+
+// Helper: eliminar las URLs que ya no están presentes en keptImages
+async function deleteRemovedImages(prevImages, keptImages, cloudinary) {
+  if (!Array.isArray(prevImages) || !Array.isArray(keptImages)) return;
+  const toDelete = prevImages.filter(url => !keptImages.includes(url));
+  if (toDelete.length === 0) return;
+  await eliminarImagenesCloudinary(toDelete, cloudinary);
+}
+
+// Helper: merge existing images (client) and newly uploaded Cloudinary URLs
+async function handleImageMerge(req, cabana, cloudinary) {
+  const nuevasUrls = Array.isArray(req.cloudinaryUrls) ? req.cloudinaryUrls : [];
+  const existingFromBody = parseExistingImages(req);
+
+  if (existingFromBody.length > 0) {
+    // Mantener las existentes que el cliente indicó y agregar las nuevas
+    await deleteRemovedImages(Array.isArray(cabana.imagen) ? cabana.imagen : [], existingFromBody, cloudinary);
+    req.body.imagen = [...existingFromBody, ...nuevasUrls];
+    return;
+  }
+
+  if (nuevasUrls.length > 0) {
+    // No se enviaron existingImages — el cliente quiere reemplazar todas las imágenes
+    await eliminarImagenesCloudinary(cabana.imagen, cloudinary);
+    req.body.imagen = nuevasUrls;
+  }
+}
+
+// Helper: sanitize categoria field to avoid invalid ObjectId casts
+function sanitizeCategoriaField(req) {
+  // Usar operador 'in' para detectar presencia de la propiedad (evita hasOwnProperty call)
+  if (!req.body || !('categoria' in req.body)) return;
+
+  let cat = req.body.categoria;
+  // Si viene como objeto poblado, extraer su _id
+  if (typeof cat === 'object' && cat !== null) {
+    if (cat._id) {
+      cat = String(cat._id);
+      req.body.categoria = cat;
+    } else {
+      // objeto sin _id: eliminar para evitar casteos inválidos
+      delete req.body.categoria;
+      return;
+    }
+  }
+
+  if (typeof cat === 'string') {
+    if (cat.trim() === '' || !mongoose.Types.ObjectId.isValid(cat)) {
+      console.warn('[CABANAS] categoria inválida recibida en actualización, se omite:', cat);
+      delete req.body.categoria;
+    }
+  }
+}
+
 exports.actualizarCabana = async (req, res) => {
   try {
     let cabana = await Cabana.findById(req.params.id);
@@ -117,10 +182,10 @@ exports.actualizarCabana = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Cabaña no encontrada' });
     }
     const cloudinary = require('../config/cloudinary');
-    if (req.cloudinaryUrls?.length > 0) {
-      await eliminarImagenesCloudinary(cabana.imagen, cloudinary);
-      req.body.imagen = req.cloudinaryUrls;
-    }
+    // Delegar la lógica de imágenes a la función helper
+    await handleImageMerge(req, cabana, cloudinary);
+    // Sanitizar campo categoria antes de actualizar
+    sanitizeCategoriaField(req);
     cabana = await Cabana.findByIdAndUpdate(req.params.id, req.body, { new: true })
       .populate('categoria', 'nombre')
       .populate('creadoPor', 'nombre email');
