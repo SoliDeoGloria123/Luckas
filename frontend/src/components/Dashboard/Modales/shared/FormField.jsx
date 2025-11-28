@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const FormField = ({ id, label, type = 'text', value, onChange, required = false, placeholder, children, inputProps = {} }) => {
+const FormField = ({ id, label, type = 'text', value, onChange, required = false, placeholder, children, inputProps = {}, name }) => {
   return (
     <div className="form-grupo-admin">
       <label htmlFor={id}>{label}</label>
       {type === 'select' ? (
-        <select id={id} value={value} onChange={onChange} required={required} {...inputProps}>
+        <select id={id} name={name || id} value={value} onChange={onChange} required={required} {...inputProps}>
           {children}
         </select>
       ) : (
-        <input id={id} type={type} value={value} onChange={onChange} placeholder={placeholder} required={required} {...inputProps} />
+        <input id={id} name={name || id} type={type} value={value} onChange={onChange} placeholder={placeholder} required={required} {...inputProps} />
       )}
     </div>
   );
@@ -26,6 +26,7 @@ FormField.propTypes = {
   placeholder: PropTypes.string,
   children: PropTypes.node,
   inputProps: PropTypes.object,
+  name: PropTypes.string,
 };
 
 export default FormField;

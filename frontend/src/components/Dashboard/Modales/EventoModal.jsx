@@ -95,8 +95,8 @@ const EventoModal = ({
       const time = d.getTime();
       if (Number.isNaN(time)) return true;
       const hoy = new Date();
-      d.setHours(0,0,0,0);
-      hoy.setHours(0,0,0,0);
+      d.setHours(0, 0, 0, 0);
+      hoy.setHours(0, 0, 0, 0);
       if (d < hoy) {
         alert('La fecha del evento no puede ser anterior a hoy');
         return false;
@@ -116,15 +116,15 @@ const EventoModal = ({
       if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
       if (str.includes('T')) {
         const d = new Date(str);
-        if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0,10);
+        if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0, 10);
       }
       const d = new Date(str);
-      if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0,10);
+      if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0, 10);
       // intentar dd/mm/yyyy o dd-mm-yyyy
       const parts = str.includes('/') ? str.split('/') : str.split('-');
       if (parts.length === 3 && parts[2].length === 4) {
         const [dd, mm, yyyy] = parts.map(p => p.trim());
-        return `${yyyy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+        return `${yyyy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
       }
     } catch (err) {
       console.error('formatToInputDate error:', err);
@@ -224,12 +224,12 @@ const EventoModal = ({
         </div>
         <form className="modal-body-admin" onSubmit={handleSubmit}>
           <div className="from-grid-admin">
-            <FormField id="nombre-evento" label="Nombre Evento:" value={getFieldValue('nombre')} onChange={e => handleFieldChange('nombre', e.target.value)} placeholder="Nombre del Evento" />
-            <FormField id="descripcion-evento" label="Descripcion Evento:" value={getFieldValue('descripcion')} onChange={e => handleFieldChange('descripcion', e.target.value)} placeholder="Descripción del Evento" />
+            <FormField id="nombre-evento" name="nombre" label="Nombre Evento:" value={getFieldValue('nombre')} onChange={e => handleFieldChange('nombre', e.target.value)} placeholder="Nombre del Evento" />
+            <FormField id="descripcion-evento" name="descripcion" label="Descripcion Evento:" value={getFieldValue('descripcion')} onChange={e => handleFieldChange('descripcion', e.target.value)} placeholder="Descripción del Evento" />
           </div>
           <div className="from-grid-admin">
-            <FormField id="precio-evento" label="Precio Evento:" type="number" value={getFieldValue('precio')} onChange={e => handleFieldChange('precio', e.target.value)} placeholder="Precio" />
-            <FormField id="categoria-evento" label="Categoría:" type="select" value={getFieldValue('categoria')} onChange={e => handleFieldChange('categoria', e.target.value)}>
+            <FormField id="precio-evento" name="precio" label="Precio Evento:" type="number" value={getFieldValue('precio')} onChange={e => handleFieldChange('precio', e.target.value)} placeholder="Precio" />
+            <FormField id="categoria-evento" name="categoria" label="Categoría:" type="select" value={getFieldValue('categoria')} onChange={e => handleFieldChange('categoria', e.target.value)}>
               <option value="">Seleccione...</option>
               {categorias && categorias
                 .filter(cat => String(cat.estado || '').toLowerCase() === 'activo')
@@ -247,8 +247,8 @@ const EventoModal = ({
             <FormField id="hora-fin" label="Hora de Fin:" type="time" value={getFieldValue('horaFin')} onChange={e => handleFieldChange('horaFin', e.target.value)} />
           </div>
           <div className="from-grid-admin">
-            <FormField id="lugar-evento" label="Lugar:" value={getFieldValue('lugar')} onChange={e => handleFieldChange('lugar', e.target.value)} placeholder="Ej: Auditorio Principal" />
-            <FormField id="direccion-evento" label="Dirección:" value={getFieldValue('direccion')} onChange={e => handleFieldChange('direccion', e.target.value)} placeholder="Ej: Carrera 45 #50-12, Bogotá" />
+            <FormField id="lugar-evento" name="lugar" label="Lugar:" value={getFieldValue('lugar')} onChange={e => handleFieldChange('lugar', e.target.value)} placeholder="Ej: Auditorio Principal" />
+            <FormField id="direccion-evento" name="direccion" label="Dirección:" value={getFieldValue('direccion')} onChange={e => handleFieldChange('direccion', e.target.value)} placeholder="Ej: Carrera 45 #50-12, Bogotá" />
           </div>
           <div className="from-grid-admin">
             <FormField id="cupos-totales" label="Cupos Totales:" type="number" value={getFieldValue('cuposTotales')} onChange={e => handleFieldChange('cuposTotales', e.target.value)} />
