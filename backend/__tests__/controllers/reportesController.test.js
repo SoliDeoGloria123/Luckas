@@ -1,3 +1,10 @@
+const reportesController = require('../../controllers/reportesControllers');
+const Reporte = require('../../models/Reportes');
+const Usuario = require('../../models/User');
+const Reserva = require('../../models/Reservas');
+const Inscripcion = require('../../models/Inscripciones');
+const Solicitud = require('../../models/Solicitud');
+const Evento = require('../../models/Eventos');
 
 describe('Reportes Controller', () => {
   let req, res;
@@ -22,9 +29,6 @@ describe('Reportes Controller', () => {
       Reserva.countDocuments.mockResolvedValue(5);
       Inscripcion.countDocuments.mockResolvedValue(20);
       Evento.countDocuments.mockResolvedValue(3);
-      Cabana.countDocuments.mockResolvedValue(8);
-      Solicitud.countDocuments.mockResolvedValue(15);
-      Tarea.countDocuments.mockResolvedValue(7);
 
       await reportesController.getDashboardReport(req, res);
 
@@ -203,34 +207,13 @@ describe('Reportes Controller', () => {
       Usuario.findById.mockReturnValue({ select: jest.fn().mockResolvedValue({ _id: 'userId' }) });
       
       const mockFindReserva = { populate: jest.fn().mockReturnThis(), populate: jest.fn().mockResolvedValue([]) };
-      // Need to handle chaining properly for multiple populates
-      // Simplified mock for Promise.all
-      Reserva.find.mockReturnValue({ populate: jest.fn().mockReturnThis(), populate: jest.fn().mockResolvedValue([]) });
-      Inscripcion.find.mockReturnValue({ populate: jest.fn().mockReturnThis(), populate: jest.fn().mockResolvedValue([]) });
-      Solicitud.find.mockReturnValue({ populate: jest.fn().mockResolvedValue([]) });
-
-      // Fix mock return values to be thenable for Promise.all
-      Reserva.find.mockImplementation(() => ({
-        populate: jest.fn().mockReturnThis(),
-        then: (cb) => cb([]) 
-      }));
-      // Actually Promise.all expects promises.
-      Reserva.find.mockReturnValue({
-        populate: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([]),
-        then: (resolve) => resolve([])
-      });
-      Inscripcion.find.mockReturnValue({
-        populate: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([]),
-        then: (resolve) => resolve([])
-      });
-      Solicitud.find.mockReturnValue({
-        populate: jest.fn().mockResolvedValue([])
-      });
+      Reserva.find.mockReturnValue(mockFindReserva);
+      Inscripcion.find.mockReturnValue(mockFindReserva);
+      Solicitud.find.mockReturnValue(mockFindReserva);
 
       await reportesController.getActividadUsuarios(req, res);
 
+      expect(Usuario.findById).toHaveBeenCalledWith('userId');
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true
       }));
@@ -244,7 +227,9 @@ describe('Reportes Controller', () => {
         populate: jest.fn().mockReturnThis(),
         sort: jest.fn().mockResolvedValue([])
       });
-      Reporte.prototype.save = jest.fn().mockResolvedValue({});
+      Reporte.mockImplementation(() => ({
+        save: jest.fn().mockResolvedValue({ _id: 'report-id' })
+      }));
 
       await reportesController.guardarReporte(req, res);
 
@@ -267,7 +252,10 @@ describe('Reportes Controller', () => {
 
       await reportesController.getReportesGuardados(req, res);
 
-      expect(res.json).toHaveBeenCalledWith(mockReportes);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: mockReportes
+      }));
     });
   });
 
@@ -300,16 +288,13 @@ describe('Reportes Controller', () => {
       Reserva.countDocuments.mockResolvedValue(1);
       Inscripcion.countDocuments.mockResolvedValue(1);
       Solicitud.countDocuments.mockResolvedValue(1);
-      Evento.countDocuments.mockResolvedValue(1);
-      Cabana.countDocuments.mockResolvedValue(1);
-      Tarea.countDocuments.mockResolvedValue(1);
 
       await reportesController.getTotalGestiones(req, res);
 
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,
         data: expect.objectContaining({
-          totalGestiones: 7
+          totalGestiones: 4
         })
       }));
     });

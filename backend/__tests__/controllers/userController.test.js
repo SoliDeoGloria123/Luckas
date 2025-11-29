@@ -1,3 +1,8 @@
+const userController = require('../../controllers/userController');
+const User = require('../../models/User');
+const bcrypt = require('bcryptjs');
+const { normalizeTipoDocumento } = require('../../utils/userValidation');
+
 jest.mock('../../utils/userValidation');
 
 describe('User Controller', () => {

@@ -48,6 +48,16 @@ jest.mock('mongoose', () => ({
         mockModel.find = jest.fn().mockReturnThis();
         mockModel.findById = jest.fn().mockReturnThis();
         mockModel.findOne = jest.fn().mockReturnThis();
+        mockModel.findByIdAndUpdate = jest.fn().mockReturnThis();
+        mockModel.findByIdAndDelete = jest.fn().mockReturnThis();
+        mockModel.findOneAndUpdate = jest.fn().mockReturnThis();
+        mockModel.countDocuments = jest.fn().mockResolvedValue(0);
+        mockModel.aggregate = jest.fn().mockResolvedValue([]);
+        mockModel.populate = jest.fn().mockReturnThis();
+        mockModel.exec = jest.fn().mockResolvedValue([]);
+        mockModel.sort = jest.fn().mockReturnThis();
+        mockModel.limit = jest.fn().mockReturnThis();
+        mockModel.skip = jest.fn().mockReturnThis();
         mockModel.select = jest.fn().mockReturnThis();
         return mockModel;
     })
