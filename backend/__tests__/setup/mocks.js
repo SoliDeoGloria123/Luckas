@@ -10,13 +10,19 @@ jest.mock('mongoose', () => ({
             pre: jest.fn(),
             post: jest.fn(),
             methods: {},
-            statics: {}
+            methods: {},
+            statics: {},
+            index: jest.fn(),
+            virtual: jest.fn().mockReturnValue({ get: jest.fn() })
         })),
         {
             Types: {
                 ObjectId: Object.assign(
                     jest.fn(),
-                    { isValid: jest.fn().mockReturnValue(true) }
+                    { 
+                        isValid: jest.fn().mockReturnValue(true),
+                        createFromHexString: jest.fn().mockReturnValue('mock-id-123')
+                    }
                 )
             }
         }
@@ -24,7 +30,10 @@ jest.mock('mongoose', () => ({
     Types: {
         ObjectId: Object.assign(
             jest.fn(),
-            { isValid: jest.fn().mockReturnValue(true) }
+            { 
+                isValid: jest.fn().mockReturnValue(true),
+                createFromHexString: jest.fn().mockReturnValue('mock-id-123')
+            }
         )
     },
     model: jest.fn().mockImplementation((name) => {
@@ -32,24 +41,13 @@ jest.mock('mongoose', () => ({
             return {
                 ...data,
                 save: jest.fn().mockResolvedValue(data),
-                _id: 'mock-id-123'
+                _id: 'mock-id-123',
+                toObject: jest.fn().mockReturnValue(data)
             };
         };
         mockModel.find = jest.fn().mockReturnThis();
         mockModel.findById = jest.fn().mockReturnThis();
         mockModel.findOne = jest.fn().mockReturnThis();
-        mockModel.findByIdAndUpdate = jest.fn().mockReturnThis();
-        mockModel.findByIdAndDelete = jest.fn().mockReturnThis();
-        mockModel.create = jest.fn().mockResolvedValue({ _id: 'mock-id-123' });
-        mockModel.updateOne = jest.fn().mockResolvedValue({ nModified: 1 });
-        mockModel.deleteOne = jest.fn().mockResolvedValue({ deletedCount: 1 });
-        mockModel.countDocuments = jest.fn().mockResolvedValue(0);
-        mockModel.aggregate = jest.fn().mockResolvedValue([]);
-        mockModel.populate = jest.fn().mockReturnThis();
-        mockModel.exec = jest.fn().mockResolvedValue([]);
-        mockModel.sort = jest.fn().mockReturnThis();
-        mockModel.limit = jest.fn().mockReturnThis();
-        mockModel.skip = jest.fn().mockReturnThis();
         mockModel.select = jest.fn().mockReturnThis();
         return mockModel;
     })
