@@ -1,0 +1,270 @@
+
+> backend@1.0.0 test
+> jest --coverage --detectOpenHandles --forceExit __tests__/controllers/reservasController.test.js
+
+  console.error
+    Error al obtener estadísticas de reservas: Error: DB Error
+        at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/reservasController.test.js:203:60)
+        at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+        at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+        at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+        at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+        at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+        at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+        at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      370 |     });
+      371 |   } catch (error) {
+    > 372 |     console.error('Error al obtener estadísticas de reservas:', error);
+          |             ^
+      373 |     res.status(500).json({ success: false, message: 'Error al obtener estadísticas de reservas' });
+      374 |   }
+      375 | };
+
+      at Object.error [as obtenerEstadisticasReservas] (controllers/reservasController.js:372:13)
+      at Object.<anonymous> (__tests__/controllers/reservasController.test.js:205:7)
+
+  console.log
+    === DEBUG RESERVA ===
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:98:13)
+
+  console.log
+    Datos recibidos: {}
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:99:13)
+
+  console.log
+    Usuario autenticado: user-123
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:100:13)
+
+  console.log
+    Rol del usuario: admin
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:101:13)
+
+  console.log
+    ❌ CAMPOS FALTANTES: [
+      'usuario',
+      'cabana',
+      'fechaInicio',
+      'fechaFin',
+      'nombre',
+      'apellido',
+      'tipoDocumento',
+      'numeroDocumento',
+      'correoElectronico',
+      'telefono',
+      'numeroPersonas'
+    ]
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:108:15)
+
+  console.log
+    === DEBUG RESERVA ===
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:98:13)
+
+  console.log
+    Datos recibidos: {
+      "usuario": "invalid",
+      "cabana": "invalid",
+      "fechaInicio": "2023-01-01",
+      "fechaFin": "2023-01-05",
+      "nombre": "John",
+      "apellido": "Doe",
+      "tipoDocumento": "Cédula de ciudadanía",
+      "numeroDocumento": "123456",
+      "correoElectronico": "john@example.com",
+      "telefono": "1234567890",
+      "numeroPersonas": 2
+    }
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:99:13)
+
+  console.log
+    Usuario autenticado: user-123
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:100:13)
+
+  console.log
+    Rol del usuario: admin
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:101:13)
+
+  console.log
+    Error: ID de usuario inválido
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:118:15)
+
+  console.log
+    === DEBUG RESERVA ===
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:98:13)
+
+  console.log
+    Datos recibidos: {
+      "usuario": "507f1f77bcf86cd799439011",
+      "cabana": "507f1f77bcf86cd799439012",
+      "fechaInicio": "2023-01-01",
+      "fechaFin": "2023-01-05",
+      "nombre": "John",
+      "apellido": "Doe",
+      "tipoDocumento": "Cédula de ciudadanía",
+      "numeroDocumento": "123456",
+      "correoElectronico": "john@example.com",
+      "telefono": "1234567890",
+      "numeroPersonas": 2
+    }
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:99:13)
+
+  console.log
+    Usuario autenticado: user-123
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:100:13)
+
+  console.log
+    Rol del usuario: admin
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:101:13)
+
+  console.log
+    Error: Usuario no encontrado
+
+      at Object.log [as crearReserva] (controllers/reservasController.js:125:15)
+
+FAIL __tests__/controllers/reservasController.test.js
+  Reservas Controller
+    obtenerReservas
+      ✓ should return all reservas (11 ms)
+      ✓ should handle errors (2 ms)
+    obtenerReservaPorId
+      ✓ should return a reserva by id (1 ms)
+      ✓ should return 404 if reserva not found (1 ms)
+    actualizarReserva
+      ✓ should update a reserva (2 ms)
+      ✓ should return 404 if reserva not found (1 ms)
+      ✓ should update reservation successfully (1 ms)
+      ✓ should return 404 if reservation not found (1 ms)
+    eliminarReserva
+      ✓ should delete a reserva (3 ms)
+      ✓ should return 404 if reserva not found (2 ms)
+      ✓ should delete reservation successfully (1 ms)
+      ✓ should return 404 if reservation not found (1 ms)
+    obtenerReservasPorUsuario
+      ✓ should return reservas for a user (3 ms)
+      ✓ should return 400 if userId is missing (2 ms)
+      ✓ should return reservations for user (1 ms)
+      ✓ should return 400 if userId missing (7 ms)
+      ✓ should handle errors (1 ms)
+    obtenerEstadisticasReservas
+      ✓ should return reservas statistics (4 ms)
+      ✓ should handle errors (57 ms)
+    toggleReservaActivation
+      ✓ should toggle reserva activation (1 ms)
+      ✓ should return 404 if reserva not found (2 ms)
+    obtenerDatosParaReserva
+      ✓ should return data for creating reserva (1 ms)
+    crearReserva
+      ✕ should create a reservation successfully (1 ms)
+      ✓ should return 400 if required fields are missing (8 ms)
+      ✓ should return 400 if invalid IDs (4 ms)
+      ✓ should return 404 if user or cabana not found (5 ms)
+
+  ● Reservas Controller › crearReserva › should create a reservation successfully
+
+    TypeError: Reserva.mockImplementation is not a function
+
+      303 |       };
+      304 |       
+    > 305 |       Reserva.mockImplementation(() => mockReserva);
+          |               ^
+      306 |       Solicitud.mockImplementation(() => ({
+      307 |         save: jest.fn().mockResolvedValue({ _id: 'solicitud-123' })
+      308 |       }));
+
+      at Object.mockImplementation (__tests__/controllers/reservasController.test.js:305:15)
+
+---------------------------------|---------|----------|---------|---------|----------------------------------------------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                        
+---------------------------------|---------|----------|---------|---------|----------------------------------------------------------
+All files                        |    5.23 |     2.43 |    4.97 |    5.27 |                                                          
+ controllers                     |    5.89 |     3.03 |    6.74 |    5.91 |                                                          
+  authControllers.js             |       0 |        0 |       0 |       0 | 1-457                                                    
+  cabanasController.js           |       0 |        0 |       0 |       0 | 1-273                                                    
+  categorizacionController.js    |       0 |        0 |       0 |       0 | 1-381                                                    
+  certificadoControllers.js      |       0 |        0 |       0 |       0 | 1-208                                                    
+  comentarioEventoController.js  |       0 |        0 |       0 |       0 | 1-156                                                    
+  eventosController.js           |       0 |        0 |       0 |       0 | 1-371                                                    
+  inscripcionController.js       |       0 |        0 |       0 |       0 | 1-505                                                    
+  notificationController.js      |       0 |        0 |       0 |       0 | 1-76                                                     
+  programaAcademicoController.js |       0 |        0 |       0 |       0 | 1-130                                                    
+  reportesControllers.js         |       0 |        0 |       0 |       0 | 1-838                                                    
+  reservasController.js          |   69.46 |       50 |   85.71 |   68.71 | 31,43-51,56-66,71-92,129-189,236,249,261-262,270,290,301 
+  solicitudController.js         |       0 |        0 |       0 |       0 | 1-493                                                    
+  tareaController.js             |       0 |        0 |       0 |       0 | 1-414                                                    
+  userController.js              |       0 |        0 |       0 |       0 | 1-375                                                    
+ middlewares                     |       0 |        0 |       0 |       0 |                                                          
+  auth.js                        |       0 |        0 |       0 |       0 | 1-43                                                     
+  authJwt.js                     |       0 |        0 |       0 |       0 | 1-80                                                     
+  index.js                       |       0 |      100 |     100 |       0 | 1-5                                                      
+  normalizeUserData.js           |       0 |        0 |       0 |       0 | 1-16                                                     
+  role.js                        |       0 |        0 |       0 |       0 | 1-27                                                     
+  uploadCloudinary.js            |       0 |        0 |       0 |       0 | 2-84                                                     
+  validateEvents.js              |       0 |        0 |       0 |       0 | 1-38                                                     
+  verifySignUp.js                |       0 |        0 |       0 |       0 | 1-47                                                     
+ models                          |   13.33 |        0 |       0 |   13.43 |                                                          
+  Cabana.js                      |     100 |      100 |     100 |     100 |                                                          
+  ComentarioEvento.js            |       0 |      100 |     100 |       0 | 1-36                                                     
+  Eventos.js                     |       0 |      100 |     100 |       0 | 1-95                                                     
+  Inscripciones.js               |       0 |        0 |       0 |       0 | 1-124                                                    
+  Notification.js                |     100 |      100 |     100 |     100 |                                                          
+  ProgramaAcademico.js           |       0 |      100 |     100 |       0 | 1-99                                                     
+  Reportes.js                    |       0 |        0 |       0 |       0 | 1-176                                                    
+  Reservas.js                    |     100 |      100 |     100 |     100 |                                                          
+  Solicitud.js                   |      75 |        0 |       0 |      75 | 37                                                       
+  Tarea.js                       |       0 |      100 |     100 |       0 | 1-51                                                     
+  User.js                        |   23.07 |        0 |       0 |      24 | 41-70,160-167,173                                        
+  categorizacion.js              |       0 |      100 |     100 |       0 | 2-36                                                     
+  index.js                       |       0 |      100 |     100 |       0 | 1-14                                                     
+ routes                          |       0 |        0 |       0 |       0 |                                                          
+  authRoutes.js                  |       0 |        0 |       0 |       0 | 1-71                                                     
+  cabanasRoutes.js               |       0 |      100 |       0 |       0 | 1-46                                                     
+  categorizacionRoutes.js        |       0 |      100 |     100 |       0 | 1-33                                                     
+  certificadoRoutes.js           |       0 |      100 |     100 |       0 | 1-14                                                     
+  comentarioEventoRoutes.js      |       0 |      100 |     100 |       0 | 1-25                                                     
+  eventosRoutes.js               |       0 |      100 |       0 |       0 | 1-48                                                     
+  inscripcionRoutes.js           |       0 |      100 |     100 |       0 | 1-30                                                     
+  notificationRoutes.js          |       0 |      100 |     100 |       0 | 1-27                                                     
+  programaAcademicoRoutes.js     |       0 |      100 |     100 |       0 | 1-31                                                     
+  reportesRoutes.js              |       0 |      100 |     100 |       0 | 1-24                                                     
+  reservasRoutes.js              |       0 |      100 |     100 |       0 | 1-29                                                     
+  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131                                                    
+  tareaRoutes.js                 |       0 |      100 |     100 |       0 | 1-29                                                     
+  userRoutes.js                  |       0 |        0 |       0 |       0 | 1-39                                                     
+ utils                           |    2.83 |        0 |       0 |    3.12 |                                                          
+  notificationUtils.js           |     7.5 |        0 |       0 |    7.69 | 13-132                                                   
+  reportUtils.js                 |       0 |        0 |       0 |       0 | 9-57                                                     
+  roleValidation.js              |       0 |        0 |       0 |       0 | 2-10                                                     
+  sendEmail.js                   |       0 |        0 |       0 |       0 | 1-42                                                     
+  solicitudUtils.js              |       0 |        0 |       0 |       0 | 9-56                                                     
+  userValidation.js              |       0 |        0 |       0 |       0 | 6-50                                                     
+---------------------------------|---------|----------|---------|---------|----------------------------------------------------------
+Jest: "global" coverage threshold for statements (55%) not met: 5.23%
+Jest: "global" coverage threshold for branches (40%) not met: 2.43%
+Jest: "global" coverage threshold for lines (55%) not met: 5.27%
+Jest: "global" coverage threshold for functions (60%) not met: 4.97%
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 25 passed, 26 total
+Snapshots:   0 total
+Time:        2.721 s
+Ran all test suites matching /__tests__\/controllers\/reservasController.test.js/i.

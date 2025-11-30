@@ -59,6 +59,8 @@ jest.mock('mongoose', () => ({
         mockModel.limit = jest.fn().mockReturnThis();
         mockModel.skip = jest.fn().mockReturnThis();
         mockModel.select = jest.fn().mockReturnThis();
+        mockModel.insertMany = jest.fn().mockResolvedValue([]);
+        mockModel.create = jest.fn().mockResolvedValue({});
         return mockModel;
     })
 }));

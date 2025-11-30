@@ -27,7 +27,12 @@ const normalizeTipoDocumento = (tipoDocumento) => {
     'cedula de ciuania': 'Cédula de ciudadanía',
     'cedula de ciudania': 'Cédula de ciudadanía',
     'cedula de cíudania': 'Cédula de ciudadanía',
-    'cédula de cíudania': 'Cédula de ciudadanía'
+    'cédula de cíudania': 'Cédula de ciudadanía',
+    // Abbreviations
+    'cc': 'Cédula de ciudadanía',
+    'ce': 'Cédula de extranjería',
+    'ti': 'Tarjeta de identidad',
+    'pp': 'Pasaporte'
   };
   
   const valorNormalizado = mappings[tipo];

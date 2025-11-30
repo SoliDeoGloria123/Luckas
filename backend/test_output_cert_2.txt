@@ -1,0 +1,139 @@
+
+> backend@1.0.0 test
+> jest --coverage --detectOpenHandles --forceExit __tests__/controllers/certificadoController.test.js
+
+  console.error
+    Error al obtener estadísticas de certificados: Error: DB Error
+        at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/certificadoController.test.js:214:64)
+        at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+        at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+        at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+        at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+        at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+        at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+        at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      205 |     });
+      206 |   } catch (error) {
+    > 207 |     console.error('Error al obtener estadísticas de certificados:', error);
+          |             ^
+      208 |     res.status(500).json({ message: 'Error al obtener estadísticas de certificados' });
+      209 |   }
+      210 | };
+
+      at Object.error [as obtenerEstadisticasCertificados] (controllers/certificadoControllers.js:207:13)
+      at Object.<anonymous> (__tests__/controllers/certificadoController.test.js:216:7)
+
+FAIL __tests__/controllers/certificadoController.test.js
+  Certificado Controller
+    generarCertificado
+      ✓ should return 400 if userId or cursoId is missing (8 ms)
+      ✓ should return 400 if invalid ObjectId (2 ms)
+      ✓ should return 400 if no valid inscripcion (1 ms)
+      ✓ should return 400 if not ProgramaAcademico (1 ms)
+      ✓ should return 404 if usuario not found (2 ms)
+      ✓ should return 404 if curso not found (1 ms)
+      ✕ should generate certificate successfully (28 ms)
+    obtenerEstadisticasCertificados
+      ✓ should return certificate statistics (1 ms)
+      ✓ should handle errors (38 ms)
+
+  ● Certificado Controller › generarCertificado › should generate certificate successfully
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: {"end": [Function mockConstructor], "json": [Function mockConstructor], "status": [Function mockConstructor], "writeHead": [Function mockConstructor]}
+
+    Number of calls: 0
+
+      187 |
+      188 |       expect(res.writeHead).toHaveBeenCalledWith(200, expect.anything());
+    > 189 |       expect(mockDoc.pipe).toHaveBeenCalledWith(res);
+          |                            ^
+      190 |       expect(mockDoc.text).toHaveBeenCalled();
+      191 |       expect(mockDoc.end).toHaveBeenCalled();
+      192 |     });
+
+      at Object.toHaveBeenCalledWith (__tests__/controllers/certificadoController.test.js:189:28)
+
+---------------------------------|---------|----------|---------|---------|-------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+---------------------------------|---------|----------|---------|---------|-------------------
+All files                        |    3.93 |     1.53 |    2.07 |       4 |                   
+ controllers                     |    4.57 |     1.91 |     2.8 |    4.64 |                   
+  authControllers.js             |       0 |        0 |       0 |       0 | 1-457             
+  cabanasController.js           |       0 |        0 |       0 |       0 | 1-273             
+  categorizacionController.js    |       0 |        0 |       0 |       0 | 1-381             
+  certificadoControllers.js      |   94.73 |    77.27 |     100 |   94.62 | 20-21,134-135,169 
+  comentarioEventoController.js  |       0 |        0 |       0 |       0 | 1-156             
+  eventosController.js           |       0 |        0 |       0 |       0 | 1-371             
+  inscripcionController.js       |       0 |        0 |       0 |       0 | 1-505             
+  notificationController.js      |       0 |        0 |       0 |       0 | 1-76              
+  programaAcademicoController.js |       0 |        0 |       0 |       0 | 1-130             
+  reportesControllers.js         |       0 |        0 |       0 |       0 | 1-838             
+  reservasController.js          |       0 |        0 |       0 |       0 | 1-373             
+  solicitudController.js         |       0 |        0 |       0 |       0 | 1-493             
+  tareaController.js             |       0 |        0 |       0 |       0 | 1-414             
+  userController.js              |       0 |        0 |       0 |       0 | 1-375             
+ middlewares                     |       0 |        0 |       0 |       0 |                   
+  auth.js                        |       0 |        0 |       0 |       0 | 1-43              
+  authJwt.js                     |       0 |        0 |       0 |       0 | 1-80              
+  index.js                       |       0 |      100 |     100 |       0 | 1-5               
+  normalizeUserData.js           |       0 |        0 |       0 |       0 | 1-16              
+  role.js                        |       0 |        0 |       0 |       0 | 1-27              
+  uploadCloudinary.js            |       0 |        0 |       0 |       0 | 2-84              
+  validateEvents.js              |       0 |        0 |       0 |       0 | 1-38              
+  verifySignUp.js                |       0 |        0 |       0 |       0 | 1-47              
+ models                          |    9.62 |        0 |       0 |     9.7 |                   
+  Cabana.js                      |       0 |      100 |     100 |       0 | 1-46              
+  ComentarioEvento.js            |       0 |      100 |     100 |       0 | 1-36              
+  Eventos.js                     |       0 |      100 |     100 |       0 | 1-95              
+  Inscripciones.js               |   15.38 |        0 |       0 |   15.38 | 69-94,113-121     
+  Notification.js                |       0 |      100 |     100 |       0 | 1-31              
+  ProgramaAcademico.js           |     100 |      100 |     100 |     100 |                   
+  Reportes.js                    |       0 |        0 |       0 |       0 | 1-176             
+  Reservas.js                    |       0 |      100 |     100 |       0 | 1-78              
+  Solicitud.js                   |       0 |        0 |       0 |       0 | 1-99              
+  Tarea.js                       |       0 |      100 |     100 |       0 | 1-51              
+  User.js                        |   23.07 |        0 |       0 |      24 | 41-70,160-167,173 
+  categorizacion.js              |       0 |      100 |     100 |       0 | 2-36              
+  index.js                       |       0 |      100 |     100 |       0 | 1-14              
+ routes                          |       0 |        0 |       0 |       0 |                   
+  authRoutes.js                  |       0 |        0 |       0 |       0 | 1-71              
+  cabanasRoutes.js               |       0 |      100 |       0 |       0 | 1-46              
+  categorizacionRoutes.js        |       0 |      100 |     100 |       0 | 1-33              
+  certificadoRoutes.js           |       0 |      100 |     100 |       0 | 1-14              
+  comentarioEventoRoutes.js      |       0 |      100 |     100 |       0 | 1-25              
+  eventosRoutes.js               |       0 |      100 |       0 |       0 | 1-48              
+  inscripcionRoutes.js           |       0 |      100 |     100 |       0 | 1-30              
+  notificationRoutes.js          |       0 |      100 |     100 |       0 | 1-27              
+  programaAcademicoRoutes.js     |       0 |      100 |     100 |       0 | 1-31              
+  reportesRoutes.js              |       0 |      100 |     100 |       0 | 1-24              
+  reservasRoutes.js              |       0 |      100 |     100 |       0 | 1-29              
+  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131             
+  tareaRoutes.js                 |       0 |      100 |     100 |       0 | 1-29              
+  userRoutes.js                  |       0 |        0 |       0 |       0 | 1-39              
+ utils                           |       0 |        0 |       0 |       0 |                   
+  notificationUtils.js           |       0 |        0 |       0 |       0 | 1-136             
+  reportUtils.js                 |       0 |        0 |       0 |       0 | 9-57              
+  roleValidation.js              |       0 |        0 |       0 |       0 | 2-10              
+  sendEmail.js                   |       0 |        0 |       0 |       0 | 1-42              
+  solicitudUtils.js              |       0 |        0 |       0 |       0 | 9-56              
+  userValidation.js              |       0 |        0 |       0 |       0 | 6-50              
+---------------------------------|---------|----------|---------|---------|-------------------
+Jest: "global" coverage threshold for statements (55%) not met: 3.93%
+Jest: "global" coverage threshold for branches (40%) not met: 1.53%
+Jest: "global" coverage threshold for lines (55%) not met: 4%
+Jest: "global" coverage threshold for functions (60%) not met: 2.07%
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 8 passed, 9 total
+Snapshots:   0 total
+Time:        2.598 s
+Ran all test suites matching /__tests__\/controllers\/certificadoController.test.js/i.

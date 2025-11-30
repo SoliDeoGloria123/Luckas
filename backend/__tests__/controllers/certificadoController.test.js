@@ -123,6 +123,72 @@ describe('Certificado Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
     });
+    it('should generate certificate successfully', async () => {
+      req.body = {
+        userId: '507f1f77bcf86cd799439011',
+        cursoId: '507f1f77bcf86cd799439012'
+      };
+
+      Inscripcion.findOne = jest.fn().mockResolvedValue({
+        tipoReferencia: 'ProgramaAcademico',
+        estado: 'Completado',
+        fechaInscripcion: new Date()
+      });
+
+      User.findById = jest.fn().mockResolvedValue({
+        _id: '507f1f77bcf86cd799439011',
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        numeroDocumento: '123456'
+      });
+
+      ProgramaAcademico.findById = jest.fn().mockResolvedValue({
+        _id: '507f1f77bcf86cd799439012',
+        nombre: 'Curso de Prueba',
+        duracion: '40 horas'
+      });
+
+      const mockDoc = {
+        pipe: jest.fn(),
+        image: jest.fn().mockReturnThis(),
+        font: jest.fn().mockReturnThis(),
+        fontSize: jest.fn().mockReturnThis(),
+        fillColor: jest.fn().mockReturnThis(),
+        text: jest.fn().mockReturnThis(),
+        moveDown: jest.fn().mockReturnThis(),
+        moveTo: jest.fn().mockReturnThis(),
+        lineTo: jest.fn().mockReturnThis(),
+        stroke: jest.fn().mockReturnThis(),
+        rect: jest.fn().mockReturnThis(),
+        on: jest.fn(),
+        end: jest.fn(),
+        page: { width: 600, height: 400 },
+        y: 0
+      };
+
+      // Capture the 'end' callback
+      mockDoc.on.mockImplementation((event, callback) => {
+        if (event === 'end') {
+          mockDoc._endCallback = callback;
+        }
+      });
+
+      // Trigger the callback when end() is called
+      mockDoc.end.mockImplementation(() => {
+        if (mockDoc._endCallback) {
+          mockDoc._endCallback();
+        }
+      });
+      
+      const PDFDocument = require('pdfkit');
+      PDFDocument.mockImplementation(() => mockDoc);
+
+      await certificadoController.generarCertificado(req, res);
+
+      expect(res.writeHead).toHaveBeenCalledWith(200, expect.anything());
+      expect(mockDoc.text).toHaveBeenCalled();
+      expect(mockDoc.end).toHaveBeenCalled();
+    });
   });
 
   describe('obtenerEstadisticasCertificados', () => {

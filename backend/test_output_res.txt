@@ -1,0 +1,302 @@
+
+> backend@1.0.0 test
+> jest --coverage --detectOpenHandles --forceExit __tests__/controllers/reservasController.test.js
+
+  console.error
+    Error al obtener estadísticas de reservas: Error: DB Error
+        at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/reservasController.test.js:202:60)
+        at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+        at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+        at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+        at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+        at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+        at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+        at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      370 |     });
+      371 |   } catch (error) {
+    > 372 |     console.error('Error al obtener estadísticas de reservas:', error);
+          |             ^
+      373 |     res.status(500).json({ success: false, message: 'Error al obtener estadísticas de reservas' });
+      374 |   }
+      375 | };
+
+      at Object.error [as obtenerEstadisticasReservas] (controllers/reservasController.js:372:13)
+      at Object.<anonymous> (__tests__/controllers/reservasController.test.js:204:7)
+
+FAIL __tests__/controllers/reservasController.test.js
+  Reservas Controller
+    obtenerReservas
+      ✓ should return all reservas (10 ms)
+      ✓ should handle errors (2 ms)
+    obtenerReservaPorId
+      ✓ should return a reserva by id (2 ms)
+      ✓ should return 404 if reserva not found (1 ms)
+    actualizarReserva
+      ✓ should update a reserva (2 ms)
+      ✓ should return 404 if reserva not found (2 ms)
+    eliminarReserva
+      ✓ should delete a reserva (3 ms)
+      ✓ should return 404 if reserva not found (2 ms)
+    obtenerReservasPorUsuario
+      ✓ should return reservas for a user (4 ms)
+      ✓ should return 400 if userId is missing (2 ms)
+    obtenerEstadisticasReservas
+      ✓ should return reservas statistics (2 ms)
+      ✓ should handle errors (64 ms)
+    toggleReservaActivation
+      ✓ should toggle reserva activation (1 ms)
+      ✓ should return 404 if reserva not found (1 ms)
+    obtenerDatosParaReserva
+      ✓ should return data for creating reserva (2 ms)
+  crearReserva
+    ✕ should create a reservation successfully (1 ms)
+    ✕ should return 400 if required fields are missing
+    ✕ should return 400 if invalid IDs (1 ms)
+    ✕ should return 404 if user or cabana not found (1 ms)
+  actualizarReserva
+    ✕ should update reservation successfully (1 ms)
+    ✕ should return 404 if reservation not found (1 ms)
+  eliminarReserva
+    ✕ should delete reservation successfully (1 ms)
+    ✕ should return 404 if reservation not found (1 ms)
+  obtenerReservasPorUsuario
+    ✕ should return reservations for user (1 ms)
+    ✕ should return 400 if userId missing
+    ✕ should handle errors
+
+  ● crearReserva › should create a reservation successfully
+
+    ReferenceError: req is not defined
+
+      267 |   describe('crearReserva', () => {
+      268 |     it('should create a reservation successfully', async () => {
+    > 269 |       req.body = {
+          |       ^
+      270 |         usuario: '507f1f77bcf86cd799439011',
+      271 |         cabana: '507f1f77bcf86cd799439012',
+      272 |         fechaInicio: '2023-01-01',
+
+      at Object.req (__tests__/controllers/reservasController.test.js:269:7)
+
+  ● crearReserva › should return 400 if required fields are missing
+
+    ReferenceError: req is not defined
+
+      315 |
+      316 |     it('should return 400 if required fields are missing', async () => {
+    > 317 |       req.body = {};
+          |       ^
+      318 |       await reservasController.crearReserva(req, res);
+      319 |       expect(res.status).toHaveBeenCalledWith(400);
+      320 |       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ 
+
+      at Object.req (__tests__/controllers/reservasController.test.js:317:7)
+
+  ● crearReserva › should return 400 if invalid IDs
+
+    ReferenceError: req is not defined
+
+      324 |
+      325 |     it('should return 400 if invalid IDs', async () => {
+    > 326 |       req.body = {
+          |       ^
+      327 |         usuario: 'invalid',
+      328 |         cabana: 'invalid',
+      329 |         fechaInicio: '2023-01-01',
+
+      at Object.req (__tests__/controllers/reservasController.test.js:326:7)
+
+  ● crearReserva › should return 404 if user or cabana not found
+
+    ReferenceError: req is not defined
+
+      344 |
+      345 |     it('should return 404 if user or cabana not found', async () => {
+    > 346 |       req.body = {
+          |       ^
+      347 |         usuario: '507f1f77bcf86cd799439011',
+      348 |         cabana: '507f1f77bcf86cd799439012',
+      349 |         fechaInicio: '2023-01-01',
+
+      at Object.req (__tests__/controllers/reservasController.test.js:346:7)
+
+  ● actualizarReserva › should update reservation successfully
+
+    ReferenceError: req is not defined
+
+      367 |   describe('actualizarReserva', () => {
+      368 |     it('should update reservation successfully', async () => {
+    > 369 |       req.params.id = 'reserva-123';
+          |       ^
+      370 |       req.body = { estado: 'Confirmada', activo: 'true' };
+      371 |       
+      372 |       Reserva.findByIdAndUpdate.mockResolvedValue({ _id: 'reserva-123', estado: 'Confirmada' });
+
+      at Object.req (__tests__/controllers/reservasController.test.js:369:7)
+
+  ● actualizarReserva › should return 404 if reservation not found
+
+    ReferenceError: req is not defined
+
+      379 |
+      380 |     it('should return 404 if reservation not found', async () => {
+    > 381 |       req.params.id = 'reserva-123';
+          |       ^
+      382 |       Reserva.findByIdAndUpdate.mockResolvedValue(null);
+      383 |
+      384 |       await reservasController.actualizarReserva(req, res);
+
+      at Object.req (__tests__/controllers/reservasController.test.js:381:7)
+
+  ● eliminarReserva › should delete reservation successfully
+
+    ReferenceError: req is not defined
+
+      390 |   describe('eliminarReserva', () => {
+      391 |     it('should delete reservation successfully', async () => {
+    > 392 |       req.params.id = 'reserva-123';
+          |       ^
+      393 |       Reserva.findByIdAndDelete.mockResolvedValue({ _id: 'reserva-123' });
+      394 |
+      395 |       await reservasController.eliminarReserva(req, res);
+
+      at Object.req (__tests__/controllers/reservasController.test.js:392:7)
+
+  ● eliminarReserva › should return 404 if reservation not found
+
+    ReferenceError: req is not defined
+
+      399 |
+      400 |     it('should return 404 if reservation not found', async () => {
+    > 401 |       req.params.id = 'reserva-123';
+          |       ^
+      402 |       Reserva.findByIdAndDelete.mockResolvedValue(null);
+      403 |
+      404 |       await reservasController.eliminarReserva(req, res);
+
+      at Object.req (__tests__/controllers/reservasController.test.js:401:7)
+
+  ● obtenerReservasPorUsuario › should return reservations for user
+
+    ReferenceError: req is not defined
+
+      410 |   describe('obtenerReservasPorUsuario', () => {
+      411 |     it('should return reservations for user', async () => {
+    > 412 |       req.params.userId = 'user-123';
+          |       ^
+      413 |       Reserva.find.mockReturnValue({
+      414 |         populate: jest.fn().mockResolvedValue([{ _id: 'reserva-1' }])
+      415 |       });
+
+      at Object.req (__tests__/controllers/reservasController.test.js:412:7)
+
+  ● obtenerReservasPorUsuario › should return 400 if userId missing
+
+    ReferenceError: req is not defined
+
+      421 |
+      422 |     it('should return 400 if userId missing', async () => {
+    > 423 |       req.params.userId = undefined;
+          |       ^
+      424 |       await reservasController.obtenerReservasPorUsuario(req, res);
+      425 |       expect(res.status).toHaveBeenCalledWith(400);
+      426 |     });
+
+      at Object.req (__tests__/controllers/reservasController.test.js:423:7)
+
+  ● obtenerReservasPorUsuario › should handle errors
+
+    ReferenceError: req is not defined
+
+      427 |
+      428 |     it('should handle errors', async () => {
+    > 429 |       req.params.userId = 'user-123';
+          |       ^
+      430 |       Reserva.find.mockImplementation(() => { throw new Error('DB Error'); });
+      431 |       await reservasController.obtenerReservasPorUsuario(req, res);
+      432 |       expect(res.status).toHaveBeenCalledWith(500);
+
+      at Object.req (__tests__/controllers/reservasController.test.js:429:7)
+
+---------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                    
+---------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------
+All files                        |    3.86 |     1.26 |    3.31 |    3.84 |                                                                      
+ controllers                     |    4.06 |     1.57 |    4.49 |    4.01 |                                                                      
+  authControllers.js             |       0 |        0 |       0 |       0 | 1-457                                                                
+  cabanasController.js           |       0 |        0 |       0 |       0 | 1-273                                                                
+  categorizacionController.js    |       0 |        0 |       0 |       0 | 1-381                                                                
+  certificadoControllers.js      |       0 |        0 |       0 |       0 | 1-208                                                                
+  comentarioEventoController.js  |       0 |        0 |       0 |       0 | 1-156                                                                
+  eventosController.js           |       0 |        0 |       0 |       0 | 1-371                                                                
+  inscripcionController.js       |       0 |        0 |       0 |       0 | 1-505                                                                
+  notificationController.js      |       0 |        0 |       0 |       0 | 1-76                                                                 
+  programaAcademicoController.js |       0 |        0 |       0 |       0 | 1-130                                                                
+  reportesControllers.js         |       0 |        0 |       0 |       0 | 1-838                                                                
+  reservasController.js          |    47.9 |    25.92 |   57.14 |   46.62 | 10-22,27-33,38-51,56-66,71-92,97-189,236,249,258-264,270,290,301,313 
+  solicitudController.js         |       0 |        0 |       0 |       0 | 1-493                                                                
+  tareaController.js             |       0 |        0 |       0 |       0 | 1-414                                                                
+  userController.js              |       0 |        0 |       0 |       0 | 1-375                                                                
+ middlewares                     |       0 |        0 |       0 |       0 |                                                                      
+  auth.js                        |       0 |        0 |       0 |       0 | 1-43                                                                 
+  authJwt.js                     |       0 |        0 |       0 |       0 | 1-80                                                                 
+  index.js                       |       0 |      100 |     100 |       0 | 1-5                                                                  
+  normalizeUserData.js           |       0 |        0 |       0 |       0 | 1-16                                                                 
+  role.js                        |       0 |        0 |       0 |       0 | 1-27                                                                 
+  uploadCloudinary.js            |       0 |        0 |       0 |       0 | 2-84                                                                 
+  validateEvents.js              |       0 |        0 |       0 |       0 | 1-38                                                                 
+  verifySignUp.js                |       0 |        0 |       0 |       0 | 1-47                                                                 
+ models                          |   13.33 |        0 |       0 |   13.43 |                                                                      
+  Cabana.js                      |     100 |      100 |     100 |     100 |                                                                      
+  ComentarioEvento.js            |       0 |      100 |     100 |       0 | 1-36                                                                 
+  Eventos.js                     |       0 |      100 |     100 |       0 | 1-95                                                                 
+  Inscripciones.js               |       0 |        0 |       0 |       0 | 1-124                                                                
+  Notification.js                |     100 |      100 |     100 |     100 |                                                                      
+  ProgramaAcademico.js           |       0 |      100 |     100 |       0 | 1-99                                                                 
+  Reportes.js                    |       0 |        0 |       0 |       0 | 1-176                                                                
+  Reservas.js                    |     100 |      100 |     100 |     100 |                                                                      
+  Solicitud.js                   |      75 |        0 |       0 |      75 | 37                                                                   
+  Tarea.js                       |       0 |      100 |     100 |       0 | 1-51                                                                 
+  User.js                        |   23.07 |        0 |       0 |      24 | 41-70,160-167,173                                                    
+  categorizacion.js              |       0 |      100 |     100 |       0 | 2-36                                                                 
+  index.js                       |       0 |      100 |     100 |       0 | 1-14                                                                 
+ routes                          |       0 |        0 |       0 |       0 |                                                                      
+  authRoutes.js                  |       0 |        0 |       0 |       0 | 1-71                                                                 
+  cabanasRoutes.js               |       0 |      100 |       0 |       0 | 1-46                                                                 
+  categorizacionRoutes.js        |       0 |      100 |     100 |       0 | 1-33                                                                 
+  certificadoRoutes.js           |       0 |      100 |     100 |       0 | 1-14                                                                 
+  comentarioEventoRoutes.js      |       0 |      100 |     100 |       0 | 1-25                                                                 
+  eventosRoutes.js               |       0 |      100 |       0 |       0 | 1-48                                                                 
+  inscripcionRoutes.js           |       0 |      100 |     100 |       0 | 1-30                                                                 
+  notificationRoutes.js          |       0 |      100 |     100 |       0 | 1-27                                                                 
+  programaAcademicoRoutes.js     |       0 |      100 |     100 |       0 | 1-31                                                                 
+  reportesRoutes.js              |       0 |      100 |     100 |       0 | 1-24                                                                 
+  reservasRoutes.js              |       0 |      100 |     100 |       0 | 1-29                                                                 
+  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131                                                                
+  tareaRoutes.js                 |       0 |      100 |     100 |       0 | 1-29                                                                 
+  userRoutes.js                  |       0 |        0 |       0 |       0 | 1-39                                                                 
+ utils                           |    2.83 |        0 |       0 |    3.12 |                                                                      
+  notificationUtils.js           |     7.5 |        0 |       0 |    7.69 | 13-132                                                               
+  reportUtils.js                 |       0 |        0 |       0 |       0 | 9-57                                                                 
+  roleValidation.js              |       0 |        0 |       0 |       0 | 2-10                                                                 
+  sendEmail.js                   |       0 |        0 |       0 |       0 | 1-42                                                                 
+  solicitudUtils.js              |       0 |        0 |       0 |       0 | 9-56                                                                 
+  userValidation.js              |       0 |        0 |       0 |       0 | 6-50                                                                 
+---------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------
+Jest: "global" coverage threshold for statements (55%) not met: 3.86%
+Jest: "global" coverage threshold for branches (40%) not met: 1.26%
+Jest: "global" coverage threshold for lines (55%) not met: 3.84%
+Jest: "global" coverage threshold for functions (60%) not met: 3.31%
+Test Suites: 1 failed, 1 total
+Tests:       11 failed, 15 passed, 26 total
+Snapshots:   0 total
+Time:        2.673 s
+Ran all test suites matching /__tests__\/controllers\/reservasController.test.js/i.
