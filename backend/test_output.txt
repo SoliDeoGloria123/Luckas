@@ -1,319 +1,709 @@
 
 > backend@1.0.0 test
-> jest --coverage --detectOpenHandles --forceExit __tests__/utils/notificationUtils.test.js
+> jest --coverage --detectOpenHandles --forceExit __tests__/models/User.test.js __tests__/controllers/cabanasController.test.js __tests__/controllers/inscripcionController.test.js __tests__/models/Inscripciones.test.js __tests__/models/Reportes.test.js
 
-  console.log
-    No se encontraron usuarios con los roles especificados: [ 'admin', 'tesorero' ]
+FAIL __tests__/models/User.test.js
+  ● User Model › comparePassword › should return true if passwords match
 
-      at Object.log [as enviarNotificacionAUsuariosConRol] (utils/notificationUtils.js:28:15)
+    TypeError: user.comparePassword is not a function
 
-  console.error
-    ❌ Error al enviar notificaciones: Error: DB Error
-        at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/utils/notificationUtils.test.js:73:45)
-        at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-        at new Promise (<anonymous>)
-        at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-        at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-        at processTicksAndRejections (node:internal/process/task_queues:95:5)
-        at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-        at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-        at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-        at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-        at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-        at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+      26 |       });
+      27 |
+    > 28 |       const isMatch = await user.comparePassword('password');
+         |                                  ^
+      29 |       expect(bcrypt.compare).toHaveBeenCalledWith('password', 'hashedPassword');
+      30 |       expect(isMatch).toBe(true);
+      31 |     });
 
-      52 |     
-      53 |   } catch (error) {
-    > 54 |     console.error('❌ Error al enviar notificaciones:', error);
-         |             ^
-      55 |     return { success: false, message: error.message };
-      56 |   }
-      57 | }
+      at Object.comparePassword (__tests__/models/User.test.js:28:34)
 
-      at Object.error [as enviarNotificacionAUsuariosConRol] (utils/notificationUtils.js:54:13)
-      at Object.<anonymous> (__tests__/utils/notificationUtils.test.js:76:22)
+  ● User Model › comparePassword › should return false if passwords do not match
 
-  console.error
-    ❌ Error al enviar notificaciones: Error: DB Error
-        at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/utils/notificationUtils.test.js:149:45)
-        at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-        at new Promise (<anonymous>)
-        at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-        at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-        at processTicksAndRejections (node:internal/process/task_queues:95:5)
-        at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-        at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-        at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-        at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-        at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-        at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+    TypeError: user.comparePassword is not a function
 
-      52 |     
-      53 |   } catch (error) {
-    > 54 |     console.error('❌ Error al enviar notificaciones:', error);
-         |             ^
-      55 |     return { success: false, message: error.message };
-      56 |   }
-      57 | }
+      45 |       });
+      46 |       
+    > 47 |       const isMatch = await user.comparePassword('wrongPassword');
+         |                                  ^
+      48 |       expect(isMatch).toBe(false);
+      49 |     });
+      50 |   });
 
-      at error (utils/notificationUtils.js:54:13)
-      at Object.notificarNuevaInscripcion (utils/notificationUtils.js:73:12)
-      at Object.<anonymous> (__tests__/utils/notificationUtils.test.js:152:22)
+      at Object.comparePassword (__tests__/models/User.test.js:47:34)
 
-  console.error
-    ❌ Error al enviar notificaciones: Error: DB Error
-        at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/utils/notificationUtils.test.js:184:45)
-        at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-        at new Promise (<anonymous>)
-        at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-        at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-        at processTicksAndRejections (node:internal/process/task_queues:95:5)
-        at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-        at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-        at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-        at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-        at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-        at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+  ● User Model › Validation Logic › should validate numeroDocumento for Cédula de ciudadanía
 
-      52 |     
-      53 |   } catch (error) {
-    > 54 |     console.error('❌ Error al enviar notificaciones:', error);
-         |             ^
-      55 |     return { success: false, message: error.message };
-      56 |   }
-      57 | }
+    TypeError: Cannot read properties of undefined (reading 'path')
 
-      at error (utils/notificationUtils.js:54:13)
-      at Object.notificarNuevaReserva (utils/notificationUtils.js:100:12)
-      at Object.<anonymous> (__tests__/utils/notificationUtils.test.js:187:22)
+      53 |     it('should validate numeroDocumento for Cédula de ciudadanía', () => {
+      54 |       // Access the validator directly from the schema paths
+    > 55 |       const numeroDocumentoPath = User.schema.path('numeroDocumento');
+         |                                               ^
+      56 |       const validator = numeroDocumentoPath.validators.find(v => v.validator.name === '' || v.validator.name === 'validator').validator;
+      57 |       
+      58 |       const context = { tipoDocumento: 'Cédula de ciudadanía' };
 
-  console.error
-    ❌ Error al enviar notificaciones: Error: DB Error
-        at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/utils/notificationUtils.test.js:217:45)
-        at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-        at new Promise (<anonymous>)
-        at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-        at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-        at processTicksAndRejections (node:internal/process/task_queues:95:5)
-        at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-        at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-        at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-        at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-        at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-        at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-        at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+      at Object.path (__tests__/models/User.test.js:55:47)
 
-      52 |     
-      53 |   } catch (error) {
-    > 54 |     console.error('❌ Error al enviar notificaciones:', error);
-         |             ^
-      55 |     return { success: false, message: error.message };
-      56 |   }
-      57 | }
+  ● User Model › Validation Logic › should validate numeroDocumento for Pasaporte
 
-      at error (utils/notificationUtils.js:54:13)
-      at Object.notificarNuevaSolicitud (utils/notificationUtils.js:123:12)
-      at Object.<anonymous> (__tests__/utils/notificationUtils.test.js:220:22)
+    TypeError: Cannot read properties of undefined (reading 'path')
 
-FAIL __tests__/utils/notificationUtils.test.js
-  Notification Utils
-    enviarNotificacionAUsuariosConRol
-      ✕ should send notifications to users with specified roles (4 ms)
-      ✕ should exclude specified user (1 ms)
-      ✓ should return error if no users found (34 ms)
-      ✓ should handle errors (5 ms)
-    notificarNuevaInscripcion
-      ✕ should notify new inscripcion for Evento (1 ms)
-      ✕ should notify new inscripcion for Programa Academico (1 ms)
-      ✕ should handle missing reference name (2 ms)
-      ✓ should handle errors (4 ms)
-    notificarNuevaReserva
-      ✕ should notify new reserva (1 ms)
-      ✓ should handle errors (14 ms)
-    notificarNuevaSolicitud
-      ✕ should notify new solicitud (1 ms)
-      ✓ should handle errors (3 ms)
+      66 |
+      67 |     it('should validate numeroDocumento for Pasaporte', () => {
+    > 68 |       const numeroDocumentoPath = User.schema.path('numeroDocumento');
+         |                                               ^
+      69 |       const validator = numeroDocumentoPath.validators.find(v => v.validator.name === '' || v.validator.name === 'validator').validator;
+      70 |       
+      71 |       const context = { tipoDocumento: 'Pasaporte' };
 
-  ● Notification Utils › enviarNotificacionAUsuariosConRol › should send notifications to users with specified roles
+      at Object.path (__tests__/models/User.test.js:68:47)
 
-    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+  ● User Model › Validation Logic › should return correct error message
 
-      17 |         select: jest.fn().mockResolvedValue(mockUsers)
-      18 |       });
-    > 19 |       Notification.insertMany.mockResolvedValue([{}, {}]);
+    TypeError: Cannot read properties of undefined (reading 'path')
+
+      78 |     
+      79 |     it('should return correct error message', () => {
+    > 80 |        const numeroDocumentoPath = User.schema.path('numeroDocumento');
+         |                                                ^
+      81 |        const messageFn = numeroDocumentoPath.validators.find(v => v.validator.name === '' || v.validator.name === 'validator').message;
+      82 |        
+      83 |        expect(messageFn.call({ tipoDocumento: 'Cédula de Ciudadanía' })).toContain('solo números');
+
+      at Object.path (__tests__/models/User.test.js:80:48)
+
+FAIL __tests__/controllers/inscripcionController.test.js
+  ● Console
+
+    console.log
+      ✅ Notificación de inscripción enviada correctamente
+
+      at Object.log [as crearInscripcion] (controllers/inscripcionController.js:236:15)
+
+    console.log
+      === OBTENER INSCRIPCIONES DEBUG ===
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:251:13)
+
+    console.log
+      [INSCRIPCIONES] Usuario: user-123 Rol: admin
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:252:13)
+
+    console.log
+      [INSCRIPCIONES] Headers: undefined
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:253:13)
+
+    console.log
+      [INSCRIPCIONES] Filtro aplicado: {}
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:261:13)
+
+    console.log
+      [INSCRIPCIONES] Encontradas: 2
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:269:13)
+
+    console.log
+      [INSCRIPCIONES] Primera inscripción: {
+        nombre: 'Test 1',
+        apellido: undefined,
+        usuario: undefined,
+        tipoReferencia: undefined
+      }
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:270:13)
+
+    console.log
+      === OBTENER INSCRIPCIONES DEBUG ===
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:251:13)
+
+    console.log
+      [INSCRIPCIONES] Usuario: user-123 Rol: seminarista
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:252:13)
+
+    console.log
+      [INSCRIPCIONES] Headers: undefined
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:253:13)
+
+    console.log
+      [INSCRIPCIONES] Filtrando por usuario: user-123
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:258:15)
+
+    console.log
+      [INSCRIPCIONES] Filtro aplicado: {
+        "usuario": "user-123"
+      }
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:261:13)
+
+    console.log
+      [INSCRIPCIONES] Encontradas: 1
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:269:13)
+
+    console.log
+      [INSCRIPCIONES] Primera inscripción: {
+        nombre: undefined,
+        apellido: undefined,
+        usuario: undefined,
+        tipoReferencia: undefined
+      }
+
+      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:270:13)
+
+  ● actualizarInscripcion › should update inscripcion
+
+    ReferenceError: req is not defined
+
+      209 |       const mockInscripcion = { _id: 'inscripcion-123', solicitud: 'solicitud-123' };
+      210 |
+    > 211 |       req.params.id = 'inscripcion-123';
+          |       ^
+      212 |       req.body = {
+      213 |         usuario: 'user-123',
+      214 |         referencia: 'evento-123',
+
+      at Object.req (__tests__/controllers/inscripcionController.test.js:211:7)
+
+  ● actualizarInscripcion › should return 400 if validation fails in update
+
+    ReferenceError: req is not defined
+
+      238 |
+      239 |     it('should return 400 if validation fails in update', async () => {
+    > 240 |       req.body = { usuario: 'invalid-id' };
+          |       ^
+      241 |       await inscripcionController.actualizarInscripcion(req, res);
+      242 |       expect(res.status).toHaveBeenCalledWith(400);
+      243 |     });
+
+      at Object.req (__tests__/controllers/inscripcionController.test.js:240:7)
+
+  ● actualizarInscripcion › should return 400 if invalid state transition
+
+    ReferenceError: req is not defined
+
+      244 |
+      245 |     it('should return 400 if invalid state transition', async () => {
+    > 246 |       req.params.id = 'inscripcion-123';
+          |       ^
+      247 |       req.body = { 
+      248 |         usuario: '507f1f77bcf86cd799439011', 
+      249 |         referencia: '507f1f77bcf86cd799439011', 
+
+      at Object.req (__tests__/controllers/inscripcionController.test.js:246:7)
+
+  ● actualizarInscripcion › eliminarInscripcion › should delete inscripcion
+
+    ReferenceError: req is not defined
+
+      265 |   describe('eliminarInscripcion', () => {
+      266 |     it('should delete inscripcion', async () => {
+    > 267 |       req.params.id = 'inscripcion-123';
+          |       ^
+      268 |
+      269 |       Inscripcion.findByIdAndDelete = jest.fn().mockResolvedValue({
+      270 |         _id: 'inscripcion-123'
+
+      at Object.req (__tests__/controllers/inscripcionController.test.js:267:7)
+
+  ● actualizarInscripcion › eliminarInscripcion › should return 404 if not found
+
+    ReferenceError: req is not defined
+
+      280 |
+      281 |     it('should return 404 if not found', async () => {
+    > 282 |       req.params.id = 'nonexistent';
+          |       ^
+      283 |
+      284 |       Inscripcion.findByIdAndDelete = jest.fn().mockResolvedValue(null);
+      285 |
+
+      at Object.req (__tests__/controllers/inscripcionController.test.js:282:7)
+
+  ● actualizarInscripcion › obtenerInscripcionesPorUsuario › should return inscripciones for user
+
+    ReferenceError: req is not defined
+
+      293 |     it('should return inscripciones for user', async () => {
+      294 |       const mockInscripciones = [{ _id: '1' }, { _id: '2' }];
+    > 295 |       req.params.userId = 'user-123';
+          |       ^
+      296 |
+      297 |       Inscripcion.find = jest.fn().mockReturnValue({
+      298 |         populate: jest.fn().mockReturnValue({
+
+      at Object.req (__tests__/controllers/inscripcionController.test.js:295:7)
+
+  ● actualizarInscripcion › obtenerInscripcionesPorUsuario › should return 400 if userId is missing
+
+    ReferenceError: req is not defined
+
+      314 |
+      315 |     it('should return 400 if userId is missing', async () => {
+    > 316 |       req.params = {};
+          |       ^
+      317 |
+      318 |       await inscripcionController.obtenerInscripcionesPorUsuario(req, res);
+      319 |
+
+      at Object.req (__tests__/controllers/inscripcionController.test.js:316:7)
+
+  ● actualizarInscripcion › obtenerEstadisticasInscripciones › should return statistics
+
+    ReferenceError: req is not defined
+
+      330 |         .mockResolvedValueOnce(30); // pendientes
+      331 |
+    > 332 |       await inscripcionController.obtenerEstadisticasInscripciones(req, res);
+          |                                                                    ^
+      333 |
+      334 |       expect(res.status).toHaveBeenCalledWith(200);
+      335 |       expect(res.json).toHaveBeenCalledWith({
+
+      at Object.req (__tests__/controllers/inscripcionController.test.js:332:68)
+
+FAIL __tests__/controllers/cabanasController.test.js
+  ● Console
+
+    console.log
+      [CABANAS] crearCabana - Iniciando creación
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:7:13)
+
+    console.log
+      [CABANAS] req.body: {
+        nombre: 'Cabaña Test',
+        descripcion: 'Descripción test',
+        capacidad: 4,
+        precio: 100,
+        categoria: '507f1f77bcf86cd799439011'
+      }
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:8:13)
+
+    console.log
+      [CABANAS] req.files: 0
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:9:13)
+
+    console.log
+      [CABANAS] req.cloudinaryUrls: [ 'https://cloudinary.com/image1.jpg' ]
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:10:13)
+
+    console.log
+      [CABANAS] Imágenes a guardar: [ 'https://cloudinary.com/image1.jpg' ]
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:43:11)
+
+    console.log
+      [CABANAS] Datos completos para crear cabaña: {
+        nombre: 'Cabaña Test',
+        descripcion: 'Descripción test',
+        capacidad: 4,
+        categoria: '507f1f77bcf86cd799439011',
+        precio: 100,
+        ubicacion: '',
+        estado: 'disponible',
+        imagen: [ 'https://cloudinary.com/image1.jpg' ],
+        creadoPor: 'user-123'
+      }
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:57:11)
+
+    console.log
+      [CABANAS] Cabaña creada en memoria, guardando...
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:60:11)
+
+    console.log
+      [CABANAS] Cabaña guardada exitosamente: cabana-123
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:63:11)
+
+    console.log
+      [CABANAS] crearCabana - Iniciando creación
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:7:13)
+
+    console.log
+      [CABANAS] req.body: {
+        descripcion: 'Test',
+        capacidad: 4,
+        precio: 100,
+        categoria: '507f1f77bcf86cd799439011'
+      }
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:8:13)
+
+    console.log
+      [CABANAS] req.files: 0
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:9:13)
+
+    console.log
+      [CABANAS] req.cloudinaryUrls: []
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:10:13)
+
+    console.log
+      [CABANAS] crearCabana - Iniciando creación
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:7:13)
+
+    console.log
+      [CABANAS] req.body: {
+        nombre: 'Test',
+        capacidad: 4,
+        precio: 100,
+        categoria: '507f1f77bcf86cd799439011'
+      }
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:8:13)
+
+    console.log
+      [CABANAS] req.files: 0
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:9:13)
+
+    console.log
+      [CABANAS] req.cloudinaryUrls: []
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:10:13)
+
+    console.log
+      [CABANAS] crearCabana - Iniciando creación
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:7:13)
+
+    console.log
+      [CABANAS] req.body: {
+        nombre: 'Test',
+        descripcion: 'Test desc',
+        capacidad: 0,
+        precio: 100,
+        categoria: '507f1f77bcf86cd799439011'
+      }
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:8:13)
+
+    console.log
+      [CABANAS] req.files: 0
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:9:13)
+
+    console.log
+      [CABANAS] req.cloudinaryUrls: []
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:10:13)
+
+    console.log
+      [CABANAS] crearCabana - Iniciando creación
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:7:13)
+
+    console.log
+      [CABANAS] req.body: {
+        nombre: 'Test',
+        descripcion: 'Test desc',
+        capacidad: 4,
+        precio: -1,
+        categoria: '507f1f77bcf86cd799439011'
+      }
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:8:13)
+
+    console.log
+      [CABANAS] req.files: 0
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:9:13)
+
+    console.log
+      [CABANAS] req.cloudinaryUrls: []
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:10:13)
+
+    console.log
+      [CABANAS] crearCabana - Iniciando creación
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:7:13)
+
+    console.log
+      [CABANAS] req.body: {
+        nombre: 'Test',
+        descripcion: 'Test desc',
+        capacidad: 4,
+        precio: 100,
+        categoria: '507f1f77bcf86cd799439011'
+      }
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:8:13)
+
+    console.log
+      [CABANAS] req.files: 0
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:9:13)
+
+    console.log
+      [CABANAS] req.cloudinaryUrls: []
+
+      at Object.log [as crearCabana] (controllers/cabanasController.js:10:13)
+
+    console.log
+      [CABAÑAS] Se eliminaron 3 reservas asociadas a la cabaña.
+
+      at Object.log [as eliminarCabana] (controllers/cabanasController.js:207:13)
+
+    console.log
+      [CABAÑAS] Se eliminaron 0 reservas asociadas a la cabaña.
+
+      at Object.log [as eliminarCabana] (controllers/cabanasController.js:207:13)
+
+  ● Cabanas Controller › actualizarCabana › should sanitize invalid category in update
+
+    expect(received).toBeUndefined()
+
+    Received: "invalid-id"
+
+      307 |       await cabanasController.actualizarCabana(req, res);
+      308 |
+    > 309 |       expect(req.body.categoria).toBeUndefined();
+          |                                  ^
+      310 |       expect(res.json).toHaveBeenCalledWith({ success: true, data: mockCabana });
+      311 |     });
+      312 |
+
+      at Object.toBeUndefined (__tests__/controllers/cabanasController.test.js:309:34)
+
+FAIL __tests__/models/Reportes.test.js
+  ● Reporte Model › Virtuals › should return correct rangoFechas
+
+    expect(received).toContain(expected) // indexOf
+
+    Matcher error: received value must not be null nor undefined
+
+    Received has value: undefined
+
+      11 |         }
+      12 |       });
+    > 13 |       expect(reporte.rangoFechas).toContain('1/1/2023');
+         |                                   ^
+      14 |       expect(reporte.rangoFechas).toContain('31/1/2023');
+      15 |     });
+      16 |
+
+      at Object.toContain (__tests__/models/Reportes.test.js:13:35)
+
+  ● Reporte Model › Virtuals › should return correct resumenFiltros
+
+    expect(received).toContain(expected) // indexOf
+
+    Matcher error: received value must not be null nor undefined
+
+    Received has value: undefined
+
+      25 |       });
+      26 |       const resumen = reporte.resumenFiltros;
+    > 27 |       expect(resumen).toContain('Fechas:');
+         |                       ^
+      28 |       expect(resumen).toContain('Estado: activo');
+      29 |       expect(resumen).toContain('Categoría: General');
+      30 |       expect(resumen).toContain('Usuario: User1');
+
+      at Object.toContain (__tests__/models/Reportes.test.js:27:23)
+
+  ● Reporte Model › pre save hook › should validate fechaFin >= fechaInicio
+
+    TypeError: Cannot read properties of undefined (reading 's')
+
+      34 |   describe('pre save hook', () => {
+      35 |     it('should validate fechaFin >= fechaInicio', () => {
+    > 36 |       const hook = Reporte.schema.s.hooks._pres.get('save')[0].fn;
+         |                                   ^
+      37 |       const context = {
+      38 |         filtros: {
+      39 |           fechaInicio: new Date('2023-01-02'),
+
+      at Object.s (__tests__/models/Reportes.test.js:36:35)
+
+  ● Reporte Model › pre save hook › should validate future dates
+
+    TypeError: Cannot read properties of undefined (reading 's')
+
+      50 |
+      51 |     it('should validate future dates', () => {
+    > 52 |       const hook = Reporte.schema.s.hooks._pres.get('save')[0].fn;
+         |                                   ^
+      53 |       const futureDate = new Date();
+      54 |       futureDate.setFullYear(futureDate.getFullYear() + 1);
+      55 |       
+
+      at Object.s (__tests__/models/Reportes.test.js:52:35)
+
+  ● Reporte Model › pre save hook › should set estado to error if no data
+
+    TypeError: Cannot read properties of undefined (reading 's')
+
+      69 |
+      70 |     it('should set estado to error if no data', () => {
+    > 71 |       const hook = Reporte.schema.s.hooks._pres.get('save')[0].fn;
+         |                                   ^
+      72 |       const context = {
+      73 |         estado: 'generado',
+      74 |         datos: {},
+
+      at Object.s (__tests__/models/Reportes.test.js:71:35)
+
+FAIL __tests__/models/Inscripciones.test.js
+  ● Inscripcion Model › Validation › should be invalid if required fields are missing
+
+    TypeError: inscripcion.validateSync is not a function
+
+       6 |     it('should be invalid if required fields are missing', () => {
+       7 |       const inscripcion = new Inscripcion();
+    >  8 |       const err = inscripcion.validateSync();
          |                               ^
-      20 |
-      21 |       const result = await notificationUtils.enviarNotificacionAUsuariosConRol(
-      22 |         'Test Title',
+       9 |       expect(err.errors.usuario).toBeDefined();
+      10 |       expect(err.errors.nombre).toBeDefined();
+      11 |       expect(err.errors.tipoDocumento).toBeDefined();
 
-      at Object.mockResolvedValue (__tests__/utils/notificationUtils.test.js:19:31)
+      at Object.validateSync (__tests__/models/Inscripciones.test.js:8:31)
 
-  ● Notification Utils › enviarNotificacionAUsuariosConRol › should exclude specified user
+  ● Inscripcion Model › Validation › should validate estado for Eventos
 
-    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+    TypeError: Cannot read properties of undefined (reading 'path')
 
-      38 |         select: jest.fn().mockResolvedValue(mockUsers)
-      39 |       });
-    > 40 |       Notification.insertMany.mockResolvedValue([{}]);
-         |                               ^
-      41 |
-      42 |       await notificationUtils.enviarNotificacionAUsuariosConRol(
-      43 |         'Test Title',
+      24 |       });
+      25 |       // Access the validator directly
+    > 26 |       const estadoPath = Inscripcion.schema.path('estado');
+         |                                             ^
+      27 |       const validator = estadoPath.validators.find(v => v.validator.name === '' || v.validator.name === 'validator').validator;
+      28 |       
+      29 |       const context = { tipoReferencia: 'Eventos' };
 
-      at Object.mockResolvedValue (__tests__/utils/notificationUtils.test.js:40:31)
+      at Object.path (__tests__/models/Inscripciones.test.js:26:45)
 
-  ● Notification Utils › notificarNuevaInscripcion › should notify new inscripcion for Evento
+  ● Inscripcion Model › Validation › should validate estado for ProgramaAcademico
 
-    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+    TypeError: Cannot read properties of undefined (reading 'path')
 
-      93 |         select: jest.fn().mockResolvedValue([{ _id: 'admin1' }])
-      94 |       });
-    > 95 |       Notification.insertMany.mockResolvedValue([{}]);
-         |                               ^
-      96 |
-      97 |       await notificationUtils.notificarNuevaInscripcion(inscripcion, usuario, referencia);
-      98 |
+      33 |
+      34 |     it('should validate estado for ProgramaAcademico', () => {
+    > 35 |       const estadoPath = Inscripcion.schema.path('estado');
+         |                                             ^
+      36 |       const validator = estadoPath.validators.find(v => v.validator.name === '' || v.validator.name === 'validator').validator;
+      37 |       
+      38 |       const context = { tipoReferencia: 'ProgramaAcademico' };
 
-      at Object.mockResolvedValue (__tests__/utils/notificationUtils.test.js:95:31)
+      at Object.path (__tests__/models/Inscripciones.test.js:35:45)
 
-  ● Notification Utils › notificarNuevaInscripcion › should notify new inscripcion for Programa Academico
+  ● Inscripcion Model › pre save hook › should set default state for Eventos
 
-    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+    TypeError: Cannot read properties of undefined (reading 's')
 
-      113 |         select: jest.fn().mockResolvedValue([{ _id: 'admin1' }])
-      114 |       });
-    > 115 |       Notification.insertMany.mockResolvedValue([{}]);
-          |                               ^
-      116 |
-      117 |       await notificationUtils.notificarNuevaInscripcion(inscripcion, usuario, referencia);
-      118 |
+      52 |     
+      53 |     it('should set default state for Eventos', () => {
+    > 54 |         const hook = Inscripcion.schema.s.hooks._pres.get('save')[0].fn;
+         |                                         ^
+      55 |         const context = {
+      56 |             tipoReferencia: 'Eventos',
+      57 |             estado: '',
 
-      at Object.mockResolvedValue (__tests__/utils/notificationUtils.test.js:115:31)
+      at Object.s (__tests__/models/Inscripciones.test.js:54:41)
 
-  ● Notification Utils › notificarNuevaInscripcion › should handle missing reference name
+  ● Inscripcion Model › pre save hook › should set default state for ProgramaAcademico
 
-    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+    TypeError: Cannot read properties of undefined (reading 's')
 
-      131 |         select: jest.fn().mockResolvedValue([{ _id: 'admin1' }])
-      132 |       });
-    > 133 |       Notification.insertMany.mockResolvedValue([{}]);
-          |                               ^
-      134 |
-      135 |       await notificationUtils.notificarNuevaInscripcion(inscripcion, usuario, null);
-      136 |
+      67 |
+      68 |     it('should set default state for ProgramaAcademico', () => {
+    > 69 |         const hook = Inscripcion.schema.s.hooks._pres.get('save')[0].fn;
+         |                                         ^
+      70 |         const context = {
+      71 |             tipoReferencia: 'ProgramaAcademico',
+      72 |             estado: '',
 
-      at Object.mockResolvedValue (__tests__/utils/notificationUtils.test.js:133:31)
+      at Object.s (__tests__/models/Inscripciones.test.js:69:41)
 
-  ● Notification Utils › notificarNuevaReserva › should notify new reserva
-
-    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
-
-      164 |         select: jest.fn().mockResolvedValue([{ _id: 'admin1' }])
-      165 |       });
-    > 166 |       Notification.insertMany.mockResolvedValue([{}]);
-          |                               ^
-      167 |
-      168 |       await notificationUtils.notificarNuevaReserva(reserva, usuario, cabana);
-      169 |
-
-      at Object.mockResolvedValue (__tests__/utils/notificationUtils.test.js:166:31)
-
-  ● Notification Utils › notificarNuevaSolicitud › should notify new solicitud
-
-    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
-
-      198 |         select: jest.fn().mockResolvedValue([{ _id: 'admin1' }])
-      199 |       });
-    > 200 |       Notification.insertMany.mockResolvedValue([{}]);
-          |                               ^
-      201 |
-      202 |       await notificationUtils.notificarNuevaSolicitud(solicitud, usuario);
-      203 |
-
-      at Object.mockResolvedValue (__tests__/utils/notificationUtils.test.js:200:31)
-
----------------------------------|---------|----------|---------|---------|-----------------------------
-File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s           
----------------------------------|---------|----------|---------|---------|-----------------------------
-All files                        |    1.45 |     0.81 |    1.65 |     1.5 |                             
- controllers                     |       0 |        0 |       0 |       0 |                             
-  authControllers.js             |       0 |        0 |       0 |       0 | 1-457                       
-  cabanasController.js           |       0 |        0 |       0 |       0 | 1-273                       
-  categorizacionController.js    |       0 |        0 |       0 |       0 | 1-381                       
-  certificadoControllers.js      |       0 |        0 |       0 |       0 | 1-208                       
-  comentarioEventoController.js  |       0 |        0 |       0 |       0 | 1-156                       
-  eventosController.js           |       0 |        0 |       0 |       0 | 1-371                       
-  inscripcionController.js       |       0 |        0 |       0 |       0 | 1-505                       
-  notificationController.js      |       0 |        0 |       0 |       0 | 1-76                        
-  programaAcademicoController.js |       0 |        0 |       0 |       0 | 1-130                       
-  reportesControllers.js         |       0 |        0 |       0 |       0 | 1-838                       
-  reservasController.js          |       0 |        0 |       0 |       0 | 1-373                       
-  solicitudController.js         |       0 |        0 |       0 |       0 | 1-493                       
-  tareaController.js             |       0 |        0 |       0 |       0 | 1-414                       
-  userController.js              |       0 |        0 |       0 |       0 | 1-375                       
- middlewares                     |       0 |        0 |       0 |       0 |                             
-  auth.js                        |       0 |        0 |       0 |       0 | 1-43                        
-  authJwt.js                     |       0 |        0 |       0 |       0 | 1-80                        
-  index.js                       |       0 |      100 |     100 |       0 | 1-5                         
-  normalizeUserData.js           |       0 |        0 |       0 |       0 | 1-16                        
-  role.js                        |       0 |        0 |       0 |       0 | 1-27                        
-  uploadCloudinary.js            |       0 |        0 |       0 |       0 | 2-84                        
-  validateEvents.js              |       0 |        0 |       0 |       0 | 1-38                        
-  verifySignUp.js                |       0 |        0 |       0 |       0 | 1-47                        
- models                          |    6.66 |        0 |       0 |    6.71 |                             
-  Cabana.js                      |       0 |      100 |     100 |       0 | 1-46                        
-  ComentarioEvento.js            |       0 |      100 |     100 |       0 | 1-36                        
-  Eventos.js                     |       0 |      100 |     100 |       0 | 1-95                        
-  Inscripciones.js               |       0 |        0 |       0 |       0 | 1-124                       
-  Notification.js                |     100 |      100 |     100 |     100 |                             
-  ProgramaAcademico.js           |       0 |      100 |     100 |       0 | 1-99                        
-  Reportes.js                    |       0 |        0 |       0 |       0 | 1-176                       
-  Reservas.js                    |       0 |      100 |     100 |       0 | 1-78                        
-  Solicitud.js                   |       0 |        0 |       0 |       0 | 1-99                        
-  Tarea.js                       |       0 |      100 |     100 |       0 | 1-51                        
-  User.js                        |   23.07 |        0 |       0 |      24 | 41-70,160-167,173           
-  categorizacion.js              |       0 |      100 |     100 |       0 | 2-36                        
-  index.js                       |       0 |      100 |     100 |       0 | 1-14                        
- routes                          |       0 |        0 |       0 |       0 |                             
-  authRoutes.js                  |       0 |        0 |       0 |       0 | 1-71                        
-  cabanasRoutes.js               |       0 |      100 |       0 |       0 | 1-46                        
-  categorizacionRoutes.js        |       0 |      100 |     100 |       0 | 1-33                        
-  certificadoRoutes.js           |       0 |      100 |     100 |       0 | 1-14                        
-  comentarioEventoRoutes.js      |       0 |      100 |     100 |       0 | 1-25                        
-  eventosRoutes.js               |       0 |      100 |       0 |       0 | 1-48                        
-  inscripcionRoutes.js           |       0 |      100 |     100 |       0 | 1-30                        
-  notificationRoutes.js          |       0 |      100 |     100 |       0 | 1-27                        
-  programaAcademicoRoutes.js     |       0 |      100 |     100 |       0 | 1-31                        
-  reportesRoutes.js              |       0 |      100 |     100 |       0 | 1-24                        
-  reservasRoutes.js              |       0 |      100 |     100 |       0 | 1-29                        
-  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131                       
-  tareaRoutes.js                 |       0 |      100 |     100 |       0 | 1-29                        
-  userRoutes.js                  |       0 |        0 |       0 |       0 | 1-39                        
- utils                           |   27.35 |    12.67 |   28.57 |    30.2 |                             
-  notificationUtils.js           |    72.5 |    81.81 |      80 |   74.35 | 33-47,81-82,108-109,131-132 
-  reportUtils.js                 |       0 |        0 |       0 |       0 | 9-57                        
-  roleValidation.js              |       0 |        0 |       0 |       0 | 2-10                        
-  sendEmail.js                   |       0 |        0 |       0 |       0 | 1-42                        
-  solicitudUtils.js              |       0 |        0 |       0 |       0 | 9-56                        
-  userValidation.js              |       0 |        0 |       0 |       0 | 6-50                        
----------------------------------|---------|----------|---------|---------|-----------------------------
-Jest: "global" coverage threshold for statements (55%) not met: 1.45%
-Jest: "global" coverage threshold for branches (40%) not met: 0.81%
-Jest: "global" coverage threshold for lines (55%) not met: 1.5%
-Jest: "global" coverage threshold for functions (60%) not met: 1.65%
-Test Suites: 1 failed, 1 total
-Tests:       7 failed, 5 passed, 12 total
+---------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                                                          
+---------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------
+All files                        |    9.93 |     9.74 |   10.41 |   10.15 |                                                                                                                                            
+ controllers                     |   10.87 |    12.02 |   14.04 |   11.08 |                                                                                                                                            
+  authControllers.js             |       0 |        0 |       0 |       0 | 1-457                                                                                                                                      
+  cabanasController.js           |   80.74 |    75.58 |     100 |   82.17 | 33,67-69,94,103-107,120-121,147-148,165-166,172-173,182,194,214,234,272-273                                                                
+  categorizacionController.js    |       0 |        0 |       0 |       0 | 1-381                                                                                                                                      
+  certificadoControllers.js      |       0 |        0 |       0 |       0 | 1-208                                                                                                                                      
+  comentarioEventoController.js  |       0 |        0 |       0 |       0 | 1-156                                                                                                                                      
+  eventosController.js           |       0 |        0 |       0 |       0 | 1-371                                                                                                                                      
+  inscripcionController.js       |   46.66 |    35.59 |      60 |   46.84 | 12,34,37,48-56,65,75-87,95,110,128,135,144,160-161,185-193,225-226,238,244,279-280,286-300,306-333,347-386,390-444,450-455,460-474,480-505 
+  notificationController.js      |       0 |        0 |       0 |       0 | 1-76                                                                                                                                       
+  programaAcademicoController.js |       0 |        0 |       0 |       0 | 1-130                                                                                                                                      
+  reportesControllers.js         |       0 |        0 |       0 |       0 | 1-838                                                                                                                                      
+  reservasController.js          |       0 |        0 |       0 |       0 | 1-373                                                                                                                                      
+  solicitudController.js         |       0 |        0 |       0 |       0 | 1-493                                                                                                                                      
+  tareaController.js             |       0 |        0 |       0 |       0 | 1-414                                                                                                                                      
+  userController.js              |       0 |        0 |       0 |       0 | 1-375                                                                                                                                      
+ middlewares                     |       0 |        0 |       0 |       0 |                                                                                                                                            
+  auth.js                        |       0 |        0 |       0 |       0 | 1-43                                                                                                                                       
+  authJwt.js                     |       0 |        0 |       0 |       0 | 1-39                                                                                                                                       
+  index.js                       |       0 |      100 |     100 |       0 | 1-5                                                                                                                                        
+  normalizeUserData.js           |       0 |        0 |       0 |       0 | 1-16                                                                                                                                       
+  role.js                        |       0 |        0 |       0 |       0 | 1-27                                                                                                                                       
+  uploadCloudinary.js            |       0 |        0 |       0 |       0 | 2-84                                                                                                                                       
+  validateEvents.js              |       0 |        0 |       0 |       0 | 1-38                                                                                                                                       
+  verifySignUp.js                |       0 |        0 |       0 |       0 | 1-47                                                                                                                                       
+ models                          |   30.37 |        0 |       0 |   30.59 |                                                                                                                                            
+  Cabana.js                      |     100 |      100 |     100 |     100 |                                                                                                                                            
+  ComentarioEvento.js            |       0 |      100 |     100 |       0 | 1-36                                                                                                                                       
+  Eventos.js                     |     100 |      100 |     100 |     100 |                                                                                                                                            
+  Inscripciones.js               |   15.38 |        0 |       0 |   15.38 | 69-94,113-121                                                                                                                              
+  Notification.js                |     100 |      100 |     100 |     100 |                                                                                                                                            
+  ProgramaAcademico.js           |       0 |      100 |     100 |       0 | 1-99                                                                                                                                       
+  Reportes.js                    |   29.54 |        0 |       0 |   29.54 | 100-105,109-122,128-145,150-153,159,166,170                                                                                                
+  Reservas.js                    |     100 |      100 |     100 |     100 |                                                                                                                                            
+  Solicitud.js                   |      75 |        0 |       0 |      75 | 37                                                                                                                                         
+  Tarea.js                       |       0 |      100 |     100 |       0 | 1-51                                                                                                                                       
+  User.js                        |   23.07 |        0 |       0 |      24 | 41-70,160-167,173                                                                                                                          
+  categorizacion.js              |     100 |      100 |     100 |     100 |                                                                                                                                            
+  index.js                       |       0 |      100 |     100 |       0 | 1-14                                                                                                                                       
+ routes                          |       0 |        0 |       0 |       0 |                                                                                                                                            
+  authRoutes.js                  |       0 |        0 |       0 |       0 | 1-71                                                                                                                                       
+  cabanasRoutes.js               |       0 |      100 |       0 |       0 | 1-46                                                                                                                                       
+  categorizacionRoutes.js        |       0 |      100 |     100 |       0 | 1-33                                                                                                                                       
+  certificadoRoutes.js           |       0 |      100 |     100 |       0 | 1-14                                                                                                                                       
+  comentarioEventoRoutes.js      |       0 |      100 |     100 |       0 | 1-25                                                                                                                                       
+  eventosRoutes.js               |       0 |      100 |       0 |       0 | 1-48                                                                                                                                       
+  inscripcionRoutes.js           |       0 |      100 |     100 |       0 | 1-30                                                                                                                                       
+  notificationRoutes.js          |       0 |      100 |     100 |       0 | 1-27                                                                                                                                       
+  programaAcademicoRoutes.js     |       0 |      100 |     100 |       0 | 1-31                                                                                                                                       
+  reportesRoutes.js              |       0 |      100 |     100 |       0 | 1-24                                                                                                                                       
+  reservasRoutes.js              |       0 |      100 |     100 |       0 | 1-29                                                                                                                                       
+  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131                                                                                                                                      
+  tareaRoutes.js                 |       0 |      100 |     100 |       0 | 1-29                                                                                                                                       
+  userRoutes.js                  |       0 |        0 |       0 |       0 | 1-39                                                                                                                                       
+ utils                           |    2.83 |        0 |       0 |    3.12 |                                                                                                                                            
+  notificationUtils.js           |     7.5 |        0 |       0 |    7.69 | 13-132                                                                                                                                     
+  reportUtils.js                 |       0 |        0 |       0 |       0 | 9-57                                                                                                                                       
+  roleValidation.js              |       0 |        0 |       0 |       0 | 2-10                                                                                                                                       
+  sendEmail.js                   |       0 |        0 |       0 |       0 | 1-42                                                                                                                                       
+  solicitudUtils.js              |       0 |        0 |       0 |       0 | 9-56                                                                                                                                       
+  userValidation.js              |       0 |        0 |       0 |       0 | 6-55                                                                                                                                       
+---------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------
+Jest: "global" coverage threshold for statements (55%) not met: 9.93%
+Jest: "global" coverage threshold for branches (40%) not met: 9.74%
+Jest: "global" coverage threshold for lines (55%) not met: 10.15%
+Jest: "global" coverage threshold for functions (60%) not met: 10.41%
+Test Suites: 5 failed, 5 total
+Tests:       24 failed, 29 passed, 53 total
 Snapshots:   0 total
-Time:        2.765 s
-Ran all test suites matching /__tests__\/utils\/notificationUtils.test.js/i.
+Time:        3.59 s
+Ran all test suites matching /__tests__\/models\/User.test.js|__tests__\/controllers\/cabanasController.test.js|__tests__\/controllers\/inscripcionController.test.js|__tests__\/models\/Inscripciones.test.js|__tests__\/models\/Reportes.test.js/i.

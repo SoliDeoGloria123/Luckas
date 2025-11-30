@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { normalizeTipoDocumento } = require('../../utils/userValidation');
 
 jest.mock('../../utils/userValidation');
+jest.mock('../../models/User');
 
 describe('User Controller', () => {
   let req, res;
@@ -92,6 +93,15 @@ describe('User Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(403);
     });
+
+    it('should handle errors', async () => {
+      req.params.id = 'userId';
+      User.findById.mockReturnValue({
+        select: jest.fn().mockRejectedValue(new Error('DB Error'))
+      });
+      await userController.getUserById(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
   });
 
   describe('getUserByDocumento', () => {
@@ -119,48 +129,77 @@ describe('User Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
     });
+
+    it('should handle errors', async () => {
+      req.params.numeroDocumento = '123';
+      User.findOne.mockReturnValue({
+        select: jest.fn().mockRejectedValue(new Error('DB Error'))
+      });
+      await userController.getUserByDocumento(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
   });
 
   describe('createUser', () => {
     it('should create a new user', async () => {
       req.body = {
-        nombre: 'John',
-        apellido: 'Doe',
-        correo: 'john@example.com',
-        password: 'password123',
+        nombre: 'Test',
+        apellido: 'User',
+        correo: 'test@example.com',
+        telefono: '1234567',
         tipoDocumento: 'CC',
         numeroDocumento: '123456',
-        telefono: '1234567890'
+        fechaNacimiento: '1990-01-01',
+        password: 'password123',
+        role: 'externo'
       };
-      normalizeTipoDocumento.mockReturnValue('Cédula de Ciudadanía');
-      bcrypt.hash = jest.fn().mockResolvedValue('hashedPassword');
       
-      const mockSavedUser = { ...req.body, _id: 'newUserId', save: jest.fn().mockResolvedValue(true) };
-      User.mockImplementation(() => mockSavedUser);
+      normalizeTipoDocumento.mockReturnValue('Cédula de ciudadanía');
+      
+      const mockSave = jest.fn().mockResolvedValue({
+        _id: 'userId',
+        nombre: 'Test',
+        apellido: 'User',
+        correo: 'test@example.com',
+        telefono: '1234567',
+        tipoDocumento: 'Cédula de ciudadanía',
+        numeroDocumento: '123456',
+        fechaNacimiento: '1990-01-01',
+        estado: 'activo',
+        role: 'externo'
+      });
+
+      User.mockImplementation(() => ({
+        save: mockSave
+      }));
 
       await userController.createUser(req, res);
 
+      expect(normalizeTipoDocumento).toHaveBeenCalledWith('CC');
+      expect(mockSave).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        user: expect.objectContaining({ nombre: 'Test' })
+      }));
     });
 
     it('should handle errors during creation', async () => {
-      req.body = {
-        nombre: 'John',
-        apellido: 'Doe',
-        correo: 'john@example.com',
-        password: 'password123',
-        tipoDocumento: 'CC'
-      };
-      normalizeTipoDocumento.mockReturnValue('Cédula de Ciudadanía');
-      bcrypt.hash = jest.fn().mockResolvedValue('hashedPassword');
+      req.body = {};
+      normalizeTipoDocumento.mockReturnValue('Cédula de ciudadanía');
       
-      const mockUser = { save: jest.fn().mockRejectedValue(new Error('Validation error')) };
-      User.mockImplementation(() => mockUser);
+      const mockSave = jest.fn().mockRejectedValue(new Error('Creation failed'));
+      User.mockImplementation(() => ({
+        save: mockSave
+      }));
 
       await userController.createUser(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: false,
+        message: 'Error al crear usuario'
+      }));
     });
   });
 
@@ -192,6 +231,15 @@ describe('User Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
     });
+
+    it('should handle errors', async () => {
+      req.params.id = 'userId';
+      User.findByIdAndUpdate.mockReturnValue({
+        select: jest.fn().mockRejectedValue(new Error('DB Error'))
+      });
+      await userController.updateUser(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
   });
 
   describe('updateOwnProfile', () => {
@@ -217,6 +265,23 @@ describe('User Controller', () => {
 
       await userController.updateOwnProfile(req, res);
 
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('should handle errors', async () => {
+      req.userId = 'userId';
+      User.findById.mockRejectedValue(new Error('DB Error'));
+      await userController.updateOwnProfile(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('should return 404 if update fails', async () => {
+      req.userId = 'userId';
+      User.findById.mockResolvedValue({ _id: 'userId' });
+      User.findByIdAndUpdate.mockReturnValue({
+        select: jest.fn().mockResolvedValue(null)
+      });
+      await userController.updateOwnProfile(req, res);
       expect(res.status).toHaveBeenCalledWith(404);
     });
   });
@@ -258,6 +323,32 @@ describe('User Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
     });
+
+    it('should return 400 if params missing', async () => {
+      req.body = {};
+      await userController.changePassword(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it('should return 404 if user not found', async () => {
+      req.userId = 'userId';
+      req.body = { currentPassword: 'old', newPassword: 'new' };
+      User.findById.mockReturnValue({
+        select: jest.fn().mockResolvedValue(null)
+      });
+      await userController.changePassword(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('should handle errors', async () => {
+      req.userId = 'userId';
+      req.body = { currentPassword: 'old', newPassword: 'new' };
+      User.findById.mockReturnValue({
+        select: jest.fn().mockRejectedValue(new Error('DB Error'))
+      });
+      await userController.changePassword(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
   });
 
   describe('getUserStats', () => {
@@ -277,6 +368,12 @@ describe('User Controller', () => {
           usuariosActivos: 80
         })
       }));
+    });
+
+    it('should handle errors', async () => {
+      User.countDocuments.mockRejectedValue(new Error('DB Error'));
+      await userController.getUserStats(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
     });
   });
 
@@ -300,6 +397,26 @@ describe('User Controller', () => {
       await userController.toggleUserActivation(req, res);
       expect(res.status).toHaveBeenCalledWith(400);
     });
+
+    it('should return 404 if user not found', async () => {
+      req.params.id = 'userId';
+      req.body = { estado: 'activo' };
+      User.findByIdAndUpdate.mockReturnValue({
+        select: jest.fn().mockResolvedValue(null)
+      });
+      await userController.toggleUserActivation(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('should handle errors', async () => {
+      req.params.id = 'userId';
+      req.body = { estado: 'activo' };
+      User.findByIdAndUpdate.mockReturnValue({
+        select: jest.fn().mockRejectedValue(new Error('DB Error'))
+      });
+      await userController.toggleUserActivation(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
   });
 
   describe('deleteUser', () => {
@@ -320,6 +437,13 @@ describe('User Controller', () => {
       await userController.deleteUser(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('should handle errors', async () => {
+      req.params.id = 'userId';
+      User.findByIdAndDelete.mockRejectedValue(new Error('DB Error'));
+      await userController.deleteUser(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
     });
   });
 });

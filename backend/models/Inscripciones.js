@@ -107,8 +107,8 @@ const inscripcionSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Middleware pre-save para establecer estado por defecto según tipo de referencia
-inscripcionSchema.pre('save', function(next) {
+// Método para establecer estado por defecto (extraído para facilitar testing)
+inscripcionSchema.methods.setDefaultState = function() {
     // Solo establecer estado por defecto si no se ha establecido uno
     if (!this.estado || this.estado === '') {
         if (this.tipoReferencia === 'Eventos') {
@@ -118,6 +118,11 @@ inscripcionSchema.pre('save', function(next) {
         }
     }
     console.log(`📋 PRE-SAVE INSCRIPCIÓN: Tipo=${this.tipoReferencia}, Estado=${this.estado}`);
+};
+
+// Middleware pre-save para establecer estado por defecto según tipo de referencia
+inscripcionSchema.pre('save', function(next) {
+    this.setDefaultState();
     next();
 });
 

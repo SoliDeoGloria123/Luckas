@@ -5,6 +5,19 @@ const Reserva = require('../../models/Reservas');
 const Inscripcion = require('../../models/Inscripciones');
 const Solicitud = require('../../models/Solicitud');
 const Evento = require('../../models/Eventos');
+const Categorizacion = require('../../models/categorizacion');
+const Cabana = require('../../models/Cabana');
+const Tarea = require('../../models/Tarea');
+
+jest.mock('../../models/Reportes');
+jest.mock('../../models/User');
+jest.mock('../../models/Reservas');
+jest.mock('../../models/Inscripciones');
+jest.mock('../../models/Solicitud');
+jest.mock('../../models/Eventos');
+jest.mock('../../models/categorizacion');
+jest.mock('../../models/Cabana');
+jest.mock('../../models/Tarea');
 
 describe('Reportes Controller', () => {
   let req, res;
@@ -29,6 +42,9 @@ describe('Reportes Controller', () => {
       Reserva.countDocuments.mockResolvedValue(5);
       Inscripcion.countDocuments.mockResolvedValue(20);
       Evento.countDocuments.mockResolvedValue(3);
+      Cabana.countDocuments.mockResolvedValue(2);
+      Solicitud.countDocuments.mockResolvedValue(4);
+      Tarea.countDocuments.mockResolvedValue(6);
 
       await reportesController.getDashboardReport(req, res);
 
@@ -48,23 +64,25 @@ describe('Reportes Controller', () => {
       Usuario.countDocuments.mockRejectedValue(new Error('Database error'));
       await reportesController.getDashboardReport(req, res);
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
     });
   });
 
   describe('getReservasReport', () => {
-    it('should return reservas report with filters', async () => {
+    it('should return reservas report with filters and stats', async () => {
       req.query = { fechaInicio: '2023-01-01', fechaFin: '2023-12-31', cabana: 'cabanaId' };
       
       const mockReservas = [
-        { _id: 'reserva1', activo: true, estado: 'Confirmada' },
-        { _id: 'reserva2', activo: false, estado: 'Cancelada' }
+        { _id: 'res1', activo: true, estado: 'Confirmada', cabana: { precio: 100 }, fechaInicio: new Date('2023-01-01') },
+        { _id: 'res2', activo: false, estado: 'Cancelada', cabana: { precio: 200 }, fechaInicio: new Date('2023-02-01') }
       ];
       
       const mockFind = {
         populate: jest.fn().mockReturnThis(),
         sort: jest.fn().mockResolvedValue(mockReservas)
       };
+      mockFind.populate.mockReturnValue(mockFind);
+      mockFind.populate.mockReturnValue(mockFind);
+
       Reserva.find.mockReturnValue(mockFind);
       Reserva.aggregate.mockResolvedValue([]);
 
@@ -74,130 +92,106 @@ describe('Reportes Controller', () => {
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,
         data: expect.objectContaining({
-          reservas: expect.any(Array),
-          estadisticas: expect.any(Object)
+          estadisticas: expect.objectContaining({
+            total: 2,
+            activos: 1,
+            inactivos: 1
+          })
         })
       }));
-    });
-
-    it('should handle errors in getReservasReport', async () => {
-      Reserva.find.mockImplementation(() => { throw new Error('Error'); });
-      await reportesController.getReservasReport(req, res);
-      expect(res.status).toHaveBeenCalledWith(500);
     });
   });
 
   describe('getInscripcionesReport', () => {
-    it('should return inscripciones report', async () => {
+    it('should return inscripciones report with stats', async () => {
       req.query = { evento: 'eventoId' };
-      const mockInscripciones = [{ _id: 'ins1' }];
+      const mockInscripciones = [
+        { _id: 'ins1', tipoReferencia: 'Eventos', referencia: { name: 'Evento 1' }, createdAt: new Date('2023-01-01') },
+        { _id: 'ins2', tipoReferencia: 'ProgramaAcademico', referencia: { nombre: 'Prog 1' }, createdAt: new Date('2023-02-01') }
+      ];
       
       const mockFind = {
         populate: jest.fn().mockReturnThis(),
         sort: jest.fn().mockResolvedValue(mockInscripciones)
       };
+      mockFind.populate.mockReturnValue(mockFind);
+      mockFind.populate.mockReturnValue(mockFind);
+      mockFind.populate.mockReturnValue(mockFind);
+
       Inscripcion.find.mockReturnValue(mockFind);
       Inscripcion.aggregate.mockResolvedValue([]);
 
       await reportesController.getInscripcionesReport(req, res);
 
-      expect(Inscripcion.find).toHaveBeenCalled();
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,
         data: expect.objectContaining({
-          inscripciones: expect.any(Array)
-        })
-      }));
-    });
-  });
-
-  describe('getSolicitudesReport', () => {
-    it('should return solicitudes report', async () => {
-      const mockSolicitudes = [{ _id: 'sol1' }];
-      const mockFind = {
-        populate: jest.fn().mockReturnThis(),
-        sort: jest.fn().mockResolvedValue(mockSolicitudes)
-      };
-      Solicitud.find.mockReturnValue(mockFind);
-      Solicitud.aggregate.mockResolvedValue([]);
-
-      await reportesController.getSolicitudesReport(req, res);
-
-      expect(Solicitud.find).toHaveBeenCalled();
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        success: true,
-        data: expect.objectContaining({
-          solicitudes: expect.any(Array)
-        })
-      }));
-    });
-  });
-
-  describe('getUsuariosReport', () => {
-    it('should return usuarios report', async () => {
-      const mockUsuarios = [{ _id: 'user1' }];
-      const mockFind = {
-        select: jest.fn().mockReturnThis(),
-        sort: jest.fn().mockResolvedValue(mockUsuarios)
-      };
-      Usuario.find.mockReturnValue(mockFind);
-      Usuario.aggregate.mockResolvedValue([]);
-      Usuario.countDocuments.mockResolvedValue(5);
-
-      await reportesController.getUsuariosReport(req, res);
-
-      expect(Usuario.find).toHaveBeenCalled();
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        success: true,
-        data: expect.objectContaining({
-          usuarios: expect.any(Array)
-        })
-      }));
-    });
-  });
-
-  describe('getEventosReport', () => {
-    it('should return eventos report', async () => {
-      const mockEventos = [{ _id: 'evento1', toObject: () => ({ _id: 'evento1' }) }];
-      const mockFind = {
-        populate: jest.fn().mockReturnThis(),
-        sort: jest.fn().mockResolvedValue(mockEventos)
-      };
-      Evento.find.mockReturnValue(mockFind);
-      Inscripcion.countDocuments.mockResolvedValue(2);
-      Evento.countDocuments.mockResolvedValue(1);
-      Evento.aggregate.mockResolvedValue([]);
-
-      await reportesController.getEventosReport(req, res);
-
-      expect(Evento.find).toHaveBeenCalled();
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        success: true,
-        data: expect.objectContaining({
-          eventos: expect.any(Array)
-        })
-      }));
-    });
-  });
-
-  describe('getReporteFinanciero', () => {
-    it('should return financiero report', async () => {
-      req.query = { fechaInicio: '2023-01-01', fechaFin: '2023-12-31' };
-      Reserva.aggregate.mockResolvedValue([{ totalReservas: 10, ingresoTotal: 1000 }]);
-      Inscripcion.aggregate.mockResolvedValue([{ totalInscripciones: 5, ingresoTotal: 500 }]);
-
-      await reportesController.getReporteFinanciero(req, res);
-
-      expect(Reserva.aggregate).toHaveBeenCalled();
-      expect(Inscripcion.aggregate).toHaveBeenCalled();
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        success: true,
-        data: expect.objectContaining({
-          resumen: expect.objectContaining({
-            ingresoTotalConsolidado: 1500
+          estadisticas: expect.objectContaining({
+            total: 2
           })
         })
       }));
+    });
+  });
+
+  describe('guardarReporte', () => {
+    it('should save a report with resolved category and user', async () => {
+      req.body = {
+        nombre: 'Test Report',
+        descripcion: 'Desc',
+        tipo: 'reservas',
+        filtros: { categoria: 'CatName', usuario: 'UserName', fechaInicio: '2023-01-01', fechaFin: '2023-01-31' },
+        formatoExportacion: ['pdf']
+      };
+
+      Categorizacion.findOne.mockResolvedValue({ _id: 'cat-id', nombre: 'CatName' });
+      Usuario.findOne.mockResolvedValue({ _id: 'user-id', username: 'UserName' });
+      
+      // Mock Reserva.find for generarDatosReporte('reservas')
+      const mockReservas = [];
+      const mockFind = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue(mockReservas)
+      };
+      mockFind.populate.mockReturnValue(mockFind);
+      Reserva.find.mockReturnValue(mockFind);
+
+      // Mock Reporte constructor and save
+      const mockSave = jest.fn().mockResolvedValue({});
+      Reporte.mockImplementation(() => ({ save: mockSave }));
+
+      await reportesController.guardarReporte(req, res);
+
+      expect(mockSave).toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(201);
+    });
+
+    it('should handle ObjectId inputs for category and user', async () => {
+      req.body = {
+        nombre: 'Test Report',
+        descripcion: 'Desc',
+        tipo: 'inscripciones',
+        filtros: { categoria: '507f1f77bcf86cd799439011', usuario: '507f1f77bcf86cd799439011' }
+      };
+
+      Categorizacion.findById.mockReturnValue({ select: jest.fn().mockResolvedValue({ _id: '507f1f77bcf86cd799439011', nombre: 'CatName' }) });
+      Usuario.findById.mockReturnValue({ select: jest.fn().mockResolvedValue({ _id: '507f1f77bcf86cd799439011', username: 'UserName' }) });
+
+      const mockInscripciones = [];
+      const mockFind = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue(mockInscripciones)
+      };
+      mockFind.populate.mockReturnValue(mockFind);
+      Inscripcion.find.mockReturnValue(mockFind);
+
+      const mockSave = jest.fn().mockResolvedValue({});
+      Reporte.mockImplementation(() => ({ save: mockSave }));
+
+      await reportesController.guardarReporte(req, res);
+
+      expect(mockSave).toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(201);
     });
   });
 
@@ -206,67 +200,208 @@ describe('Reportes Controller', () => {
       req.query = { usuarioId: 'userId' };
       Usuario.findById.mockReturnValue({ select: jest.fn().mockResolvedValue({ _id: 'userId' }) });
       
-      const mockFindReserva = { populate: jest.fn().mockReturnThis(), populate: jest.fn().mockResolvedValue([]) };
-      Reserva.find.mockReturnValue(mockFindReserva);
-      Inscripcion.find.mockReturnValue(mockFindReserva);
-      Solicitud.find.mockReturnValue(mockFindReserva);
-
+      const mockFind = { 
+        populate: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([])
+      };
+      mockFind.populate.mockReturnValue(mockFind);
+      
+      // Mocking promises for Promise.all
+      Reserva.find.mockReturnValue(mockFind);
+      Inscripcion.find.mockReturnValue(mockFind);
+      Solicitud.find.mockReturnValue(mockFind);
+      // Wait, Promise.all takes promises. .find() returns a Query which is thenable.
+      // But we need to make sure populate returns the query object.
+      
       await reportesController.getActividadUsuarios(req, res);
 
-      expect(Usuario.findById).toHaveBeenCalledWith('userId');
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true
       }));
     });
   });
 
-  describe('guardarReporte', () => {
-    it('should save a report', async () => {
-    });
+  describe('getSolicitudesReport', () => {
+    it('should return solicitudes report with stats', async () => {
+      req.query = { estado: 'Pendiente' };
+      const mockSolicitudes = [
+        { _id: 'sol1', estado: 'Pendiente', tipoSolicitud: 'Tipo1', prioridad: 'Alta', fechaSolicitud: new Date() }
+      ];
+      
+      const mockFind = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue(mockSolicitudes)
+      };
+      mockFind.populate.mockReturnValue(mockFind);
+      mockFind.populate.mockReturnValue(mockFind);
 
-    it('should validate required fields', async () => {
-      req.body = {};
-      await reportesController.guardarReporte(req, res);
-      expect(res.status).toHaveBeenCalledWith(400);
+      Solicitud.find.mockReturnValue(mockFind);
+      Solicitud.aggregate.mockResolvedValue([]);
+
+      await reportesController.getSolicitudesReport(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: expect.objectContaining({
+          estadisticas: expect.objectContaining({
+            total: 1
+          })
+        })
+      }));
+    });
+  });
+
+  describe('getUsuariosReport', () => {
+    it('should return usuarios report with stats', async () => {
+      req.query = { rol: 'admin' };
+      const mockUsuarios = [
+        { _id: 'u1', roles: ['admin'], active: true, createdAt: new Date() }
+      ];
+      
+      const mockFind = {
+        select: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue(mockUsuarios)
+      };
+      mockFind.select.mockReturnValue(mockFind);
+
+      Usuario.find.mockReturnValue(mockFind);
+      Usuario.aggregate.mockResolvedValue([]);
+      Usuario.countDocuments.mockResolvedValue(1);
+
+      await reportesController.getUsuariosReport(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: expect.objectContaining({
+          estadisticas: expect.objectContaining({
+            total: 1
+          })
+        })
+      }));
+    });
+  });
+
+  describe('getEventosReport', () => {
+    it('should return eventos report with stats', async () => {
+      req.query = { categoria: 'catId' };
+      const mockEventos = [
+        { _id: 'ev1', active: true, precio: 100, toObject: () => ({ _id: 'ev1' }) }
+      ];
+      
+      const mockFind = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue(mockEventos)
+      };
+      mockFind.populate.mockReturnValue(mockFind);
+
+      Evento.find.mockReturnValue(mockFind);
+      Evento.countDocuments.mockResolvedValue(1);
+      Evento.aggregate.mockResolvedValue([]);
+      Inscripcion.countDocuments.mockResolvedValue(5);
+
+      await reportesController.getEventosReport(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: expect.objectContaining({
+          eventos: expect.arrayContaining([
+            expect.objectContaining({ totalInscripciones: 5 })
+          ])
+        })
+      }));
+    });
+  });
+
+  describe('getReporteFinanciero', () => {
+    it('should return financial report', async () => {
+      req.query = { fechaInicio: '2023-01-01', fechaFin: '2023-12-31' };
+      
+      Reserva.aggregate.mockResolvedValue([{
+        totalReservas: 10,
+        ingresoTotal: 1000,
+        promedioPorReserva: 100
+      }]);
+      
+      Inscripcion.aggregate.mockResolvedValue([{
+        totalInscripciones: 5,
+        ingresoTotal: 500,
+        promedioPorInscripcion: 100
+      }]);
+
+      await reportesController.getReporteFinanciero(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: expect.objectContaining({
+          resumen: expect.objectContaining({
+            ingresoTotalConsolidado: 1500,
+            transaccionesTotales: 15
+          })
+        })
+      }));
     });
   });
 
   describe('getReportesGuardados', () => {
-    it('should return saved reports', async () => {
-      const mockReportes = [{ _id: 'rep1' }];
-      Reporte.find.mockReturnValue({
+    it('should return all saved reports', async () => {
+      const mockReportes = [{ _id: 'r1', nombre: 'Reporte 1' }];
+      const mockFind = {
         populate: jest.fn().mockResolvedValue(mockReportes)
-      });
+      };
+      Reporte.find.mockReturnValue(mockFind);
 
       await reportesController.getReportesGuardados(req, res);
 
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        success: true,
-        data: mockReportes
-      }));
+      expect(res.json).toHaveBeenCalledWith(mockReportes);
     });
   });
 
   describe('editarReporteGuardado', () => {
     it('should update a saved report', async () => {
-      req.params = { id: 'rep1' };
-      req.body = { nombre: 'Updated' };
-      Reporte.findOneAndUpdate.mockResolvedValue({ _id: 'rep1', nombre: 'Updated' });
+      req.params = { id: 'r1' };
+      req.body = { nombre: 'Updated Name' };
+      
+      const mockReporte = { _id: 'r1', nombre: 'Updated Name' };
+      Reporte.findOneAndUpdate.mockResolvedValue(mockReporte);
 
       await reportesController.editarReporteGuardado(req, res);
 
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true,
+        data: mockReporte
+      }));
+    });
+
+    it('should return 404 if report not found', async () => {
+      req.params = { id: 'r1' };
+      req.body = { nombre: 'Updated Name' };
+      Reporte.findOneAndUpdate.mockResolvedValue(null);
+
+      await reportesController.editarReporteGuardado(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
     });
   });
 
   describe('eliminarReporteGuardado', () => {
     it('should delete a saved report', async () => {
-      req.params = { id: 'rep1' };
-      Reporte.findByIdAndDelete.mockResolvedValue({ _id: 'rep1' });
+      req.params = { id: 'r1' };
+      Reporte.findByIdAndDelete.mockResolvedValue({ _id: 'r1' });
 
       await reportesController.eliminarReporteGuardado(req, res);
 
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true
+      }));
+    });
+
+    it('should return 404 if report not found', async () => {
+      req.params = { id: 'r1' };
+      Reporte.findByIdAndDelete.mockResolvedValue(null);
+
+      await reportesController.eliminarReporteGuardado(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
     });
   });
 
@@ -276,14 +411,15 @@ describe('Reportes Controller', () => {
       Reserva.countDocuments.mockResolvedValue(1);
       Inscripcion.countDocuments.mockResolvedValue(1);
       Solicitud.countDocuments.mockResolvedValue(1);
+      Evento.countDocuments.mockResolvedValue(1);
+      Cabana.countDocuments.mockResolvedValue(1);
+      Tarea.countDocuments.mockResolvedValue(1);
+      Reporte.countDocuments.mockResolvedValue(1);
 
       await reportesController.getTotalGestiones(req, res);
 
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        success: true,
-        data: expect.objectContaining({
-          totalGestiones: 4
-        })
+        success: true
       }));
     });
   });

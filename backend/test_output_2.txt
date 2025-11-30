@@ -1,1380 +1,164 @@
 
 > backend@1.0.0 test
-> jest --coverage --detectOpenHandles --forceExit --coverage
-
-PASS __tests__/controllers/certificadoController.test.js
-  ● Console
-
-    console.error
-      Error al obtener estadísticas de certificados: Error: DB Error
-          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/certificadoController.test.js:147:64)
-          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-          at new Promise (<anonymous>)
-          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-          at processTicksAndRejections (node:internal/process/task_queues:95:5)
-          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
-
-      205 |     });
-      206 |   } catch (error) {
-    > 207 |     console.error('Error al obtener estadísticas de certificados:', error);
-          |             ^
-      208 |     res.status(500).json({ message: 'Error al obtener estadísticas de certificados' });
-      209 |   }
-      210 | };
-
-      at Object.error [as obtenerEstadisticasCertificados] (controllers/certificadoControllers.js:207:13)
-      at Object.<anonymous> (__tests__/controllers/certificadoController.test.js:149:7)
-
-FAIL __tests__/controllers/categorizacionController.test.js
-  ● Console
-
-    console.log
-      [CATEGORIA] Datos recibidos: { nombre: 'Test Category', codigo: 'test', tipo: 'general' }
-
-      at Object.log [as crearCategoria] (controllers/categorizacionController.js:12:13)
-
-    console.log
-      [CATEGORIA] Datos recibidos: { nombre: 'Test' }
-
-      at Object.log [as crearCategoria] (controllers/categorizacionController.js:12:13)
-
-    console.log
-      [CATEGORIA] Datos recibidos: { nombre: 'Test Category', codigo: 'TEST', tipo: 'general' }
-
-      at Object.log [as crearCategoria] (controllers/categorizacionController.js:12:13)
-
-  ● Categorizacion Controller › actualizarCategoria › should return 400 for invalid ID
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 400
-
-    Number of calls: 0
-
-      183 |       await categorizacionController.actualizarCategoria(req, res);
-      184 |
-    > 185 |       expect(res.status).toHaveBeenCalledWith(400);
-          |                          ^
-      186 |     });
-      187 |   });
-      188 |
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/categorizacionController.test.js:185:26)
-
-FAIL __tests__/controllers/reservasController.test.js
-  ● Console
-
-    console.log
-      === DEBUG RESERVA ===
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:98:13)
-
-    console.log
-      Datos recibidos: {
-        "usuario": "user-123",
-        "cabana": "cabana-123",
-        "fechaInicio": "2024-01-01",
-        "fechaFin": "2024-01-05",
-        "numeroPersonas": 4,
-        "estado": "pendiente",
-        "nombre": "Test",
-        "apellido": "User",
-        "tipoDocumento": "Cédula de ciudadanía",
-        "numeroDocumento": "1234567890",
-        "correoElectronico": "test@example.com",
-        "telefono": "1234567890"
-      }
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:99:13)
-
-    console.log
-      Usuario autenticado: user-123
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:100:13)
-
-    console.log
-      Rol del usuario: undefined
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:101:13)
-
-    console.log
-      Usuario encontrado: Test User undefined
-
-      at log (controllers/reservasController.js:48:11)
-
-    console.log
-      Cabaña encontrada: Cabaña Test
-
-      at log (controllers/reservasController.js:49:11)
-
-    console.log
-      ❌ ERROR ENUM: Estado inválido. Debe ser: Pendiente, Confirmada, Cancelada, finalizada
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:134:15)
-
-    console.log
-      === DEBUG RESERVA ===
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:98:13)
-
-    console.log
-      Datos recibidos: {
-        "usuario": "user-123"
-      }
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:99:13)
-
-    console.log
-      Usuario autenticado: user-123
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:100:13)
-
-    console.log
-      Rol del usuario: undefined
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:101:13)
-
-    console.log
-      ❌ CAMPOS FALTANTES: [
-        'cabana',
-        'fechaInicio',
-        'fechaFin',
-        'nombre',
-        'apellido',
-        'tipoDocumento',
-        'numeroDocumento',
-        'correoElectronico',
-        'telefono',
-        'numeroPersonas'
-      ]
-
-      at Object.log [as crearReserva] (controllers/reservasController.js:108:15)
-
-    console.error
-      Error al obtener estadísticas de reservas: Error: DB Error
-          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/reservasController.test.js:276:60)
-          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-          at new Promise (<anonymous>)
-          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
-
-      370 |     });
-      371 |   } catch (error) {
-    > 372 |     console.error('Error al obtener estadísticas de reservas:', error);
-          |             ^
-      373 |     res.status(500).json({ success: false, message: 'Error al obtener estadísticas de reservas' });
-      374 |   }
-      375 | };
-
-      at Object.error [as obtenerEstadisticasReservas] (controllers/reservasController.js:372:13)
-      at Object.<anonymous> (__tests__/controllers/reservasController.test.js:278:7)
-
-  ● Reservas Controller › crearReserva › should create a reserva successfully
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 201
-    Received: 400
-
-    Number of calls: 1
-
-      66 |       await reservasController.crearReserva(req, res);
-      67 |
-    > 68 |       expect(res.status).toHaveBeenCalledWith(201);
-         |                          ^
-      69 |       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-      70 |         success: true
-      71 |       }));
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/reservasController.test.js:68:26)
-
-  ● Reservas Controller › obtenerReservas › should return all reservas
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 200
-
-    Number of calls: 0
-
-      102 |       await reservasController.obtenerReservas(req, res);
-      103 |
-    > 104 |       expect(res.status).toHaveBeenCalledWith(200);
-          |                          ^
-      105 |       expect(res.json).toHaveBeenCalledWith({
-      106 |         success: true,
-      107 |         data: mockReservas
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/reservasController.test.js:104:26)
-
-  ● Reservas Controller › obtenerReservaPorId › should return a reserva by id
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 200
-    Received: 500
-
-    Number of calls: 1
-
-      131 |       await reservasController.obtenerReservaPorId(req, res);
-      132 |
-    > 133 |       expect(res.status).toHaveBeenCalledWith(200);
-          |                          ^
-      134 |       expect(res.json).toHaveBeenCalledWith({
-      135 |         success: true,
-      136 |         data: mockReserva
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/reservasController.test.js:133:26)
-
-  ● Reservas Controller › obtenerReservaPorId › should return 404 if reserva not found
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 404
-    Received: 500
-
-    Number of calls: 1
-
-      145 |       await reservasController.obtenerReservaPorId(req, res);
-      146 |
-    > 147 |       expect(res.status).toHaveBeenCalledWith(404);
-          |                          ^
-      148 |     });
-      149 |   });
-      150 |
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/reservasController.test.js:147:26)
-
-  ● Reservas Controller › actualizarReserva › should update a reserva
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 200
-
-    Number of calls: 0
-
-      163 |       await reservasController.actualizarReserva(req, res);
-      164 |
-    > 165 |       expect(res.status).toHaveBeenCalledWith(200);
-          |                          ^
-      166 |       expect(res.json).toHaveBeenCalledWith({
-      167 |         success: true,
-      168 |         data: mockReserva
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/reservasController.test.js:165:26)
-
-  ● Reservas Controller › eliminarReserva › should delete a reserva
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 200
-
-    Number of calls: 0
-
-      192 |       await reservasController.eliminarReserva(req, res);
-      193 |
-    > 194 |       expect(res.status).toHaveBeenCalledWith(200);
-          |                          ^
-      195 |       expect(res.json).toHaveBeenCalledWith({
-      196 |         success: true,
-      197 |         message: 'Reserva eliminada'
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/reservasController.test.js:194:26)
-
-  ● Reservas Controller › obtenerReservasPorUsuario › should return reservas for a user
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 200
-
-    Number of calls: 0
-
-      223 |       await reservasController.obtenerReservasPorUsuario(req, res);
-      224 |
-    > 225 |       expect(res.status).toHaveBeenCalledWith(200);
-          |                          ^
-      226 |       expect(res.json).toHaveBeenCalledWith({
-      227 |         success: true,
-      228 |         data: mockReservas
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/reservasController.test.js:225:26)
-
-  ● Reservas Controller › toggleReservaActivation › should toggle reserva activation
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 200
-
-    Number of calls: 0
-
-      246 |
-      247 |       expect(mockReserva.activo).toBe(false);
-    > 248 |       expect(res.status).toHaveBeenCalledWith(200);
-          |                          ^
-      249 |     });
-      250 |   });
-      251 |
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/reservasController.test.js:248:26)
-
-  ● Reservas Controller › obtenerEstadisticasReservas › should return reservas statistics
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: ObjectContaining {"canceladas": 5, "confirmadas": 25, "pendientes": 20, "totalReservas": 50}
-    Received: {"activas": 20, "canceladas": undefined, "confirmadas": 5, "finalizadas": undefined, "nuevasEsteMes": undefined, "pendientes": 25, "reservasPorCabana": [{"_id": null, "total": 10000}], "reservasPorMes": [{"month": "2025-06", "total": undefined}, {"month": "2025-07", "total": undefined}, {"month": "2025-08", "total": undefined}, {"month": "2025-09", "total": undefined}, {"month": "2025-10", "total": undefined}, {"month": "2025-11", "total": undefined}], "totalReservas": 50}
-
-    Number of calls: 1
-
-      265 |
-      266 |       expect(res.status).toHaveBeenCalledWith(200);
-    > 267 |       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-          |                        ^
-      268 |         totalReservas: 50,
-      269 |         pendientes: 20,
-      270 |         confirmadas: 25,
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/reservasController.test.js:267:24)
-
-FAIL __tests__/controllers/tareaController.test.js
-  ● Console
-
-    console.log
-      Datos recibidos: {
-        asignadoA: 'user-456',
-        asignadoPor: 'user-123',
-        titulo: 'Tarea Test',
-        descripcion: 'Descripción test'
-      }
-
-      at Object.log [as crearTarea] (controllers/tareaController.js:110:17)
-
-    console.log
-      User ID: user-123 Role: admin
-
-      at Object.log [as crearTarea] (controllers/tareaController.js:111:17)
-
-    console.log
-      Datos recibidos: { asignadoA: 'invalid-id', asignadoPor: 'user-123' }
-
-      at Object.log [as crearTarea] (controllers/tareaController.js:110:17)
-
-    console.log
-      User ID: user-123 Role: admin
-
-      at Object.log [as crearTarea] (controllers/tareaController.js:111:17)
-
-    console.log
-      Datos recibidos: {
-        asignadoA: '507f1f77bcf86cd799439011',
-        asignadoPor: '507f1f77bcf86cd799439012'
-      }
-
-      at Object.log [as crearTarea] (controllers/tareaController.js:110:17)
-
-    console.log
-      User ID: user-123 Role: admin
-
-      at Object.log [as crearTarea] (controllers/tareaController.js:111:17)
-
-  ● Tarea Controller › crearTarea › should return 400 if asignadoA ID is invalid
-
-    ReferenceError: mongoose is not defined
-
-      67 |       await tareaController.crearTarea(req, res);
-      68 |
-    > 69 |       mongoose.Types.ObjectId.isValid.mockReturnValueOnce(false);
-         |       ^
-      70 |       await tareaController.crearTarea(req, res);
-      71 |
-      72 |       expect(res.status).toHaveBeenCalledWith(400);
-
-      at Object.mongoose (__tests__/controllers/tareaController.test.js:69:7)
-
-  ● Tarea Controller › obtenerTareasPorUsuario › should return 400 for invalid usuarioId
-
-    expect(jest.fn()).toHaveBeenCalledWith(...expected)
-
-    Expected: 400
-
-    Number of calls: 0
-
-      307 |       await tareaController.obtenerTareasPorUsuario(req, res);
-      308 |
-    > 309 |       expect(res.status).toHaveBeenCalledWith(400);
-          |                          ^
-      310 |     });
-      311 |   });
-      312 |
-
-      at Object.toHaveBeenCalledWith (__tests__/controllers/tareaController.test.js:309:26)
-
-PASS __tests__/routes/eventos.test.js
-  ● Console
-
-    console.log
-      [EVENTOS] Consultando eventos para usuario: undefined ID: undefined
-
-      at log (controllers/eventosController.js:9:13)
-
-    console.log
-      [EVENTOS] Total de eventos en BD: 2
-
-      at log (controllers/eventosController.js:13:13)
-
-    console.log
-      [EVENTOS] Eventos activos: 2
-
-      at log (controllers/eventosController.js:17:13)
-
-    console.log
-      [EVENTOS] Eventos encontrados después del populate: 2
-
-      at log (controllers/eventosController.js:31:13)
-
-    console.log
-      [EVENTOS] Consultando eventos para usuario: undefined ID: undefined
-
-      at log (controllers/eventosController.js:9:13)
-
-    console.error
-      [EVENTOS] Error al obtener eventos: Error: DB Error
-          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/routes/eventos.test.js:62:53)
-          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-          at new Promise (<anonymous>)
-          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-          at processTicksAndRejections (node:internal/process/task_queues:95:5)
-          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
-
-      33 |     res.status(200).json({ success: true, data: events });
-      34 |   } catch (error) {
-    > 35 |     console.error('[EVENTOS] Error al obtener eventos:', error);
-         |             ^
-      36 |     res.status(500).json({ success: false, message: 'Error al obtener eventos', error: error.message });
-      37 |   }
-      38 | };
-
-      at error (controllers/eventosController.js:35:13)
-
-    console.log
-      [UPLOAD] uploadMultipleToCloudinary - Iniciando
-
-      at log (middlewares/uploadCloudinary.js:46:11)
-
-    console.log
-      [UPLOAD] req.files: 1
-
-      at log (middlewares/uploadCloudinary.js:47:11)
-
-    console.log
-      [EVENTOS] createEvent - Iniciando creación de evento
-
-      at log (controllers/eventosController.js:56:13)
-
-    console.log
-      [EVENTOS] req.body: {
-        nombre: 'New Event',
-        descripcion: 'Desc',
-        precio: 100,
-        categoria: '507f1f77bcf86cd799439011',
-        fechaEvento: '2024-12-31'
-      }
-
-      at log (controllers/eventosController.js:57:13)
-
-    console.log
-      [EVENTOS] req.files: [
-        {
-          fieldname: 'imagen',
-          originalname: 'test.jpg',
-          buffer: <Buffer 6d 6f 63 6b 2d 66 69 6c 65 2d 63 6f 6e 74 65 6e 74>
-        }
-      ]
-
-      at log (controllers/eventosController.js:58:13)
-
-    console.log
-      [EVENTOS] req.cloudinaryUrls: [ 'https://mock-url.com/image.jpg' ]
-
-      at log (controllers/eventosController.js:59:13)
-
-    console.log
-      [UPLOAD] uploadMultipleToCloudinary - Iniciando
-
-      at log (middlewares/uploadCloudinary.js:46:11)
-
-    console.log
-      [UPLOAD] req.files: 1
-
-      at log (middlewares/uploadCloudinary.js:47:11)
-
-    console.log
-      [EVENTOS] createEvent - Iniciando creación de evento
-
-      at log (controllers/eventosController.js:56:13)
-
-    console.log
-      [EVENTOS] req.body: {
-        nombre: 'New Event',
-        descripcion: 'Desc',
-        precio: 100,
-        categoria: '507f1f77bcf86cd799439011',
-        fechaEvento: '2024-12-31'
-      }
-
-      at log (controllers/eventosController.js:57:13)
-
-    console.log
-      [EVENTOS] req.files: [
-        {
-          fieldname: 'imagen',
-          originalname: 'test.jpg',
-          buffer: <Buffer 6d 6f 63 6b 2d 66 69 6c 65 2d 63 6f 6e 74 65 6e 74>
-        }
-      ]
-
-      at log (controllers/eventosController.js:58:13)
-
-    console.log
-      [EVENTOS] req.cloudinaryUrls: [ 'https://mock-url.com/image.jpg' ]
-
-      at log (controllers/eventosController.js:59:13)
-
-    console.log
-      [UPLOAD] uploadMultipleToCloudinary - Iniciando
-
-      at log (middlewares/uploadCloudinary.js:46:11)
-
-    console.log
-      [UPLOAD] req.files: 1
-
-      at log (middlewares/uploadCloudinary.js:47:11)
-
-    console.log
-      [UPLOAD] uploadMultipleToCloudinary - Iniciando
-
-      at log (middlewares/uploadCloudinary.js:46:11)
-
-    console.log
-      [UPLOAD] req.files: 1
-
-      at log (middlewares/uploadCloudinary.js:47:11)
-
-PASS __tests__/routes/auth.test.js
-  ● Console
-
-    console.log
-      [AuthJWT ]Configuracion cargada:  ***ecret
-
-      at Object.log (middlewares/authJwt.js:5:9)
-
-    console.log
-      [AuthJWT] Middleware verifyTokenFn es una funcion:  function
-
-      at Object.log (middlewares/authJwt.js:78:9)
-
-    console.log
-      [AuthRoutes] verifyToken importado correctamente function
-
-      at Object.log (routes/authRoutes.js:12:13)
-
-    console.log
-      [AuthRoutes] Rutas configuradas:  [
-        { path: undefined, method: undefined },
-        { path: undefined, method: undefined },
-        { path: undefined, method: undefined },
-        { path: undefined, method: undefined },
-        { path: undefined, method: undefined },
-        { path: undefined, method: undefined },
-        { path: undefined, method: undefined }
-      ]
-
-      at Object.log (routes/authRoutes.js:64:9)
-
-    console.log
-      
-      [AuthRoutes] Peticion recibida:  {
-        method: 'POST',
-        path: '/signup',
-        Headers: { authorization: 'NO', 'x-access-token': 'NO' }
-      }
-
-      at log (routes/authRoutes.js:21:13)
-
-    console.log
-      [AuthRoutes] middlewares de verificacion de registro
-
-      at log (routes/authRoutes.js:55:17)
-
-    console.log
-      
-      [AuthRoutes] Peticion recibida:  {
-        method: 'POST',
-        path: '/signup',
-        Headers: { authorization: 'NO', 'x-access-token': 'NO' }
-      }
-
-      at log (routes/authRoutes.js:21:13)
-
-    console.log
-      [AuthRoutes] middlewares de verificacion de registro
-
-      at log (routes/authRoutes.js:55:17)
-
-    console.log
-      
-      [AuthRoutes] Peticion recibida:  {
-        method: 'POST',
-        path: '/signup',
-        Headers: { authorization: 'NO', 'x-access-token': 'NO' }
-      }
-
-      at log (routes/authRoutes.js:21:13)
-
-    console.log
-      [AuthRoutes] middlewares de verificacion de registro
-
-      at log (routes/authRoutes.js:55:17)
-
-    console.error
-      [AuthController] Error en registro: { code: 11000, keyPattern: { correo: 1 } }
-
-      76 |
-      77 |   } catch (error) {
-    > 78 |     console.error('[AuthController] Error en registro:', error);
-         |             ^
-      79 |
-      80 |     // Manejo especial de errores de MongoDB
-      81 |     if (error.code === 11000) {
-
-      at error (controllers/authControllers.js:78:13)
-
-    console.log
-      
-      [AuthRoutes] Peticion recibida:  {
-        method: 'POST',
-        path: '/signin',
-        Headers: { authorization: 'NO', 'x-access-token': 'NO' }
-      }
-
-      at log (routes/authRoutes.js:21:13)
-
-    console.log
-      [AUTH] Intento de login para: test@example.com
-
-      at log (controllers/authControllers.js:112:13)
-
-    console.log
-      [AUTH] Usuario encontrado: Sí
-
-      at log (controllers/authControllers.js:126:13)
-
-    console.log
-      [AUTH] Correo del usuario: test@example.com
-
-      at log (controllers/authControllers.js:128:15)
-
-    console.log
-      [AUTH] Hash de password almacenado: Existe
-
-      at log (controllers/authControllers.js:129:15)
-
-    console.log
-      [AUTH] Comparando contraseñas...
-
-      at log (controllers/authControllers.js:141:13)
-
-    console.log
-      [AUTH] Password ingresado: password123
-
-      at log (controllers/authControllers.js:142:13)
-
-    console.log
-      [AUTH] Contraseñas coinciden: true
-
-      at log (controllers/authControllers.js:144:13)
-
-    console.log
-      [AUTH] Login exitoso para usuario: test@example.com
-
-      at log (controllers/authControllers.js:154:13)
-
-    console.log
-      
-      [AuthRoutes] Peticion recibida:  {
-        method: 'POST',
-        path: '/signin',
-        Headers: { authorization: 'NO', 'x-access-token': 'NO' }
-      }
-
-      at log (routes/authRoutes.js:21:13)
-
-    console.log
-      [AUTH] Intento de login para: test@example.com
-
-      at log (controllers/authControllers.js:112:13)
-
-    console.log
-      [AUTH] Usuario encontrado: No
-
-      at log (controllers/authControllers.js:126:13)
-
-    console.log
-      [AUTH] Usuario no encontrado para correo: test@example.com
-
-      at log (controllers/authControllers.js:133:15)
-
-    console.log
-      
-      [AuthRoutes] Peticion recibida:  {
-        method: 'POST',
-        path: '/signin',
-        Headers: { authorization: 'NO', 'x-access-token': 'NO' }
-      }
-
-      at log (routes/authRoutes.js:21:13)
-
-    console.log
-      [AUTH] Intento de login para: test@example.com
-
-      at log (controllers/authControllers.js:112:13)
-
-    console.log
-      [AUTH] Usuario encontrado: Sí
-
-      at log (controllers/authControllers.js:126:13)
-
-    console.log
-      [AUTH] Correo del usuario: undefined
-
-      at log (controllers/authControllers.js:128:15)
-
-    console.log
-      [AUTH] Hash de password almacenado: No existe
-
-      at log (controllers/authControllers.js:129:15)
-
-    console.log
-      [AUTH] Comparando contraseñas...
-
-      at log (controllers/authControllers.js:141:13)
-
-    console.log
-      [AUTH] Password ingresado: password123
-
-      at log (controllers/authControllers.js:142:13)
-
-    console.log
-      [AUTH] Contraseñas coinciden: false
-
-      at log (controllers/authControllers.js:144:13)
-
-    console.log
-      [AUTH] Credenciales inválidas para usuario: test@example.com
-
-      at log (controllers/authControllers.js:147:15)
-
-    console.log
-      
-      [AuthRoutes] Peticion recibida:  {
-        method: 'POST',
-        path: '/forgot-password',
-        Headers: { authorization: 'NO', 'x-access-token': 'NO' }
-      }
-
-      at log (routes/authRoutes.js:21:13)
-
-    console.log
-      
-      [AuthRoutes] Peticion recibida:  {
-        method: 'POST',
-        path: '/forgot-password',
-        Headers: { authorization: 'NO', 'x-access-token': 'NO' }
-      }
-
-      at log (routes/authRoutes.js:21:13)
-
-PASS __tests__/routes/user.test.js
-  ● Console
-
-    console.log
-      
-      === DIAGNÓSTICO DE RUTA ===
-
-      at log (routes/userRoutes.js:8:13)
-
-    console.log
-      [2025-11-29T03:53:27.765Z] GET /api/users
-
-      at log (routes/userRoutes.js:9:13)
-
-    console.log
-      Headers: {
-        authorization: null,
-        'x-access-token': null,
-        'user-agent': undefined
-      }
-
-      at log (routes/userRoutes.js:10:13)
-
-    console.log
-      [CONTROLLER] Ejecutando getAllUsers
-
-      at log (controllers/userController.js:8:13)
-
-    console.log
-      [CONTROLLER] - getAllUsers Users found: 2
-
-      at log (controllers/userController.js:11:17)
-
-    console.log
-      
-      === DIAGNÓSTICO DE RUTA ===
-
-      at log (routes/userRoutes.js:8:13)
-
-    console.log
-      [2025-11-29T03:53:27.804Z] GET /api/users/1
-
-      at log (routes/userRoutes.js:9:13)
-
-    console.log
-      Headers: {
-        authorization: null,
-        'x-access-token': null,
-        'user-agent': undefined
-      }
-
-      at log (routes/userRoutes.js:10:13)
-
-    console.log
-      [CONTROLLER] getUserById - req.userId: admin-id
-
-      at log (controllers/userController.js:28:17)
-
-    console.log
-      [CONTROLLER] getUserById - req.userRole: admin
-
-      at log (controllers/userController.js:29:17)
-
-    console.log
-      [CONTROLLER] getUserById - params.id: 1
-
-      at log (controllers/userController.js:30:17)
-
-    console.log
-      [CONTROLLER] getUserById - user._id: 1
-
-      at log (controllers/userController.js:41:17)
-
-    console.log
-      [CONTROLLER] Acceso permitido - admin puede ver cualquier usuario
-
-      at log (controllers/userController.js:45:21)
-
-    console.log
-      
-      === DIAGNÓSTICO DE RUTA ===
-
-      at log (routes/userRoutes.js:8:13)
-
-    console.log
-      [2025-11-29T03:53:27.818Z] GET /api/users/1
-
-      at log (routes/userRoutes.js:9:13)
-
-    console.log
-      Headers: {
-        authorization: null,
-        'x-access-token': null,
-        'user-agent': undefined
-      }
-
-      at log (routes/userRoutes.js:10:13)
-
-    console.log
-      [CONTROLLER] getUserById - req.userId: admin-id
-
-      at log (controllers/userController.js:28:17)
-
-    console.log
-      [CONTROLLER] getUserById - req.userRole: admin
-
-      at log (controllers/userController.js:29:17)
-
-    console.log
-      [CONTROLLER] getUserById - params.id: 1
-
-      at log (controllers/userController.js:30:17)
-
-    console.log
-      
-      === DIAGNÓSTICO DE RUTA ===
-
-      at log (routes/userRoutes.js:8:13)
-
-    console.log
-      [2025-11-29T03:53:27.845Z] PUT /api/users/1
-
-      at log (routes/userRoutes.js:9:13)
-
-    console.log
-      Headers: {
-        authorization: null,
-        'x-access-token': null,
-        'user-agent': undefined
-      }
-
-      at log (routes/userRoutes.js:10:13)
-
-    console.log
-      
-      === DIAGNÓSTICO DE RUTA ===
-
-      at log (routes/userRoutes.js:8:13)
-
-    console.log
-      [2025-11-29T03:53:27.854Z] DELETE /api/users/1
-
-      at log (routes/userRoutes.js:9:13)
-
-    console.log
-      Headers: {
-        authorization: null,
-        'x-access-token': null,
-        'user-agent': undefined
-      }
-
-      at log (routes/userRoutes.js:10:13)
-
-    console.log
-      [CONTROLLER ] Ejecutando deleteUser para ID: 1
-
-      at log (controllers/userController.js:357:13)
-
-    console.log
-      [CONTROLLER] Usuario eliminado: 1
-
-      at log (controllers/userController.js:368:17)
-
-    console.log
-      
-      === DIAGNÓSTICO DE RUTA ===
-
-      at log (routes/userRoutes.js:8:13)
-
-    console.log
-      [2025-11-29T03:53:27.867Z] DELETE /api/users/1
-
-      at log (routes/userRoutes.js:9:13)
-
-    console.log
-      Headers: {
-        authorization: null,
-        'x-access-token': null,
-        'user-agent': undefined
-      }
-
-      at log (routes/userRoutes.js:10:13)
-
-    console.log
-      [CONTROLLER ] Ejecutando deleteUser para ID: 1
-
-      at log (controllers/userController.js:357:13)
-
-    console.log
-      [CONTROLLER] Usuario no encontrado para eliminar
-
-      at log (controllers/userController.js:362:21)
-
-PASS __tests__/controllers/userController.test.js
-  ● Console
-
-    console.log
-      [CONTROLLER] Ejecutando getAllUsers
-
-      at Object.log [as getAllUsers] (controllers/userController.js:8:13)
-
-    console.log
-      [CONTROLLER] - getAllUsers Users found: 2
-
-      at Object.log [as getAllUsers] (controllers/userController.js:11:17)
-
-    console.log
-      [CONTROLLER] Ejecutando getAllUsers
-
-      at Object.log [as getAllUsers] (controllers/userController.js:8:13)
-
-    console.error
-      [CONTROLLER] - getAllUsers Error: Error: Database error
-          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/userController.test.js:48:45)
-          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-          at new Promise (<anonymous>)
-          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
-
-      15 |         });
-      16 |     } catch (error) {
-    > 17 |         console.error('[CONTROLLER] - getAllUsers Error:', error);
-         |                 ^
-      18 |         res.status(500).json({
-      19 |             success: false,
-      20 |             message: 'Error retrieving users', error
-
-      at Object.error [as getAllUsers] (controllers/userController.js:17:17)
-      at Object.<anonymous> (__tests__/controllers/userController.test.js:51:7)
-
-    console.log
-      [CONTROLLER] getUserById - req.userId: userId
-
-      at Object.log [as getUserById] (controllers/userController.js:28:17)
-
-    console.log
-      [CONTROLLER] getUserById - req.userRole: admin
-
-      at Object.log [as getUserById] (controllers/userController.js:29:17)
-
-    console.log
-      [CONTROLLER] getUserById - params.id: targetUserId
-
-      at Object.log [as getUserById] (controllers/userController.js:30:17)
-
-    console.log
-      [CONTROLLER] getUserById - user._id: targetUserId
-
-      at Object.log [as getUserById] (controllers/userController.js:41:17)
-
-    console.log
-      [CONTROLLER] Acceso permitido - admin puede ver cualquier usuario
-
-      at Object.log [as getUserById] (controllers/userController.js:45:21)
-
-    console.log
-      [CONTROLLER] getUserById - req.userId: userId
-
-      at Object.log [as getUserById] (controllers/userController.js:28:17)
-
-    console.log
-      [CONTROLLER] getUserById - req.userRole: admin
-
-      at Object.log [as getUserById] (controllers/userController.js:29:17)
-
-    console.log
-      [CONTROLLER] getUserById - params.id: targetUserId
-
-      at Object.log [as getUserById] (controllers/userController.js:30:17)
-
-    console.log
-      [CONTROLLER] getUserById - req.userId: myUserId
-
-      at Object.log [as getUserById] (controllers/userController.js:28:17)
-
-    console.log
-      [CONTROLLER] getUserById - req.userRole: externo
-
-      at Object.log [as getUserById] (controllers/userController.js:29:17)
-
-    console.log
-      [CONTROLLER] getUserById - params.id: targetUserId
-
-      at Object.log [as getUserById] (controllers/userController.js:30:17)
-
-    console.log
-      [CONTROLLER] getUserById - user._id: targetUserId
-
-      at Object.log [as getUserById] (controllers/userController.js:41:17)
-
-    console.log
-      [CONTROLLER] Acceso denegado - externo intentando ver otro usuario
-
-      at Object.log [as getUserById] (controllers/userController.js:54:21)
-
-    console.log
-      Buscando usuario con documento: 123456
-
-      at Object.log [as getUserByDocumento] (controllers/userController.js:84:17)
-
-    console.log
-      Usuario encontrado: {
-        id: 'user1',
-        nombre: undefined,
-        apellido: undefined,
-        fechaNacimiento: undefined,
-        tieneFechaNacimiento: false
-      }
-
-      at Object.log [as getUserByDocumento] (controllers/userController.js:90:17)
-
-    console.log
-      🔍 ID exacto del usuario encontrado: user1
-
-      at Object.log [as getUserByDocumento] (controllers/userController.js:97:17)
-
-    console.log
-      Buscando usuario con documento: 123456
-
-      at Object.log [as getUserByDocumento] (controllers/userController.js:84:17)
-
-    console.log
-      Usuario no encontrado para documento: 123456
-
-      at Object.log [as getUserByDocumento] (controllers/userController.js:87:21)
-
-    console.log
-      [CONTROLLER] Ejecutando updateOwnProfile para usuario: userId
-
-      at Object.log [as updateOwnProfile] (controllers/userController.js:186:13)
-
-    console.log
-      [CONTROLLER] Datos recibidos: { nombre: 'New Name' }
-
-      at Object.log [as updateOwnProfile] (controllers/userController.js:187:13)
-
-    console.log
-      [CONTROLLER] Datos a actualizar: { nombre: 'New Name' }
-
-      at Object.log [as updateOwnProfile] (controllers/userController.js:229:17)
-
-    console.log
-      [CONTROLLER] Perfil actualizado exitosamente: userId
-
-      at Object.log [as updateOwnProfile] (controllers/userController.js:248:17)
-
-    console.log
-      [CONTROLLER] Ejecutando updateOwnProfile para usuario: userId
-
-      at Object.log [as updateOwnProfile] (controllers/userController.js:186:13)
-
-    console.log
-      [CONTROLLER] Datos recibidos: {}
-
-      at Object.log [as updateOwnProfile] (controllers/userController.js:187:13)
-
-    console.log
-      [CONTROLLER] Usuario no encontrado para actualizar perfil
-
-      at Object.log [as updateOwnProfile] (controllers/userController.js:207:21)
-
-    console.log
-      [CONTROLLER] Ejecutando changePassword para usuario: userId
-
-      at Object.log [as changePassword] (controllers/userController.js:266:13)
-
-    console.log
-      [CONTROLLER] Contraseña cambiada exitosamente para usuario: userId
-
-      at Object.log [as changePassword] (controllers/userController.js:299:17)
-
-    console.log
-      [CONTROLLER] Ejecutando changePassword para usuario: userId
-
-      at Object.log [as changePassword] (controllers/userController.js:266:13)
-
-    console.log
-      [CONTROLLER ] Ejecutando deleteUser para ID: userId
-
-      at Object.log [as deleteUser] (controllers/userController.js:357:13)
-
-    console.log
-      [CONTROLLER] Usuario eliminado: userId
-
-      at Object.log [as deleteUser] (controllers/userController.js:368:17)
-
-    console.log
-      [CONTROLLER ] Ejecutando deleteUser para ID: userId
-
-      at Object.log [as deleteUser] (controllers/userController.js:357:13)
-
-    console.log
-      [CONTROLLER] Usuario no encontrado para eliminar
-
-      at Object.log [as deleteUser] (controllers/userController.js:362:21)
-
-PASS __tests__/controllers/solicitudController.test.js
-  ● Console
-
-    console.log
-      === INICIO CREAR SOLICITUD ===
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:131:15)
-
-    console.log
-      req.body: {
-        solicitante: 'user-123',
-        titulo: 'Test Solicitud',
-        correo: 'test@test.com',
-        telefono: '123',
-        tipoSolicitud: 'General',
-        descripcion: 'Test description'
-      }
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:132:15)
-
-    console.log
-      req.userId: user-123
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:133:15)
-
-    console.log
-      === DEBUG CREAR SOLICITUD ===
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:158:15)
-
-    console.log
-      req.userId: user-123
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:159:15)
-
-    console.log
-      req.body.responsable: undefined
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:160:15)
-
-    console.log
-      req.body: {
-        solicitante: 'user-123',
-        titulo: 'Test Solicitud',
-        correo: 'test@test.com',
-        telefono: '123',
-        tipoSolicitud: 'General',
-        descripcion: 'Test description'
-      }
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:161:15)
-
-    console.log
-      responsable final: user-123
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:168:15)
-
-    console.log
-      ✅ Notificación de nueva solicitud enviada correctamente
-
-      at log (controllers/solicitudController.js:40:15)
-
-    console.log
-      === INICIO CREAR SOLICITUD ===
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:131:15)
-
-    console.log
-      req.body: {
-        solicitante: 'user-123',
-        tipoSolicitud: 'Inscripción',
-        modeloReferencia: 'Invalid'
-      }
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:132:15)
-
-    console.log
-      req.userId: user-123
-
-      at Object.log [as crearSolicitud] (controllers/solicitudController.js:133:15)
-
-    console.log
-      === ACTUALIZANDO SOLICITUD ===
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:225:15)
-
-    console.log
-      ID: sol-123
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:226:15)
-
-    console.log
-      Datos recibidos: { titulo: 'Updated' }
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:227:15)
-
-    console.log
-      Usuario: user-123
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:228:15)
-
-    console.log
-      Datos finales a actualizar: {
-        titulo: 'Updated',
-        responsable: 'user-123',
-        modificadoPor: 'user-123',
-        fechaRespuesta: 2025-11-29T03:53:27.472Z
-      }
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:257:15)
-
-    console.log
-      Solicitud actualizada exitosamente: sol-123
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:276:15)
-
-    console.log
-      === ACTUALIZANDO SOLICITUD ===
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:225:15)
-
-    console.log
-      ID: nonexistent
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:226:15)
-
-    console.log
-      Datos recibidos: { titulo: 'Updated' }
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:227:15)
-
-    console.log
-      Usuario: user-123
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:228:15)
-
-    console.log
-      Datos finales a actualizar: {
-        titulo: 'Updated',
-        responsable: 'user-123',
-        modificadoPor: 'user-123',
-        fechaRespuesta: 2025-11-29T03:53:27.475Z
-      }
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:257:15)
-
-    console.log
-      Solicitud no encontrada con ID: nonexistent
-
-      at Object.log [as actualizarSolicitud] (controllers/solicitudController.js:269:17)
+> jest --coverage --detectOpenHandles --forceExit __tests__/models/User.test.js __tests__/controllers/cabanasController.test.js __tests__/controllers/inscripcionController.test.js __tests__/models/Inscripciones.test.js __tests__/models/Reportes.test.js
+
+FAIL __tests__/models/User.test.js
+  ● User Model › Validation Logic › should validate numeroDocumento for Cédula de ciudadanía
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: 7
+
+      59 |       const context = { tipoDocumento: 'Cédula de ciudadanía' };
+      60 |       
+    > 61 |       expect(validator.call(context, '1234567')).toBe(true); // 7 digits
+         |                                                  ^
+      62 |       expect(validator.call(context, '123456')).toBe(false); // 6 digits
+      63 |       expect(validator.call(context, '123456789012')).toBe(true); // 12 digits
+      64 |       expect(validator.call(context, '1234567890123')).toBe(false); // 13 digits
+
+      at Object.toBe (__tests__/models/User.test.js:61:50)
+
+  ● User Model › Validation Logic › should validate numeroDocumento for Pasaporte
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: 6
+
+      72 |       const context = { tipoDocumento: 'Pasaporte' };
+      73 |       
+    > 74 |       expect(validator.call(context, 'A12345')).toBe(true); // 6 chars
+         |                                                 ^
+      75 |       expect(validator.call(context, 'A1234')).toBe(false); // 5 chars
+      76 |       expect(validator.call(context, 'A12345678901234')).toBe(true); // 15 chars
+      77 |       expect(validator.call(context, 'A123456789012345')).toBe(false); // 16 chars
+
+      at Object.toBe (__tests__/models/User.test.js:74:49)
+
+  ● User Model › Validation Logic › should return correct error message
+
+    TypeError: messageFn.call is not a function
+
+      82 |        const messageFn = numeroDocumentoPath.validators.find(v => v.validator.name === '' || v.validator.name === 'validator').message;
+      83 |        
+    > 84 |        expect(messageFn.call({ tipoDocumento: 'Cédula de Ciudadanía' })).toContain('solo números');
+         |                         ^
+      85 |        expect(messageFn.call({ tipoDocumento: 'Pasaporte' })).toContain('alfanumérico');
+      86 |     });
+      87 |   });
+
+      at Object.call (__tests__/models/User.test.js:84:25)
+
+FAIL __tests__/controllers/inscripcionController.test.js
+  ● Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    SyntaxError: /home/juandam/Luckas/backend/__tests__/controllers/inscripcionController.test.js: Unexpected token (346:0)
+
+      344 |   });
+      345 | });
+    > 346 |
+          | ^
+
+      at constructor (node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at Parser.toParseError [as raise] (node_modules/@babel/parser/src/tokenizer/index.ts:1507:19)
+      at Parser.raise [as unexpected] (node_modules/@babel/parser/src/tokenizer/index.ts:1547:16)
+      at Parser.unexpected [as parseExprAtom] (node_modules/@babel/parser/src/parser/expression.ts:1355:22)
+      at Parser.parseExprAtom [as parseExprSubscripts] (node_modules/@babel/parser/src/parser/expression.ts:742:23)
+      at Parser.parseExprSubscripts [as parseUpdate] (node_modules/@babel/parser/src/parser/expression.ts:721:21)
+      at Parser.parseUpdate [as parseMaybeUnary] (node_modules/@babel/parser/src/parser/expression.ts:683:23)
+      at Parser.parseMaybeUnary [as parseMaybeUnaryOrPrivate] (node_modules/@babel/parser/src/parser/expression.ts:417:14)
+      at Parser.parseMaybeUnaryOrPrivate [as parseExprOps] (node_modules/@babel/parser/src/parser/expression.ts:429:23)
+      at Parser.parseExprOps [as parseMaybeConditional] (node_modules/@babel/parser/src/parser/expression.ts:384:23)
+      at Parser.parseMaybeConditional [as parseMaybeAssign] (node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at Parser.parseMaybeAssign [as parseExpressionBase] (node_modules/@babel/parser/src/parser/expression.ts:226:23)
+      at parseExpressionBase (node_modules/@babel/parser/src/parser/expression.ts:217:39)
+      at Parser.callback [as allowInAnd] (node_modules/@babel/parser/src/parser/expression.ts:3197:16)
+      at Parser.allowInAnd [as parseExpression] (node_modules/@babel/parser/src/parser/expression.ts:217:17)
+      at Parser.parseExpression [as parseStatementContent] (node_modules/@babel/parser/src/parser/statement.ts:688:23)
+      at Parser.parseStatementContent [as parseStatementLike] (node_modules/@babel/parser/src/parser/statement.ts:482:17)
+      at Parser.parseStatementLike [as parseStatementListItem] (node_modules/@babel/parser/src/parser/statement.ts:431:17)
+      at Parser.parseStatementListItem [as parseBlockOrModuleBlockBody] (node_modules/@babel/parser/src/parser/statement.ts:1444:16)
+      at Parser.parseBlockOrModuleBlockBody [as parseBlockBody] (node_modules/@babel/parser/src/parser/statement.ts:1417:10)
+      at Parser.parseBlockBody [as parseBlock] (node_modules/@babel/parser/src/parser/statement.ts:1385:10)
+      at Parser.parseBlock [as parseFunctionBody] (node_modules/@babel/parser/src/parser/expression.ts:2626:24)
+      at Parser.parseFunctionBody [as parseArrowExpression] (node_modules/@babel/parser/src/parser/expression.ts:2563:10)
+      at Parser.parseArrowExpression [as parseParenAndDistinguishExpression] (node_modules/@babel/parser/src/parser/expression.ts:1847:12)
+      at Parser.parseParenAndDistinguishExpression [as parseExprAtom] (node_modules/@babel/parser/src/parser/expression.ts:1170:21)
+      at Parser.parseExprAtom [as parseExprSubscripts] (node_modules/@babel/parser/src/parser/expression.ts:742:23)
+      at Parser.parseExprSubscripts [as parseUpdate] (node_modules/@babel/parser/src/parser/expression.ts:721:21)
+      at Parser.parseUpdate [as parseMaybeUnary] (node_modules/@babel/parser/src/parser/expression.ts:683:23)
+      at Parser.parseMaybeUnary [as parseMaybeUnaryOrPrivate] (node_modules/@babel/parser/src/parser/expression.ts:417:14)
+      at Parser.parseMaybeUnaryOrPrivate [as parseExprOps] (node_modules/@babel/parser/src/parser/expression.ts:429:23)
+      at Parser.parseExprOps [as parseMaybeConditional] (node_modules/@babel/parser/src/parser/expression.ts:384:23)
+      at Parser.parseMaybeConditional [as parseMaybeAssign] (node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at parseMaybeAssign (node_modules/@babel/parser/src/parser/expression.ts:257:12)
+      at Parser.callback [as allowInAnd] (node_modules/@babel/parser/src/parser/expression.ts:3202:12)
+      at Parser.allowInAnd [as parseMaybeAssignAllowIn] (node_modules/@babel/parser/src/parser/expression.ts:256:17)
+      at Parser.parseMaybeAssignAllowIn [as parseMaybeAssignAllowInOrVoidPattern] (node_modules/@babel/parser/src/parser/expression.ts:3316:17)
+      at Parser.parseMaybeAssignAllowInOrVoidPattern [as parseExprListItem] (node_modules/@babel/parser/src/parser/expression.ts:2798:18)
+      at Parser.parseExprListItem [as parseCallExpressionArguments] (node_modules/@babel/parser/src/parser/expression.ts:1042:14)
+      at Parser.parseCallExpressionArguments [as parseCoverCallAndAsyncArrowHead] (node_modules/@babel/parser/src/parser/expression.ts:922:29)
+      at Parser.parseCoverCallAndAsyncArrowHead [as parseSubscript] (node_modules/@babel/parser/src/parser/expression.ts:804:19)
+      at Parser.parseSubscript [as parseSubscripts] (node_modules/@babel/parser/src/parser/expression.ts:763:19)
+      at Parser.parseSubscripts [as parseExprSubscripts] (node_modules/@babel/parser/src/parser/expression.ts:748:17)
+      at Parser.parseExprSubscripts [as parseUpdate] (node_modules/@babel/parser/src/parser/expression.ts:721:21)
+      at Parser.parseUpdate [as parseMaybeUnary] (node_modules/@babel/parser/src/parser/expression.ts:683:23)
+      at Parser.parseMaybeUnary [as parseMaybeUnaryOrPrivate] (node_modules/@babel/parser/src/parser/expression.ts:417:14)
+      at Parser.parseMaybeUnaryOrPrivate [as parseExprOps] (node_modules/@babel/parser/src/parser/expression.ts:429:23)
+      at Parser.parseExprOps [as parseMaybeConditional] (node_modules/@babel/parser/src/parser/expression.ts:384:23)
+      at Parser.parseMaybeConditional [as parseMaybeAssign] (node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at Parser.parseMaybeAssign [as parseExpressionBase] (node_modules/@babel/parser/src/parser/expression.ts:226:23)
+      at parseExpressionBase (node_modules/@babel/parser/src/parser/expression.ts:217:39)
+      at Parser.callback [as allowInAnd] (node_modules/@babel/parser/src/parser/expression.ts:3197:16)
+      at Parser.allowInAnd [as parseExpression] (node_modules/@babel/parser/src/parser/expression.ts:217:17)
+      at Parser.parseExpression [as parseStatementContent] (node_modules/@babel/parser/src/parser/statement.ts:688:23)
+      at Parser.parseStatementContent [as parseStatementLike] (node_modules/@babel/parser/src/parser/statement.ts:482:17)
+      at Parser.parseStatementLike [as parseModuleItem] (node_modules/@babel/parser/src/parser/statement.ts:419:17)
+      at Parser.parseModuleItem [as parseBlockOrModuleBlockBody] (node_modules/@babel/parser/src/parser/statement.ts:1443:16)
+      at Parser.parseBlockOrModuleBlockBody [as parseBlockBody] (node_modules/@babel/parser/src/parser/statement.ts:1417:10)
+      at Parser.parseBlockBody [as parseProgram] (node_modules/@babel/parser/src/parser/statement.ts:229:10)
+      at Parser.parseProgram [as parseTopLevel] (node_modules/@babel/parser/src/parser/statement.ts:203:25)
+      at Parser.parseTopLevel [as parse] (node_modules/@babel/parser/src/parser/index.ts:88:25)
+      at parse (node_modules/@babel/parser/src/index.ts:86:38)
+      at parser (node_modules/@babel/core/src/parser/index.ts:29:19)
+          at parser.next (<anonymous>)
+      at normalizeFile (node_modules/@babel/core/src/transformation/normalize-file.ts:50:24)
+          at normalizeFile.next (<anonymous>)
+      at run (node_modules/@babel/core/src/transformation/index.ts:41:36)
+          at run.next (<anonymous>)
+      at transform (node_modules/@babel/core/src/transform.ts:29:20)
+          at transform.next (<anonymous>)
+      at evaluateSync (node_modules/gensync/index.js:251:28)
+      at sync (node_modules/gensync/index.js:89:14)
+      at fn (node_modules/@babel/core/src/errors/rewrite-stack-trace.ts:99:14)
+      at transformSync (node_modules/@babel/core/src/transform.ts:66:52)
+      at ScriptTransformer.transformSource (node_modules/@jest/transform/build/ScriptTransformer.js:545:31)
+      at ScriptTransformer._transformAndBuildScript (node_modules/@jest/transform/build/ScriptTransformer.js:674:40)
+      at ScriptTransformer.transform (node_modules/@jest/transform/build/ScriptTransformer.js:726:19)
 
 PASS __tests__/controllers/cabanasController.test.js
   ● Console
@@ -1563,289 +347,230 @@ PASS __tests__/controllers/cabanasController.test.js
 
       at Object.log [as crearCabana] (controllers/cabanasController.js:10:13)
 
+    console.warn
+      [CABANAS] categoria inválida recibida en actualización, se omite: invalid-id
+
+      170 |   if (typeof cat === 'string') {
+      171 |     if (cat.trim() === '' || !mongoose.Types.ObjectId.isValid(cat)) {
+    > 172 |       console.warn('[CABANAS] categoria inválida recibida en actualización, se omite:', cat);
+          |               ^
+      173 |       delete req.body.categoria;
+      174 |     }
+      175 |   }
+
+      at warn (controllers/cabanasController.js:172:15)
+      at Object.sanitizeCategoriaField [as actualizarCabana] (controllers/cabanasController.js:188:5)
+      at Object.<anonymous> (__tests__/controllers/cabanasController.test.js:308:7)
+
     console.log
       [CABAÑAS] Se eliminaron 3 reservas asociadas a la cabaña.
 
       at Object.log [as eliminarCabana] (controllers/cabanasController.js:207:13)
 
-PASS __tests__/controllers/inscripcionController.test.js
-  ● Console
-
     console.log
-      ✅ Notificación de inscripción enviada correctamente
+      [CABAÑAS] Se eliminaron 0 reservas asociadas a la cabaña.
 
-      at Object.log [as crearInscripcion] (controllers/inscripcionController.js:236:15)
+      at Object.log [as eliminarCabana] (controllers/cabanasController.js:207:13)
 
-    console.log
-      === OBTENER INSCRIPCIONES DEBUG ===
+FAIL __tests__/models/Reportes.test.js
+  ● Reporte Model › Virtuals › should return correct rangoFechas
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:251:13)
+    expect(received).toContain(expected) // indexOf
 
-    console.log
-      [INSCRIPCIONES] Usuario: user-123 Rol: admin
+    Expected substring: "1/1/2023"
+    Received string:    "31/12/2022 - 30/1/2023"
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:252:13)
+      12 |         }
+      13 |       });
+    > 14 |       expect(reporte.rangoFechas).toContain('1/1/2023');
+         |                                   ^
+      15 |       expect(reporte.rangoFechas).toContain('31/1/2023');
+      16 |     });
+      17 |
 
-    console.log
-      [INSCRIPCIONES] Headers: undefined
+      at Object.toContain (__tests__/models/Reportes.test.js:14:35)
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:253:13)
+  ● Reporte Model › pre save hook › should validate fechaFin >= fechaInicio
 
-    console.log
-      [INSCRIPCIONES] Filtro aplicado: {}
+    TypeError: Cannot read properties of undefined (reading 'options')
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:261:13)
+      44 |       const next = jest.fn();
+      45 |       
+    > 46 |       hook.call(context, next);
+         |            ^
+      47 |       
+      48 |       expect(next).toHaveBeenCalledWith(expect.any(Error));
+      49 |       expect(next.mock.calls[0][0].message).toContain('La fecha fin no puede ser menor');
 
-    console.log
-      [INSCRIPCIONES] Encontradas: 2
+      at Object.validateBeforeSave (node_modules/mongoose/lib/plugins/validateBeforeSave.js:24:39)
+      at Object.call (__tests__/models/Reportes.test.js:46:12)
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:269:13)
+  ● Reporte Model › pre save hook › should validate future dates
 
-    console.log
-      [INSCRIPCIONES] Primera inscripción: {
-        nombre: 'Test 1',
-        apellido: undefined,
-        usuario: undefined,
-        tipoReferencia: undefined
-      }
+    TypeError: Cannot read properties of undefined (reading 'options')
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:270:13)
+      63 |       const next = jest.fn();
+      64 |       
+    > 65 |       hook.call(context, next);
+         |            ^
+      66 |       
+      67 |       expect(next).toHaveBeenCalledWith(expect.any(Error));
+      68 |       expect(next.mock.calls[0][0].message).toContain('No se puede crear un reporte de meses futuros');
 
-    console.log
-      === OBTENER INSCRIPCIONES DEBUG ===
+      at Object.validateBeforeSave (node_modules/mongoose/lib/plugins/validateBeforeSave.js:24:39)
+      at Object.call (__tests__/models/Reportes.test.js:65:12)
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:251:13)
+  ● Reporte Model › pre save hook › should set estado to error if no data
 
-    console.log
-      [INSCRIPCIONES] Usuario: user-123 Rol: seminarista
+    TypeError: Cannot read properties of undefined (reading 'options')
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:252:13)
+      78 |       const next = jest.fn();
+      79 |       
+    > 80 |       hook.call(context, next);
+         |            ^
+      81 |       
+      82 |       expect(context.estado).toBe('error');
+      83 |       expect(next).toHaveBeenCalled();
 
-    console.log
-      [INSCRIPCIONES] Headers: undefined
+      at Object.validateBeforeSave (node_modules/mongoose/lib/plugins/validateBeforeSave.js:24:39)
+      at Object.call (__tests__/models/Reportes.test.js:80:12)
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:253:13)
+FAIL __tests__/models/Inscripciones.test.js
+  ● Inscripcion Model › Validation › should validate estado for Eventos
 
-    console.log
-      [INSCRIPCIONES] Filtrando por usuario: user-123
+    expect(received).toBe(expected) // Object.is equality
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:258:15)
+    Expected: true
+    Received: 8
 
-    console.log
-      [INSCRIPCIONES] Filtro aplicado: {
-        "usuario": "user-123"
-      }
+      29 |       
+      30 |       const context = { tipoReferencia: 'Eventos' };
+    > 31 |       expect(validator.call(context, 'inscrito')).toBe(true);
+         |                                                   ^
+      32 |       expect(validator.call(context, 'invalid')).toBe(false);
+      33 |     });
+      34 |
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:261:13)
+      at Object.toBe (__tests__/models/Inscripciones.test.js:31:51)
 
-    console.log
-      [INSCRIPCIONES] Encontradas: 1
+  ● Inscripcion Model › Validation › should validate estado for ProgramaAcademico
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:269:13)
+    expect(received).toBe(expected) // Object.is equality
 
-    console.log
-      [INSCRIPCIONES] Primera inscripción: {
-        nombre: undefined,
-        apellido: undefined,
-        usuario: undefined,
-        tipoReferencia: undefined
-      }
+    Expected: true
+    Received: 11
 
-      at Object.log [as obtenerInscripciones] (controllers/inscripcionController.js:270:13)
+      38 |       
+      39 |       const context = { tipoReferencia: 'ProgramaAcademico' };
+    > 40 |       expect(validator.call(context, 'matriculado')).toBe(true);
+         |                                                      ^
+      41 |       expect(validator.call(context, 'invalid')).toBe(false);
+      42 |     });
+      43 |   });
 
-PASS __tests__/controllers/programaAcademicoController.test.js
-  ● Console
+      at Object.toBe (__tests__/models/Inscripciones.test.js:40:54)
 
-    console.error
-      Error al crear programa académico: Error: DB Error
-          at mockModel.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/programaAcademicoController.test.js:81:43)
-          at /home/juandam/Luckas/backend/node_modules/jest-mock/build/index.js:387:43
-          at mockModel.<anonymous> (/home/juandam/Luckas/backend/node_modules/jest-mock/build/index.js:404:13)
-          at mockModel.mockConstructor (/home/juandam/Luckas/backend/node_modules/jest-mock/build/index.js:148:19)
-          at new mockModel (eval at _createMockFunction (/home/juandam/Luckas/backend/node_modules/jest-mock/build/index.js:566:31), <anonymous>:3:55)
-          at Object.<anonymous>.exports.crearProgramaAcademico (/home/juandam/Luckas/backend/controllers/programaAcademicoController.js:14:27)
-          at Object.crearProgramaAcademico (/home/juandam/Luckas/backend/__tests__/controllers/programaAcademicoController.test.js:84:32)
-          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-          at new Promise (<anonymous>)
-          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+  ● Inscripcion Model › pre save hook › should set default state for Eventos
 
-      36 |     res.status(201).json({ success: true, message: 'Programa académico creado exitosamente', data: nuevoPrograma });
-      37 |   } catch (error) {
-    > 38 |     console.error('Error al crear programa académico:', error);
-         |             ^
-      39 |     res.status(500).json({ success: false, message: 'Error interno del servidor', error: error.message });
-      40 |   }
-      41 | };
+    TypeError: Cannot read properties of undefined (reading 'options')
 
-      at Object.error [as crearProgramaAcademico] (controllers/programaAcademicoController.js:38:13)
-      at Object.<anonymous> (__tests__/controllers/programaAcademicoController.test.js:84:7)
+      61 |         const next = jest.fn();
+      62 |         
+    > 63 |         hook.call(context, next);
+         |              ^
+      64 |         
+      65 |         expect(context.estado).toBe('no inscrito');
+      66 |         expect(next).toHaveBeenCalled();
 
-    console.error
-      Error al obtener estadísticas de programas académicos: Error: DB Error
-          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/programaAcademicoController.test.js:257:70)
-          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
-          at new Promise (<anonymous>)
-          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
-          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
-          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
-          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
-          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
-          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
-          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
-          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+      at Object.validateBeforeSave (node_modules/mongoose/lib/plugins/validateBeforeSave.js:24:39)
+      at Object.call (__tests__/models/Inscripciones.test.js:63:14)
 
-      127 |     });
-      128 |   } catch (error) {
-    > 129 |     console.error('Error al obtener estadísticas de programas académicos:', error);
-          |             ^
-      130 |     res.status(500).json({ success: false, message: 'Error interno del servidor', error: error.message });
-      131 |   }
-      132 | };
+  ● Inscripcion Model › pre save hook › should set default state for ProgramaAcademico
 
-      at Object.error [as obtenerEstadisticasProgramas] (controllers/programaAcademicoController.js:129:13)
-      at Object.<anonymous> (__tests__/controllers/programaAcademicoController.test.js:259:7)
+    TypeError: Cannot read properties of undefined (reading 'options')
 
-PASS __tests__/controllers/comentarioEventoController.test.js
-PASS __tests__/controllers/notificationController.test.js
-PASS __tests__/middlewares/verifySignUp.test.js
-PASS __tests__/middlewares/role.test.js
-  ● Console
+      76 |         const next = jest.fn();
+      77 |         
+    > 78 |         hook.call(context, next);
+         |              ^
+      79 |         
+      80 |         expect(context.estado).toBe('preinscrito');
+      81 |         expect(next).toHaveBeenCalled();
 
-    console.log
-      Acceso denegado para test@example.com (externo) en ruta /test
+      at Object.validateBeforeSave (node_modules/mongoose/lib/plugins/validateBeforeSave.js:24:39)
+      at Object.call (__tests__/models/Inscripciones.test.js:78:14)
 
-      at log (middlewares/role.js:11:21)
-
-    console.error
-      intento de verificar rol son token valido
-
-      2 |     return (req, res, next )=>{
-      3 |         if(!req.userRole){
-    > 4 |             console.error('intento de verificar rol son token valido');
-        |                     ^
-      5 |             return res.status(500).json({
-      6 |                 success: false,
-      7 |                 message: 'Error al verificar rol'
-
-      at error (middlewares/role.js:4:21)
-      at Object.middleware (__tests__/middlewares/role.test.js:48:7)
-
-    console.log
-      Acceso denegado para test@example.com (tesorero) en ruta /test
-
-      at log (middlewares/role.js:11:21)
-
-PASS __tests__/utils/userValidation.test.js
-PASS __tests__/utils/roleValidation.test.js
-FAIL __tests__/controllers/reportesController.test.js
-  ● Test suite failed to run
-
-    TypeError: reporteSchema.index is not a function
-
-      92 |
-      93 | // Índices para mejorar performance
-    > 94 | reporteSchema.index({ tipo: 1, 'filtros.fechaInicio': 1, 'filtros.fechaFin': 1 });
-         |               ^
-      95 | reporteSchema.index({ creadoPor: 1, fechaGeneracion: -1 });
-      96 | reporteSchema.index({ estado: 1 });
-      97 |
-
-      at Object.index (models/Reportes.js:94:15)
-      at Object.require (controllers/reportesControllers.js:10:17)
-      at Object.require (__tests__/controllers/reportesController.test.js:1:28)
-
----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                                                                                            
----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-All files                        |   51.03 |    39.08 |   54.29 |   51.92 |                                                                                                                                                                              
- backend                         |       0 |        0 |       0 |       0 |                                                                                                                                                                              
-  config.js                      |       0 |        0 |     100 |       0 | 1                                                                                                                                                                            
-  database.js                    |       0 |      100 |       0 |       0 | 1-17                                                                                                                                                                         
-  server.js                      |       0 |        0 |       0 |       0 | 1-165                                                                                                                                                                        
- backend/config                  |       0 |        0 |     100 |       0 |                                                                                                                                                                              
-  auth.config.js                 |       0 |        0 |     100 |       0 | 1-3                                                                                                                                                                          
-  cloudinary.js                  |       0 |      100 |     100 |       0 | 1-8                                                                                                                                                                          
-  db.js                          |       0 |        0 |     100 |       0 | 1                                                                                                                                                                            
- backend/controllers             |    59.8 |    45.39 |   66.85 |   61.19 |                                                                                                                                                                              
-  authControllers.js             |   48.66 |    41.79 |   33.33 |   48.99 | 23,91-100,116-117,175-176,185-251,259-284,355,360,365-413,423-457                                                                                                            
-  cabanasController.js           |    67.4 |    54.65 |   84.61 |   68.99 | 33,67-69,94,103-107,116-130,140-142,147-148,157-173,194,214,230,234,272-273                                                                                                  
-  categorizacionController.js    |   77.37 |    63.93 |     100 |   79.54 | 33,56-57,86-87,114-115,130,138-144,159,173,177,181,191,204-205,230,242-243,267,296-297,328,333,377                                                                           
-  certificadoControllers.js      |      40 |    59.09 |      80 |    38.7 | 20-21,58-169                                                                                                                                                                 
-  comentarioEventoController.js  |   78.86 |    65.78 |      75 |   88.57 | 21-23,30-31,52,69,86,104,122,138,156                                                                                                                                         
-  eventosController.js           |   50.36 |    43.47 |   38.46 |   50.37 | 20-21,42-49,84,88,99-101,131-133,152,159,173,182,193,200-206,213-224,230-268,278-293,303-320,329-333,339-371                                                                 
-  inscripcionController.js       |   67.11 |       50 |      85 |   67.11 | 12,21,34,37,48-56,65,69,75-87,95,110,116,128,135,144,160-161,185-193,225-226,238,244,279-280,286-300,306-333,347,362,367,373,378,384,394,401,409-411,419,444,455,474,504-505 
-  notificationController.js      |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  programaAcademicoController.js |   94.44 |    96.66 |     100 |   94.44 | 64,84,98                                                                                                                                                                     
-  reportesControllers.js         |       0 |        0 |       0 |       0 | 1-838                                                                                                                                                                        
-  reservasController.js          |   67.06 |    42.59 |   85.71 |   66.87 | 28,31,40,45,58,66,71-92,118-119,125-126,138-189,207-236,246-247,258-264,270,280,290,301,308,313                                                                              
-  solicitudController.js         |   77.16 |    62.33 |   92.85 |   77.01 | 11,18-19,43,87-88,119-120,138-140,172-175,212-213,233-234,284-297,310,319,346,359-360,385,398-399,432-433,452,492-493                                                        
-  tareaController.js             |   75.75 |    55.55 |     100 |   75.57 | 8,15,37,54-55,68-79,115,123-124,147,156,171-172,187,197,213-214,241,272,287,314,326,350,377,413-414                                                                          
-  userController.js              |   79.35 |    66.12 |     100 |   85.31 | 60-73,100-101,176,241-242,255-256,271,280,305-306,333,346,350,374-375                                                                                                        
- backend/middlewares             |   46.38 |    31.74 |      50 |   45.62 |                                                                                                                                                                              
-  auth.js                        |       0 |        0 |       0 |       0 | 1-43                                                                                                                                                                         
-  authJwt.js                     |    22.5 |    11.76 |       0 |    22.5 | 9-29,38-64,74-75                                                                                                                                                             
-  index.js                       |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  normalizeUserData.js           |       0 |        0 |       0 |       0 | 1-16                                                                                                                                                                         
-  role.js                        |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  uploadCloudinary.js            |   56.52 |    42.85 |      50 |   57.77 | 18-40,49-50,65,78-80                                                                                                                                                         
-  validateEvents.js              |   18.18 |        0 |       0 |   18.18 | 2-35                                                                                                                                                                         
-  verifySignUp.js                |     100 |      100 |     100 |     100 |                                                                                                                                                                              
- backend/models                  |    27.4 |        0 |       0 |   27.61 |                                                                                                                                                                              
-  Cabana.js                      |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  ComentarioEvento.js            |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  Eventos.js                     |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  Inscripciones.js               |   15.38 |        0 |       0 |   15.38 | 69-94,113-121                                                                                                                                                                
-  Notification.js                |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  ProgramaAcademico.js           |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  Reportes.js                    |       0 |        0 |       0 |       0 | 1-176                                                                                                                                                                        
-  Reservas.js                    |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  Solicitud.js                   |      75 |        0 |       0 |      75 | 37                                                                                                                                                                           
-  Tarea.js                       |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  User.js                        |   23.07 |        0 |       0 |      24 | 41-70,160-167,173                                                                                                                                                            
-  categorizacion.js              |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  index.js                       |       0 |      100 |     100 |       0 | 1-14                                                                                                                                                                         
- backend/routes                  |    27.8 |       50 |      60 |   27.42 |                                                                                                                                                                              
-  authRoutes.js                  |   85.18 |       50 |      75 |   85.18 | 15-16,36-37                                                                                                                                                                  
-  cabanasRoutes.js               |       0 |      100 |       0 |       0 | 1-46                                                                                                                                                                         
-  categorizacionRoutes.js        |       0 |      100 |     100 |       0 | 1-33                                                                                                                                                                         
-  certificadoRoutes.js           |       0 |      100 |     100 |       0 | 1-14                                                                                                                                                                         
-  comentarioEventoRoutes.js      |       0 |      100 |     100 |       0 | 1-25                                                                                                                                                                         
-  eventosRoutes.js               |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  inscripcionRoutes.js           |       0 |      100 |     100 |       0 | 1-30                                                                                                                                                                         
-  notificationRoutes.js          |       0 |      100 |     100 |       0 | 1-27                                                                                                                                                                         
-  programaAcademicoRoutes.js     |       0 |      100 |     100 |       0 | 1-31                                                                                                                                                                         
-  reportesRoutes.js              |       0 |      100 |     100 |       0 | 1-24                                                                                                                                                                         
-  reservasRoutes.js              |       0 |      100 |     100 |       0 | 1-29                                                                                                                                                                         
-  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131                                                                                                                                                                        
-  tareaRoutes.js                 |       0 |      100 |     100 |       0 | 1-29                                                                                                                                                                         
-  userRoutes.js                  |     100 |       50 |     100 |     100 | 11-12                                                                                                                                                                        
- backend/utils                   |   26.41 |    19.71 |   14.28 |   28.12 |                                                                                                                                                                              
-  notificationUtils.js           |     7.5 |        0 |       0 |    7.69 | 13-132                                                                                                                                                                       
-  reportUtils.js                 |       0 |        0 |       0 |       0 | 9-57                                                                                                                                                                         
-  roleValidation.js              |     100 |      100 |     100 |     100 |                                                                                                                                                                              
-  sendEmail.js                   |      80 |       50 |       0 |      80 | 29-39                                                                                                                                                                        
-  solicitudUtils.js              |    4.34 |        0 |       0 |    5.88 | 9-41                                                                                                                                                                         
-  userValidation.js              |     100 |      100 |     100 |     100 |                                                                                                                                                                              
----------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Jest: "global" coverage threshold for statements (80%) not met: 51.03%
-Jest: "global" coverage threshold for branches (80%) not met: 39.08%
-Jest: "global" coverage threshold for lines (80%) not met: 51.92%
-Jest: "global" coverage threshold for functions (80%) not met: 54.29%
-Test Suites: 4 failed, 15 passed, 19 total
-Tests:       12 failed, 200 passed, 212 total
+---------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                   
+---------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------
+All files                        |    6.12 |     6.92 |    6.66 |    6.23 |                                                                     
+ controllers                     |    5.64 |     7.41 |     7.3 |     5.7 |                                                                     
+  authControllers.js             |       0 |        0 |       0 |       0 | 1-457                                                               
+  cabanasController.js           |   82.22 |    76.74 |     100 |   83.72 | 33,67-69,94,103-107,120-121,147-148,165-166,182,194,214,234,272-273 
+  categorizacionController.js    |       0 |        0 |       0 |       0 | 1-381                                                               
+  certificadoControllers.js      |       0 |        0 |       0 |       0 | 1-208                                                               
+  comentarioEventoController.js  |       0 |        0 |       0 |       0 | 1-156                                                               
+  eventosController.js           |       0 |        0 |       0 |       0 | 1-371                                                               
+  inscripcionController.js       |       0 |        0 |       0 |       0 | 1-505                                                               
+  notificationController.js      |       0 |        0 |       0 |       0 | 1-76                                                                
+  programaAcademicoController.js |       0 |        0 |       0 |       0 | 1-130                                                               
+  reportesControllers.js         |       0 |        0 |       0 |       0 | 1-838                                                               
+  reservasController.js          |       0 |        0 |       0 |       0 | 1-373                                                               
+  solicitudController.js         |       0 |        0 |       0 |       0 | 1-493                                                               
+  tareaController.js             |       0 |        0 |       0 |       0 | 1-414                                                               
+  userController.js              |       0 |        0 |       0 |       0 | 1-375                                                               
+ middlewares                     |       0 |        0 |       0 |       0 |                                                                     
+  auth.js                        |       0 |        0 |       0 |       0 | 1-43                                                                
+  authJwt.js                     |       0 |        0 |       0 |       0 | 1-39                                                                
+  index.js                       |       0 |      100 |     100 |       0 | 1-5                                                                 
+  normalizeUserData.js           |       0 |        0 |       0 |       0 | 1-16                                                                
+  role.js                        |       0 |        0 |       0 |       0 | 1-27                                                                
+  uploadCloudinary.js            |       0 |        0 |       0 |       0 | 2-84                                                                
+  validateEvents.js              |       0 |        0 |       0 |       0 | 1-38                                                                
+  verifySignUp.js                |       0 |        0 |       0 |       0 | 1-47                                                                
+ models                          |   35.55 |    13.33 |      20 |   35.82 |                                                                     
+  Cabana.js                      |     100 |      100 |     100 |     100 |                                                                     
+  ComentarioEvento.js            |       0 |      100 |     100 |       0 | 1-36                                                                
+  Eventos.js                     |       0 |      100 |     100 |       0 | 1-95                                                                
+  Inscripciones.js               |   15.38 |        0 |       0 |   15.38 | 69-94,113-121                                                       
+  Notification.js                |       0 |      100 |     100 |       0 | 1-31                                                                
+  ProgramaAcademico.js           |       0 |      100 |     100 |       0 | 1-99                                                                
+  Reportes.js                    |   63.63 |    27.02 |   28.57 |   63.63 | 128-145,150-153,159,166,170                                         
+  Reservas.js                    |     100 |      100 |     100 |     100 |                                                                     
+  Solicitud.js                   |       0 |        0 |       0 |       0 | 1-99                                                                
+  Tarea.js                       |       0 |      100 |     100 |       0 | 1-51                                                                
+  User.js                        |   26.92 |        0 |      25 |      28 | 41-70,160-167                                                       
+  categorizacion.js              |     100 |      100 |     100 |     100 |                                                                     
+  index.js                       |       0 |      100 |     100 |       0 | 1-14                                                                
+ routes                          |       0 |        0 |       0 |       0 |                                                                     
+  authRoutes.js                  |       0 |        0 |       0 |       0 | 1-71                                                                
+  cabanasRoutes.js               |       0 |      100 |       0 |       0 | 1-46                                                                
+  categorizacionRoutes.js        |       0 |      100 |     100 |       0 | 1-33                                                                
+  certificadoRoutes.js           |       0 |      100 |     100 |       0 | 1-14                                                                
+  comentarioEventoRoutes.js      |       0 |      100 |     100 |       0 | 1-25                                                                
+  eventosRoutes.js               |       0 |      100 |       0 |       0 | 1-48                                                                
+  inscripcionRoutes.js           |       0 |      100 |     100 |       0 | 1-30                                                                
+  notificationRoutes.js          |       0 |      100 |     100 |       0 | 1-27                                                                
+  programaAcademicoRoutes.js     |       0 |      100 |     100 |       0 | 1-31                                                                
+  reportesRoutes.js              |       0 |      100 |     100 |       0 | 1-24                                                                
+  reservasRoutes.js              |       0 |      100 |     100 |       0 | 1-29                                                                
+  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131                                                               
+  tareaRoutes.js                 |       0 |      100 |     100 |       0 | 1-29                                                                
+  userRoutes.js                  |       0 |        0 |       0 |       0 | 1-39                                                                
+ utils                           |       0 |        0 |       0 |       0 |                                                                     
+  notificationUtils.js           |       0 |        0 |       0 |       0 | 1-136                                                               
+  reportUtils.js                 |       0 |        0 |       0 |       0 | 9-57                                                                
+  roleValidation.js              |       0 |        0 |       0 |       0 | 2-10                                                                
+  sendEmail.js                   |       0 |        0 |       0 |       0 | 1-42                                                                
+  solicitudUtils.js              |       0 |        0 |       0 |       0 | 9-56                                                                
+  userValidation.js              |       0 |        0 |       0 |       0 | 6-55                                                                
+---------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------
+Jest: "global" coverage threshold for statements (55%) not met: 6.12%
+Jest: "global" coverage threshold for branches (40%) not met: 6.92%
+Jest: "global" coverage threshold for lines (55%) not met: 6.23%
+Jest: "global" coverage threshold for functions (60%) not met: 6.66%
+Test Suites: 4 failed, 1 passed, 5 total
+Tests:       11 failed, 25 passed, 36 total
 Snapshots:   0 total
-Time:        5.035 s
-Ran all test suites.
+Time:        5.691 s
+Ran all test suites matching /__tests__\/models\/User.test.js|__tests__\/controllers\/cabanasController.test.js|__tests__\/controllers\/inscripcionController.test.js|__tests__\/models\/Inscripciones.test.js|__tests__\/models\/Reportes.test.js/i.

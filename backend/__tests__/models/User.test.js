@@ -1,0 +1,157 @@
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+// Explicitly unmock to ensure we get the real model
+jest.unmock('mongoose');
+jest.unmock('../../models/User');
+const User = require('../../models/User');
+
+jest.mock('bcryptjs');
+
+describe('User Model', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('comparePassword', () => {
+    it('should return true if passwords match', async () => {
+      // Mock bcrypt.compare to return true
+      bcrypt.compare.mockResolvedValue(true);
+      
+      // Create a user instance (without saving to DB)
+      const user = new User({ 
+        nombre: 'Test', 
+        apellido: 'User', 
+        correo: 'test@test.com', 
+        telefono: '1234567', 
+        tipoDocumento: 'Cédula de ciudadanía', 
+        numeroDocumento: '1234567', 
+        fechaNacimiento: new Date(),
+        password: 'hashedPassword' 
+      });
+
+      const isMatch = await user.comparePassword('password');
+      expect(bcrypt.compare).toHaveBeenCalledWith('password', 'hashedPassword');
+      expect(isMatch).toBe(true);
+    });
+
+    it('should return false if passwords do not match', async () => {
+      bcrypt.compare.mockResolvedValue(false);
+      
+      const user = new User({ 
+        nombre: 'Test', 
+        apellido: 'User', 
+        correo: 'test@test.com', 
+        telefono: '1234567', 
+        tipoDocumento: 'Cédula de ciudadanía', 
+        numeroDocumento: '1234567', 
+        fechaNacimiento: new Date(),
+        password: 'hashedPassword' 
+      });
+      
+      const isMatch = await user.comparePassword('wrongPassword');
+      expect(isMatch).toBe(false);
+    });
+  });
+
+  describe('Validation Logic', () => {
+    it('should validate correct document numbers based on type', () => {
+      const user1 = new User({
+        nombre: 'Test',
+        apellido: 'User',
+        correo: 'test@example.com',
+        telefono: '1234567',
+        tipoDocumento: 'Cédula de ciudadanía',
+        numeroDocumento: '12345678',
+        fechaNacimiento: new Date(),
+        password: 'password123'
+      });
+      
+      const err1 = user1.validateSync();
+      expect(err1).toBeUndefined();
+
+      const user2 = new User({
+        nombre: 'Test',
+        apellido: 'User',
+        correo: 'test2@example.com',
+        telefono: '1234567',
+        tipoDocumento: 'Pasaporte',
+        numeroDocumento: 'A123456',
+        fechaNacimiento: new Date(),
+        password: 'password123'
+      });
+      
+      const err2 = user2.validateSync();
+      expect(err2).toBeUndefined();
+    });
+
+    it('should return correct error message', () => {
+       const user1 = new User({
+         nombre: 'Test',
+         apellido: 'User',
+         correo: 'test@example.com',
+         telefono: '1234567',
+         tipoDocumento: 'Tarjeta de identidad', // Use non-accented type to avoid encoding issues
+         numeroDocumento: 'abc', // Invalid for Tarjeta
+         fechaNacimiento: new Date(),
+         password: 'password123'
+       });
+       
+       let err1 = user1.validateSync();
+       expect(err1.errors.numeroDocumento.message).toContain('solo números');
+       
+       const user2 = new User({
+         nombre: 'Test',
+         apellido: 'User',
+         correo: 'test2@example.com',
+         telefono: '1234567',
+         tipoDocumento: 'Pasaporte',
+         numeroDocumento: '123', // Too short
+         fechaNacimiento: new Date(),
+         password: 'password123'
+       });
+       
+       const err2 = user2.validateSync();
+       expect(err2.errors.numeroDocumento.message).toContain('alfanumérico');
+    });
+  });
+
+  describe('encryptPassword method', () => {
+    it('should hash password if modified', async () => {
+      const user = new User({
+        nombre: 'Test',
+        apellido: 'User',
+        correo: 'test@example.com',
+        telefono: '1234567',
+        tipoDocumento: 'Pasaporte',
+        numeroDocumento: 'A123456',
+        fechaNacimiento: new Date(),
+        password: 'plainPassword'
+      });
+
+      // Mock isModified to return true
+      user.isModified = jest.fn().mockReturnValue(true);
+      
+      // Mock bcrypt
+      bcrypt.genSalt.mockResolvedValue('salt');
+      bcrypt.hash.mockResolvedValue('hashedPassword');
+
+      await user.encryptPassword();
+
+      expect(user.isModified).toHaveBeenCalledWith('password');
+      expect(bcrypt.genSalt).toHaveBeenCalledWith(10);
+      expect(bcrypt.hash).toHaveBeenCalledWith('plainPassword', 'salt');
+      expect(user.password).toBe('hashedPassword');
+    });
+
+    it('should not hash password if not modified', async () => {
+      const user = new User({ password: 'plainPassword' });
+      user.isModified = jest.fn().mockReturnValue(false);
+
+      await user.encryptPassword();
+
+      expect(user.isModified).toHaveBeenCalledWith('password');
+      expect(bcrypt.genSalt).not.toHaveBeenCalled();
+    });
+  });
+});

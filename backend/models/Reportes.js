@@ -122,27 +122,35 @@ reporteSchema.virtual('resumenFiltros').get(function() {
   return filtros.length > 0 ? filtros.join(' | ') : 'Sin filtros aplicados';
 });
 
-// Middleware para validaciones personalizadas
-reporteSchema.pre('save', function(next) {
-  // Validar que fechaFin no sea menor a fechaInicio
+// Método para validar fechas (extraído para facilitar testing)
+reporteSchema.methods.validateDates = function() {
   if (this.filtros.fechaInicio && this.filtros.fechaFin) {
     if (new Date(this.filtros.fechaFin) < new Date(this.filtros.fechaInicio)) {
-      return next(new Error('La fecha fin no puede ser menor a la fecha inicio'));
+      throw new Error('La fecha fin no puede ser menor a la fecha inicio');
     }
     // Validar que fechaFin no sea en el futuro (mes actual)
     const ahora = new Date();
     const fin = new Date(this.filtros.fechaFin);
     if (fin.getFullYear() > ahora.getFullYear() || (fin.getFullYear() === ahora.getFullYear() && fin.getMonth() > ahora.getMonth())) {
-      return next(new Error('No se puede crear un reporte de meses futuros.'));
+      throw new Error('No se puede crear un reporte de meses futuros.');
     }
   }
+};
 
-  // Asegurar que hay datos si el estado es 'generado'
-  if (this.estado === 'generado' && (!this.datos || Object.keys(this.datos).length === 0)) {
-    this.estado = 'error';
+// Middleware para validaciones personalizadas
+reporteSchema.pre('save', function(next) {
+  try {
+    this.validateDates();
+    
+    // Asegurar que hay datos si el estado es 'generado'
+    if (this.estado === 'generado' && (!this.datos || Object.keys(this.datos).length === 0)) {
+      this.estado = 'error';
+    }
+    
+    next();
+  } catch (error) {
+    next(error);
   }
-
-  next();
 });
 
 // Manejo de errores
