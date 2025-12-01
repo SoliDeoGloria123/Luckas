@@ -94,6 +94,20 @@ describe('User Controller', () => {
       expect(res.status).toHaveBeenCalledWith(403);
     });
 
+    it('should deny access for seminarista viewing another profile', async () => {
+      req.params.id = 'targetUserId';
+      req.userRole = 'seminarista';
+      req.userId = 'myUserId';
+      const mockUser = { _id: 'targetUserId' };
+      User.findById.mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockUser)
+      });
+
+      await userController.getUserById(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+    });
+
     it('should handle errors', async () => {
       req.params.id = 'userId';
       User.findById.mockReturnValue({

@@ -340,5 +340,152 @@ describe('Categorizacion Controller', () => {
         }
       });
     });
+
+    it('should handle errors', async () => {
+      Categorizacion.countDocuments = jest.fn().mockRejectedValue(new Error('DB Error'));
+      await categorizacionController.estadisticasCategorias(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+  });
+
+  // Additional tests for coverage
+  describe('Edge cases and Error handling', () => {
+    it('crearCategoria: should return 400 if nombre already exists', async () => {
+      req.body = { nombre: 'Existing Name', codigo: 'NEW', tipo: 'general' };
+      Categorizacion.findOne = jest.fn()
+        .mockResolvedValueOnce(null) // codigo check
+        .mockResolvedValueOnce({ nombre: 'Existing Name' }); // nombre check
+
+      await categorizacionController.crearCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Ya existe una categoría con ese nombre' }));
+    });
+
+    it('crearCategoria: should handle catch error', async () => {
+      req.body = { nombre: 'Test', codigo: 'TEST', tipo: 'general' };
+      Categorizacion.findOne = jest.fn().mockRejectedValue(new Error('DB Error'));
+      await categorizacionController.crearCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('obtenerCategorias: should handle catch error', async () => {
+      Categorizacion.find = jest.fn().mockImplementation(() => { throw new Error('DB Error'); });
+      await categorizacionController.obtenerCategorias(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('obtenerCategoriaPorId: should handle catch error', async () => {
+      req.params.id = '123';
+      Categorizacion.findById = jest.fn().mockImplementation(() => { throw new Error('DB Error'); });
+      await categorizacionController.obtenerCategoriaPorId(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('actualizarCategoria: should return 400 if codigo exists in another category', async () => {
+      req.params.id = '507f1f77bcf86cd799439011';
+      req.body = { codigo: 'EXISTING' };
+      Categorizacion.findOne = jest.fn().mockResolvedValue({ _id: 'other-id' }); // Found another category
+      
+      await categorizacionController.actualizarCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Ya existe una categoría con ese código' }));
+    });
+
+    it('actualizarCategoria: should return 400 if nombre exists in another category', async () => {
+      req.params.id = '507f1f77bcf86cd799439011';
+      req.body = { nombre: 'Existing Name' };
+      Categorizacion.findOne = jest.fn().mockResolvedValue({ _id: 'other-id' });
+      
+      await categorizacionController.actualizarCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Ya existe una categoría con ese nombre' }));
+    });
+
+    it('actualizarCategoria: should update individual fields (estado, tipo, codigo)', async () => {
+      req.params.id = '507f1f77bcf86cd799439011';
+      req.body = { estado: 'inactivo', tipo: 'especial', codigo: 'UPDATED' };
+      
+      Categorizacion.findOne = jest.fn().mockResolvedValue(null); // No duplicates
+      Categorizacion.findByIdAndUpdate = jest.fn().mockResolvedValue({ _id: 'id', ...req.body });
+
+      await categorizacionController.actualizarCategoria(req, res);
+      
+      expect(Categorizacion.findByIdAndUpdate).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ estado: 'inactivo', tipo: 'especial', codigo: 'UPDATED' }),
+        expect.anything()
+      );
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    });
+
+    it('actualizarCategoria: should return 404 if category not found', async () => {
+      req.params.id = '507f1f77bcf86cd799439011';
+      req.body = { nombre: 'New Name' };
+      Categorizacion.findOne = jest.fn().mockResolvedValue(null);
+      Categorizacion.findByIdAndUpdate = jest.fn().mockResolvedValue(null);
+
+      await categorizacionController.actualizarCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('actualizarCategoria: should handle catch error', async () => {
+      req.params.id = '507f1f77bcf86cd799439011';
+      req.body = { nombre: 'New' };
+      Categorizacion.findOne = jest.fn().mockRejectedValue(new Error('DB Error'));
+      await categorizacionController.actualizarCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('eliminarCategoria: should return 404 if category not found', async () => {
+      req.params.id = 'cat-123';
+      Solicitud.countDocuments = jest.fn().mockResolvedValue(0);
+      Categorizacion.findByIdAndDelete = jest.fn().mockResolvedValue(null);
+
+      await categorizacionController.eliminarCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('eliminarCategoria: should handle catch error', async () => {
+      req.params.id = 'cat-123';
+      Solicitud.countDocuments = jest.fn().mockRejectedValue(new Error('DB Error'));
+      await categorizacionController.eliminarCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('categorizarSolicitud: should return 404 if solicitud not found', async () => {
+      req.params.id = 'sol-123';
+      req.body = { categoriaId: 'cat-123' };
+      Categorizacion.findById = jest.fn().mockResolvedValue({ _id: 'cat-123' });
+      Solicitud.findById = jest.fn().mockResolvedValue(null);
+
+      await categorizacionController.categorizarSolicitud(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Solicitud no encontrada' }));
+    });
+
+    it('categorizarSolicitud: should handle catch error', async () => {
+      req.params.id = 'sol-123';
+      req.body = { categoriaId: 'cat-123' };
+      Categorizacion.findById = jest.fn().mockRejectedValue(new Error('DB Error'));
+      await categorizacionController.categorizarSolicitud(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('activarDesactivarCategoria: should return 404 if category not found', async () => {
+      req.params.id = 'cat-123';
+      req.body = { estado: 'activo' };
+      Categorizacion.findByIdAndUpdate = jest.fn().mockResolvedValue(null);
+      
+      await categorizacionController.activarDesactivarCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('activarDesactivarCategoria: should handle catch error', async () => {
+      req.params.id = 'cat-123';
+      req.body = { estado: 'activo' };
+      Categorizacion.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error('DB Error'));
+      await categorizacionController.activarDesactivarCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
   });
 });

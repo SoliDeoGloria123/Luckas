@@ -6,29 +6,7 @@ const Usuario = require('../models/User');
 // Obtener todos los eventos
 exports.getAllEvents = async (req, res) => {
   try {
-    console.log('[EVENTOS] Consultando eventos para usuario:', req.userRole, 'ID:', req.userId);
 
-    // Primero verificar cuántos eventos hay en total
-    const totalEvents = await Evento.countDocuments();
-    console.log('[EVENTOS] Total de eventos en BD:', totalEvents);
-
-    // Verificar cuántos eventos activos hay
-    const activeEvents = await Evento.countDocuments({ active: true });
-    console.log('[EVENTOS] Eventos activos:', activeEvents);
-    // Si no hay eventos activos, mostrar algunos eventos sin filtro para debug
-    if (activeEvents === 0 && totalEvents > 0) {
-      const allEvents = await Evento.find().limit(5);
-      console.log('[EVENTOS] Muestra de eventos (cualquier estado):', allEvents.map(e => ({
-        id: e._id,
-        nombre: e.nombre,
-        active: e.active
-      })));
-    }
-
-    // TEMPORAL: Mostrar todos los eventos independientemente del estado active
-    // Cambiar de: { active: true } a: {} para mostrar todos
-    const events = await Evento.find({}).populate('categoria');
-    console.log('[EVENTOS] Eventos encontrados después del populate:', events.length);
 
     res.status(200).json({ success: true, data: events });
   } catch (error) {
@@ -53,10 +31,6 @@ exports.getEventById = async (req, res) => {
 // Crear nuevo evento
 exports.createEvent = async (req, res) => {
   try {
-    console.log('[EVENTOS] createEvent - Iniciando creación de evento');
-    console.log('[EVENTOS] req.body:', req.body);
-    console.log('[EVENTOS] req.files:', req.files);
-    console.log('[EVENTOS] req.cloudinaryUrls:', req.cloudinaryUrls);
 
     const {
       nombre,
@@ -301,14 +275,12 @@ exports.getEventosPorCategoria = async (req, res) => {
 // Función temporal para activar todos los eventos
 exports.activarTodosLosEventos = async (req, res) => {
   try {
-    console.log('[EVENTOS] Activando todos los eventos...');
 
     const result = await Evento.updateMany(
       { active: false },
       { $set: { active: true } }
     );
 
-    console.log('[EVENTOS] Eventos activados:', result.modifiedCount);
 
     res.status(200).json({
       success: true,
@@ -355,7 +327,6 @@ exports.obtenerEstadisticasEventos = async (req, res) => {
       Evento.countDocuments({ active: false })
     ]);
 
-    console.log('[EVENTOS] Estadísticas calculadas:', { totalEvents, upcomingEvents, completedEvents, cancelledEvents });
 
     res.status(200).json({
       success: true,
