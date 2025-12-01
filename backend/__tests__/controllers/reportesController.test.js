@@ -18,9 +18,31 @@ jest.mock('../../models/Eventos');
 jest.mock('../../models/categorizacion');
 jest.mock('../../models/Cabana');
 jest.mock('../../models/Tarea');
+jest.mock('mongoose', () => {
+  const actualMongoose = jest.requireActual('mongoose');
+  return {
+    ...actualMongoose,
+    Types: {
+      ...actualMongoose.Types,
+      ObjectId: {
+        ...actualMongoose.Types.ObjectId,
+        isValid: jest.fn(val => val === '507f1f77bcf86cd799439011')
+      }
+    }
+  };
+});
 
 describe('Reportes Controller', () => {
   let req, res;
+
+  beforeAll(() => {
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
 
   beforeEach(() => {
     req = {
@@ -155,6 +177,12 @@ describe('Reportes Controller', () => {
       };
       mockFind.populate.mockReturnValue(mockFind);
       Reserva.find.mockReturnValue(mockFind);
+
+      // Mock Usuario.findOne for resolverUsuario
+      const mockUsuarioQuery = {
+        select: jest.fn().mockResolvedValue({ _id: 'user-id', username: 'UserName' })
+      };
+      Usuario.findOne.mockReturnValue(mockUsuarioQuery);
 
       // Mock Reporte constructor and save
       const mockSave = jest.fn().mockResolvedValue({});
@@ -423,4 +451,134 @@ describe('Reportes Controller', () => {
       }));
     });
   });
+  describe('Error Handling and Edge Cases', () => {
+    it('getReportesGuardados should handle errors', async () => {
+      Reporte.find.mockReturnValue({
+        populate: jest.fn().mockRejectedValue(new Error('DB Error'))
+      });
+      await reportesController.getReportesGuardados(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('guardarReporte should handle errors', async () => {
+      req.body = { nombre: 'Test', descripcion: 'Desc', tipo: 'reservas' };
+      Reporte.mockImplementation(() => {
+        throw new Error('Save Error');
+      });
+      await reportesController.guardarReporte(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('guardarReporte should validate missing fields', async () => {
+      req.body = {};
+      await reportesController.guardarReporte(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: false,
+        message: 'Faltan campos obligatorios'
+      }));
+    });
+
+    it('editarReporteGuardado should handle errors', async () => {
+      req.params.id = 'id';
+      req.body = { nombre: 'Updated' };
+      Reporte.findOneAndUpdate.mockRejectedValue(new Error('Update Error'));
+      await reportesController.editarReporteGuardado(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('editarReporteGuardado should validate empty body', async () => {
+      req.params.id = 'id';
+      req.body = {};
+      await reportesController.editarReporteGuardado(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it('eliminarReporteGuardado should handle errors', async () => {
+      req.params.id = 'id';
+      Reporte.findByIdAndDelete.mockRejectedValue(new Error('Delete Error'));
+      await reportesController.eliminarReporteGuardado(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    it('getTotalGestiones should handle errors', async () => {
+      Usuario.countDocuments.mockRejectedValue(new Error('Count Error'));
+      await reportesController.getTotalGestiones(req, res);
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    describe('Helper Functions Logic', () => {
+    it('should resolve category and user by name/email using regex', async () => {
+      req.body = {
+        nombre: 'Test Regex',
+        descripcion: 'Desc',
+        tipo: 'reservas',
+        filtros: { categoria: 'CatName', usuario: 'test@example.com' }
+      };
+
+      // Mock Categorizacion
+      Categorizacion.findOne.mockResolvedValue({ _id: 'cat-id-regex', nombre: 'CatName' });
+
+      // Mock Usuario with chaining support for .select()
+      const mockUsuarioQuery = {
+        select: jest.fn().mockResolvedValue({ _id: 'user-id-regex' })
+      };
+      Usuario.findOne.mockReturnValue(mockUsuarioQuery);
+
+      // Mock Reserva.find with chaining support
+      const mockFind = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue([])
+      };
+      mockFind.populate.mockReturnValue(mockFind);
+      Reserva.find.mockReturnValue(mockFind);
+
+      const mockSave = jest.fn().mockResolvedValue({});
+      Reporte.mockImplementation(() => ({ save: mockSave }));
+
+      await reportesController.guardarReporte(req, res);
+
+      expect(Categorizacion.findOne).toHaveBeenCalledWith(expect.objectContaining({
+        nombre: expect.anything()
+      }));
+      expect(Usuario.findOne).toHaveBeenCalledWith(expect.objectContaining({
+        $or: expect.arrayContaining([{ email: 'test@example.com' }])
+      }));
+      expect(mockSave).toHaveBeenCalled();
+    });
+
+    it('should handle missing category and user resolution gracefully', async () => {
+      req.body = {
+        nombre: 'Test Missing',
+        descripcion: 'Desc',
+        tipo: 'reservas',
+        filtros: { categoria: 'UnknownCat', usuario: 'UnknownUser' }
+      };
+
+      // Mock Categorizacion
+      Categorizacion.findOne.mockResolvedValue(null);
+      
+      // Mock Usuario with chaining support
+      const mockUsuarioQuery = {
+        select: jest.fn().mockResolvedValue(null)
+      };
+      Usuario.findOne.mockReturnValue(mockUsuarioQuery);
+
+      // Mock Reserva.find with chaining support
+      const mockFind = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue([])
+      };
+      mockFind.populate.mockReturnValue(mockFind);
+      Reserva.find.mockReturnValue(mockFind);
+
+      const mockSave = jest.fn().mockResolvedValue({});
+      Reporte.mockImplementation(() => ({ save: mockSave }));
+
+      await reportesController.guardarReporte(req, res);
+
+      expect(mockSave).toHaveBeenCalled();
+    });
+  });
+});
 });

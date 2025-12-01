@@ -85,6 +85,43 @@ describe('Inscripcion Model', () => {
       let err2 = inscripcion2.validateSync();
       expect(err2.errors.estado).toBeDefined();
     });
+
+    it('should allow validation when tipoReferencia is not set', () => {
+      const inscripcion = new Inscripcion({
+        usuario: '507f1f77bcf86cd799439011',
+        nombre: 'Test',
+        tipoDocumento: 'Cédula de ciudadanía',
+        numeroDocumento: '123456',
+        telefono: '123456',
+        edad: 25,
+        referencia: '507f1f77bcf86cd799439012',
+        categoria: '507f1f77bcf86cd799439013',
+        estado: 'any_state'
+      });
+      // Without tipoReferencia, validator should allow (line 73-74)
+      let err = inscripcion.validateSync();
+      // Should not have estado error since tipoReferencia is undefined
+      expect(err?.errors?.estado).toBeUndefined();
+    });
+
+    it('should return false for invalid estado when tipoReferencia is not Eventos or ProgramaAcademico', () => {
+      const inscripcion = new Inscripcion({
+        usuario: '507f1f77bcf86cd799439011',
+        nombre: 'Test',
+        tipoDocumento: 'Cédula de ciudadanía',
+        numeroDocumento: '123456',
+        telefono: '123456',
+        edad: 25,
+        tipoReferencia: 'OtroTipo',
+        referencia: '507f1f77bcf86cd799439012',
+        categoria: '507f1f77bcf86cd799439013',
+        estado: 'invalid_state'
+      });
+      
+      let err = inscripcion.validateSync();
+      expect(err).toBeDefined();
+      expect(err.errors.estado).toBeDefined();
+    });
   });
 
   describe('setDefaultState method', () => {
@@ -119,6 +156,12 @@ describe('Inscripcion Model', () => {
         inscripcion.setDefaultState();
         
         expect(inscripcion.estado).toBe('inscrito');
+    });
+
+    it('should have pre-save hook that calls setDefaultState', () => {
+      const hooks = Inscripcion.schema.s.hooks._pres.get('save');
+      expect(hooks).toBeDefined();
+      expect(hooks.length).toBeGreaterThan(0);
     });
   });
 });

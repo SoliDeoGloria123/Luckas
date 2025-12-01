@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
   },
   tipoDocumento: {
     type: String,
-    enum: ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad'],
+    enum: ['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'Tarjeta de identidad', 'Otro'],
     required: true
   },
   numeroDocumento: {
@@ -42,17 +42,26 @@ const userSchema = new mongoose.Schema({
         switch (this.tipoDocumento) {
           case 'Cédula de ciudadanía':
           case 'Cédula de extranjería':
-              if (!/^\d{7,12}$/.test(value)) throw new Error('La cédula debe contener solo números y tener entre 7 y 12 dígitos');
-              return true;
+              return /^\d{7,12}$/.test(value);
           case 'Pasaporte':
-              if (!/^[A-Za-z0-9]{6,15}$/.test(value)) throw new Error('El pasaporte debe ser alfanumérico y tener entre 6 y 15 caracteres');
-              return true;
+              return /^[A-Za-z0-9]{6,15}$/.test(value);
           case 'Tarjeta de identidad':
-              if (!/^\d{8,15}$/.test(value)) throw new Error('La tarjeta de identidad debe contener solo números y tener entre 8 y 15 dígitos');
-              return true;
+              return /^\d{8,15}$/.test(value);
           default:
-              if (!/^[A-Za-z0-9]{6,15}$/.test(value)) throw new Error('El número de documento debe ser alfanumérico y tener entre 6 y 15 caracteres');
-              return true;
+              return /^[A-Za-z0-9]{6,15}$/.test(value);
+        }
+      },
+      message: function(props) {
+        switch (this.tipoDocumento) {
+          case 'Cédula de ciudadanía':
+          case 'Cédula de extranjería':
+            return 'La cédula debe contener solo números y tener entre 7 y 12 dígitos';
+          case 'Pasaporte':
+            return 'El pasaporte debe ser alfanumérico y tener entre 6 y 15 caracteres';
+          case 'Tarjeta de identidad':
+            return 'La tarjeta de identidad debe contener solo números y tener entre 8 y 15 dígitos';
+          default:
+            return 'El número de documento debe ser alfanumérico y tener entre 6 y 15 caracteres';
         }
       }
     }
@@ -163,4 +172,4 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('usuarios', userSchema);
+module.exports = mongoose.model('User', userSchema);
