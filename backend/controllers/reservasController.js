@@ -45,8 +45,6 @@ const validarExistencia = async (usuario, cabana) => {
     return { error: 'Cabaña no encontrada' };
   }
 
-  console.log('Usuario encontrado:', usuarioExiste.nombre, usuarioExiste.apellido);
-  console.log('Cabaña encontrada:', cabanaExiste.nombre);
   
   return { usuarioExiste, cabanaExiste, error: null };
 };
@@ -85,7 +83,6 @@ const crearSolicitudAsociada = async (reserva, usuarioExiste, cabanaExiste) => {
   });
   
   await solicitud.save();
-  console.log('Solicitud creada:', solicitud._id);
   
   // Enlazar la solicitud a la reserva
   reserva.solicitud = solicitud._id;
@@ -95,17 +92,12 @@ const crearSolicitudAsociada = async (reserva, usuarioExiste, cabanaExiste) => {
 // Crear reserva
 exports.crearReserva = async (req, res) => {
   try {
-    console.log('=== DEBUG RESERVA ===');
-    console.log('Datos recibidos:', JSON.stringify(req.body, null, 2));
-    console.log('Usuario autenticado:', req.userId);
-    console.log('Rol del usuario:', req.userRole);
 
     const { usuario, cabana } = req.body;
 
     // Validar campos requeridos
     const camposFaltantes = validarCamposRequeridos(req.body);
     if (camposFaltantes.length > 0) {
-      console.log('❌ CAMPOS FALTANTES:', camposFaltantes);
       return res.status(400).json({ 
         success: false, 
         message: `Campos requeridos faltantes: ${camposFaltantes.join(', ')}` 
@@ -115,14 +107,12 @@ exports.crearReserva = async (req, res) => {
     // Validar IDs
     const validacionIds = validarIds(usuario, cabana);
     if (validacionIds.error) {
-      console.log('Error:', validacionIds.error);
       return res.status(400).json({ success: false, message: validacionIds.error });
     }
 
     // Validar existencia
     const validacionExistencia = await validarExistencia(usuario, cabana);
     if (validacionExistencia.error) {
-      console.log('Error:', validacionExistencia.error);
       return res.status(404).json({ success: false, message: validacionExistencia.error });
     }
 
@@ -131,11 +121,9 @@ exports.crearReserva = async (req, res) => {
     // Validar enums
     const validacionEnums = validarEnums(req.body);
     if (validacionEnums.error) {
-      console.log('❌ ERROR ENUM:', validacionEnums.error);
       return res.status(400).json({ success: false, message: validacionEnums.error });
     }
 
-    console.log('✅ Validaciones pasadas, creando reserva...');
 
     // Procesar campo activo
     let activo = req.body.activo;
@@ -165,10 +153,8 @@ exports.crearReserva = async (req, res) => {
       activo
     });
     
-    console.log('🔄 GUARDANDO RESERVA:', JSON.stringify(reserva.toObject(), null, 2));
     
     await reserva.save();
-    console.log('✅ Reserva creada exitosamente:', reserva._id);
 
     // Crear solicitud asociada
     await crearSolicitudAsociada(reserva, usuarioExiste, cabanaExiste);
@@ -176,16 +162,11 @@ exports.crearReserva = async (req, res) => {
     // Enviar notificación a administradores y tesoreros
     try {
       await notificarNuevaReserva(reserva, usuarioExiste, cabanaExiste);
-      console.log('✅ Notificación de reserva enviada correctamente');
     } catch (notificationError) {
-      console.error('❌ Error al enviar notificación de reserva:', notificationError);
     }
 
-    console.log('=== FIN DEBUG RESERVA ===');
     res.status(201).json({ success: true, data: reserva });
   } catch (error) {
-    console.log('Error en crearReserva:', error.message);
-    console.log('Stack:', error.stack);
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -369,7 +350,6 @@ exports.obtenerEstadisticasReservas = async (req, res) => {
       reservasPorMes
     });
   } catch (error) {
-    console.error('Error al obtener estadísticas de reservas:', error);
     res.status(500).json({ success: false, message: 'Error al obtener estadísticas de reservas' });
   }
 };

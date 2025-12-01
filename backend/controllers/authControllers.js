@@ -75,7 +75,6 @@ exports.signup = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[AuthController] Error en registro:', error);
 
     // Manejo especial de errores de MongoDB
     if (error.code === 11000) {
@@ -109,11 +108,9 @@ exports.signin = async (req, res) => {
   try {
     const { correo, password } = req.body;
 
-    console.log('[AUTH] Intento de login para:', correo);
 
     // 1. Validación básica
     if (!correo || !password) {
-      console.log('[AUTH] Faltan campos obligatorios');
       return res.status(400).json({
         success: false,
         message: "Email y contraseña son requeridos"
@@ -123,14 +120,10 @@ exports.signin = async (req, res) => {
     // 2. Buscar usuario incluyendo el password (que normalmente está oculto)
     const user = await User.findOne({ correo }).select('+password');
 
-    console.log('[AUTH] Usuario encontrado:', user ? 'Sí' : 'No');
     if (user) {
-      console.log('[AUTH] Correo del usuario:', user.correo);
-      console.log('[AUTH] Hash de password almacenado:', user.password ? 'Existe' : 'No existe');
     }
 
     if (!user) {
-      console.log('[AUTH] Usuario no encontrado para correo:', correo);
       return res.status(404).json({
         success: false,
         message: "Usuario no encontrado"
@@ -138,20 +131,15 @@ exports.signin = async (req, res) => {
     }
 
     // 3. Comparar contraseñas
-    console.log('[AUTH] Comparando contraseñas...');
-    console.log('[AUTH] Password ingresado:', password);
     const isMatch = await user.comparePassword(password);
-    console.log('[AUTH] Contraseñas coinciden:', isMatch);
 
     if (!isMatch) {
-      console.log('[AUTH] Credenciales inválidas para usuario:', correo);
       return res.status(401).json({
         success: false,
         message: "Credenciales inválidas"
       });
     }
 
-    console.log('[AUTH] Login exitoso para usuario:', correo);
 
     // 4. Generar token JWT
     const token = jwt.sign(
@@ -172,7 +160,6 @@ exports.signin = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[AuthController] Error en login:', error);
     res.status(500).json({
       success: false,
       message: "Error en el servidor",
@@ -247,7 +234,6 @@ exports.updateUser = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error en updateUser:', error);
     return res.status(500).json({
       success: false,
       message: 'Error al actualizar usuario'
@@ -280,7 +266,6 @@ exports.deleteUser = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error en deleteUser:', error);
     return res.status(500).json({
       success: false,
       message: 'Error al eliminar usuario'
@@ -380,7 +365,6 @@ exports.resetPassword = async (req, res) => {
         throw new Error('Token inválido para este propósito');
       }
     } catch (jwtError) {
-      console.warn('[RESET PASSWORD] Error verificando resetToken:', jwtError && jwtError.message ? jwtError.message : jwtError);
       return res.status(400).json({ 
         success: false, 
         message: 'Token inválido o expirado' 
@@ -402,14 +386,12 @@ exports.resetPassword = async (req, res) => {
     user.resetPasswordExpires = undefined;
     await user.save();
 
-    console.log('[RESET PASSWORD] Contraseña actualizada para usuario:', user.correo);
 
     return res.status(200).json({ 
       success: true, 
       message: 'Contraseña actualizada correctamente' 
     });
   } catch (error) {
-    console.error('[AuthController] Error resetPassword:', error);
     return res.status(500).json({ 
       success: false, 
       message: 'Error en el servidor', 
@@ -453,7 +435,6 @@ exports.verifyResetCode = async (req, res) => {
       resetToken: resetToken
     });
   } catch (error) {
-    console.error('[AuthController] Error verifyResetCode:', error);
     return res.status(500).json({ success: false, message: 'Error en el servidor', error: error.message });
   }
 };

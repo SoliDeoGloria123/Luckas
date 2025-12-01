@@ -3,18 +3,6 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const { authJwt, role } = require('../middlewares');
 
-// Middleware de diagnóstico para todas las rutas
-router.use((req, res, next) => {
-    console.log('\n=== DIAGNÓSTICO DE RUTA ===');
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-    console.log('Headers:', {
-        'authorization': req.headers.authorization ? '***' + req.headers.authorization.slice(-8) : null,
-        'x-access-token': req.headers['x-access-token'] ? '***' + req.headers['x-access-token'].slice(-8) : null,
-        'user-agent': req.headers['user-agent']
-    });
-    next();
-});
-
 // Middleware de autenticación para todas las rutas
 router.use(authJwt.verifyToken);
 

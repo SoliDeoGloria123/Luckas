@@ -107,8 +107,6 @@ exports.crearTarea = async (req, res) => {
         const userRole = req.userRole;
         const userId = req.userId;
 
-        console.log('Datos recibidos:', req.body);
-        console.log('User ID:', userId, 'Role:', userRole);
 
         // Para seminaristas, asignadoPor debe ser ellos mismos
         if (userRole === 'seminarista') {
@@ -120,7 +118,6 @@ exports.crearTarea = async (req, res) => {
         // Validar IDs de ObjectId
         const validacionIds = validarObjectIds(asignadoA, finalAsignadoPor);
         if (validacionIds.error) {
-            console.log('Error de validación ID:', validacionIds.message);
             return res.status(validacionIds.status).json({ 
                 success: false, 
                 message: validacionIds.message 
@@ -168,7 +165,6 @@ exports.crearTarea = async (req, res) => {
             data: tareaPoblada
         });
     } catch (error) {
-        console.error('Error al crear tarea:', error);
         res.status(400).json({ 
             success: false,
             message: error.message 
@@ -210,7 +206,6 @@ exports.obtenerTareasPorUsuario = async (req, res) => {
             data: tareas
         });
     } catch (error) {
-        console.error('Error al obtener tareas del usuario:', error);
         res.status(500).json({
             success: false,
             message: 'Error al obtener las tareas del usuario',
@@ -410,7 +405,6 @@ exports.obtenerEstadisticasTareas = async (req, res) => {
             porPrioridad
         });
     } catch (error) {
-        console.error('Error al obtener estadísticas de tareas:', error);
         res.status(500).json({ success: false, message: 'Error al obtener estadísticas de tareas' });
     }
 };

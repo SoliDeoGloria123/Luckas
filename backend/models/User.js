@@ -38,7 +38,6 @@ const userSchema = new mongoose.Schema({
     trim: true,
     validate: {
       validator: function(value) {
-        console.log('Validando numeroDocumento:', value, 'con tipoDocumento:', this.tipoDocumento);
         switch (this.tipoDocumento) {
           case 'Cédula de ciudadanía':
           case 'Cédula de extranjería':

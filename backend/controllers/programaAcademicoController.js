@@ -35,7 +35,6 @@ exports.crearProgramaAcademico = async (req, res) => {
     await nuevoPrograma.save();
     res.status(201).json({ success: true, message: 'Programa académico creado exitosamente', data: nuevoPrograma });
   } catch (error) {
-    console.error('Error al crear programa académico:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor', error: error.message });
   }
 };
@@ -126,7 +125,6 @@ exports.obtenerEstadisticasProgramas = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error al obtener estadísticas de programas académicos:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor', error: error.message });
   }
 };

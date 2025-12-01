@@ -4,10 +4,6 @@ const Categorizacion = require('../models/categorizacion');
 // CRUD básico
 exports.crearCabana = async (req, res) => {
   try {
-    console.log('[CABANAS] crearCabana - Iniciando creación');
-    console.log('[CABANAS] req.body:', req.body);
-    console.log('[CABANAS] req.files:', req.files ? req.files.length : 'No files');
-    console.log('[CABANAS] req.cloudinaryUrls:', req.cloudinaryUrls);
     
     const { categoria, capacidad, precio } = req.body;
     
@@ -40,7 +36,6 @@ exports.crearCabana = async (req, res) => {
     }
   // Usar las URLs de Cloudinary si existen, si no, array vacío
   const imagen = req.cloudinaryUrls || [];
-  console.log('[CABANAS] Imágenes a guardar:', imagen);
   
   const datosCompletos = {
     nombre: req.body.nombre.trim(),
@@ -54,18 +49,13 @@ exports.crearCabana = async (req, res) => {
     creadoPor: req.userId
   };
   
-  console.log('[CABANAS] Datos completos para crear cabaña:', datosCompletos);
   
   const cabana = new Cabana(datosCompletos);
-  console.log('[CABANAS] Cabaña creada en memoria, guardando...');
   
   await cabana.save();
-  console.log('[CABANAS] Cabaña guardada exitosamente:', cabana._id);
   
   res.status(201).json({ success: true, data: cabana });
   } catch (error) {
-    console.error('[CABANAS] Error al crear cabaña:', error);
-    console.error('[CABANAS] Stack trace:', error.stack);
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -104,7 +94,6 @@ async function eliminarImagenesCloudinary(imagenes, cloudinary) {
       try {
         await cloudinary.uploader.destroy(publicId);
       } catch (err) {
-        console.error('Error eliminando imagen de Cloudinary:', publicId, err);
       }
     }
   }
@@ -117,7 +106,6 @@ function parseExistingImages(req) {
     const parsed = JSON.parse(req.body.existingImages);
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
-    console.warn('[UPLOAD] existingImages JSON parse error:', err && err.message ? err.message : err);
     return [];
   }
 }
@@ -169,7 +157,6 @@ function sanitizeCategoriaField(req) {
 
   if (typeof cat === 'string') {
     if (cat.trim() === '' || !mongoose.Types.ObjectId.isValid(cat)) {
-      console.warn('[CABANAS] categoria inválida recibida en actualización, se omite:', cat);
       delete req.body.categoria;
     }
   }
@@ -204,7 +191,6 @@ exports.eliminarCabana = async (req, res) => {
     // Eliminar reservas asociadas a esta cabaña
     const Reserva = require('../models/Reservas');
     const result = await Reserva.deleteMany({ cabana: cabana._id });
-    console.log(`[CABAÑAS] Se eliminaron ${result.deletedCount} reservas asociadas a la cabaña.`);
 
     const cloudinary = require('../config/cloudinary');
     await eliminarImagenesCloudinary(cabana.imagen, cloudinary);
@@ -269,7 +255,6 @@ exports.obtenerEstadisticasCabanas = async (req, res) => {
       precioPromedio: precioPromedio[0]?.promedioPrecio || 0
     });
   } catch (error) {
-    console.error('Error al obtener estadísticas de cabañas:', error);
     res.status(500).json({ message: 'Error al obtener estadísticas de cabañas' });
   }
 };

@@ -190,7 +190,6 @@ async function actualizarCuposProgramaAcademico(tipoReferencia, referencia) {
         await programa.save();
       }
     } catch (err) {
-      console.error('Error al actualizar cuposDisponibles:', err.message);
     }
   }
 }
@@ -222,7 +221,6 @@ exports.crearInscripcion = async (req, res) => {
       inscripcion = new Inscripcion(datosInscripcion);
       await inscripcion.save();
     } catch (inscripcionError) {
-      console.error('Error al crear inscripción:', inscripcionError);
       return res.status(400).json({ success: false, message: 'Error al crear inscripción: ' + inscripcionError.message });
     }
     
@@ -233,9 +231,7 @@ exports.crearInscripcion = async (req, res) => {
     try {
       const usuarioData = validacion.usuarioExiste; // Ya tenemos los datos del usuario de la validación
       await notificarNuevaInscripcion(inscripcion, usuarioData, referenciaExiste);
-      console.log('✅ Notificación de inscripción enviada correctamente');
     } catch (notificationError) {
-      console.error('❌ Error al enviar notificación de inscripción:', notificationError);
       // No fallar el proceso si hay error en notificación
     }
     
@@ -248,43 +244,8 @@ exports.crearInscripcion = async (req, res) => {
 // Obtener todas las inscripciones
 exports.obtenerInscripciones = async (req, res) => {
   try {
-    console.log('=== OBTENER INSCRIPCIONES DEBUG ===');
-    console.log('[INSCRIPCIONES] Usuario:', req.userId, 'Rol:', req.userRole);
-    console.log('[INSCRIPCIONES] Headers:', JSON.stringify(req.headers, null, 2));
     
     let filtro = {};
-    if (req.userRole === 'seminarista' || req.userRole === 'externo') {
-      filtro.usuario = req.userId;
-      console.log('[INSCRIPCIONES] Filtrando por usuario:', req.userId);
-    }
-    
-    console.log('[INSCRIPCIONES] Filtro aplicado:', JSON.stringify(filtro, null, 2));
-    
-    const inscripciones = await Inscripcion.find(filtro)
-      .populate('usuario', 'nombre apellido correo telefono numeroDocumento tipoDocumento')
-      .populate('referencia')
-      .populate('categoria', 'nombre descripcion codigo')
-      .sort({ createdAt: -1 });
-      
-    console.log('[INSCRIPCIONES] Encontradas:', inscripciones.length);
-    console.log('[INSCRIPCIONES] Primera inscripción:', inscripciones[0] ? {
-      nombre: inscripciones[0].nombre,
-      apellido: inscripciones[0].apellido,
-      usuario: inscripciones[0].usuario?.nombre,
-      tipoReferencia: inscripciones[0].tipoReferencia
-    } : 'N/A');
-    
-    res.json({ success: true, data: inscripciones });
-  } catch (error) {
-    console.error('[INSCRIPCIONES] Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// Obtener las inscripciones del usuario actual
-exports.obtenerMisInscripciones = async (req, res) => {
-  try {
-    console.log('[MIS INSCRIPCIONES] Usuario:', req.userId);
     const inscripciones = await Inscripcion.find({ usuario: req.userId })
       .populate('usuario', 'nombre apellido correo telefono numeroDocumento tipoDocumento')
       .populate({
@@ -293,13 +254,29 @@ exports.obtenerMisInscripciones = async (req, res) => {
       })
       .populate('categoria', 'nombre descripcion codigo')
       .sort({ createdAt: -1 }); // Ordenar por fecha de creación, más recientes primero
-    console.log('[MIS INSCRIPCIONES] Encontradas:', inscripciones.length);
     res.json({ success: true, data: inscripciones });
   } catch (error) {
-    console.error('[MIS INSCRIPCIONES] Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Obtener las inscripciones del usuario actual
+exports.obtenerMisInscripciones = async (req, res) => {
+  try {
+    const inscripciones = await Inscripcion.find({ usuario: req.userId })
+      .populate('usuario', 'nombre apellido correo telefono numeroDocumento tipoDocumento')
+      .populate({
+        path: 'evento',
+        select: 'nombre fechaEvento lugar descripcion imagen imagenUrl precio etiquetas horaInicio horaFin cuposDisponibles cuposTotales direccion programa observaciones',
+      })
+      .populate('categoria', 'nombre descripcion codigo')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, data: inscripciones });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
 // Endpoint temporal para obtener datos para crear inscripciones
 exports.obtenerDatosParaInscripcion = async (req, res) => {
@@ -501,7 +478,6 @@ exports.obtenerEstadisticasInscripciones = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error al obtener estadísticas de inscripciones:', error);
     res.status(500).json({ success: false, message: 'Error al obtener estadísticas de inscripciones' });
   }
 };

@@ -25,7 +25,6 @@ async function enviarNotificacionAUsuariosConRol(title, message, icon = 'Bell', 
     const usuarios = await Usuario.find(filtro).select('_id');
     
     if (usuarios.length === 0) {
-      console.log('No se encontraron usuarios con los roles especificados:', targetRoles);
       return { success: false, message: 'No se encontraron usuarios destinatarios' };
     }
     
@@ -42,7 +41,6 @@ async function enviarNotificacionAUsuariosConRol(title, message, icon = 'Bell', 
     // Insertar todas las notificaciones
     const notificacionesCreadas = await Notification.insertMany(notificaciones);
     
-    console.log(`✅ Se enviaron ${notificacionesCreadas.length} notificaciones con título: "${title}"`);
     
     return {
       success: true,
@@ -51,7 +49,6 @@ async function enviarNotificacionAUsuariosConRol(title, message, icon = 'Bell', 
     };
     
   } catch (error) {
-    console.error('❌ Error al enviar notificaciones:', error);
     return { success: false, message: error.message };
   }
 }
@@ -78,7 +75,6 @@ async function notificarNuevaInscripcion(inscripcion, usuario, referencia) {
       usuario._id
     );
   } catch (error) {
-    console.error('Error al notificar nueva inscripción:', error);
     return { success: false, message: error.message };
   }
 }
@@ -105,7 +101,6 @@ async function notificarNuevaReserva(reserva, usuario, cabana) {
       usuario._id
     );
   } catch (error) {
-    console.error('Error al notificar nueva reserva:', error);
     return { success: false, message: error.message };
   }
 }
@@ -128,7 +123,6 @@ async function notificarNuevaSolicitud(solicitud, usuario) {
       usuario._id
     );
   } catch (error) {
-    console.error('Error al notificar nueva solicitud:', error);
     return { success: false, message: error.message };
   }
 }

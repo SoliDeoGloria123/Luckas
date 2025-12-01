@@ -5,16 +5,13 @@ const { normalizeTipoDocumento } = require('../utils/userValidation');
 
 //Obtener todos los usuarios (Admin tesorero)
 exports.getAllUsers = async (req, res) => {
-    console.log('[CONTROLLER] Ejecutando getAllUsers');
     try {
         const users = await User.find().select('-password');
-        console.log('[CONTROLLER] - getAllUsers Users found:', users.length);
         res.status(200).json({
             success: true,
             data: users
         });
     } catch (error) {
-        console.error('[CONTROLLER] - getAllUsers Error:', error);
         res.status(500).json({
             success: false,
             message: 'Error retrieving users', error
@@ -25,9 +22,6 @@ exports.getAllUsers = async (req, res) => {
 //Obtener usuario espesifico
 exports.getUserById = async (req, res) => {
     try {
-        console.log('[CONTROLLER] getUserById - req.userId:', req.userId);
-        console.log('[CONTROLLER] getUserById - req.userRole:', req.userRole);
-        console.log('[CONTROLLER] getUserById - params.id:', req.params.id);
 
         const user = await User.findById(req.params.id).select('-password');
 
@@ -38,11 +32,9 @@ exports.getUserById = async (req, res) => {
             });
         }
 
-        console.log('[CONTROLLER] getUserById - user._id:', user._id.toString());
 
         // Los administradores y tesoreros pueden ver cualquier usuario
         if (req.userRole === 'admin' || req.userRole === 'tesorero') {
-            console.log('[CONTROLLER] Acceso permitido -', req.userRole, 'puede ver cualquier usuario');
             return res.status(200).json({
                 success: true,
                 user
@@ -51,14 +43,12 @@ exports.getUserById = async (req, res) => {
 
         // Validaciones de acceso para otros roles (solo pueden ver su propio perfil)
         if (req.userRole === 'externo' && req.userId !== user._id.toString()) {
-            console.log('[CONTROLLER] Acceso denegado - externo intentando ver otro usuario');
             return res.status(403).json({
                 success: false,
                 message: 'No puedes ver otro usuario'
             });
         }
         if (req.userRole === 'seminarista' && req.userId !== user._id.toString()) {
-            console.log('[CONTROLLER] Acceso denegado - seminarista intentando ver otro usuario');
             return res.status(403).json({
                 success: false,
                 message: 'No puedes ver otro usuario'
@@ -81,23 +71,12 @@ exports.getUserById = async (req, res) => {
 exports.getUserByDocumento = async (req, res) => {
     try {
         const { numeroDocumento } = req.params;
-        console.log('Buscando usuario con documento:', numeroDocumento);
         const user = await User.findOne({ numeroDocumento: numeroDocumento }).select('-password');
         if (!user) {
-            console.log('Usuario no encontrado para documento:', numeroDocumento);
             return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
         }
-        console.log('Usuario encontrado:', {
-            id: user._id,
-            nombre: user.nombre,
-            apellido: user.apellido,
-            fechaNacimiento: user.fechaNacimiento,
-            tieneFechaNacimiento: !!user.fechaNacimiento
-        });
-        console.log('🔍 ID exacto del usuario encontrado:', String(user._id));
         res.status(200).json({ success: true, user });
     } catch (error) {
-        console.log('Error buscando usuario:', error.message);
         res.status(500).json({ success: false, message: 'Error al buscar usuario por documento', error: error.message });
     }
 };
@@ -183,8 +162,6 @@ exports.updateUser = async (req, res) => {
 
 // Actualizar perfil propio usuarios
 exports.updateOwnProfile = async (req, res) => {
-    console.log('[CONTROLLER] Ejecutando updateOwnProfile para usuario:', req.userId);
-    console.log('[CONTROLLER] Datos recibidos:', req.body);
     try {
         const {
             nombre,
@@ -204,7 +181,6 @@ exports.updateOwnProfile = async (req, res) => {
         // Validar que el usuario existe
         const user = await User.findById(req.userId);
         if (!user) {
-            console.log('[CONTROLLER] Usuario no encontrado para actualizar perfil');
             return res.status(404).json({
                 success: false,
                 message: 'Usuario no encontrado'
@@ -226,7 +202,6 @@ exports.updateOwnProfile = async (req, res) => {
         if (idiomas !== undefined) updateData.idiomas = idiomas;
         if (especialidad !== undefined) updateData.especialidad = especialidad;
 
-        console.log('[CONTROLLER] Datos a actualizar:', updateData);
 
         const updatedUser = await User.findByIdAndUpdate(
             req.userId,
@@ -238,21 +213,18 @@ exports.updateOwnProfile = async (req, res) => {
         ).select('-password');
 
         if (!updatedUser) {
-            console.log('[CONTROLLER] Error al actualizar perfil propio');
             return res.status(404).json({
                 success: false,
                 message: 'Error al actualizar perfil'
             });
         }
 
-        console.log('[CONTROLLER] Perfil actualizado exitosamente:', updatedUser._id);
         res.status(200).json({
             success: true,
             message: 'Perfil actualizado correctamente',
             user: updatedUser
         });
     } catch (error) {
-        console.error('[CONTROLLER] Error al actualizar perfil propio:', error.message);
         res.status(500).json({
             success: false,
             message: 'Error al actualizar perfil',
@@ -263,7 +235,6 @@ exports.updateOwnProfile = async (req, res) => {
 
 // Cambiar contraseña propia
 exports.changePassword = async (req, res) => {
-    console.log('[CONTROLLER] Ejecutando changePassword para usuario:', req.userId);
     try {
         const { currentPassword, newPassword } = req.body;
 
@@ -296,13 +267,11 @@ exports.changePassword = async (req, res) => {
         user.password = newPassword; // El middleware pre('save') se encargará del hashing
         await user.save({ validateBeforeSave: false });
 
-        console.log('[CONTROLLER] Contraseña cambiada exitosamente para usuario:', req.userId);
         res.status(200).json({
             success: true,
             message: 'Contraseña cambiada correctamente'
         });
     } catch (error) {
-        console.error('[CONTROLLER] Error al cambiar contraseña:', error.message);
         res.status(500).json({
             success: false,
             message: 'Error al cambiar contraseña',
@@ -354,24 +323,20 @@ exports.toggleUserActivation = async (req, res) => {
 
 // Eliminar usuaario (solo admin)
 exports.deleteUser = async (req, res) => {
-    console.log('[CONTROLLER ] Ejecutando deleteUser para ID:', req.params.id);//Diagnostico
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
 
         if (!deletedUser) {
-            console.log('[CONTROLLER] Usuario no encontrado para eliminar');//Diagnostico
             return res.status(404).json({
                 success: false,
                 message: 'Usuario no encontrado'
             });
         }
-        console.log('[CONTROLLER] Usuario eliminado:', deletedUser._id);//Diagnostico
         res.status(200).json({
             success: true,
             message: 'Usuario eliminado correctamente'
         });
     } catch (error) {
-        console.error('[CONTROLLER] Error al elimniar usuario', error.message);//Diagnostico
         res.status(500).json({
             success: false,
             message: 'Error al eliminar usuario'

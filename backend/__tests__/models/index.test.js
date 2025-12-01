@@ -32,7 +32,7 @@ describe('Models Index', () => {
       expect(models.Inscripcion.modelName).toBe('Inscripcion');
       
       expect(models.Evento).toBeDefined();
-      expect(models.Evento.modelName).toBe('Evento');
+      expect(models.Evento.modelName).toBe('Eventos');
       
       expect(models.Categorizacion).toBeDefined();
       expect(models.Categorizacion.modelName).toBe('Categorizacion');

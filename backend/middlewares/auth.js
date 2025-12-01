@@ -20,7 +20,6 @@ exports.authenticate = async (req, res, next) => {
         req.user = user;
         next();
     } catch (error) {
-        console.error('Error en autenticación:', error);
         res.status(401).json({
             success: false,
             message: error.message === 'Token de autenticacion requerido' ? error.message : 'Token inválido o expirado',

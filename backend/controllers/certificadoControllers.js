@@ -17,7 +17,6 @@ function validarIds(userId, cursoId) {
       cursoObjectId: mongoose.Types.ObjectId.createFromHexString(cursoId)
     };
   } catch (e) {
-    console.error('Error al validar ObjectId:', e);
     return { valido: false, mensaje: 'ID de usuario o curso inválido', error: e.message };
   }
 }
@@ -204,7 +203,6 @@ exports.obtenerEstadisticasCertificados = async (req, res) => {
       listosParaDescarga
     });
   } catch (error) {
-    console.error('Error al obtener estadísticas de certificados:', error);
     res.status(500).json({ message: 'Error al obtener estadísticas de certificados' });
   }
 };

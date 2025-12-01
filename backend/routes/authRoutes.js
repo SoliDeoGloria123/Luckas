@@ -9,31 +9,12 @@ let verifyToken;
 try{
     const authJwt = require('../middlewares/authJwt');
     verifyToken=authJwt.verifyToken;
-    console.log ('[AuthRoutes] verifyToken importado correctamente', typeof verifyToken);
-
 }catch(error){
-    console.log('[AuthRoutes] ERROR al importar verifyToken ', error);
-    throw error;
+    // Si falla la carga del middleware, continuamos pero algunas rutas protegidas podrían fallar
 }
-
-//Moddleware de diagnostico
-router.use((req, res, next)=> {
-    console.log('\n[AuthRoutes] Peticion recibida: ', {
-        method: req.method,
-        path: req.path,
-        Headers:{
-            authorization: req.headers.authorization ?  '***' : 'NO', 
-            'x-access-token': req.headers
-            ['x-access-token']? '***' : 'NO'
-        }
-    });
-    next();
-});
-
 
 // Ruta de prueba
 router.get('/test', (req, res) => {
-    console.log('[AuthRoutes] Ruta de prueba llamada');
     res.json({ message: 'Servidor funcionando correctamente' });
 });
 
@@ -52,20 +33,11 @@ router.post('/reset-password', authController.resetPassword);
 // Ruta de registro
 router.post('/signup',
     (req,res,next) =>{
-        console.log('[AuthRoutes] middlewares de verificacion de registro ');
         next();
     },
     verifySignUp.checkDuplicateEmailOrPhone,
     verifySignUp.checkRolesExisted,
     authController.signup
 );
-
-//verificacion final de rutas
-console.log('[AuthRoutes] Rutas configuradas: ', router.stack.map(layer =>{
-    return {
-        path: layer.router?.path,
-        method: layer.router?.method
-    };
-}));
 
 module.exports=router;

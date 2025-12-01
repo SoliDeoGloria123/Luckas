@@ -70,7 +70,6 @@ const inscripcionSchema = new mongoose.Schema({
                 
                 // Si no podemos determinar el tipo, permitir la validación (se validará en el controller)
                 if (!tipoRef) {
-                    console.log('⚠️ VALIDADOR: No se pudo determinar tipoReferencia, permitiendo validación');
                     return true;
                 }
                 
@@ -117,7 +116,6 @@ inscripcionSchema.methods.setDefaultState = function() {
             this.estado = 'preinscrito';
         }
     }
-    console.log(`📋 PRE-SAVE INSCRIPCIÓN: Tipo=${this.tipoReferencia}, Estado=${this.estado}`);
 };
 
 // Middleware pre-save para establecer estado por defecto según tipo de referencia

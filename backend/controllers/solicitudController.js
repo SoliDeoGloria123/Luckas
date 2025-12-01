@@ -37,10 +37,8 @@ const enviarNotificacionSiCorresponde = async (solicitudGuardada, reqUserId) => 
     const usuarioCreador = await Usuario.findById(reqUserId);
     if (usuarioCreador && !['admin', 'tesorero'].includes(usuarioCreador.role)) {
       await notificarNuevaSolicitud(solicitudGuardada, usuarioCreador);
-      console.log('✅ Notificación de nueva solicitud enviada correctamente');
     }
   } catch (notificationError) {
-    console.error('❌ Error al enviar notificación de nueva solicitud:', notificationError);
   }
 };
 
@@ -84,7 +82,6 @@ exports.obtenerSolicitudes = async (req, res) => {
       });
 
     } catch (error) {
-      console.error('Error al obtener solicitudes:', error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
@@ -116,7 +113,6 @@ exports.obtenerSolicitudes = async (req, res) => {
       });
 
     } catch (error) {
-      console.error('Error al obtener solicitud:', error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
@@ -128,15 +124,10 @@ exports.obtenerSolicitudes = async (req, res) => {
   // Crear nueva solicitud
   exports.crearSolicitud = async (req, res) => {
     try {
-      console.log('=== INICIO CREAR SOLICITUD ===');
-      console.log('req.body:', req.body);
-      console.log('req.userId:', req.userId);
       
       // Validar errores de entrada
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        console.log('=== ERRORES DE VALIDACIÓN ===');
-        console.log('Errores:', errors.array());
         return res.status(400).json({
           success: false,
           message: 'Datos de entrada inválidos',
@@ -155,23 +146,15 @@ exports.obtenerSolicitudes = async (req, res) => {
       }
 
       // Debug información
-      console.log('=== DEBUG CREAR SOLICITUD ===');
-      console.log('req.userId:', req.userId);
-      console.log('req.body.responsable:', req.body.responsable);
-      console.log('req.body:', req.body);
 
       // Generar título automáticamente si no viene
       const titulo = req.body.titulo || `Solicitud de ${req.body.tipoSolicitud} - ${new Date().toLocaleDateString()}`;
       
       // Determinar responsable
       const responsable = determinarResponsable(req.body.responsable, req.userId, req.user);
-      console.log('responsable final:', responsable);
       
       // Validar que el responsable sea válido
       if (!responsable) {
-        console.error('ERROR: No se pudo determinar el responsable');
-        console.error('req.userId:', req.userId);
-        console.error('req.user:', req.user);
         return res.status(400).json({
           success: false,
           message: 'No se pudo determinar el responsable de la solicitud. Verifica tu autenticación.'
@@ -209,7 +192,6 @@ exports.obtenerSolicitudes = async (req, res) => {
       });
 
     } catch (error) {
-      console.error('Error al crear solicitud:', error);
       res.status(500).json({
         success: false,
         message: 'Error al crear la solicitud',
@@ -222,15 +204,10 @@ exports.obtenerSolicitudes = async (req, res) => {
   exports.actualizarSolicitud = async (req, res) => {
     try {
       const { id } = req.params;
-      console.log('=== ACTUALIZANDO SOLICITUD ===');
-      console.log('ID:', id);
-      console.log('Datos recibidos:', req.body);
-      console.log('Usuario:', req.userId);
       
       // Validar errores de entrada (solo validaciones básicas)
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        console.log('Errores de validación:', errors.array());
         return res.status(400).json({
           success: false,
           message: 'Datos de entrada inválidos',
@@ -254,7 +231,6 @@ exports.obtenerSolicitudes = async (req, res) => {
       delete datosActualizacion.solicitante;
       delete datosActualizacion.fechaSolicitud;
 
-      console.log('Datos finales a actualizar:', datosActualizacion);
 
       const solicitudActualizada = await Solicitud.findByIdAndUpdate(
         id,
@@ -266,14 +242,12 @@ exports.obtenerSolicitudes = async (req, res) => {
       );
 
       if (!solicitudActualizada) {
-        console.log('Solicitud no encontrada con ID:', id);
         return res.status(404).json({
           success: false,
           message: 'Solicitud no encontrada'
         });
       }
 
-      console.log('Solicitud actualizada exitosamente:', solicitudActualizada._id);
       res.status(200).json({
         success: true,
         message: 'Solicitud actualizada exitosamente',
@@ -281,7 +255,6 @@ exports.obtenerSolicitudes = async (req, res) => {
       });
 
     } catch (error) {
-      console.error('Error al actualizar solicitud:', error);
       
       if (error.name === 'ValidationError') {
         return res.status(400).json({
@@ -356,7 +329,6 @@ exports.obtenerSolicitudes = async (req, res) => {
       });
 
     } catch (error) {
-      console.error('Error al categorizar solicitud:', error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
@@ -395,7 +367,6 @@ exports.obtenerSolicitudes = async (req, res) => {
       });
 
     } catch (error) {
-      console.error('Error al asignar responsable:', error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
@@ -429,7 +400,6 @@ exports.obtenerSolicitudes = async (req, res) => {
       });
 
     } catch (error) {
-      console.error('Error al obtener estadísticas:', error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
@@ -489,7 +459,6 @@ exports.obtenerEstadisticasGenerales = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error al obtener estadísticas generales de solicitudes:', error);
     res.status(500).json({ success: false, message: 'Error al obtener estadísticas', error: error.message });
   }
 };
