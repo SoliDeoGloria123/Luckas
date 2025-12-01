@@ -27,6 +27,12 @@ const Gestioncabana = () => {
   const [imgIndices, setImgIndices] = useState({});
   const [eventoDetalle, setEventoDetalle] = useState(null);
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
+  // Filtros y buscador
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategoria, setFilterCategoria] = useState('todos');
+  const [filterEstado, setFilterEstado] = useState('todos');
 
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -42,7 +48,7 @@ const Gestioncabana = () => {
     servicios: []
   });
   const [selectedImages, setSelectedImages] = useState([]);
-  const [estadisticas, setEstadisticas] = useState({totalCabanas:0, disponibles:0, ocupadas:0, mantenimiento:0});
+  const [estadisticas, setEstadisticas] = useState({ totalCabanas: 0, disponibles: 0, ocupadas: 0, mantenimiento: 0 });
 
   // Función para obtener el tipo de cabaña (dummy)
   const obtenerTipoCabana = (tipo) => ({ label: tipo || 'Cabaña', icon: <Home className="w-6 h-6" /> });
@@ -59,13 +65,61 @@ const Gestioncabana = () => {
   ];
 
 
+  // Helper: obtiene las imágenes desde el objeto de detalle (soporta varias claves)
+  const getImagesFromDetalle = (detalle) => {
+    if (!detalle) return [];
+    if (Array.isArray(detalle.imagen)) return detalle.imagen;
+    if (Array.isArray(detalle.imagenes)) return detalle.imagenes;
+    // Algunos backends pueden enviar 'images' o 'files' o solo una URL en 'imagen'
+    if (Array.isArray(detalle.images)) return detalle.images;
+    if (detalle.imagen && typeof detalle.imagen === 'string') return [detalle.imagen];
+    return [];
+  };
 
   const abrirModalVer = (evento) => {
     setEventoDetalle(evento);
+    setCarouselIndex(0);
     setMostrarModalDetalle(true);
   };
+  // Alias usados por el markup original (no modificar el card):
+  const onVerDetalle = abrirModalVer;
   const [cabanas, setCabanas] = useState([]);
-  const cabanasFiltradas = cabanas;
+  // Helpers de filtrado
+  const pasaFiltroPorCategoriaCabana = (cabana, categoriaFilter) => {
+    if (!categoriaFilter || categoriaFilter === 'todos') return true;
+    const cat = cabana.categoria?._id || cabana.categoria?.nombre || cabana.categoria;
+    if (!cat) return false;
+    return String(cat) === String(categoriaFilter) || String((cabana.categoria?.nombre || '')).toLowerCase() === String(categoriaFilter).toLowerCase();
+  };
+
+  const pasaFiltroPorEstadoCabana = (cabana, estadoFilter) => {
+    if (!estadoFilter || estadoFilter === 'todos') return true;
+    const ef = String(estadoFilter).toLowerCase();
+    // soportar booleano disponibilidad o campo estado
+    if (ef === 'disponible') return (cabana.estado && String(cabana.estado).toLowerCase() === 'disponible') || Boolean(cabana.disponibilidad);
+    if (ef === 'ocupada') return (cabana.estado && String(cabana.estado).toLowerCase() === 'ocupada');
+    if (ef === 'mantenimiento') return (cabana.estado && String(cabana.estado).toLowerCase() === 'mantenimiento');
+    return (cabana.estado || '').toLowerCase() === ef;
+  };
+
+  const pasaFiltroPorBusquedaCabana = (cabana, q) => {
+    if (!q) return true;
+    const s = String(q).trim().toLowerCase();
+    if (!s) return true;
+    const campos = [
+      cabana.nombre || '',
+      cabana.descripcion || '',
+      cabana.ubicacion || '',
+      cabana.categoria?.nombre || cabana.categoria || ''
+    ].map(c => String(c).toLowerCase());
+    return campos.some(c => c.includes(s));
+  };
+
+  const cabanasFiltradas = (cabanas || []).filter(c => (
+    pasaFiltroPorCategoriaCabana(c, filterCategoria) &&
+    pasaFiltroPorEstadoCabana(c, filterEstado) &&
+    pasaFiltroPorBusquedaCabana(c, searchTerm)
+  ));
   const [categorias, setCategorias] = useState([]);
 
 
@@ -86,25 +140,25 @@ const Gestioncabana = () => {
 
   // Función para renderizar servicios
   const renderServicios = (servicios) => {
-    const serviciosVisibles = servicios.slice(0, 4);
+    const serviciosVisibles = (servicios || []).slice(0, 4);
     return (
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-2">
         {serviciosVisibles.map((servicio) => {
           const servicioInfo = serviciosDisponibles.find(s => s.value === servicio);
           return servicioInfo ? (
-            <span key={`servicio-${servicio}`} className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs">
+            <span key={`servicio-${servicio}`} className="flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-lg">
               {servicioInfo.icon}
-              {servicioInfo.label}
+              <span className="ml-1">{servicioInfo.label}</span>
             </span>
           ) : (
-            <span key={`servicio-${servicio}`} className="px-2 py-1 bg-gray-50 text-gray-700 rounded text-xs">
+            <span key={`servicio-${servicio}`} className="px-2 py-1 bg-gray-50 text-gray-700 text-xs rounded-lg">
               {servicio}
             </span>
           );
         })}
-        {servicios.length > 4 && (
-          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-            +{servicios.length - 4} más
+        {(servicios || []).length > 4 && (
+          <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg">
+            +{(servicios || []).length - 4} más
           </span>
         )}
       </div>
@@ -127,12 +181,12 @@ const Gestioncabana = () => {
   };
   //obtener estadisticas
   const estadisticasIniciales = async () => {
-    try{
+    try {
       const stats = await cabanaService.getEstadisticasGenerales();
-     setEstadisticas(stats);
+      setEstadisticas(stats);
 
     }
-    catch(err){
+    catch (err) {
       console.log("Error al obtener estadísticas generales: " + err.message);
     }
   }
@@ -175,6 +229,22 @@ const Gestioncabana = () => {
     setCabanaSeleccionada(cabana);
     setMostrarModal(true);
   };
+  const onEditar = handleEdit;
+
+  // Eliminar referencias inalcanzables; los helpers se usan en el render.
+
+  // Toggle de disponibilidad (actualiza el backend y recarga la lista)
+  const toggleDisponibilidad = async (cabana) => {
+    try {
+      const id = cabana._id;
+      const nuevoValor = !cabana.disponibilidad;
+      await cabanaService.update(id, { disponibilidad: nuevoValor });
+      mostrarAlerta('¡Éxito!', `Disponibilidad actualizada`, 'success');
+      obtenerCabanas();
+    } catch (err) {
+      mostrarAlerta('Error', `No se pudo actualizar disponibilidad: ${err.message}`, 'error');
+    }
+  };
 
   // Funciones para el modal del Dashboard
   const crearCabana = async (payload) => {
@@ -187,7 +257,7 @@ const Gestioncabana = () => {
       setMostrarModal(false);
       obtenerCabanas();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error al crear cabaña: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al crear cabaña: ${error.message}`, 'error');
     }
   };
 
@@ -208,23 +278,23 @@ const Gestioncabana = () => {
       setMostrarModal(false);
       obtenerCabanas();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error al actualizar cabaña: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al actualizar cabaña: ${error.message}`, 'error');
     }
   };
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
-  const registrosPorPagina = 6;
+  const registrosPorPagina = 15;
   const totalPaginas = Math.ceil(cabanasFiltradas.length / registrosPorPagina);
   const cabanasPaginadas = cabanasFiltradas.slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
 
-  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  // Reiniciar a la página 1 cuando cambian filtros/búsqueda o la lista de cabañas
   useEffect(() => {
     setPaginaActual(1);
-  }, [cabanasFiltradas]);
+  }, [searchTerm, filterCategoria, filterEstado, cabanas.length]);
 
   return (
     <>
@@ -292,269 +362,349 @@ const Gestioncabana = () => {
           <div className="search-filters-tesorero">
             <div className="search-input-container-tesorero">
               <i className="fas fa-search"></i>
-              <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+              <input
+                type="text"
+                placeholder="Buscar cabañas..."
+                id="userSearch"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <select className="filter-select">
-              <option value="">Todos los roles</option>
-              <option value="administrador">Administrador</option>
-              <option value="tesorero">Tesorero</option>
-              <option value="seminarista">Seminarista</option>
+            <select
+              className="filter-select"
+              value={filterCategoria}
+              onChange={(e) => setFilterCategoria(e.target.value)}
+            >
+              <option value="todos">Todas las Categorías</option>
+              {(categorias || []).map((c) => (
+                <option key={c._id || c.nombre} value={c._id || c.nombre}>{c.nombre || c._id}</option>
+              ))}
             </select>
-            <select id="statusFilter" className="filter-select">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
+            <select
+              id="statusFilter"
+              className="filter-select"
+              value={filterEstado}
+              onChange={(e) => setFilterEstado(e.target.value)}
+            >
+               <option value="todos">Todos los estados</option>
+                <option value="disponible">Disponible</option>
+                <option value="ocupada">Ocupada</option>
+                <option value="mantenimiento">Mantenimiento</option>
             </select>
           </div>
-          <div className="export-actions">
-            <button className="btn-outline-tesorero" id="exportBtn">
-              <i className="fas fa-download"></i>
-            </button>
-            <button className="btn-outline-tesorero" id="importBtn">
-              <i className="fas fa-upload"></i>
-            </button>
-          </div>
+         
         </div>
 
 
         {/* Lista de Cabañas */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(() => {
-           
-            
-            if (cabanasFiltradas.length > 0) {
-              return cabanasPaginadas.map((cabana) => {
+          {cabanasFiltradas.length > 0 ? (
+            cabanasPaginadas.map((cabana) => {
               const tipoCabana = obtenerTipoCabana(cabana.tipo);
-              // Definir variables dentro del map
               const imagenes = Array.isArray(cabana.imagen) ? cabana.imagen : [];
               const imgIndex = imgIndices[cabana._id] || 0;
-              // Determinar clases para el estado
-              let estadoClases = 'bg-gray-500/90 text-white';
+              let estadoClass = 'bg-gray-500/90 text-white';
               if (cabana.estado === 'disponible') {
-                estadoClases = 'bg-emerald-500/90 text-white';
+                estadoClass = 'bg-emerald-500/90 text-white';
               } else if (cabana.estado === 'ocupada') {
-                estadoClases = 'bg-red-500/90 text-white';
+                estadoClass = 'bg-red-500/90 text-white';
               } else if (cabana.estado === 'mantenimiento') {
-                estadoClases = 'bg-amber-500/90 text-white';
+                estadoClass = 'bg-amber-500/90 text-white';
               }
+
+              // Variables usadas por el markup original (evitan ReferenceError)
+              const capacidad = cabana.capacidad ?? cabana.capacidadMaxima ?? '—';
+              const precio = cabana.precio ?? cabana.precioPorNoche ?? null;
+              const categoria = cabana.categoria?.nombre || cabana.categoria || null;
+              const creadoPor = cabana.creadoPor?.nombre || cabana.creadoPor || null;
+              // Determina disponibilidad: prioriza `estado === 'disponible'`, si no existe usa el booleano `disponibilidad`.
+              const isDisponible = (cabana.estado && String(cabana.estado).toLowerCase() === 'disponible') || Boolean(cabana.disponibilidad);
+              const disponibilidadClass = isDisponible ? 'text-emerald-600' : 'text-red-600';
+              const disponibilidadNode = isDisponible ? (
+                <>
+                  <Check className="w-4 h-4 mr-1" /> Disponible
+                </>
+              ) : (
+                <>
+                  <X className="w-4 h-4 mr-1" /> No Disponible
+                </>
+              );
 
               return (
                 <div key={cabana._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-                  {/* Imagen principal */}
-                  <div className="relative h-64 bg-gradient-to-r from-emerald-500 to-blue-600">
-                    {imagenes.length > 0 ? (
+              {/* Imagen principal */}
+              <div className="relative h-64 bg-gradient-to-r from-emerald-500 to-blue-600">
+                        {imagenes.length > 0 ? (
+                  <>
+                    <img
+                      src={imagenes[imgIndex]}
+                      alt={cabana.nombre}
+                      className="w-full h-64 object-cover"
+                      style={{ borderRadius: '1rem' }}
+                    />
+                    {imagenes.length > 1 && (
                       <>
-                        <img
-                          src={imagenes[imgIndex]}
-                          alt={cabana.nombre}
-                          className="w-full h-64 object-cover"
-                          style={{ borderRadius: '1rem' }}
-                        />
-                        {imagenes.length > 1 && (
-                          <>
-                            <button
-                              onClick={() => prevImg(cabana._id, imagenes)}
-                              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
-                              style={{ zIndex: 2 }}
-                            >
-                              {"<"}
-                            </button>
-                            <button
-                              onClick={() => nextImg(cabana._id, imagenes)}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
-                              style={{ zIndex: 2 }}
-                            >
-                              {">"}
-                            </button>
-                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                              {imagenes.map((_, idx) => (
-                                <span
-                                  key={`indicator-${cabana._id}-${idx}`}
-                                  className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
-                                />
-                              ))}
-                            </div>
-                          </>
-                        )}
+                                <button
+                                  onClick={() => prevImg(cabana._id, imagenes)}
+                                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
+                                  style={{ zIndex: 2 }}
+                                >
+                                  {"<"}
+                                </button>
+                                <button
+                                  onClick={() => nextImg(cabana._id, imagenes)}
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
+                                  style={{ zIndex: 2 }}
+                                >
+                                  {">"}
+                                </button>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                          {imagenes.map((img, idx) => (
+                            <span
+                              key={img || idx}
+                              className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
+                            />
+                          ))}
+                        </div>
                       </>
-                    ) : (
-                      <div className="flex items-center justify-center w-full h-64 text-white text-4xl">
-                        <span>{tipoCabana.icon}</span>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center w-full h-64 text-white text-4xl">
+                    <span>{tipoCabana.icon}</span>
+                  </div>
+                )}
+
+                {/* Badges */}
+                <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-white/90 text-slate-800 text-xs font-medium rounded-full">
+                    {tipoCabana.label}
+                  </span>
+                  {cabana.destacada && (
+                    <span className="px-3 py-1 bg-yellow-500/90 text-white text-xs font-medium rounded-full flex items-center">
+                      <Star className="w-3 h-3 mr-1" />
+                      Destacada
+                    </span>
+                  )}
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClass}`}>
+                    {cabana.estado || '—'}
+                  </span>
+                </div>
+
+                {/* Botones de acción */}
+                <div className="flex justify-end gap-2 px-6 py-3">
+                  <button
+                    onClick={() => onVerDetalle(cabana)}
+                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                    title="Ver detalles"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => onEditar(cabana)}
+                    className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors"
+                    title="Editar"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                 
+                </div>
+              </div>
+
+              {/* Contenido de la cabaña */}
+              <div className="p-6 space-y-4">
+                <div>
+                  <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-2">{cabana.nombre}</h3>
+                  <p className="text-slate-600 text-sm line-clamp-3">{cabana.descripcion}</p>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Capacidad y habitaciones */}
+                  <div className="flex items-center space-x-4 text-sm">
+                    <div className="flex items-center space-x-1">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <span className="text-slate-600">Hasta {capacidad ?? '—'} personas</span>
+                    </div>
+                    {cabana.numeroCuartos && (
+                      <div className="flex items-center space-x-1">
+                        <Home className="w-4 h-4 text-green-600" />
+                        <span className="text-slate-600">{cabana.numeroCuartos} cuarto(s)</span>
                       </div>
                     )}
-
-                    {/* Badges */}
-                    <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                      <span className="px-3 py-1 bg-white/90 text-slate-800 text-xs font-medium rounded-full">
-                        {tipoCabana.label}
-                      </span>
-                      {cabana.destacada && (
-                        <span className="px-3 py-1 bg-yellow-500/90 text-white text-xs font-medium rounded-full flex items-center">
-                          <Star className="w-3 h-3 mr-1" />
-                          Destacada
-                        </span>
-                      )}
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClases}`}>
-                        {cabana.estado}
-                      </span>
-                    </div>
-
-                    {/* Botones de acción */}
-                    <div className="flex  justify-end  gap-2  px-6 py-3 ">
-                      <button
-                        onClick={() => abrirModalVer(cabana)}
-                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                        title="Ver detalles"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleEdit(cabana)}
-                        className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors "
-                        title="Editar"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-
-                    </div>
                   </div>
 
-                  {/* Contenido de la cabaña */}
-                  <div className="p-6 space-y-4">
-                    <div>
-                      <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-2">{cabana.nombre}</h3>
-                      <p className="text-slate-600 text-sm line-clamp-3">{cabana.descripcion}</p>
+                  {/* Ubicación */}
+                  {cabana.ubicacion && (
+                    <div className="flex items-center space-x-2 text-sm">
+                      <MapPin className="w-4 h-4 text-red-600" />
+                      <span className="text-slate-600 line-clamp-1">{cabana.ubicacion}</span>
                     </div>
+                  )}
 
-                    <div className="space-y-3">
-                      {/* Capacidad y habitaciones */}
-                      <div className="flex items-center space-x-4 text-sm">
-                        <div className="flex items-center space-x-1">
-                          <Users className="w-4 h-4 text-blue-600" />
-                          <span className="text-slate-600">Hasta {cabana.capacidadMaxima} personas</span>
-                        </div>
-                        {cabana.numeroCuartos && (
-                          <div className="flex items-center space-x-1">
-                            <Home className="w-4 h-4 text-green-600" />
-                            <span className="text-slate-600">{cabana.numeroCuartos} cuarto(s)</span>
-                          </div>
-                        )}
+                  {/* Precios */}
+                  <div className="space-y-1">
+                    {precio != null && (
+                      <div className="flex items-center space-x-2 text-sm">
+                        <DollarSign className="w-4 h-4 text-emerald-600" />
+                        <span className="font-semibold text-emerald-600">
+                          {formatearPrecio(precio)}{(cabana.precio || cabana.precioPorNoche) ? ' / noche' : ''}
+                        </span>
                       </div>
-
-                      {/* Ubicación */}
-                      {cabana.ubicacion && (
-                        <div className="flex items-center space-x-2 text-sm">
-                          <MapPin className="w-4 h-4 text-red-600" />
-                          <span className="text-slate-600 line-clamp-1">{cabana.ubicacion}</span>
-                        </div>
-                      )}
-
-                      {/* Precios */}
-                      <div className="space-y-1">
-                        {cabana.precioPorNoche && (
-                          <div className="flex items-center space-x-2 text-sm">
-                            <DollarSign className="w-4 h-4 text-emerald-600" />
-                            <span className="font-semibold text-emerald-600">
-                              {formatearPrecio(cabana.precioPorNoche)} / noche
-                            </span>
-                          </div>
-                        )}
-                        {cabana.precioPorPersona && (
-                          <div className="flex items-center space-x-2 text-sm ml-6">
-                            <span className="text-slate-600">
-                              {formatearPrecio(cabana.precioPorPersona)} / persona
-                            </span>
-                          </div>
-                        )}
+                    )}
+                    {cabana.precioPorPersona && (
+                      <div className="flex items-center space-x-2 text-sm ml-6">
+                        <span className="text-slate-600">
+                          {formatearPrecio(cabana.precioPorPersona)} / persona
+                        </span>
                       </div>
-
-                      {/* Servicios principales */}
-                      {cabana.servicios && cabana.servicios.length > 0 && renderServicios(cabana.servicios)}
-
-                      {/* Disponibilidad */}
-                      <div className="pt-3 border-t border-slate-200/50">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-600">Disponibilidad:</span>
-                          <span className={`flex items-center text-sm font-medium ${cabana.disponibilidad ? 'text-emerald-600' : 'text-red-600'
-                            }`}>
-                            {cabana.disponibilidad ? (
-                              <><Check className="w-4 h-4 mr-1" /> Disponible</>
-                            ) : (
-                              <><X className="w-4 h-4 mr-1" /> No Disponible</>
-                            )}
-                          </span>
-                        </div>
+                    )}
+                    {categoria && (
+                      <div className="flex items-center space-x-2 text-sm">
+                        <span className="text-slate-500 italic">Categoría:</span>
+                        <span className="text-slate-700 font-medium">{categoria}</span>
                       </div>
+                    )}
+                    {creadoPor && (
+                      <div className="flex items-center space-x-2 text-sm">
+                        <span className="text-slate-500 italic">Creado por:</span>
+                        <span className="text-slate-700">{creadoPor}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Servicios principales */}
+                  {renderServicios(cabana.servicios || [])}
+
+                  {/* Disponibilidad (usando campo `estado` del modelo) */}
+                  <div className="pt-3 border-t border-slate-200/50">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-600">Disponibilidad:</span>
+                          <button
+                            type="button"
+                            onClick={() => toggleDisponibilidad(cabana)}
+                            className={`flex items-center text-sm font-medium cursor-pointer bg-transparent border-0 p-0 ${disponibilidadClass}`}
+                          >
+                            {disponibilidadNode}
+                          </button>
                     </div>
                   </div>
                 </div>
-              );
-            });
-            }
-            
-            return (
-              <div className="col-span-full text-center py-12">
-                <Home className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay cabañas</h3>
-                <p className="text-slate-500 mb-6">Comienza agregando tu primera cabaña o alojamiento</p>
-                <button
-                  onClick={handleCreate}
-                  className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
-                >
-                  <Plus className="w-5 h-5 mr-2 inline" />
-                  Crear Cabaña
-                </button>
               </div>
-            );
-          })()}
+            </div>
+
+              );
+            })
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <Home className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay cabañas</h3>
+              <p className="text-slate-500 mb-6">Comienza agregando tu primera cabaña o alojamiento</p>
+              <button
+                onClick={handleCreate}
+                className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
+              >
+                <Plus className="w-5 h-5 mr-2 inline" />
+                Crear Cabaña
+              </button>
+            </div>
+          )}
         </div>
         {mostrarModalDetalle && eventoDetalle && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8">
-              <button
-                className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
-                onClick={() => setMostrarModalDetalle(false)}
-              >
-                <X size={24} />
-              </button>
-              <h2 className="text-2xl font-bold mb-4">{eventoDetalle.nombre}</h2>
-              <p className="mb-2"><strong>Descripción:</strong> {eventoDetalle.descripcion}</p>
-              <p className="mb-2"><strong>Categoría:</strong> {eventoDetalle.categoria?.nombre || eventoDetalle.categoria}</p>
-              <p className="mb-2"><strong>Capacidad:</strong> {eventoDetalle.capacidad}</p>
-              <p className="mb-2"><strong>Precio:</strong> ${eventoDetalle.precio}</p>
-              <p className="mb-2"><strong>Ubicación:</strong> {eventoDetalle.ubicacion}</p>
-              <p className="mb-2"><strong>Estado:</strong> {eventoDetalle.estado}</p>
-              <p className="mb-2"><strong>Creado por:</strong> {eventoDetalle.creadoPor?.nombre || eventoDetalle.creadoPor}</p>
-              <div className="flex flex-wrap gap-2 my-4">
-                {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.length > 0 ? (
-                  eventoDetalle.imagen.map((img, idx) => (
-                    <img
-                      key={`detalle-img-${eventoDetalle._id || eventoDetalle.id || 'default'}-${idx}`}
-                      src={img}
-                      alt={`Imagen ${idx + 1}`}
-                      className="w-32 h-32 object-cover rounded-lg border"
-                    />
-                  ))
-                ) : (
-                  <span className="text-gray-400">Sin imágenes</span>
-                )}
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">
+              <div className="flex items-start justify-between p-6 border-b">
+                <div>
+                  <h2 className="text-2xl font-semibold text-slate-800">{eventoDetalle.nombre}</h2>
+                  <p className="text-sm text-slate-500 mt-1">{eventoDetalle.categoria?.nombre || eventoDetalle.categoria} • {eventoDetalle.ubicacion || ''}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`px-3 py-1 rounded-full text-sm ${eventoDetalle.estado === 'disponible' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700'}`}>{eventoDetalle.estado || '—'}</span>
+                  <button onClick={() => setMostrarModalDetalle(false)} className="text-slate-400 hover:text-slate-600 p-2 rounded-md"><X size={20} /></button>
+                </div>
               </div>
-              <div className="text-xs text-gray-400">
-                <span>Creado: {eventoDetalle.createdAt ? new Date(eventoDetalle.createdAt).toLocaleString() : "N/A"}</span>
-                <span className="ml-4">Actualizado: {eventoDetalle.updatedAt ? new Date(eventoDetalle.updatedAt).toLocaleString() : "N/A"}</span>
+
+              <div className="p-6 overflow-y-auto" style={{ maxHeight: '70vh' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    {/* Carrusel */}
+                    {getImagesFromDetalle(eventoDetalle).length > 0 ? (
+                      <div>
+                        <div className="relative mb-3">
+                          <img
+                            src={getImagesFromDetalle(eventoDetalle)[carouselIndex]}
+                            alt={`Imagen cabaña ${carouselIndex + 1}`}
+                            className="w-full h-56 object-cover rounded-lg"
+                          />
+                          {getImagesFromDetalle(eventoDetalle).length > 1 && (
+                            <>
+                              <button
+                                onClick={() => setCarouselIndex(i => Math.max(i - 1, 0))}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                                aria-label="Imagen anterior"
+                              >◀</button>
+                              <button
+                                onClick={() => setCarouselIndex(i => Math.min(i + 1, getImagesFromDetalle(eventoDetalle).length - 1))}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                                aria-label="Imagen siguiente"
+                              >▶</button>
+                            </>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2">
+                          {getImagesFromDetalle(eventoDetalle).map((img) => (
+                            <button
+                              key={typeof img === 'string' ? img : (img?.name || String(img))}
+                              type="button"
+                              onClick={() => setCarouselIndex(getImagesFromDetalle(eventoDetalle).indexOf(img))}
+                              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCarouselIndex(getImagesFromDetalle(eventoDetalle).indexOf(img)); } }}
+                              aria-label={`Mostrar imagen`}
+                              className={`p-0 border-0 bg-transparent ${getImagesFromDetalle(eventoDetalle).indexOf(img) === carouselIndex ? 'ring-2 ring-blue-500 rounded' : ''}`}
+                            >
+                              <img
+                                src={typeof img === 'string' ? img : img?.url || ''}
+                                alt={`Thumb`}
+                                className="w-20 h-14 object-cover rounded cursor-pointer"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-56 flex items-center justify-center bg-slate-100 rounded-lg mb-3 text-sm text-slate-500">Sin imágenes</div>
+                    )}
+
+                    <p className="text-sm text-slate-700 leading-relaxed mt-4">{eventoDetalle.descripcion || 'Sin descripción'}</p>
+                  </div>
+
+                  <div>
+                    <ul className="mt-2 text-sm text-slate-700 space-y-2">
+                      <li><strong className="text-slate-800">Capacidad:</strong> {eventoDetalle.capacidad ?? '—'}</li>
+                      <li><strong className="text-slate-800">Precio:</strong> ${eventoDetalle.precio ?? 0}</li>
+                      <li><strong className="text-slate-800">Ubicación:</strong> {eventoDetalle.ubicacion || '—'}</li>
+                      <li><strong className="text-slate-800">Estado:</strong> {eventoDetalle.estado || '—'}</li>
+                      <li><strong className="text-slate-800">Creado por:</strong> {eventoDetalle.creadoPor?.nombre || eventoDetalle.creadoPor || '—'}</li>
+                      <li><strong className="text-slate-800">Creado:</strong> {eventoDetalle.createdAt ? new Date(eventoDetalle.createdAt).toLocaleString() : '—'}</li>
+                      <li><strong className="text-slate-800">Actualizado:</strong> {eventoDetalle.updatedAt ? new Date(eventoDetalle.updatedAt).toLocaleString() : '—'}</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
-              <button
-                onClick={() => setMostrarModalDetalle(false)}
-                className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Cerrar
-              </button>
+
+              <div className="p-4 border-t flex justify-end">
+                <button
+                  onClick={() => setMostrarModalDetalle(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         )}
 
         {mostrarModal && (
-            <CabanaModal
+          <CabanaModal
             mostrar={mostrarModal}
             modoEdicion={modoEdicion}
             cabanaSeleccionada={cabanaSeleccionada}
@@ -562,7 +712,7 @@ const Gestioncabana = () => {
             nuevaCabana={nuevaCabana}
             setNuevaCabana={setNuevaCabana}
             onClose={() => setMostrarModal(false)}
-              onSubmit={modoEdicion ? actualizarCabana : crearCabana}
+            onSubmit={modoEdicion ? actualizarCabana : crearCabana}
             categorias={categorias}
             selectedImages={selectedImages}
             setSelectedImages={setSelectedImages}
@@ -582,8 +732,8 @@ const Gestioncabana = () => {
           </span>
           <button
             className="pagination-btn-admin"
-          onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-          disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
+            disabled={paginaActual === totalPaginas || totalPaginas === 0}
           >
             <i className="fas fa-chevron-right"></i>
           </button>

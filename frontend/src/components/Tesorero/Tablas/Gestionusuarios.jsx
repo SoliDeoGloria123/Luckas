@@ -11,6 +11,8 @@ const Gestionusuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterRole, setFilterRole] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
 
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -92,7 +94,7 @@ const Gestionusuarios = () => {
       setMostrarModal(false);
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
 
@@ -113,23 +115,7 @@ const Gestionusuarios = () => {
   // Función de búsqueda por número de cédula, nombre, apellido y correo
   const handleSearch = (searchValue) => {
     setSearchTerm(searchValue);
-    const trimmedValue = searchValue.trim();
-    if (trimmedValue.length === 0) {
-      setUsuariosFiltrados(usuarios);
-      return;
-    }
-    const searchLower = trimmedValue.toLowerCase();
-    const filteredUsers = usuarios.filter(user => {
-      const numeroDocumento = user.numeroDocumento?.toString().toLowerCase();
-      const nombre = user.nombre?.toLowerCase();
-      const apellido = user.apellido?.toLowerCase();
-      const correo = user.correo?.toLowerCase();
-      return numeroDocumento?.includes(searchLower) ||
-        nombre?.includes(searchLower) ||
-        apellido?.includes(searchLower) ||
-        correo?.includes(searchLower);
-    });
-    setUsuariosFiltrados(filteredUsers);
+    setPaginaActual(1);
   };
 
   useEffect(() => {
@@ -137,13 +123,36 @@ const Gestionusuarios = () => {
   }, []);
 
   // Efecto para actualizar usuarios filtrados cuando cambia la lista de usuarios
+  // Aplicar filtros combinados (búsqueda + role + estado)
+  const applyFilters = () => {
+    const term = String(searchTerm || '').trim().toLowerCase();
+    const filtered = usuarios.filter(user => {
+      // Role filter
+      if (filterRole && String(user.role || '').toLowerCase() !== String(filterRole).toLowerCase()) return false;
+      // Status filter
+      if (filterStatus && String(user.estado || '').toLowerCase() !== String(filterStatus).toLowerCase()) return false;
+
+      if (!term) return true;
+
+      const numeroDocumento = String(user.numeroDocumento || '').toLowerCase();
+      const nombre = String(user.nombre || '').toLowerCase();
+      const apellido = String(user.apellido || '').toLowerCase();
+      const correo = String(user.correo || '').toLowerCase();
+
+      return (
+        numeroDocumento.includes(term) ||
+        nombre.includes(term) ||
+        apellido.includes(term) ||
+        correo.includes(term)
+      );
+    });
+    setUsuariosFiltrados(filtered);
+    setPaginaActual(1);
+  };
+
   useEffect(() => {
-    if (searchTerm) {
-      handleSearch(searchTerm);
-    } else {
-      setUsuariosFiltrados(usuarios);
-    }
-  }, [usuarios]);
+    applyFilters();
+  }, [usuarios, searchTerm, filterRole, filterStatus]);
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
@@ -167,7 +176,7 @@ const Gestionusuarios = () => {
       mostrarAlerta("¡Éxito!", `Usuario ${nuevoEstado === "activo" ? "activado" : "desactivado"} exitosamente`);
       obtenerUsuarios(); // <-- Esto refresca la lista
     } catch (error) {
-      mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`);
+      mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`, 'error');
     }
   };
 
@@ -240,47 +249,42 @@ const Gestionusuarios = () => {
             </div>
           </div>
         </div>
-        <div className="space-y-4">
-          <div className="filters-section-tesorero">
-            <div className="search-filters-tesorero">
-              <div className="search-input-container-tesorero">
-                <i className="fas fa-search"></i>
-                <input
-                  type="text"
-                  placeholder="Buscar por cédula, nombre, apellido o correo..."
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
-                />
-              </div>
-              <select className="filter-select">
-                <option value="">Todos los roles</option>
-                <option value="administrador">Administrador</option>
-                <option value="tesorero">Tesorero</option>
-                <option value="seminarista">Seminarista</option>
-              </select>
-              <select id="statusFilter" className="filter-select">
-                <option value="">Todos los estados</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-            </div>
-            <div className="export-actions">
-              <button className="btn-outline-tesorero" >
-                <i className="fas fa-download"></i>
-              </button>
-              <button className="btn-outline-tesorero" >
-                <i className="fas fa-share"></i>
-              </button>
-            </div>
-          </div>
 
+        <div className="filters-section-tesorero">
+          <div className="search-filters-tesorero">
+            <div className="search-input-container-tesorero">
+              <i className="fas fa-search"></i>
+              <input
+                type="text"
+                placeholder="Buscar usuarios..."
+                id="userSearch"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
+            <select className="filter-select" value={filterRole} onChange={(e) => setFilterRole(e.target.value)}>
+              <option value="">Todos los Roles</option>
+              <option value="admin">Administrador</option>
+              <option value="seminarista">Seminarista</option>
+              <option value="tesorero">Tesorero</option>
+              <option value="externo">Usuario Externo</option>
+            </select>
+            <select id="statusFilter" className="filter-select" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+              <option value="">Todos los Estados</option>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+         
+        </div>
+        <div className="space-y-4">
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <div className="overflow-hidden rounded-xl border border-[#334155]/10 bg-white shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
-                  
+
                       <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">
                         Nombre
                       </th>
@@ -314,47 +318,47 @@ const Gestionusuarios = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#334155]/10">
-  
-                      {usuariosPaginados.map((user) => (
-                        <tr key={user.id} className="transition-colors hover:bg-[#f1f5f9]/50">
-                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.nombre}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.apellido}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.tipoDocumento}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.numeroDocumento}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]/60">{user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : "N/A"}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#2563eb]">{user.correo}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.telefono}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.role}</td>
-                          <td className="whitespace-nowrap px-6 py-4">
-                            <span
-                              className={`badge-tesorero badge-tesorero-${user.estado}`}
+
+                    {usuariosPaginados.map((user) => (
+                      <tr key={user._id || user.id} className={`transition-colors hover:bg-[#f1f5f9]/50 ${user.estado === 'inactivo' ? 'usuario-inactivo-blur' : ''}`}>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.nombre}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.apellido}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.tipoDocumento}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.numeroDocumento}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]/60">{user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : "N/A"}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#2563eb]">{user.correo}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base font-semibold text-[#334155]">{user.telefono}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-base text-[#334155]">{user.role}</td>
+                        <td className="whitespace-nowrap px-6 py-4">
+                          <span
+                            className={`badge-tesorero badge-tesorero-${user.estado}`}
+                          >
+                            {user.estado}
+                          </span>
+                        </td>
+                        <td className="whitespace-nowrap px-6 py-4">
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                              onClick={() => handleEdit(user)}
+                              size="icon"
+                              className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]"
                             >
-                              {user.estado}
-                            </span>
-                          </td>
-                          <td className="whitespace-nowrap px-6 py-4">
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              <button
-                                onClick={() => handleEdit(user)}
-                                size="icon"
-                                className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </button>
-                              <button
-                                className={`btn-action ${user.estado === "activo" ? "desactivar" : "activar"}  text-red-600 hover:bg-red-50 rounded transition-colors`}
-                                onClick={() => onToggleEstado(user)}
-                              >
-                                {user.estado === "activo" ? (
-                                  <i className="fas fa-ban"></i>
-                                ) : (
-                                  <i className="fas fa-check"></i>
-                                )}
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-          
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              className={`btn-action ${user.estado === "activo" ? "desactivar" : "activar"}  text-red-600 hover:bg-red-50 rounded transition-colors`}
+                              onClick={() => onToggleEstado(user)}
+                            >
+                              {user.estado === "activo" ? (
+                                <i className="fas fa-ban"></i>
+                              ) : (
+                                <i className="fas fa-check"></i>
+                              )}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+
                     ))}
                   </tbody>
                 </table>

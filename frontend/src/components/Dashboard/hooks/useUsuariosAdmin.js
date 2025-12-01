@@ -37,7 +37,7 @@ export const useUsuariosAdmin = (obtenerUsuarios, usuarioActual, setUsuarioActua
       });
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `Error al crear el usuario: ${error.message}`);
+      mostrarAlerta("Error", `Error al crear el usuario: ${error.message}`, 'error');
     }
   }, [nuevoUsuario, obtenerUsuarios]);
 
@@ -75,7 +75,7 @@ export const useUsuariosAdmin = (obtenerUsuarios, usuarioActual, setUsuarioActua
       }
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   }, [usuarioSeleccionado, usuarioActual, setUsuarioActual, obtenerUsuarios]);
 
@@ -92,7 +92,7 @@ export const useUsuariosAdmin = (obtenerUsuarios, usuarioActual, setUsuarioActua
       mostrarAlerta("¡Éxito!", "Usuario eliminado exitosamente");
       obtenerUsuarios();
     } catch (error) {
-      mostrarAlerta("Error", `No se pudo eliminar el usuario: ${error.message}`);
+      mostrarAlerta("Error", `No se pudo eliminar el usuario: ${error.message}`, 'error');
     }
   }, [obtenerUsuarios]);
 

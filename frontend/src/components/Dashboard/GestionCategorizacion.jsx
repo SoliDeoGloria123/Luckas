@@ -33,7 +33,7 @@ const GestionCategorizacion = () => {
             obtenerEstadisticas();
         } catch (error) {
             setCategorias([]);
-            mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`);
+            mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`, 'error');
         }
     };
     useEffect(() => {
@@ -49,7 +49,7 @@ const GestionCategorizacion = () => {
             setMostrarModal(false);
             obtenerCategorias();
         } catch (error) {
-            mostrarAlerta("ERROR", `Error al crear la categoría: ${error.message}`);
+            mostrarAlerta("Error", `Error al crear la categoría: ${error.message}`, 'error');
         }
     };
 
@@ -63,7 +63,7 @@ const GestionCategorizacion = () => {
             setMostrarModal(false);
             obtenerCategorias();
         } catch (error) {
-            mostrarAlerta("ERROR", `Error al actualizar la categoría: ${error.message}`);
+            mostrarAlerta("Error", `Error al actualizar la categoría: ${error.message}`, 'error');
         }
     };
 
@@ -90,7 +90,7 @@ const GestionCategorizacion = () => {
         } catch (error) {
             console.error("Error al obtener estadísticas de categorías:", error);
             // Manejar la excepción: notificar al usuario y restablecer estadísticas por defecto
-            mostrarAlerta("Error", `No se pudieron obtener las estadísticas: ${error.message}`);
+            mostrarAlerta("Error", `No se pudieron obtener las estadísticas: ${error.message}`, 'error');
             setEstadisticas({ totalCategorias: 0, categoriasActivas: 0, categoriasInactivas: 0, nuevasEsteMes: 0 });
         }
     };

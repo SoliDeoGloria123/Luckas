@@ -121,7 +121,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       setModoEdicion(false);
       obtenerCabanas();
     } catch (err) {
-      mostrarAlerta("Error", "Error al actualizar cabaña: " + err.message);
+      mostrarAlerta("Error", "Error al actualizar cabaña: " + err.message, "error");
     }
   };
 
@@ -137,7 +137,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       mostrarAlerta("¡Éxito!", "Cabaña eliminada exitosamente");
       obtenerCabanas();
     } catch (err) {
-      mostrarAlerta("Error", "Error al eliminar cabaña: " + err.message);
+      mostrarAlerta("Error", "Error al eliminar cabaña: " + err.message, "error");
     }
   };
 
@@ -271,47 +271,46 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
             </div>
           </div>
 
+          <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar cabañas..."
+                  value={filtros.busqueda}
+                  onChange={(e) => { setFiltros({ ...filtros, busqueda: e.target.value }); setPaginaActual(1); }}
+                  className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
 
-                <div className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Buscar cabañas..."
-                    value={filtros.busqueda}
-                    onChange={(e) => { setFiltros({ ...filtros, busqueda: e.target.value }); setPaginaActual(1); }}
-                    className="w-full pl-10 pr-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                </div>
+              <select
+                value={filtros.categoria}
+                onChange={(e) => { setFiltros({ ...filtros, categoria: e.target.value }); setPaginaActual(1); }}
+                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="todos">Todas las Categorías</option>
+                {categorias.map(cat => (
+                  <option key={cat._id || cat.id} value={cat._id || cat.id}>{cat.nombre || cat.nombreCategoria || cat.codigo || cat._id}</option>
+                ))}
+              </select>
 
-                <select
-                  value={filtros.categoria}
-                  onChange={(e) => { setFiltros({ ...filtros, categoria: e.target.value }); setPaginaActual(1); }}
-                  className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                >
-                  <option value="todos">Todas las Categorías</option>
-                  {categorias.map(cat => (
-                    <option key={cat._id || cat.id} value={cat._id || cat.id}>{cat.nombre || cat.nombreCategoria || cat.codigo || cat._id}</option>
-                  ))}
-                </select>
+              <select
+                value={filtros.estado}
+                onChange={(e) => { setFiltros({ ...filtros, estado: e.target.value }); setPaginaActual(1); }}
+                className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="todos">Todos los estados</option>
+                <option value="disponible">Disponible</option>
+                <option value="ocupada">Ocupada</option>
+                <option value="mantenimiento">Mantenimiento</option>
+              </select>
 
-                <select
-                  value={filtros.estado}
-                  onChange={(e) => { setFiltros({ ...filtros, estado: e.target.value }); setPaginaActual(1); }}
-                  className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                >
-                  <option value="todos">Todos los estados</option>
-                  <option value="disponible">Disponible</option>
-                  <option value="ocupada">Ocupada</option>
-                  <option value="mantenimiento">Mantenimiento</option>
-                </select>
-
-                <div className="text-sm text-slate-600 flex items-center">
-                  <span className="font-medium">{cabanasFiltradas.length}</span> cabaña(s) encontrada(s)
-                </div>
+              <div className="text-sm text-slate-600 flex items-center">
+                <span className="font-medium">{cabanasFiltradas.length}</span> cabaña(s) encontrada(s)
               </div>
             </div>
+          </div>
           {mostrarModalDetalle && eventoDetalle && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">

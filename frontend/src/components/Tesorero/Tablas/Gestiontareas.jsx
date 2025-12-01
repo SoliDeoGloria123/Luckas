@@ -11,6 +11,10 @@ import { Edit } from "lucide-react"
 const Gestiontarea = () => {
   const [tareas, setTareas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
+  const [tareasFiltradas, setTareasFiltradas] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterPriority, setFilterPriority] = useState('todas');
+  const [filterEstado, setFilterEstado] = useState('todos');
 
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -33,7 +37,9 @@ const Gestiontarea = () => {
   const obtenerTareas = async () => {
     try {
       const data = await tareaService.getAll();
-      setTareas(Array.isArray(data.data) ? data.data : []);
+      const lista = Array.isArray(data.data) ? data.data : [];
+      setTareas(lista);
+      setTareasFiltradas(lista);
     } catch (err) {
       console.log("Error al obtener tareas: " + err.message);
     }
@@ -60,6 +66,45 @@ const Gestiontarea = () => {
     } catch (err) {
       console.error("Error al obtener estadísticas: " + err.message);
     }
+  };
+
+  const extractText = (val) => {
+    if (val === null || val === undefined) return '';
+    if (typeof val === 'object') {
+      return (val.nombre || val.username || val.role || JSON.stringify(val));
+    }
+    return String(val);
+  };
+
+  const applyFilters = (search = searchTerm, prioridad = filterPriority, estado = filterEstado, lista = tareas) => {
+    const s = (search || '').toString().trim().toLowerCase();
+    const arr = Array.isArray(lista) ? lista : [];
+    const salida = arr.filter((t) => {
+      if (prioridad && prioridad !== 'todas') {
+        if (String((t.prioridad || '')).toLowerCase() !== String(prioridad).toLowerCase()) return false;
+      }
+      if (estado && estado !== 'todos') {
+        if (String((t.estado || '')).toLowerCase() !== String(estado).toLowerCase()) return false;
+      }
+
+      if (!s) return true;
+
+      const titulo = extractText(t.titulo).toLowerCase();
+      const descripcion = extractText(t.descripcion).toLowerCase();
+      const asignadoA = extractText(t.asignadoA?.nombre || t.asignadoA).toLowerCase();
+      const asignadoPor = extractText(t.asignadoPor?.nombre || t.asignadoPor).toLowerCase();
+
+      return (
+        titulo.includes(s) ||
+        descripcion.includes(s) ||
+        asignadoA.includes(s) ||
+        asignadoPor.includes(s) ||
+        String(t.prioridad || '').toLowerCase().includes(s) ||
+        String(t.estado || '').toLowerCase().includes(s)
+      );
+    });
+
+    setTareasFiltradas(salida);
   };
 
   const handleCreate = () => {
@@ -117,7 +162,7 @@ const Gestiontarea = () => {
       setMostrarModal(false);
       obtenerTareas();
     } catch (error) {
-      mostrarAlerta("Error", "Error al procesar la tarea: " + error.message);
+      mostrarAlerta("Error", "Error al procesar la tarea: " + error.message, 'error');
     }
   };
 
@@ -135,23 +180,28 @@ const Gestiontarea = () => {
       setMostrarModal(false);
       obtenerTareas();
     } catch (error) {
-      mostrarAlerta("Error", "Error al procesar la tarea: " + error.message);
+      mostrarAlerta("Error", "Error al procesar la tarea: " + error.message, 'error');
     }
   };
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
   const registrosPorPagina = 10;
-  const totalPaginas = Math.ceil(tareas.length / registrosPorPagina);
-  const tareasPaginadas = tareas.slice(
+  const totalPaginas = Math.ceil((tareasFiltradas.length || 0) / registrosPorPagina) || 1;
+  const tareasPaginadas = (tareasFiltradas || []).slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
 
-  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  // Reiniciar a la página 1 si cambia el filtro de usuarios o la lista filtrada
   useEffect(() => {
     setPaginaActual(1);
-  }, [tareas]);
+  }, [tareasFiltradas, searchTerm, filterPriority, filterEstado]);
+
+  // Aplicar filtros cuando cambie la lista original o filtros
+  useEffect(() => {
+    applyFilters(searchTerm, filterPriority, filterEstado, tareas);
+  }, [tareas, searchTerm, filterPriority, filterEstado]);
 
 
   return (
@@ -216,28 +266,50 @@ const Gestiontarea = () => {
           <div className="search-filters-tesorero">
             <div className="search-input-container-tesorero">
               <i className="fas fa-search"></i>
-              <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+              <input
+                type="text"
+                placeholder="Buscar tareas..."
+                id="userSearch"
+                value={searchTerm}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setSearchTerm(v);
+                  applyFilters(v, filterPriority, filterEstado, tareas);
+                }}
+              />
             </div>
-            <select className="filter-select">
-              <option value="">Todos los roles</option>
-              <option value="administrador">Administrador</option>
-              <option value="tesorero">Tesorero</option>
-              <option value="seminarista">Seminarista</option>
+            <select
+              className="filter-select"
+              value={filterPriority}
+              onChange={(e) => {
+                const v = e.target.value;
+                setFilterPriority(v);
+                applyFilters(searchTerm, v, filterEstado, tareas);
+              }}
+            >
+              <option value="todas">Todas las Prioridades</option>
+              <option value="alta">Alta</option>
+              <option value="media">Media</option>
+              <option value="baja">Baja</option>
             </select>
-            <select id="statusFilter" className="filter-select">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
+            <select
+              id="statusFilter"
+              className="filter-select"
+              value={filterEstado}
+              onChange={(e) => {
+                const v = e.target.value;
+                setFilterEstado(v);
+                applyFilters(searchTerm, filterPriority, v, tareas);
+              }}
+            >
+              <option value="todos">Todos los Estados</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="en_progreso">En Progreso</option>
+              <option value="completada">Completada</option>
+              <option value="cancelada">Cancelada</option>
             </select>
           </div>
-          <div className="export-actions">
-            <button className="btn-outline-tesorero" >
-              <i className="fas fa-download"></i>
-            </button>
-            <button className="btn-outline-tesorero" >
-              <i className="fas fa-share"></i>
-            </button>
-          </div>
+          
         </div>
 
 
@@ -261,32 +333,32 @@ const Gestiontarea = () => {
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
-                    {tareasPaginadas.map((tarea) => (
-                      <tr key={tarea._id}>
-                        <td>{tarea.titulo}</td>
-                        <td>{tarea.descripcion}</td>
-                        <td>
-                          <span className={`badge-tesorero badge-tesorero-${tarea.estado} `}>
-                            {tarea.estado}
-                          </span>
-                        </td>
-                        <td>{tarea.prioridad}</td>
-                        <td>{tarea.asignadoA?.nombre || "N/A"}</td>
-                        <td>{tarea.asignadoA?.role || "N/A"}</td>
-                        <td>{tarea.asignadoPor?.nombre || "N/A"}</td>
-                        <td>{tarea.asignadoPor?.role || "N/A"}</td>
-                        <td>{tarea.fechaLimite ? new Date(tarea.fechaLimite).toLocaleDateString() : "N/A"}</td>
-                        <td>
-                          {tarea.updatedAt ? new Date(tarea.updatedAt).toLocaleDateString() : "N/A"}
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(tarea)}>
-                            <Edit className="h-4 w-4" />
-                          </button>
+                  {tareasPaginadas.map((tarea) => (
+                    <tr key={tarea._id}>
+                      <td>{tarea.titulo}</td>
+                      <td>{tarea.descripcion}</td>
+                      <td>
+                        <span className={`badge-tesorero badge-tesorero-${tarea.estado} `}>
+                          {tarea.estado}
+                        </span>
+                      </td>
+                      <td>{tarea.prioridad}</td>
+                      <td>{tarea.asignadoA?.nombre || "N/A"}</td>
+                      <td>{tarea.asignadoA?.role || "N/A"}</td>
+                      <td>{tarea.asignadoPor?.nombre || "N/A"}</td>
+                      <td>{tarea.asignadoPor?.role || "N/A"}</td>
+                      <td>{tarea.fechaLimite ? new Date(tarea.fechaLimite).toLocaleDateString() : "N/A"}</td>
+                      <td>
+                        {tarea.updatedAt ? new Date(tarea.updatedAt).toLocaleDateString() : "N/A"}
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(tarea)}>
+                          <Edit className="h-4 w-4" />
+                        </button>
 
-                        </td>
-                      </tr>
-                  
+                      </td>
+                    </tr>
+
                   ))}
                 </tbody>
               </table>

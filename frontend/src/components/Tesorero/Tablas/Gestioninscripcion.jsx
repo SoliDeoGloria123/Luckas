@@ -15,6 +15,11 @@ const Gestioninscripcion = () => {
   const [programas, setProgramas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [inscripciones, setInscripciones] = useState([]);
+  const [inscripcionesFiltradas, setInscripcionesFiltradas] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategoria, setFilterCategoria] = useState('todos');
+  const [filterTipoReferencia, setFilterTipoReferencia] = useState('todos');
+  const [filterEstado, setFilterEstado] = useState('todos');
 
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -46,9 +51,10 @@ const Gestioninscripcion = () => {
       else if (Array.isArray(data.data)) listaIns = data.data;
       else if (Array.isArray(data.results)) listaIns = data.results;
       setInscripciones(listaIns);
+      setInscripcionesFiltradas(listaIns);
     } catch (error) {
       setInscripciones([]);
-      mostrarAlerta("ERROR", `Error al obtener inscripciones: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al obtener inscripciones: ${error.message}`, 'error');
     }
   };
 
@@ -64,7 +70,7 @@ const Gestioninscripcion = () => {
       setEventos(lista);
     } catch (error) {
       setEventos([]);
-      mostrarAlerta("ERROR", `Error al obtener eventos: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al obtener eventos: ${error.message}`, 'error');
     }
   };
 
@@ -80,7 +86,7 @@ const Gestioninscripcion = () => {
       setProgramas(lista);
     } catch (error) {
       setProgramas([]);
-      mostrarAlerta("ERROR", `Error al obtener programas académicos: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al obtener programas académicos: ${error.message}`, 'error');
     }
   };
 
@@ -96,7 +102,7 @@ const Gestioninscripcion = () => {
       Estadisticagenerales();
     } catch (error) {
       setCategorias([]);
-      mostrarAlerta("ERROR", `Error al obtener categorías: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al obtener categorías: ${error.message}`, 'error');
     }
   };
 
@@ -106,6 +112,58 @@ const Gestioninscripcion = () => {
     obtenerProgramas();
     obtenerCategorias();
   }, []);
+
+  const extractText = (val) => {
+    if (val === null || val === undefined) return '';
+    if (typeof val === 'object') {
+      return (val.nombre || val.titulo || val.username || JSON.stringify(val));
+    }
+    return String(val);
+  };
+
+  const applyFilters = (search = searchTerm, categoria = filterCategoria, tipoRef = filterTipoReferencia, estado = filterEstado, lista = inscripciones) => {
+    const s = (search || '').toString().trim().toLowerCase();
+    const arr = Array.isArray(lista) ? lista : [];
+    const filtered = arr.filter((item) => {
+      // categoria
+      if (categoria && categoria !== 'todos') {
+        const catId = item.categoria && (item.categoria._id || item.categoria);
+        if (String(catId) !== String(categoria)) return false;
+      }
+      // tipo referencia
+      if (tipoRef && tipoRef !== 'todos') {
+        if (String((item.tipoReferencia || '')).toLowerCase() !== String(tipoRef).toLowerCase()) return false;
+      }
+      // estado
+      if (estado && estado !== 'todos') {
+        if (String((item.estado || '')).toLowerCase() !== String(estado).toLowerCase()) return false;
+      }
+
+      if (!s) return true;
+
+      const nombre = extractText(item.nombre).toLowerCase();
+      const apellido = extractText(item.apellido).toLowerCase();
+      const documento = extractText(item.numeroDocumento).toLowerCase();
+      const correo = extractText(item.correo).toLowerCase();
+      const telefono = extractText(item.telefono).toLowerCase();
+      const eventoNombre = extractText(item.referencia?.nombre || item.evento?.nombre).toLowerCase();
+      const categoriaNombre = extractText(item.categoria?.nombre).toLowerCase();
+
+      return (
+        nombre.includes(s) ||
+        apellido.includes(s) ||
+        documento.includes(s) ||
+        correo.includes(s) ||
+        telefono.includes(s) ||
+        eventoNombre.includes(s) ||
+        categoriaNombre.includes(s) ||
+        String(item.tipoReferencia || '').toLowerCase().includes(s) ||
+        String(item.estado || '').toLowerCase().includes(s)
+      );
+    });
+
+    setInscripcionesFiltradas(filtered);
+  };
 
   //obtener estadísticas generales
   const Estadisticagenerales = async () => {
@@ -153,7 +211,7 @@ const Gestioninscripcion = () => {
       setMostrarModal(false);
       obtenerInscripciones();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error al crear inscripción: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al crear inscripción: ${error.message}`, 'error');
     }
   };
 
@@ -163,7 +221,7 @@ const Gestioninscripcion = () => {
       const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaInscripcion;
       const id = (body && body._id) ? body._id : (inscripcionSeleccionada && inscripcionSeleccionada._id);
       if (!id) {
-        mostrarAlerta('ERROR', 'No se encontró el ID de la inscripción a actualizar', 'error');
+        mostrarAlerta('Error', 'No se encontró el ID de la inscripción a actualizar', 'error');
         return;
       }
       await inscripcionService.update(id, body);
@@ -171,21 +229,66 @@ const Gestioninscripcion = () => {
       setMostrarModal(false);
       obtenerInscripciones();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error al actualizar inscripción: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al actualizar inscripción: ${error.message}`, 'error');
+    }
+  };
+
+  // Mostrar solicitud sin exponer la ID (copia al portapapeles si es posible)
+  const handleMostrarSolicitud = async (solicitud) => {
+    if (!solicitud) {
+      mostrarAlerta('INFO', 'No hay solicitud asociada a esta inscripción', 'info');
+      return;
+    }
+
+    try {
+      if (typeof solicitud === 'string') {
+        const fullId = String(solicitud);
+        try {
+          if (navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            await navigator.clipboard.writeText(fullId);
+            mostrarAlerta('Solicitud', `ID: ${fullId} (ID copiada al portapapeles)`, 'info');
+          } else {
+            mostrarAlerta('Solicitud', `ID: ${fullId}`, 'info');
+          }
+        } catch (err) {
+          console.warn('No se pudo copiar ID al portapapeles', err);
+          mostrarAlerta('Solicitud', `ID: ${fullId}`, 'info');
+        }
+        return;
+      }
+
+      // solicitud es objeto: mostrar resumen y ID si existe
+      const candidatoTitulo = solicitud.titulo || solicitud.nombre || solicitud.tipo || '';
+      const usuario = solicitud.usuario?.nombre || solicitud.usuario || '';
+      const estado = solicitud.estado ? `Estado: ${solicitud.estado}` : '';
+      const fecha = solicitud.fecha ? `Fecha: ${new Date(solicitud.fecha).toLocaleDateString()}` : '';
+      const id = solicitud._id ? `ID: ${solicitud._id}` : '';
+      const partes = [candidatoTitulo, usuario, estado, fecha].filter(Boolean);
+      const mensajeResumen = partes.join(' • ') || 'Solicitud registrada';
+      const mensaje = id ? `${mensajeResumen} • ${id}` : mensajeResumen;
+      mostrarAlerta('Solicitud', mensaje, 'info');
+    } catch (err) {
+      console.error('Error mostrando solicitud', err);
+      mostrarAlerta('ERROR', 'No se pudo mostrar la solicitud', 'error');
     }
   };
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
   const registrosPorPagina = 10;
-  const totalPaginas = Math.ceil(inscripciones.length / registrosPorPagina);
-  const inscripcionesPaginadas = inscripciones.slice(
+  const totalPaginas = Math.ceil((inscripcionesFiltradas.length || 0) / registrosPorPagina) || 1;
+  const inscripcionesPaginadas = (inscripcionesFiltradas || []).slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
 
-  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  // Reiniciar a la página 1 si cambia la búsqueda o filtros
   useEffect(() => {
     setPaginaActual(1);
+  }, [searchTerm, filterCategoria, filterTipoReferencia, filterEstado, inscripcionesFiltradas]);
+
+  // Aplicar filtros cuando cambia la lista original
+  useEffect(() => {
+    applyFilters(searchTerm, filterCategoria, filterTipoReferencia, filterEstado, inscripciones);
   }, [inscripciones]);
 
 
@@ -205,7 +308,7 @@ const Gestioninscripcion = () => {
           </div>
 
           <button className="btn-primary-tesorero" onClick={handleCreate}>
-            <i className="fas fa-plus"/>
+            <i className="fas fa-plus" />
             Nueva Inscripción{' '}
           </button>
         </div>
@@ -252,28 +355,73 @@ const Gestioninscripcion = () => {
           <div className="search-filters-tesorero">
             <div className="search-input-container-tesorero">
               <i className="fas fa-search"></i>
-              <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+              <input
+                type="text"
+                placeholder="Buscar inscripciones..."
+                id="userSearch"
+                value={searchTerm}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setSearchTerm(v);
+                  applyFilters(v, filterCategoria, filterTipoReferencia, filterEstado, inscripciones);
+                  setPaginaActual(1);
+                }}
+              />
             </div>
-            <select className="filter-select">
-              <option value="">Todos los roles</option>
-              <option value="administrador">Administrador</option>
-              <option value="tesorero">Tesorero</option>
-              <option value="seminarista">Seminarista</option>
+            <select
+              className="filter-select"
+              value={filterCategoria}
+              onChange={(e) => {
+                const v = e.target.value;
+                setFilterCategoria(v);
+                applyFilters(searchTerm, v, filterTipoReferencia, filterEstado, inscripciones);
+                setPaginaActual(1);
+              }}
+            >
+              <option value="todos">Todas las categorías</option>
+              {Array.isArray(categorias) && categorias.map(cat => (
+                <option key={cat._id || cat.id || cat.codigo} value={cat._id || cat.id || cat.codigo}>{cat.nombre || cat.codigo}</option>
+              ))}
             </select>
-            <select id="statusFilter" className="filter-select">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
+            <select
+              id="statusFilter"
+              className="filter-select"
+              value={filterTipoReferencia}
+              onChange={(e) => {
+                const v = e.target.value;
+                setFilterTipoReferencia(v);
+                applyFilters(searchTerm, filterCategoria, v, filterEstado, inscripciones);
+                setPaginaActual(1);
+              }}
+            >
+              <option value="todos">Todos los tipos</option>
+              <option value="Eventos">Eventos</option>
+              <option value="ProgramaAcademico">ProgramaAcademico</option>
+            </select>
+            <select
+              id="statusFilterEstado"
+              className="filter-select"
+              value={filterEstado}
+              onChange={(e) => {
+                const v = e.target.value;
+                setFilterEstado(v);
+                applyFilters(searchTerm, filterCategoria, filterTipoReferencia, v, inscripciones);
+                setPaginaActual(1);
+              }}
+            >
+              <option value="todos">Todos los estados</option>
+              <option value="no inscrito">no inscrito</option>
+              <option value="inscrito">inscrito</option>
+              <option value="finalizado">finalizado</option>
+              <option value="preinscrito">preinscrito</option>
+              <option value="matriculado">matriculado</option>
+              <option value="en_curso">en_curso</option>
+              <option value="certificado">certificado</option>
+              <option value="rechazada">rechazada</option>
+              <option value="cancelada academico">cancelada academico</option>
             </select>
           </div>
-          <div className="export-actions">
-            <button className="btn-outline-tesorero" >
-              <i className="fas fa-download"></i>
-            </button>
-            <button className="btn-outline-tesorero" >
-              <i className="fas fa-share"></i>
-            </button>
-          </div>
+          
         </div>
 
 
@@ -300,36 +448,48 @@ const Gestioninscripcion = () => {
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
-  
-                    {inscripcionesPaginadas.map((ins) => (
-                      <tr key={ins._id}>
-                        <td>{(ins.nombre && ins.apelledio) ? `${ins.nombre} ${ins.apellido}` : ins.nombre || ins.apellido || "N/A"}</td>
-                        <td>{ins.tipoDocumento}</td>
-                        <td>{ins.numeroDocumento}</td>
-                        <td>{ins.correo}</td>
-                        <td>{ins.telefono}</td>
-                        <td>{ins.edad}</td>
-                        <td>{ins.tipoReferencia}</td>
-                        <td>{ins.referencia?.nombre || ins.evento?.nombre}</td>
-                        <td>{ins.categoria?.nombre || "N/A"}</td>
-                        <td>
-                          <span className={`badge-estado estado-${(ins.estado || "pendiente").toLowerCase()}`}>
-                            {ins.estado || "Pendiente"}
-                          </span>
-                        </td>
-                        <td>{ins.observaciones || "N/A"}</td>
-                        <td>
-                          {ins.fechaInscripcion
-                            ? new Date(ins.fechaInscripcion).toLocaleString()
-                            : "N/A"}
-                        </td>
-                        <td>{ins.solicitud ? ins.solicitud : "N/A"}</td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(ins)}>
-                            <Edit className="h-4 w-4" />
+
+                  {inscripcionesPaginadas.map((ins) => (
+                    <tr key={ins._id}>
+                      <td>{(ins.nombre && ins.apelledio) ? `${ins.nombre} ${ins.apellido}` : ins.nombre || ins.apellido || "N/A"}</td>
+                      <td>{ins.tipoDocumento}</td>
+                      <td>{ins.numeroDocumento}</td>
+                      <td>{ins.correo}</td>
+                      <td>{ins.telefono}</td>
+                      <td>{ins.edad}</td>
+                      <td>{ins.tipoReferencia}</td>
+                      <td>{ins.referencia?.nombre || ins.evento?.nombre}</td>
+                      <td>{ins.categoria?.nombre || "N/A"}</td>
+                      <td>
+                        <span className={`badge-estado estado-${(ins.estado || "pendiente").toLowerCase()}`}>
+                          {ins.estado || "Pendiente"}
+                        </span>
+                      </td>
+                      <td>{ins.observaciones || "N/A"}</td>
+                      <td>
+                        {ins.fechaInscripcion
+                          ? new Date(ins.fechaInscripcion).toLocaleString()
+                          : "N/A"}
+                      </td>
+                      <td>
+                        {ins.solicitud ? (
+                          <button
+                            className="text-blue-600 hover:underline"
+                            onClick={() => handleMostrarSolicitud(ins.solicitud)}
+                            title="Ver solicitud"
+                          >
+                            Ver solicitud
                           </button>
-                        </td>
-                      </tr>
+                        ) : (
+                          'N/A'
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(ins)}>
+                          <Edit className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
                   ))}
 
                 </tbody>

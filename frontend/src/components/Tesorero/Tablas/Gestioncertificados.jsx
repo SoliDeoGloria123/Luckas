@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Search, Download, Users, UserCheck, Shield, TrendingUp, ChevronLeft, ChevronDown } from "lucide-react"
+import { Search, Download, Users, UserCheck, Shield, TrendingUp, ChevronLeft } from "lucide-react"
 import Header from "../Header/Header-tesorero";
 import Footer from '../../footer/Footer'
 import { generarCertificado, estadisticasCertificados as fetchEstadisticasCertificados } from '../../../services/certificadoService';
@@ -15,24 +15,34 @@ const CertificadosPage = () => {
         descargasHoy: 0,
         listosParaDescarga: 0
     });
+    const [certificadosFiltrados, setCertificadosFiltrados] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterPrograma, setFilterPrograma] = useState('todos');
+    const [filterEstado, setFilterEstado] = useState('todos');
 
     useEffect(() => {
         // Obtener inscripciones con estado certificado o finalizado usando inscripcionService
         const fetchCertificados = async () => {
             try {
                 const data = await inscripcionService.getAll();
-                if (data.success && Array.isArray(data.data)) {
+                if (data && data.success && Array.isArray(data.data)) {
                     // Mostrar solo inscripciones de programas académicos cuyo estado sea exactamente 'certificado'
                     const filtrados = data.data.filter(
                         insc => (insc.tipoReferencia === 'ProgramaAcademico') && (insc.estado === 'certificado')
                     );
                     setCertificados(filtrados);
+                    setCertificadosFiltrados(filtrados);
+                } else if (Array.isArray(data)) {
+                    const filtrados = data.filter(insc => (insc.tipoReferencia === 'ProgramaAcademico') && (insc.estado === 'certificado'));
+                    setCertificados(filtrados);
+                    setCertificadosFiltrados(filtrados);
                 } else {
                     setCertificados([]);
+                    setCertificadosFiltrados([]);
                 }
             } catch (err) {
                 setCertificados([]);
-                mostrarAlerta("ERROR", `Error al obtener certificados: ${err.message}`, 'error');
+                mostrarAlerta("Error", `Error al obtener certificados: ${err.message}`, 'error');
             }
         };
         fetchCertificados();
@@ -45,13 +55,60 @@ const CertificadosPage = () => {
             // El servicio devuelve directamente el objeto { totalInscripciones, certificadosEmitidos, descargasHoy, listosParaDescarga }
             setEstadisticasCertificados(data || {});
         } catch (error) {
-            mostrarAlerta("ERROR", `Error al obtener estadísticas de certificados: ${error.message}`, 'error');
+            mostrarAlerta("Error", `obtener estadísticas de certificados: ${error.message}`, 'error');
         }
     };
 
     useEffect(() => {
         obtenerEstadisticasCertificados();
     }, []);
+
+    // Helper para extraer texto seguro
+    const extractText = (val) => {
+        if (val === null || val === undefined) return '';
+        if (typeof val === 'object') return (val.nombre || val.titulo || val.cursoNombre || JSON.stringify(val));
+        return String(val);
+    };
+
+    const applyFilters = (search = searchTerm, programa = filterPrograma, estado = filterEstado, lista = certificados) => {
+        const s = (search || '').toString().trim().toLowerCase();
+        const arr = Array.isArray(lista) ? lista : [];
+        const filtered = arr.filter((c) => {
+            // filtro por programa
+            if (programa && programa !== 'todos') {
+                const prog = c.programaNombre || c.cursoNombre || (c.referencia && (c.referencia.nombre || c.referencia));
+                if (String(prog) !== String(programa)) return false;
+            }
+            // filtro por estado
+            if (estado && estado !== 'todos') {
+                if (String((c.estado || '')).toLowerCase() !== String(estado).toLowerCase()) return false;
+            }
+
+            if (!s) return true;
+
+            const nombre = extractText(c.nombre).toLowerCase();
+            const apellido = extractText(c.apellido).toLowerCase();
+            const correo = extractText(c.correo).toLowerCase();
+            const documento = extractText(c.numeroDocumento).toLowerCase();
+            const programaNombre = extractText(c.programaNombre || c.cursoNombre || c.referencia?.nombre).toLowerCase();
+
+            return (
+                nombre.includes(s) ||
+                apellido.includes(s) ||
+                correo.includes(s) ||
+                documento.includes(s) ||
+                programaNombre.includes(s) ||
+                String(c.estado || '').toLowerCase().includes(s)
+            );
+        });
+
+        setCertificadosFiltrados(filtered);
+    };
+
+    // aplicar filtros cuando cambie la fuente
+    useEffect(() => {
+        applyFilters(searchTerm, filterPrograma, filterEstado, certificados);
+    }, [certificados]);
 
     // Descargar certificado PDF
     const handleDescargar = async (cert) => {
@@ -69,7 +126,7 @@ const CertificadosPage = () => {
             a.remove();
             globalThis.URL.revokeObjectURL(url);
         } catch (err) {
-            mostrarAlerta("ERROR", `Error al descargar certificado: ${err.message}`, 'error');
+            mostrarAlerta("Error", `Error al descargar certificado: ${err.message}`, 'error');
         }
     };
 
@@ -104,8 +161,8 @@ const CertificadosPage = () => {
                     </div>
                     <div className="stat-card-usuarios">
                         <div className="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center">
-                                <UserCheck className="h-6 w-6 text-green-600" />
-                            </div>
+                            <UserCheck className="h-6 w-6 text-green-600" />
+                        </div>
                         <div className="stat-content">
                             <div className="stat-number-usuarios" id="activeUsers">{estadisticasCertificados.certificadosEmitidos}</div>
                             <div className="stat-label-usuarios">Certificados Emitidos</div>
@@ -113,8 +170,8 @@ const CertificadosPage = () => {
                     </div>
                     <div className="stat-card-usuarios">
                         <div className="h-12 w-12 rounded-lg bg-purple-100 flex items-center justify-center">
-                                <Shield className="h-6 w-6 text-purple-600" />
-                            </div>
+                            <Shield className="h-6 w-6 text-purple-600" />
+                        </div>
                         <div className="stat-content">
                             <div className="stat-number-usuarios" id="adminUsers">{estadisticasCertificados.descargasHoy}</div>
                             <div className="stat-label-usuarios">Descargas Hoy</div>
@@ -122,8 +179,8 @@ const CertificadosPage = () => {
                     </div>
                     <div className="stat-card-usuarios">
                         <div className="h-12 w-12 rounded-lg bg-orange-100 flex items-center justify-center">
-                                <TrendingUp className="h-6 w-6 text-orange-600" />
-                            </div>
+                            <TrendingUp className="h-6 w-6 text-orange-600" />
+                        </div>
                         <div className="stat-content">
                             <div className="stat-number-usuarios" id="newUsers">{estadisticasCertificados.listosParaDescarga}</div>
                             <div className="stat-label-usuarios">Listos para Descarga</div>
@@ -131,47 +188,56 @@ const CertificadosPage = () => {
                     </div>
                 </div>
 
-                {/* Search and Filters */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="relative flex-1">
+
+                <div className="filters-section-tesorero">
+                    <div className="search-filters-tesorero">
+                        <div className="search-input-container-tesorero">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
-                                type="search"
-                                placeholder="Buscar por nombre, documento o correo..."
-                                // value={searchQuery}
-                                //onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-9 h-10 bg-white border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                type="text"
+                                placeholder="Buscar por nombre, descripción o código..."
+                                id="userSearch"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    setSearchTerm(v);
+                                    applyFilters(v, filterPrograma, filterEstado, certificados);
+                                }}
                             />
                         </div>
-                        <div className="relative w-full sm:w-[200px]">
-                            <select
-                                //value={programFilter}
-                                //onChange={(e) => setProgramFilter(e.target.value)}
-                                className="w-full h-10 px-3 pr-8 bg-white border border-gray-200 rounded-md text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="all">Todos los programas</option>
-                                <option value="Administración de Empresas">Administración de Empresas</option>
-                                <option value="Inglés Conversacional">Inglés Conversacional</option>
-                                <option value="Pintura al Óleo">Pintura al Óleo</option>
-                                <option value="Yoga y Meditación">Yoga y Meditación</option>
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                        </div>
-                        <div className="relative w-full sm:w-[180px]">
-                            <select
-                                // value={statusFilter}
-                                // onChange={(e) => setStatusFilter(e.target.value)}
-                                className="w-full h-10 px-3 pr-8 bg-white border border-gray-200 rounded-md text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="all">Todos los estados</option>
-                                <option value="certificado">Certificado</option>
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                        </div>
+                        <select
+                            id="programFilter"
+                            className="filter-select"
+                            value={filterPrograma}
+                            onChange={(e) => {
+                                const v = e.target.value;
+                                setFilterPrograma(v);
+                                applyFilters(searchTerm, v, filterEstado, certificados);
+                            }}
+                        >
+                            <option value="todos">Todos los Programas</option>
+                            {Array.from(new Set(certificados.map(c => c.programaNombre || c.cursoNombre || (c.referencia && (c.referencia.nombre || c.referencia)) ).filter(Boolean))).map(p => (
+                                <option key={p} value={p}>{p}</option>
+                            ))}
+                        </select>
+                        <select
+                            id="statusFilterEstado"
+                            className="filter-select"
+                            value={filterEstado}
+                            onChange={(e) => {
+                                const v = e.target.value;
+                                setFilterEstado(v);
+                                applyFilters(searchTerm, filterPrograma, v, certificados);
+                            }}
+                        >
+                            <option value="todos">Todos los Estados</option>
+                            <option value="certificado">Certificado</option>
+                            <option value="finalizado">Finalizado</option>
+                            <option value="pendiente">Pendiente</option>
+                        </select>
                     </div>
+                
                 </div>
-
                 {/* Certificates Table */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto">
@@ -199,7 +265,7 @@ const CertificadosPage = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                                {certificados.map((cert) => (
+                                {(certificadosFiltrados && certificadosFiltrados.length > 0 ? certificadosFiltrados : certificados).map((cert) => (
                                     <tr key={cert._id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cert.certificados} {cert.apellido}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{cert.numeroDocumento}</td>

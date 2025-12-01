@@ -13,6 +13,10 @@ const Gestionreserva = () => {
   const [reservas, setReservas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [cabanas, setCabanas] = useState([]);
+  // Filtros y buscador
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCabana, setFilterCabana] = useState('todos');
+  const [filterEstado, setFilterEstado] = useState('todos');
 
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -29,7 +33,7 @@ const Gestionreserva = () => {
     correoElectronico: '',
     telefono: '',
     propositoEstadia: '',
-    estado: 'pendiente'
+    estado: 'Pendiente'
   });
   const [estadisticas, setEstadisticas] = useState({totalReservas:0, pendientes:0, confirmadas:0, ingresosMes:0});
 
@@ -108,7 +112,7 @@ const Gestionreserva = () => {
       correoElectronico: '',
       telefono: '',
       propositoEstadia: '',
-      estado: 'pendiente'
+      estado: 'Pendiente'
     });
     setMostrarModal(true);
   };
@@ -130,7 +134,7 @@ const Gestionreserva = () => {
       setMostrarModal(false);
       obtenerReservas();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error al crear reserva: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al crear reserva: ${error.message}`, 'error');
     }
   };
 
@@ -140,7 +144,7 @@ const Gestionreserva = () => {
       const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaReserva;
       const id = (body && body._id) ? body._id : (reservaSeleccionada && reservaSeleccionada._id);
       if (!id) {
-        mostrarAlerta('ERROR', 'No se encontró el ID de la reserva a actualizar', 'error');
+        mostrarAlerta('Error', 'No se encontró el ID de la reserva a actualizar', 'error');
         return;
       }
       await reservaService.update(id, body);
@@ -148,26 +152,106 @@ const Gestionreserva = () => {
       setMostrarModal(false);
       obtenerReservas();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error al actualizar reserva: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al actualizar reserva: ${error.message}`, 'error');
     }
   };
 
+  // Mostrar solicitud sin exponer la ID
+  const handleMostrarSolicitud = async (solicitud) => {
+    if (!solicitud) {
+      mostrarAlerta('INFO', 'No hay solicitud asociada a esta reserva', 'info');
+      return;
+    }
 
+    try {
+      if (typeof solicitud === 'string') {
+        // Mostrar la ID completa a petición del usuario, y copiarla al portapapeles si es posible.
+        const fullId = String(solicitud);
+        try {
+          if (navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            await navigator.clipboard.writeText(fullId);
+            mostrarAlerta('Solicitud', `ID: ${fullId} (ID copiada al portapapeles)`, 'info');
+          } else {
+            mostrarAlerta('Solicitud', `ID: ${fullId}`, 'info');
+          }
+        } catch (err) {
+          // Si la copia falla por permisos, igualmente mostramos la ID completa
+          console.warn('No se pudo copiar ID al portapapeles', err);
+          mostrarAlerta('Solicitud', `ID: ${fullId}`, 'info');
+        }
+        return;
+      }
 
+      // solicitud es objeto: mostrar campos amigables si existen
+      const candidatoTitulo = solicitud.titulo || solicitud.nombre || solicitud.tipo || '';
+      const usuario = solicitud.usuario?.nombre || solicitud.usuario || '';
+      const estado = solicitud.estado ? `Estado: ${solicitud.estado}` : '';
+      const fecha = solicitud.fecha ? `Fecha: ${new Date(solicitud.fecha).toLocaleDateString()}` : '';
+      const id = solicitud._id ? `ID: ${solicitud._id}` : '';
+      const partes = [candidatoTitulo, usuario, estado, fecha].filter(Boolean);
+      const mensajeResumen = partes.join(' • ') || 'Solicitud registrada';
+      const mensaje = id ? `${mensajeResumen} • ${id}` : mensajeResumen;
+      mostrarAlerta('Solicitud', mensaje, 'info');
+    } catch (err) {
+      console.error('Error mostrando solicitud', err);
+      mostrarAlerta('ERROR', 'No se pudo mostrar la solicitud', 'error');
+    }
+  };
+
+  // Helpers de filtrado para reducir complejidad
+  const pasaFiltroCabana = (r, filterCabana) => {
+    if (!filterCabana || filterCabana === 'todos') return true;
+    const cabObj = r && r.cabana ? r.cabana : null;
+    const cab = (cabObj && typeof cabObj === 'object') ? (cabObj._id || cabObj.nombre || cabObj) : cabObj;
+    if (!cab) return false;
+    return String(cab) === String(filterCabana) || String((cabObj?.nombre || '')).toLowerCase() === String(filterCabana).toLowerCase();
+  };
+
+  const pasaFiltroEstado = (r, filterEstado) => {
+    if (!filterEstado || filterEstado === 'todos') return true;
+    return (r.estado || '').toLowerCase() === String(filterEstado).toLowerCase();
+  };
+
+  const pasaBusqueda = (r, searchTerm) => {
+    if (!searchTerm) return true;
+    const s = searchTerm.trim().toLowerCase();
+    if (!s) return true;
+    const usuarioObj = r && r.usuario ? r.usuario : null;
+    const nombreUsuario = ((usuarioObj && typeof usuarioObj === 'object')
+      ? (usuarioObj.username || usuarioObj.nombre || usuarioObj.correo || '')
+      : (usuarioObj || '')
+    ).toString().toLowerCase();
+    const cabanaObj = r && r.cabana ? r.cabana : null;
+    const cabanaNombre = ((cabanaObj && typeof cabanaObj === 'object') ? (cabanaObj.nombre || '') : (cabanaObj || '')).toString().toLowerCase();
+    const campos = [
+      nombreUsuario,
+      cabanaNombre,
+      (r.tipoDocumento || '').toLowerCase(),
+      (r.numeroDocumento || '').toLowerCase(),
+      (r.correoElectronico || '').toLowerCase(),
+      (r.telefono || '').toLowerCase(),
+      (r.propositoEstadia || '').toLowerCase()
+    ];
+    return campos.some(c => c.includes(s));
+  };
+
+  const reservasFiltradas = (reservas || []).filter((r) => (
+    pasaFiltroCabana(r, filterCabana) && pasaFiltroEstado(r, filterEstado) && pasaBusqueda(r, searchTerm)
+  ));
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
   const registrosPorPagina = 10;
-  const totalPaginas = Math.ceil(reservas.length / registrosPorPagina);
-  const reservasPaginadas = reservas.slice(
+  const totalPaginas = Math.ceil(reservasFiltradas.length / registrosPorPagina) || 1;
+  const reservasPaginadas = reservasFiltradas.slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
 
-  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  // Reiniciar a la página 1 si cambian filtros o la lista de reservas
   useEffect(() => {
     setPaginaActual(1);
-  }, [reservas]);
+  }, [searchTerm, filterCabana, filterEstado, reservas.length]);
 
   return (
     <>
@@ -231,30 +315,40 @@ const Gestionreserva = () => {
 
         <div className="filters-section-tesorero">
           <div className="search-filters-tesorero">
-            <div className="search-input-container-tesorero">
-              <i className="fas fa-search"></i>
-              <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+              <div className="search-input-container-tesorero">
+                <i className="fas fa-search"></i>
+                <input
+                  type="text"
+                  placeholder="Buscar reservas..."
+                  id="userSearch"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <select
+                className="filter-select"
+                value={filterCabana}
+                onChange={(e) => setFilterCabana(e.target.value)}
+              >
+                <option value="todos">Todas las Cabañas</option>
+                {(cabanas || []).map((c) => (
+                  <option key={c._id || c.nombre} value={c._id || c.nombre}>{c.nombre || c._id}</option>
+                ))}
+              </select>
+              <select
+                id="statusFilter"
+                className="filter-select"
+                value={filterEstado}
+                onChange={(e) => setFilterEstado(e.target.value)}
+              >
+               <option value="todos">Todos los Estados</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Confirmada">Confirmada</option>
+                    <option value="Cancelada">Cancelada</option>
+                    <option value="finalizada">Finalizada</option>
+              </select>
             </div>
-            <select className="filter-select">
-              <option value="">Todos los roles</option>
-              <option value="administrador">Administrador</option>
-              <option value="tesorero">Tesorero</option>
-              <option value="seminarista">Seminarista</option>
-            </select>
-            <select id="statusFilter" className="filter-select">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-          </div>
-          <div className="export-actions">
-            <button className="btn-outline-tesorero" >
-              <i className="fas fa-download"></i>
-            </button>
-            <button className="btn-outline-tesorero" >
-              <i className="fas fa-share"></i>
-            </button>
-          </div>
+          
         </div>
 
 
@@ -317,9 +411,17 @@ const Gestionreserva = () => {
                         </td>
                         <td>{reser.observaciones || "N/A"}</td>
                         <td>
-                          {typeof reser.solicitud === "object"
-                            ? reser.solicitud?._id || "N/A"
-                            : reser.solicitud || "N/A"}
+                          {reser.solicitud ? (
+                            <button
+                              className="text-blue-600 hover:underline"
+                              onClick={() => handleMostrarSolicitud(reser.solicitud)}
+                              title="Ver solicitud"
+                            >
+                              Ver solicitud
+                            </button>
+                          ) : (
+                            'N/A'
+                          )}
                         </td>
                         <td>
                           <span className={`status-badge status-${reser.activo ? 'Activo' : 'Desactivado'}`}>

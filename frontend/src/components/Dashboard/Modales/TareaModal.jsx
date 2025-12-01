@@ -141,13 +141,13 @@ const TareaModal = ({
           <label htmlFor="prioridad">Prioridad:</label>
           <select
             id="prioridad"
-            value={getValue('prioridad') || 'media'}
+            value={getValue('prioridad') || 'Media'}
             onChange={e => handleChange('prioridad', e.target.value)}
             required
           >
-            <option value="media">Media</option>
-            <option value="alta">Alta</option>
-            <option value="baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+            <option value="Baja">Baja</option>
           </select>
         </div>
 
@@ -161,7 +161,7 @@ const TareaModal = ({
             required
           >
             <option value="pendiente">Pendiente</option>
-            <option value="en progreso">En Progreso</option>
+            <option value="en_progreso">En Progreso</option>
             <option value="completada">Completada</option>
             <option value="cancelada">Cancelada</option>
           </select>

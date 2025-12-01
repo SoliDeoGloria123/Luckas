@@ -24,7 +24,7 @@ const GestionIscripcion = () => {
   const [estadisticas, setEstadisticas] = useState({ totalInscripciones: 0, nuevasEstaSemana: 0, aprobadas: 0, pendientes: 0 });
   const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
   // Filtros UI
-  const [filtroEvento, setFiltroEvento] = useState('todos');
+  const [filtroEvento] = useState('todos');
   const [filtroCategoria, setFiltroCategoria] = useState('todos');
   const [filtroTipoReferencia, setFiltroTipoReferencia] = useState('todos');
   const [filtroEstado, setFiltroEstado] = useState('todos');
@@ -56,7 +56,7 @@ const GestionIscripcion = () => {
       setEstado(Array.isArray(datos) ? datos : valorPorDefecto);
     } catch (error) {
       setEstado(valorPorDefecto);
-      mostrarAlerta("Error", `${mensajeError}: ${error.message}`);
+      mostrarAlerta("Error", `${mensajeError}: ${error.message}`, 'error');
     }
   };
 
@@ -68,7 +68,7 @@ const GestionIscripcion = () => {
       if (callback) callback();
     } catch (error) {
       console.error(mensajeError, error.response?.data || error.message);
-      mostrarAlerta("Error", `${mensajeError}: ${error.response?.data?.message || error.message}`);
+      mostrarAlerta("Error", `${mensajeError}: ${error.response?.data?.message || error.message}`, 'error');
     }
   };
 
@@ -319,17 +319,6 @@ const GestionIscripcion = () => {
                 />
               </div>
               <div className="flex space-x-3">
-                <select
-                  className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                  value={filtroEvento}
-                  onChange={(e) => { setFiltroEvento(e.target.value); setPaginaActual(1); }}
-                >
-                  <option value="todos">Todos los eventos/programas</option>
-                  {Array.isArray(eventos) && eventos.map(ev => (
-                    <option key={ev._id || ev.id} value={ev._id || ev.id}>{ev.nombre || ev.titulo}</option>
-                  ))}
-                </select>
-
                 <select
                   className="px-4 py-3 glass-card border border-slate-200/50 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                   value={filtroCategoria}

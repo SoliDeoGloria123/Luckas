@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search,  FileText,TrendingUp,PieChartIcon,X, } from 'lucide-react';
 import { reporteService } from '../../services/reporteService';
 import './Dashboard.css'
 import Sidebar from './Sidebar/Sidebar';
@@ -7,6 +7,20 @@ import Header from './Sidebar/Header';
 import ReportesTabla from './Tablas/ReportesTabla';
 import ReporteModal from './Modales/ReporteModal';
 import { mostrarAlerta, mostrarConfirmacion } from '../utils/alertas';
+import Pagination from '../Dashboard/Shared/Pagination';
+import {
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts"
 
 
 const Reportes = () => {
@@ -29,6 +43,12 @@ const Reportes = () => {
   const [reportesGuardados, setReportesGuardados] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [seccionActiva, setSeccionActiva] = useState("dashboard");
+
+  // Variables para el modal de ver detalles del reporte
+  const [activeReport, setActiveReport] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -169,6 +189,113 @@ const Reportes = () => {
   //  setReporteEditando(null);
   //  setModoEdicion(false);
   //};
+  
+  // Extraer datos del reporte activo - debe estar antes de generateChartData
+  const extraerDataArray = (datos) => {
+    if (Array.isArray(datos)) return datos;
+    if (typeof datos === 'object' && datos !== null) {
+      const values = Object.values(datos);
+      const arrays = values.filter(v => Array.isArray(v));
+      return arrays.length > 0 ? arrays[0] : [];
+    }
+    return [];
+  };
+  
+  // Variables para el modal de ver detalles
+  const COLORS = ["#2563eb", "#8b5cf6", "#059669", "#f59e0b", "#ef4444"];
+  
+  // Helpers para generar gráficos
+  const generateTrendData = (datos) => {
+    if (!datos.length) return [];
+    
+    const mesesConDatos = {};
+    
+    for (const item of datos) {
+      const fechaField = item.createdAt || item.fechaCreacion || item.fecha || item.fechaInscripcion || item.fechaInicio;
+      if (fechaField) {
+        const fecha = new Date(fechaField);
+        if (!Number.isNaN(fecha.getTime())) {
+          const mesKey = fecha.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
+          mesesConDatos[mesKey] = (mesesConDatos[mesKey] || 0) + 1;
+        }
+      }
+    }
+    
+    const trend = [];
+    for (const [mes, total] of Object.entries(mesesConDatos)) {
+      trend.push({ mes, total });
+    }
+    
+    // Fallback si no hay datos de fecha
+    if (trend.length === 0) {
+      const meses = ['Ene', 'Feb', 'Mar', 'Abr'];
+      const totalPorMes = Math.ceil(datos.length / 4);
+      for (const [index, mes] of meses.entries()) {
+        trend.push({ 
+          mes, 
+          total: index === meses.length - 1 ? datos.length - (totalPorMes * (meses.length - 1)) : totalPorMes 
+        });
+      }
+    }
+    
+    return trend;
+  };
+  
+  const generateDistributionData = (datos) => {
+    if (!datos.length) return [];
+    
+    const conteoEstados = {};
+    
+    for (const item of datos) {
+      const estado = item.estado || item.tipo || item.status || item.tipoReferencia || 'Sin clasificar';
+      conteoEstados[estado] = (conteoEstados[estado] || 0) + 1;
+    }
+    
+    const distribution = [];
+    for (const [name, value] of Object.entries(conteoEstados)) {
+      distribution.push({ name, value });
+    }
+    
+    // Fallback si no hay estados
+    if (distribution.length === 0) {
+      distribution.push({ name: 'Total', value: datos.length });
+    }
+    
+    return distribution;
+  };
+
+  // Generar datos del gráfico
+  const generateChartData = (report) => {
+    if (!report || !report.datos) {
+      return { trend: [], distribution: [] };
+    }
+    
+    const datos = extraerDataArray(report.datos);
+    return {
+      trend: generateTrendData(datos),
+      distribution: generateDistributionData(datos)
+    };
+  };
+  
+  const chartData = React.useMemo(() => generateChartData(activeReport), [activeReport]);
+  
+  const filteredData = React.useMemo(() => {
+    if (!activeReport) return [];
+    const datos = activeReport.datos || {};
+    const data = extraerDataArray(datos);
+
+    return data.filter((item) =>
+      Object.values(item).some((value) => String(value).toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [activeReport, searchTerm]);
+
+  const paginatedData = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredData.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredData, currentPage]);
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  
   // Resumen seguro para evitar errores en render cuando datosReporte es null
   const resumen = (datosReporte && datosReporte.resumen) ? datosReporte.resumen : {
     totalUsuarios: 0,
@@ -332,6 +459,7 @@ const Reportes = () => {
               reportesGuardados={reportesPaginados}
               editarReporte={abrirModalEditar}
               eliminarReporte={eliminarReporte}
+              onVerDetalles={setActiveReport}
             />
 
           </div>
@@ -377,6 +505,185 @@ const Reportes = () => {
             </div>
           </div>
         </div>
+
+             {activeReport && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 md:p-10">
+            <div className="bg-white rounded-xl shadow-lg w-full max-w-7xl max-h-[90vh] overflow-y-auto p-6">
+
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <h2 className="font-bold text-xl text-gray-900">{activeReport.nombre || 'Reporte'}</h2>
+                  <p className="text-sm text-gray-600">{activeReport.descripcion || 'Sin descripción disponible'}</p>
+                </div>
+                <button
+                  onClick={() => setActiveReport(null)}
+                  className="rounded-lg border border-gray-200 bg-white p-2 hover:bg-gray-50 transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-600" />
+                </button>
+              </div>
+
+              {/* Search and Filters */}
+              <div className="mb-6 flex items-center gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar en resultados..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-10 w-full rounded-lg border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              {/* Data Table */}
+              <div className="mb-6 overflow-x-auto rounded-lg border border-gray-200">
+                {filteredData.length > 0 ? (
+                  <>
+                    <table className="hidden md:table w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          {Object.keys(paginatedData[0] || {})
+                            .filter((key) => key !== '_id' && key !== 'id')
+                            .map((key) => (
+                              <th
+                                key={key}
+                                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                              >
+                                {key}
+                              </th>
+                            ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 bg-white">
+                        {paginatedData.map((row, idx) => {
+                          const rowKey = row._id || row.id || Object.values(row).join('-') + '-' + idx;
+                          return (
+                            <tr key={rowKey} className="hover:bg-gray-50">
+                              {Object.entries(row)
+                                .filter(([colKey]) => colKey !== '_id' && colKey !== 'id')
+                                .map(([colKey, value]) => (
+                                  <td key={colKey} className="px-4 py-3 text-sm text-gray-900">
+                                    {String(value || 'N/A')}
+                                  </td>
+                                ))}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    {/* Tarjetas responsive para móvil */}
+                    <div className="md:hidden">
+                      {paginatedData.map((row, idx) => {
+                        const rowKey = row._id || row.id || Object.values(row).join('-') + '-' + idx;
+                        return (
+                          <div key={rowKey} className="bg-white rounded-lg shadow p-3 mb-2 border">
+                            {Object.entries(row)
+                              .filter(([key]) => key !== '_id' && key !== 'id')
+                              .map(([key, value]) => (
+                                <div key={key} className="flex justify-between py-1 text-sm">
+                                  <span className="font-semibold text-gray-700">{key}:</span>
+                                  <span className="text-gray-900">{String(value || 'N/A')}</span>
+                                </div>
+                              ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-48 text-gray-500">
+                    <div className="text-center">
+                      <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No hay datos disponibles</h3>
+                      <p className="text-sm text-gray-600">
+                        Este reporte no contiene datos para los filtros seleccionados o el tipo de reporte no está soportado.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Pagination */}
+              <div className="mb-6 flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  Mostrando {(currentPage - 1) * itemsPerPage + 1} a {Math.min(currentPage * itemsPerPage, filteredData.length)} de {filteredData.length} resultados
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPrevious={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  onNext={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                />
+              </div>
+
+              {/* Charts */}
+              <div className="grid gap-6 md:grid-cols-2">
+                {/* Trend Chart */}
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                  <div className="mb-4 flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                    <h3 className="font-semibold text-gray-900">Tendencia</h3>
+                  </div>
+                  {chartData.trend.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <LineChart data={chartData.trend}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <XAxis dataKey="mes" stroke="#6b7280" fontSize={12} />
+                        <YAxis stroke="#6b7280" fontSize={12} />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="total" stroke="#2563eb" strokeWidth={2} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-48 text-gray-500">
+                      <div className="text-center">
+                        <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p>No hay datos de tendencia disponibles</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Distribution Chart */}
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                  <div className="mb-4 flex items-center gap-2">
+                    <PieChartIcon className="h-5 w-5 text-purple-600" />
+                    <h3 className="font-semibold text-gray-900">Distribución</h3>
+                  </div>
+                  {chartData.distribution.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={chartData.distribution}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {chartData.distribution.map((entry, index) => (
+                            <Cell key={`cell-${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-48 text-gray-500">
+                      <div className="text-center">
+                        <PieChartIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p>No hay datos de distribución disponibles</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <ReporteModal
           mostrar={mostrarModal}
           onClose={() => {

@@ -9,6 +9,8 @@ import { Edit } from "lucide-react"
 
 const Gestioncategorizacion = () => {
   const [categorias, setCategorias] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
 
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -24,7 +26,7 @@ const Gestioncategorizacion = () => {
 
   // Obtener categorías
   const obtenerCategorias = async () => {
-   try {
+    try {
       const res = await categorizacionService.getAll();
       let lista = [];
       if (res) {
@@ -74,7 +76,7 @@ const Gestioncategorizacion = () => {
       setMostrarModal(false);
       obtenerCategorias();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
 
@@ -86,7 +88,7 @@ const Gestioncategorizacion = () => {
       setMostrarModal(false);
       obtenerCategorias();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
 
@@ -99,7 +101,7 @@ const Gestioncategorizacion = () => {
       mostrarAlerta("¡Éxito!", `Categoría actualizada a ${nuevoEstado}`);
       obtenerCategorias(); // refresca la lista
     } catch (error) {
-      mostrarAlerta("Error", `No se pudo actualizar el estado: ${error.message}`);
+      mostrarAlerta("Error", `No se pudo actualizar el estado: ${error.message}`,'error' );
     }
   };
 
@@ -115,16 +117,27 @@ const Gestioncategorizacion = () => {
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
   const registrosPorPagina = 10;
-  const totalPaginas = Math.ceil(categorias.length / registrosPorPagina);
-  const categorizacionPaginados = categorias.slice(
+  // Aplicar búsqueda y filtro por estado
+  const term = String(searchTerm || '').trim().toLowerCase();
+  const categoriasFiltradas = categorias.filter((c) => {
+    if (filterStatus) {
+      if (String(c.estado || '').toLowerCase() !== String(filterStatus).toLowerCase()) return false;
+    }
+    if (!term) return true;
+    const nombre = String(c.nombre || '').toLowerCase();
+    const descripcion = String(c.descripcion || '').toLowerCase();
+    const codigo = String(c.codigo || '').toLowerCase();
+    return nombre.includes(term) || descripcion.includes(term) || codigo.includes(term);
+  });
+
+  const totalPaginas = Math.ceil(categoriasFiltradas.length / registrosPorPagina);
+  const categorizacionPaginados = categoriasFiltradas.slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
-
-  // Reiniciar a la página 1 si cambia el filtro de usuarios
   useEffect(() => {
     setPaginaActual(1);
-  }, [categorias]);
+  }, [searchTerm, filterStatus, categorias.length]);
 
   return (
     <>
@@ -194,28 +207,26 @@ const Gestioncategorizacion = () => {
           <div className="search-filters-tesorero">
             <div className="search-input-container-tesorero">
               <i className="fas fa-search"></i>
-              <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, descripción o código..."
+                  id="userSearch"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
-            <select className="filter-select">
-              <option value="">Todos los roles</option>
-              <option value="administrador">Administrador</option>
-              <option value="tesorero">Tesorero</option>
-              <option value="seminarista">Seminarista</option>
-            </select>
-            <select id="statusFilter" className="filter-select">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
+              <select
+                id="statusFilter"
+                className="filter-select"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+              >
+                <option value="">Todos los Estados</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
           </div>
-          <div className="export-actions">
-            <button className="btn-outline-tesorero" id="exportBtn">
-              <i className="fas fa-download"></i>
-            </button>
-            <button className="btn-outline-tesorero" id="importBtn">
-              <i className="fas fa-upload"></i>
-            </button>
-          </div>
+         
         </div>
 
 
@@ -225,8 +236,6 @@ const Gestioncategorizacion = () => {
               <table className="users-table-tesorero">
                 <thead>
                   <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
-
-                    <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">ID</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">Nombre</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">Tipo de categoria</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-[#334155]">Codigo</th>
@@ -237,7 +246,6 @@ const Gestioncategorizacion = () => {
                 <tbody id="usersTableBody">
                   {categorizacionPaginados.map((cate) => (
                     <tr key={cate._id}>
-                      <td>{cate._id}</td>
                       <td>{cate.nombre}</td>
                       <td>{cate.tipo}</td>
                       <td>{cate.codigo}</td>
@@ -285,8 +293,8 @@ const Gestioncategorizacion = () => {
 
           <button
             className="pagination-btn-admin"
-            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))}
-            disabled={paginaActual === totalPaginas || totalPaginas === 0}
+            onClick={() => setPaginaActual((prev) => Math.min(prev + 1, Math.max(1, totalPaginas)))}
+            disabled={paginaActual === totalPaginas || totalPaginas <= 1}
           >
             <i className="fas fa-chevron-right"></i>
           </button>

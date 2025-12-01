@@ -122,7 +122,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
       setNuevaReserva({ ...defaultReserva });
       obtenerReservas();
     } catch (err) {
-      mostrarAlerta("Error", "Error al crear la reserva: " + err.message);
+      mostrarAlerta("Error", "Error al crear la reserva: " + err.message, 'error');
     }
   };
 
@@ -142,7 +142,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
       setModoEdicion(false);
       obtenerReservas();
     } catch (err) {
-      mostrarAlerta("Error", "Error al actualizar reserva: " + err.message);
+      mostrarAlerta("Error", "Error al actualizar reserva: " + err.message, 'error');
     }
   };
 
@@ -158,7 +158,7 @@ const GestionReservas = ({ readOnly = false, modoTesorero = false, canCreate = t
       mostrarAlerta("¡Éxito!", "Reserva eliminada exitosamente");
       obtenerReservas();
     } catch (err) {
-      mostrarAlerta("Error", "Error al eliminar reserva: " + err.message);
+      mostrarAlerta("Error", "Error al eliminar reserva: " + err.message, 'error');
     }
   };
 

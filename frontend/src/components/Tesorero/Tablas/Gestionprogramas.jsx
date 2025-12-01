@@ -21,6 +21,8 @@ const Gestionprogramas = () => {
   const [programas, setProgramas] = useState([]);
   const [programasFiltrados, setProgramasFiltrados] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterTipo, setFilterTipo] = useState('todos');
+  const [filterEstado, setFilterEstado] = useState('todos');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
   // `programas` es la lista principal (ya definida arriba).
@@ -60,6 +62,12 @@ const Gestionprogramas = () => {
   });
   const formatearPrecio = (precio) => `$${precio}`;
 
+  // Helper function to format dates
+  const formatearFecha = (fecha) => {
+    if (!fecha) return '';
+    return new Date(fecha).toLocaleDateString();
+  };
+
 
   const obtenerCursos = async () => {
     try {
@@ -85,7 +93,7 @@ const Gestionprogramas = () => {
 
     }
   };
-  
+
 
   // Funciones auxiliares para procesar datos del formulario
   const procesarRequisitos = (requisitos) => {
@@ -101,7 +109,7 @@ const Gestionprogramas = () => {
       .map(obj => typeof obj === 'object' ? obj.value : obj)
       .filter(obj => obj && obj.trim() !== '');
   };
- 
+
 
   // Funciones del modal
   const abrirModalVer = (programa) => {
@@ -138,6 +146,20 @@ const Gestionprogramas = () => {
     setMostrarModal(true);
   };
 
+  // Helper function to extract categoria ID - fixes SonarQube S3358
+  const extractCategoriaId = (categoria) => {
+    if (!categoria) return '';
+    if (typeof categoria === 'object') {
+      return categoria._id || categoria.id || '';
+    }
+    return categoria;
+  };
+
+  const abrirModalEditar = (programa) => {
+    handleEdit(programa);
+  };
+
+
   const handleEdit = (programa) => {
     setModoEdicion(true);
     setProgramaSeleccionado(programa);
@@ -154,6 +176,7 @@ const Gestionprogramas = () => {
       cupos: programa.cuposDisponibles || '',
       profesor: programa.profesor || '',
       profesorBio: programa.profesorBio || '',
+      categoria: extractCategoriaId(programa.categoria),
       requisitos: Array.isArray(programa.requisitos)
         ? programa.requisitos.map((req, i) => ({ id: `req_${i}`, value: req }))
         : [{ id: 'req_0', value: '' }],
@@ -211,7 +234,7 @@ const Gestionprogramas = () => {
       obtenerCursos();
       obtenerEstadisticas();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error al crear programa: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al crear programa: ${error.message}`, 'error');
     }
   };
 
@@ -259,33 +282,46 @@ const Gestionprogramas = () => {
       setMostrarModal(false);
       obtenerCursos();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error al actualizar programa: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al actualizar programa: ${error.message}`, 'error');
     }
   };
-
-  //------------------------------------------------------------------------------------------------------------------------------------
-  //obtener cursos
-
-
-
   // Función de búsqueda por nombre, instructor o categoría
   const handleSearch = (searchValue) => {
     setSearchTerm(searchValue);
-    const trimmedValue = searchValue.trim();
-    if (trimmedValue.length === 0) {
-      setProgramasFiltrados(programas);
-      return;
+    // Aplicamos filtros de forma centralizada
+    applyFilters(searchValue, filterTipo, filterEstado, programas);
+  };
+
+  const extractText = (val) => {
+    if (!val && val !== 0) return '';
+    if (typeof val === 'object') {
+      return (val.nombre || val.nombreCategoria || val.titulo || val.instructor || val.categoria || JSON.stringify(val)).toString();
     }
-    const searchLower = trimmedValue.toLowerCase();
-    const filteredProgramas = programas.filter(curso => {
-      const nombre = curso.nombre?.toLowerCase();
-      const instructor = curso.instructor?.toLowerCase();
-      const categoria = curso.categoria?.toLowerCase();
-      return nombre?.includes(searchLower) ||
-        instructor?.includes(searchLower) ||
-        categoria?.includes(searchLower);
+    return String(val);
+  };
+
+  const applyFilters = (search = searchTerm, tipo = filterTipo, estado = filterEstado, lista = programas) => {
+    const s = (search || '').toString().trim().toLowerCase();
+    const filtered = (Array.isArray(lista) ? lista : []).filter((programa) => {
+      // filtro por tipo
+      if (tipo && tipo !== 'todos') {
+        if (String(programa.tipo || '').toLowerCase() !== String(tipo).toLowerCase()) return false;
+      }
+      // filtro por estado
+      if (estado && estado !== 'todos') {
+        if (String(programa.estado || '').toLowerCase() !== String(estado).toLowerCase()) return false;
+      }
+
+      if (!s) return true;
+
+      const nombre = extractText(programa.nombre).toLowerCase();
+      const profesor = extractText(programa.profesor).toLowerCase();
+      const categoria = extractText(programa.categoria).toLowerCase();
+
+      return nombre.includes(s) || profesor.includes(s) || categoria.includes(s);
     });
-    setProgramasFiltrados(filteredProgramas);
+
+    setProgramasFiltrados(filtered);
   };
 
   useEffect(() => {
@@ -293,18 +329,14 @@ const Gestionprogramas = () => {
     obtenerEstadisticas();
   }, []);
 
-  // Efecto para actualizar cursos filtrados cuando cambia la lista de cursos
+  // Efecto para actualizar cursos filtrados cuando cambia la lista de cursos o filtros
   useEffect(() => {
-    if (searchTerm) {
-      handleSearch(searchTerm);
-    } else {
-      setProgramasFiltrados(programas);
-    }
-  }, [programas]);
+    applyFilters(searchTerm, filterTipo, filterEstado, programas);
+  }, [programas, searchTerm, filterTipo, filterEstado]);
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
-  const registrosPorPagina = 6;
+  const registrosPorPagina = 15;
   const totalPaginas = Math.ceil(programasFiltrados.length / registrosPorPagina);
   const programasPaginados = programasFiltrados.slice(
     (paginaActual - 1) * registrosPorPagina,
@@ -318,7 +350,7 @@ const Gestionprogramas = () => {
 
   return (
     <>
-      <Header />
+      <Header/>
       <main className="main-content-tesorero">
         <div className="page-header-tesorero">
           <div className="card-header-tesorero">
@@ -382,85 +414,101 @@ const Gestionprogramas = () => {
           </div>
         </div>
 
-        <div className="filters-section-tesorero">
+         <div className="filters-section-tesorero">
           <div className="search-filters-tesorero">
             <div className="search-input-container-tesorero">
               <i className="fas fa-search"></i>
               <input
                 type="text"
                 placeholder="Buscar por nombre, instructor o categoría..."
+                id="userSearch"
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
-            <select className="filter-select">
-              <option value="">Todas las categorías</option>
-              <option value="biblico">Bíblico</option>
-              <option value="ministerial">Ministerial</option>
-              <option value="liderazgo">Liderazgo</option>
-              <option value="pastoral">Pastoral</option>
-              <option value="tecnologia">Tecnología</option>
-              <option value="administracion">Administración</option>
+            <select
+              className="filter-select"
+              value={filterTipo}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFilterTipo(val);
+                applyFilters(searchTerm, val, filterEstado, programas);
+              }}
+            >
+              <option value="todos">Todos los tipos</option>
+              <option value="curso">Cursos</option>
+              <option value="programa-tecnico">Programas Técnicos</option>
             </select>
-            <select className="filter-select">
-              <option value="">Todos los estados</option>
+            <select
+              className="filter-select"
+              value={filterEstado}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFilterEstado(val);
+                applyFilters(searchTerm, filterTipo, val, programas);
+              }}
+            >
+              <option value="todos">Todos los estados</option>
               <option value="activo">Activo</option>
               <option value="inactivo">Inactivo</option>
-              <option value="finalizado">Finalizado</option>
             </select>
           </div>
-          <div className="export-actions">
-            <button className="btn-outline-tesorero">
-              <i className="fas fa-download"></i>
-            </button>
-            <button className="btn-outline-tesorero">
-              <i className="fas fa-share"></i>
-            </button>
-          </div>
+        
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(() => {
-           
 
-            if (programas.length > 0) {
-              return programasPaginados.map((programa) => {
-                // Determinar clases para el tipo de programa
-                const tipoClases = programa.tipo === 'curso'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
-                  : 'bg-gradient-to-r from-purple-600 to-violet-600';
-
-                const tipoLabelClases = programa.tipo === 'curso'
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'bg-purple-100 text-purple-800';
-
-                // Determinar clases para el estado del programa
-                let estadoClases = 'bg-amber-100 text-amber-800';
-                if (programa.estado === 'activo') {
-                  estadoClases = 'bg-emerald-100 text-emerald-800';
-                } else if (programa.estado === 'inactivo') {
-                  estadoClases = 'bg-red-100 text-red-800';
-                }
-
-                return (
+            if (programasPaginados.length > 0) {
+              return (
+                programasPaginados.map((programa) => (
                   <div key={programa._id} className="glass-card rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
                     {/* Header del programa */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <div className={`p-3 rounded-xl ${tipoClases}`}>
-                          {programa.tipo === 'curso' ? (
-                            <BookOpen className="w-6 h-6 text-white" />
-                          ) : (
-                            <GraduationCap className="w-6 h-6 text-white" />
-                          )}
-                        </div>
+                        {(() => {
+                          const esCurso = programa.tipo === 'curso';
+                          const gradientClass = esCurso
+                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
+                            : 'bg-gradient-to-r from-purple-600 to-violet-600';
+                          const IconComponent = esCurso ? BookOpen : GraduationCap;
+
+                          return (
+                            <div className={`p-3 rounded-xl ${gradientClass}`}>
+                              <IconComponent className="w-6 h-6 text-white" />
+                            </div>
+                          );
+                        })()}
                         <div>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-lg ${tipoLabelClases}`}>
-                            {programa.tipo === 'curso' ? 'Curso' : 'Programa Técnico'}
-                          </span>
-                          <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-lg ${estadoClases}`}>
-                            {programa.estado}
-                          </span>
+                          {(() => {
+                            const esCurso = programa.tipo === 'curso';
+                            const badgeClass = esCurso
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-purple-100 text-purple-800';
+                            const tipoTexto = esCurso ? 'Curso' : 'Programa Técnico';
+
+                            return (
+                              <span className={`px-2 py-1 text-xs font-medium rounded-lg ${badgeClass}`}>
+                                {tipoTexto}
+                              </span>
+                            );
+                          })()}
+                          {(() => {
+                            const estado = programa.estado;
+                            let estadoClass = 'bg-amber-100 text-amber-800'; // Por defecto
+
+                            if (estado === 'activo') {
+                              estadoClass = 'bg-emerald-100 text-emerald-800';
+                            } else if (estado === 'inactivo') {
+                              estadoClass = 'bg-red-100 text-red-800';
+                            }
+
+                            return (
+                              <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-lg ${estadoClass}`}>
+                                {estado}
+                              </span>
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -473,7 +521,7 @@ const Gestionprogramas = () => {
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleEdit(programa)}
+                          onClick={() => abrirModalEditar(programa)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Editar"
                         >
@@ -498,38 +546,55 @@ const Gestionprogramas = () => {
                         <div className="flex items-center space-x-2">
                           <Users className="w-4 h-4 text-blue-600" />
                           <span className="text-slate-600">
-                            Max. {programa.capacidadMaxima || 'N/A'}
+                            Disponibles: {programa.cuposDisponibles ?? 'N/A'} / Ocupados: {programa.cuposOcupados ?? 0}
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Clock className="w-4 h-4 text-purple-600" />
                           <span className="text-slate-600">
-                            {typeof programa.duracion === 'object'
-                              ? `${programa.duracion?.horas || 0}h - ${programa.duracion?.semanas || 0} sem`
-                              : programa.duracion || 'N/A'
-                            }
+                            {(() => {
+                              if (typeof programa.duracion === 'object') {
+                                const horas = programa.duracion?.horas || 0;
+                                const semanas = programa.duracion?.semanas || 0;
+                                return `${horas}h - ${semanas} sem`;
+                              }
+                              return programa.duracion || 'N/A';
+                            })()}
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4 text-amber-600" />
                           <span className="text-slate-600">
-                            {programa.fechaInicio ? new Date(programa.fechaInicio).toLocaleDateString() : 'Por definir'}
+                            {programa.fechaInicio ? formatearFecha(programa.fechaInicio) : 'Por definir'}
+                            {programa.fechaFin ? ` — ${formatearFecha(programa.fechaFin)}` : ''}
                           </span>
                         </div>
                       </div>
-
-                      {programa.instructor && (
-                        <div className="pt-3 border-t border-slate-200/50">
-                          <p className="text-sm text-slate-600">
-                            <span className="font-medium">Instructor:</span> {programa.instructor}
-                          </p>
-                        </div>
-                      )}
+                      <div className="pt-3 border-t border-slate-200/50">
+                        <p className="text-sm text-slate-600">
+                          <span className="font-medium">Profesor:</span> {programa.profesor || '—'}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          <span className="font-medium">Modalidad:</span> {programa.modalidad || '—'}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          <span className="font-medium">Nivel:</span> {programa.nivel || '—'}</p>
+                        <p className="text-sm text-slate-600">
+                          <span className="font-medium">Inscripciones:</span> {Array.isArray(programa.inscripciones) ? programa.inscripciones.length : 0}
+                        </p>
+                        {programa.certificacion && (
+                          <p className="text-sm mt-2 inline-block px-2 py-1 rounded bg-blue-100 text-blue-800">Certificación disponible</p>
+                        )}
+                        {programa.destacado && (
+                          <p className="text-sm mt-2 inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 ml-2">Destacado</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                );
-              });
+                ))
+              );
             }
+
 
             return (
               <div className="col-span-full text-center py-12">
@@ -565,66 +630,111 @@ const Gestionprogramas = () => {
 
         {/* Modal de Detalles del Programa */}
         {showDetailModal && selectedProgram && (
-          <div className="modal-overlay-tesorero">
-            <div className="tesorero-modal">
-              <div className="modal-header-tesorero">
-                <h2>Detalle del Programa</h2>
-                <button className="close-btn" onClick={() => setShowDetailModal(false)}>×</button>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">
+              <div className="flex items-start justify-between p-6 border-b">
+                <div>
+                  <h2 className="text-2xl font-semibold text-slate-800">{selectedProgram.nombre}</h2>
+                  <p className="text-sm text-slate-500 mt-1">{selectedProgram.tipo ? String(selectedProgram.tipo).replace('-', ' ') : ''} • {selectedProgram.modalidad}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">{selectedProgram.estado || '—'}</span>
+                    <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm">{selectedProgram.certificacion ? 'Con certificación' : 'Sin certificación'}</span>
+                    {selectedProgram.destacado && <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-sm">Destacado</span>}
+                  </div>
+                  <button onClick={() => setShowDetailModal(false)} className="text-slate-400 hover:text-slate-600 p-2 rounded-md">
+                    ✕
+                  </button>
+                </div>
               </div>
-              <div className="modal-body-tesorero">
-                <div className="programa-detalle-card">
-                  {selectedProgram.imagen && (
-                    <div className="programa-detalle-imagen">
-                      <img src={selectedProgram.imagen} alt="Imagen del programa" style={{ maxWidth: '100%', borderRadius: '8px', marginBottom: '1rem' }} />
-                    </div>
-                  )}
-                  <div className="programa-detalle-info">
-                    <div className="detalle-row"><span className="detalle-label">Título:</span> <span>{selectedProgram.nombre}</span></div>
-                    <div className="detalle-row"><span className="detalle-label">Tipo:</span> <span>{selectedProgram.tipo === 'curso' ? 'Curso' : 'Programa Técnico'}</span></div>
-                    <div className="detalle-row"><span className="detalle-label">Descripción:</span> <span>{selectedProgram.descripcion}</span></div>
-                    <div className="detalle-row"><span className="detalle-label">Modalidad:</span> <span>{selectedProgram.modalidad}</span></div>
-                    <div className="detalle-row"><span className="detalle-label">Duración:</span> <span>{selectedProgram.duracion}</span></div>
-                    <div className="detalle-row"><span className="detalle-label">Fecha de Inicio:</span> <span>{selectedProgram.fechaInicio ? selectedProgram.fechaInicio.split('T')[0] : 'No definida'}</span></div>
-                    <div className="detalle-row"><span className="detalle-label">Fecha de Fin:</span> <span>{selectedProgram.fechaFin ? selectedProgram.fechaFin.split('T')[0] : 'No definida'}</span></div>
-                    <div className="detalle-row"><span className="detalle-label">Precio:</span> <span>${selectedProgram.precio}</span></div>
-                    <div className="detalle-row"><span className="detalle-label">Cupos Disponibles:</span> <span>{selectedProgram.cuposDisponibles}</span></div>
-                    <div className="detalle-row"><span className="detalle-label">Profesor:</span> <span>{selectedProgram.profesor}</span></div>
-                    {selectedProgram.profesorBio && <div className="detalle-row"><span className="detalle-label">Biografía del Profesor:</span> <span>{selectedProgram.profesorBio}</span></div>}
-                    {selectedProgram.metodologia && <div className="detalle-row"><span className="detalle-label">Metodología:</span> <span>{selectedProgram.metodologia}</span></div>}
-                    {selectedProgram.evaluacion && <div className="detalle-row"><span className="detalle-label">Sistema de Evaluación:</span> <span>{selectedProgram.evaluacion}</span></div>}
-                    {selectedProgram.certificacion && <div className="detalle-row"><span className="detalle-label">Certificación:</span> <span>{selectedProgram.certificacion}</span></div>}
-                    <div className="detalle-row"><span className="detalle-label">Programa Destacado:</span> <span>{selectedProgram.destacado ? 'Sí' : 'No'}</span></div>
-                    {selectedProgram.requisitos && selectedProgram.requisitos.length > 0 && (
-                      <div className="detalle-row">
-                        <span className="detalle-label">Requisitos:</span>
-                        <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
-                          {selectedProgram.requisitos.map((req, index) => req && <li key={`req-${index}-${req.substring(0, 10)}`}>{req}</li>)}
-                        </ul>
-                      </div>
+
+              <div className="p-6 overflow-y-auto" style={{ maxHeight: '70vh' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    {selectedProgram.imagen && (
+                      <img src={selectedProgram.imagen} alt="Imagen del programa" className="w-full h-44 object-cover rounded-lg mb-4" />
                     )}
-                    {selectedProgram.objetivos && selectedProgram.objetivos.length > 0 && (
-                      <div className="detalle-row">
-                        <span className="detalle-label">Objetivos:</span>
-                        <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
-                          {selectedProgram.objetivos.map((obj, index) => obj && <li key={`obj-${index}-${obj.substring(0, 10)}`}>{obj}</li>)}
-                        </ul>
-                      </div>
-                    )}
-                    {selectedProgram.pensum && selectedProgram.pensum.length > 0 && (
-                      <div className="detalle-row">
-                        <span className="detalle-label">Pensum Académico:</span>
-                        <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
-                          {selectedProgram.pensum.map((mod, index) => (
-                            <li key={`pensum-${index}-${(mod.modulo || '').substring(0, 10)}`}><b>{mod.modulo}</b>: {mod.descripcion} ({mod.horas} horas)</li>
+
+                    <p className="text-sm text-slate-700 leading-relaxed">{selectedProgram.descripcion || 'Sin descripción'}</p>
+
+                    <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                      <li><strong className="text-slate-800">Profesor:</strong> {selectedProgram.profesor || '—'}</li>
+                      <li><strong className="text-slate-800">Duración:</strong> {selectedProgram.duracion || '—'}</li>
+                      <li><strong className="text-slate-800">Precio:</strong> {formatearPrecio(selectedProgram.precio || 0)}</li>
+                      <li><strong className="text-slate-800">Cupos disponibles:</strong> {selectedProgram.cuposDisponibles ?? '—'}</li>
+                      <li><strong className="text-slate-800">Cupos ocupados:</strong> {selectedProgram.cuposOcupados ?? '—'}</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-slate-800">Objetivos</h4>
+                      {selectedProgram.objetivos && selectedProgram.objetivos.length > 0 ? (
+                        <ul className="list-disc ml-5 mt-2 text-sm text-slate-700 space-y-1">
+                          {selectedProgram.objetivos.map((obj) => (
+                            <li key={String(obj)}>{obj}</li>
                           ))}
                         </ul>
-                      </div>
-                    )}
-                  </div>
-                  <div className="modal-footer-tesorero" style={{ marginTop: '2rem' }}>
-                    <button type="button" className="cancel-btn" onClick={() => setShowDetailModal(false)}>Cerrar</button>
+                      ) : (
+                        <p className="text-sm text-slate-500 mt-2">Ninguno</p>
+                      )}
+                    </div>
+
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-slate-800">Requisitos</h4>
+                      {selectedProgram.requisitos && selectedProgram.requisitos.length > 0 ? (
+                        <ul className="list-disc ml-5 mt-2 text-sm text-slate-700 space-y-1">
+                          {selectedProgram.requisitos.map((req) => (
+                            <li key={String(req)}>{req}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-slate-500 mt-2">Ninguno</p>
+                      )}
+                    </div>
+
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-slate-800">Metodología</h4>
+                      <p className="text-sm text-slate-700 mt-2">{selectedProgram.metodologia || 'No especificada'}</p>
+                    </div>
+
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-slate-800">Evaluación</h4>
+                      <p className="text-sm text-slate-700 mt-2">{selectedProgram.evaluacion || 'No especificada'}</p>
+                    </div>
                   </div>
                 </div>
+
+                <div className="mt-6">
+                  <h4 className="font-semibold text-slate-800">Inscripciones</h4>
+                  {selectedProgram.inscripciones && selectedProgram.inscripciones.length > 0 ? (
+                    <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                      {selectedProgram.inscripciones.map((insc) => (
+                        <li key={insc._id || insc.usuario?._id || `${String(insc.usuario || '')}-${String(insc.fechaInscripcion || '')}`} className="p-2 rounded-md bg-slate-50">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-medium text-slate-800">{insc.usuario?.nombre || insc.usuario || 'Usuario anónimo'}</div>
+                              <div className="text-xs text-slate-500">{insc.fechaInscripcion ? new Date(insc.fechaInscripcion).toLocaleDateString() : ''}</div>
+                            </div>
+                            <div className="text-sm text-slate-700">{insc.estado}</div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-slate-500 mt-2">Ninguna</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-4 border-t flex justify-end">
+                <button
+                  onClick={() => setShowDetailModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>

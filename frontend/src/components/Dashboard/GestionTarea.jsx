@@ -62,7 +62,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
   // CRUD operations
   const crearTarea = async () => {
     if (!nuevaTarea.descripcion || nuevaTarea.descripcion.trim() === "") {
-      mostrarAlerta("Error", "La descripción es obligatoria");
+      mostrarAlerta("Error", "La descripción es obligatoria", 'error');
       return;
     }
     try {
@@ -81,7 +81,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
       });
       obtenerTareas();
     } catch (err) {
-      mostrarAlerta("Error", "Error al crear la tarea: " + err.message);
+      mostrarAlerta("Error", "Error al crear la tarea: " + err.message, 'error');
     }
   };
 
@@ -94,7 +94,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
       setModoEdicion(false);
       obtenerTareas();
     } catch (err) {
-      mostrarAlerta("Error", "Error al actualizar tarea: " + err.message);
+      mostrarAlerta("Error", "Error al actualizar tarea: " + err.message, 'error');
     }
   };
 
@@ -110,7 +110,7 @@ const GestionTarea = ({ readOnly = false, modoTesorero = false, canCreate = true
       mostrarAlerta("¡Éxito!", "Tarea eliminada exitosamente");
       obtenerTareas();
     } catch (err) {
-      mostrarAlerta("Error", "Error al eliminar tarea: " + err.message);
+      mostrarAlerta("Error", "Error al eliminar tarea: " + err.message, 'error');
     }
   };
 

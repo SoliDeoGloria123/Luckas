@@ -11,6 +11,45 @@ import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
 import { Edit } from "lucide-react"
 
+// Helpers para filtros
+const pasaFiltroPorCategoria = (solicitud, filterCategoria) => {
+  if (!filterCategoria || filterCategoria === 'todos') return true;
+  
+  const cat = solicitud.categoria?._id || solicitud.categoria?.nombre || solicitud.categoria;
+  if (!cat) return false;
+  
+  return String(cat) === String(filterCategoria) || 
+         String((solicitud.categoria?.nombre || '')).toLowerCase() === String(filterCategoria).toLowerCase();
+};
+
+const pasaFiltroPorEstado = (solicitud, filterEstado) => {
+  if (!filterEstado || filterEstado === 'todos') return true;
+  return (solicitud.estado || '').toLowerCase() === String(filterEstado).toLowerCase();
+};
+
+const pasaFiltroPorBusqueda = (solicitud, searchTerm) => {
+  if (!searchTerm) return true;
+  
+  const q = searchTerm.trim().toLowerCase();
+  if (!q) return true;
+  
+  const nombreSolic = (
+    solicitud.solicitante?.nombre
+      ? `${solicitud.solicitante.nombre} ${solicitud.solicitante.apellido || ''}`
+      : solicitud.solicitante?.username || solicitud.solicitante?.correo || ''
+  ).toLowerCase();
+
+  const campos = [
+    nombreSolic,
+    (solicitud.tipoSolicitud || '').toLowerCase(),
+    (solicitud.descripcion || '').toLowerCase(),
+    (solicitud.modeloReferencia || '').toLowerCase(),
+    (solicitud.categoria?.nombre || '').toLowerCase(),
+    (solicitud.solicitante?.numeroDocumento || '').toLowerCase()
+  ];
+
+  return campos.some(campo => campo.includes(q));
+};
 
 const Gestionsolicitud = () => {
 
@@ -20,7 +59,12 @@ const Gestionsolicitud = () => {
   const [cabanas, setCabanas] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [programasAcademicos, setProgramasAcademicos] = useState([]);
-  
+
+  // Filtros y buscador
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategoria, setFilterCategoria] = useState('todos');
+  const [filterEstado, setFilterEstado] = useState('todos');
+
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -45,7 +89,7 @@ const Gestionsolicitud = () => {
       setSolicitudes(Array.isArray(data.data) ? data.data : []);
       obtenerEstadiscas();
     } catch (error) {
-      mostrarAlerta("Error", `Error al obtener solicitudes: ${error.message}`);
+      mostrarAlerta("Error", `Error al obtener solicitudes: ${error.message}`, 'error');
     }
   };
   useEffect(() => {
@@ -73,89 +117,89 @@ const Gestionsolicitud = () => {
     obtenerCategorias();
   }, []);
 
-   // Obtener eventos
-    const obtenerEventos = async () => {
-      try {
-        const data = await eventService.getAllEvents();
-        console.log('Eventos obtenidos:', data);
-        let listaEventos = [];
-        if (!data) listaEventos = [];
-        else if (Array.isArray(data)) listaEventos = data;
-        else if (data.data && Array.isArray(data.data)) listaEventos = data.data;
-        setEventos(listaEventos);
-      } catch (error) {
-        console.error('Error obteniendo eventos:', error);
-        setEventos([]);
-      }
-    };
-  
-    // Obtener cabañas
-    const obtenerCabanas = async () => {
-      try {
-        const data = await cabanaService.getAll();
-        console.log('Cabañas obtenidas:', data);
-        let listaCabanas = [];
-        if (!data) listaCabanas = [];
-        else if (Array.isArray(data)) listaCabanas = data;
-        else if (data.data && Array.isArray(data.data)) listaCabanas = data.data;
-        setCabanas(listaCabanas);
-      } catch (error) {
-        console.error('Error obteniendo cabañas:', error);
-        setCabanas([]);
-      }
-    };
-  
-    // Obtener reservas
-    const obtenerReservas = async () => {
-      try {
-        const data = await reservaService.getAll();
-        let listaReservas = [];
-        if (!data) listaReservas = [];
-        else if (Array.isArray(data)) listaReservas = data;
-        else if (data.data && Array.isArray(data.data)) listaReservas = data.data;
-        setReservas(listaReservas);
-      } catch (error) {
-        console.error('Error obteniendo reservas:', error);
-        setReservas([]);
-      }
-    };
-  
-    // Obtener programas académicos
-    const obtenerProgramasAcademicos = async () => {
-      try {
-        // El servicio expone `getAllProgramas`.
-        const data = await programasAcademicosService.getAllProgramas();
-        let listaProgramas = [];
-        if (!data) listaProgramas = [];
-        else if (Array.isArray(data)) listaProgramas = data;
-        else if (data.data && Array.isArray(data.data)) listaProgramas = data.data;
-        setProgramasAcademicos(listaProgramas);
-      } catch (error) {
-        console.error('Error obteniendo programas académicos:', error);
-        setProgramasAcademicos([]);
-      }
-    };
-  
-    // Obtener referencias según el modelo
-    const obtenerReferencias = async (modelo) => {
-      switch (modelo) {
-        case 'Eventos':
-          await obtenerEventos();
-          break;
-        case 'Cabana':
-          await obtenerCabanas();
-          break;
-        case 'Reserva':
-          await obtenerReservas();
-          break;
-        case 'ProgramaAcademico':
-          await obtenerProgramasAcademicos();
-          break;
-        default:
-          break;
-      }
-    };
-  
+  // Obtener eventos
+  const obtenerEventos = async () => {
+    try {
+      const data = await eventService.getAllEvents();
+      console.log('Eventos obtenidos:', data);
+      let listaEventos = [];
+      if (!data) listaEventos = [];
+      else if (Array.isArray(data)) listaEventos = data;
+      else if (data.data && Array.isArray(data.data)) listaEventos = data.data;
+      setEventos(listaEventos);
+    } catch (error) {
+      console.error('Error obteniendo eventos:', error);
+      setEventos([]);
+    }
+  };
+
+  // Obtener cabañas
+  const obtenerCabanas = async () => {
+    try {
+      const data = await cabanaService.getAll();
+      console.log('Cabañas obtenidas:', data);
+      let listaCabanas = [];
+      if (!data) listaCabanas = [];
+      else if (Array.isArray(data)) listaCabanas = data;
+      else if (data.data && Array.isArray(data.data)) listaCabanas = data.data;
+      setCabanas(listaCabanas);
+    } catch (error) {
+      console.error('Error obteniendo cabañas:', error);
+      setCabanas([]);
+    }
+  };
+
+  // Obtener reservas
+  const obtenerReservas = async () => {
+    try {
+      const data = await reservaService.getAll();
+      let listaReservas = [];
+      if (!data) listaReservas = [];
+      else if (Array.isArray(data)) listaReservas = data;
+      else if (data.data && Array.isArray(data.data)) listaReservas = data.data;
+      setReservas(listaReservas);
+    } catch (error) {
+      console.error('Error obteniendo reservas:', error);
+      setReservas([]);
+    }
+  };
+
+  // Obtener programas académicos
+  const obtenerProgramasAcademicos = async () => {
+    try {
+      // El servicio expone `getAllProgramas`.
+      const data = await programasAcademicosService.getAllProgramas();
+      let listaProgramas = [];
+      if (!data) listaProgramas = [];
+      else if (Array.isArray(data)) listaProgramas = data;
+      else if (data.data && Array.isArray(data.data)) listaProgramas = data.data;
+      setProgramasAcademicos(listaProgramas);
+    } catch (error) {
+      console.error('Error obteniendo programas académicos:', error);
+      setProgramasAcademicos([]);
+    }
+  };
+
+  // Obtener referencias según el modelo
+  const obtenerReferencias = async (modelo) => {
+    switch (modelo) {
+      case 'Eventos':
+        await obtenerEventos();
+        break;
+      case 'Cabana':
+        await obtenerCabanas();
+        break;
+      case 'Reserva':
+        await obtenerReservas();
+        break;
+      case 'ProgramaAcademico':
+        await obtenerProgramasAcademicos();
+        break;
+      default:
+        break;
+    }
+  };
+
 
   const handleCreate = () => {
     setModoEdicion(false);
@@ -187,7 +231,7 @@ const Gestionsolicitud = () => {
       setMostrarModal(false);
       obtenerSolicitudes();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
 
@@ -198,7 +242,7 @@ const Gestionsolicitud = () => {
       setMostrarModal(false);
       obtenerSolicitudes();
     } catch (error) {
-      mostrarAlerta("ERROR", `Error: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
   const obtenerEstadiscas = async () => {
@@ -211,19 +255,26 @@ const Gestionsolicitud = () => {
     }
   };
 
+  // Filtros aplicados sobre solicitudes
+  const solicitudesFiltradas = (solicitudes || []).filter((soli) => {
+    return pasaFiltroPorCategoria(soli, filterCategoria) &&
+           pasaFiltroPorEstado(soli, filterEstado) &&
+           pasaFiltroPorBusqueda(soli, searchTerm);
+  });
+
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
   const registrosPorPagina = 10;
-  const totalPaginas = Math.ceil(solicitudes.length / registrosPorPagina);
-  const solicitudesPaginadas = solicitudes.slice(
+  const totalPaginas = Math.ceil(solicitudesFiltradas.length / registrosPorPagina) || 1;
+  const solicitudesPaginadas = solicitudesFiltradas.slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
 
-  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  // Reiniciar a la página 1 si cambian los resultados filtrados
   useEffect(() => {
     setPaginaActual(1);
-  }, [solicitudes]);
+  }, [searchTerm, filterCategoria, filterEstado, solicitudes.length]);
 
   return (
     <>
@@ -292,28 +343,42 @@ const Gestionsolicitud = () => {
           <div className="search-filters-tesorero">
             <div className="search-input-container-tesorero">
               <i className="fas fa-search"></i>
-              <input type="text" placeholder="Buscar Solicitudes..." id="userSearch"></input>
+              <input
+                type="text"
+                placeholder="Buscar Solicitudes..."
+                id="userSearch"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <select className="filter-select">
-              <option value="">Todos los roles</option>
-              <option value="administrador">Administrador</option>
-              <option value="tesorero">Tesorero</option>
-              <option value="seminarista">Seminarista</option>
+            <select
+              className="filter-select"
+              value={filterCategoria}
+              onChange={(e) => setFilterCategoria(e.target.value)}
+            >
+              <option value="todos">Todas las categorías</option>
+              {(categorias || []).map((c) => (
+                <option key={c._id || c.nombre} value={c._id || c.nombre}>
+                  {c.nombre || c._id}
+                </option>
+              ))}
             </select>
-            <select id="statusFilter" className="filter-select">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
+            <select
+              id="statusFilter"
+              className="filter-select"
+              value={filterEstado}
+              onChange={(e) => setFilterEstado(e.target.value)}
+            >
+              <option value="todos">Todos los estados</option>
+              <option value="Nueva">Nueva</option>
+              <option value="En Revisión">En Revisión</option>
+              <option value="Aprobada">Aprobada</option>
+              <option value="Rechazada">Rechazada</option>
+              <option value="Completada">Completada</option>
+              <option value="Pendiente Info">Pendiente Info</option>
             </select>
           </div>
-          <div className="export-actions">
-            <button className="btn-outline-tesorero" id="exportBtn">
-              <i className="fas fa-download"></i>
-            </button>
-            <button className="btn-outline-tesorero" id="importBtn">
-              <i className="fas fa-upload"></i>
-            </button>
-          </div>
+         
         </div>
         <div className="rounded-xl bg-white p-6 shadow-sm">
           <div className="overflow-hidden rounded-xl border border-[#334155]/10 bg-white shadow-sm">
@@ -322,7 +387,7 @@ const Gestionsolicitud = () => {
                 <thead>
                   <tr>
 
-                    
+
                     <th>Nombre Solicitante</th>
                     <th>Cédula</th>
                     <th>Correo</th>
@@ -352,9 +417,16 @@ const Gestionsolicitud = () => {
                       <td>{soli.solicitante?.correo || "N/A"}</td>
                       <td>{soli.solicitante?.telefono || "N/A"}</td>
                       <td>
-                        <span className={`role-badge-tesorero role-tesorero-${soli.solicitante?.role}`}>
-                          {soli.solicitante?.role || "N/A"}
-                        </span>
+                        {(() => {
+                          const roleVal = soli.solicitante?.role || 'N/A';
+                          const baseClass = `role-badge-tesorero role-tesorero-${roleVal}`;
+                          const externoStyle = roleVal === 'externo' ? { backgroundColor: '#e6f7ff', color: '#0f4fc1' } : {};
+                          return (
+                            <span className={baseClass} style={externoStyle}>
+                              {roleVal}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td>{soli.tipoSolicitud || "N/A"}</td>
                       <td>{soli.categoria?.nombre || soli.categoria?._id || "N/A"}</td>

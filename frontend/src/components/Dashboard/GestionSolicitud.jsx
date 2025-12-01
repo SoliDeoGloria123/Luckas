@@ -71,7 +71,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       obtenerEstadiscas();
     } catch (error) {
       console.error('Error obteniendo solicitudes:', error);
-      mostrarAlerta("Error", "Error al obtener solicitudes");
+      mostrarAlerta("Error", "Error al obtener solicitudes", 'error');
     }
   };
 
@@ -201,7 +201,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       });
       obtenerSolicitudes();
     } catch (error) {
-      mostrarAlerta("Error", `Error al crear la solicitud: ${error.message}`);
+      mostrarAlerta("Error", `Error al crear la solicitud: ${error.message}`, 'error');
     }
   };
 
@@ -216,11 +216,11 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
         setModoEdicionSolicitud(false);
         obtenerSolicitudes();
       } else {
-        mostrarAlerta("Error", resultado.message || "Error al actualizar la solicitud");
+        mostrarAlerta("Error", resultado.message || "Error al actualizar la solicitud", 'error');
       }
     } catch (error) {
       console.error('Error actualizando solicitud:', error);
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
 
@@ -237,7 +237,7 @@ const GestionSolicitud = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesion
       mostrarAlerta("¡Éxito!", "Solicitud eliminada exitosamente");
       obtenerSolicitudes();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
   const obtenerEstadiscas = async () => {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { authService } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
-import { mostrarAlerta } from '../utils/alertas';
+import Swal from 'sweetalert2';
 import "./Login.css";
 
 const Login = () => {
@@ -11,7 +11,10 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
+    // CRÍTICO: Prevenir CUALQUIER comportamiento por defecto
     e.preventDefault();
+    e.stopPropagation();
+
     // Limpiar espacios en blanco y normalizar correo
     const correoLimpio = correo.trim().toLowerCase();
     const passwordLimpio = password.trim();
@@ -30,10 +33,9 @@ const Login = () => {
       } else if (data.user.role === 'seminarista') {
         navigate('/seminarista');
       } else if (data.user.role === 'externo') {
-        // Para usuarios externos, redirigir al dashboard HTML estático
         navigate('/external');
       } else {
-        navigate('/admin/users'); // Por defecto para otros roles
+        navigate('/admin/users');
       }
     } catch (err) {
       console.error('❌ Error durante el login:', err);
@@ -42,16 +44,42 @@ const Login = () => {
       if (err.message) {
         errorMessage = err.message;
       }
-      mostrarAlerta('Error', errorMessage, 'error');
+
+      Swal.fire({
+        title: 'Error',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        allowOutsideClick: true,
+        allowEscapeKey: true,
+        allowEnterKey: true,
+        showConfirmButton: true,
+        timer: undefined, // Sin timer automático
+      }).then((result) => {
+        console.log('🔴 Usuario cerró la alerta:', result);
+        // NO hacer nada aquí, solo cerrar la alerta
+      });
     }
+
+    // NO retornar nada
   };
 
-  const handleRegisterClick = () => {
+  const handleRegisterClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     navigate('/signup/registro');
   };
 
-  const handleOlvidarrClick = () => {
+  const handleOlvidarrClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     navigate('/Olvidar-Contraseña');
+  };
+
+  const handlePasswordToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -116,7 +144,10 @@ const Login = () => {
           </div>
 
           {/* Formulario */}
-          <form onSubmit={handleSubmit} className="login-form">
+          <form
+            onSubmit={handleSubmit}
+            className="login-form"
+          >
             {/* Campo Email */}
             <div className="form-group-login">
               <label htmlFor="email" className="form-label">
@@ -129,6 +160,7 @@ const Login = () => {
                 <input
                   type="email"
                   id="correo"
+                  name="correo"
                   className="form-control"
                   value={correo}
                   onChange={(e) => setcorreo(e.target.value)}
@@ -150,6 +182,7 @@ const Login = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
+                  name="password"
                   className="form-control"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -159,7 +192,8 @@ const Login = () => {
                 <button
                   type="button"
                   className="btn btn-outline-secondary password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={handlePasswordToggle}
+                  tabIndex="-1"
                 >
                   <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
                 </button>
@@ -168,21 +202,11 @@ const Login = () => {
 
             {/* Opciones */}
             <div className="form-options">
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="remember"
-                  name="remember"
-                />
-                <label className="form-check-label" htmlFor="remember">
-                  Recordarme
-                </label>
-              </div>
               <button
                 type="button"
                 className="forgot-password-link"
                 onClick={handleOlvidarrClick}
+                tabIndex="-1"
               >
                 ¿Olvidaste tu contraseña?
               </button>
@@ -199,6 +223,7 @@ const Login = () => {
             <p>
               ¿No tienes una cuenta?{' '}
               <button
+                type="button"
                 className="register-link"
                 onClick={handleRegisterClick}
               >

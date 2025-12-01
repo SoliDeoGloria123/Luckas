@@ -67,26 +67,29 @@ const validarEnums = (body) => {
 };
 
 // Función auxiliar para crear la solicitud asociada
-const crearSolicitudAsociada = async (reserva, usuarioExiste, cabanaExiste) => {
-  const solicitud = new Solicitud({
+const crearSolicitudAsociada = async (reserva, usuarioExiste, cabanaExiste, creadoPor) => {
+  const solicitudPayload = {
     solicitante: usuarioExiste._id,
     responsable: usuarioExiste._id,
     titulo: cabanaExiste.nombre || 'Reserva de cabaña',
     correo: usuarioExiste.correo,
     telefono: usuarioExiste.telefono,
     tipoSolicitud: 'Hospedaje',
+    modeloReferencia: 'Reserva',
+    referencia: reserva._id,
     categoria: cabanaExiste.categoria,
     descripcion: `Reserva de cabaña ${cabanaExiste.nombre}`,
     estado: 'Nueva',
-    origin: 'reserva',
     prioridad: 'Media',
-    modeloReferencia: 'Reserva',
-    referencia: reserva._id
-  });
-  
+    origen: 'reserva',
+    creadoPor: creadoPor || usuarioExiste._id
+  };
+
+  const solicitud = new Solicitud(solicitudPayload);
+  console.log('Payload solicitud a guardar:', JSON.stringify(solicitudPayload, null, 2));
   await solicitud.save();
   console.log('Solicitud creada:', solicitud._id);
-  
+
   // Enlazar la solicitud a la reserva
   reserva.solicitud = solicitud._id;
   await reserva.save();
@@ -170,8 +173,8 @@ exports.crearReserva = async (req, res) => {
     await reserva.save();
     console.log('✅ Reserva creada exitosamente:', reserva._id);
 
-    // Crear solicitud asociada
-    await crearSolicitudAsociada(reserva, usuarioExiste, cabanaExiste);
+    // Crear solicitud asociada (pasamos el usuario que creó la reserva)
+    await crearSolicitudAsociada(reserva, usuarioExiste, cabanaExiste, req.userId);
 
     // Enviar notificación a administradores y tesoreros
     try {

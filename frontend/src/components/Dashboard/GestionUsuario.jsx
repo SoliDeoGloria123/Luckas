@@ -211,7 +211,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
             mostrarAlerta("¡Éxito!", "Usuario eliminado exitosamente");
             obtenerUsuarios();
         } catch (error) {
-            mostrarAlerta("Error", `No se pudo eliminar el usuario: ${error.message}`);
+            mostrarAlerta("Error", `No se pudo eliminar el usuario: ${error.message}, 'error'`);
         }
     };
 
@@ -265,7 +265,7 @@ const GestionUsuario = ({ usuario: usuarioProp, onCerrarSesion: onCerrarSesionPr
             mostrarAlerta("¡Éxito!", `Usuario ${nuevoEstado === "activo" ? "activado" : "desactivado"} exitosamente`);
             obtenerUsuarios(); // <-- Esto refresca la lista
         } catch (error) {
-            mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`);
+            mostrarAlerta("Error", `Error al actualizar el estado del usuario: ${error.message}`, 'error');
         }
     };
 

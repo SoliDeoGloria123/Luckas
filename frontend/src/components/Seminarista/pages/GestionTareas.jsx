@@ -138,7 +138,8 @@ const TareasManagement = () => {
       }
     } catch (e) {
       // Si la fecha no es válida, prevenir envío
-      mostrarAlerta('Error', 'Fecha límite inválida', 'error');
+      console.error('Fecha límite inválida:', e);
+      mostrarAlerta('Error', `Fecha límite inválida${e && e.message ? ': ' + e.message : ''}`, 'error');
       return;
     }
 

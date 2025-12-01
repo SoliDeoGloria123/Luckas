@@ -6,7 +6,6 @@ import EventoModal from '../../Dashboard/Modales/EventoModal';
 import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
 import {
-  Plus,
   Edit,
   Calendar,
   Eye,
@@ -18,9 +17,42 @@ import {
 } from 'lucide-react';
 
 
+// Helpers para filtrado de eventos
+const pasaFiltroPorCategoriaEvento = (evento, filterCategoria) => {
+  if (!filterCategoria || filterCategoria === '' || filterCategoria === 'todos') return true;
+  const cat = evento.categoria?._id || evento.categoria?.nombre || evento.categoria;
+  if (!cat) return false;
+  return String(cat) === String(filterCategoria) || String((evento.categoria?.nombre || '')).toLowerCase() === String(filterCategoria).toLowerCase();
+};
+
+const pasaFiltroPorEstadoEvento = (evento, filterEstado) => {
+  if (!filterEstado || filterEstado === 'todos') return true;
+  const fs = String(filterEstado).toLowerCase();
+  if (fs === 'activo') return evento.active === true || (evento.estado && String(evento.estado).toLowerCase() === 'activo');
+  if (fs === 'inactivo') return evento.active === false || (evento.estado && String(evento.estado).toLowerCase() === 'inactivo');
+  // comparar por cadena si viene otro valor
+  return (evento.estado || '').toLowerCase() === fs;
+};
+
+const pasaFiltroPorBusquedaEvento = (evento, searchTerm) => {
+  if (!searchTerm) return true;
+  const q = String(searchTerm).trim().toLowerCase();
+  if (!q) return true;
+  const nombre = (evento.nombre || '').toLowerCase();
+  const descripcion = (evento.descripcion || '').toLowerCase();
+  const lugar = (evento.lugar || '').toLowerCase();
+  const direccion = (evento.direccion || '').toLowerCase();
+  const categoria = (evento.categoria?.nombre || '').toLowerCase();
+  return [nombre, descripcion, lugar, direccion, categoria].some(f => f.includes(q));
+};
+
 const Gestionevento = () => {
   const [eventos, setEventos] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  // Filtros y buscador
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategoria, setFilterCategoria] = useState('todos');
+  const [filterEstado, setFilterEstado] = useState('todos');
 
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -40,6 +72,29 @@ const Gestionevento = () => {
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
   const [estadisticas, setEstadisticas] = useState({ totalEvents: 0, upcoming: 0, completed: 0, cancelled: 0 });
 
+  // Helper local para formatear fecha de forma segura
+  const formatFecha = (f) => {
+    if (!f && f !== 0) return '';
+    const str = String(f).trim();
+    const d = new Date(str);
+    if (!Number.isNaN(d.getTime())) return d.toLocaleDateString('es-ES');
+
+    // intentar formatos dd/mm/yyyy o dd-mm-yyyy
+    let sep = null;
+    if (str.includes('/')) sep = '/';
+    else if (str.includes('-')) sep = '-';
+    if (sep) {
+      const parts = str.split(sep).map(p => p.trim());
+      if (parts.length === 3 && parts[2].length === 4) {
+        const [dd, mm, yyyy] = parts;
+        const reconstructed = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+        const d2 = new Date(reconstructed);
+        if (!Number.isNaN(d2.getTime())) return d2.toLocaleDateString('es-ES');
+      }
+    }
+    return str;
+  };
+
 
 
   // Obtener eventos
@@ -58,7 +113,7 @@ const Gestionevento = () => {
       setEventos(lista);
     } catch (error) {
       setEventos([]);
-      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`);
+      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`, 'error');
 
     }
   };
@@ -77,7 +132,7 @@ const Gestionevento = () => {
       obtenerEstadisticas();
     } catch (error) {
       setCategorias([]);
-      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`);
+      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`, 'error');
     }
   };
 
@@ -92,15 +147,31 @@ const Gestionevento = () => {
       const stats = await eventService.getEstadisticasGenerales();
       setEstadisticas(stats?.data || stats);
     } catch (error) {
-      mostrarAlerta("ERROR", `Error al obtener estadísticas: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error al obtener estadísticas: ${error.message}`, 'error');
     }
   };
 
   // Estado de carga y filtrado
-  const eventosFiltrados = eventos; // Puedes aplicar filtros si lo necesitas
+  // Estado de carga y filtrado (aplica buscador y filtros)
+  const eventosFiltrados = (eventos || []).filter((ev) => {
+    return pasaFiltroPorCategoriaEvento(ev, filterCategoria) &&
+           pasaFiltroPorEstadoEvento(ev, filterEstado) &&
+           pasaFiltroPorBusquedaEvento(ev, searchTerm);
+  });
 
   // Carrusel de imágenes: un índice por evento
   const [imgIndices, setImgIndices] = useState({});
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
+  // Helper: obtiene las imágenes desde el objeto de detalle (soporta varias claves)
+  const getImagesFromDetalle = (detalle) => {
+    if (!detalle) return [];
+    if (Array.isArray(detalle.imagen)) return detalle.imagen;
+    if (Array.isArray(detalle.imagenes)) return detalle.imagenes;
+    if (Array.isArray(detalle.images)) return detalle.images;
+    if (detalle.imagen && typeof detalle.imagen === 'string') return [detalle.imagen];
+    return [];
+  };
   const prevImg = (eventoId, totalImages) => {
     setImgIndices(prev => ({
       ...prev,
@@ -118,6 +189,9 @@ const Gestionevento = () => {
     setEventoDetalle(evento);
     setMostrarModalDetalle(true);
   };
+
+  // Alias para mantener la API usada por el markup (onVerDetalle/onEditar)
+  const onVerDetalle = abrirModalVer;
 
 
   const handleCreate = () => {
@@ -141,6 +215,7 @@ const Gestionevento = () => {
     setEventoSeleccionado(evento);
     setMostrarModal(true);
   };
+  const onEditar = handleEdit;
 
   // Funciones para el modal del Dashboard
   const crearEvento = async (payload) => {
@@ -155,7 +230,7 @@ const Gestionevento = () => {
       setMostrarModal(false);
       obtenerEventos();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
 
@@ -175,23 +250,23 @@ const Gestionevento = () => {
       setMostrarModal(false);
       obtenerEventos();
     } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`);
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
-  const registrosPorPagina = 6;
+  const registrosPorPagina = 15;
   const totalPaginas = Math.ceil(eventosFiltrados.length / registrosPorPagina);
   const eventosPaginados = eventosFiltrados.slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
 
-  // Reiniciar a la página 1 si cambia el filtro de usuarios
+  // Reiniciar a la página 1 cuando cambian filtros, búsqueda o la lista de eventos
   useEffect(() => {
     setPaginaActual(1);
-  }, [eventosFiltrados]);
+  }, [searchTerm, filterCategoria, filterEstado, eventos.length]);
 
   return (
     <>
@@ -260,45 +335,56 @@ const Gestionevento = () => {
           <div className="search-filters-tesorero">
             <div className="search-input-container-tesorero">
               <i className="fas fa-search"></i>
-              <input type="text" placeholder="Buscar usuarios..." id="userSearch"></input>
+              <input
+                type="text"
+                placeholder="Buscar eventos..."
+                id="userSearch"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <select className="filter-select">
-              <option value="">Todos los roles</option>
-              <option value="administrador">Administrador</option>
-              <option value="tesorero">Tesorero</option>
-              <option value="seminarista">Seminarista</option>
+            <select
+              className="filter-select"
+              value={filterCategoria}
+              onChange={(e) => setFilterCategoria(e.target.value)}
+            >
+              <option value="todos">Todas las categorías</option>
+              {(categorias || []).map((c) => (
+                <option key={c._id || c.nombre} value={c._id || c.nombre}>
+                  {c.nombre || c._id}
+                </option>
+              ))}
             </select>
-            <select id="statusFilter" className="filter-select">
-              <option value="">Todos los estados</option>
+            <select
+              id="statusFilter"
+              className="filter-select"
+              value={filterEstado}
+              onChange={(e) => setFilterEstado(e.target.value)}
+            >
+              <option value="todos">Todos los estados</option>
               <option value="activo">Activo</option>
               <option value="inactivo">Inactivo</option>
+              <option value="cancelado">Cancelado</option>
+              <option value="finalizado">Finalizado</option>
             </select>
           </div>
-          <div className="export-actions">
-            <button className="btn-outline-tesorero" id="exportBtn">
-              <i className="fas fa-download"></i>
-            </button>
-            <button className="btn-outline-tesorero" id="importBtn">
-              <i className="fas fa-upload"></i>
-            </button>
-          </div>
+         
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(() => {
-        
+
             if (eventosFiltrados.length > 0) {
               return eventosPaginados.map((evento) => {
                 const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
                 const imgIndex = imgIndices[evento._id] || 0;
 
-                // Determinar clases para el estado del evento
-                let estadoClases = 'bg-amber-500/90 text-white';
-                if (evento.estado === 'activo') {
-                  estadoClases = 'bg-emerald-500/90 text-white';
-                } else if (evento.estado === 'inactivo') {
-                  estadoClases = 'bg-red-500/90 text-white';
-                } else if (evento.estado === 'finalizado') {
-                  estadoClases = 'bg-gray-500/90 text-white';
+                // Determinar clases para el estado del evento (no usadas aquí)
+
+                // Variables locales usadas en el markup
+                const categoriaNombre = evento.categoria?.nombre || evento.categoria || null;
+                let etiquetas = [];
+                if (evento.etiquetas) {
+                  etiquetas = Array.isArray(evento.etiquetas) ? evento.etiquetas : [evento.etiquetas];
                 }
 
                 return (
@@ -331,9 +417,9 @@ const Gestionevento = () => {
                                 {">"}
                               </button>
                               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                                {imagenes.map((_, idx) => (
+                                {imagenes.map((img, idx) => (
                                   <span
-                                    key={`dot-${evento._id}-${idx}`}
+                                    key={`indicator-${evento._id}-${idx}`}
                                     className={`inline-block w-2 h-2 rounded-full ${imgIndex === idx ? 'bg-blue-600' : 'bg-gray-300'}`}
                                   />
                                 ))}
@@ -351,21 +437,24 @@ const Gestionevento = () => {
                         <span className="px-3 py-1 bg-white/90 text-slate-800 text-xs font-medium rounded-full">
                           {/*tipoEvento.label*/}
                         </span>
+                        {categoriaNombre && (
+                          <span className="px-3 py-1 bg-indigo-600/90 text-white text-xs font-medium rounded-full">
+                            {categoriaNombre}
+                          </span>
+                        )}
                         {evento.destacado && (
                           <span className="px-3 py-1 bg-yellow-500/90 text-white text-xs font-medium rounded-full flex items-center">
                             <Star className="w-3 h-3 mr-1" />
                             Destacado
                           </span>
                         )}
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${estadoClases}`}>
-                          {evento.estado}
-                        </span>
+
                       </div>
 
                       {/* Botones de acción */}
-                      <div className="flex  justify-end  gap-2  px-6 py-3 ">
+                      <div className="flex justify-end gap-2 px-6 py-3">
                         <button
-                          onClick={() => abrirModalVer(evento)}
+                          onClick={() => onVerDetalle(evento)}
                           className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                           title="Ver detalles"
                         >
@@ -373,8 +462,8 @@ const Gestionevento = () => {
                         </button>
 
                         <button
-                          onClick={() => handleEdit(evento)}
-                          className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors "
+                          onClick={() => onEditar(evento)}
+                          className="p-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors"
                           title="Editar"
                         >
                           <Edit className="w-4 h-4" />
@@ -395,36 +484,41 @@ const Gestionevento = () => {
                         <div className="flex items-center space-x-2 text-sm">
                           <Calendar className="w-4 h-4 text-blue-600" />
                           <span className="text-slate-600">
-                            {evento.fechaEvento ? new Date(evento.fechaEvento).toLocaleDateString() : 'N/A'}
+                            {formatFecha(evento.fechaEvento)}
+
                           </span>
                         </div>
 
                         {/* Ubicación */}
-
                         <div className="flex items-center space-x-2 text-sm">
                           <MapPin className="w-4 h-4 text-red-600" />
-                          <span className="text-slate-600 line-clamp-1">{evento.lugar || "N/A"}</span>
+                          <span className="text-slate-600 line-clamp-1">{evento.lugar}</span>
+                        </div>
+
+                        <div className="flex items-center space-x-2 text-sm">
+                          <span className="text-slate-600 line-clamp-1">{evento.direccion}</span>
                         </div>
 
 
                         {/* Horario */}
-                        {(evento.horaInicio || evento.horaFin) && (
-                          <div className="flex items-center space-x-2 text-sm">
-                            <Clock className="w-4 h-4 text-purple-600" />
-                            <span className="text-slate-600">
-                              {evento.horaInicio} {evento.horaFin && `- ${evento.horaFin}`}
-                            </span>
-                            <span className="ml-2 text-xs text-slate-500">
-                              ({evento.duracionDias} día{evento.duracionDias > 1 ? 's' : ''})
-                            </span>
-                          </div>
-                        )}
+
+                        <div className="flex items-center space-x-2 text-sm">
+                          <Clock className="w-4 h-4 text-purple-600" />
+                          <span className="text-slate-600">
+                            {evento.horaInicio} {evento.horaFin && `- ${evento.horaFin}`}
+                          </span>
+                          <span className="ml-2 text-xs text-slate-500">
+                            ({evento.duracionDias} día{evento.duracionDias > 1 ? 's' : ''})
+                          </span>
+                        </div>
+
+
 
                         {/* Capacidad */}
 
                         <div className="flex items-center space-x-2 text-sm">
                           <Users className="w-4 h-4 text-green-600" />
-                          <span className="text-slate-600">Máximo {evento.cuposDisponibles} participantes</span>
+                          <span className="text-slate-600">Máximo {evento.cuposTotales ?? evento.cuposDisponibles} participantes</span>
                         </div>
 
 
@@ -436,14 +530,13 @@ const Gestionevento = () => {
                             {evento.precio}
                           </span>
                         </div>
-
                         <div className="flex items-center space-x-2 text-sm">
-
-                          <span className="text-xs">
-                            Estado: {evento.active ? 'Activo' : 'Inactivo'}
+                          <span className="text-slate-600">Estado:</span>
+                          <span className={`px-3 py-1 text-base font-medium rounded-full shadow-md ${evento.active ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
+                            }`}>
+                            {evento.active ? 'Activo' : 'Inactivo'}
                           </span>
                         </div>
-
 
 
                         {/* Servicios incluidos */}
@@ -459,6 +552,15 @@ const Gestionevento = () => {
                             </span>
                           )}
                         </div>
+                        {etiquetas.length > 0 && (
+                          <div className="pt-2">
+                            <div className="flex flex-wrap gap-2">
+                              {etiquetas.slice(0, 6).map((tag, i) => (
+                                <span key={`tag-${evento._id}-${i}`} className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">#{tag}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Coordinador */}
@@ -472,72 +574,112 @@ const Gestionevento = () => {
                     </div>
                   </div>
                 );
-              });
-            }
-
-            return (
-              <div className="col-span-full text-center py-12">
-                <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-slate-700 mb-2">No hay eventos</h3>
-                <p className="text-slate-500 mb-6">Comienza creando tu primer eventos o actividad</p>
-                <button
-                  onClick={handleCreate}
-                  className="btn-premium px-6 py-3 text-white rounded-xl font-medium shadow-lg"
-                >
-                  <Plus className="w-5 h-5 mr-2 inline" />
-                  Crear Evento
-                </button>
-              </div>
-            );
+              }); // end map
+            } // end if
+            return null;
           })()}
         </div>
         {/* Lista de Eventos */}
         {mostrarModalDetalle && eventoDetalle && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8">
-              <h2 className="text-2xl font-bold mb-4">{eventoDetalle.nombre}</h2>
-              <p className="mb-2"><strong>Descripción:</strong> {eventoDetalle.descripcion}</p>
-              <p className="mb-2"><strong>Categoría:</strong> {eventoDetalle.categoria?.nombre || eventoDetalle.categoria}</p>
-              <p className="mb-2"><strong>Etiquetas:</strong> {eventoDetalle.etiquetas?.join(', ')}</p>
-              <p className="mb-2"><strong>Fecha:</strong> {eventoDetalle.fechaEvento ? new Date(eventoDetalle.fechaEvento).toLocaleDateString() : ''}</p>
-              <p className="mb-2"><strong>Hora:</strong> {eventoDetalle.horaInicio} - {eventoDetalle.horaFin}</p>
-              <p className="mb-2"><strong>Lugar:</strong> {eventoDetalle.lugar}</p>
-              <p className="mb-2"><strong>Dirección:</strong> {eventoDetalle.direccion}</p>
-              <p className="mb-2"><strong>Duración (días):</strong> {eventoDetalle.duracionDias}</p>
-              <p className="mb-2"><strong>Cupos totales:</strong> {eventoDetalle.cuposTotales}</p>
-              <p className="mb-2"><strong>Cupos disponibles:</strong> {eventoDetalle.cuposDisponibles}</p>
-              <p className="mb-2"><strong>Precio:</strong> ${eventoDetalle.precio}</p>
-              <p className="mb-2"><strong>Prioridad:</strong> {eventoDetalle.prioridad}</p>
-              <p className="mb-2"><strong>Observaciones:</strong> {eventoDetalle.observaciones}</p>
-              <p className="mb-2"><strong>Coordinador:</strong> {eventoDetalle.categorizadoPor?.nombre || eventoDetalle.categorizadoPor}</p>
-              <p className="mb-2"><strong>Fecha categorización:</strong> {eventoDetalle.fechaCategorizacion ? new Date(eventoDetalle.fechaCategorizacion).toLocaleDateString() : ''}</p>
-              <p className="mb-2"><strong>Activo:</strong> {eventoDetalle.active ? 'Sí' : 'No'}</p>
-              <p className="mb-2"><strong>Programa:</strong> {eventoDetalle.programa && eventoDetalle.programa.length > 0 ? (
-                <ul className="list-disc ml-6">
-                  {eventoDetalle.programa.map((mod) => (
-                    <li key={mod.tema + '-' + mod.horaInicio + '-' + mod.horaFin}>
-                      <strong>{mod.tema}</strong> ({mod.horaInicio} - {mod.horaFin}): {mod.descripcion}
-                    </li>
-                  ))}
-                </ul>
-              ) : 'No definido'}
-              </p>
-              <div className="flex flex-wrap gap-2 my-4">
-                {Array.isArray(eventoDetalle.imagen) && eventoDetalle.imagen.map((img, idx) => (
-                  <img
-                    key={img + '-' + idx}
-                    src={img}
-                    alt={`Imagen ${idx + 1}`}
-                    className="w-32 h-32 object-cover rounded-lg border"
-                  />
-                ))}
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">
+              <div className="flex items-start justify-between p-6 border-b">
+                <div>
+                  <h2 className="text-2xl font-semibold text-slate-800">{eventoDetalle.nombre}</h2>
+                  <p className="text-sm text-slate-500 mt-1">{eventoDetalle.categoria?.nombre || eventoDetalle.categoria} • {eventoDetalle.fechaEvento ? new Date(eventoDetalle.fechaEvento).toLocaleDateString() : ''}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`px-3 py-1 rounded-full text-sm ${eventoDetalle.active ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700'}`}>{eventoDetalle.active ? 'Activo' : 'Inactivo'}</span>
+                  <button onClick={() => setMostrarModalDetalle(false)} className="text-slate-400 hover:text-slate-600 p-2 rounded-md">✕</button>
+                </div>
               </div>
-              <button
-                onClick={() => setMostrarModalDetalle(false)}
-                className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Cerrar
-              </button>
+
+              <div className="p-6 overflow-y-auto" style={{ maxHeight: '70vh' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    {/* Carrusel */}
+                    {getImagesFromDetalle(eventoDetalle).length > 0 ? (
+                      <div>
+                        <div className="relative mb-3">
+                          <img
+                            src={getImagesFromDetalle(eventoDetalle)[carouselIndex]}
+                            alt={`Imagen evento ${carouselIndex + 1}`}
+                            className="w-full h-56 object-cover rounded-lg"
+                          />
+                          {getImagesFromDetalle(eventoDetalle).length > 1 && (
+                            <>
+                              <button
+                                onClick={() => setCarouselIndex(i => Math.max(i - 1, 0))}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                              >◀</button>
+                              <button
+                                onClick={() => setCarouselIndex(i => Math.min(i + 1, getImagesFromDetalle(eventoDetalle).length - 1))}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                              >▶</button>
+                            </>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2">
+                          {getImagesFromDetalle(eventoDetalle).map((img, idx) => (
+                            <button
+                              key={img}
+                              type="button"
+                              onClick={() => setCarouselIndex(idx)}
+                              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCarouselIndex(idx); } }}
+                              aria-label={`Mostrar imagen ${idx + 1}`}
+                              className={`p-0 border-0 bg-transparent ${carouselIndex === idx ? 'ring-2 ring-blue-500 rounded' : ''}`}
+                            >
+                              <img
+                                src={img}
+                                alt={`Thumb ${idx + 1}`}
+                                className="w-20 h-14 object-cover rounded cursor-pointer"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-56 flex items-center justify-center bg-slate-100 rounded-lg mb-3 text-sm text-slate-500">Sin imágenes</div>
+                    )}
+
+                    <p className="text-sm text-slate-700 leading-relaxed mt-4">{eventoDetalle.descripcion || 'Sin descripción'}</p>
+
+                    <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                      <li><strong className="text-slate-800">Lugar:</strong> {eventoDetalle.lugar || '—'}</li>
+                      <li><strong className="text-slate-800">Dirección:</strong> {eventoDetalle.direccion || '—'}</li>
+                      <li><strong className="text-slate-800">Hora:</strong> {eventoDetalle.horaInicio || '—'} - {eventoDetalle.horaFin || '—'}</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-slate-800">Detalles</h4>
+                      <div className="mt-2 text-sm text-slate-700 space-y-1">
+                        <div><strong>Duración (días):</strong> {eventoDetalle.duracionDias ?? '—'}</div>
+                        <div><strong>Cupos totales:</strong> {eventoDetalle.cuposTotales ?? '—'}</div>
+                        <div><strong>Cupos disponibles:</strong> {eventoDetalle.cuposDisponibles ?? '—'}</div>
+                        <div><strong>Precio:</strong> ${eventoDetalle.precio ?? 0}</div>
+                        <div><strong>Prioridad:</strong> {eventoDetalle.prioridad || '—'}</div>
+
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-800">Observaciones</h4>
+                      <p className="text-sm text-slate-700 mt-2">{eventoDetalle.observaciones || '—'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border-t flex justify-end">
+                <button
+                  onClick={() => setMostrarModalDetalle(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         )}

@@ -90,7 +90,7 @@ const ReservasModal = ({
       }
       return val || '';
     }
-    return val;
+    return val ?? '';
   };
 
   const getSelectValue = (fieldName) => {
@@ -181,26 +181,25 @@ const ReservasModal = ({
         </div>
 
         <form className="modal-body-admin" style={{ maxHeight: '70vh', overflowY: 'auto' }} onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
-          {/* Usuario */}
-          <div className="form-grupo-admin">
-            <label htmlFor="usuario">Usuario:</label>
-            <select
-              id="usuario"
-              name="usuario"
-              value={getSelectValue('usuario')}
-              onChange={e => handleUsuarioChange(e.target.value)}
-              required
-            >
-              <option value="">Seleccione...</option>
-              {usuarios && usuarios.map(user => (
-                <option key={user._id} value={user._id}>
-                  {user.nombre || user.username || user.correo} ({user.role})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-grid-admin">
+          <div className="from-grid-admin">
+            {/* Usuario */}
+            <div className="form-grupo-admin">
+              <label htmlFor="usuario">Usuario:</label>
+              <select
+                id="usuario"
+                name="usuario"
+                value={getSelectValue('usuario')}
+                onChange={e => handleUsuarioChange(e.target.value)}
+                required
+              >
+                <option value="">Seleccione usuarios...</option>
+                {usuarios && usuarios.map(user => (
+                  <option key={user._id} value={user._id}>
+                    {user.nombre || user.username || user.correo} ({user.role})
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="form-grupo-admin">
               <label htmlFor="cabana">Cabaña:</label>
               <select
@@ -210,24 +209,13 @@ const ReservasModal = ({
                 onChange={e => handleCabanaChange(e.target.value)}
                 required
               >
-                <option value="">Seleccione...</option>
+                <option value="">Seleccione cabañas...</option>
                 {cabanas && cabanas.map(cab => (
                   <option key={cab._id} value={cab._id}>
                     {cab.nombre} {cab.precio ? `- $${cab.precio}` : ''}
                   </option>
                 ))}
               </select>
-            </div>
-            <div className="form-grupo-admin">
-              <label htmlFor="precio">Precio:</label>
-              <input
-                id="precio"
-                name="precio"
-                type="number"
-                value={getFieldValue('precio')}
-                readOnly
-                required
-              />
             </div>
           </div>
           <div className="from-grid-admin">
@@ -407,6 +395,18 @@ const ReservasModal = ({
             </div>
           </div>
 
+          <div className="form-grupo-admin">
+            <label htmlFor="propositoEstadia">Propósito de Estadía:</label>
+            <input
+              id="propositoEstadia"
+              type="text"
+              name="propositoEstadia"
+              value={getFieldValue('propositoEstadia')}
+              onChange={e => handleFieldChange('propositoEstadia', e.target.value)}
+              placeholder="Propósito de la estadía"
+            />
+          </div>
+
           {/* Observaciones */}
           <div className="form-grupo-admin">
             <label htmlFor="observaciones">Observaciones:</label>
@@ -460,6 +460,7 @@ ReservasModal.propTypes = {
     fechaInicio: PropTypes.string,
     fechaFin: PropTypes.string,
     estado: PropTypes.string,
+    propositoEstadia: PropTypes.string,
     activo: PropTypes.bool,
     nombre: PropTypes.string,
     apellido: PropTypes.string,

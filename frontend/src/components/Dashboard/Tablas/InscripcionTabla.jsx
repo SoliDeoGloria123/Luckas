@@ -1,28 +1,70 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { mostrarAlerta } from "../../utils/alertas";
 
-const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
-  <div className="tabla-contenedor-admin">
-    <table className="tabla-usuarios-admin">
-      <thead>
-        <tr>
-          <th>Nombre completo</th>
-          <th>Tipo Doc.</th>
-          <th>Número Doc.</th>
-          <th>Correo</th>
-          <th>Teléfono</th>
-          <th>Edad</th>
-          <th>Tipo Inscripción</th>
-          <th>Evento/Programa</th>
-          <th>Categoría</th>
-          <th>Estado</th>
-          <th>Observaciones</th>
-          <th>Fecha inscripción</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        
+const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => {
+
+  const handleMostrarSolicitud = async (solicitud) => {
+    if (!solicitud) {
+      mostrarAlerta('INFO', 'No hay solicitud asociada a esta inscripción', 'info');
+      return;
+    }
+
+    try {
+      if (typeof solicitud === 'string') {
+        const fullId = String(solicitud);
+        try {
+          if (navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            await navigator.clipboard.writeText(fullId);
+            mostrarAlerta('Solicitud', `ID: ${fullId} (ID copiada al portapapeles)`, 'info');
+          } else {
+            mostrarAlerta('Solicitud', `ID: ${fullId}`, 'info');
+          }
+        } catch (err) {
+          console.warn('No se pudo copiar ID al portapapeles', err);
+          mostrarAlerta('Solicitud', `ID: ${fullId}`, 'info');
+        }
+        return;
+      }
+
+      // solicitud es objeto
+      const candidatoTitulo = solicitud.titulo || solicitud.nombre || solicitud.tipo || '';
+      const usuario = solicitud.usuario?.nombre || solicitud.usuario || '';
+      const estado = solicitud.estado ? `Estado: ${solicitud.estado}` : '';
+      const fecha = solicitud.fecha ? `Fecha: ${new Date(solicitud.fecha).toLocaleDateString()}` : '';
+      const id = solicitud._id ? `ID: ${solicitud._id}` : '';
+      const partes = [candidatoTitulo, usuario, estado, fecha].filter(Boolean);
+      const mensajeResumen = partes.join(' • ') || 'Solicitud registrada';
+      const mensaje = id ? `${mensajeResumen} • ${id}` : mensajeResumen;
+      mostrarAlerta('Solicitud', mensaje, 'info');
+    } catch (err) {
+      console.error('Error mostrando solicitud', err);
+      mostrarAlerta('ERROR', 'No se pudo mostrar la solicitud', 'error');
+    }
+  };
+
+  return (
+    <div className="tabla-contenedor-admin">
+      <table className="tabla-usuarios-admin">
+        <thead>
+          <tr>
+            <th>Nombre completo</th>
+            <th>Tipo Doc.</th>
+            <th>Número Doc.</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Edad</th>
+            <th>Tipo Inscripción</th>
+            <th>Evento/Programa</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+            <th>Observaciones</th>
+            <th>Fecha inscripción</th>
+            <th>Solicitudes</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
           {inscripciones.map((ins) => {
             // Extraer ternarias anidadas a variables
             let nombreCompleto = "N/A";
@@ -73,6 +115,17 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
                     ? new Date(ins.fechaInscripcion).toLocaleString()
                     : "N/A"}
                 </td>
+                <td>{ins.solicitud ? (
+                  <button
+                    className="text-blue-600 hover:underline"
+                    onClick={() => handleMostrarSolicitud(ins.solicitud)}
+                    title="Ver solicitud"
+                  >
+                    Ver solicitud
+                  </button>
+                ) : (
+                  "N/A"
+                )}</td>
                 <td>
                   <div className="acciones-botones">
                     <button className="btn-action editar" onClick={() => onEditar(ins)}><i className="fas fa-edit"></i></button>
@@ -84,10 +137,11 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => (
               </tr>
             );
           })}
-      </tbody>
-    </table>
-  </div>
-);
+        </tbody>
+      </table>
+    </div>
+  );
+};
 TablaInscripciones.propTypes = {
   inscripciones: PropTypes.array.isRequired,
   onEditar: PropTypes.func.isRequired,

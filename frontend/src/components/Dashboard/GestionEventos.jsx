@@ -63,7 +63,7 @@ const GestionEventos = () => {
       setEventos(lista);
     } catch (error) {
       setEventos([]);
-      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`);
+      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`, 'error');
 
     }
   };
@@ -82,7 +82,7 @@ const GestionEventos = () => {
       obtenerEstadisticas();
     } catch (error) {
       setCategorias([]);
-      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`);
+      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`, 'error');
     }
   };
 
@@ -141,7 +141,7 @@ const GestionEventos = () => {
       }
       resetearFormulario();
     } catch (error) {
-      mostrarAlerta("Error", `Error al crear el evento: ${error.message}`);
+      mostrarAlerta("Error", `Error al crear el evento: ${error.message}`, 'error');
     }
   };
 
@@ -155,7 +155,7 @@ const GestionEventos = () => {
       setModoEdicion(false);
       obtenerEventos();
     } catch (error) {
-      mostrarAlerta("Error", `Error al actualizar el evento: ${error.message}`);
+      mostrarAlerta("Error", `Error al actualizar el evento: ${error.message}`, 'error');
     }
   };
 
@@ -172,7 +172,7 @@ const GestionEventos = () => {
       mostrarAlerta("¡Éxito!", "Evento eliminado exitosamente");
       obtenerEventos();
     } catch (error) {
-      mostrarAlerta("Error", `Error al eliminar el evento: ${error.message}`);
+      mostrarAlerta("Error", `Error al eliminar el evento: ${error.message}`, 'error');
     }
   };
 
