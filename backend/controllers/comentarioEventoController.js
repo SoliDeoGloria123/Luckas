@@ -27,7 +27,6 @@ exports.getComentariosByEvento = async (req, res) => {
     });
     res.json({ success: true, comentarios });
   } catch (error) {
-    console.error('[ERROR getComentariosByEvento]', error);
     res.status(500).json({ success: false, message: error.message, stack: error.stack });
   }
 };

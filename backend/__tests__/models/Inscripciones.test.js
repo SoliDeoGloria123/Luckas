@@ -163,5 +163,23 @@ describe('Inscripcion Model', () => {
       expect(hooks).toBeDefined();
       expect(hooks.length).toBeGreaterThan(0);
     });
+
+    it('should call setDefaultState in pre-save hook', () => {
+      const inscripcion = new Inscripcion({
+        usuario: '507f1f77bcf86cd799439011',
+        nombre: 'Test',
+        tipoDocumento: 'Cédula de ciudadanía',
+        numeroDocumento: '123456',
+        telefono: '123456',
+        edad: 25,
+        tipoReferencia: 'Eventos',
+        referencia: '507f1f77bcf86cd799439012',
+        categoria: '507f1f77bcf86cd799439013'
+      });
+
+      const setDefaultStateSpy = jest.spyOn(inscripcion, 'setDefaultState');
+      inscripcion.setDefaultState();
+      expect(setDefaultStateSpy).toHaveBeenCalled();
+    });
   });
 });

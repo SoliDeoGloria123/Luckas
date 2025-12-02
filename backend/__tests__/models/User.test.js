@@ -215,5 +215,72 @@ describe('User Model', () => {
 
       expect(typeof user.encryptPassword).toBe('function');
     });
+
+    it('should handle encryption error in pre-save hook', async () => {
+      bcrypt.genSalt.mockRejectedValue(new Error('Encryption failed'));
+      
+      const user = new User({
+        nombre: 'Test',
+        apellido: 'User',
+        correo: 'test-error@example.com',
+        telefono: '1234572',
+        tipoDocumento: 'Cédula de ciudadanía',
+        numeroDocumento: '1234567890',
+        fechaNacimiento: new Date(),
+        password: 'plainPassword'
+      });
+
+      await expect(user.save()).rejects.toThrow();
+    });
+  });
+
+  describe('Document Validation Messages', () => {
+    it('should validate Cédula de extranjería format', () => {
+      const user = new User({
+        nombre: 'Test',
+        apellido: 'User',
+        correo: 'test-ce@example.com',
+        telefono: '1234573',
+        tipoDocumento: 'Cédula de extranjería',
+        numeroDocumento: '1234567890',
+        fechaNacimiento: new Date(),
+        password: 'password123'
+      });
+
+      const error = user.validateSync();
+      expect(error).toBeUndefined();
+    });
+
+    it('should validate Pasaporte format', () => {
+      const user = new User({
+        nombre: 'Test',
+        apellido: 'User',
+        correo: 'test-passport@example.com',
+        telefono: '1234574',
+        tipoDocumento: 'Pasaporte',
+        numeroDocumento: 'AB123456',
+        fechaNacimiento: new Date(),
+        password: 'password123'
+      });
+
+      const error = user.validateSync();
+      expect(error).toBeUndefined();
+    });
+
+    it('should validate Tarjeta de identidad format', () => {
+      const user = new User({
+        nombre: 'Test',
+        apellido: 'User',
+        correo: 'test-ti@example.com',
+        telefono: '1234575',
+        tipoDocumento: 'Tarjeta de identidad',
+        numeroDocumento: '12345678901',
+        fechaNacimiento: new Date(),
+        password: 'password123'
+      });
+
+      const error = user.validateSync();
+      expect(error).toBeUndefined();
+    });
   });
 });
