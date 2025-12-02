@@ -1,0 +1,186 @@
+
+> backend@1.0.0 test
+> jest --coverage --detectOpenHandles --forceExit __tests__/routes/eventos.test.js __tests__/controllers/reportesController.test.js __tests__/utils/sendEmail.test.js __tests__/controllers/tareaController.test.js
+
+FAIL __tests__/routes/eventos.test.js
+  ● Eventos Routes & Controllers › GET /api/eventos › should handle errors
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 500
+    Received: 200
+
+      64 |             const res = await request(app).get('/api/eventos');
+      65 |
+    > 66 |             expect(res.statusCode).toBe(500);
+         |                                    ^
+      67 |         });
+      68 |     });
+      69 |
+
+      at Object.toBe (__tests__/routes/eventos.test.js:66:36)
+
+PASS __tests__/controllers/tareaController.test.js
+PASS __tests__/controllers/reportesController.test.js
+  ● Console
+
+    console.error
+      Error en getDashboardReport: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/reportesController.test.js:64:48)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      58 |     res.json({ success: true, data: dashboard });
+      59 |   } catch (error) {
+    > 60 |     console.error('Error en getDashboardReport:', error);
+         |             ^
+      61 |     res.status(500).json({ success: false, message: error.message });
+      62 |   }
+      63 | };
+
+      at Object.error [as getDashboardReport] (controllers/reportesControllers.js:60:13)
+      at Object.<anonymous> (__tests__/controllers/reportesController.test.js:65:7)
+
+    console.error
+      Error al guardar el reporte: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/reportesController.test.js:311:60)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      742 |     res.status(201).json({ success: true, message: 'Reporte guardado correctamente', data: reporteToSave });
+      743 |   } catch (error) {
+    > 744 |     console.error('Error al guardar el reporte:', error);
+          |             ^
+      745 |     res.status(500).json({ success: false, message: error.message });
+      746 |   }
+      747 | };
+
+      at Object.error [as guardarReporte] (controllers/reportesControllers.js:744:13)
+      at Object.<anonymous> (__tests__/controllers/reportesController.test.js:312:7)
+
+    console.error
+      Error en getTotalGestiones: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/reportesController.test.js:450:48)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      835 |     });
+      836 |   } catch (error) {
+    > 837 |     console.error('Error en getTotalGestiones:', error);
+          |             ^
+      838 |     res.status(500).json({ success: false, message: error.message });
+      839 |   }
+      840 | };
+
+      at Object.error [as getTotalGestiones] (controllers/reportesControllers.js:837:13)
+      at Object.<anonymous> (__tests__/controllers/reportesController.test.js:451:7)
+
+PASS __tests__/utils/sendEmail.test.js
+---------------------------------|---------|----------|---------|---------|-------------------------------------------------------------------------------------------------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                           
+---------------------------------|---------|----------|---------|---------|-------------------------------------------------------------------------------------------------------------
+All files                        |   22.57 |    20.75 |   25.52 |    22.8 |                                                                                                             
+ controllers                     |   23.21 |    23.09 |   28.81 |   23.44 |                                                                                                             
+  authControllers.js             |       0 |        0 |       0 |       0 | 1-438                                                                                                       
+  cabanasController.js           |       0 |        0 |       0 |       0 | 1-258                                                                                                       
+  categorizacionController.js    |       0 |        0 |       0 |       0 | 1-381                                                                                                       
+  certificadoControllers.js      |       0 |        0 |       0 |       0 | 1-206                                                                                                       
+  comentarioEventoController.js  |       0 |        0 |       0 |       0 | 1-156                                                                                                       
+  eventosController.js           |   46.66 |    42.85 |   41.66 |   46.21 | 17-18,24-31,62,66,77-79,109-111,130,137,151,160,171,178-184,191-202,208-246,256-271,281-296,305-309,315-346 
+  inscripcionController.js       |       0 |        0 |       0 |       0 | 1-481                                                                                                       
+  notificationController.js      |       0 |        0 |       0 |       0 | 1-76                                                                                                        
+  programaAcademicoController.js |       0 |        0 |       0 |       0 | 1-128                                                                                                       
+  reportesControllers.js         |   93.33 |    75.72 |   96.96 |   96.18 | 200,277,336,461,538,566,722,773,787                                                                         
+  reservasController.js          |       0 |        0 |       0 |       0 | 1-353                                                                                                       
+  solicitudController.js         |       0 |        0 |       0 |       0 | 1-462                                                                                                       
+  tareaController.js             |     100 |    94.44 |     100 |     100 | 54,76-78                                                                                                    
+  userController.js              |       0 |        0 |       0 |       0 | 1-340                                                                                                       
+ middlewares                     |   35.11 |    14.58 |   30.43 |      36 |                                                                                                             
+  auth.js                        |       0 |        0 |       0 |       0 | 1-42                                                                                                        
+  authJwt.js                     |       0 |        0 |       0 |       0 | 1-32                                                                                                        
+  index.js                       |     100 |      100 |     100 |     100 |                                                                                                             
+  normalizeUserData.js           |       0 |        0 |       0 |       0 | 1-15                                                                                                        
+  role.js                        |   68.75 |       50 |      50 |   83.33 | 4,10                                                                                                        
+  uploadCloudinary.js            |   58.53 |    41.66 |      50 |      60 | 18-40,47,62,75                                                                                              
+  validateEvents.js              |   18.18 |        0 |       0 |   18.18 | 2-35                                                                                                        
+  verifySignUp.js                |   27.77 |        0 |       0 |   27.77 | 6-27,36-44                                                                                                  
+ models                          |   31.65 |        0 |       0 |   31.88 |                                                                                                             
+  Cabana.js                      |     100 |      100 |     100 |     100 |                                                                                                             
+  ComentarioEvento.js            |       0 |      100 |     100 |       0 | 1-36                                                                                                        
+  Eventos.js                     |     100 |      100 |     100 |     100 |                                                                                                             
+  Inscripciones.js               |   19.23 |        0 |       0 |   19.23 | 69-93,112-116,123-124                                                                                       
+  Notification.js                |       0 |      100 |     100 |       0 | 1-31                                                                                                        
+  ProgramaAcademico.js           |       0 |      100 |     100 |       0 | 1-99                                                                                                        
+  Reportes.js                    |   29.16 |        0 |       0 |   29.16 | 100-105,109-122,127-135,142-152,158-161,167,174,178                                                         
+  Reservas.js                    |     100 |      100 |     100 |     100 |                                                                                                             
+  Solicitud.js                   |      75 |        0 |       0 |      75 | 37                                                                                                          
+  Tarea.js                       |     100 |      100 |     100 |     100 |                                                                                                             
+  User.js                        |   26.92 |        0 |       0 |      28 | 41-63,153-156,161-165,171                                                                                   
+  categorizacion.js              |     100 |      100 |     100 |     100 |                                                                                                             
+  index.js                       |       0 |      100 |     100 |       0 | 1-14                                                                                                        
+ routes                          |   10.17 |      100 |   28.57 |    9.45 |                                                                                                             
+  authRoutes.js                  |       0 |      100 |       0 |       0 | 1-43                                                                                                        
+  cabanasRoutes.js               |       0 |      100 |       0 |       0 | 1-46                                                                                                        
+  categorizacionRoutes.js        |       0 |      100 |     100 |       0 | 1-33                                                                                                        
+  certificadoRoutes.js           |       0 |      100 |     100 |       0 | 1-14                                                                                                        
+  comentarioEventoRoutes.js      |       0 |      100 |     100 |       0 | 1-25                                                                                                        
+  eventosRoutes.js               |     100 |      100 |     100 |     100 |                                                                                                             
+  inscripcionRoutes.js           |       0 |      100 |     100 |       0 | 1-30                                                                                                        
+  notificationRoutes.js          |       0 |      100 |     100 |       0 | 1-27                                                                                                        
+  programaAcademicoRoutes.js     |       0 |      100 |     100 |       0 | 1-31                                                                                                        
+  reportesRoutes.js              |       0 |      100 |     100 |       0 | 1-24                                                                                                        
+  reservasRoutes.js              |       0 |      100 |     100 |       0 | 1-29                                                                                                        
+  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131                                                                                                       
+  tareaRoutes.js                 |       0 |      100 |     100 |       0 | 1-29                                                                                                        
+  userRoutes.js                  |       0 |      100 |     100 |       0 | 1-27                                                                                                        
+ utils                           |      10 |     18.3 |    7.14 |   11.11 |                                                                                                             
+  notificationUtils.js           |       0 |        0 |       0 |       0 | 1-130                                                                                                       
+  reportUtils.js                 |       0 |        0 |       0 |       0 | 9-57                                                                                                        
+  roleValidation.js              |       0 |        0 |       0 |       0 | 2-10                                                                                                        
+  sendEmail.js                   |     100 |    81.25 |     100 |     100 | 7-33                                                                                                        
+  solicitudUtils.js              |       0 |        0 |       0 |       0 | 9-56                                                                                                        
+  userValidation.js              |       0 |        0 |       0 |       0 | 6-55                                                                                                        
+---------------------------------|---------|----------|---------|---------|-------------------------------------------------------------------------------------------------------------
+Jest: "global" coverage threshold for statements (55%) not met: 22.57%
+Jest: "global" coverage threshold for branches (40%) not met: 20.75%
+Jest: "global" coverage threshold for lines (55%) not met: 22.8%
+Jest: "global" coverage threshold for functions (60%) not met: 25.52%
+
+Test Suites: 1 failed, 3 passed, 4 total
+Tests:       1 failed, 80 passed, 81 total
+Snapshots:   0 total
+Time:        5.184 s
+Ran all test suites matching /__tests__\/routes\/eventos.test.js|__tests__\/controllers\/reportesController.test.js|__tests__\/utils\/sendEmail.test.js|__tests__\/controllers\/tareaController.test.js/i.

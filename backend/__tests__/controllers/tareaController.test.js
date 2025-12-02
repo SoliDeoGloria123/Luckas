@@ -5,6 +5,19 @@ const tareaController = require('../../controllers/tareaController');
 
 jest.mock('../../models/Tarea');
 jest.mock('../../models/User');
+jest.mock('mongoose', () => {
+  const originalModule = jest.requireActual('mongoose');
+  return {
+    ...originalModule,
+    Types: {
+      ...originalModule.Types,
+      ObjectId: {
+        ...originalModule.Types.ObjectId,
+        isValid: jest.fn().mockReturnValue(true)
+      }
+    }
+  };
+});
 
 describe('Tarea Controller', () => {
   let req, res;
@@ -64,8 +77,6 @@ describe('Tarea Controller', () => {
         asignadoA: 'invalid-id',
         asignadoPor: 'user-123'
       };
-
-      await tareaController.crearTarea(req, res);
 
       mongoose.Types.ObjectId.isValid.mockReturnValueOnce(false);
       await tareaController.crearTarea(req, res);
@@ -350,7 +361,7 @@ describe('Tarea Controller', () => {
   describe('Edge cases and Error handling', () => {
     it('crearTarea: should return 400 if asignadoPor ID is invalid', async () => {
       req.body = { asignadoA: '507f1f77bcf86cd799439011', asignadoPor: 'invalid' };
-      mongoose.Types.ObjectId.isValid = jest.fn()
+      mongoose.Types.ObjectId.isValid
           .mockReturnValueOnce(true) // asignadoA
           .mockReturnValueOnce(false); // asignadoPor
 
@@ -392,7 +403,7 @@ describe('Tarea Controller', () => {
       };
       
       Usuario.findById = jest.fn().mockResolvedValue({}); // Users exist
-      mongoose.Types.ObjectId.isValid = jest.fn()
+      mongoose.Types.ObjectId.isValid
           .mockReturnValueOnce(true) // asignadoA
           .mockReturnValueOnce(true) // asignadoPor
           .mockReturnValueOnce(false); // comment author

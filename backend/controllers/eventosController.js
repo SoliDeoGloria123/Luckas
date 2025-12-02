@@ -7,10 +7,12 @@ const Usuario = require('../models/User');
 exports.getAllEvents = async (req, res) => {
   try {
 
+    // TEMPORAL: Mostrar todos los eventos independientemente del estado active
+    // Cambiar de: { active: true } a: {} para mostrar todos
+    const events = await Evento.find({}).populate('categoria');
 
     res.status(200).json({ success: true, data: events });
   } catch (error) {
-    console.error('[EVENTOS] Error al obtener eventos:', error);
     res.status(500).json({ success: false, message: 'Error al obtener eventos', error: error.message });
   }
 };
@@ -102,8 +104,6 @@ exports.createEvent = async (req, res) => {
     const savedEvent = await event.save();
     res.status(201).json({ success: true, data: savedEvent });
   } catch (error) {
-    console.error('[EVENTOS] Error completo al crear evento:', error);
-    console.error('[EVENTOS] Stack trace:', error.stack);
     res.status(500).json({ success: false, message: 'Error al crear evento', error: error.message });
   }
 };
@@ -177,7 +177,6 @@ async function eliminarImagenesCloudinary(imagenes, cloudinary) {
       try {
         await cloudinary.uploader.destroy(publicId);
       } catch (err) {
-        console.error('Error eliminando imagen de Cloudinary:', publicId, err);
       }
     }
   }
@@ -288,7 +287,6 @@ exports.activarTodosLosEventos = async (req, res) => {
       data: result
     });
   } catch (error) {
-    console.error('[EVENTOS] Error al activar eventos:', error);
     res.status(500).json({
       success: false,
       message: 'Error al activar eventos',
@@ -338,7 +336,6 @@ exports.obtenerEstadisticasEventos = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('[EVENTOS] Error al obtener estadísticas de eventos:', error);
     res.status(500).json({ success: false, message: 'Error al obtener estadísticas', error: error.message });
   }
 };

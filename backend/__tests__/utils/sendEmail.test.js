@@ -1,15 +1,20 @@
 const nodemailer = require('nodemailer');
 
-const mockSendMail = jest.fn().mockResolvedValue(true);
-jest.mock('nodemailer', () => ({
-  createTransport: jest.fn().mockReturnValue({
-    sendMail: mockSendMail
-  })
-}));
+jest.mock('nodemailer', () => {
+  const mockSendMail = jest.fn().mockResolvedValue(true);
+  return {
+    createTransport: jest.fn().mockReturnValue({
+      sendMail: mockSendMail
+    }),
+    __mockSendMail: mockSendMail // Expose for assertions
+  };
+});
 
 const sendEmail = require('../../utils/sendEmail');
 
 describe('sendEmail', () => {
+  const mockSendMail = require('nodemailer').__mockSendMail;
+
   beforeEach(() => {
     mockSendMail.mockClear();
   });

@@ -379,7 +379,7 @@ describe('Reportes Controller', () => {
           filtros: { usuario: 'invalid-id' }
         };
         mongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(false);
-        Usuario.findOne.mockResolvedValue(null); // Not found by name either
+        Usuario.findOne.mockReturnValue({ select: jest.fn().mockResolvedValue(null) }); // Fix chaining
         
         await reportesController.guardarReporte(req, res);
         expect(res.status).toHaveBeenCalledWith(201);
@@ -480,7 +480,7 @@ describe('Reportes Controller', () => {
         };
         
         mongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(false);
-        Usuario.findOne.mockResolvedValue({ _id: 'user-123' }); // Found by email
+        Usuario.findOne.mockReturnValue({ select: jest.fn().mockResolvedValue({ _id: 'user-123' }) }); // Fix chaining
         Reserva.find.mockReturnValue({ populate: jest.fn().mockReturnValue({ populate: jest.fn().mockReturnValue({ sort: jest.fn().mockResolvedValue([]) }) }) });
         Reporte.prototype.save = jest.fn().mockResolvedValue(true);
   

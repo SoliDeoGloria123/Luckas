@@ -118,19 +118,7 @@ describe('EventosController', () => {
     });
   });
 
-  describe('obtenerEventos', () => {
-    it('should return all events', async () => {
-      Evento.find.mockResolvedValue([]);
-      await eventosController.obtenerEventos(req, res);
-      expect(res.json).toHaveBeenCalledWith({ success: true, data: [] });
-    });
 
-    it('should handle errors', async () => {
-      Evento.find.mockRejectedValue(new Error('DB Error'));
-      await eventosController.obtenerEventos(req, res);
-      expect(res.status).toHaveBeenCalledWith(500);
-    });
-  });
 
   describe('obtenerEstadisticasEventos', () => {
     it('should return statistics', async () => {

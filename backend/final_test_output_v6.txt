@@ -1,0 +1,405 @@
+
+> backend@1.0.0 test
+> jest --coverage --detectOpenHandles --forceExit __tests__/routes/eventos.test.js __tests__/controllers/reportesController.test.js __tests__/utils/sendEmail.test.js __tests__/controllers/tareaController.test.js __tests__/controllers/userController.test.js __tests__/utils/notificationUtils.test.js
+
+PASS __tests__/routes/eventos.test.js
+  ● Console
+
+    console.error
+      [EVENTOS] Error al obtener eventos: Error: DB Error
+          at Function.<anonymous> (/home/juandam/Luckas/backend/__tests__/routes/eventos.test.js:71:23)
+          at /home/juandam/Luckas/backend/node_modules/jest-mock/build/index.js:397:39
+          at Function.<anonymous> (/home/juandam/Luckas/backend/node_modules/jest-mock/build/index.js:404:13)
+          at Function.mockConstructor [as find] (/home/juandam/Luckas/backend/node_modules/jest-mock/build/index.js:148:19)
+          at find (/home/juandam/Luckas/backend/controllers/eventosController.js:13:33)
+          at Layer.handle [as handle_request] (/home/juandam/Luckas/backend/node_modules/express/lib/router/layer.js:95:5)
+          at next (/home/juandam/Luckas/backend/node_modules/express/lib/router/route.js:149:13)
+          at Route.dispatch (/home/juandam/Luckas/backend/node_modules/express/lib/router/route.js:119:3)
+          at Layer.handle [as handle_request] (/home/juandam/Luckas/backend/node_modules/express/lib/router/layer.js:95:5)
+          at /home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:284:15
+          at Function.process_params (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:346:12)
+          at next (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:280:10)
+          at Function.handle (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:175:3)
+          at router (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:47:12)
+          at Layer.handle [as handle_request] (/home/juandam/Luckas/backend/node_modules/express/lib/router/layer.js:95:5)
+          at trim_prefix (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:328:13)
+          at /home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:286:9
+          at Function.process_params (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:346:12)
+          at next (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:280:10)
+          at jsonParser (/home/juandam/Luckas/backend/node_modules/body-parser/lib/types/json.js:113:7)
+          at Layer.handle [as handle_request] (/home/juandam/Luckas/backend/node_modules/express/lib/router/layer.js:95:5)
+          at trim_prefix (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:328:13)
+          at /home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:286:9
+          at Function.process_params (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:346:12)
+          at next (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:280:10)
+          at expressInit (/home/juandam/Luckas/backend/node_modules/express/lib/middleware/init.js:40:5)
+          at Layer.handle [as handle_request] (/home/juandam/Luckas/backend/node_modules/express/lib/router/layer.js:95:5)
+          at trim_prefix (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:328:13)
+          at /home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:286:9
+          at Function.process_params (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:346:12)
+          at next (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:280:10)
+          at query (/home/juandam/Luckas/backend/node_modules/express/lib/middleware/query.js:45:5)
+          at Layer.handle [as handle_request] (/home/juandam/Luckas/backend/node_modules/express/lib/router/layer.js:95:5)
+          at trim_prefix (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:328:13)
+          at /home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:286:9
+          at Function.process_params (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:346:12)
+          at next (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:280:10)
+          at Function.handle (/home/juandam/Luckas/backend/node_modules/express/lib/router/index.js:175:3)
+          at Function.handle (/home/juandam/Luckas/backend/node_modules/express/lib/application.js:181:10)
+          at Server.app (/home/juandam/Luckas/backend/node_modules/express/lib/express.js:39:9)
+          at Server.emit (node:events:517:28)
+          at parserOnIncoming (node:_http_server:1131:12)
+          at HTTPParser.parserOnHeadersComplete (node:_http_common:119:17)
+
+      15 |     res.status(200).json({ success: true, data: events });
+      16 |   } catch (error) {
+    > 17 |     console.error('[EVENTOS] Error al obtener eventos:', error);
+         |             ^
+      18 |     res.status(500).json({ success: false, message: 'Error al obtener eventos', error: error.message });
+      19 |   }
+      20 | };
+
+      at error (controllers/eventosController.js:17:13)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at next (node_modules/express/lib/router/route.js:149:13)
+      at Route.dispatch (node_modules/express/lib/router/route.js:119:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at node_modules/express/lib/router/index.js:284:15
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at jsonParser (node_modules/body-parser/lib/types/json.js:113:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at expressInit (node_modules/express/lib/middleware/init.js:40:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at query (node_modules/express/lib/middleware/query.js:45:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at Function.handle (node_modules/express/lib/application.js:181:10)
+      at Server.app (node_modules/express/lib/express.js:39:9)
+
+    console.error
+      [EVENTOS] Error completo al crear evento: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/routes/eventos.test.js:175:66)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      107 |     res.status(201).json({ success: true, data: savedEvent });
+      108 |   } catch (error) {
+    > 109 |     console.error('[EVENTOS] Error completo al crear evento:', error);
+          |             ^
+      110 |     console.error('[EVENTOS] Stack trace:', error.stack);
+      111 |     res.status(500).json({ success: false, message: 'Error al crear evento', error: error.message });
+      112 |   }
+
+      at error (controllers/eventosController.js:109:13)
+
+    console.error
+      [EVENTOS] Stack trace: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/routes/eventos.test.js:175:66)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      108 |   } catch (error) {
+      109 |     console.error('[EVENTOS] Error completo al crear evento:', error);
+    > 110 |     console.error('[EVENTOS] Stack trace:', error.stack);
+          |             ^
+      111 |     res.status(500).json({ success: false, message: 'Error al crear evento', error: error.message });
+      112 |   }
+      113 | };
+
+      at error (controllers/eventosController.js:110:13)
+
+    console.error
+      Error eliminando imagen de Cloudinary: Luckas/eventos/img Error: Cloudinary Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/routes/eventos.test.js:251:83)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      182 |         await cloudinary.uploader.destroy(publicId);
+      183 |       } catch (err) {
+    > 184 |         console.error('Error eliminando imagen de Cloudinary:', publicId, err);
+          |                 ^
+      185 |       }
+      186 |     }
+      187 |   }
+
+      at error (controllers/eventosController.js:184:17)
+      at Object.<anonymous>.exports.deleteEvent (controllers/eventosController.js:167:5)
+
+    console.error
+      [EVENTOS] Error al activar eventos: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/routes/eventos.test.js:376:61)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      293 |     });
+      294 |   } catch (error) {
+    > 295 |     console.error('[EVENTOS] Error al activar eventos:', error);
+          |             ^
+      296 |     res.status(500).json({
+      297 |       success: false,
+      298 |       message: 'Error al activar eventos',
+
+      at error (controllers/eventosController.js:295:13)
+
+    console.error
+      [EVENTOS] Error al obtener estadísticas de eventos: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/routes/eventos.test.js:404:53)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      334 |     });
+      335 |   } catch (error) {
+    > 336 |     console.error('[EVENTOS] Error al obtener estadísticas de eventos:', error);
+          |             ^
+      337 |     res.status(500).json({ success: false, message: 'Error al obtener estadísticas', error: error.message });
+      338 |   }
+      339 | };
+
+      at error (controllers/eventosController.js:336:13)
+
+PASS __tests__/controllers/tareaController.test.js
+PASS __tests__/controllers/reportesController.test.js
+  ● Console
+
+    console.error
+      Error en getDashboardReport: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/reportesController.test.js:64:48)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      58 |     res.json({ success: true, data: dashboard });
+      59 |   } catch (error) {
+    > 60 |     console.error('Error en getDashboardReport:', error);
+         |             ^
+      61 |     res.status(500).json({ success: false, message: error.message });
+      62 |   }
+      63 | };
+
+      at Object.error [as getDashboardReport] (controllers/reportesControllers.js:60:13)
+      at Object.<anonymous> (__tests__/controllers/reportesController.test.js:65:7)
+
+    console.error
+      Error al guardar el reporte: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/reportesController.test.js:311:60)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      742 |     res.status(201).json({ success: true, message: 'Reporte guardado correctamente', data: reporteToSave });
+      743 |   } catch (error) {
+    > 744 |     console.error('Error al guardar el reporte:', error);
+          |             ^
+      745 |     res.status(500).json({ success: false, message: error.message });
+      746 |   }
+      747 | };
+
+      at Object.error [as guardarReporte] (controllers/reportesControllers.js:744:13)
+      at Object.<anonymous> (__tests__/controllers/reportesController.test.js:312:7)
+
+    console.error
+      Error en getTotalGestiones: Error: DB Error
+          at Object.<anonymous> (/home/juandam/Luckas/backend/__tests__/controllers/reportesController.test.js:450:48)
+          at Promise.then.completed (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/juandam/Luckas/backend/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/juandam/Luckas/backend/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/juandam/Luckas/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/juandam/Luckas/backend/node_modules/jest-runner/build/runTest.js:444:34)
+
+      835 |     });
+      836 |   } catch (error) {
+    > 837 |     console.error('Error en getTotalGestiones:', error);
+          |             ^
+      838 |     res.status(500).json({ success: false, message: error.message });
+      839 |   }
+      840 | };
+
+      at Object.error [as getTotalGestiones] (controllers/reportesControllers.js:837:13)
+      at Object.<anonymous> (__tests__/controllers/reportesController.test.js:451:7)
+
+PASS __tests__/controllers/userController.test.js
+PASS __tests__/utils/sendEmail.test.js
+PASS __tests__/utils/notificationUtils.test.js
+---------------------------------|---------|----------|---------|---------|-----------------------------------------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                   
+---------------------------------|---------|----------|---------|---------|-----------------------------------------------------
+All files                        |   30.91 |    28.11 |   33.19 |   31.43 |                                                     
+ controllers                     |   32.87 |    31.06 |   38.06 |   33.44 |                                                     
+  authControllers.js             |       0 |        0 |       0 |       0 | 1-438                                               
+  cabanasController.js           |       0 |        0 |       0 |       0 | 1-258                                               
+  categorizacionController.js    |       0 |        0 |       0 |       0 | 1-381                                               
+  certificadoControllers.js      |       0 |        0 |       0 |       0 | 1-206                                               
+  comentarioEventoController.js  |       0 |        0 |       0 |       0 | 1-156                                               
+  eventosController.js           |     100 |    88.09 |     100 |     100 | 78-82,125,176-179                                   
+  inscripcionController.js       |       0 |        0 |       0 |       0 | 1-481                                               
+  notificationController.js      |       0 |        0 |       0 |       0 | 1-76                                                
+  programaAcademicoController.js |       0 |        0 |       0 |       0 | 1-128                                               
+  reportesControllers.js         |   93.33 |    75.72 |   96.96 |   96.18 | 200,277,336,461,538,566,722,773,787                 
+  reservasController.js          |       0 |        0 |       0 |       0 | 1-353                                               
+  solicitudController.js         |       0 |        0 |       0 |       0 | 1-462                                               
+  tareaController.js             |     100 |    94.44 |     100 |     100 | 54,76-78                                            
+  userController.js              |   90.47 |    80.64 |     100 |   99.12 | 58                                                  
+ middlewares                     |   26.71 |    10.41 |   17.39 |      28 |                                                     
+  auth.js                        |       0 |        0 |       0 |       0 | 1-42                                                
+  authJwt.js                     |       0 |        0 |       0 |       0 | 1-32                                                
+  index.js                       |     100 |      100 |     100 |     100 |                                                     
+  normalizeUserData.js           |       0 |        0 |       0 |       0 | 1-15                                                
+  role.js                        |       0 |        0 |       0 |       0 | 1-25                                                
+  uploadCloudinary.js            |   58.53 |    41.66 |      50 |      60 | 18-40,47,62,75                                      
+  validateEvents.js              |   18.18 |        0 |       0 |   18.18 | 2-35                                                
+  verifySignUp.js                |   27.77 |        0 |       0 |   27.77 | 6-27,36-44                                          
+ models                          |   33.81 |        0 |       0 |   34.05 |                                                     
+  Cabana.js                      |     100 |      100 |     100 |     100 |                                                     
+  ComentarioEvento.js            |       0 |      100 |     100 |       0 | 1-36                                                
+  Eventos.js                     |     100 |      100 |     100 |     100 |                                                     
+  Inscripciones.js               |   19.23 |        0 |       0 |   19.23 | 69-93,112-116,123-124                               
+  Notification.js                |     100 |      100 |     100 |     100 |                                                     
+  ProgramaAcademico.js           |       0 |      100 |     100 |       0 | 1-99                                                
+  Reportes.js                    |   29.16 |        0 |       0 |   29.16 | 100-105,109-122,127-135,142-152,158-161,167,174,178 
+  Reservas.js                    |     100 |      100 |     100 |     100 |                                                     
+  Solicitud.js                   |      75 |        0 |       0 |      75 | 37                                                  
+  Tarea.js                       |     100 |      100 |     100 |     100 |                                                     
+  User.js                        |   26.92 |        0 |       0 |      28 | 41-63,153-156,161-165,171                           
+  categorizacion.js              |     100 |      100 |     100 |     100 |                                                     
+  index.js                       |       0 |      100 |     100 |       0 | 1-14                                                
+ routes                          |   10.17 |      100 |   28.57 |    9.45 |                                                     
+  authRoutes.js                  |       0 |      100 |       0 |       0 | 1-43                                                
+  cabanasRoutes.js               |       0 |      100 |       0 |       0 | 1-46                                                
+  categorizacionRoutes.js        |       0 |      100 |     100 |       0 | 1-33                                                
+  certificadoRoutes.js           |       0 |      100 |     100 |       0 | 1-14                                                
+  comentarioEventoRoutes.js      |       0 |      100 |     100 |       0 | 1-25                                                
+  eventosRoutes.js               |     100 |      100 |     100 |     100 |                                                     
+  inscripcionRoutes.js           |       0 |      100 |     100 |       0 | 1-30                                                
+  notificationRoutes.js          |       0 |      100 |     100 |       0 | 1-27                                                
+  programaAcademicoRoutes.js     |       0 |      100 |     100 |       0 | 1-31                                                
+  reportesRoutes.js              |       0 |      100 |     100 |       0 | 1-24                                                
+  reservasRoutes.js              |       0 |      100 |     100 |       0 | 1-29                                                
+  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131                                               
+  tareaRoutes.js                 |       0 |      100 |     100 |       0 | 1-29                                                
+  userRoutes.js                  |       0 |      100 |     100 |       0 | 1-27                                                
+ utils                           |      44 |     33.8 |   42.85 |   47.77 |                                                     
+  notificationUtils.js           |   91.17 |      100 |     100 |    90.9 | 78,104,126                                          
+  reportUtils.js                 |       0 |        0 |       0 |       0 | 9-57                                                
+  roleValidation.js              |       0 |        0 |       0 |       0 | 2-10                                                
+  sendEmail.js                   |     100 |    81.25 |     100 |     100 | 7-33                                                
+  solicitudUtils.js              |       0 |        0 |       0 |       0 | 9-56                                                
+  userValidation.js              |   27.27 |        0 |       0 |      30 | 7-44                                                
+---------------------------------|---------|----------|---------|---------|-----------------------------------------------------
+Jest: "global" coverage threshold for statements (55%) not met: 30.91%
+Jest: "global" coverage threshold for branches (40%) not met: 28.11%
+Jest: "global" coverage threshold for lines (55%) not met: 31.43%
+Jest: "global" coverage threshold for functions (60%) not met: 33.19%
+
+Test Suites: 6 passed, 6 total
+Tests:       151 passed, 151 total
+Snapshots:   0 total
+Time:        5.776 s
+Ran all test suites matching /__tests__\/routes\/eventos.test.js|__tests__\/controllers\/reportesController.test.js|__tests__\/utils\/sendEmail.test.js|__tests__\/controllers\/tareaController.test.js|__tests__\/controllers\/userController.test.js|__tests__\/utils\/notificationUtils.test.js/i.

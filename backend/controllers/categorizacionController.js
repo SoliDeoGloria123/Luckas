@@ -9,7 +9,7 @@ const Inscripcion = require('../models/Inscripciones');
 // CREAR nueva categoría
 const crearCategoria = async (req, res) => {
   try {
-    console.log('[CATEGORIA] Datos recibidos:', req.body);
+  
     const { nombre, codigo, tipo } = req.body;
 
     if (!nombre || !codigo || !tipo) {
@@ -53,7 +53,7 @@ const crearCategoria = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[CATEGORIA] Error al crear:', error);
+
     res.status(500).json({
       success: false,
       message: 'Error al crear la categoría',
@@ -83,7 +83,7 @@ const obtenerCategorias = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[CATEGORIA] Error al obtener:', error);
+
     res.status(500).json({
       success: false,
       message: 'Error al obtener las categorías',
@@ -111,7 +111,7 @@ const obtenerCategoriaPorId = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[CATEGORIA] Error al buscar por ID:', error);
+
     res.status(500).json({
       success: false,
       message: 'Error al obtener la categoría',
@@ -201,7 +201,7 @@ const actualizarCategoria = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[CATEGORIA] Error al actualizar:', error);
+
     res.status(500).json({
       success: false,
       message: 'Error al actualizar la categoría',
@@ -239,7 +239,7 @@ const eliminarCategoria = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[CATEGORIA] Error al eliminar:', error);
+
     res.status(500).json({
       success: false,
       message: 'Error al eliminar la categoría',
@@ -293,7 +293,7 @@ const categorizarSolicitud = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[CATEGORIA] Error al categorizar solicitud:', error);
+
     res.status(500).json({
       success: false,
       message: 'Error al categorizar la solicitud',

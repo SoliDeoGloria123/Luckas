@@ -57,7 +57,7 @@ exports.getDashboardReport = async (req, res) => {
 
     res.json({ success: true, data: dashboard });
   } catch (error) {
-    console.error('Error en getDashboardReport:', error);
+
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -741,7 +741,7 @@ exports.guardarReporte = async (req, res) => {
     await reporteToSave.save();
     res.status(201).json({ success: true, message: 'Reporte guardado correctamente', data: reporteToSave });
   } catch (error) {
-    console.error('Error al guardar el reporte:', error);
+
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -834,7 +834,7 @@ exports.getTotalGestiones = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error en getTotalGestiones:', error);
+
     res.status(500).json({ success: false, message: error.message });
   }
 };

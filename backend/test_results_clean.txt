@@ -1,0 +1,230 @@
+
+> backend@1.0.0 test
+> jest --coverage --detectOpenHandles --forceExit
+
+PASS __tests__/controllers/eventosController.test.js
+PASS __tests__/controllers/categorizacionController.test.js
+  ● Console
+
+    console.log
+      DEBUG TEST: mongoose.Types.ObjectId {
+        index: 1463068,
+        isValid: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        createFromHexString: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        }
+      }
+
+      at Object.log (__tests__/controllers/categorizacionController.test.js:36:13)
+
+    console.log
+      DEBUG TEST: createFromHexString [Function: mockConstructor] {
+        _isMockFunction: true,
+        getMockImplementation: [Function (anonymous)],
+        mock: [Getter/Setter],
+        mockClear: [Function (anonymous)],
+        mockReset: [Function (anonymous)],
+        mockRestore: [Function (anonymous)],
+        mockReturnValueOnce: [Function (anonymous)],
+        mockResolvedValueOnce: [Function (anonymous)],
+        mockRejectedValueOnce: [Function (anonymous)],
+        mockReturnValue: [Function (anonymous)],
+        mockResolvedValue: [Function (anonymous)],
+        mockRejectedValue: [Function (anonymous)],
+        mockImplementationOnce: [Function (anonymous)],
+        withImplementation: [Function: bound withImplementation],
+        mockImplementation: [Function (anonymous)],
+        mockReturnThis: [Function (anonymous)],
+        mockName: [Function (anonymous)],
+        getMockName: [Function (anonymous)]
+      }
+
+      at Object.log (__tests__/controllers/categorizacionController.test.js:37:13)
+
+PASS __tests__/controllers/cabanasController.test.js
+FAIL __tests__/routes/eventos.test.js
+  ● Eventos Routes & Controllers › GET /api/eventos › should return all events
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 500
+
+      62 |             const res = await request(app).get('/api/eventos');
+      63 |
+    > 64 |             expect(res.statusCode).toBe(200);
+         |                                    ^
+      65 |             expect(res.body.success).toBe(true);
+      66 |             expect(res.body.data).toHaveLength(2);
+      67 |         });
+
+      at Object.toBe (__tests__/routes/eventos.test.js:64:36)
+
+PASS __tests__/controllers/tareaController.test.js
+PASS __tests__/routes/certificado.test.js
+PASS __tests__/models/Reportes.test.js
+PASS __tests__/models/index.test.js
+PASS __tests__/models/User.test.js
+PASS __tests__/routes/categorizacion.test.js
+PASS __tests__/models/Inscripciones.test.js
+PASS __tests__/routes/auth.test.js
+PASS __tests__/models/Solicitud.test.js
+PASS __tests__/controllers/certificadoController.test.js
+PASS __tests__/routes/reportes.test.js
+PASS __tests__/routes/cabanas.test.js
+PASS __tests__/routes/user.test.js
+PASS __tests__/routes/programaAcademico.test.js
+PASS __tests__/routes/notification.test.js
+PASS __tests__/routes/inscripcion.test.js
+PASS __tests__/routes/reservas.test.js
+PASS __tests__/routes/tarea.test.js
+PASS __tests__/routes/comentarioEvento.test.js
+PASS __tests__/controllers/reportesController.test.js
+PASS __tests__/controllers/inscripcionController.test.js
+PASS __tests__/controllers/solicitudController.test.js
+PASS __tests__/controllers/userController.test.js
+PASS __tests__/controllers/authController.test.js
+PASS __tests__/controllers/reservasController.test.js
+PASS __tests__/controllers/notificationController.test.js
+PASS __tests__/controllers/comentarioEventoController.test.js
+PASS __tests__/controllers/programaAcademicoController.test.js
+PASS __tests__/middlewares/verifySignUp.test.js
+PASS __tests__/utils/notificationUtils.test.js
+PASS __tests__/middlewares/auth.test.js
+PASS __tests__/middlewares/role.test.js
+PASS __tests__/utils/solicitudUtils.test.js
+PASS __tests__/utils/reportUtils.test.js
+PASS __tests__/utils/userValidation.test.js
+PASS __tests__/utils/roleValidation.test.js
+PASS __tests__/middlewares/uploadCloudinary.test.js
+PASS __tests__/utils/sendEmail.test.js
+PASS __tests__/middlewares/validateEvents.test.js
+PASS __tests__/middlewares/authJwt.test.js
+PASS __tests__/middlewares/normalizeUserData.test.js
+---------------------------------|---------|----------|---------|---------|--------------------------------------------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                      
+---------------------------------|---------|----------|---------|---------|--------------------------------------------------------
+All files                        |   92.67 |    81.98 |   95.39 |   94.11 |                                                        
+ controllers                     |   93.13 |    81.63 |   97.17 |   95.17 |                                                        
+  authControllers.js             |   95.41 |    91.52 |     100 |   95.38 | 114,224,345,365,395,438                                
+  cabanasController.js           |   84.16 |    81.25 |     100 |   85.96 | 29,59,84,93-95,109,135-136,153-154,169,181,200,220,258 
+  categorizacionController.js    |   96.92 |    90.16 |     100 |     100 | 317,348-352                                            
+  certificadoControllers.js      |   95.69 |    77.27 |     100 |    95.6 | 20,133-134,168                                         
+  comentarioEventoController.js  |   78.86 |    65.78 |      75 |   88.57 | 21-23,30-31,52,69,86,104,122,138,156                   
+  eventosController.js           |   96.46 |    88.09 |   91.66 |   96.42 | 296-300                                                
+  inscripcionController.js       |   93.23 |    78.57 |     100 |   93.13 | 12,53-56,65,78,82,110,128,135,144,339,344,350,355      
+  notificationController.js      |     100 |      100 |     100 |     100 |                                                        
+  programaAcademicoController.js |   94.23 |    96.66 |     100 |   94.23 | 63,83,97                                               
+  reportesControllers.js         |   93.25 |    75.72 |   96.96 |   96.13 | 200,277,336,461,538,566,722,773,787                    
+  reservasController.js          |   90.47 |    72.22 |     100 |    90.2 | 31,45,56,61,124,131,170,217,230,242-243,251,271,282    
+  solicitudController.js         |     100 |    83.11 |     100 |     100 | 18-28,38,53-79,224,350,415-449                         
+  tareaController.js             |     100 |    94.44 |     100 |     100 | 54,76-78                                               
+  userController.js              |   90.47 |    80.64 |     100 |   99.12 | 58                                                     
+ middlewares                     |     100 |    97.91 |     100 |     100 |                                                        
+  auth.js                        |     100 |      100 |     100 |     100 |                                                        
+  authJwt.js                     |     100 |      100 |     100 |     100 |                                                        
+  index.js                       |     100 |      100 |     100 |     100 |                                                        
+  normalizeUserData.js           |     100 |      100 |     100 |     100 |                                                        
+  role.js                        |     100 |      100 |     100 |     100 |                                                        
+  uploadCloudinary.js            |     100 |    91.66 |     100 |     100 | 52                                                     
+  validateEvents.js              |     100 |      100 |     100 |     100 |                                                        
+  verifySignUp.js                |     100 |      100 |     100 |     100 |                                                        
+ models                          |   85.61 |    65.33 |   77.77 |    85.5 |                                                        
+  Cabana.js                      |     100 |      100 |     100 |     100 |                                                        
+  ComentarioEvento.js            |     100 |      100 |     100 |     100 |                                                        
+  Eventos.js                     |     100 |      100 |     100 |     100 |                                                        
+  Inscripciones.js               |   84.61 |     87.5 |      75 |   84.61 | 89,91,123-124                                          
+  Notification.js                |     100 |      100 |     100 |     100 |                                                        
+  ProgramaAcademico.js           |     100 |      100 |     100 |     100 |                                                        
+  Reportes.js                    |   81.25 |    48.64 |      75 |   81.25 | 142-152,158-161                                        
+  Reservas.js                    |     100 |      100 |     100 |     100 |                                                        
+  Solicitud.js                   |     100 |      100 |     100 |     100 |                                                        
+  Tarea.js                       |     100 |      100 |     100 |     100 |                                                        
+  User.js                        |   73.07 |    66.66 |      80 |      72 | 57-61,161-165                                          
+  categorizacion.js              |     100 |      100 |     100 |     100 |                                                        
+  index.js                       |     100 |      100 |     100 |     100 |                                                        
+ routes                          |   87.16 |      100 |   71.42 |   86.93 |                                                        
+  authRoutes.js                  |   94.11 |      100 |      50 |   94.11 | 18                                                     
+  cabanasRoutes.js               |     100 |      100 |     100 |     100 |                                                        
+  categorizacionRoutes.js        |     100 |      100 |     100 |     100 |                                                        
+  certificadoRoutes.js           |     100 |      100 |     100 |     100 |                                                        
+  comentarioEventoRoutes.js      |     100 |      100 |     100 |     100 |                                                        
+  eventosRoutes.js               |     100 |      100 |     100 |     100 |                                                        
+  inscripcionRoutes.js           |     100 |      100 |     100 |     100 |                                                        
+  notificationRoutes.js          |     100 |      100 |     100 |     100 |                                                        
+  programaAcademicoRoutes.js     |     100 |      100 |     100 |     100 |                                                        
+  reportesRoutes.js              |     100 |      100 |     100 |     100 |                                                        
+  reservasRoutes.js              |     100 |      100 |     100 |     100 |                                                        
+  solicitudRoutes.js             |       0 |      100 |       0 |       0 | 1-131                                                  
+  tareaRoutes.js                 |     100 |      100 |     100 |     100 |                                                        
+  userRoutes.js                  |     100 |      100 |     100 |     100 |                                                        
+ utils                           |      97 |    92.95 |     100 |   96.66 |                                                        
+  notificationUtils.js           |   91.17 |      100 |     100 |    90.9 | 78,104,126                                             
+  reportUtils.js                 |     100 |      100 |     100 |     100 |                                                        
+  roleValidation.js              |     100 |      100 |     100 |     100 |                                                        
+  sendEmail.js                   |     100 |    81.25 |     100 |     100 | 7-33                                                   
+  solicitudUtils.js              |     100 |     92.3 |     100 |     100 | 17-18                                                  
+  userValidation.js              |     100 |      100 |     100 |     100 |                                                        
+---------------------------------|---------|----------|---------|---------|--------------------------------------------------------
+
+Summary of all failing tests
+FAIL __tests__/routes/eventos.test.js
+  ● Eventos Routes & Controllers › GET /api/eventos › should return all events
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 500
+
+      62 |             const res = await request(app).get('/api/eventos');
+      63 |
+    > 64 |             expect(res.statusCode).toBe(200);
+         |                                    ^
+      65 |             expect(res.body.success).toBe(true);
+      66 |             expect(res.body.data).toHaveLength(2);
+      67 |         });
+
+      at Object.toBe (__tests__/routes/eventos.test.js:64:36)
+
+
+Test Suites: 1 failed, 44 passed, 45 total
+Tests:       1 failed, 554 passed, 555 total
+Snapshots:   0 total
+Time:        16.402 s
+Ran all test suites.
