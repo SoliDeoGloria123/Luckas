@@ -19,6 +19,73 @@ import {
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
+// ============ HELPERS CENTRALIZADOS ============
+
+// Helper para obtener imágenes desde varios formatos
+const getImagesFromDetalle = (detalle) => {
+  if (!detalle) return [];
+  if (Array.isArray(detalle.imagen)) return detalle.imagen;
+  if (detalle.imagen) return [detalle.imagen];
+  return [];
+};
+
+// Helper para extraer nombre de categoría con fallbacks
+const getCategoriaInfo = (categoria) => {
+  if (!categoria) return '';
+  if (typeof categoria === 'object') {
+    return categoria.nombre || categoria.nombreCategoria || categoria.codigo || categoria._id || '';
+  }
+  return categoria;
+};
+
+// Helper para preparar FormData de cabaña
+const prepararFormDataCabana = (cabana, selectedImages = []) => {
+  const formData = new FormData();
+  const camposBase = ['nombre', 'descripcion', 'capacidad', 'categoria', 'precio', 'estado', 'ubicacion'];
+  
+  for (const campo of camposBase) {
+    if (cabana[campo] !== undefined && cabana[campo] !== null) {
+      formData.append(campo, cabana[campo]);
+    }
+  }
+
+  for (const imgObj of selectedImages) {
+    if (imgObj.file) formData.append('imagen', imgObj.file);
+  }
+
+  return formData;
+};
+
+// Factory function para filtrar cabañas
+const filtrarCabanas = (cabanas, filtros) => {
+  return cabanas.filter(c => {
+    const q = (filtros.busqueda || '').toString().trim().toLowerCase();
+
+    // Filtro por categoría
+    if (filtros.categoria && filtros.categoria !== 'todos') {
+      const catId = c.categoria?._id || c.categoria || '';
+      if (String(catId) !== String(filtros.categoria)) return false;
+    }
+
+    // Filtro por estado
+    if (filtros.estado && filtros.estado !== 'todos') {
+      if ((c.estado || '') !== filtros.estado) return false;
+    }
+
+    if (!q) return true;
+    const texto = `${c.nombre || ''} ${c.descripcion || ''} ${c.ubicacion || ''} ${c.precio || ''}`.toLowerCase();
+    return texto.includes(q);
+  });
+};
+
+// Helper para resetear estado del modal
+const resetearEstadoModal = () => ({
+  modoEdicion: false,
+  cabanaSeleccionada: null,
+  nuevaCabana: { ...defaultCabana },
+  selectedImages: []
+});
+
 
 
 
@@ -84,60 +151,40 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
       mostrarAlerta('Error', 'No se pudieron obtener las estadísticas de cabañas: ' + (error.message || error), 'error');
     }
   };
-  // CRUD
-  const crearCabana = async () => {
+  // CRUD - Factory function
+  const operarCabana = async (operacion, id = null) => {
     try {
-      const formData = new FormData();
-      formData.append("nombre", nuevaCabana.nombre);
-      formData.append("descripcion", nuevaCabana.descripcion);
-      formData.append("capacidad", nuevaCabana.capacidad);
-      formData.append("categoria", nuevaCabana.categoria);
-      formData.append("precio", nuevaCabana.precio);
-      formData.append("estado", nuevaCabana.estado);
-      formData.append("ubicacion", nuevaCabana.ubicacion);
-
-      // Agregar imágenes seleccionadas
-      for (const imgObj of selectedImages) {
-        if (imgObj.file) formData.append('imagen', imgObj.file);
+      switch (operacion) {
+        case 'crear': {
+          const formData = prepararFormDataCabana(nuevaCabana, selectedImages);
+          await cabanaService.create(formData);
+          mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente");
+          break;
+        }
+        case 'actualizar': {
+          await cabanaService.update(cabanaSeleccionada._id, cabanaSeleccionada);
+          mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente");
+          break;
+        }
+        case 'eliminar': {
+          const confirmado = await mostrarConfirmacion(
+            "¿Estás seguro?",
+            "Esta acción eliminará la cabaña de forma permanente."
+          );
+          if (!confirmado) return;
+          await cabanaService.delete(id);
+          mostrarAlerta("¡Éxito!", "Cabaña eliminada exitosamente");
+          break;
+        }
       }
-
-      await cabanaService.create(formData);
-      mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente");
       setMostrarModal(false);
+      setModoEdicion(false);
+      setCabanaSeleccionada(null);
       setNuevaCabana({ ...defaultCabana });
       setSelectedImages([]);
       obtenerCabanas();
     } catch (error) {
-      mostrarAlerta("Error", "Error al crear la cabaña: " + error.message, "error");
-    }
-  };
-
-  const actualizarCabana = async () => {
-    try {
-      await cabanaService.update(cabanaSeleccionada._id, cabanaSeleccionada);
-      mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente");
-      setMostrarModal(false);
-      setCabanaSeleccionada(null);
-      setModoEdicion(false);
-      obtenerCabanas();
-    } catch (err) {
-      mostrarAlerta("Error", "Error al actualizar cabaña: " + err.message, "error");
-    }
-  };
-
-  const eliminarCabana = async (id) => {
-    const confirmado = await mostrarConfirmacion(
-      "¿Estás seguro?",
-      "Esta acción eliminará el usuario de forma permanente."
-    );
-
-    if (!confirmado) return;
-    try {
-      await cabanaService.delete(id);
-      mostrarAlerta("¡Éxito!", "Cabaña eliminada exitosamente");
-      obtenerCabanas();
-    } catch (err) {
-      mostrarAlerta("Error", "Error al eliminar cabaña: " + err.message, "error");
+      mostrarAlerta("Error", `Error: ${error.message}`, "error");
     }
   };
 
@@ -145,6 +192,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     setEventoDetalle(evento);
     setMostrarModalDetalle(true);
   };
+
   // Modal handlers
   const abrirModalCrear = () => {
     setModoEdicion(false);
@@ -159,37 +207,12 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
     setMostrarModal(true);
   };
 
-  // Helpers para el carrusel de imágenes en el modal de detalle
-  const getImagesFromDetalle = (detalle) => {
-    if (!detalle) return [];
-    if (Array.isArray(detalle.imagen)) return detalle.imagen;
-    if (detalle.imagen) return [detalle.imagen];
-    return [];
-  };
-
   useEffect(() => {
     setCarouselIndex(0);
   }, [eventoDetalle]);
 
-  // Search filter (filtra por nombre, descripción, categoría y estado según el modelo)
-  const cabanasFiltradas = cabanas.filter(c => {
-    const q = (filtros.busqueda || '').toString().trim().toLowerCase();
-
-    // filtro por categoria (acepta población o id)
-    if (filtros.categoria && filtros.categoria !== 'todos') {
-      const catId = c.categoria?._id || c.categoria || '';
-      if (String(catId) !== String(filtros.categoria)) return false;
-    }
-
-    // filtro por estado (según enum en modelo)
-    if (filtros.estado && filtros.estado !== 'todos') {
-      if ((c.estado || '') !== filtros.estado) return false;
-    }
-
-    if (!q) return true;
-    const texto = `${c.nombre || ''} ${c.descripcion || ''} ${c.ubicacion || ''} ${c.precio || ''}`.toLowerCase();
-    return texto.includes(q);
-  });
+  // Search filter consolidada
+  const cabanasFiltradas = filtrarCabanas(cabanas, filtros);
 
   const [paginaActual, setPaginaActual] = useState(1);
   const registrosPorPagina = 6;
@@ -291,7 +314,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
               >
                 <option value="todos">Todas las Categorías</option>
                 {categorias.map(cat => (
-                  <option key={cat._id || cat.id} value={cat._id || cat.id}>{cat.nombre || cat.nombreCategoria || cat.codigo || cat._id}</option>
+                  <option key={cat._id || cat.id} value={cat._id || cat.id}>{getCategoriaInfo(cat)}</option>
                 ))}
               </select>
 
@@ -317,7 +340,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
                 <div className="flex items-start justify-between p-6 border-b">
                   <div>
                     <h2 className="text-2xl font-semibold text-slate-800">{eventoDetalle.nombre}</h2>
-                    <p className="text-sm text-slate-500 mt-1">{eventoDetalle.categoria?.nombre || eventoDetalle.categoria} • {eventoDetalle.ubicacion || ''}</p>
+                    <p className="text-sm text-slate-500 mt-1">{getCategoriaInfo(eventoDetalle.categoria)} • {eventoDetalle.ubicacion || ''}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={`px-3 py-1 rounded-full text-sm ${eventoDetalle.estado === 'disponible' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700'}`}>{eventoDetalle.estado || '—'}</span>
@@ -409,7 +432,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
           <CabanaTabla
             cabanas={cabanasPaginadas}
             onEditar={canEdit && !readOnly ? abrirModalEditar : null}
-            onEliminar={canDelete && !modoTesorero && !readOnly ? eliminarCabana : null}
+            onEliminar={canDelete && !modoTesorero && !readOnly ? (id) => operarCabana('eliminar', id) : null}
             onVerDetalle={abrirModalVer}
             onInsertar={abrirModalCrear}
             nuevaCabana={nuevaCabana}
@@ -423,7 +446,7 @@ const GestioCabañas = ({ readOnly = false, modoTesorero = false, canCreate = tr
             nuevaCabana={nuevaCabana}
             setNuevaCabana={setNuevaCabana}
             onClose={() => setMostrarModal(false)}
-            onSubmit={modoEdicion ? actualizarCabana : crearCabana}
+            onSubmit={modoEdicion ? () => operarCabana('actualizar') : () => operarCabana('crear')}
             categorias={categorias}
             selectedImages={selectedImages}
             setSelectedImages={setSelectedImages}

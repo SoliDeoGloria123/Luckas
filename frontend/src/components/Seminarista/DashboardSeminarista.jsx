@@ -44,35 +44,35 @@ const DashboardSeminarista = () => {
                   </div>
                 </div>
 
-                <div className="stat-card">
-                  <div className="stat-icon security">
+                <div className="stat-card-dashboard-seminarista">
+                  <div className="stat-icon-dashboard-seminarista security">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                       <path d="M9 12l2 2 4-4" />
                     </svg>
                   </div>
-                  <div className="stat-info">
+                  <div className="stat-info-dashboard-seminarista">
                     <h3>Acceso Seguro</h3>
                     <p>Autenticación verificada</p>
                     <span className="status-badge secure">✓ Protegido</span>
                   </div>
                 </div>
 
-                <div className="stat-card">
-                  <div className="stat-icon navigation">
+                <div className="stat-card-dashboard-seminarista">
+                  <div className="stat-icon-dashboard-seminarista navigation">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" />
                     </svg>
                   </div>
-                  <div className="stat-info">
+                  <div className="stat-info-dashboard-seminarista">
                     <h3>Navegación Rápida</h3>
                     <p>Acceso optimizado</p>
                     <span className="status-badge ready">✓ Listo para usar</span>
                   </div>
                 </div>
 
-                <div className="stat-card">
-                  <div className="stat-icon resources">
+                <div className="stat-card-dashboard-seminarista">
+                  <div className="stat-icon-dashboard-seminarista resources">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="3" width="7" height="7" />
                       <rect x="14" y="3" width="7" height="7" />
@@ -80,7 +80,7 @@ const DashboardSeminarista = () => {
                       <rect x="3" y="14" width="7" height="7" />
                     </svg>
                   </div>
-                  <div className="stat-info">
+                  <div className="stat-info-dashboard-seminarista">
                     <h3>Recursos</h3>
                     <p>Herramientas disponibles</p>
                     <span className="status-badge available">✓ Todo disponible</span>
@@ -91,8 +91,8 @@ const DashboardSeminarista = () => {
 
 
           {/* Services Grid */}
-          <section className="services-section">
-            <div className="section-header">
+          <section className="quick-actions-section">
+            <div className="section-header-seminarista">
               <h2>Servicios Principales</h2>
               <p>Accede rápidamente a las funciones más importantes</p>
             </div>
@@ -110,7 +110,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Eventos</h3>
                   <p>Explora y participa en eventos del seminario</p>
-                  <button className="service-btn" onClick={() => navigate('/seminarista/eventos')}>Explorar Eventos</button>
+                  <button className="service-btn" onClick={() => navigate('/dashboard/seminarista/eventos')}>Explorar Eventos</button>
                 </div>
               </div>
 
@@ -124,7 +124,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Cabañas</h3>
                   <p>Descubre y reserva cabañas disponibles</p>
-                  <button className="service-btn" onClick={() => navigate('/seminarista/cabanas')}>Ver Cabañas</button>
+                  <button className="service-btn" onClick={() => navigate('/dashboard/seminarista/cabanas')}>Ver Cabañas</button>
                 </div>
               </div>
 
@@ -141,7 +141,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Mis Inscripciones</h3>
                   <p>Revisa tus inscripciones a eventos</p>
-                  <button className="service-btn" onClick={() => navigate('/seminarista/inscripciones')}>Ver Inscripciones</button>
+                  <button className="service-btn" onClick={() => navigate('/dashboard/seminarista/mis-inscripciones')}>Ver Inscripciones</button>
                 </div>
               </div>
 
@@ -155,7 +155,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Mis Reservas</h3>
                   <p>Gestiona tus reservas de cabañas</p>
-                  <button className="service-btn" onClick={() => navigate('/seminarista/reservas')}>Ver Reservas</button>
+                  <button className="service-btn" onClick={() => navigate('/dashboard/seminarista/mis-reservas')}>Ver Reservas</button>
                 </div>
               </div>
 
@@ -171,7 +171,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Mis Solicitudes</h3>
                   <p>Consulta el estado de tus solicitudes</p>
-                  <button className="service-btn" onClick={() => navigate('/seminarista/solicitudes')}>Ver Solicitudes</button>
+                  <button className="service-btn" onClick={() => navigate('/dashboard/seminarista/mis-solicitudes')}>Ver Solicitudes</button>
                 </div>
               </div>
 
@@ -186,7 +186,7 @@ const DashboardSeminarista = () => {
                 <div className="service-content">
                   <h3>Nueva Solicitud</h3>
                   <p>Crea una nueva solicitud</p>
-                  <button className="service-btn" onClick={() => navigate('/seminarista/nueva-solicitud')}>Crear Solicitud</button>
+                  <button className="service-btn" onClick={() => navigate('/dashboard/seminarista/nueva-solicitud')}>Crear Solicitud</button>
                 </div>
               </div>
             </div>
@@ -194,7 +194,7 @@ const DashboardSeminarista = () => {
 
           {/* Quick Actions */}
           <section className="quick-actions-section">
-            <div className="section-header">
+            <div className="section-header-seminarista">
               <h2>Acciones Rápidas</h2>
               <p>Funciones frecuentemente utilizadas</p>
             </div>

@@ -15,7 +15,7 @@
 
 /* Header */
 .header-panel-princiapl {
-    position: fixed;
+
     top: 0;
     width: 100%;
     background: rgba(255, 255, 255, 0.95);
@@ -23,7 +23,7 @@
     z-index: 1000;
     border-bottom: 1px solid rgba(37, 99, 235, 0.1);
     transition: all 0.3s ease;
-}
+    }
 
 .nav-panel-princiapl {
     display: flex;

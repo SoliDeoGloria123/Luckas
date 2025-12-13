@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../footer/Footer";
+import Header from "./Header";
 import './Panel.css'
 import EventosCarousel from "./EventosCarousel/EventosCarousel";
 import {
@@ -17,11 +18,23 @@ import {
     Award,
     Heart,
     Quote,
+    Send,
+    AlertCircle,
 } from "lucide-react"
+import { enviarMensajePanel } from "../../services/contactosService";
 
 const PanelPrincipal = () => {
 
     const navigate = useNavigate();
+    
+    // Estado para el formulario de contacto
+    const [formPanel, setFormPanel] = useState({
+        nombre: "",
+        email: "",
+        mensaje: "",
+    })
+    const [submitStatusPanel, setSubmitStatusPanel] = useState("idle")
+    const [errorsPanel, setErrorsPanel] = useState({})
 
     const handlLogin = () => {
         navigate('/login');
@@ -31,7 +44,103 @@ const PanelPrincipal = () => {
         navigate('/signup/registro');
     };
 
-    const [menuOpen, setMenuOpen] = useState(false);
+    // Validación del formulario del panel
+    const validateFormPanel = () => {
+        const newErrors = {}
+
+        if (!formPanel.nombre.trim()) {
+            newErrors.nombre = "El nombre es requerido"
+        }
+
+        if (!formPanel.email.trim()) {
+            newErrors.email = "El email es requerido"
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formPanel.email)) {
+            newErrors.email = "Email inválido"
+        }
+
+        if (!formPanel.mensaje.trim()) {
+            newErrors.mensaje = "El mensaje es requerido"
+        } else if (formPanel.mensaje.trim().length < 10) {
+            newErrors.mensaje = "El mensaje debe tener al menos 10 caracteres"
+        }
+
+        setErrorsPanel(newErrors)
+        return Object.keys(newErrors).length === 0
+    }
+
+    // Manejador para cambios en el formulario
+    const handleChangePanel = (e) => {
+        const { id, value } = e.target
+        setFormPanel((prev) => ({ ...prev, [id]: value }))
+        
+        // Validación en tiempo real
+        const newErrors = { ...errorsPanel }
+        
+        switch(id) {
+            case 'nombre':
+                if (value.trim().length > 0) {
+                    delete newErrors.nombre
+                } else {
+                    newErrors.nombre = "El nombre es requerido"
+                }
+                break
+            case 'email': {
+                const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                if (value.trim().length === 0) {
+                    newErrors.email = "El email es requerido"
+                } else if (isValidEmail) {
+                    delete newErrors.email
+                } else {
+                    newErrors.email = "Email inválido"
+                }
+                break
+            }
+            case 'mensaje':
+                if (value.trim().length >= 10) {
+                    delete newErrors.mensaje
+                } else if (value.trim().length === 0) {
+                    newErrors.mensaje = "El mensaje es requerido"
+                } else {
+                    newErrors.mensaje = "El mensaje debe tener al menos 10 caracteres"
+                }
+                break
+            default:
+                break
+        }
+        
+        setErrorsPanel(newErrors)
+    }
+
+    // Manejador para envío del formulario
+    const handleSubmitPanel = async (e) => {
+        e.preventDefault()
+
+        if (!validateFormPanel()) {
+            setSubmitStatusPanel("error")
+            return
+        }
+
+        setSubmitStatusPanel("loading")
+
+        try {
+            await enviarMensajePanel({
+                nombre: formPanel.nombre,
+                email: formPanel.email,
+                asunto: "Contacto desde Panel Principal",
+                mensaje: formPanel.mensaje,
+            })
+
+            setSubmitStatusPanel("success")
+            setFormPanel({ nombre: "", email: "", mensaje: "" })
+            
+            setTimeout(() => {
+                setSubmitStatusPanel("idle")
+            }, 5000)
+        } catch (error) {
+            console.error("Error al enviar:", error)
+            setSubmitStatusPanel("error")
+        }
+    }
 
 
     const stats = [
@@ -132,33 +241,7 @@ const PanelPrincipal = () => {
 
     return (
         <>
-            <header className="header-panel-princiapl">
-                <nav className="nav-panel-princiapl">
-                    <div className="nav-brand-panel-princiapl">
-                        <h1 className="icono-luckas" >LUCKAS</h1>
-                    </div>
-                    <button
-                        className="mobile-menu-btn"
-                        aria-expanded={menuOpen}
-                        aria-label="Abrir menú"
-                        onClick={() => setMenuOpen(prev => !prev)}
-                    >
-                        ☰
-                    </button>
-                    <div className={`nav-links-panel-princiapl ${menuOpen ? 'mobile-open' : ''}`}>
-                        <a href="#inicio" onClick={() => setMenuOpen(false)}>Inicio</a>
-                        <a href="#servicios" onClick={() => setMenuOpen(false)}>Servicios</a>
-                        <a href="#eventos" onClick={() => setMenuOpen(false)}>Eventos</a>
-                        <a href="#testimonios" onClick={() => setMenuOpen(false)}>Testimonios</a>
-                        <a href="#contacto" onClick={() => setMenuOpen(false)}>Contacto</a>
-                        <div className="nav-actions-panel-princiapl">
-                            <button className="btn-secondary-panel-princiapl" onClick={() => { setMenuOpen(false); handlLogin(); }}>Iniciar Sesión</button>
-                            <button className="btn-primary-panel-princiapl" onClick={() => { setMenuOpen(false); handlRegistro(); }}>Registrarse</button>
-                        </div>
-                    </div>
-                
-                </nav>
-            </header>
+            <Header />
             <section id="inicio" className="relative overflow-hidden bg-gradient-to-br from-[#2563eb] via-[#1d4ed8] to-[#1e40af] py-20 text-white md:py-32">
                 <div className="absolute inset-0  opacity-10" />
                 <div className="container relative mx-auto px-4">
@@ -429,42 +512,132 @@ const PanelPrincipal = () => {
                         </div>
                         <div className="rounded-lg bg-white p-8 shadow-sm">
                             <h3 className="mb-6 text-2xl font-bold text-[#334155]">Envíanos un Mensaje</h3>
-                            <form className="space-y-4">
+
+                            {submitStatusPanel === "success" && (
+                                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                                    <div>
+                                        <h3 className="font-bold text-green-900 mb-1">¡Mensaje enviado exitosamente!</h3>
+                                        <p className="text-sm text-green-700">Te responderemos lo antes posible.</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {submitStatusPanel === "error" && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+                                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                                    <div>
+                                        <h3 className="font-bold text-red-900 mb-1">Error en el formulario</h3>
+                                        <p className="text-sm text-red-700">Por favor corrige los errores antes de enviar.</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <form onSubmit={handleSubmitPanel} className="space-y-4">
                                 <div>
-                                    <label htmlFor="name" className="mb-2 block text-sm font-medium text-[#334155]">
-                                        Nombre Completo
+                                    <label htmlFor="nombre" className="mb-2 block text-sm font-medium text-[#334155]">
+                                        Nombre Completo <span className="text-red-600">*</span>
                                     </label>
                                     <input
                                         type="text"
-                                        id="name"
-                                        className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-[#334155] outline-none ring-[#2563eb] transition-colors focus:border-[#2563eb] focus:ring-2"
+                                        id="nombre"
+                                        value={formPanel.nombre}
+                                        onChange={handleChangePanel}
+                                        className={`w-full rounded-lg border bg-white px-4 py-2.5 text-[#334155] outline-none ring-[#2563eb] transition-colors focus:ring-2 ${
+                                            errorsPanel.nombre ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:border-[#2563eb]"
+                                        }`}
                                         placeholder="Tu nombre"
                                     />
+                                    {errorsPanel.nombre && (
+                                        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            {errorsPanel.nombre}
+                                        </p>
+                                    )}
+                                    {formPanel.nombre && !errorsPanel.nombre && (
+                                        <p className="mt-1 text-xs text-green-600 flex items-center gap-1">
+                                            <CheckCircle className="w-3 h-3" />
+                                            Campo válido
+                                        </p>
+                                    )}
                                 </div>
                                 <div>
                                     <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#334155]">
-                                        Correo Electrónico
+                                        Correo Electrónico <span className="text-red-600">*</span>
                                     </label>
                                     <input
                                         type="email"
                                         id="email"
-                                        className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-[#334155] outline-none ring-[#2563eb] transition-colors focus:border-[#2563eb] focus:ring-2"
+                                        value={formPanel.email}
+                                        onChange={handleChangePanel}
+                                        className={`w-full rounded-lg border bg-white px-4 py-2.5 text-[#334155] outline-none ring-[#2563eb] transition-colors focus:ring-2 ${
+                                            errorsPanel.email ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:border-[#2563eb]"
+                                        }`}
                                         placeholder="tu@email.com"
                                     />
+                                    {errorsPanel.email && (
+                                        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            {errorsPanel.email}
+                                        </p>
+                                    )}
+                                    {formPanel.email && !errorsPanel.email && (
+                                        <p className="mt-1 text-xs text-green-600 flex items-center gap-1">
+                                            <CheckCircle className="w-3 h-3" />
+                                            Email válido
+                                        </p>
+                                    )}
                                 </div>
                                 <div>
-                                    <label htmlFor="message" className="mb-2 block text-sm font-medium text-[#334155]">
-                                        Mensaje
+                                    <label htmlFor="mensaje" className="mb-2 block text-sm font-medium text-[#334155]">
+                                        Mensaje <span className="text-red-600">*</span>
                                     </label>
                                     <textarea
-                                        id="message"
+                                        id="mensaje"
                                         rows={4}
-                                        className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-[#334155] outline-none ring-[#2563eb] transition-colors focus:border-[#2563eb] focus:ring-2"
+                                        value={formPanel.mensaje}
+                                        onChange={handleChangePanel}
+                                        className={`w-full rounded-lg border bg-white px-4 py-2.5 text-[#334155] outline-none ring-[#2563eb] transition-colors resize-none focus:ring-2 ${
+                                            errorsPanel.mensaje ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:border-[#2563eb]"
+                                        }`}
                                         placeholder="¿En qué podemos ayudarte?"
                                     />
+                                    {errorsPanel.mensaje && (
+                                        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            {errorsPanel.mensaje}
+                                        </p>
+                                    )}
+                                    {formPanel.mensaje && !errorsPanel.mensaje && (
+                                        <p className="mt-1 text-xs text-green-600 flex items-center gap-1">
+                                            <CheckCircle className="w-3 h-3" />
+                                            Mensaje válido ({formPanel.mensaje.length} caracteres)
+                                        </p>
+                                    )}
+                                    <p className="mt-2 text-xs text-[#64748b]">Mínimo 10 caracteres</p>
                                 </div>
-                                <button className="w-full rounded-lg bg-[#2563eb] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#1d4ed8]">
-                                    Enviar Mensaje
+                                <button 
+                                    type="submit"
+                                    disabled={submitStatusPanel === "loading"}
+                                    className={`w-full rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors flex items-center justify-center gap-2 ${
+                                        submitStatusPanel === "loading"
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-[#2563eb] hover:bg-[#1d4ed8]"
+                                    }`}
+                                >
+                                    {submitStatusPanel === "loading" ? (
+                                        <>
+                                            <div className="animate-spin">
+                                                <Send className="w-4 h-4" />
+                                            </div>
+                                            Enviando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Send className="w-4 h-4" />
+                                            Enviar Mensaje
+                                        </>
+                                    )}
                                 </button>
                             </form>
                         </div>

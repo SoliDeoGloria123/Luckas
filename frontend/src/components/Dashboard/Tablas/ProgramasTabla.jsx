@@ -23,6 +23,41 @@ const ProgramasTabla = ({
   cargando,
   abrirModalCrear
 }) => {
+  // Funciones auxiliares para evitar duplicación
+  const esCurso = (programa) => programa.tipo === 'curso';
+  
+  const getIconoYGradient = (programa) => {
+    const esC = esCurso(programa);
+    return {
+      gradientClass: esC ? 'bg-gradient-to-r from-blue-600 to-indigo-600' : 'bg-gradient-to-r from-purple-600 to-violet-600',
+      IconComponent: esC ? BookOpen : GraduationCap
+    };
+  };
+  
+  const getBadgeClass = (programa) => {
+    const esC = esCurso(programa);
+    return {
+      badgeClass: esC ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800',
+      tipoTexto: esC ? 'Curso' : 'Programa Técnico'
+    };
+  };
+  
+  const getEstadoClass = (estado) => {
+    let estadoClass = 'bg-amber-100 text-amber-800';
+    if (estado === 'activo') estadoClass = 'bg-emerald-100 text-emerald-800';
+    else if (estado === 'inactivo') estadoClass = 'bg-red-100 text-red-800';
+    return estadoClass;
+  };
+  
+  const getDuracion = (programa) => {
+    if (typeof programa.duracion === 'object') {
+      const horas = programa.duracion?.horas || 0;
+      const semanas = programa.duracion?.semanas || 0;
+      return `${horas}h - ${semanas} sem`;
+    }
+    return programa.duracion || 'N/A';
+  };
+
   // Función auxiliar para renderizar el contenido apropiado
   const renderContenido = () => {
     if (cargando) {
@@ -42,12 +77,7 @@ const ProgramasTabla = ({
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
                 {(() => {
-                  const esCurso = programa.tipo === 'curso';
-                  const gradientClass = esCurso 
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
-                    : 'bg-gradient-to-r from-purple-600 to-violet-600';
-                  const IconComponent = esCurso ? BookOpen : GraduationCap;
-                  
+                  const { gradientClass, IconComponent } = getIconoYGradient(programa);
                   return (
                     <div className={`p-3 rounded-xl ${gradientClass}`}>
                       <IconComponent className="w-6 h-6 text-white" />
@@ -56,12 +86,7 @@ const ProgramasTabla = ({
                 })()}
                 <div>
                   {(() => {
-                    const esCurso = programa.tipo === 'curso';
-                    const badgeClass = esCurso
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-purple-100 text-purple-800';
-                    const tipoTexto = esCurso ? 'Curso' : 'Programa Técnico';
-                    
+                    const { badgeClass, tipoTexto } = getBadgeClass(programa);
                     return (
                       <span className={`px-2 py-1 text-xs font-medium rounded-lg ${badgeClass}`}>
                         {tipoTexto}
@@ -69,18 +94,10 @@ const ProgramasTabla = ({
                     );
                   })()}
                   {(() => {
-                    const estado = programa.estado;
-                    let estadoClass = 'bg-amber-100 text-amber-800'; // Por defecto
-                    
-                    if (estado === 'activo') {
-                      estadoClass = 'bg-emerald-100 text-emerald-800';
-                    } else if (estado === 'inactivo') {
-                      estadoClass = 'bg-red-100 text-red-800';
-                    }
-                    
+                    const estadoClass = getEstadoClass(programa.estado);
                     return (
                       <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-lg ${estadoClass}`}>
-                        {estado}
+                        {programa.estado}
                       </span>
                     );
                   })()}
@@ -133,14 +150,7 @@ const ProgramasTabla = ({
                 <div className="flex items-center space-x-2">
                   <Clock className="w-4 h-4 text-purple-600" />
                   <span className="text-slate-600">
-                    {(() => {
-                      if (typeof programa.duracion === 'object') {
-                        const horas = programa.duracion?.horas || 0;
-                        const semanas = programa.duracion?.semanas || 0;
-                        return `${horas}h - ${semanas} sem`;
-                      }
-                      return programa.duracion || 'N/A';
-                    })()}
+                    {getDuracion(programa)}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">

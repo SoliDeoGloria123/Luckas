@@ -11,10 +11,20 @@ const CategorizacionModal = ({
   onClose,
   onSubmit
 }) => {
+  // Efecto para manejar el scroll del body cuando el modal está abierto
+  React.useEffect(() => {
+    if (mostrar) {
+      // Desactivar scroll del body
+      document.body.style.overflow = 'hidden';
+      return () => {
+        // Reactivar scroll del body al cerrar el modal
+        document.body.style.overflow = 'auto';
+      };
+    }
+  }, [mostrar]);
   if (!mostrar) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 1100 }}>
       <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
         <div
           className="4sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
@@ -86,19 +96,19 @@ const CategorizacionModal = ({
               </div>
             </div>
             <div className="form-grupo-admin">
-            <label htmlFor="estado-categoria">Estado:</label>
-            <select
-              id="estado-categoria"
-              value={modoEdicion ? categoriaSeleccionada?.estado : nuevaCategoria.estado}
-              onChange={e =>
-                modoEdicion
-                  ? setCategoriaSeleccionada({ ...categoriaSeleccionada, estado: e.target.value })
-                  : setNuevaCategoria({ ...nuevaCategoria, estado: e.target.value })
-              }
-            >
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
+              <label htmlFor="estado-categoria">Estado:</label>
+              <select
+                id="estado-categoria"
+                value={modoEdicion ? categoriaSeleccionada?.estado : nuevaCategoria.estado}
+                onChange={e =>
+                  modoEdicion
+                    ? setCategoriaSeleccionada({ ...categoriaSeleccionada, estado: e.target.value })
+                    : setNuevaCategoria({ ...nuevaCategoria, estado: e.target.value })
+                }
+              >
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
             </div>
           </div>
         </div>

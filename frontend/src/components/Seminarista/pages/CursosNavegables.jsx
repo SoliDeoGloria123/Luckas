@@ -16,6 +16,7 @@ const CursosSeminario = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [activeFilter, setActiveFilter] = useState('todos');
   const [inscripcionLoading] = useState(false);
+  const [misInscripciones, setMisInscripciones] = useState([]);
 
   // Effect para manejar el cierre del modal con la tecla Escape
   useEffect(() => {
@@ -56,10 +57,36 @@ const CursosSeminario = () => {
   cargarCursos();
 }, []);
 
+// Cargar inscripciones del usuario
+useEffect(() => {
+  const cargarInscripciones = async () => {
+    try {
+      const { inscripcionService } = require('../../../services/inscripcionService');
+      const inscripciones = await inscripcionService.getAll();
+      const inscripcionesArray = Array.isArray(inscripciones) ? inscripciones : inscripciones.data || [];
+      setMisInscripciones(inscripcionesArray);
+    } catch (err) {
+      console.error('Error al cargar inscripciones:', err);
+    }
+  };
+  if (user) {
+    cargarInscripciones();
+  }
+}, [user]);
+
 
   
   const verDetalles = (curso) => {
     setCursoSeleccionado(curso);
+  };
+
+  // Verificar si el usuario ya está inscrito en un curso
+  const estaInscrito = (cursoId) => {
+    return misInscripciones.some(
+      insc =>
+      (insc.tipoReferencia === 'ProgramaAcademico' &&
+        (insc.referencia === cursoId || insc.referencia?._id === cursoId))
+    );
   };
 
   const filterCursos = (categoria) => {
@@ -240,12 +267,20 @@ const CursosSeminario = () => {
               return 'Sin descripción';
             })();
 
+            const inscrito = estaInscrito(curso._id);
             const isLleno = (curso.cuposDisponibles || 0) === 0;
             const availabilityClass = isLleno ? 'reserved' : '';
-            const availabilityText = isLleno ? 'Lleno' : 'Disponible';
+            
+            // Extraer ternario anidado a variable independiente (mejora SonarQube)
+            const availabilityText = (() => {
+              if (isLleno) return 'Lleno';
+              if (inscrito) return 'Inscrito';
+              return 'Disponible';
+            })();
 
             const inscribirLabel = (() => {
               if (inscripcionLoading) return 'Inscribiendo...';
+              if (inscrito) return 'Ya inscrito';
               if (isLleno) return 'Lleno';
               return 'Inscribirse';
             })();
@@ -342,10 +377,12 @@ const CursosSeminario = () => {
                   <button 
                     className="cabin-btn-cursos primary"
                     onClick={() => {
-                      setCursoSeleccionado(curso);
-                      setMostrarFormulario(true);
+                      if (!inscrito) {
+                        setCursoSeleccionado(curso);
+                        setMostrarFormulario(true);
+                      }
                     }}
-                    disabled={inscripcionLoading || isLleno}
+                    disabled={inscripcionLoading || isLleno || inscrito}
                   >
                     {inscribirLabel}
                   </button>
@@ -409,12 +446,13 @@ const CursosSeminario = () => {
         })();
 
         const inscribirModalLabel = (() => {
+          if (estaInscrito(cursoSeleccionado._id)) return 'Ya inscrito';
           if (inscripcionLoading) return 'Inscribiendo...';
           if ((cursoSeleccionado.cuposDisponibles || 0) === 0) return 'Sin Cupos';
           return 'Inscribirse Ahora';
         })();
 
-        const isModalDisabled = inscripcionLoading || (cursoSeleccionado.cuposDisponibles || 0) === 0;
+        const isModalDisabled = inscripcionLoading || (cursoSeleccionado.cuposDisponibles || 0) === 0 || estaInscrito(cursoSeleccionado._id);
 
         return (
         <div className="modal-overlay-programas">

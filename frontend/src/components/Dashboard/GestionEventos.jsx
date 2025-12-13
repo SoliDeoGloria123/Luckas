@@ -13,6 +13,91 @@ import {
 
 } from 'lucide-react';
 
+// ============ HELPERS CENTRALIZADOS ============
+
+// Helper genérico para extraer lista de respuesta API
+const extraerListaDeRespuesta = (respuesta) => {
+  if (!respuesta) return [];
+  if (Array.isArray(respuesta)) return respuesta;
+  if (respuesta.data && Array.isArray(respuesta.data)) return respuesta.data;
+  return [];
+};
+
+// Estado inicial del evento
+const EVENTO_INICIAL = {
+  nombre: "",
+  descripcion: "",
+  precio: 0,
+  categoria: "",
+  fechaEvento: "",
+  horaInicio: "",
+  horaFin: "",
+  lugar: "",
+  direccion: "",
+  duracionDias: 1,
+  cuposTotales: 0,
+  cuposDisponibles: 0,
+  prioridad: "Media",
+  active: true,
+  etiquetas: "",
+  observaciones: "",
+  imagen: ""
+};
+
+// Helper para obtener imágenes desde varios formatos
+const getImagesFromEvento = (evento) => {
+  if (!evento) return [];
+  if (Array.isArray(evento.imagen)) return evento.imagen;
+  if (evento.imagen) return [evento.imagen];
+  return [];
+};
+
+// Helper genérico para obtener datos
+const obtenerDatosGenerico = async (servicio, setState, onSuccess, errorMsg) => {
+  try {
+    const res = await servicio();
+    const lista = extraerListaDeRespuesta(res);
+    setState(lista);
+    if (onSuccess) onSuccess();
+  } catch (error) {
+    setState([]);
+    mostrarAlerta("Error", `${errorMsg}: ${error.message}`, 'error');
+  }
+};
+
+// Helper para filtrar eventos
+const filtrarEventos = (eventos, filtros) => {
+  return eventos.filter(evento => {
+    const texto = (filtros.busqueda || '').toLowerCase();
+    const campos = [
+      String(evento.nombre || '').toLowerCase(),
+      String(evento.descripcion || '').toLowerCase(),
+      String(evento.lugar || evento.ubicacion || '').toLowerCase(),
+      String(evento.direccion || '').toLowerCase(),
+      ...(Array.isArray(evento.etiquetas) ? evento.etiquetas.map(e => String(e).toLowerCase()) : []),
+      String(evento.categoria?.nombre || evento.categoria || '').toLowerCase(),
+      String(evento.categorizadoPor?.nombre || evento.coordinador || '').toLowerCase(),
+    ];
+
+    const cumpleBusqueda = !texto || campos.some(campo => campo.includes(texto));
+
+    const cumpleCategoria = filtros.categoria === 'todos' || 
+      (evento.categoria && (String(evento.categoria._id || evento.categoria) === String(filtros.categoria)));
+
+    let cumpleEstado = true;
+    if (filtros.estado && filtros.estado !== 'todos') {
+      const esActivo = evento.active === true || String(evento.estado || '').toLowerCase() === 'activo';
+      const esInactivo = evento.active === false || String(evento.estado || '').toLowerCase() === 'inactivo';
+      
+      if (filtros.estado === 'activo') cumpleEstado = esActivo;
+      else if (filtros.estado === 'inactivo') cumpleEstado = esInactivo;
+      else cumpleEstado = String(evento.estado || '').toLowerCase() === String(filtros.estado).toLowerCase();
+    }
+
+    return cumpleBusqueda && cumpleCategoria && cumpleEstado;
+  });
+};
+
 const GestionEventos = () => {
   const [eventos, setEventos] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -48,50 +133,27 @@ const GestionEventos = () => {
   });
   const [categorias, setCategorias] = useState([]);
 
-  // Obtener eventos
-  const obtenerEventos = async () => {
-    try {
-      const res = await eventService.getAllEvents();
-      // Aceptar respuesta en varios formatos: array directo o { success, data }
-      let lista = [];
-      if (res) {
-        if (Array.isArray(res)) lista = res;
-        else if (res.data && Array.isArray(res.data)) lista = res.data;
-        else if (res.success && Array.isArray(res.data)) lista = res.data;
-        else if (res.data) lista = res.data;
-      }
-      setEventos(lista);
-    } catch (error) {
-      setEventos([]);
-      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`, 'error');
+  // Obtener eventos y categorías
+  const obtenerEventos = () => obtenerDatosGenerico(
+    () => eventService.getAllEvents(),
+    setEventos,
+    null,
+    'No se pudieron obtener los eventos'
+  );
 
-    }
-  };
-
-  // Obtener categorías
-  const obtenerCategorias = async () => {
-    try {
-      const res = await categorizacionService.getAll();
-      let lista = [];
-      if (res) {
-        if (Array.isArray(res)) lista = res;
-        else if (res.data && Array.isArray(res.data)) lista = res.data;
-        else if (res.data) lista = res.data;
-      }
-      setCategorias(lista || []);
-      obtenerEstadisticas();
-    } catch (error) {
-      setCategorias([]);
-      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`, 'error');
-    }
-  };
+  const obtenerCategorias = () => obtenerDatosGenerico(
+    () => categorizacionService.getAll(),
+    setCategorias,
+    obtenerEstadisticas,
+    'No se pudieron obtener las categorías'
+  );
 
   useEffect(() => {
     obtenerEventos();
     obtenerCategorias();
   }, []);
 
-  //estadisticas de eventos
+  // Estadísticas de eventos
   const obtenerEstadisticas = async () => {
     try {
       const stats = await eventService.getEstadisticasGenerales();
@@ -101,10 +163,10 @@ const GestionEventos = () => {
     }
   };
 
-  // Función auxiliar para preparar FormData del evento
-  const prepararFormDataEvento = () => {
+  // Helper para preparar FormData del evento
+  const prepararFormDataEvento = (eventoData = nuevoEvento) => {
     const formData = new globalThis.FormData();
-    for (const [key, value] of Object.entries(nuevoEvento)) {
+    for (const [key, value] of Object.entries(eventoData)) {
       if (key === 'etiquetas' && typeof value === 'string') {
         for (const et of value.split(',')) {
           formData.append('etiquetas', et.trim());
@@ -113,128 +175,83 @@ const GestionEventos = () => {
         formData.append(key, value);
       }
     }
-    // Agregar imágenes
     for (const imgObj of selectedImages) {
       if (imgObj.file) formData.append('imagen', imgObj.file);
     }
     return formData;
   };
 
-  // Función auxiliar para resetear el formulario
-  const resetearFormulario = () => {
-    setMostrarModal(false);
-    resetearEstadoEvento();
+  // Helper para resetear estado
+  const resetearEstado = () => {
+    setNuevoEvento({ ...EVENTO_INICIAL });
     setSelectedImages([]);
-    obtenerEventos();
+    setModoEdicion(false);
+    setEventoSeleccionado(null);
   };
 
-  // Crear evento
-  const crearEvento = async (formDataFromModal = null, isFormData = false) => {
-    try {
-      if (formDataFromModal && isFormData) {
-        await eventService.createEvent(formDataFromModal, true);
-        mostrarAlerta("¡Éxito!", "Evento creado exitosamente con imágenes");
-      } else {
-        const formData = prepararFormDataEvento();
-        await eventService.createEvent(formData, true);
-        mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
-      }
-      resetearFormulario();
-    } catch (error) {
-      mostrarAlerta("Error", `Error al crear el evento: ${error.message}`, 'error');
-    }
+  // Funciones de modal - CRUD
+  const abrirModalCrear = () => {
+    setModoEdicion(false);
+    resetearEstado();
+    setMostrarModal(true);
   };
 
-  // Actualizar evento
-  const actualizarEvento = async () => {
-    try {
-      await eventService.updateEvent(eventoSeleccionado._id, eventoSeleccionado);
-      mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
-      setMostrarModal(false);
-      setEventoSeleccionado(null);
-      setModoEdicion(false);
-      obtenerEventos();
-    } catch (error) {
-      mostrarAlerta("Error", `Error al actualizar el evento: ${error.message}`, 'error');
-    }
-  };
-
-  // Eliminar evento
-  const eliminarEvento = async (id) => {
-    const confirmado = await mostrarConfirmacion(
-      "¿Estás seguro?",
-      "Esta acción eliminará el usuario de forma permanente."
-    );
-
-    if (!confirmado) return;
-    try {
-      await eventService.deleteEvent(id);
-      mostrarAlerta("¡Éxito!", "Evento eliminado exitosamente");
-      obtenerEventos();
-    } catch (error) {
-      mostrarAlerta("Error", `Error al eliminar el evento: ${error.message}`, 'error');
-    }
+  const abrirModalEditar = (evento) => {
+    setModoEdicion(true);
+    setEventoSeleccionado({ ...evento });
+    setMostrarModal(true);
   };
 
   const abrirModalVer = (evento) => {
     setEventoDetalle(evento);
     setMostrarModalDetalle(true);
   };
-  // Función auxiliar para resetear estado inicial del evento
-  const resetearEstadoEvento = () => {
-    setNuevoEvento({
-      nombre: "",
-      descripcion: "",
-      precio: 0,
-      categoria: "",
-      fechaEvento: "",
-      horaInicio: "",
-      horaFin: "",
-      lugar: "",
-      direccion: "",
-      duracionDias: 1,
-      cuposTotales: 0,
-      cuposDisponibles: 0,
-      prioridad: "Media",
-      active: true,
-      etiquetas: "",
-      observaciones: "",
-      imagen: ""
-    });
+
+  // Helper genérico para operaciones CRUD de eventos
+  const operarEvento = async (operacion, id = null, datos = null) => {
+    try {
+      switch (operacion) {
+        case 'crear': {
+          const formData = datos instanceof FormData ? datos : prepararFormDataEvento(datos);
+          await eventService.createEvent(formData, true);
+          mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
+          break;
+        }
+        case 'actualizar': {
+          await eventService.updateEvent(id || eventoSeleccionado._id, datos || eventoSeleccionado);
+          mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
+          break;
+        }
+        case 'eliminar': {
+          const confirmado = await mostrarConfirmacion(
+            "¿Estás seguro?",
+            "Esta acción eliminará el evento de forma permanente."
+          );
+          if (!confirmado) return;
+          await eventService.deleteEvent(id);
+          mostrarAlerta("¡Éxito!", "Evento eliminado exitosamente");
+          break;
+        }
+      }
+      setMostrarModal(false);
+      resetearEstado();
+      obtenerEventos();
+    } catch (error) {
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
+    }
   };
 
-  // Abrir modal para crear
-  const abrirModalCrear = () => {
-    setModoEdicion(false);
-    resetearEstadoEvento();
-    setMostrarModal(true);
+  const crearEvento = (formDataFromModal = null, isFormData = false) => {
+    const datos = isFormData ? formDataFromModal : null;
+    operarEvento('crear', null, datos);
   };
+
+  const actualizarEvento = () => operarEvento('actualizar');
+
+  const eliminarEvento = (id) => operarEvento('eliminar', id);
 
   // Filtrar eventos antes de la paginación
-  const eventosFiltrados = eventos.filter(evento => {
-    const texto = (filtros.busqueda || '').toLowerCase();
-    const nombre = String(evento.nombre || '').toLowerCase();
-    const descripcion = String(evento.descripcion || '').toLowerCase();
-    const lugar = String(evento.lugar || evento.ubicacion || '').toLowerCase();
-    const direccion = String(evento.direccion || '').toLowerCase();
-    const etiquetasArr = Array.isArray(evento.etiquetas) ? evento.etiquetas.map(e => String(e).toLowerCase()) : [];
-    const categoriaNombre = String(evento.categoria?.nombre || evento.categoria || '').toLowerCase();
-    const categorizadoPor = String(evento.categorizadoPor?.nombre || evento.coordinador || '').toLowerCase();
-
-    const cumpleBusqueda = !texto || nombre.includes(texto) || descripcion.includes(texto) || lugar.includes(texto) || direccion.includes(texto) || etiquetasArr.some(et => et.includes(texto)) || categoriaNombre.includes(texto) || categorizadoPor.includes(texto);
-
-    const cumpleCategoria = filtros.categoria === 'todos' || (evento.categoria && (String(evento.categoria._id || evento.categoria) === String(filtros.categoria)));
-
-    // Estado: preferir boolean 'active' en el modelo; si existe 'estado' usarlo también
-    let cumpleEstado = true;
-    if (filtros.estado && filtros.estado !== 'todos') {
-      if (filtros.estado === 'activo') cumpleEstado = evento.active === true || String(evento.estado || '').toLowerCase() === 'activo';
-      else if (filtros.estado === 'inactivo') cumpleEstado = evento.active === false || String(evento.estado || '').toLowerCase() === 'inactivo';
-      else cumpleEstado = String(evento.estado || '').toLowerCase() === String(filtros.estado).toLowerCase();
-    }
-
-    return cumpleBusqueda && cumpleCategoria && cumpleEstado;
-  });
+  const eventosFiltrados = filtrarEventos(eventos, filtros);
 
   // Paginación para eventos
   const [paginaActual, setPaginaActual] = useState(1);
@@ -244,24 +261,11 @@ const GestionEventos = () => {
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
-  // Abrir modal para editar
-  const abrirModalEditar = (evento) => {
-    setModoEdicion(true);
-    setEventoSeleccionado({ ...evento });
-    setMostrarModal(true);
-  };
-
-  // Helpers para el carrusel de imágenes del detalle
-  const getImagesFromDetalle = (detalle) => {
-    if (!detalle) return [];
-    if (Array.isArray(detalle.imagen)) return detalle.imagen;
-    if (detalle.imagen) return [detalle.imagen];
-    return [];
-  };
 
   useEffect(() => {
     setCarouselIndex(0);
   }, [eventoDetalle]);
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
       <Sidebar
@@ -436,22 +440,22 @@ const GestionEventos = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       {/* Carrusel */}
-                      {getImagesFromDetalle(eventoDetalle).length > 0 ? (
+                      {getImagesFromEvento(eventoDetalle).length > 0 ? (
                         <div>
                           <div className="relative mb-3">
                             <img
-                              src={getImagesFromDetalle(eventoDetalle)[carouselIndex]}
+                              src={getImagesFromEvento(eventoDetalle)[carouselIndex]}
                               alt={`Imagen evento ${carouselIndex + 1}`}
                               className="w-full h-56 object-cover rounded-lg"
                             />
-                            {getImagesFromDetalle(eventoDetalle).length > 1 && (
+                            {getImagesFromEvento(eventoDetalle).length > 1 && (
                               <>
                                 <button
                                   onClick={() => setCarouselIndex(i => Math.max(i - 1, 0))}
                                   className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
                                 >◀</button>
                                 <button
-                                  onClick={() => setCarouselIndex(i => Math.min(i + 1, getImagesFromDetalle(eventoDetalle).length - 1))}
+                                  onClick={() => setCarouselIndex(i => Math.min(i + 1, getImagesFromEvento(eventoDetalle).length - 1))}
                                   className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
                                 >▶</button>
                               </>
@@ -459,7 +463,7 @@ const GestionEventos = () => {
                           </div>
 
                           <div className="flex gap-2">
-                            {getImagesFromDetalle(eventoDetalle).map((img, idx) => (
+                            {getImagesFromEvento(eventoDetalle).map((img, idx) => (
                               <button
                                 key={img}
                                 type="button"

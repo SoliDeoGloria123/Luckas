@@ -13,77 +13,89 @@ import {
   Star
 } from 'lucide-react';
 
+// ============ HELPERS CENTRALIZADOS ============
+
+// Helper para obtener imágenes del evento
+const extraerImagenes = (evento) => {
+  return Array.isArray(evento.imagen) ? evento.imagen : [];
+};
+
+// Helper para formatear fechas con múltiples formatos
+const formatFecha = (f) => {
+  if (!f && f !== 0) return '';
+  const str = String(f).trim();
+  const d = new Date(str);
+  if (!Number.isNaN(d.getTime())) return d.toLocaleDateString('es-ES');
+
+  let sep = null;
+  if (str.includes('/')) {
+    sep = '/';
+  } else if (str.includes('-')) {
+    sep = '-';
+  }
+  if (sep) {
+    const parts = str.split(sep).map(p => p.trim());
+    if (parts.length === 3 && parts[2].length === 4) {
+      const [dd, mm, yyyy] = parts;
+      const reconstructed = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+      const d2 = new Date(reconstructed);
+      if (!Number.isNaN(d2.getTime())) return d2.toLocaleDateString('es-ES');
+    }
+  }
+  return str;
+};
+
+// Helper para obtener nombre de categoría
+const extraerCategoriaInfo = (categoria) => {
+  if (!categoria) return '';
+  if (typeof categoria === 'object') return categoria.nombre || categoria.title || '';
+  return '';
+};
+
+// Helper para parsear etiquetas
+const parsearEtiquetas = (etiquetasData) => {
+  if (Array.isArray(etiquetasData)) {
+    return etiquetasData;
+  } else if (etiquetasData) {
+    return String(etiquetasData).split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
+// Helper para obtener clases de estado
+const obtenerClasesEstado = (activo) => {
+  return activo
+    ? 'bg-emerald-500 text-white'
+    : 'bg-red-500 text-white';
+};
+
 const TablaEventos = ({ eventos = [], onEditar, onEliminar, onDeshabilitar, onVerDetalle }) => {
 
   // Estado para manejar el índice de imagen de cada evento
   const [imgIndices, setImgIndices] = useState({});
-  // Funciones para navegar en el carrusel
-  const prevImg = (eventoId, totalImages) => {
-    setImgIndices(prev => ({
-      ...prev,
-      [eventoId]: prev[eventoId] > 0 ? prev[eventoId] - 1 : totalImages - 1
-    }));
+  
+  // Factory function para navegar imágenes
+  const navegarImagen = (eventoId, totalImages, direccion) => {
+    setImgIndices(prev => {
+      const current = prev[eventoId] || 0;
+      if (direccion === 'prev') {
+        return { ...prev, [eventoId]: current > 0 ? current - 1 : totalImages - 1 };
+      } else {
+        return { ...prev, [eventoId]: current < totalImages - 1 ? current + 1 : 0 };
+      }
+    });
   };
+  // Renderizado condicional extraído
+  let contenidoEventos;
+  if (eventos.length > 0) {
+    contenidoEventos = eventos.map((evento) => {
+      const imagenes = extraerImagenes(evento);
+      const imgIndex = imgIndices[evento._id] || 0;
+      const categoriaNombre = extraerCategoriaInfo(evento.categoria);
+      const etiquetas = parsearEtiquetas(evento.etiquetas);
+      const clasesEstado = obtenerClasesEstado(evento.active);
 
-  const nextImg = (eventoId, totalImages) => {
-    setImgIndices(prev => ({
-      ...prev,
-      [eventoId]: prev[eventoId] < totalImages - 1 ? prev[eventoId] + 1 : 0
-    }));
-  };
-
-    // Renderizado condicional extraído para evitar ternarias anidadas en JSX
-    let contenidoEventos;
-    if (eventos.length > 0) {
-    contenidoEventos = (
-        eventos.map((evento) => {
-          const imagenes = Array.isArray(evento.imagen) ? evento.imagen : [];
-          const imgIndex = imgIndices[evento._id] || 0;
-
-          // Helper local para formatear fecha y seguridad de campos
-          const formatFecha = (f) => {
-            if (!f && f !== 0) return '';
-            const str = String(f).trim();
-            // intentar parse estándar
-            const d = new Date(str);
-            if (!Number.isNaN(d.getTime())) return d.toLocaleDateString('es-ES');
-
-            // intentar formatos dd/mm/yyyy o dd-mm-yyyy
-            let sep = null;
-            if (str.includes('/')) {
-              sep = '/';
-            } else if (str.includes('-')) {
-              sep = '-';
-            }
-            if (sep) {
-              const parts = str.split(sep).map(p => p.trim());
-              if (parts.length === 3 && parts[2].length === 4) {
-                const [dd, mm, yyyy] = parts;
-                const reconstructed = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
-                const d2 = new Date(reconstructed);
-                if (!Number.isNaN(d2.getTime())) return d2.toLocaleDateString('es-ES');
-              }
-            }
-            return str;
-          };
-
-          const categoriaNombre = (() => {
-            const c = evento.categoria;
-            if (!c) return '';
-            if (typeof c === 'object') return c.nombre || c.title || '';
-            return '';
-          })();
-
-          let etiquetas = [];
-          if (Array.isArray(evento.etiquetas)) {
-            etiquetas = evento.etiquetas;
-          } else if (evento.etiquetas) {
-            etiquetas = String(evento.etiquetas).split(',').map(s => s.trim()).filter(Boolean);
-          }
-
-          // (Se eliminó la variable `estadoClass` porque ahora usamos clases inline donde se requiere)
-
-          return (
+      return (
             <div key={evento._id} className="glass-card rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
               {/* Imagen del evento */}
               <div className="relative h-64 bg-gradient-to-r from-blue-500 to-purple-600">
@@ -99,14 +111,14 @@ const TablaEventos = ({ eventos = [], onEditar, onEliminar, onDeshabilitar, onVe
                     {imagenes.length > 1 && (
                       <>
                         <button
-                          onClick={() => prevImg(evento._id, imagenes.length)}
+                          onClick={() => navegarImagen(evento._id, imagenes.length, 'prev')}
                           className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
                           style={{ zIndex: 2 }}
                         >
                           {"<"}
                         </button>
                         <button
-                          onClick={() => nextImg(evento._id, imagenes.length)}
+                          onClick={() => navegarImagen(evento._id, imagenes.length, 'next')}
                           className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 text-blue-700 rounded-full p-2 shadow hover:bg-white"
                           style={{ zIndex: 2 }}
                         >
@@ -234,9 +246,7 @@ const TablaEventos = ({ eventos = [], onEditar, onEliminar, onDeshabilitar, onVe
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
                     <span className="text-slate-600">Estado:</span>
-                    <span className={`px-3 py-1 text-base font-medium rounded-full shadow-md ${
-                      evento.active ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
-                    }`}>
+                    <span className={`px-3 py-1 text-base font-medium rounded-full shadow-md ${clasesEstado}`}>
                       {evento.active ? 'Activo' : 'Inactivo'}
                     </span>
                   </div>
@@ -277,8 +287,7 @@ const TablaEventos = ({ eventos = [], onEditar, onEliminar, onDeshabilitar, onVe
               </div>
             </div>
           );
-        })
-    );
+        });
   } else {
     contenidoEventos = (
       <div className="col-span-full text-center py-12">

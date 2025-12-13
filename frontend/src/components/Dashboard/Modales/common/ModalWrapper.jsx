@@ -23,7 +23,7 @@ const ModalWrapper = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" style={{ zIndex: 1100 }}>
       <div className={`glass-card rounded-2xl shadow-2xl border border-white/20 w-full ${maxWidthClass} max-h-[90vh] overflow-y-auto bg-white`}>
         <div
           className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"

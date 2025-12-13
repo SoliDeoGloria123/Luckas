@@ -195,7 +195,7 @@ const Gestionusuarios = () => {
     <>
       <Header />
       <main className="main-content-tesorero">
-        <div className="page-header-tesorero">
+        <div className="page-header-tesorero responsive-header">
           <div className="card-header-tesorero">
             <button className="back-btn-tesorero" onClick={() => globalThis.history.back()}>
               <i className="fas fa-arrow-left"></i>
@@ -211,8 +211,8 @@ const Gestionusuarios = () => {
             Nuevo Usuario
           </button>
         </div>
-        <div className="stats-grid-usuarios">
-          <div className="stat-card-usuarios">
+        <div className="stats-grid-usuarios responsive-stats">
+          <div className="stat-card-usuarios responsive-stat-card">
             <div className="stat-icon-usuarios blue">
               <i className="fas fa-users"></i>
             </div>
@@ -221,7 +221,7 @@ const Gestionusuarios = () => {
               <div className="stat-label-usuarios">Total Usuarios</div>
             </div>
           </div>
-          <div className="stat-card-usuarios">
+          <div className="stat-card-usuarios responsive-stat-card">
             <div className="stat-icon-usuarios green">
               <i className="fas fa-user-check"></i>
             </div>
@@ -230,7 +230,7 @@ const Gestionusuarios = () => {
               <div className="stat-label-usuarios">Usuarios Activos</div>
             </div>
           </div>
-          <div className="stat-card-usuarios">
+          <div className="stat-card-usuarios responsive-stat-card">
             <div className="stat-icon-usuarios purple">
               <i className="fas fa-user-shield"></i>
             </div>
@@ -239,7 +239,7 @@ const Gestionusuarios = () => {
               <div className="stat-label-usuarios">Administradores</div>
             </div>
           </div>
-          <div className="stat-card-usuarios">
+          <div className="stat-card-usuarios responsive-stat-card">
             <div className="stat-icon-usuarios orange">
               <i className="fas fa-user-plus"></i>
             </div>
@@ -250,26 +250,27 @@ const Gestionusuarios = () => {
           </div>
         </div>
 
-        <div className="filters-section-tesorero">
-          <div className="search-filters-tesorero">
+        <div className="filters-section-tesorero responsive-filters">
+          <div className="search-filters-tesorero responsive-search-filters">
             <div className="search-input-container-tesorero">
               <i className="fas fa-search"></i>
               <input
                 type="text"
                 placeholder="Buscar usuarios..."
                 id="userSearch"
+                className="responsive-search-input"
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
-            <select className="filter-select" value={filterRole} onChange={(e) => setFilterRole(e.target.value)}>
+            <select className="filter-select responsive-select" value={filterRole} onChange={(e) => setFilterRole(e.target.value)}>
               <option value="">Todos los Roles</option>
               <option value="admin">Administrador</option>
               <option value="seminarista">Seminarista</option>
               <option value="tesorero">Tesorero</option>
               <option value="externo">Usuario Externo</option>
             </select>
-            <select id="statusFilter" className="filter-select" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+            <select id="statusFilter" className="filter-select responsive-select" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
               <option value="">Todos los Estados</option>
               <option value="activo">Activo</option>
               <option value="inactivo">Inactivo</option>
@@ -277,11 +278,11 @@ const Gestionusuarios = () => {
           </div>
          
         </div>
-        <div className="space-y-4">
+        <div className="space-y-4 responsive-container">
           <div className="rounded-xl bg-white p-6 shadow-sm">
-            <div className="overflow-hidden rounded-xl border border-[#334155]/10 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-[#334155]/10 bg-white shadow-sm responsive-table-container">
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full responsive-table">
                   <thead>
                     <tr className="border-b border-[#334155]/10 bg-[#f1f5f9]">
 

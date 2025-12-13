@@ -4,6 +4,7 @@ const Solicitud = require('../models/Solicitud');
 const Usuario = require('../models/User');
 const Cabana = require('../models/Cabana');
 const { notificarNuevaReserva } = require('../utils/notificationUtils');
+const { sendNotification } = require('../utils/notificationHelper');
 
 // Función auxiliar para validar campos requeridos
 const validarCamposRequeridos = (body) => {
@@ -256,8 +257,14 @@ exports.obtenerReservaPorId = async (req, res) => {
 // Actualizar reserva
 exports.actualizarReserva = async (req, res) => {
   try {
+    // Obtener la reserva actual antes de actualizar
+    const reservaActual = await Reserva.findById(req.params.id).populate('usuario', 'nombre apellido correo').populate('cabana', 'nombre');
+    if (!reservaActual) {
+      return res.status(404).json({ success: false, message: 'Reserva no encontrada' });
+    }
+
     // Forzar el campo activo a booleano si viene en el body
-  if (Object.hasOwn(req.body, 'activo')) {
+    if (Object.hasOwn(req.body, 'activo')) {
       let activo = req.body.activo;
       if (typeof activo === 'string') {
         activo = activo === 'true';
@@ -266,9 +273,47 @@ exports.actualizarReserva = async (req, res) => {
       }
       req.body.activo = activo;
     }
-    const reserva = await Reserva.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!reserva) return res.status(404).json({ success: false, message: 'Reserva no encontrada' });
-    res.json({ success: true, data: reserva });
+
+    const reservaActualizada = await Reserva.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!reservaActualizada) {
+      return res.status(404).json({ success: false, message: 'Reserva no encontrada' });
+    }
+
+    // 🔔 Enviar notificación si el estado cambió
+    const io = req.app.get('io');
+    if (req.body.estado && reservaActual.estado !== req.body.estado) {
+      const estadoNuevo = req.body.estado;
+      const usuarioId = reservaActual.usuario._id;
+      const cabanaName = reservaActual.cabana?.nombre || 'la cabaña';
+
+      if (estadoNuevo === 'Confirmada') {
+        await sendNotification(io, usuarioId, {
+          title: '✅ Reserva Confirmada',
+          message: `Tu reserva de la cabaña "${cabanaName}" ha sido confirmada.`,
+          icon: 'check-circle',
+          type: 'success'
+        });
+        console.log(`✅ Notificación de confirmación de reserva enviada a usuario ${usuarioId}`);
+      } else if (estadoNuevo === 'Cancelada') {
+        await sendNotification(io, usuarioId, {
+          title: '❌ Reserva Cancelada',
+          message: `Tu reserva de la cabaña "${cabanaName}" ha sido cancelada.`,
+          icon: 'times-circle',
+          type: 'error'
+        });
+        console.log(`❌ Notificación de cancelación de reserva enviada a usuario ${usuarioId}`);
+      } else if (estadoNuevo === 'finalizada') {
+        await sendNotification(io, usuarioId, {
+          title: '✔️ Reserva Finalizada',
+          message: `Tu reserva de la cabaña "${cabanaName}" ha sido finalizada.`,
+          icon: 'check',
+          type: 'info'
+        });
+        console.log(`✔️ Notificación de finalización de reserva enviada a usuario ${usuarioId}`);
+      }
+    }
+
+    res.json({ success: true, data: reservaActualizada });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

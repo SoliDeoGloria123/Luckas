@@ -56,6 +56,15 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
   // Calcular la fecha actual en formato YYYY-MM-DD
   const maxDate = getCurrentDate();
 
+  // Efecto para manejar el scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (mostrar) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = 'auto'; };
+    }
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [mostrar]);
+
   if (!mostrar) return null;
 
   const handleChange = (e) => {
@@ -89,6 +98,7 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
     const datosEnvio = buildSubmissionData(form);
     onSubmit(datosEnvio);
   };
+      
 
   const REPORT_TYPES = [
     { value: "usuarios", label: "Usuarios", icon: Users },
@@ -101,8 +111,9 @@ const ReporteModal = ({ mostrar, onClose, onSubmit, datosIniciales, modoEdicion 
     { value: "cabañas", label: "Cabañas", icon: Home },
   ]
 
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" style={{ zIndex: 1100 }}>
       <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white">        <ModalHeader 
           title={modoEdicion ? "Editar Reporte" : "Crear Nuevo Reporte"}
           onClose={onClose}

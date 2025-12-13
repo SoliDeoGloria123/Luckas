@@ -474,6 +474,19 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+.evento-btn:disabled {
+    background: linear-gradient(135deg, #93c5fd, #60a5fa);
+  color: var(--color-white);
+  cursor: not-allowed;
+  opacity: 0.8;
+  transform: none;
+}
+
+.evento-btn:disabled:hover {
+  box-shadow: var(--shadow-md);
+  transform: none;
+}
+
 /* Load More Section */
 .load-more-section {
   text-align: center;
@@ -540,27 +553,17 @@ body {
 
 /* Tarjeta de evento cuando el usuario está inscrito */
 .event-card-inscrito {
-  background: linear-gradient(120deg, #ffffff 60%, #ffffff 100%) !important;
-  opacity: 0.7;
-  filter: grayscale(0.2);
+  background: var(--color-white) !important;
+  opacity: 1;
+  filter: none;
   position: relative;
 }
 
 .event-card-inscrito .event-image img {
-  filter: grayscale(0.5);
-  opacity: 0.7;
+  filter: none;
+  opacity: 1;
 }
 
 .event-card-inscrito .inscrito-msg {
-  width: 100%;
-  text-align: center;
-  border-radius: 12px;
-  padding: 14px 0;
-  margin: 16px 0;
-  font-weight: bold;
-  color: #ff5252;
-  font-size: 1.15em;
-  letter-spacing: 1px;
-  box-shadow: 0 2px 12px #23243a44;
-  border: 2px solid #ff5252;
+  display: none;
 }

@@ -215,6 +215,7 @@ const InscripcionModal = ({ inscripcion, isOpen, onClose, onCancel }) => {
 
 InscripcionModal.propTypes = {
   inscripcion: PropTypes.shape({
+    _id: PropTypes.string,
     estado: PropTypes.string.isRequired,
     titulo: PropTypes.string,
     precio: PropTypes.string,

@@ -11,7 +11,7 @@ def test_login_page_loads_and_take_screenshot(page: Page):
     try:
         # Aumentar el timeout de la navegación por si la red es lenta
         page.goto(f"{BASE_URL}/login", timeout=60000)
-        page.screenshot(path="e2e_tests/screenshots/diagnostic_login_page.png", full_page=True)
+        page.screenshot(path="screenshots/diagnostic_login_page.png", full_page=True)
         print("\n📸 Captura de diagnóstico guardada en 'e2e_tests/screenshots/diagnostic_login_page.png'")
     except Exception as e:
         page.screenshot(path="e2e_tests/screenshots/diagnostic_error_page.png", full_page=True)

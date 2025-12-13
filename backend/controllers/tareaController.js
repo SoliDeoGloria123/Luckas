@@ -1,6 +1,7 @@
 const Tarea = require('../models/Tarea');
 const Usuario = require('../models/User');
 const mongoose = require('mongoose');
+const { notifyTaskAssigned } = require('../utils/notificationHelper');
 
 // Función auxiliar para validar IDs de ObjectId
 function validarObjectIds(asignadoA, finalAsignadoPor) {
@@ -161,6 +162,12 @@ exports.crearTarea = async (req, res) => {
 
         // Crear y guardar tarea
         const tareaPoblada = await crearYGuardarTarea(req.body);
+
+        // Enviar notificación al usuario asignado
+        const io = req.app.get('io');
+        if (io) {
+          await notifyTaskAssigned(io, asignadoA, tareaPoblada.titulo);
+        }
 
         res.status(201).json({
             success: true,

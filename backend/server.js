@@ -7,6 +7,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const path = require('node:path');
 const config = require('./config');
+const http = require('node:http');
+const { Server } = require('socket.io');
 
 async function startServer() {
 
@@ -26,6 +28,7 @@ const reporteguardarRoutes = require('./routes/reportesRoutes');
 const comentarioEventoRoutes = require('./routes/comentarioEventoRoutes');
 const certificadoRoutes = require('./routes/certificadoRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const contactoRoutes = require('./routes/contactoRoutes');
 
 // Inicializar Express
 const app = express();
@@ -120,6 +123,7 @@ app.use('/api/reporte', reporteguardarRoutes);
 app.use('/api/comentarios-evento', comentarioEventoRoutes);
 app.use('/api/certificados', certificadoRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/contacto', contactoRoutes);
 
 // Ruta para el login/admin - redirigir al frontend React
 app.get('/login', (req, res) => {
@@ -147,8 +151,47 @@ app.get('*', (req, res) => {
 
 //Inicio del servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT,()=>{
-    console.log(`Servidor en http://localhost:${PORT}`);
+
+// Crear servidor HTTP (necesario para Socket.IO)
+const server = http.createServer(app);
+
+// Configurar Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: [
+      'https://luckas.zapto.org',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:19006',
+      'https://localhost:3000',
+      'https://localhost:3001',
+      'https://localhost:19006',
+    ],
+    credentials: true
+  }
+});
+
+// Guardar io en app para que los controladores puedan usarlo
+app.set('io', io);
+
+// Manejo de conexiones Socket.IO
+io.on('connection', (socket) => {
+  // Unirse al room personal del usuario
+  socket.on('join-user', (userId) => {
+    if (userId) {
+      socket.join(`user_${userId}`);
+      console.log(`✅ Usuario ${userId} unido a su room`);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('❌ Socket desconectado:', socket.id);
+  });
+});
+
+// Usar server.listen en lugar de app.listen
+server.listen(PORT, () => {
+  console.log(`Servidor en http://localhost:${PORT}`);
 });
 }
 

@@ -2,6 +2,44 @@ import React from "react";
 import PropTypes from "prop-types";
 import { mostrarAlerta } from "../../utils/alertas";
 
+// Helpers para renderizado
+const renderField = (value) => value || "N/A";
+
+const renderDateTime = (date) => date ? new Date(date).toLocaleString() : "N/A";
+
+const renderNombreCompleto = (nombre, apellido) => {
+  if (nombre && apellido) return `${nombre} ${apellido}`;
+  if (nombre) return nombre;
+  if (apellido) return apellido;
+  return "N/A";
+};
+
+const renderTipoInscripcion = (tipoReferencia) => {
+  if (tipoReferencia === "Eventos") return "Evento";
+  if (tipoReferencia === "ProgramaAcademico") return "Programa académico";
+  return "N/A";
+};
+
+const renderEventoPrograma = (tipoReferencia, referencia, evento) => {
+  if (tipoReferencia === "Eventos") {
+    return referencia?.nombre || evento?.nombre || "N/A";
+  }
+  if (tipoReferencia === "ProgramaAcademico") {
+    return referencia?.nombre || "N/A";
+  }
+  return "N/A";
+};
+
+const renderEstadoClass = (estado) => {
+  return (estado || "pendiente").toLowerCase().trim().split(/\s+/).join('-');
+};
+
+const renderEstado = (estado) => (
+  <span className={`badge-estado estado-${renderEstadoClass(estado)}`}>
+    {estado || "Pendiente"}
+  </span>
+);
+
 const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => {
 
   const handleMostrarSolicitud = async (solicitud) => {
@@ -14,7 +52,7 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => {
       if (typeof solicitud === 'string') {
         const fullId = String(solicitud);
         try {
-          if (navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+          if (navigator?.clipboard?.writeText) {
             await navigator.clipboard.writeText(fullId);
             mostrarAlerta('Solicitud', `ID: ${fullId} (ID copiada al portapapeles)`, 'info');
           } else {
@@ -27,7 +65,6 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => {
         return;
       }
 
-      // solicitud es objeto
       const candidatoTitulo = solicitud.titulo || solicitud.nombre || solicitud.tipo || '';
       const usuario = solicitud.usuario?.nombre || solicitud.usuario || '';
       const estado = solicitud.estado ? `Estado: ${solicitud.estado}` : '';
@@ -65,57 +102,22 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => {
           </tr>
         </thead>
         <tbody>
-          {inscripciones.map((ins) => {
-            // Extraer ternarias anidadas a variables
-            let nombreCompleto = "N/A";
-            if (ins.nombre && ins.apellido) {
-              nombreCompleto = `${ins.nombre} ${ins.apellido}`;
-            } else if (ins.nombre) {
-              nombreCompleto = ins.nombre;
-            } else if (ins.apellido) {
-              nombreCompleto = ins.apellido;
-            }
-
-            let tipoInscripcion = "N/A";
-            if (ins.tipoReferencia === "Eventos") {
-              tipoInscripcion = "Evento";
-            } else if (ins.tipoReferencia === "ProgramaAcademico") {
-              tipoInscripcion = "Programa académico";
-            }
-
-            let eventoPrograma = "N/A";
-            if (ins.tipoReferencia === "Eventos") {
-              eventoPrograma = ins.referencia?.nombre || ins.evento?.nombre || "N/A";
-            } else if (ins.tipoReferencia === "ProgramaAcademico") {
-              eventoPrograma = ins.referencia?.nombre || "N/A";
-            }
-
-            // Sanitizar estado para clases CSS (reemplazar espacios por guiones)
-            const estadoClass = (ins.estado || "pendiente").toLowerCase().trim().split(/\s+/).join('-');
-
-            return (
-              <tr key={ins._id}>
-                <td >{nombreCompleto}</td>
-                <td>{ins.tipoDocumento || "N/A"}</td>
-                <td>{ins.numeroDocumento || "N/A"}</td>
-                <td>{ins.correo || "N/A"}</td>
-                <td>{ins.telefono || "N/A"}</td>
-                <td>{ins.edad || "N/A"}</td>
-                <td >{tipoInscripcion}</td>
-                <td>{eventoPrograma}</td>
-                <td>{ins.categoria?.nombre || "N/A"}</td>
-                <td>
-                  <span className={`badge-estado estado-${estadoClass}`}>
-                    {ins.estado || "Pendiente"}
-                  </span>
-                </td>
-                <td>{ins.observaciones || "N/A"}</td>
-                <td>
-                  {ins.fechaInscripcion
-                    ? new Date(ins.fechaInscripcion).toLocaleString()
-                    : "N/A"}
-                </td>
-                <td>{ins.solicitud ? (
+          {inscripciones.map((ins) => (
+            <tr key={ins._id}>
+              <td>{renderNombreCompleto(ins.nombre, ins.apellido)}</td>
+              <td>{renderField(ins.tipoDocumento)}</td>
+              <td>{renderField(ins.numeroDocumento)}</td>
+              <td>{renderField(ins.correo)}</td>
+              <td>{renderField(ins.telefono)}</td>
+              <td>{renderField(ins.edad)}</td>
+              <td>{renderTipoInscripcion(ins.tipoReferencia)}</td>
+              <td>{renderEventoPrograma(ins.tipoReferencia, ins.referencia, ins.evento)}</td>
+              <td>{renderField(ins.categoria?.nombre)}</td>
+              <td>{renderEstado(ins.estado)}</td>
+              <td>{renderField(ins.observaciones)}</td>
+              <td>{renderDateTime(ins.fechaInscripcion)}</td>
+              <td>
+                {ins.solicitud ? (
                   <button
                     className="text-blue-600 hover:underline"
                     onClick={() => handleMostrarSolicitud(ins.solicitud)}
@@ -125,18 +127,22 @@ const TablaInscripciones = ({ inscripciones, onEditar, onEliminar }) => {
                   </button>
                 ) : (
                   "N/A"
-                )}</td>
-                <td>
-                  <div className="acciones-botones">
-                    <button className="btn-action editar" onClick={() => onEditar(ins)}><i className="fas fa-edit"></i></button>
-                    {onEliminar && (
-                      <button className="btn-action eliminar" onClick={() => onEliminar(ins._id)}><i className="fas fa-trash"></i></button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
+                )}
+              </td>
+              <td>
+                <div className="acciones-botones">
+                  <button className="btn-action editar" onClick={() => onEditar(ins)}>
+                    <i className="fas fa-edit"></i>
+                  </button>
+                  {onEliminar && (
+                    <button className="btn-action eliminar" onClick={() => onEliminar(ins._id)}>
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

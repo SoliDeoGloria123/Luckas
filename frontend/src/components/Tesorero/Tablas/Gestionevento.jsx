@@ -16,34 +16,85 @@ import {
   Star
 } from 'lucide-react';
 
+// ============ HELPERS CENTRALIZADOS ============
+
+// Helper genérico para extraer lista de respuesta API
+const extraerListaDeRespuesta = (respuesta) => {
+  if (!respuesta) return [];
+  if (Array.isArray(respuesta)) return respuesta;
+  if (respuesta.data && Array.isArray(respuesta.data)) return respuesta.data;
+  return [];
+};
+
+// Helper para filtrado flexible
+const pasaFiltroGenerico = (objeto, filterValue, comparadores) => {
+  if (!filterValue || filterValue === '' || filterValue === 'todos') return true;
+  return comparadores.some(comp => comp(objeto, filterValue));
+};
 
 // Helpers para filtrado de eventos
 const pasaFiltroPorCategoriaEvento = (evento, filterCategoria) => {
-  if (!filterCategoria || filterCategoria === '' || filterCategoria === 'todos') return true;
   const cat = evento.categoria?._id || evento.categoria?.nombre || evento.categoria;
-  if (!cat) return false;
-  return String(cat) === String(filterCategoria) || String((evento.categoria?.nombre || '')).toLowerCase() === String(filterCategoria).toLowerCase();
+  return pasaFiltroGenerico(evento, filterCategoria, [
+    (e, val) => String(cat) === String(val),
+    (e, val) => String((e.categoria?.nombre || '')).toLowerCase() === String(val).toLowerCase(),
+  ]);
 };
 
 const pasaFiltroPorEstadoEvento = (evento, filterEstado) => {
-  if (!filterEstado || filterEstado === 'todos') return true;
-  const fs = String(filterEstado).toLowerCase();
-  if (fs === 'activo') return evento.active === true || (evento.estado && String(evento.estado).toLowerCase() === 'activo');
-  if (fs === 'inactivo') return evento.active === false || (evento.estado && String(evento.estado).toLowerCase() === 'inactivo');
-  // comparar por cadena si viene otro valor
-  return (evento.estado || '').toLowerCase() === fs;
+  const comparadores = [
+    (e, val) => String(val).toLowerCase() === 'activo' && (e.active === true || String(e.estado).toLowerCase() === 'activo'),
+    (e, val) => String(val).toLowerCase() === 'inactivo' && (e.active === false || String(e.estado).toLowerCase() === 'inactivo'),
+    (e, val) => (e.estado || '').toLowerCase() === String(val).toLowerCase(),
+  ];
+  return pasaFiltroGenerico(evento, filterEstado, comparadores);
 };
 
 const pasaFiltroPorBusquedaEvento = (evento, searchTerm) => {
   if (!searchTerm) return true;
   const q = String(searchTerm).trim().toLowerCase();
   if (!q) return true;
-  const nombre = (evento.nombre || '').toLowerCase();
-  const descripcion = (evento.descripcion || '').toLowerCase();
-  const lugar = (evento.lugar || '').toLowerCase();
-  const direccion = (evento.direccion || '').toLowerCase();
-  const categoria = (evento.categoria?.nombre || '').toLowerCase();
-  return [nombre, descripcion, lugar, direccion, categoria].some(f => f.includes(q));
+  const campos = [
+    (evento.nombre || '').toLowerCase(),
+    (evento.descripcion || '').toLowerCase(),
+    (evento.lugar || '').toLowerCase(),
+    (evento.direccion || '').toLowerCase(),
+    (evento.categoria?.nombre || '').toLowerCase(),
+  ];
+  return campos.some(campo => campo.includes(q));
+};
+
+// Helper para formatear fecha
+const formatFecha = (f) => {
+  if (!f && f !== 0) return '';
+  const str = String(f).trim();
+  const d = new Date(str);
+  if (!Number.isNaN(d.getTime())) return d.toLocaleDateString('es-ES');
+
+  let sep = null;
+  if (str.includes('/')) sep = '/';
+  else if (str.includes('-')) sep = '-';
+  
+  if (sep) {
+    const parts = str.split(sep).map(p => p.trim());
+    if (parts.length === 3 && parts[2].length === 4) {
+      const [dd, mm, yyyy] = parts;
+      const reconstructed = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+      const d2 = new Date(reconstructed);
+      if (!Number.isNaN(d2.getTime())) return d2.toLocaleDateString('es-ES');
+    }
+  }
+  return str;
+};
+
+// Helper para obtener imágenes desde varios formatos
+const getImagesFromEvento = (evento) => {
+  if (!evento) return [];
+  if (Array.isArray(evento.imagen)) return evento.imagen;
+  if (Array.isArray(evento.imagenes)) return evento.imagenes;
+  if (Array.isArray(evento.images)) return evento.images;
+  if (evento.imagen && typeof evento.imagen === 'string') return [evento.imagen];
+  return [];
 };
 
 const Gestionevento = () => {
@@ -72,76 +123,41 @@ const Gestionevento = () => {
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
   const [estadisticas, setEstadisticas] = useState({ totalEvents: 0, upcoming: 0, completed: 0, cancelled: 0 });
 
-  // Helper local para formatear fecha de forma segura
-  const formatFecha = (f) => {
-    if (!f && f !== 0) return '';
-    const str = String(f).trim();
-    const d = new Date(str);
-    if (!Number.isNaN(d.getTime())) return d.toLocaleDateString('es-ES');
-
-    // intentar formatos dd/mm/yyyy o dd-mm-yyyy
-    let sep = null;
-    if (str.includes('/')) sep = '/';
-    else if (str.includes('-')) sep = '-';
-    if (sep) {
-      const parts = str.split(sep).map(p => p.trim());
-      if (parts.length === 3 && parts[2].length === 4) {
-        const [dd, mm, yyyy] = parts;
-        const reconstructed = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
-        const d2 = new Date(reconstructed);
-        if (!Number.isNaN(d2.getTime())) return d2.toLocaleDateString('es-ES');
-      }
+  // Helper genérico para obtener datos
+  const obtenerDatos = async (servicio, setState, onSuccess, errorMsg) => {
+    try {
+      const res = await servicio();
+      const lista = extraerListaDeRespuesta(res);
+      setState(lista);
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      setState([]);
+      mostrarAlerta("Error", `${errorMsg}: ${error.message}`, 'error');
     }
-    return str;
   };
-
-
 
   // Obtener eventos
-  const obtenerEventos = async () => {
-    try {
-      const res = await eventService.getAllEvents();
-      // Aceptar respuesta en varios formatos: array directo o { success, data }
-      let lista = [];
-      if (res) {
-        if (Array.isArray(res)) lista = res;
-        else if (res.data && Array.isArray(res.data)) lista = res.data;
-        else if (res.success && Array.isArray(res.data)) lista = res.data;
-        else if (res.data) lista = res.data;
-      }
-      console.debug('EVENTOS RECIBIDOS:', lista);
-      setEventos(lista);
-    } catch (error) {
-      setEventos([]);
-      mostrarAlerta("Error", `No se pudieron obtener los eventos: ${error.message}`, 'error');
-
-    }
-  };
+  const obtenerEventos = () => obtenerDatos(
+    () => eventService.getAllEvents(),
+    setEventos,
+    null,
+    'No se pudieron obtener los eventos'
+  );
 
   // Obtener categorías
-  const obtenerCategorias = async () => {
-    try {
-      const res = await categorizacionService.getAll();
-      let lista = [];
-      if (res) {
-        if (Array.isArray(res)) lista = res;
-        else if (res.data && Array.isArray(res.data)) lista = res.data;
-        else if (res.data) lista = res.data;
-      }
-      setCategorias(lista || []);
-      obtenerEstadisticas();
-    } catch (error) {
-      setCategorias([]);
-      mostrarAlerta("Error", `No se pudieron obtener las categorías: ${error.message}`, 'error');
-    }
-  };
+  const obtenerCategorias = () => obtenerDatos(
+    () => categorizacionService.getAll(),
+    setCategorias,
+    obtenerEstadisticas,
+    'No se pudieron obtener las categorías'
+  );
 
   useEffect(() => {
     obtenerEventos();
     obtenerCategorias();
   }, []);
 
-  //estadisticas de eventos
+  // Estadísticas de eventos
   const obtenerEstadisticas = async () => {
     try {
       const stats = await eventService.getEstadisticasGenerales();
@@ -151,8 +167,7 @@ const Gestionevento = () => {
     }
   };
 
-  // Estado de carga y filtrado
-  // Estado de carga y filtrado (aplica buscador y filtros)
+  // Estado de filtrado
   const eventosFiltrados = (eventos || []).filter((ev) => {
     return pasaFiltroPorCategoriaEvento(ev, filterCategoria) &&
            pasaFiltroPorEstadoEvento(ev, filterEstado) &&
@@ -163,49 +178,45 @@ const Gestionevento = () => {
   const [imgIndices, setImgIndices] = useState({});
   const [carouselIndex, setCarouselIndex] = useState(0);
 
-  // Helper: obtiene las imágenes desde el objeto de detalle (soporta varias claves)
-  const getImagesFromDetalle = (detalle) => {
-    if (!detalle) return [];
-    if (Array.isArray(detalle.imagen)) return detalle.imagen;
-    if (Array.isArray(detalle.imagenes)) return detalle.imagenes;
-    if (Array.isArray(detalle.images)) return detalle.images;
-    if (detalle.imagen && typeof detalle.imagen === 'string') return [detalle.imagen];
-    return [];
-  };
-  const prevImg = (eventoId, totalImages) => {
-    setImgIndices(prev => ({
-      ...prev,
-      [eventoId]: prev[eventoId] > 0 ? prev[eventoId] - 1 : totalImages - 1
-    }));
-  };
-  const nextImg = (eventoId, totalImages) => {
-    setImgIndices(prev => ({
-      ...prev,
-      [eventoId]: prev[eventoId] < totalImages - 1 ? prev[eventoId] + 1 : 0
-    }));
+  // Helper unificado para navegación de imágenes
+  const navegarImagen = (eventoId, totalImages, direction) => {
+    setImgIndices(prev => {
+      const currentIndex = prev[eventoId] || 0;
+      let newIndex;
+      if (direction === 'next') {
+        newIndex = currentIndex < totalImages - 1 ? currentIndex + 1 : 0;
+      } else {
+        newIndex = currentIndex > 0 ? currentIndex - 1 : totalImages - 1;
+      }
+      return { ...prev, [eventoId]: newIndex };
+    });
   };
 
+  const prevImg = (eventoId, totalImages) => navegarImagen(eventoId, totalImages, 'prev');
+  const nextImg = (eventoId, totalImages) => navegarImagen(eventoId, totalImages, 'next');
+
+  // Modales y handlers
   const abrirModalVer = (evento) => {
     setEventoDetalle(evento);
     setMostrarModalDetalle(true);
   };
 
-  // Alias para mantener la API usada por el markup (onVerDetalle/onEditar)
   const onVerDetalle = abrirModalVer;
 
+  const resetNuevoEvento = () => ({
+    nombre: '',
+    descripcion: '',
+    fecha: '',
+    capacidad: '',
+    ubicacion: '',
+    categoria: '',
+    estado: 'activo'
+  });
 
   const handleCreate = () => {
     setModoEdicion(false);
     setEventoSeleccionado(null);
-    setNuevoEvento({
-      nombre: '',
-      descripcion: '',
-      fecha: '',
-      capacidad: '',
-      ubicacion: '',
-      categoria: '',
-      estado: 'activo'
-    });
+    setNuevoEvento(resetNuevoEvento());
     setSelectedImages([]);
     setMostrarModal(true);
   };
@@ -215,44 +226,44 @@ const Gestionevento = () => {
     setEventoSeleccionado(evento);
     setMostrarModal(true);
   };
+
   const onEditar = handleEdit;
 
-  // Funciones para el modal del Dashboard
-  const crearEvento = async (payload) => {
-    // El modal puede llamar al handler pasando los datos (payload)
-    // o puede invocarlo como handler de formulario (event). Adaptamos ambos casos.
+  // Helper para manejar llamadas que pueden venir como event o payload
+  const manejarSubmitEvento = (esEdicion) => async (payload) => {
     try {
-      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
-      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevoEvento;
+      if (payload && typeof payload.preventDefault === 'function') {
+        payload.preventDefault();
+      }
+      const isEvent = payload && typeof payload.preventDefault === 'function';
+      let body;
+      if (isEvent) {
+        body = esEdicion ? (eventoSeleccionado || nuevoEvento) : nuevoEvento;
+      } else {
+        body = payload;
+      }
       const isFormData = (typeof FormData !== 'undefined') && (body instanceof FormData);
-      await eventService.createEvent(body, isFormData);
-      mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
-      setMostrarModal(false);
-      obtenerEventos();
-    } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
-    }
-  };
-
-  const actualizarEvento = async (payload) => {
-    // Soportar llamadas con event (desde un submit directo) o con datos (desde el modal)
-    try {
-      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
-      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : (eventoSeleccionado || nuevoEvento);
-      const isFormData = (typeof FormData !== 'undefined') && (body instanceof FormData);
-      const id = (body && body._id) ? body._id : (eventoSeleccionado && eventoSeleccionado._id);
-      if (!id) {
+      const id = body?._id;
+      
+      if (esEdicion && !id) {
         mostrarAlerta('Error', 'No se encontró el ID del evento a actualizar');
         return;
       }
-      await eventService.updateEvent(id, body, isFormData);
-      mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
+      
+      esEdicion 
+        ? await eventService.updateEvent(id, body, isFormData)
+        : await eventService.createEvent(body, isFormData);
+      
+      mostrarAlerta("¡Éxito!", `Evento ${esEdicion ? 'actualizado' : 'creado'} exitosamente`);
       setMostrarModal(false);
       obtenerEventos();
     } catch (error) {
       mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
+
+  const crearEvento = manejarSubmitEvento(false);
+  const actualizarEvento = manejarSubmitEvento(true);
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
@@ -598,22 +609,22 @@ const Gestionevento = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     {/* Carrusel */}
-                    {getImagesFromDetalle(eventoDetalle).length > 0 ? (
+                    {getImagesFromEvento(eventoDetalle).length > 0 ? (
                       <div>
                         <div className="relative mb-3">
                           <img
-                            src={getImagesFromDetalle(eventoDetalle)[carouselIndex]}
+                            src={getImagesFromEvento(eventoDetalle)[carouselIndex]}
                             alt={`Imagen evento ${carouselIndex + 1}`}
                             className="w-full h-56 object-cover rounded-lg"
                           />
-                          {getImagesFromDetalle(eventoDetalle).length > 1 && (
+                          {getImagesFromEvento(eventoDetalle).length > 1 && (
                             <>
                               <button
                                 onClick={() => setCarouselIndex(i => Math.max(i - 1, 0))}
                                 className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
                               >◀</button>
                               <button
-                                onClick={() => setCarouselIndex(i => Math.min(i + 1, getImagesFromDetalle(eventoDetalle).length - 1))}
+                                onClick={() => setCarouselIndex(i => Math.min(i + 1, getImagesFromEvento(eventoDetalle).length - 1))}
                                 className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
                               >▶</button>
                             </>
@@ -621,7 +632,7 @@ const Gestionevento = () => {
                         </div>
 
                         <div className="flex gap-2">
-                          {getImagesFromDetalle(eventoDetalle).map((img, idx) => (
+                          {getImagesFromEvento(eventoDetalle).map((img, idx) => (
                             <button
                               key={img}
                               type="button"

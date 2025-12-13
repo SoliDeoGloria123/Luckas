@@ -2,9 +2,73 @@ import React from "react";
 import PropTypes from "prop-types";
 import { mostrarAlerta } from "../../utils/alertas";
 
+// ============ HELPERS CENTRALIZADOS ============
+
+// Helper genérico para renderizar campos
+const renderField = (value) => value || "N/A";
+
+const renderDate = (date) => date ? new Date(date).toLocaleDateString() : "N/A";
+
 const renderEstadoActivo = (activo) => {
   if (activo === undefined) return 'N/A';
   return activo ? 'Activo' : 'Desactivado';
+};
+
+// Helper para obtener nombre completo o fallback
+const getNombreUsuario = (usuario) => {
+  if (typeof usuario === "object" && usuario) {
+    const nombreCompleto = `${usuario.nombre || ""} ${usuario.apellido || ""}`.trim();
+    return nombreCompleto || usuario.username || usuario.correo || usuario._id || "N/A";
+  }
+  return usuario || "N/A";
+};
+
+const renderUsuario = (usuario) => getNombreUsuario(usuario);
+
+const renderCabana = (cabana) => {
+  if (typeof cabana === "object" && cabana) {
+    return cabana.nombre || cabana._id || "N/A";
+  }
+  return cabana || "N/A";
+};
+
+const renderEstado = (estado) => (
+  <span className={`badge-estado estado-${(estado || "pendiente").toLowerCase()}`}>
+    {estado || "Pendiente"}
+  </span>
+);
+
+// Helper para copiar al portapapeles con manejo de errores
+const copiarAlPortapapeles = async (texto) => {
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(texto);
+      return true;
+    }
+  } catch (err) {
+    console.warn('No se pudo copiar al portapapeles', err);
+  }
+  return false;
+};
+
+// Helper para construir mensaje de solicitud string
+const construirMensajeSolicitudString = (solicitudId) => {
+  return `ID: ${solicitudId}`;
+};
+
+// Helper para construir mensaje de solicitud objeto
+const construirMensajeSolicitudObjeto = (solicitud) => {
+  const partes = [
+    solicitud.titulo || solicitud.nombre || solicitud.tipo || '',
+    solicitud.usuario?.nombre || solicitud.usuario || '',
+    solicitud.estado ? `Estado: ${solicitud.estado}` : '',
+    solicitud.fecha ? `Fecha: ${new Date(solicitud.fecha).toLocaleDateString()}` : ''
+  ].filter(Boolean);
+  
+  const mensajeResumen = partes.join(' • ') || 'Solicitud registrada';
+  const id = solicitud._id ? `ID: ${solicitud._id}` : '';
+  
+  return id ? `${mensajeResumen} • ${id}` : mensajeResumen;
 };
 
 const TablaReservas = ({ reservas, onEditar, onEliminar }) => {
@@ -15,35 +79,23 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => {
     }
 
     try {
-      if (typeof solicitud === 'string') {
-        const fullId = String(solicitud);
-        try {
-          if (navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-            await navigator.clipboard.writeText(fullId);
-            mostrarAlerta('Solicitud', `ID: ${fullId} (ID copiada al portapapeles)`, 'info');
-          } else {
-            mostrarAlerta('Solicitud', `ID: ${fullId}`, 'info');
-          }
-        } catch (err) {
-          console.warn('No se pudo copiar ID al portapapeles', err);
-          mostrarAlerta('Solicitud', `ID: ${fullId}`, 'info');
-        }
-        return;
-      }
+      const mensaje = typeof solicitud === 'string'
+        ? construirMensajeSolicitudString(solicitud)
+        : construirMensajeSolicitudObjeto(solicitud);
 
-      // solicitud es objeto
-      const candidatoTitulo = solicitud.titulo || solicitud.nombre || solicitud.tipo || '';
-      const usuario = solicitud.usuario?.nombre || solicitud.usuario || '';
-      const estado = solicitud.estado ? `Estado: ${solicitud.estado}` : '';
-      const fecha = solicitud.fecha ? `Fecha: ${new Date(solicitud.fecha).toLocaleDateString()}` : '';
-      const id = solicitud._id ? `ID: ${solicitud._id}` : '';
-      const partes = [candidatoTitulo, usuario, estado, fecha].filter(Boolean);
-      const mensajeResumen = partes.join(' • ') || 'Solicitud registrada';
-      const mensaje = id ? `${mensajeResumen} • ${id}` : mensajeResumen;
-      mostrarAlerta('Solicitud', mensaje, 'info');
+      // Intentar copiar al portapapeles si es string
+      if (typeof solicitud === 'string') {
+        const copiado = await copiarAlPortapapeles(solicitud);
+        const mensajeFinal = copiado
+          ? `${mensaje} (ID copiada al portapapeles)`
+          : mensaje;
+        mostrarAlerta('Solicitud', mensajeFinal, 'info');
+      } else {
+        mostrarAlerta('Solicitud', mensaje, 'info');
+      }
     } catch (err) {
       console.error('Error mostrando solicitud', err);
-      mostrarAlerta('ERROR', 'No se pudo mostrar la solicitud', 'error');
+      mostrarAlerta("ERROR", 'No se pudo mostrar la solicitud', 'error');
     }
   };
 
@@ -76,51 +128,34 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => {
 
             {reservas.map((reserva) => (
               <tr key={reserva._id}>
+                <td>{renderUsuario(reserva.usuario)}</td>
+                <td>{renderCabana(reserva.cabana)}</td>
+                <td>{renderDate(reserva.fechaInicio)}</td>
+                <td>{renderDate(reserva.fechaFin)}</td>
+                <td>{renderField(reserva.numeroPersonas)}</td>
+                <td>{renderField(reserva.tipoDocumento)}</td>
+                <td>{renderField(reserva.numeroDocumento)}</td>
+                <td>{renderField(reserva.correoElectronico)}</td>
+                <td>{renderField(reserva.telefono)}</td>
+                <td>{renderField(reserva.propositoEstadia)}</td>
+                <td>{renderEstado(reserva.estado)}</td>
+                <td>{renderField(reserva.observaciones)}</td>
                 <td>
-                  {typeof reserva.usuario === "object"
-                    ? `${reserva.usuario?.nombre || ""} ${reserva.usuario?.apellido || ""}`.trim() ||
-                    reserva.usuario?.username ||
-                    reserva.usuario?.correo ||
-                    reserva.usuario?._id ||
+                  {reserva.solicitud ? (
+                    <button
+                      className="text-blue-600 hover:underline"
+                      onClick={() => handleMostrarSolicitud(reserva.solicitud)}
+                      title="Ver solicitud"
+                    >
+                      Ver solicitud
+                    </button>
+                  ) : (
                     "N/A"
-                    : reserva.usuario || "N/A"}
+                  )}
                 </td>
-                <td>
-                  {typeof reserva.cabana === "object"
-                    ? reserva.cabana?.nombre || reserva.cabana?._id || "N/A"
-                    : reserva.cabana || "N/A"}
-                </td>
-                <td>{reserva.fechaInicio ? new Date(reserva.fechaInicio).toLocaleDateString() : ""}</td>
-                <td>{reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : ""}</td>
-
-                <td>{reserva.numeroPersonas || "N/A"}</td>
-                <td>{reserva.tipoDocumento || "N/A"}</td>
-                <td>{reserva.numeroDocumento || "N/A"}</td>
-                <td>{reserva.correoElectronico || "N/A"}</td>
-                <td>{reserva.telefono || "N/A"}</td>
-                <td>{reserva.propositoEstadia || "N/A"}</td>
-                <td>
-                  <span className={`badge-estado estado-${(reserva.estado || "pendiente").toLowerCase()}`}>
-                    {reserva.estado || "Pendiente"}
-                  </span>
-                </td>
-                <td>{reserva.observaciones || "N/A"}</td>
-                <td>{reserva.solicitud ? (
-                  <button
-                    className="text-blue-600 hover:underline"
-                    onClick={() => handleMostrarSolicitud(reserva.solicitud)}
-                    title="Ver solicitud"
-                  >
-                    Ver solicitud
-                  </button>
-                ) : (
-                  "N/A"
-
-                )}</td>
-
                 <td>{renderEstadoActivo(reserva.activo)}</td>
-                <td>{reserva.createdAt ? new Date(reserva.createdAt).toLocaleDateString() : "N/A"}</td>
-                <td>{reserva.updatedAt ? new Date(reserva.updatedAt).toLocaleDateString() : "N/A"}</td>
+                <td>{renderDate(reserva.createdAt)}</td>
+                <td>{renderDate(reserva.updatedAt)}</td>
                 <td>
                   <div className="acciones-botones">
                     <button className="btn-action editar" onClick={() => onEditar(reserva)}>
@@ -131,12 +166,9 @@ const TablaReservas = ({ reservas, onEditar, onEliminar }) => {
                         <i className="fas fa-trash"></i>
                       </button>
                     )}
-
-
                   </div>
                 </td>
               </tr>
-
             ))}
           </tbody>
         </table>

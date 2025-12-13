@@ -70,6 +70,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-xl);
+  min-height: 70px;
 }
 
 .header-left-seminario {
@@ -96,7 +97,6 @@
   line-height: 52px;
   text-align: left;
   white-space: nowrap;
-  z-index: 6;
 }
 
 .role-badge-seminario {
@@ -219,6 +219,13 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  position: relative;
+}
+
+/* Wrapper del NotificationCenter - z-index muy alto para estar por encima de todo */
+.notification-center-wrapper {
+  position: relative;
+  z-index: 9999;
 }
 
 .icon-btn-seminario {
@@ -269,14 +276,18 @@
 .user-profile-seminario {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-sm) var(--spacing-lg);
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
   background: rgba(255, 255, 255, 0.1);
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  border: none;
+  min-width: fit-content;
+  white-space: nowrap;
 }
+
 .user-profile-seminario:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
@@ -308,6 +319,16 @@
 .user-menu-container {
   position: relative;
   display: inline-block;
+  min-width: max-content;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .user-menu-container {
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+  }
 }
 .user-info-seminario{
     display: flex;
@@ -329,46 +350,63 @@
 
 .user-dropdown-header {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   right: 0;
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   min-width: 200px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.2s;
-  z-index: 1000;
+  transform: translateY(-10px) scale(0.95);
+  transition: all 0.2s ease;
+  z-index: 2000;
+  padding: 0;
+  pointer-events: none;
 }
 
 .user-dropdown-header.show {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 .dropdown-item {
-  display: flex;
-  align-items: center;
-  padding: 0.7rem 1rem;
-  gap: 0.5rem;
+  display: block;
+  padding: 12px 16px;
   color: #374151;
   text-decoration: none;
   font-size: 0.9rem;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  background: transparent;
+}
+
+.dropdown-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.dropdown-item:last-child {
+  border-radius: 0 0 8px 8px;
 }
 
 .dropdown-item:hover {
-  background: #0156ff;
+  background: #f1f5f9;
+  color: #2563eb;
+  padding-left: 20px;
 }
 
 .dropdown-divider {
   border: none;
   height: 1px;
-  background: #e5e7eb;
-  margin: 0.3rem 0;
+  background: #e2e8f0;
+  margin: 0;
+  padding: 0;
 }
 /* Mobile Menu Overlay */
 .mobile-menu-overlay {
@@ -595,201 +633,19 @@
   }
 }
 
-/* Tablet Mediana (577px - 768px) - Inicio del menú móvil */
+/* Tablet Mediana (577px - 768px) */
 @media (max-width: 768px) and (min-width: 577px) {
-  .header-seminario {
-    padding: 12px 0;
-  }
-  
-  .header-container-seminario {
-    padding: 0 var(--spacing-md);
-    gap: var(--spacing-sm);
-  }
-  
-  .mobile-menu-toggle {
-    display: flex !important;
-    order: -1;
-  }
-  
-  .mobile-menu-overlay {
-    display: block;
-  }
-  
-  .header-nav-seminario {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, var(--color-gray-dark) 0%, var(--color-gray-800) 100%);
-    flex-direction: column;
-    align-items: stretch;
-    padding: var(--spacing-lg);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    border-top: 2px solid var(--color-blue-primary);
-    border-radius: 0 0 12px 12px;
-    transform: translateY(-100%);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 999;
-    backdrop-filter: blur(10px);
-  }
-  
-  .header-nav-seminario.mobile-open {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  .luckas-seminario {
-    font-size: 40px;
-    height: 36px;
-    line-height: 36px;
-  }
-  
-  .role-badge-seminario {
-    font-size: 0.8rem;
-    padding: 4px 10px;
-    margin-left: 6px;
-  }
-  
-  .nav-item-seminario {
-    padding: 16px;
-    font-size: 1rem;
-    font-weight: 500;
-    border-radius: 10px;
-    margin-bottom: 4px;
-    border: 1px solid transparent;
-  }
-  
-  .nav-item-seminario:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateX(5px);
-  }
-  
-  .nav-item-seminario.active {
-    background: var(--color-blue-primary);
-    border-color: var(--color-blue-light);
-    transform: translateX(5px);
-  }
-  
-  .nav-icon-seminario {
-    font-size: 1.1rem;
-    margin-right: 8px;
-  }
-  
-  .header-icons-seminario {
-    gap: 8px;
-  }
-  
-  .icon-btn-seminario {
-    padding: 8px;
-  }
-  
-  .user-profile-seminario {
-    gap: 8px;
-    padding: 6px 10px;
-  }
-  
-  .user-avatar-seminario {
-    width: 36px;
-    height: 36px;
-    font-size: 0.9rem;
-  }
-  
-  .user-info-seminario {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .user-name-seminario {
-    font-size: 0.85rem;
-  }
-  
-  .user-role-seminario {
-    font-size: 0.7rem;
-  }
-  
-  .dropdown-menu-seminario {
-    position: static;
-    background: var(--color-gray-800);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: none;
-    border-radius: 8px;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    margin-top: 8px;
-  }
-  
-  .dropdown-container-seminario {
-    flex-direction: column;
-    padding: 8px;
-    gap: 4px;
-  }
-  
-  .dropdown-item-seminario {
-    padding: 12px;
-    background: var(--color-gray-700);
-    color: var(--color-white);
-    font-size: 0.9rem;
-    border-radius: 6px;
-  }
-  
-  .dropdown-item-seminario:hover {
-    background: var(--color-gray-600);
-  }
-}
-
-/* Móvil Grande (481px - 576px) */
-@media (max-width: 576px) and (min-width: 481px) {
   .header-seminario {
     padding: 10px 0;
   }
   
   .header-container-seminario {
-    padding: 0 16px;
-    gap: 12px;
+    padding: 0 12px;
+    gap: 8px;
   }
   
   .mobile-menu-toggle {
     display: flex !important;
-    order: -1;
-    font-size: 1.6rem;
-    padding: 8px;
-    min-width: 40px;
-    min-height: 40px;
-  }
-  
-  .mobile-menu-overlay {
-    display: block;
-  }
-  
-  .header-nav-seminario {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, var(--color-gray-dark) 0%, var(--color-gray-800) 100%);
-    flex-direction: column;
-    align-items: stretch;
-    padding: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    border-top: 2px solid var(--color-blue-primary);
-    border-radius: 0 0 10px 10px;
-    transform: translateY(-100%);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 999;
-    backdrop-filter: blur(10px);
-  }
-  
-  .header-nav-seminario.mobile-open {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
   }
   
   .luckas-seminario {
@@ -800,141 +656,6 @@
   
   .role-badge-seminario {
     display: none;
-  }
-  
-  .nav-item-seminario {
-    padding: 14px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    border-radius: 8px;
-    margin-bottom: 3px;
-    border: 1px solid transparent;
-  }
-  
-  .nav-item-seminario:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateX(3px);
-  }
-  
-  .nav-item-seminario.active {
-    background: var(--color-blue-primary);
-    border-color: var(--color-blue-light);
-    transform: translateX(3px);
-  }
-  
-  .nav-icon-seminario {
-    font-size: 1rem;
-    margin-right: 8px;
-  }
-  
-  .header-icons-seminario {
-    gap: 6px;
-  }
-  
-  .icon-btn-seminario {
-    padding: 7px;
-  }
-  
-  .notification-icon-seminario {
-    font-size: 1rem;
-  }
-  
-  .notification-badge-seminario {
-    top: -2px;
-    right: -2px;
-    font-size: 0.65rem;
-    padding: 0.1rem 0.3rem;
-    min-width: 15px;
-  }
-  
-  .user-profile-seminario {
-    gap: 6px;
-    padding: 5px 8px;
-  }
-  
-  .user-avatar-seminario {
-    width: 32px;
-    height: 32px;
-    font-size: 0.85rem;
-  }
-  
-  .user-info-seminario {
-    display: none;
-  }
-  
-  .dropdown-menu-seminario {
-    position: static;
-    background: var(--color-gray-800);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: none;
-    border-radius: 6px;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    margin-top: 6px;
-  }
-  
-  .dropdown-container-seminario {
-    flex-direction: column;
-    padding: 6px;
-    gap: 3px;
-  }
-  
-  .dropdown-item-seminario {
-    padding: 10px;
-    background: var(--color-gray-700);
-    color: var(--color-white);
-    font-size: 0.85rem;
-    border-radius: 4px;
-  }
-  
-  .dropdown-item-seminario:hover {
-    background: var(--color-gray-600);
-  }
-  
-  .user-dropdown-header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    border-radius: 16px 16px 0 0;
-    min-width: auto;
-  }
-}
-
-/* Móvil Mediano (361px - 480px) */
-@media (max-width: 480px) and (min-width: 361px) {
-  .header-seminario {
-    padding: 8px 0;
-  }
-  
-  .header-container-seminario {
-    padding: 0 12px;
-    gap: 10px;
-  }
-  
-  .mobile-menu-toggle {
-    display: flex !important;
-    order: -1;
-    font-size: 1.4rem;
-    padding: 6px;
-    min-width: 36px;
-    min-height: 36px;
-  }
-  
-  .luckas-seminario {
-    font-size: 32px;
-    height: 28px;
-    line-height: 28px;
-  }
-  
-  .role-badge-seminario {
-    display: none;
-  }
-  
-  .header-left-seminario {
-    min-width: 140px;
   }
   
   .header-nav-seminario {
@@ -952,9 +673,8 @@
     transform: translateY(-100%);
     opacity: 0;
     visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
     z-index: 999;
-    backdrop-filter: blur(10px);
   }
   
   .header-nav-seminario.mobile-open {
@@ -966,174 +686,195 @@
   .nav-item-seminario {
     padding: 12px;
     font-size: 0.9rem;
-    border-radius: 6px;
     margin-bottom: 2px;
   }
   
-  .nav-icon-seminario {
-    font-size: 0.95rem;
-    margin-right: 6px;
+  .user-info-seminario {
+    display: none;
   }
   
-  .header-icons-seminario {
-    gap: 4px;
+  .user-avatar-seminario {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
   }
   
   .icon-btn-seminario {
     padding: 6px;
+    min-width: 32px;
+    min-height: 32px;
   }
   
   .notification-icon-seminario {
     font-size: 0.95rem;
   }
-  
-  .notification-badge-seminario {
-    top: -1px;
-    right: -1px;
-    font-size: 0.6rem;
-    padding: 0.05rem 0.25rem;
-    min-width: 14px;
-  }
-  
-  .user-profile-seminario {
-    gap: 4px;
-    padding: 4px 6px;
-  }
-  
-  .user-avatar-seminario {
-    width: 30px;
-    height: 30px;
-    font-size: 0.8rem;
-  }
-  
-  .dropdown-container-seminario {
-    padding: 8px;
-  }
-  
-  .dropdown-item-seminario {
-    padding: 8px;
-    font-size: 0.8rem;
-  }
 }
 
-/* Móvil Pequeño (0 - 360px) */
-@media (max-width: 360px) {
+/* Móvil Grande (481px - 576px) */
+@media (max-width: 576px) and (min-width: 481px) {
   .header-seminario {
-    padding: 6px 0;
+    padding: 10px 0;
   }
   
   .header-container-seminario {
-    padding: 0 8px;
-    gap: 8px;
+    padding: 0 16px;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
   }
   
   .mobile-menu-toggle {
     display: flex !important;
     order: -1;
-    font-size: 1.2rem;
-    padding: 5px;
-    min-width: 32px;
-    min-height: 32px;
+    font-size: 1.4rem;
+    padding: 6px;
+    min-width: 36px;
+    min-height: 36px;
+    flex-shrink: 0;
   }
   
   .luckas-seminario {
-    font-size: 28px;
-    height: 26px;
-    line-height: 26px;
+    font-size: 34px;
+    height: 30px;
+    line-height: 30px;
   }
   
   .role-badge-seminario {
     display: none;
   }
   
-  .header-left-seminario {
-    min-width: 120px;
-  }
-  
-  .header-nav-seminario {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, var(--color-gray-dark) 0%, var(--color-gray-800) 100%);
-    flex-direction: column;
-    align-items: stretch;
-    padding: 10px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    border-top: 1px solid var(--color-blue-primary);
-    border-radius: 0 0 6px 6px;
-    transform: translateY(-100%);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 999;
-  }
-  
-  .header-nav-seminario.mobile-open {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-  }
-  
   .nav-item-seminario {
-    padding: 10px;
-    font-size: 0.85rem;
-    border-radius: 4px;
-    margin-bottom: 1px;
-  }
-  
-  .nav-icon-seminario {
+    padding: 12px 14px;
     font-size: 0.9rem;
-    margin-right: 5px;
   }
   
   .header-icons-seminario {
-    gap: 3px;
+    gap: 4px;
   }
   
   .icon-btn-seminario {
-    padding: 5px;
-  }
-  
-  .notification-icon-seminario {
-    font-size: 0.9rem;
-  }
-  
-  .notification-badge-seminario {
-    top: 0;
-    right: 0;
-    font-size: 0.55rem;
-    padding: 0.05rem 0.2rem;
-    min-width: 12px;
+    padding: 6px;
+    min-width: 32px;
+    min-height: 32px;
   }
   
   .user-profile-seminario {
-    gap: 3px;
-    padding: 3px 5px;
+    gap: 4px;
+    padding: 4px 6px;
+    min-width: 32px;
+    min-height: 32px;
   }
   
   .user-avatar-seminario {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  
+  .user-info-seminario {
+    display: none;
+  }
+}
+
+/* Móvil Mediano (361px - 480px) */
+@media (max-width: 480px) and (min-width: 361px) {
+  .header-seminario {
+    padding: 6px 0;
+  }
+  
+  .header-container-seminario {
+    padding: 0 8px;
+    gap: 5px;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex !important;
+    font-size: 1rem;
+    padding: 4px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+  
+  .luckas-seminario {
+    font-size: 28px;
+    height: 24px;
+    line-height: 24px;
+  }
+  
+  .role-badge-seminario {
+    display: none;
+  }
+  
+  .user-info-seminario {
+    display: none;
+  }
+  
+  .user-avatar-seminario {
+    width: 24px;
+    height: 24px;
+    font-size: 0.65rem;
+  }
+  
+  .icon-btn-seminario {
+    padding: 4px;
+    min-width: 24px;
+    min-height: 24px;
+  }
+  
+  .notification-icon-seminario {
     font-size: 0.75rem;
   }
-  
-  .dropdown-container-seminario {
-    padding: 6px;
+}
+
+/* Móvil Pequeño (0 - 360px) */
+@media (max-width: 360px) {
+  .header-seminario {
+    padding: 4px 0;
   }
   
-  .dropdown-item-seminario {
-    padding: 6px;
-    font-size: 0.75rem;
+  .header-container-seminario {
+    padding: 0 6px;
+    gap: 4px;
   }
   
-  .user-dropdown-header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    border-radius: 12px 12px 0 0;
-    min-width: auto;
+  .mobile-menu-toggle {
+    display: flex !important;
+    font-size: 0.9rem;
+    padding: 3px;
+    min-width: 24px;
+    min-height: 24px;
+  }
+  
+  .luckas-seminario {
+    font-size: 24px;
+    height: 20px;
+    line-height: 20px;
+  }
+  
+  .role-badge-seminario {
+    display: none;
+  }
+  
+  .user-info-seminario {
+    display: none;
+  }
+  
+  .user-avatar-seminario {
+    width: 20px;
+    height: 20px;
+    font-size: 0.6rem;
+  }
+  
+  .icon-btn-seminario {
+    padding: 3px;
+    min-width: 20px;
+    min-height: 20px;
+  }
+  
+  .notification-icon-seminario {
+    font-size: 0.65rem;
   }
 }
 
@@ -1316,73 +1057,7 @@
 }
 
 /* Comportamiento móvil: mostrar toggle y convertir nav en panel deslizable */
-@media (max-width: 768px) {
-  .mobile-menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .header-nav-seminario {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: -100%;
-    height: 100%;
-    width: 80%;
-    max-width: 360px;
-    background: linear-gradient(135deg, var(--color-gray-dark) 0%, var(--color-gray-800) 100%);
-    color: var(--color-white);
-    flex-direction: column;
-    padding-top: 88px;
-    gap: 0.5rem;
-    transition: left 0.25s ease;
-    z-index: 1002;
-    overflow-y: auto;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.2);
-  }
-
-  .header-nav-seminario.mobile-open {
-    display: flex;
-    left: 0;
-  }
-
-  .mobile-menu-overlay {
-    display: none;
-  }
-  .mobile-menu-overlay.show {
-    display: block;
-  }
-
-  .header-nav-seminario a,
-  .header-nav-seminario .nav-item-seminario,
-  .header-nav-seminario button.nav-item-seminario {
-    color: #ffffff;
-    padding: 0.9rem 1.25rem;
-    width: 100%;
-    text-align: left;
-    border-radius: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-
-  .header-container-seminario {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-}
-
-/* Mostrar menú móvil en pantallas medianas: mejorar colapso antes (hasta 1200px) */
-@media (max-width: 1200px) {
-  .mobile-menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .header-nav-seminario {
-    display: none;
-  }
-}
+/* Ya están definidos en los media queries principales */
 
 /* Botón cerrar dentro del panel móvil */
 .mobile-menu-close {

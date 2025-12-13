@@ -5,6 +5,7 @@ const Evento = require('../models/Eventos');
 const Usuario = require('../models/User');
 const Categorizacion = require('../models/categorizacion');
 const { notificarNuevaInscripcion } = require('../utils/notificationUtils');
+const { sendNotification } = require('../utils/notificationHelper');
 // Crear inscripción
 // Función auxiliar para validar ObjectId
 function validarObjectId(id, nombreCampo) {
@@ -386,6 +387,26 @@ async function validarActualizacionInscripcion(req) {
   return { usuarioExiste, referenciaExiste, categoriaExiste };
 }
 
+async function enviarNotificacionCambioEstado(io, inscripcionActual, estadoNuevo, referenciaExiste, usuarioId) {
+  if (estadoNuevo === 'inscrito' || estadoNuevo === 'matriculado') {
+    await sendNotification(io, usuarioId, {
+      title: '✅ Inscripción Aprobada',
+      message: `Tu inscripción a "${referenciaExiste?.nombre || 'la actividad'}" ha sido aprobada.`,
+      icon: 'check-circle',
+      type: 'success'
+    });
+    console.log(`✅ Notificación de aprobación enviada a usuario ${usuarioId}`);
+  } else if (estadoNuevo === 'rechazada') {
+    await sendNotification(io, usuarioId, {
+      title: '❌ Inscripción Rechazada',
+      message: `Tu inscripción a "${referenciaExiste?.nombre || 'la actividad'}" ha sido rechazada.`,
+      icon: 'times-circle',
+      type: 'error'
+    });
+    console.log(`❌ Notificación de rechazo enviada a usuario ${usuarioId}`);
+  }
+}
+
 exports.actualizarInscripcion = async (req, res) => {
   try {
     // Validaciones y obtención de datos
@@ -395,16 +416,16 @@ exports.actualizarInscripcion = async (req, res) => {
     }
     const { usuarioExiste, referenciaExiste } = validacion;
 
-    // Obtener la inscripción actual para validaciones
+    // Obtener la inscripción actual
     const inscripcionActual = await Inscripcion.findById(req.params.id);
     if (!inscripcionActual) {
       return res.status(404).json({ success: false, message: 'Inscripción no encontrada' });
     }
 
-    // Determinar el tipoReferencia final (actual o nuevo)
+    // Determinar el tipoReferencia final
     const tipoReferenciaFinal = req.body.tipoReferencia || inscripcionActual.tipoReferencia;
 
-    // Validación adicional de estado si se está cambiando
+    // Validar estado si se está cambiando
     if (req.body.estado) {
       const errorEstadoFinal = validarEstado(tipoReferenciaFinal, req.body.estado);
       if (errorEstadoFinal) {
@@ -412,6 +433,7 @@ exports.actualizarInscripcion = async (req, res) => {
       }
     }
 
+    // Actualizar inscripción
     let inscripcion;
     try {
       inscripcion = await Inscripcion.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: false });
@@ -419,9 +441,11 @@ exports.actualizarInscripcion = async (req, res) => {
       return res.status(400).json({ success: false, message: `Error al actualizar: ${updateError.message}` });
     }
 
-    if (!inscripcion) return res.status(404).json({ success: false, message: 'Inscripción no encontrada' });
+    if (!inscripcion) {
+      return res.status(404).json({ success: false, message: 'Inscripción no encontrada' });
+    }
 
-    // Actualizar solicitud asociada si existe
+    // Actualizar solicitud asociada
     if (inscripcion.solicitud) {
       let descripcionSolicitud = '';
       if (tipoReferenciaFinal === 'Eventos' && referenciaExiste) {
@@ -437,6 +461,12 @@ exports.actualizarInscripcion = async (req, res) => {
         descripcion: descripcionSolicitud,
         referencia: inscripcion._id
       });
+    }
+
+    // Enviar notificación si cambió de estado
+    const io = req.app.get('io');
+    if (req.body.estado && inscripcionActual.estado !== req.body.estado) {
+      await enviarNotificacionCambioEstado(io, inscripcionActual, req.body.estado, referenciaExiste, inscripcionActual.usuario);
     }
 
     res.json({ success: true, data: inscripcion });

@@ -2,6 +2,7 @@ const Solicitud = require('../models/Solicitud');
 const { validationResult } = require('express-validator');
 const { construirFiltros, configurarPaginacion, generarPipelineEstadisticasSolicitudes } = require('../utils/solicitudUtils');
 const { notificarNuevaSolicitud } = require('../utils/notificationUtils');
+const { sendNotification, notifySolicitudApproved, notifySolicitudRejected } = require('../utils/notificationHelper');
 const Usuario = require('../models/User');
 
 // Función auxiliar para validar modeloReferencia
@@ -238,6 +239,15 @@ exports.obtenerSolicitudes = async (req, res) => {
         });
       }
 
+      // Obtener la solicitud anterior para comparar estado
+      const solicitudAnterior = await Solicitud.findById(id);
+      if (!solicitudAnterior) {
+        return res.status(404).json({
+          success: false,
+          message: 'Solicitud no encontrada'
+        });
+      }
+
       // Construir datos de actualización sin campos que causan problemas
       const datosActualizacion = {
         ...req.body
@@ -271,6 +281,18 @@ exports.obtenerSolicitudes = async (req, res) => {
           success: false,
           message: 'Solicitud no encontrada'
         });
+      }
+
+      // Enviar notificación si cambió el estado
+      if (datosActualizacion.estado && datosActualizacion.estado !== solicitudAnterior.estado) {
+        const io = req.app.get('io');
+        const usuarioId = solicitudActualizada.solicitante;
+
+        if (datosActualizacion.estado === 'Aprobada') {
+          await notifySolicitudApproved(io, usuarioId, solicitudActualizada.tipoSolicitud || 'solicitud');
+        } else if (datosActualizacion.estado === 'Rechazada') {
+          await notifySolicitudRejected(io, usuarioId, solicitudActualizada.tipoSolicitud || 'solicitud');
+        }
       }
 
       console.log('Solicitud actualizada exitosamente:', solicitudActualizada._id);

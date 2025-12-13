@@ -6,6 +6,42 @@ import MainFormFields from './MainFormFields';
 import DynamicFields from './DynamicFields';
 import FileUploadSection from './FileUploadSection';
 
+// Componente para campos read-only
+const ReadOnlyField = ({ label, id, name, value }) => (
+  <div className="form-group-nuevasolicitud">
+    <label htmlFor={id}>{label}</label>
+    <input type="text" id={id} name={name} value={value} readOnly disabled />
+  </div>
+);
+
+ReadOnlyField.propTypes = {
+  label: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  value: PropTypes.string,
+};
+
+// Helper para obtener el email del usuario con fallbacks
+const getUserEmail = (usuario) => usuario?.correo || usuario?.correoElectronico || usuario?.email || '';
+
+// Componente para mostrar el tipo seleccionado
+const SelectedTypeDisplay = ({ typeConfigs, selectedType }) => (
+  <div className="selected-type-nuevasolicitud">
+    <div className="selected-type-icon-nuevasolicitud">
+      {typeConfigs[selectedType]?.icon}
+    </div>
+    <div className="selected-type-content-nuevasolicitud">
+      <h3>{typeConfigs[selectedType]?.title}</h3>
+      <p>{typeConfigs[selectedType]?.description}</p>
+    </div>
+  </div>
+);
+
+SelectedTypeDisplay.propTypes = {
+  typeConfigs: PropTypes.object.isRequired,
+  selectedType: PropTypes.string.isRequired,
+};
+
 const StepTwo = ({ 
   formState, 
   handlers, 
@@ -31,40 +67,22 @@ const StepTwo = ({
         </button>
       </div>
 
-      <div className="selected-type-nuevasolicitud">
-        <div className="selected-type-icon-nuevasolicitud">
-          {typeConfigs[formState.selectedType]?.icon}
-        </div>
-        <div className="selected-type-content-nuevasolicitud">
-          <h3>{typeConfigs[formState.selectedType]?.title}</h3>
-          <p>{typeConfigs[formState.selectedType]?.description}</p>
-        </div>
-      </div>
+      <SelectedTypeDisplay typeConfigs={typeConfigs} selectedType={formState.selectedType} />
 
       <div className="request-form-nuevasolicitud">
         <div className="form-row-nuevasolicitud">
-          <div className="form-group-nuevasolicitud">
-            <label htmlFor="correo">Correo</label>
-            <input
-              type="email"
-              id="correo"
-              name="correo"
-              value={usuarioLogueado?.correo || usuarioLogueado?.correoElectronico || usuarioLogueado?.email || ''}
-              readOnly
-              disabled
-            />
-          </div>
-          <div className="form-group-nuevasolicitud">
-            <label htmlFor="telefono">Teléfono</label>
-            <input
-              type="text"
-              id="telefono"
-              name="telefono"
-              value={usuarioLogueado?.telefono || ''}
-              readOnly
-              disabled
-            />
-          </div>
+          <ReadOnlyField 
+            label="Correo" 
+            id="correo" 
+            name="correo" 
+            value={getUserEmail(usuarioLogueado)} 
+          />
+          <ReadOnlyField 
+            label="Teléfono" 
+            id="telefono" 
+            name="telefono" 
+            value={usuarioLogueado?.telefono || ''} 
+          />
         </div>
         
         <ReferenceFields formState={formState} handlers={handlers} />
@@ -89,13 +107,22 @@ const StepTwo = ({
 };
 
 StepTwo.propTypes = {
-  formState: PropTypes.object.isRequired,
-  handlers: PropTypes.object.isRequired,
+  formState: PropTypes.shape({
+    currentStep: PropTypes.number.isRequired,
+    selectedType: PropTypes.string.isRequired,
+    setCurrentStep: PropTypes.func.isRequired,
+    modeloReferencia: PropTypes.any,
+    referencia: PropTypes.any,
+    formData: PropTypes.object,
+  }).isRequired,
+  handlers: PropTypes.shape({
+    handleInputChange: PropTypes.func.isRequired,
+  }).isRequired,
   typeConfigs: PropTypes.object.isRequired,
   usuarioLogueado: PropTypes.object,
   categories: PropTypes.array,
   modeloCategoriaMap: PropTypes.object.isRequired,
-  fileManager: PropTypes.object.isRequired
+  fileManager: PropTypes.object.isRequired,
 };
 
 export default StepTwo;

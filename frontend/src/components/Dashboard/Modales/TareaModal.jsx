@@ -46,8 +46,8 @@ const TareaModal = ({
       const fechaSel = new Date(fecha);
       const hoy = new Date();
       // normalizar horas a 00:00 para comparar solo fecha
-      fechaSel.setHours(0,0,0,0);
-      hoy.setHours(0,0,0,0);
+      fechaSel.setHours(0, 0, 0, 0);
+      hoy.setHours(0, 0, 0, 0);
       if (fechaSel < hoy) {
         // Usar mostrarAlerta con título y mensaje para consistencia
         mostrarAlerta('Error', 'La fecha límite debe ser hoy o en el futuro. Por favor elija una fecha válida.');
@@ -58,9 +58,19 @@ const TareaModal = ({
       // si hay error, prevenir submit por seguridad
       return;
     }
-
     if (onSubmit) onSubmit(e);
   };
+      // Efecto para manejar el scroll del body cuando el modal está abierto
+    React.useEffect(() => {
+      if (mostrar) {
+        // Desactivar scroll del body
+        document.body.style.overflow = 'hidden';
+        return () => {
+          // Reactivar scroll del body al cerrar el modal
+          document.body.style.overflow = 'auto';
+        };
+      }
+    }, [mostrar]);
 
   return (
     <ModalWrapper

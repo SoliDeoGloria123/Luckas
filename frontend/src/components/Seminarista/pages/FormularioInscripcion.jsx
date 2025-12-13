@@ -65,7 +65,7 @@ const FormularioInscripcion = ({
           const usuarioLocal = JSON.parse(usuarioStorage);
           fechaNacimiento = usuarioLocal?.fechaNacimiento;
         }
-      } catch { 
+      } catch {
         // Error al parsear, mantener fechaNacimiento como undefined
       }
     }
@@ -111,22 +111,22 @@ const FormularioInscripcion = ({
       // Calcular edad usando fechaNacimiento del usuario (usa helper)
       const edadCalculada = calcularEdad(usuarioLogueado?.fechaNacimiento);
       // Detectar tipo de inscripción y obtener datos
-  let tipoReferencia = '';
-  let referencia = null;
-  let categoria = null;
+      let tipoReferencia = '';
+      let referencia = null;
+      let categoria = null;
 
       if (evento) {
         tipoReferencia = 'Eventos';
         referencia = evento._id || evento.id;
-  categoria = evento.categoria?._id || evento.categoria;
+        categoria = evento.categoria?._id || evento.categoria;
       } else if (curso) {
         tipoReferencia = 'ProgramaAcademico';
         referencia = curso._id || curso.id;
-  categoria = curso.categoria?._id || curso.categoria;
+        categoria = curso.categoria?._id || curso.categoria;
       } else if (programa) {
         tipoReferencia = 'ProgramaAcademico';
         referencia = programa._id || programa.id;
-  categoria = programa.categoria?._id || programa.categoria;
+        categoria = programa.categoria?._id || programa.categoria;
       }
 
       if (!tipoReferencia) {
@@ -180,7 +180,7 @@ const FormularioInscripcion = ({
     setTimeout(async () => {
       setIsLoading(false);
       setCurrentStep(2);
-      updateProgress(50); 
+      updateProgress(50);
 
       // Llama a onSubmit para notificar al padre
       if (onSubmit) {
@@ -260,7 +260,7 @@ const FormularioInscripcion = ({
   // Función auxiliar para obtener usuario logueado para validación
   const obtenerUsuarioParaValidacion = () => {
     if (usuario) return usuario;
-    
+
     try {
       const usuarioStorage = localStorage.getItem('usuario');
       return usuarioStorage ? JSON.parse(usuarioStorage) : null;
@@ -290,7 +290,7 @@ const FormularioInscripcion = ({
   // Función auxiliar para validar edad específicamente
   const validarEdadEnAdvertencias = (usuarioLogueado, advertencias) => {
     if (!formData.edad) return;
-    
+
     const nacimiento = new Date(usuarioLogueado.fechaNacimiento);
     if (Number.isNaN(nacimiento.getTime())) {
       // Fecha de nacimiento inválida: omitir comprobación
@@ -307,12 +307,12 @@ const FormularioInscripcion = ({
   const getValidationWarnings = () => {
     const usuarioLogueadoVal = obtenerUsuarioParaValidacion();
     const advertencias = [];
-    
+
     if (usuarioLogueadoVal) {
       validarCamposBasicos(usuarioLogueadoVal, advertencias);
       validarEdadEnAdvertencias(usuarioLogueadoVal, advertencias);
     }
-    
+
     return advertencias;
   };
 
@@ -333,7 +333,7 @@ const FormularioInscripcion = ({
             </div>
           </div>
           <button className="close-btn-inscribirse-seminario" onClick={onClose}>
-          <i className="fas fa-times"></i>
+            <i className="fas fa-times"></i>
           </button>
         </div>
 
@@ -475,17 +475,17 @@ const FormularioInscripcion = ({
                   />
                 </div>
               </div>
-                <div className="form-group-semianrio">
-                  <label htmlFor="correo">Correo Electrónico</label>
-                  <input
-                    type="email"
-                    id="correo"
-                    name="correo"
-                    value={usuarioLogueado?.correo || formData.correo}
-                    readOnly
-                    required
-                  />
-                </div>
+              <div className="form-group-semianrio">
+                <label htmlFor="correo">Correo Electrónico</label>
+                <input
+                  type="email"
+                  id="correo"
+                  name="correo"
+                  value={usuarioLogueado?.correo || formData.correo}
+                  readOnly
+                  required
+                />
+              </div>
               <div className="form-group-semianrio">
                 <label htmlFor="motivacion">Motivación para participar</label>
                 <textarea

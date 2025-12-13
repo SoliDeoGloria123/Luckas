@@ -11,15 +11,48 @@ import Header from '../Header/Header-tesorero'
 import Footer from '../../footer/Footer'
 import { Edit } from "lucide-react"
 
-// Helpers para filtros
+// ============ HELPERS CENTRALIZADOS ============
+
+// Helper genérico para extraer lista de respuesta API
+const extraerListaDeRespuesta = (respuesta) => {
+  if (!respuesta) return [];
+  if (Array.isArray(respuesta)) return respuesta;
+  if (respuesta.data && Array.isArray(respuesta.data)) return respuesta.data;
+  return [];
+};
+
+// Estado inicial de solicitud
+const SOLICITUD_INICIAL = {
+  usuarioId: '',
+  tipo: '',
+  descripcion: '',
+  estado: 'pendiente',
+  fechaSolicitud: new Date().toISOString().split('T')[0],
+  fechaRespuesta: '',
+  respuesta: '',
+  prioridad: 'Media'
+};
+
+// Helper genérico para obtener datos
+const obtenerDatosGenerico = async (servicio, setState, onSuccess, errorMsg) => {
+  try {
+    const res = await servicio();
+    const lista = extraerListaDeRespuesta(res);
+    setState(lista);
+    if (onSuccess) onSuccess();
+  } catch (error) {
+    console.error(errorMsg, error);
+    setState([]);
+  }
+};
+
+// Helpers para filtros - unificados con patrón genérico
 const pasaFiltroPorCategoria = (solicitud, filterCategoria) => {
   if (!filterCategoria || filterCategoria === 'todos') return true;
-  
   const cat = solicitud.categoria?._id || solicitud.categoria?.nombre || solicitud.categoria;
   if (!cat) return false;
-  
-  return String(cat) === String(filterCategoria) || 
-         String((solicitud.categoria?.nombre || '')).toLowerCase() === String(filterCategoria).toLowerCase();
+  return String(cat) === String(filterCategoria) ||
+    String((solicitud.categoria?.nombre || '')).toLowerCase() === String(filterCategoria).toLowerCase();
 };
 
 const pasaFiltroPorEstado = (solicitud, filterEstado) => {
@@ -29,10 +62,9 @@ const pasaFiltroPorEstado = (solicitud, filterEstado) => {
 
 const pasaFiltroPorBusqueda = (solicitud, searchTerm) => {
   if (!searchTerm) return true;
-  
   const q = searchTerm.trim().toLowerCase();
   if (!q) return true;
-  
+
   const nombreSolic = (
     solicitud.solicitante?.nombre
       ? `${solicitud.solicitante.nombre} ${solicitud.solicitante.apellido || ''}`
@@ -51,6 +83,15 @@ const pasaFiltroPorBusqueda = (solicitud, searchTerm) => {
   return campos.some(campo => campo.includes(q));
 };
 
+// Helper para filtrar solicitudes
+const filtrarSolicitudes = (solicitudes, filtros) => {
+  return (solicitudes || []).filter((soli) => {
+    return pasaFiltroPorCategoria(soli, filtros.categoria) &&
+      pasaFiltroPorEstado(soli, filtros.estado) &&
+      pasaFiltroPorBusqueda(soli, filtros.busqueda);
+  });
+};
+
 const Gestionsolicitud = () => {
 
   const [solicitudes, setSolicitudes] = useState([]);
@@ -61,24 +102,13 @@ const Gestionsolicitud = () => {
   const [programasAcademicos, setProgramasAcademicos] = useState([]);
 
   // Filtros y buscador
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategoria, setFilterCategoria] = useState('todos');
-  const [filterEstado, setFilterEstado] = useState('todos');
+  const [filtros, setFiltros] = useState({ busqueda: '', categoria: 'todos', estado: 'todos' });
 
   // Variables para el modal del Dashboard
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
-  const [nuevaSolicitud, setNuevaSolicitud] = useState({
-    usuarioId: '',
-    tipo: '',
-    descripcion: '',
-    estado: 'pendiente',
-    fechaSolicitud: new Date().toISOString().split('T')[0],
-    fechaRespuesta: '',
-    respuesta: '',
-    prioridad: 'Media'
-  });
+  const [nuevaSolicitud, setNuevaSolicitud] = useState({ ...SOLICITUD_INICIAL });
   const [estadisticas, setEstadisticas] = useState({ totalSolicitudes: 0, pendientes: 0, aprobadas: 0, rechazadas: 0 });
 
 
@@ -92,93 +122,51 @@ const Gestionsolicitud = () => {
       mostrarAlerta("Error", `Error al obtener solicitudes: ${error.message}`, 'error');
     }
   };
+
   useEffect(() => {
     obtenerSolicitudes();
-  }, []);
-
-  // Obtener categorías para el modal
-  const obtenerCategorias = async () => {
-    try {
-      const res = await categorizacionService.getAll();
-      let lista = [];
-      if (res) {
-        if (Array.isArray(res)) lista = res;
-        else if (res.data && Array.isArray(res.data)) lista = res.data;
-        else if (res.data) lista = res.data;
-      }
-      setCategorias(lista || []);
-    } catch (error) {
-      console.error('Error obteniendo categorías:', error);
-      setCategorias([]);
-    }
-  };
-
-  useEffect(() => {
     obtenerCategorias();
   }, []);
 
+  // Obtener categorías
+  const obtenerCategorias = () => obtenerDatosGenerico(
+    () => categorizacionService.getAll(),
+    setCategorias,
+    null,
+    'Error obteniendo categorías'
+  );
+
   // Obtener eventos
-  const obtenerEventos = async () => {
-    try {
-      const data = await eventService.getAllEvents();
-      console.log('Eventos obtenidos:', data);
-      let listaEventos = [];
-      if (!data) listaEventos = [];
-      else if (Array.isArray(data)) listaEventos = data;
-      else if (data.data && Array.isArray(data.data)) listaEventos = data.data;
-      setEventos(listaEventos);
-    } catch (error) {
-      console.error('Error obteniendo eventos:', error);
-      setEventos([]);
-    }
-  };
+  const obtenerEventos = () => obtenerDatosGenerico(
+    () => eventService.getAllEvents(),
+    setEventos,
+    null,
+    'Error obteniendo eventos'
+  );
 
   // Obtener cabañas
-  const obtenerCabanas = async () => {
-    try {
-      const data = await cabanaService.getAll();
-      console.log('Cabañas obtenidas:', data);
-      let listaCabanas = [];
-      if (!data) listaCabanas = [];
-      else if (Array.isArray(data)) listaCabanas = data;
-      else if (data.data && Array.isArray(data.data)) listaCabanas = data.data;
-      setCabanas(listaCabanas);
-    } catch (error) {
-      console.error('Error obteniendo cabañas:', error);
-      setCabanas([]);
-    }
-  };
+  const obtenerCabanas = () => obtenerDatosGenerico(
+    () => cabanaService.getAll(),
+    setCabanas,
+    null,
+    'Error obteniendo cabañas'
+  );
 
   // Obtener reservas
-  const obtenerReservas = async () => {
-    try {
-      const data = await reservaService.getAll();
-      let listaReservas = [];
-      if (!data) listaReservas = [];
-      else if (Array.isArray(data)) listaReservas = data;
-      else if (data.data && Array.isArray(data.data)) listaReservas = data.data;
-      setReservas(listaReservas);
-    } catch (error) {
-      console.error('Error obteniendo reservas:', error);
-      setReservas([]);
-    }
-  };
+  const obtenerReservas = () => obtenerDatosGenerico(
+    () => reservaService.getAll(),
+    setReservas,
+    null,
+    'Error obteniendo reservas'
+  );
 
   // Obtener programas académicos
-  const obtenerProgramasAcademicos = async () => {
-    try {
-      // El servicio expone `getAllProgramas`.
-      const data = await programasAcademicosService.getAllProgramas();
-      let listaProgramas = [];
-      if (!data) listaProgramas = [];
-      else if (Array.isArray(data)) listaProgramas = data;
-      else if (data.data && Array.isArray(data.data)) listaProgramas = data.data;
-      setProgramasAcademicos(listaProgramas);
-    } catch (error) {
-      console.error('Error obteniendo programas académicos:', error);
-      setProgramasAcademicos([]);
-    }
-  };
+  const obtenerProgramasAcademicos = () => obtenerDatosGenerico(
+    () => programasAcademicosService.getAllProgramas(),
+    setProgramasAcademicos,
+    null,
+    'Error obteniendo programas académicos'
+  );
 
   // Obtener referencias según el modelo
   const obtenerReferencias = async (modelo) => {
@@ -200,46 +188,42 @@ const Gestionsolicitud = () => {
     }
   };
 
-
-  const handleCreate = () => {
+  // Helper para resetear estado
+  const resetearEstado = () => {
+    setNuevaSolicitud({ ...SOLICITUD_INICIAL });
     setModoEdicion(false);
     setSolicitudSeleccionada(null);
-    setNuevaSolicitud({
-      usuarioId: '',
-      tipo: '',
-      descripcion: '',
-      estado: 'pendiente',
-      fechaSolicitud: new Date().toISOString().split('T')[0],
-      fechaRespuesta: '',
-      respuesta: '',
-      prioridad: 'Media'
-    });
+  };
+
+  // Funciones para abrir modales
+  const abrirModalCrear = () => {
+    resetearEstado();
     setMostrarModal(true);
   };
 
-  const handleEdit = (solicitud) => {
+  const abrirModalEditar = (solicitud) => {
     setModoEdicion(true);
     setSolicitudSeleccionada(solicitud);
     setMostrarModal(true);
   };
 
-  // Funciones para el modal del Dashboard
-  const crearSolicitud = async () => {
+  // Factory function para operaciones CRUD
+  const operarSolicitud = async (operacion, id = null) => {
     try {
-      await solicitudService.create(nuevaSolicitud);
-      mostrarAlerta("¡EXITO!", "Solicitud creada exitosamente");
+      switch (operacion) {
+        case 'crear': {
+          await solicitudService.create(nuevaSolicitud);
+          mostrarAlerta("¡EXITO!", "Solicitud creada exitosamente");
+          break;
+        }
+        case 'actualizar': {
+          await solicitudService.update(solicitudSeleccionada._id, solicitudSeleccionada);
+          mostrarAlerta("¡EXITO!", "Solicitud actualizada exitosamente");
+          break;
+        }
+      }
       setMostrarModal(false);
-      obtenerSolicitudes();
-    } catch (error) {
-      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
-    }
-  };
-
-  const actualizarSolicitud = async () => {
-    try {
-      await solicitudService.update(solicitudSeleccionada._id, solicitudSeleccionada);
-      mostrarAlerta("¡EXITO!", "Solicitud actualizada exitosamente");
-      setMostrarModal(false);
+      resetearEstado();
       obtenerSolicitudes();
     } catch (error) {
       mostrarAlerta("Error", `Error: ${error.message}`, 'error');
@@ -256,10 +240,10 @@ const Gestionsolicitud = () => {
   };
 
   // Filtros aplicados sobre solicitudes
-  const solicitudesFiltradas = (solicitudes || []).filter((soli) => {
-    return pasaFiltroPorCategoria(soli, filterCategoria) &&
-           pasaFiltroPorEstado(soli, filterEstado) &&
-           pasaFiltroPorBusqueda(soli, searchTerm);
+  const solicitudesFiltradas = filtrarSolicitudes(solicitudes, {
+    busqueda: filtros.busqueda,
+    categoria: filtros.categoria,
+    estado: filtros.estado
   });
 
   // Paginación
@@ -274,7 +258,7 @@ const Gestionsolicitud = () => {
   // Reiniciar a la página 1 si cambian los resultados filtrados
   useEffect(() => {
     setPaginaActual(1);
-  }, [searchTerm, filterCategoria, filterEstado, solicitudes.length]);
+  }, [filtros, solicitudes.length]);
 
   return (
     <>
@@ -291,7 +275,7 @@ const Gestionsolicitud = () => {
             </div>
           </div>
 
-          <button className="btn-primary-tesorero" onClick={handleCreate}>
+          <button className="btn-primary-tesorero" onClick={abrirModalCrear}>
             <i className="fas fa-plus"></i> {' '}
             Nueva Solicitud
           </button>
@@ -347,14 +331,14 @@ const Gestionsolicitud = () => {
                 type="text"
                 placeholder="Buscar Solicitudes..."
                 id="userSearch"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={filtros.busqueda}
+                onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
               />
             </div>
             <select
               className="filter-select"
-              value={filterCategoria}
-              onChange={(e) => setFilterCategoria(e.target.value)}
+              value={filtros.categoria}
+              onChange={(e) => setFiltros({ ...filtros, categoria: e.target.value })}
             >
               <option value="todos">Todas las categorías</option>
               {(categorias || []).map((c) => (
@@ -366,8 +350,8 @@ const Gestionsolicitud = () => {
             <select
               id="statusFilter"
               className="filter-select"
-              value={filterEstado}
-              onChange={(e) => setFilterEstado(e.target.value)}
+              value={filtros.estado}
+              onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
             >
               <option value="todos">Todos los estados</option>
               <option value="Nueva">Nueva</option>
@@ -378,7 +362,7 @@ const Gestionsolicitud = () => {
               <option value="Pendiente Info">Pendiente Info</option>
             </select>
           </div>
-         
+
         </div>
         <div className="rounded-xl bg-white p-6 shadow-sm">
           <div className="overflow-hidden rounded-xl border border-[#334155]/10 bg-white shadow-sm">
@@ -459,7 +443,7 @@ const Gestionsolicitud = () => {
                         </div>
                       </td>
                       <td className="whitespace-nowrap px-6 py-4">
-                        <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => handleEdit(soli)}>
+                        <button className="h-8 w-8 text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#1d4ed8]" onClick={() => abrirModalEditar(soli)}>
                           <Edit className="h-4 w-4" />
                         </button>
                       </td>
@@ -501,7 +485,7 @@ const Gestionsolicitud = () => {
             nuevaSolicitud={nuevaSolicitud}
             setNuevaSolicitud={setNuevaSolicitud}
             onClose={() => setMostrarModal(false)}
-            onSubmit={modoEdicion ? actualizarSolicitud : crearSolicitud}
+            onSubmit={modoEdicion ? () => operarSolicitud('actualizar') : () => operarSolicitud('crear')}
             categorias={categorias}
             eventos={eventos}
             cabanas={cabanas}

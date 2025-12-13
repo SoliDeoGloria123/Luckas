@@ -101,9 +101,18 @@ const EventosSeminario = () => {
     const form = e.target;
 
     try {
+      // Verificar si ya está inscrito ANTES de enviar
+      if (estaInscrito(eventoSeleccionado._id)) {
+        setInscripcionMsg('Ya estás inscrito en este evento.');
+        setInscripcionLoading(false);
+        return;
+      }
+
       const nuevaInscripcion = {
         usuario: user._id,
         evento: eventoSeleccionado._id,
+        tipoReferencia: 'Eventos',
+        referencia: eventoSeleccionado._id,
         categoria: form.categoria.value || eventoSeleccionado.categoria,
         nombre: form.nombre.value,
         apellido: form.apellido.value,
@@ -117,18 +126,36 @@ const EventosSeminario = () => {
 
       const response = await inscripcionService.create(nuevaInscripcion);
 
-      // Actualizar la lista de inscripciones
-      setMisInscripciones(prev => [...prev, response.data || response]);
+      // Crear objeto optimista con estructura completa
+      const inscripcionOptimista = {
+        _id: response.data?._id || response._id || Date.now().toString(),
+        tipoReferencia: 'Eventos',
+        referencia: eventoSeleccionado._id,
+        usuario: user._id,
+        nombre: form.nombre.value,
+        apellido: form.apellido.value,
+        estado: 'inscrito'
+      };
+
+      // Actualizar estado inmediatamente
+      setMisInscripciones(prevInscripciones => {
+        const yaExiste = prevInscripciones.some(
+          insc => insc.referencia === eventoSeleccionado._id || insc.referencia?._id === eventoSeleccionado._id
+        );
+        if (yaExiste) return prevInscripciones;
+        return [...prevInscripciones, inscripcionOptimista];
+      });
 
       setInscripcionMsg('¡Inscripción exitosa!');
+      setInscripcionLoading(false);
+      
       setTimeout(() => {
         setEventoSeleccionado(null);
         setInscripcionMsg(null);
-      }, 1800);
+      }, 800);
     } catch (err) {
       console.error('Error al inscribirse:', err);
       setInscripcionMsg('Error al inscribirse. Intenta de nuevo.');
-    } finally {
       setInscripcionLoading(false);
     }
 
@@ -197,6 +224,13 @@ const EventosSeminario = () => {
           
            {eventosPaginados.map(ev => {
               const inscrito = estaInscrito(ev._id);
+              
+              // Precompute label to avoid nested ternaries (mejora SonarQube)
+              const inscribirLabel = (() => {
+                if (inscrito) return 'Ya inscrito';
+                return 'Inscribirme';
+              })();
+
               return (
                 <div
                   className={`event-card${inscrito ? ' event-card-inscrito' : ''}`}
@@ -244,14 +278,13 @@ const EventosSeminario = () => {
                         </div>
                       </div>
                     </div>
-                    {inscrito && (
-                      <div className="inscrito-msg">
-                        <span style={{ fontSize: '1.1em', fontWeight: 700 }}>Estás inscrito a este evento</span>
-                      </div>
-                    )}
-                    <button className="evento-btn" onClick={() => handleInscribir(ev)} disabled={inscrito}>
+                    <button 
+                      className="evento-btn" 
+                      onClick={() => handleInscribir(ev)} 
+                      disabled={inscrito}
+                    >
                       <Check size={16} />
-                      {inscrito ? "Ya inscrito" : "Inscribirme"}
+                      {inscribirLabel}
                     </button>
                   </div>
                 </div>

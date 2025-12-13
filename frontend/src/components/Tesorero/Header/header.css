@@ -20,9 +20,8 @@
 .header-tesorero-header  {
     background: var(--white);
     border-bottom: 1px solid #e2e8f0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    /* Cambiado para que el header se desplace con la página en lugar de quedarse fijo */
+    position: relative;
 }
 
 .header-content-tesorero-header {

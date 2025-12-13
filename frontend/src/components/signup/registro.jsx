@@ -3,6 +3,84 @@ import { FaBookOpen, FaUser, FaIdCard, FaHashtag, FaKey, FaEnvelope, FaLock, FaA
 import { signupService } from '../../services/authService';
 import './registro.css'; // Crearemos este archivo después
 
+// Constantes para mensajes de validación
+const VALIDATION_MESSAGES = {
+  CREDENTIAL_MIN_LENGTH: 'al menos 8 caracteres',
+  CREDENTIAL_UPPERCASE: 'una mayúscula',
+  CREDENTIAL_LOWERCASE: 'una minúscula',
+  CREDENTIAL_NUMBER: 'un número',
+  CREDENTIAL_MUST_CONTAIN: 'Credencial debe contener: ',
+  CREDENTIALS_NO_MATCH: 'Las credenciales no coinciden',
+};
+
+// Constantes para regex
+const REGEX_PATTERNS = {
+  PASSPORT: /^[A-Za-z0-9]{5,20}$/,
+  DOCUMENT_NUMBER: /^\d{6,15}$/,
+  PHONE: /^\d{7,15}$/,
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+};
+
+// Definición de campos y sus reglas de validación
+const FIELD_VALIDATION_RULES = {
+  nombre: {
+    step: 1,
+    validator: (v) => v ? undefined : 'Nombre es requerido',
+  },
+  apellido: {
+    step: 1,
+    validator: (v) => v ? undefined : 'Apellido es requerido',
+  },
+  tipoDocumento: {
+    step: 1,
+    validator: (v) => v ? undefined : 'Seleccione un tipo de documento',
+  },
+  numeroDocumento: {
+    step: 1,
+    validator: (v, data) => {
+      if (!v) return 'Número de documento es requerido';
+      const tipo = (data.tipoDocumento || '').trim();
+      if (tipo === 'Pasaporte') {
+        return REGEX_PATTERNS.PASSPORT.test(v) ? undefined : 'Pasaporte inválido (5-20 caracteres alfanuméricos)';
+      }
+      return REGEX_PATTERNS.DOCUMENT_NUMBER.test(v) ? undefined : 'Número inválido (solo dígitos, 6-15)';
+    },
+  },
+  telefono: {
+    step: 1,
+    validator: (v) => {
+      if (!v) return 'Teléfono es requerido';
+      return REGEX_PATTERNS.PHONE.test(v) ? undefined : 'Teléfono inválido (solo dígitos, 7-15)';
+    },
+  },
+  fechaNacimiento: {
+    step: 1,
+    validator: (v) => v ? undefined : 'Fecha de nacimiento es requerida',
+  },
+  correo: {
+    step: 2,
+    validator: (v) => {
+      if (!v) return 'Correo es requerido';
+      return REGEX_PATTERNS.EMAIL.test(v) ? undefined : 'Correo inválido';
+    },
+  },
+  password: {
+    step: 2,
+    validator: (v) => {
+      const problems = [];
+      if (v.length < 8) problems.push(VALIDATION_MESSAGES.CREDENTIAL_MIN_LENGTH);
+      if (!/[A-Z]/.test(v)) problems.push(VALIDATION_MESSAGES.CREDENTIAL_UPPERCASE);
+      if (!/[a-z]/.test(v)) problems.push(VALIDATION_MESSAGES.CREDENTIAL_LOWERCASE);
+      if (!/\d/.test(v)) problems.push(VALIDATION_MESSAGES.CREDENTIAL_NUMBER);
+      return problems.length ? VALIDATION_MESSAGES.CREDENTIAL_MUST_CONTAIN + problems.join(', ') : undefined;
+    },
+  },
+  confirmPassword: {
+    step: 2,
+    validator: (v, data) => v === (data.password || '') ? undefined : VALIDATION_MESSAGES.CREDENTIALS_NO_MATCH,
+  },
+};
+
 const Registro = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
@@ -21,100 +99,64 @@ const Registro = () => {
 
   const [errors, setErrors] = useState({});
 
+  // Valida un único campo usando las reglas centralizadas
+  const validateField = (name, value, allValues = formData) => {
+    const v = (value || '').toString().trim();
+    const rule = FIELD_VALIDATION_RULES[name];
+    if (!rule) return undefined;
+    return rule.validator(v, allValues);
+  };
+
+  // Valida todos los campos de un paso específico
+  const validateStep = (step) => {
+    const newErrors = {};
+    for (const name of Object.keys(FIELD_VALIDATION_RULES)) {
+      if (FIELD_VALIDATION_RULES[name].step === step) {
+        const v = (formData[name] || '').toString().trim();
+        const error = validateField(name, v, formData);
+        if (error) newErrors[name] = error;
+      }
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Construimos el nuevo estado inmediatamente para validar dependencias (ej: confirmar contraseña)
     setFormData(prev => {
       const next = { ...prev, [name]: value };
-      // Validación en tiempo real por campo
       const fieldError = validateField(name, value, next);
-      setErrors(prevErr => ({ ...prevErr, [name]: fieldError }));
-      // Si estamos actualizando la contraseña, también validar confirmPassword en tiempo real
+      
+      const updatedErrors = { ...errors, [name]: fieldError };
+      
+      // Revalidar campos dependientes
       if (name === 'password' && next.confirmPassword) {
-        const confirmErr = validateField('confirmPassword', next.confirmPassword, next);
-        setErrors(prevErr => ({ ...prevErr, confirmPassword: confirmErr, [name]: fieldError }));
+        updatedErrors.confirmPassword = validateField('confirmPassword', next.confirmPassword, next);
       }
-      // Si estamos actualizando tipoDocumento, revalidar numeroDocumento
       if (name === 'tipoDocumento' && next.numeroDocumento) {
-        const numErr = validateField('numeroDocumento', next.numeroDocumento, next);
-        setErrors(prevErr => ({ ...prevErr, numeroDocumento: numErr }));
+        updatedErrors.numeroDocumento = validateField('numeroDocumento', next.numeroDocumento, next);
       }
+      
+      setErrors(updatedErrors);
       return next;
     });
   };
 
-  // Helpers más pequeños para reducir la complejidad de validación
-  const validateDocumentNumber = (v, tipo) => {
-    if (!v) return 'Número de documento es requerido';
-    if ((tipo || '').trim() === 'Pasaporte') {
-      return /^[A-Za-z0-9]{5,20}$/.test(v)
-        ? undefined
-        : 'Pasaporte inválido (5-20 caracteres alfanuméricos)';
-    }
-    return /^\d{6,15}$/.test(v) ? undefined : 'Número inválido (solo dígitos, 6-15)';
-  };
 
-  const validatePassword = (v) => {
-    const problems = [];
-    if (v.length < 8) problems.push('al menos 8 caracteres');
-    if (!/[A-Z]/.test(v)) problems.push('una mayúscula');
-    if (!/[a-z]/.test(v)) problems.push('una minúscula');
-    if (!/\d/.test(v)) problems.push('un número');
-    return problems.length ? 'Contraseña debe contener: ' + problems.join(', ') : undefined;
-  };
-
-  const validatePersonalField = (name, v, data) => {
-    switch (name) {
-      case 'nombre':
-        return v ? undefined : 'Nombre es requerido';
-      case 'apellido':
-        return v ? undefined : 'Apellido es requerido';
-      case 'tipoDocumento':
-        return v ? undefined : 'Seleccione un tipo de documento';
-      case 'numeroDocumento':
-        return validateDocumentNumber(v, data.tipoDocumento);
-      case 'telefono':
-        if (!v) return 'Teléfono es requerido';
-        return /^\d{7,15}$/.test(v) ? undefined : 'Teléfono inválido (solo dígitos, 7-15)';
-      case 'fechaNacimiento':
-        return v ? undefined : 'Fecha de nacimiento es requerida';
-      default:
-        return undefined;
+  const nextStep = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
-  const validateCredentialField = (name, v, data) => {
-    switch (name) {
-      case 'correo':
-        if (!v) return 'Correo es requerido';
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? undefined : 'Correo inválido';
-      case 'password':
-        return validatePassword(v);
-      case 'confirmPassword':
-        return v === (data.password || '') ? undefined : 'Las contraseñas no coinciden';
-      default:
-        return undefined;
-    }
-  };
-
-  // Valida un único campo en base a su nombre y devuelve mensaje de error o undefined
-  const validateField = (name, value, allValues) => {
-    const v = (value || '').toString().trim();
-    const data = allValues || formData;
-    // Campos personales
-    const personalFields = ['nombre', 'apellido', 'tipoDocumento', 'numeroDocumento', 'telefono', 'fechaNacimiento'];
-    const credentialFields = ['correo', 'password', 'confirmPassword'];
-    if (personalFields.includes(name)) return validatePersonalField(name, v, data);
-    if (credentialFields.includes(name)) return validateCredentialField(name, v, data);
-    return undefined;
+  const prevStep = () => {
+    setCurrentStep(currentStep - 1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // validar el paso 2 antes de enviar
     if (!validateStep(2)) return;
     try {
-      // Llama al servicio de registro
       await signupService.signup({
         nombre: formData.nombre,
         apellido: formData.apellido,
@@ -125,69 +167,10 @@ const Registro = () => {
         fechaNacimiento: formData.fechaNacimiento,
         password: formData.password,
       });
-      setCurrentStep(3); // Avanza al paso de éxito
+      setCurrentStep(3);
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        alert("Error: " + err.response.data.message);
-      } else {
-        alert("Error al registrar usuario");
-      }
+      alert(err.response?.data?.message || "Error al registrar usuario");
     }
-  };
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    setCurrentStep(currentStep - 1);
-  };
-  const validatePersonal = () => {
-    const newErrors = {};
-    if (!formData.nombre || !formData.nombre.trim()) newErrors.nombre = 'Nombre es requerido';
-    if (!formData.apellido || !formData.apellido.trim()) newErrors.apellido = 'Apellido es requerido';
-    if (!formData.tipoDocumento) newErrors.tipoDocumento = 'Seleccione un tipo de documento';
-
-    const num = (formData.numeroDocumento || '').trim();
-    if (!num) {
-      newErrors.numeroDocumento = 'Número de documento es requerido';
-    } else if (formData.tipoDocumento === 'Pasaporte') {
-      if (!/^[A-Za-z0-9]{5,20}$/.test(num)) newErrors.numeroDocumento = 'Pasaporte inválido (5-20 caracteres alfanuméricos)';
-    } else if (!/^\d{6,15}$/.test(num)) {
-      newErrors.numeroDocumento = 'Número inválido (solo dígitos, 6-15)';
-    }
-
-    const tel = (formData.telefono || '').trim();
-    if (!tel) {
-      newErrors.telefono = 'Teléfono es requerido';
-    } else if (!/^\d{7,15}$/.test(tel)) {
-      newErrors.telefono = 'Teléfono inválido (solo dígitos, 7-15)';
-    }
-
-    return newErrors;
-  };
-
-  const validateCredentials = () => {
-    const newErrors = {};
-    if (!formData.correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo)) newErrors.correo = 'Correo inválido';
-    const pwd = formData.password || '';
-    const pwdProblems = [];
-    if (pwd.length < 8) pwdProblems.push('al menos 8 caracteres');
-    if (!/[A-Z]/.test(pwd)) pwdProblems.push('una mayúscula');
-    if (!/[a-z]/.test(pwd)) pwdProblems.push('una minúscula');
-    if (!/\d/.test(pwd)) pwdProblems.push('un número');
-    if (pwdProblems.length) newErrors.password = 'Contraseña debe contener: ' + pwdProblems.join(', ');
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    return newErrors;
-  };
-
-  const validateStep = (step) => {
-    let newErrors = {};
-    if (step === 1) newErrors = validatePersonal();
-    if (step === 2) newErrors = validateCredentials();
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
   const progressPercentage = (currentStep / 3) * 100;
 
@@ -302,10 +285,10 @@ const Registro = () => {
                 </div>
 
                 <div className="form-group-registro">
-                  <label htmlFor="password">Contraseña</label>
+                  <label htmlFor="password">Credencial de Acceso</label>
                   <div className="input-group-registro">
                     <FaLock className="input-icon" />
-                    <input type={showPassword ? "text": "password"} name="password" placeholder="Ingrese su contraseña" required onChange={handleChange} value={formData.password} />
+                    <input type={showPassword ? "text": "password"} name="password" placeholder="Ingrese su credencial" required onChange={handleChange} value={formData.password} />
                     <button type="button"
                       className="toggle-password"
                       onClick={() => setShowPassword(!showPassword)} >
@@ -318,10 +301,10 @@ const Registro = () => {
                   </small>
                 </div>
                 <div className="form-group-registro">
-                  <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+                  <label htmlFor="confirmPassword">Confirmar Credencial</label>
                   <div className="input-group-registro">
                     <FaLock className="input-icon" />
-                    <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="Reingrese su contraseña" required onChange={handleChange} value={formData.confirmPassword} />
+                    <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="Reingrese su credencial" required onChange={handleChange} value={formData.confirmPassword} />
                       <button type="button"
                       className="toggle-password"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)} >

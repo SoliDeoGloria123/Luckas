@@ -7,6 +7,61 @@ import PropTypes from 'prop-types';
 import { programaSeleccionadoPropType, formDataPropType } from './common/programaModalTypes';
 import { categorizacionService } from '../../../services/categorizacionService';
 
+// ============ HELPERS CENTRALIZADOS ============
+
+// Helper para obtener fecha hoy en formato YYYY-MM-DD
+const obtenerFechaHoy = () => {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+// Helper genérico para extraer lista de respuesta API
+const extraerListaDeRespuesta = (respuesta) => {
+  if (!respuesta) return [];
+  if (Array.isArray(respuesta)) return respuesta;
+  if (respuesta.data && Array.isArray(respuesta.data)) return respuesta.data;
+  return [];
+};
+
+// Estado inicial del formulario
+const FORMDATA_INICIAL = {
+  titulo: '',
+  descripcion: '',
+  tipo: 'curso',
+  modalidad: 'presencial',
+  duracion: '',
+  precio: '',
+  fechaInicio: '',
+  fechaFin: '',
+  cupos: '',
+  profesor: '',
+  profesorBio: '',
+  categoria: '',
+  requisitos: [{ id: 'req_0', value: '' }],
+  pensum: [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
+  objetivos: [{ id: 'obj_0', value: '' }],
+  metodologia: '',
+  evaluacion: '',
+  certificacion: '',
+  imagen: '',
+  destacado: false
+};
+
+// Campos de tipo select reutilizables
+const TIPO_OPCIONES = [
+  { value: 'curso', label: 'Curso' },
+  { value: 'programa-tecnico', label: 'Programa Técnico' }
+];
+
+const MODALIDAD_OPCIONES = [
+  { value: 'presencial', label: 'Presencial' },
+  { value: 'virtual', label: 'Virtual' },
+  { value: 'hibrido', label: 'Híbrido' }
+];
+
 const ProgramaModal = ({
   mostrar,
   modoEdicion,
@@ -16,12 +71,7 @@ const ProgramaModal = ({
   onClose,
   onSubmit
 }) => {
-  // Obtener la fecha de hoy en formato YYYY-MM-DD
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const todayStr = `${yyyy}-${mm}-${dd}`;
+  const todayStr = obtenerFechaHoy();
   const [errors, setErrors] = useState({});
   const [categorias, setCategorias] = useState([]);
 
@@ -32,6 +82,16 @@ const ProgramaModal = ({
       return categoria._id || categoria.id || '';
     }
     return categoria;
+  };
+
+  // Helper para convertir array a items con id
+  const arrayAItems = (arr, fieldName = 'value') => {
+    return Array.isArray(arr) && arr.length > 0
+      ? arr.map((item, i) => ({
+          id: `${fieldName.slice(0, 3)}_${i}`,
+          [fieldName]: item
+        }))
+      : [{ id: `${fieldName.slice(0, 3)}_0`, [fieldName]: '' }];
   };
 
   // Helper function to configure form data from selected program
@@ -50,15 +110,11 @@ const ProgramaModal = ({
       profesor: programa.profesor || '',
       profesorBio: programa.profesorBio || '',
       categoria: extractCategoriaId(programa.categoria),
-      requisitos: Array.isArray(programa.requisitos)
-        ? programa.requisitos.map((req, i) => ({ id: `req_${i}`, value: req }))
-        : [{ id: 'req_0', value: '' }],
-      pensum: Array.isArray(programa.pensum)
+      requisitos: arrayAItems(programa.requisitos, 'value'),
+      pensum: Array.isArray(programa.pensum) && programa.pensum.length > 0
         ? programa.pensum.map((mod, i) => ({ id: `pen_${i}`, ...mod }))
         : [{ id: 'pen_0', modulo: '', descripcion: '', horas: '' }],
-      objetivos: Array.isArray(programa.objetivos)
-        ? programa.objetivos.map((obj, i) => ({ id: `obj_${i}`, value: obj }))
-        : [{ id: 'obj_0', value: '' }],
+      objetivos: arrayAItems(programa.objetivos, 'value'),
       metodologia: programa.metodologia || '',
       evaluacion: programa.evaluacion || '',
       certificacion: programa.certificacion || '',
@@ -78,13 +134,8 @@ const ProgramaModal = ({
   const obtenerCategorias = async () => {
     try {
       const res = await categorizacionService.getAll();
-      let lista = [];
-      if (res) {
-        if (Array.isArray(res)) lista = res;
-        else if (res.data && Array.isArray(res.data)) lista = res.data;
-        else if (res.data) lista = res.data;
-      }
-      setCategorias(lista || []);
+      const lista = extraerListaDeRespuesta(res);
+      setCategorias(lista);
     } catch (error) {
       console.error('Error obteniendo categorías:', error);
       setCategorias([]);
@@ -146,26 +197,46 @@ const ProgramaModal = ({
 
   // FieldList and PensumList moved to separate files to reduce duplication and satisfy Sonar rules
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.titulo?.trim()) newErrors.titulo = 'El título es requerido';
-    if (!formData.descripcion?.trim()) newErrors.descripcion = 'La descripción es requerida';
-    if (!formData.duracion?.trim()) newErrors.duracion = 'La duración es requerida';
-    if (!formData.precio) newErrors.precio = 'El precio es requerido';
+  // Validación de fechas - helper centralizado
+  const validarFechas = () => {
+    const errores = {};
     if (!formData.fechaInicio) {
-      newErrors.fechaInicio = 'La fecha de inicio es requerida';
+      errores.fechaInicio = 'La fecha de inicio es requerida';
     } else if (formData.fechaInicio < todayStr) {
-      newErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a hoy';
+      errores.fechaInicio = 'La fecha de inicio no puede ser anterior a hoy';
     }
     if (!formData.fechaFin) {
-      newErrors.fechaFin = 'La fecha de fin es requerida';
+      errores.fechaFin = 'La fecha de fin es requerida';
     } else if (formData.fechaFin < todayStr) {
-      newErrors.fechaFin = 'La fecha de fin no puede ser anterior a hoy';
+      errores.fechaFin = 'La fecha de fin no puede ser anterior a hoy';
     } else if (formData.fechaFin < formData.fechaInicio) {
-      newErrors.fechaFin = 'La fecha de fin no puede ser anterior a la de inicio';
+      errores.fechaFin = 'La fecha de fin no puede ser anterior a la de inicio';
     }
-    if (!formData.cupos) newErrors.cupos = 'Los cupos son requeridos';
-    if (!formData.profesor?.trim()) newErrors.profesor = 'El profesor es requerido';
+    return errores;
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Validaciones de campos requeridos
+    const camposRequeridos = [
+      { field: 'titulo', mensaje: 'El título es requerido' },
+      { field: 'descripcion', mensaje: 'La descripción es requerida' },
+      { field: 'duracion', mensaje: 'La duración es requerida' },
+      { field: 'precio', mensaje: 'El precio es requerido' },
+      { field: 'cupos', mensaje: 'Los cupos son requeridos' },
+      { field: 'profesor', mensaje: 'El profesor es requerido' }
+    ];
+
+    for (const { field, mensaje } of camposRequeridos) {
+      if (!formData[field] || (typeof formData[field] === 'string' && !formData[field].trim())) {
+        newErrors[field] = mensaje;
+      }
+    }
+
+    // Validaciones de fechas
+    Object.assign(newErrors, validarFechas());
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -176,11 +247,22 @@ const ProgramaModal = ({
       onSubmit(e);
     }
   };
+  // Efecto para manejar el scroll del body cuando el modal está abierto
+  React.useEffect(() => {
+    if (mostrar) {
+      // Desactivar scroll del body
+      document.body.style.overflow = 'hidden';
+      return () => {
+        // Reactivar scroll del body al cerrar el modal
+        document.body.style.overflow = 'auto';
+      };
+    }
+  }, [mostrar]);
 
   if (!mostrar) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" style={{ zIndex: 1100 }}>
       <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
         {/* Header */}
         <div
@@ -223,10 +305,7 @@ const ProgramaModal = ({
               value={formData.tipo}
               onChange={handleInputChange}
               required
-              options={[
-                { value: 'curso', label: 'Curso' },
-                { value: 'programa-tecnico', label: 'Programa Técnico' }
-              ]}
+              options={TIPO_OPCIONES}
             />
 
             <FormField
@@ -246,11 +325,7 @@ const ProgramaModal = ({
               value={formData.modalidad}
               onChange={handleInputChange}
               required
-              options={[
-                { value: 'presencial', label: 'Presencial' },
-                { value: 'virtual', label: 'Virtual' },
-                { value: 'hibrido', label: 'Híbrido' }
-              ]}
+              options={MODALIDAD_OPCIONES}
             />
 
             <FormField

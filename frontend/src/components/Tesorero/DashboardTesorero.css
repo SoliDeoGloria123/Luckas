@@ -2028,3 +2028,351 @@ body {
         font-size: 1rem;
     }
 }
+
+/* ================= GESTIÓN USUARIOS RESPONSIVE ================= */
+
+/* Clases responsive para header */
+.responsive-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .responsive-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+/* Clases responsive para grid de estadísticas */
+.responsive-stats {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .responsive-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Clases responsive para filtros */
+.responsive-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+@media (min-width: 768px) {
+    .responsive-filters {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.responsive-search-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .responsive-search-filters {
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+    }
+}
+
+/* Contenedor de tabla responsive */
+.responsive-table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Tabla responsive */
+.responsive-table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+}
+
+/* Columnas ocultas en móviles */
+@media (max-width: 640px) {
+    .responsive-table .hidden-mobile {
+        display: none;
+    }
+}
+
+/* Columnas ocultas en tablets */
+@media (max-width: 768px) {
+    .responsive-table .hidden-tablet {
+        display: none;
+    }
+}
+
+/* Input de búsqueda responsive */
+.responsive-search-input {
+    width: 100%;
+    min-width: 200px;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+    .responsive-search-input {
+        width: 300px;
+    }
+}
+
+/* Select responsive */
+.responsive-select {
+    width: 100%;
+    min-width: 120px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+@media (min-width: 640px) {
+    .responsive-select {
+        width: auto;
+        min-width: 150px;
+    }
+}
+
+/* Cards de estadísticas responsive */
+.responsive-stat-card {
+    background: var(--color-white);
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+@media (min-width: 640px) {
+    .responsive-stat-card {
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+}
+
+.responsive-stat-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Contenedor principal responsive */
+.responsive-container {
+    padding: 1rem;
+}
+
+@media (min-width: 640px) {
+    .responsive-container {
+        padding: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-container {
+        padding: 2rem;
+    }
+}
+
+/* Responsive para header de página gestión usuarios */
+@media (max-width: 767px) {
+    .page-header-tesorero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .card-header-tesorero {
+        width: 100%;
+    }
+    
+    .btn-primary-tesorero {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Responsive para filtros gestión usuarios */
+@media (max-width: 767px) {
+    .filters-section-tesorero {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem;
+    }
+    
+    .search-filters-tesorero {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.75rem;
+    }
+    
+    #userSearch {
+        width: 100%;
+    }
+    
+    .filter-select {
+        width: 100%;
+    }
+}
+
+/* Responsive para grid de estadísticas usuarios */
+@media (max-width: 767px) {
+    .stats-grid-usuarios {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stat-card-usuarios {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .stat-number-usuarios {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-grid-usuarios {
+        margin-bottom: 1rem;
+    }
+    
+    .stat-card-usuarios {
+        padding: 0.75rem;
+    }
+    
+    .stat-number-usuarios {
+        font-size: 1.5rem;
+    }
+    
+    .stat-icon-usuarios {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+/* Responsive para tabla */
+@media (max-width: 767px) {
+    .space-y-4 {
+        padding: 0 1rem;
+    }
+    
+    .rounded-xl {
+        margin: 0;
+        border-radius: 8px;
+    }
+    
+    .overflow-x-auto table {
+        font-size: 0.8rem;
+    }
+    
+    .px-6 {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    .py-4 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .overflow-x-auto table {
+        font-size: 0.75rem;
+    }
+    
+    .px-6 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    .py-4 {
+        padding-top: 0.375rem;
+        padding-bottom: 0.375rem;
+    }
+    
+    .text-sm {
+        font-size: 0.7rem;
+    }
+}
+
+/* Responsive para paginación */
+@media (max-width: 767px) {
+    .pagination-admin {
+        padding: 0 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .pagination-info-admin {
+        order: -1;
+        text-align: center;
+    }
+    
+    .pagination-btn-admin {
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Responsive específico para botones de acción en tabla */
+@media (max-width: 767px) {
+    .whitespace-nowrap {
+        white-space: normal;
+    }
+    
+    td div[style*="display: flex"] {
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: center;
+    }
+    
+    .h-8.w-8 {
+        height: 1.75rem;
+        width: 1.75rem;
+        font-size: 0.75rem;
+    }
+    
+    .btn-action {
+        padding: 0.375rem;
+        font-size: 0.75rem;
+        min-width: 2rem;
+        height: 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

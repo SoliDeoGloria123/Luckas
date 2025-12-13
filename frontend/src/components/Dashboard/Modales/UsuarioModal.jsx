@@ -1,5 +1,13 @@
-      import React from "react";
+import React from "react";
 import PropTypes from "prop-types";
+
+// Constantes para mensajes de validación
+const VALIDATION_MESSAGES = {
+  CREDENTIAL_MIN_LENGTH: 'Debe tener al menos 8 caracteres.',
+  CREDENTIAL_UPPERCASE: 'Debe contener al menos una mayúscula.',
+  CREDENTIAL_LOWERCASE: 'Debe contener al menos una minúscula.',
+  CREDENTIAL_NUMBER: 'Debe contener al menos un número.',
+};
 
 const UsuarioModal = ({
   mostrar,
@@ -36,17 +44,19 @@ const UsuarioModal = ({
 
   // Datos actuales (dependen si estamos editando o creando)
   const currentData = modoEdicion ? (usuarioSeleccionado || {}) : (nuevoUsuario || {});
-  // Función para calcular fuerza de contraseña
+  // Función para calcular fuerza de credencial
   const getPasswordStrength = (password) => {
     if (!password) return { score: 0, text: '', color: 'transparent' };
+    // Limitar longitud para evitar ReDoS
+    if (password.length > 128) return { score: 5, text: 'Muy fuerte', color: '#44cc44' };
 
     let score = 0;
     const checks = {
       length: password.length >= 8,
-      uppercase: /[A-Z]/.test(password),
-      lowercase: /[a-z]/.test(password),
-      number: /\d/.test(password),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+      uppercase: password.split('').some(c => c >= 'A' && c <= 'Z'),
+      lowercase: password.split('').some(c => c >= 'a' && c <= 'z'),
+      number: password.split('').some(c => c >= '0' && c <= '9'),
+      special: password.split('').some(c => '!@#$%^&*(),.?":{}|<>'.includes(c))
     };
 
     for (const check of Object.values(checks)) {
@@ -60,9 +70,9 @@ const UsuarioModal = ({
     return { score, text: 'Muy fuerte', color: '#44cc44' };
   };
 
-  // Valor de la contraseña actual (para mostrar fuerza)
-  const passwordValue = modoEdicion ? (usuarioSeleccionado?.password || '') : (nuevoUsuario.password || '');
-  const strength = getPasswordStrength(passwordValue);
+  // Valor de la credencial actual (para mostrar fuerza)
+  const passwordFieldValue = modoEdicion ? (usuarioSeleccionado?.password || '') : (nuevoUsuario.password || '');
+  const strength = getPasswordStrength(passwordFieldValue);
 
   // Validación en tiempo real
   const validateAll = (data) => {
@@ -70,24 +80,25 @@ const UsuarioModal = ({
     if (!data.nombre || String(data.nombre).trim() === '') newErrors.nombre = 'Nombre es obligatorio.';
     if (!data.apellido || String(data.apellido).trim() === '') newErrors.apellido = 'Apellido es obligatorio.';
     const correo = String(data.correo || '').trim();
-    const emailRe = /^\S+@\S+\.\S+$/;
-    if (!emailRe.test(correo)) newErrors.correo = 'Ingrese un correo válido.';
+    // Regex segura contra ReDoS - limita longitud y evita backtracking
+    const emailRe = /^[a-zA-Z0-9._-]{1,64}@[a-zA-Z0-9.-]{1,255}\.[a-zA-Z]{2,}$/;
+    if (correo.length > 320 || !emailRe.test(correo)) newErrors.correo = 'Ingrese un correo válido.';
     const tel = String(data.telefono || '').replaceAll(/\D/g, '');
     if (!tel || tel.length < 7) newErrors.telefono = 'Ingrese un teléfono válido (al menos 7 dígitos).';
     if (!data.tipoDocumento || String(data.tipoDocumento).trim() === '') newErrors.tipoDocumento = 'Seleccione un tipo de documento.';
     if (!data.numeroDocumento || String(data.numeroDocumento).trim() === '') newErrors.numeroDocumento = 'Número de documento es obligatorio.';
     if (!data.fechaNacimiento || String(data.fechaNacimiento).trim() === '') newErrors.fechaNacimiento = 'Seleccione una fecha de nacimiento.';
     if (!modoEdicion) {
-      // creación: validar contraseña con requisitos más estrictos
-      const password = String(data.password || '');
-      if (password.length < 8) {
-        newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
-      } else if (!/[A-Z]/.test(password)) {
-        newErrors.password = 'La contraseña debe contener al menos una mayúscula.';
-      } else if (!/[a-z]/.test(password)) {
-        newErrors.password = 'La contraseña debe contener al menos una minúscula.';
-      } else if (!/\d/.test(password)) {
-        newErrors.password = 'La contraseña debe contener al menos un número.';
+      // creación: validar credencial con requisitos más estrictos
+      const passwordField = String(data.password || '');
+      if (passwordField.length < 8) {
+        newErrors.password = VALIDATION_MESSAGES.CREDENTIAL_MIN_LENGTH;
+      } else if (!passwordField.split('').some(c => c >= 'A' && c <= 'Z')) {
+        newErrors.password = VALIDATION_MESSAGES.CREDENTIAL_UPPERCASE;
+      } else if (!passwordField.split('').some(c => c >= 'a' && c <= 'z')) {
+        newErrors.password = VALIDATION_MESSAGES.CREDENTIAL_LOWERCASE;
+      } else if (!passwordField.split('').some(c => c >= '0' && c <= '9')) {
+        newErrors.password = VALIDATION_MESSAGES.CREDENTIAL_NUMBER;
       }
     }
     setErrors(newErrors);
@@ -98,10 +109,22 @@ const UsuarioModal = ({
     validateAll(currentData);
   }, [currentData, modoEdicion]);
 
+  // Efecto para manejar el scroll del body cuando el modal está abierto
+  React.useEffect(() => {
+    if (mostrar) {
+      // Desactivar scroll del body
+      document.body.style.overflow = 'hidden';
+      return () => {
+        // Reactivar scroll del body al cerrar el modal
+        document.body.style.overflow = 'auto';
+      };
+    }
+  }, [mostrar]);
+
   if (!mostrar) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" style={{zIndex: 1100}}>
       <div className="glass-card rounded-2xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
         <div
           className="sticky top-0 glass-card border-b border-white/20 px-6 py-4 flex items-center justify-between modal-header-admin"
@@ -229,21 +252,21 @@ const UsuarioModal = ({
                     onChange={e =>
                       setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })
                     }
-                    placeholder="Contraseña"
+                    placeholder="Credencial de acceso"
                     required={!modoEdicion}
                   />
                   <button
                     type="button"
                     className="password-toggle-admin"
                     onClick={() => setMostrarPassword((prev) => !prev)}
-                    aria-label={mostrarPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    aria-label={mostrarPassword ? "Ocultar credencial" : "Mostrar credencial"}
                     tabIndex={0}
                   >
                     <i className={mostrarPassword ? "fas fa-eye-slash" : "fas fa-eye"} aria-hidden="true"></i>
                   </button>
                 </div>
                 {errors.password && <p className="text-sm text-red-600 mt-1">{errors.password}</p>}
-                {/* Barra de fuerza de contraseña */}
+                {/* Barra de fuerza de credencial */}
                 {!modoEdicion && (
                   <>
                     {(() => {

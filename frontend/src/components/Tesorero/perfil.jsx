@@ -8,26 +8,34 @@ import { userService } from '../../services/userService';
 import './Gestion.css';
 import { mostrarAlerta } from "../utils/alertas";
 
+// Constantes para mensajes de validación de credenciales
+const CREDENTIAL_MESSAGES = {
+  CURRENT_REQUIRED: 'Credencial actual requerida',
+  NEW_REQUIRED: 'Nueva credencial requerida',
+  MIN_LENGTH: 'Debe tener al menos 6 caracteres',
+  NO_MATCH: 'Las credenciales no coinciden',
+};
+
 // Helpers fuera del componente para reducir complejidad
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 function validateEmailFormat(email) {
     return emailRegex.test(String(email || ''));
 }
 
-function computePasswordErrors(pwdData) {
+function computePasswordErrors(credentialData) {
     const errs = {};
-    const cur = pwdData.currentPassword;
-    const nw = pwdData.newPassword;
-    const cf = pwdData.confirmPassword;
+    const current = credentialData.currentPassword;
+    const newCred = credentialData.newPassword;
+    const confirm = credentialData.confirmPassword;
 
-    if (cur !== undefined && cur === '') errs.currentPassword = 'Contraseña actual requerida';
+    if (current !== undefined && current === '') errs.currentPassword = CREDENTIAL_MESSAGES.CURRENT_REQUIRED;
 
-    if (nw !== undefined) {
-        if (!nw) errs.newPassword = 'Nueva contraseña requerida';
-        else if (nw.length < 6) errs.newPassword = 'La nueva contraseña debe tener al menos 6 caracteres';
+    if (newCred !== undefined) {
+        if (!newCred) errs.newPassword = CREDENTIAL_MESSAGES.NEW_REQUIRED;
+        else if (newCred.length < 6) errs.newPassword = CREDENTIAL_MESSAGES.MIN_LENGTH;
     }
-    if (cf !== undefined && nw !== undefined && nw && cf !== nw) {
-        errs.confirmPassword = 'Las contraseñas no coinciden';
+    if (confirm !== undefined && newCred !== undefined && newCred && confirm !== newCred) {
+        errs.confirmPassword = CREDENTIAL_MESSAGES.NO_MATCH;
     }
 
     return errs;
@@ -269,35 +277,35 @@ function SecurityCard({ passwordData, handlePasswordChange, passwordErrors, show
                 <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center"><Lock className="w-5 h-5 text-red-600" /></div>
                 <div>
                     <h3 className="text-lg font-semibold text-gray-900">Seguridad</h3>
-                    <p className="text-sm text-gray-600">Gestiona tu contraseña y configuraciones de seguridad</p>
+                    <p className="text-sm text-gray-600">Gestiona tus credenciales y configuraciones de seguridad</p>
                 </div>
             </div>
 
             <div className="space-y-4">
                 <div>
-                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Credencial Actual</label>
                     <div className="relative">
-                        <input id="currentPassword" name="currentPassword" type={showCurrentPassword ? 'text' : 'password'} value={passwordData.currentPassword} onChange={(e) => handlePasswordChange('currentPassword', e.target.value)} className="w-full px-4 py-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Ingresa tu contraseña actual" />
-                        <button type="button" onClick={() => setShowCurrentPassword(s => !s)} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" aria-label={showCurrentPassword ? 'Ocultar contraseña actual' : 'Mostrar contraseña actual'}>{showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
+                        <input id="currentPassword" name="currentPassword" type={showCurrentPassword ? 'text' : 'password'} value={passwordData.currentPassword} onChange={(e) => handlePasswordChange('currentPassword', e.target.value)} className="w-full px-4 py-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Ingresa tu credencial actual" />
+                        <button type="button" onClick={() => setShowCurrentPassword(s => !s)} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" aria-label={showCurrentPassword ? 'Ocultar credencial actual' : 'Mostrar credencial actual'}>{showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
                     </div>
                     {passwordErrors.currentPassword && <p className="text-red-600 text-sm mt-1">{passwordErrors.currentPassword}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                        <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">Nueva Credencial</label>
                             <div className="relative">
-                                <input id="newPassword" name="newPassword" type={showNewPassword ? 'text' : 'password'} value={passwordData.newPassword} onChange={(e) => handlePasswordChange('newPassword', e.target.value)} className="w-full px-4 py-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Nueva contraseña" />
-                                <button type="button" onClick={() => setShowNewPassword(s => !s)} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" aria-label={showNewPassword ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}>{showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
+                                <input id="newPassword" name="newPassword" type={showNewPassword ? 'text' : 'password'} value={passwordData.newPassword} onChange={(e) => handlePasswordChange('newPassword', e.target.value)} className="w-full px-4 py-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Nueva credencial" />
+                                <button type="button" onClick={() => setShowNewPassword(s => !s)} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" aria-label={showNewPassword ? 'Ocultar nueva credencial' : 'Mostrar nueva credencial'}>{showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
                             </div>
                             {passwordErrors.newPassword && <p className="text-red-600 text-sm mt-1">{passwordErrors.newPassword}</p>}
                     </div>
 
                     <div>
-                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Credencial</label>
                         <div className="relative">
-                            <input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={passwordData.confirmPassword} onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)} className="w-full px-4 py-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Confirmar nueva contraseña" />
-                            <button type="button" onClick={() => setShowConfirmPassword(s => !s)} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" aria-label={showConfirmPassword ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'}>{showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
+                            <input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={passwordData.confirmPassword} onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)} className="w-full px-4 py-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Confirmar nueva credencial" />
+                            <button type="button" onClick={() => setShowConfirmPassword(s => !s)} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" aria-label={showConfirmPassword ? 'Ocultar confirmación de credencial' : 'Mostrar confirmación de credencial'}>{showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
                         </div>
                         {passwordErrors.confirmPassword && <p className="text-red-600 text-sm mt-1">{passwordErrors.confirmPassword}</p>}
                     </div>
@@ -305,7 +313,7 @@ function SecurityCard({ passwordData, handlePasswordChange, passwordErrors, show
 
                 <div className="flex justify-end pt-4">
                     <button onClick={cambiarContrasena} className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2">
-                        <Lock className="w-5 h-5" /> Cambiar Contraseña
+                        <Lock className="w-5 h-5" /> Cambiar Credencial
                     </button>
                 </div>
             </div>
@@ -461,15 +469,15 @@ const Perfil = ()   =>{
                 currentPassword: passwordData.currentPassword,
                 newPassword: passwordData.newPassword
             });
-            mostrarAlerta('Éxito', 'Contraseña cambiada correctamente', 'success');
+            mostrarAlerta('Éxito', 'Credencial actualizada correctamente', 'success');
 
             // Limpiar campos de contraseña y errores
             setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
             setPasswordErrors({});
         } catch (error) {
-            console.error('Error al cambiar contraseña:', error);
+            console.error('Error al cambiar credencial:', error);
             const details = error?.details || null;
-            const msg = details?.message || error.message || 'Error al cambiar la contraseña';
+            const msg = details?.message || error.message || 'Error al actualizar la credencial';
             const fieldErrs = mapServiceErrorDetailsToFieldErrors(details);
             if (Object.keys(fieldErrs).length) setPasswordErrors(prev => ({ ...prev, ...fieldErrs }));
             mostrarAlerta('Error', msg, 'error');

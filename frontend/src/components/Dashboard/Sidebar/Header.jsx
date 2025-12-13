@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Menu, Search } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import NotificationButton from '../Shared/NotificationButton';
+import NotificationButton from '../../notificaciones/admin-tesorero/NotificationButton';
 
 
 
