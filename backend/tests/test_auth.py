@@ -210,13 +210,27 @@ class TestLogout:
         page = logged_in_page
         role = page.role
         
-        # Buscar y clickear menú
+        # Para seminarista: usar selector específico
+        if role == "seminarista":
+            user_menu_btn = page.locator(".user-profile-seminario")
+            if user_menu_btn.count() > 0:
+                user_menu_btn.click(timeout=3000)
+                page.wait_for_timeout(800)
+                
+                logout_button = page.locator(".user-dropdown-header button:has-text('Cerrar Sesión')")
+                if logout_button.count() > 0:
+                    logout_button.click(timeout=3000)
+                    page.wait_for_url("**/login**", timeout=TIMEOUT_DEFAULT)
+                    print(f"✅ {role.capitalize()} cerró sesión correctamente")
+                    return
+        
+        # Para otros roles: usar selector genérico
         menu_button = page.locator("button[aria-haspopup='true']").first
         if menu_button.count() > 0:
             menu_button.click()
             page.wait_for_timeout(300)
         
-        # Logout (usar last() para evitar duplicados)
+        # Logout
         logout_button = page.locator("button:has-text('Cerrar Sesión')").last
         if logout_button.count() > 0:
             logout_button.click()
@@ -283,4 +297,4 @@ class TestUnauthorizedAccess:
         # Por ahora, log para debugging
         print(f"✅ {role.capitalize()} intentó acceder a /admin/usuarios - URL actual: {page.url}")
         
-        # TODO: Implementar protección de rutas en frontend para roles no-admin
+        # Implementar protección de rutas en frontend para roles no-admin

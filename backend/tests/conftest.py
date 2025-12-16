@@ -1,7 +1,7 @@
 import pytest
 import os
 import re
-from playwright.sync_api import Page, expect, Browser, BrowserContext
+from playwright.sync_api import sync_playwright, Page, expect, Browser, BrowserContext
 from datetime import datetime
 import sys
 
@@ -12,8 +12,42 @@ TIMEOUT_DEFAULT = 10000  # 10 segundos por defecto
 LOGIN_WAIT_URL_TIMEOUT = 10000  # 10s para esperar redirección tras login
 LOGIN_WAIT_UI_TIMEOUT = 10000   # 10s para esperar elementos UI que confirmen sesión
 
+# ========== MODO HEADLESS (VISUAL) ==========
+# Cambia HEADLESS = False para ver el navegador durante las pruebas
+HEADLESS = False  # True = sin interfaz gráfica, False = con interfaz gráfica
+SLOW_MO = 1000   # Ralentiza 1 segundo entre acciones (útil para ver lo que pasa)
+
 # Crear carpetas para resultados si no existen
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+
+# ========== FIXTURE PLAYWRIGHT BROWSER ==========
+@pytest.fixture(scope="session")
+def browser():
+    """Crea el contexto del navegador para toda la sesión."""
+    playwright = sync_playwright().start()
+    browser = playwright.firefox.launch(
+        headless=HEADLESS,  # False para ver el navegador
+        slow_mo=SLOW_MO,    # Ralentiza acciones para ver en tiempo real
+        args=["--start-maximized"]  # Maximizar ventana
+    )
+    yield browser
+    browser.close()
+    playwright.stop()
+
+@pytest.fixture
+def context(browser):
+    """Crea un nuevo contexto del navegador para cada test."""
+    context = browser.new_context()
+    yield context
+    context.close()
+
+@pytest.fixture
+def page(context):
+    """Crea una nueva página para cada test."""
+    page = context.new_page()
+    page.set_default_timeout(TIMEOUT_DEFAULT)
+    yield page
+    page.close()
 
 # ========== FIXTURES DE DATOS ==========
 
@@ -90,9 +124,55 @@ def wait_for_element(page: Page, selector: str, timeout: int = TIMEOUT_DEFAULT, 
         if description:
             print(f"[OK] Encontrado: {description}")
         return True
-    except Exception as e:
+    except Exception:
         if description:
             print(f"[ERROR] No encontrado: {description}")
+        return False
+
+def verify_dashboard_loaded(page: Page, dashboard_path: str):
+    """
+    Verifica que el dashboard se haya cargado correctamente.
+    Intenta múltiples estrategias: URL, UI, y detecta errores.
+    """
+    if _check_url_redirect(page, dashboard_path):
+        return True
+    
+    if _check_dashboard_ui(page):
+        return True
+    
+    print("   [ERROR] No se detectaron indicadores de dashboard cargado")
+    print(f"   URL actual: {page.url}")
+    return False
+
+def _check_url_redirect(page: Page, dashboard_path: str):
+    """Verifica si la URL cambió al dashboard."""
+    try:
+        page.wait_for_url(f"**{dashboard_path}**", timeout=LOGIN_WAIT_URL_TIMEOUT)
+        print("   [OK] Redireccion exitosa (URL)")
+        return True
+    except Exception:
+        print("   [WARN] URL change timed out, verificando UI del dashboard...")
+        return False
+
+def _check_dashboard_ui(page: Page):
+    """Verifica si los elementos UI del dashboard están presentes."""
+    try:
+        page.wait_for_load_state("networkidle", timeout=LOGIN_WAIT_UI_TIMEOUT)
+        
+        logout_selector = "button:has-text('Cerrar Sesión')"
+        user_menu_selector = "button[aria-haspopup='true']"
+        dashboard_heading = "text=Gestión de"
+        
+        if (wait_for_element(page, logout_selector, timeout=3000) or 
+            wait_for_element(page, user_menu_selector, timeout=3000) or 
+            wait_for_element(page, dashboard_heading, timeout=3000)):
+            print("   [OK] Dashboard cargado (UI detectada)")
+            return True
+        
+        return False
+    except Exception as redirect_error:
+        print(f"   [ERROR] Error verificando UI: {redirect_error}")
+        print(f"   URL actual: {page.url}")
         return False
 
 # ========== HOOKS DE PYTEST ==========
@@ -148,16 +228,15 @@ def logged_in_page(page: Page, users, request):
         # Se ejecutará 2 veces
     """
     
-    # Obtener el rol del parámetro
     role = request.param
     user = users[role]
     
     print(f"\n[KEY] Iniciando sesion como: {role}")
     
-    # Ir a página de login
+    # Navegar a login
     page.goto(f"{BASE_URL}/login", wait_until="networkidle")
     
-    # Esperar a que carguen los inputs del formulario
+    # Obtener campos del formulario
     email_field = page.locator("[id='correo']")
     password_field = page.locator("[id='password']")
     login_button = page.locator("button:has-text('Iniciar Sesión')")
@@ -166,65 +245,25 @@ def logged_in_page(page: Page, users, request):
         expect(email_field).to_be_visible(timeout=TIMEOUT_DEFAULT)
         expect(password_field).to_be_visible(timeout=TIMEOUT_DEFAULT)
         expect(login_button).to_be_visible(timeout=TIMEOUT_DEFAULT)
-    except Exception as e:
-        print(f"[ERROR] No se encontraron los campos de login: {e}")
+    except Exception as login_error:
+        print(f"[ERROR] No se encontraron los campos de login: {login_error}")
         raise
     
-    # Rellenar formulario
+    # Rellenar y enviar formulario
     email_field.fill(user["correo"])
     password_field.fill(user["password"])
     
     print(f"   Correo: {user['correo']}")
     print(f"   Contrasena: {'*' * len(user['password'])}")
     
-    # Hacer clic en botón de login
     login_button.click()
     
-    # Esperar redirección según el rol
+    # Verificar que el dashboard se cargó
     print(f"   Esperando redireccion a {user['dashboard_path']}...")
-    try:
-        # Intentar esperar a que la URL cambie al dashboard (React Router puede no disparar navegación completa)
-        page.wait_for_url(f"**{user['dashboard_path']}**", timeout=LOGIN_WAIT_URL_TIMEOUT)
-        print(f"   [OK] Redireccion exitosa (URL)")
-    except Exception as e:
-        print(f"   [WARN] URL change timed out, intentando comprobar elementos UI del dashboard...")
-        try:
-            # Esperar a un indicador de sesión iniciada: botón de usuario / logout o header del dashboard
-            # Primero, esperar carga de red
-            page.wait_for_load_state("networkidle", timeout=LOGIN_WAIT_UI_TIMEOUT)
-
-            # Comprobar botón de logout / menú de usuario
-            logout_selector = "button:has-text('Cerrar Sesión')"
-            user_menu_selector = "button[aria-haspopup='true']"
-            dashboard_heading = "text=Gestión de"  # heurística para páginas de administración
-
-            if wait_for_element(page, logout_selector, timeout=3000) or wait_for_element(page, user_menu_selector, timeout=3000) or wait_for_element(page, dashboard_heading, timeout=3000):
-                print(f"   [OK] Dashboard cargado (UI detectada)")
-            else:
-                # Intentar detectar mensajes de error visibles para dar mejor feedback
-                possible_error_selectors = [".swal2-popup", ".Toastify__toast", ".alert", ".error", "text=Credenciales"]
-                error_texts = []
-                for sel in possible_error_selectors:
-                    try:
-                        if page.locator(sel).count() > 0:
-                            text = page.locator(sel).inner_text()
-                            error_texts.append(f"{sel}: {text}")
-                    except Exception:
-                        continue
-
-                print(f"   [ERROR] Aun en login: {e}")
-                if error_texts:
-                    print("   Mensajes detectados:")
-                    for t in error_texts:
-                        print("    - ", t)
-                print(f"   URL actual: {page.url}")
-                raise
-        except Exception as e2:
-            print(f"   [ERROR] Error comprobando UI de redireccion: {e2}")
-            print(f"   URL actual: {page.url}")
-            raise
+    if not verify_dashboard_loaded(page, user['dashboard_path']):
+        raise AssertionError("Dashboard no cargó correctamente tras login")
     
-    # Adjuntar información al objeto page para fácil acceso en tests
+    # Adjuntar información al objeto page
     page.user = user
     page.role = role
     page.test_user_email = user["correo"]
@@ -234,23 +273,44 @@ def logged_in_page(page: Page, users, request):
     
     yield page
     
-    # CLEANUP: Cerrar sesión después de la prueba
+    # CLEANUP: Cerrar sesión después (deshabilitado para no cerrar sesión al final del test)
+    # logout_session(page, role)
+
+def logout_session(page: Page, role: str):
+    """
+    Intenta cerrar sesión haciendo clic en el botón de logout.
+    Maneja diferentes estructuras de menú por rol.
+    """
     try:
-        # Intentar hacer clic en el menú de usuario
+        # Para seminarista: el botón está en .user-dropdown-header
+        if role == "seminarista":
+            user_menu_btn = page.locator(".user-profile-seminario")
+            if user_menu_btn.count() > 0:
+                user_menu_btn.click(timeout=3000)
+                page.wait_for_timeout(800)
+                
+                # El botón está dentro de .user-dropdown-header
+                logout_button = page.locator(".user-dropdown-header button:has-text('Cerrar Sesión')")
+                if logout_button.count() > 0:
+                    logout_button.click(timeout=3000)
+                    page.wait_for_url("**/login**", timeout=TIMEOUT_DEFAULT)
+                    print(f"[OK] Sesion cerrada para {role}")
+                    return
+        
+        # Para otros roles: usar selector genérico
         menu_button = page.locator("button[aria-haspopup='true']").first
         if menu_button.count() > 0:
             menu_button.click(timeout=3000)
-            page.wait_for_timeout(300)
+            page.wait_for_timeout(500)
             
-            # Buscar botón de logout
-            logout_button = page.locator("button:has-text('Cerrar Sesión')")
+            logout_button = page.locator("button:has-text('Cerrar Sesión')").last
             if logout_button.count() > 0:
                 logout_button.click(timeout=3000)
-                page.wait_for_url("**/login**", timeout=5000)
+                page.wait_for_url("**/login**", timeout=TIMEOUT_DEFAULT)
                 print(f"[OK] Sesion cerrada para {role}")
-    except Exception as e:
-        print(f"⚠️  No se pudo cerrar sesión automáticamente: {e}")
-        # Limpiar localStorage como fallback
+                
+    except Exception as logout_error:
+        print(f"⚠️  No se pudo cerrar sesión automáticamente: {logout_error}")
         page.evaluate("localStorage.clear()")
 
 # ========== FIXTURE PARAMETRIZADA PARA MÚLTIPLES ROLES ==========
