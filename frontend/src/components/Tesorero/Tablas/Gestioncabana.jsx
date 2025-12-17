@@ -21,6 +21,17 @@ import {
   MapPin
 } from 'lucide-react';
 
+
+const crearCabanaVacia = () => ({
+  nombre: '',
+  descripcion: '',
+  capacidad: '',
+  precio: '',
+  categoria: '',
+  estado: 'disponible',
+  servicios: []
+});
+
 const Gestioncabana = () => {
   // Estado de carga y filtrado
   // Carrusel de imágenes: un índice por cabaña
@@ -38,15 +49,7 @@ const Gestioncabana = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [cabanaSeleccionada, setCabanaSeleccionada] = useState(null);
-  const [nuevaCabana, setNuevaCabana] = useState({
-    nombre: '',
-    descripcion: '',
-    capacidad: '',
-    precio: '',
-    categoria: '',
-    estado: 'disponible',
-    servicios: []
-  });
+  const [nuevaCabana, setNuevaCabana] = useState(crearCabanaVacia());
   const [selectedImages, setSelectedImages] = useState([]);
   const [estadisticas, setEstadisticas] = useState({ totalCabanas: 0, disponibles: 0, ocupadas: 0, mantenimiento: 0 });
 
@@ -76,15 +79,7 @@ const Gestioncabana = () => {
     return [];
   };
 
-  const abrirModalVer = (evento) => {
-    setEventoDetalle(evento);
-    setCarouselIndex(0);
-    setMostrarModalDetalle(true);
-  };
-  // Alias usados por el markup original (no modificar el card):
-  const onVerDetalle = abrirModalVer;
   const [cabanas, setCabanas] = useState([]);
-  // Helpers de filtrado
   const pasaFiltroPorCategoriaCabana = (cabana, categoriaFilter) => {
     if (!categoriaFilter || categoriaFilter === 'todos') return true;
     const cat = cabana.categoria?._id || cabana.categoria?.nombre || cabana.categoria;
@@ -165,75 +160,79 @@ const Gestioncabana = () => {
     );
   };
 
-  // Obtener cabañas
-  const obtenerCabanas = async () => {
+  // Helper genérico para obtener datos desde API - consolida la lógica
+  const obtenerDatos = async (servicio, setState, onSuccess, errorMsg) => {
     try {
-      const data = await cabanaService.getAll();
-      let cabs = Array.isArray(data) ? data : [];
-      if (!Array.isArray(data) && Array.isArray(data.data)) {
-        cabs = data.data;
-      }
-      setCabanas(cabs);
-      estadisticasIniciales();
+      const respuesta = await servicio();
+      const datos = Array.isArray(respuesta) ? respuesta : (respuesta?.data || []);
+      setState(datos);
+      if (onSuccess) onSuccess();
     } catch (err) {
-      console.log("Error al obtener cabañas: " + err.message);
+      setState([]);
+      console.log("Error", `${errorMsg}: ${err.message}`);
     }
   };
-  //obtener estadisticas
+
+  // Obtener cabañas
+  const obtenerCabanas = () => obtenerDatos(
+    () => cabanaService.getAll(),
+    setCabanas,
+    () => estadisticasIniciales(),
+    'Error al obtener cabañas'
+  );
+
+  // Obtener estadísticas
   const estadisticasIniciales = async () => {
     try {
       const stats = await cabanaService.getEstadisticasGenerales();
       setEstadisticas(stats);
-
-    }
-    catch (err) {
+    } catch (err) {
       console.log("Error al obtener estadísticas generales: " + err.message);
     }
-  }
-  const obtenerCategorias = async () => {
-    try {
-      const data = await categorizacionService.getAll();
-      // Soporta respuesta tipo {data: [...]} o array directa
-      let cats = Array.isArray(data) ? data : [];
-      if (!Array.isArray(data) && Array.isArray(data.data)) {
-        cats = data.data;
-      }
-      setCategorias(cats);
-    } catch (err) {
-      console.log("Error", "Error al obtener categorías: " + err.message);
-    }
   };
+
+  // Obtener categorías
+  const obtenerCategorias = () => obtenerDatos(
+    () => categorizacionService.getAll(),
+    setCategorias,
+    null,
+    'Error al obtener categorías'
+  );
   useEffect(() => {
     obtenerCabanas();
     obtenerCategorias();
   }, []);
 
-  const handleCreate = () => {
+  // Helper para resetear estado del modal
+  const resetearEstado = () => {
+    setNuevaCabana(crearCabanaVacia());
+    setSelectedImages([]);
     setModoEdicion(false);
     setCabanaSeleccionada(null);
-    setNuevaCabana({
-      nombre: '',
-      descripcion: '',
-      capacidad: '',
-      precio: '',
-      categoria: '',
-      estado: 'disponible',
-      servicios: []
-    });
-    setSelectedImages([]);
-    setMostrarModal(true);
   };
 
-  const handleEdit = (cabana) => {
-    setModoEdicion(true);
-    setCabanaSeleccionada(cabana);
-    setMostrarModal(true);
+  // Helper genérico para modales - consolidado
+  const abrirModal = (tipo, cabana = null) => {
+    if (tipo === 'crear') {
+      resetearEstado();
+      setMostrarModal(true);
+    } else if (tipo === 'editar') {
+      setModoEdicion(true);
+      setCabanaSeleccionada(cabana);
+      setMostrarModal(true);
+    } else if (tipo === 'ver') {
+      setEventoDetalle(cabana);
+      setCarouselIndex(0);
+      setMostrarModalDetalle(true);
+    }
   };
+
+  // Aliases para mantener compatibilidad
+  const handleCreate = () => abrirModal('crear');
+  const handleEdit = (cabana) => abrirModal('editar', cabana);
+  const abrirModalVer = (cabana) => abrirModal('ver', cabana);
+  const onVerDetalle = abrirModalVer;
   const onEditar = handleEdit;
-
-  // Eliminar referencias inalcanzables; los helpers se usan en el render.
-
-  // Toggle de disponibilidad (actualiza el backend y recarga la lista)
   const toggleDisponibilidad = async (cabana) => {
     try {
       const id = cabana._id;
@@ -246,41 +245,34 @@ const Gestioncabana = () => {
     }
   };
 
-  // Funciones para el modal del Dashboard
-  const crearCabana = async (payload) => {
-    // Soporta recibir event (desde submit directo) o un payload (FormData u objeto)
+  // Helper genérico para operaciones CRUD de cabañas - consolidado
+  const operarCabana = async (operacion, datosPayload = null) => {
     try {
-      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
-      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaCabana;
-      await cabanaService.create(body);
-      mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente", 'success');
+      const body = (datosPayload && typeof datosPayload.preventDefault !== 'function') ? datosPayload : nuevaCabana;
+      const id = cabanaSeleccionada?._id;
+      
+      switch (operacion) {
+        case 'crear':
+          await cabanaService.create(body);
+          mostrarAlerta("¡Éxito!", "Cabaña creada exitosamente", 'success');
+          break;
+        case 'actualizar':
+          if (!id) throw new Error('No se encontró el ID de la cabaña a actualizar');
+          await cabanaService.update(id, body);
+          mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente", 'success');
+          break;
+      }
       setMostrarModal(false);
+      resetearEstado();
       obtenerCabanas();
     } catch (error) {
-      mostrarAlerta("Error", `Error al crear cabaña: ${error.message}`, 'error');
+      mostrarAlerta("Error", `Error: ${error.message}`, 'error');
     }
   };
 
-  // Función auxiliar para manejar la actualización con FormData o sin él
-  const procesarActualizacionCabana = (payload) => {
-    const id = (payload && payload._id) ? payload._id : (cabanaSeleccionada && cabanaSeleccionada._id);
-    if (!id) throw new Error('No se encontró el ID de la cabaña a actualizar');
-    return id;
-  };
-
-  const actualizarCabana = async (payload) => {
-    try {
-      if (payload && typeof payload.preventDefault === 'function') payload.preventDefault();
-      const body = (payload && typeof payload.preventDefault !== 'function') ? payload : nuevaCabana;
-      const id = procesarActualizacionCabana(body);
-      await cabanaService.update(id, body);
-      mostrarAlerta("¡Éxito!", "Cabaña actualizada exitosamente", 'success');
-      setMostrarModal(false);
-      obtenerCabanas();
-    } catch (error) {
-      mostrarAlerta("Error", `Error al actualizar cabaña: ${error.message}`, 'error');
-    }
-  };
+  // Funciones CRUD derivadas
+  const crearCabana = (payload) => operarCabana('crear', payload);
+  const actualizarCabana = (payload) => operarCabana('actualizar', payload);
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);

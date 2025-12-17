@@ -1,3 +1,4 @@
+const crypto = require("node:crypto");
 const sendEmail = require("../utils/sendEmail");
 
 // ============================================
@@ -498,8 +499,9 @@ exports.enviarReporteSoporte = async (req, res) => {
       });
     }
 
-    // Generar número de ticket único
-    const ticketNumber = `LUCK-${Date.now()}-${Math.floor(Math.random() * 10000).toString().padStart(4, "0")}`;
+    // Generar número de ticket único usando número aleatorio criptográficamente seguro
+    const randomPart = crypto.randomBytes(2).readUInt16BE(0) % 10000;
+    const ticketNumber = `LUCK-${Date.now()}-${randomPart.toString().padStart(4, "0")}`;
 
     // HTML para el usuario (confirmación)
     const htmlUsuario = getTemplateConfirmacionSoporte(nombre, email, ticketNumber, modulo, severidad, descripcion);

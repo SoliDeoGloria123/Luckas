@@ -42,7 +42,8 @@ const EventosCarousel = () => {
     else if (e.active !== undefined) statusText = e.active ? 'Disponible' : 'No disponible';
 
     return {
-      id: e._id || e.id || e.uuid || Math.random(),
+      // Genera ID único para React key: usa _id si existe, si no usa índice generado de forma segura
+      id: e._id || e.id || e.uuid || `evento-${Date.now()}-${Array.from(crypto.getRandomValues(new Uint8Array(6))).map(b => b.toString(16).padStart(2, '0')).join('')}`,
       title: e.titulo || e.title || e.nombre || "Evento",
       date: e.fecha || e.date || e.fechaEvento || e.fecha_evento || e.createdAt || "--",
       type: e.tipo || e.type || categoriaTexto || "Evento",
@@ -58,7 +59,8 @@ const EventosCarousel = () => {
   const normalizePrograma = (p) => {
     const imagenesArray = toArray(p.imagen || p.image);
     return {
-      id: p._id || p.id || Math.random(),
+      // Genera ID único para React key: usa _id si existe, si no usa índice generado de forma segura
+      id: p._id || p.id || `programa-${Date.now()}-${Array.from(crypto.getRandomValues(new Uint8Array(6))).map(b => b.toString(16).padStart(2, '0')).join('')}`,
       title: p.titulo || p.nombre || p.title || "Programa",
       date: p.fecha_inicio || p.date || p.duracion || p.createdAt || "--",
       type: 'Curso',

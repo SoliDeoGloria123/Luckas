@@ -259,7 +259,8 @@ const ProfilePage = () => {
   // helpers para validación
   const isEmpty = (v) => !v || String(v).trim() === '';
   const validateEmail = (v) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+    // Regex seguro contra ReDoS: limita longitud para evitar backtracking catastrófico
+    const re = /^[^\s@]{1,64}@[^\s@]{1,255}$/i;
     return re.test(String(v).toLowerCase());
   };
   const validateDate = (v) => {

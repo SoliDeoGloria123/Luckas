@@ -60,9 +60,9 @@ def test_externo_can_view_public_events(logged_in_page: Page):
             # Cerrar modal
             try:
                 page.locator("button:has-text('Cerrar'), button[aria-label='Cerrar']").click(timeout=3000)
-            except:
+            except Exception:
                 page.keyboard.press("Escape")
-        except:
+        except Exception:
             pass
 
 @pytest.mark.parametrize("logged_in_page", ["externo"], indirect=True) 
@@ -81,7 +81,7 @@ def test_externo_can_view_public_cabanas(logged_in_page: Page):
         if cabanas_link.count() > 0:
             cabanas_link.click()
             page.wait_for_load_state("networkidle")
-    except:
+    except Exception:
         pass
     
     # Verificar que se muestran cabañas
@@ -102,9 +102,9 @@ def test_externo_can_view_public_cabanas(logged_in_page: Page):
             # Cerrar modal
             try:
                 page.locator("button:has-text('Cerrar'), button[aria-label='Cerrar']").click(timeout=3000)
-            except:
+            except Exception:
                 page.keyboard.press("Escape")
-        except:
+        except Exception:
             pass
 
 @pytest.mark.parametrize("logged_in_page", ["externo"], indirect=True)

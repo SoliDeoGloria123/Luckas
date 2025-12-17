@@ -26,43 +26,49 @@ const extraerListaDeRespuesta = (respuesta) => {
   return [];
 };
 
-// Helper para filtrado flexible
+// Helper para filtrado flexible - CONSOLIDADO
 const pasaFiltroGenerico = (objeto, filterValue, comparadores) => {
   if (!filterValue || filterValue === '' || filterValue === 'todos') return true;
   return comparadores.some(comp => comp(objeto, filterValue));
 };
 
-// Helpers para filtrado de eventos
-const pasaFiltroPorCategoriaEvento = (evento, filterCategoria) => {
-  const cat = evento.categoria?._id || evento.categoria?.nombre || evento.categoria;
-  return pasaFiltroGenerico(evento, filterCategoria, [
-    (e, val) => String(cat) === String(val),
-    (e, val) => String((e.categoria?.nombre || '')).toLowerCase() === String(val).toLowerCase(),
-  ]);
+// Funciones de filtrado unificadas - reduce duplicación
+const crearFiltroEvento = (tipo) => {
+  const filtros = {
+    categoria: (evento, filterCategoria) => {
+      const cat = evento.categoria?._id || evento.categoria?.nombre || evento.categoria;
+      return pasaFiltroGenerico(evento, filterCategoria, [
+        (e, val) => String(cat) === String(val),
+        (e, val) => String((e.categoria?.nombre || '')).toLowerCase() === String(val).toLowerCase(),
+      ]);
+    },
+    estado: (evento, filterEstado) => {
+      const comparadores = [
+        (e, val) => String(val).toLowerCase() === 'activo' && (e.active === true || String(e.estado).toLowerCase() === 'activo'),
+        (e, val) => String(val).toLowerCase() === 'inactivo' && (e.active === false || String(e.estado).toLowerCase() === 'inactivo'),
+        (e, val) => (e.estado || '').toLowerCase() === String(val).toLowerCase(),
+      ];
+      return pasaFiltroGenerico(evento, filterEstado, comparadores);
+    },
+    busqueda: (evento, searchTerm) => {
+      if (!searchTerm) return true;
+      const q = String(searchTerm).trim().toLowerCase();
+      if (!q) return true;
+      return [
+        (evento.nombre || '').toLowerCase(),
+        (evento.descripcion || '').toLowerCase(),
+        (evento.lugar || '').toLowerCase(),
+        (evento.direccion || '').toLowerCase(),
+        (evento.categoria?.nombre || '').toLowerCase(),
+      ].some(campo => campo.includes(q));
+    }
+  };
+  return filtros[tipo] || (() => true);
 };
 
-const pasaFiltroPorEstadoEvento = (evento, filterEstado) => {
-  const comparadores = [
-    (e, val) => String(val).toLowerCase() === 'activo' && (e.active === true || String(e.estado).toLowerCase() === 'activo'),
-    (e, val) => String(val).toLowerCase() === 'inactivo' && (e.active === false || String(e.estado).toLowerCase() === 'inactivo'),
-    (e, val) => (e.estado || '').toLowerCase() === String(val).toLowerCase(),
-  ];
-  return pasaFiltroGenerico(evento, filterEstado, comparadores);
-};
-
-const pasaFiltroPorBusquedaEvento = (evento, searchTerm) => {
-  if (!searchTerm) return true;
-  const q = String(searchTerm).trim().toLowerCase();
-  if (!q) return true;
-  const campos = [
-    (evento.nombre || '').toLowerCase(),
-    (evento.descripcion || '').toLowerCase(),
-    (evento.lugar || '').toLowerCase(),
-    (evento.direccion || '').toLowerCase(),
-    (evento.categoria?.nombre || '').toLowerCase(),
-  ];
-  return campos.some(campo => campo.includes(q));
-};
+const pasaFiltroPorCategoriaEvento = (evento, filterCategoria) => crearFiltroEvento('categoria')(evento, filterCategoria);
+const pasaFiltroPorEstadoEvento = (evento, filterEstado) => crearFiltroEvento('estado')(evento, filterEstado);
+const pasaFiltroPorBusquedaEvento = (evento, searchTerm) => crearFiltroEvento('busqueda')(evento, searchTerm);
 
 // Helper para formatear fecha
 const formatFecha = (f) => {
@@ -123,8 +129,8 @@ const Gestionevento = () => {
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
   const [estadisticas, setEstadisticas] = useState({ totalEvents: 0, upcoming: 0, completed: 0, cancelled: 0 });
 
-  // Helper genérico para obtener datos
-  const obtenerDatos = async (servicio, setState, onSuccess, errorMsg) => {
+  // Helper genérico consolidado para cargar datos
+  const cargarDatos = async (servicio, setState, onSuccess, errorMsg) => {
     try {
       const res = await servicio();
       const lista = extraerListaDeRespuesta(res);
@@ -136,16 +142,15 @@ const Gestionevento = () => {
     }
   };
 
-  // Obtener eventos
-  const obtenerEventos = () => obtenerDatos(
+  // Funciones derivadas - reutilizan cargarDatos
+  const obtenerEventos = () => cargarDatos(
     () => eventService.getAllEvents(),
     setEventos,
     null,
     'No se pudieron obtener los eventos'
   );
 
-  // Obtener categorías
-  const obtenerCategorias = () => obtenerDatos(
+  const obtenerCategorias = () => cargarDatos(
     () => categorizacionService.getAll(),
     setCategorias,
     obtenerEstadisticas,
@@ -195,25 +200,19 @@ const Gestionevento = () => {
   const prevImg = (eventoId, totalImages) => navegarImagen(eventoId, totalImages, 'prev');
   const nextImg = (eventoId, totalImages) => navegarImagen(eventoId, totalImages, 'next');
 
-  // Modales y handlers
+  // Consolidar handlers de modales
   const abrirModalVer = (evento) => {
     setEventoDetalle(evento);
     setMostrarModalDetalle(true);
   };
-
-  const onVerDetalle = abrirModalVer;
+  
+  const onVerDetalle = abrirModalVer; // Alias para mantener consistencia
 
   const resetNuevoEvento = () => ({
-    nombre: '',
-    descripcion: '',
-    fecha: '',
-    capacidad: '',
-    ubicacion: '',
-    categoria: '',
-    estado: 'activo'
+    nombre: '', descripcion: '', fecha: '', capacidad: '', ubicacion: '', categoria: '', estado: 'activo'
   });
 
-  const handleCreate = () => {
+  const abrirModalCrear = () => {
     setModoEdicion(false);
     setEventoSeleccionado(null);
     setNuevoEvento(resetNuevoEvento());
@@ -221,38 +220,37 @@ const Gestionevento = () => {
     setMostrarModal(true);
   };
 
-  const handleEdit = (evento) => {
+  const abrirModalEditar = (evento) => {
     setModoEdicion(true);
     setEventoSeleccionado(evento);
     setMostrarModal(true);
   };
+  
+  const handleCreate = abrirModalCrear; // Alias anterior
+  const onEditar = abrirModalEditar; // Alias adicional
 
-  const onEditar = handleEdit;
-
-  // Helper para manejar llamadas que pueden venir como event o payload
-  const manejarSubmitEvento = (esEdicion) => async (payload) => {
+  // Consolidado: Manejar submit de eventos (crear o actualizar)
+  const guardarEvento = (esEdicion) => async (payload) => {
     try {
-      if (payload && typeof payload.preventDefault === 'function') {
-        payload.preventDefault();
-      }
-      const isEvent = payload && typeof payload.preventDefault === 'function';
-      let body;
-      if (isEvent) {
-        body = esEdicion ? (eventoSeleccionado || nuevoEvento) : nuevoEvento;
-      } else {
-        body = payload;
-      }
-      const isFormData = (typeof FormData !== 'undefined') && (body instanceof FormData);
-      const id = body?._id;
+      // Detectar si es un evento del formulario o payload directo
+      if (payload?.preventDefault) payload.preventDefault();
       
-      if (esEdicion && !id) {
+      // Extraer body de forma clara (reducir ternario anidado)
+      const esEventoFormulario = payload && !payload.preventDefault;
+      const datosEvento = esEdicion ? (eventoSeleccionado || nuevoEvento) : nuevoEvento;
+      const bodyData = esEventoFormulario ? payload : datosEvento;
+      
+      const isFormData = bodyData instanceof FormData;
+      const eventoId = bodyData?._id;
+      
+      if (esEdicion && !eventoId) {
         mostrarAlerta('Error', 'No se encontró el ID del evento a actualizar');
         return;
       }
       
-      esEdicion 
-        ? await eventService.updateEvent(id, body, isFormData)
-        : await eventService.createEvent(body, isFormData);
+      await (esEdicion 
+        ? eventService.updateEvent(eventoId, bodyData, isFormData)
+        : eventService.createEvent(bodyData, isFormData));
       
       mostrarAlerta("¡Éxito!", `Evento ${esEdicion ? 'actualizado' : 'creado'} exitosamente`);
       setMostrarModal(false);
@@ -262,8 +260,9 @@ const Gestionevento = () => {
     }
   };
 
-  const crearEvento = manejarSubmitEvento(false);
-  const actualizarEvento = manejarSubmitEvento(true);
+  // Aliases para mantener compatibilidad
+  const crearEvento = guardarEvento(false);
+  const actualizarEvento = guardarEvento(true);
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);

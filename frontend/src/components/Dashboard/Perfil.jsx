@@ -458,8 +458,8 @@ const Perfil = () => {
         // Email
         addIfMissing('correo', (() => {
             const correo = String(datos.correo || '').trim();
-            // eslint-disable-next-line no-useless-escape
-            const emailRe = /^\S+@\S+\.\S+$/;
+            // Regex segura contra ReDoS - limita longitud para evitar backtracking catastrófico
+            const emailRe = /^[^\s@]{1,64}@[^\s@]{1,255}$/;
             return emailRe.test(correo) ? null : 'Ingrese un correo electrónico válido.';
         })());
 

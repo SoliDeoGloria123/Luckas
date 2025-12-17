@@ -24,7 +24,7 @@ const Contactanos = () => {
 
     if (!formData.email.trim()) {
       newErrors.email = "El email es requerido"
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!/^[^\s@]{1,64}@[^\s@]{1,255}$/.test(formData.email)) {
       newErrors.email = "Email inválido"
     }
 

@@ -25,11 +25,21 @@ const CertificadosPage = () => {
         const fetchCertificados = async () => {
             try {
                 const data = await inscripcionService.getAll();
+                console.log('DEBUG - Datos recibidos:', data);
+                
                 if (data && data.success && Array.isArray(data.data)) {
                     // Mostrar solo inscripciones de programas académicos cuyo estado sea exactamente 'certificado'
                     const filtrados = data.data.filter(
                         insc => (insc.tipoReferencia === 'ProgramaAcademico') && (insc.estado === 'certificado')
                     );
+                    console.log('DEBUG - Certificados filtrados:', filtrados);
+                    if (filtrados.length > 0) {
+                        console.log('DEBUG - Primer certificado:', {
+                            nombre: filtrados[0].nombre,
+                            apellido: filtrados[0].apellido,
+                            usuario: filtrados[0].usuario
+                        });
+                    }
                     setCertificados(filtrados);
                     setCertificadosFiltrados(filtrados);
                 } else if (Array.isArray(data)) {
@@ -41,6 +51,7 @@ const CertificadosPage = () => {
                     setCertificadosFiltrados([]);
                 }
             } catch (err) {
+                console.error('DEBUG - Error:', err);
                 setCertificados([]);
                 mostrarAlerta("Error", `Error al obtener certificados: ${err.message}`, 'error');
             }
@@ -63,11 +74,22 @@ const CertificadosPage = () => {
         obtenerEstadisticasCertificados();
     }, []);
 
-    // Helper para extraer texto seguro
-    const extractText = (val) => {
-        if (val === null || val === undefined) return '';
-        if (typeof val === 'object') return (val.nombre || val.titulo || val.cursoNombre || JSON.stringify(val));
-        return String(val);
+
+
+    // Helper para obtener nombre completo seguro
+    const obtenerNombreCompleto = (cert) => {
+        const nombre = cert.nombre || '';
+        const apellido = cert.apellido || '';
+        return `${nombre} ${apellido}`.trim() || 'Sin nombre';
+    };
+
+    // Helper para obtener programa/curso
+    const obtenerProgramaNombre = (cert) => {
+        if (cert.programaNombre) return cert.programaNombre;
+        if (cert.cursoNombre) return cert.cursoNombre;
+        if (cert.referencia?.nombre) return cert.referencia.nombre;
+        if (cert.referencia && typeof cert.referencia === 'object' && cert.referencia.nombre) return cert.referencia.nombre;
+        return '-';
     };
 
     const applyFilters = (search = searchTerm, programa = filterPrograma, estado = filterEstado, lista = certificados) => {
@@ -76,7 +98,7 @@ const CertificadosPage = () => {
         const filtered = arr.filter((c) => {
             // filtro por programa
             if (programa && programa !== 'todos') {
-                const prog = c.programaNombre || c.cursoNombre || (c.referencia && (c.referencia.nombre || c.referencia));
+                const prog = obtenerProgramaNombre(c);
                 if (String(prog) !== String(programa)) return false;
             }
             // filtro por estado
@@ -86,11 +108,11 @@ const CertificadosPage = () => {
 
             if (!s) return true;
 
-            const nombre = extractText(c.nombre).toLowerCase();
-            const apellido = extractText(c.apellido).toLowerCase();
-            const correo = extractText(c.correo).toLowerCase();
-            const documento = extractText(c.numeroDocumento).toLowerCase();
-            const programaNombre = extractText(c.programaNombre || c.cursoNombre || c.referencia?.nombre).toLowerCase();
+            const nombre = String(c.nombre || '').toLowerCase();
+            const apellido = String(c.apellido || '').toLowerCase();
+            const correo = String(c.correo || '').toLowerCase();
+            const documento = String(c.numeroDocumento || '').toLowerCase();
+            const programaNombre = obtenerProgramaNombre(c).toLowerCase();
 
             return (
                 nombre.includes(s) ||
@@ -216,7 +238,7 @@ const CertificadosPage = () => {
                             }}
                         >
                             <option value="todos">Todos los Programas</option>
-                            {Array.from(new Set(certificados.map(c => c.programaNombre || c.cursoNombre || (c.referencia && (c.referencia.nombre || c.referencia)) ).filter(Boolean))).map(p => (
+                            {Array.from(new Set(certificados.map(c => obtenerProgramaNombre(c)).filter(p => p && p !== '-'))).map(p => (
                                 <option key={p} value={p}>{p}</option>
                             ))}
                         </select>
@@ -233,7 +255,6 @@ const CertificadosPage = () => {
                             <option value="todos">Todos los Estados</option>
                             <option value="certificado">Certificado</option>
                             <option value="finalizado">Finalizado</option>
-                            <option value="pendiente">Pendiente</option>
                         </select>
                     </div>
                 
@@ -267,13 +288,13 @@ const CertificadosPage = () => {
                             <tbody className="divide-y divide-gray-200">
                                 {(certificadosFiltrados && certificadosFiltrados.length > 0 ? certificadosFiltrados : certificados).map((cert) => (
                                     <tr key={cert._id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cert.certificados} {cert.apellido}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{cert.numeroDocumento}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{cert.correo}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{cert.programaNombre || cert.cursoNombre || cert.referencia?.nombre || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{obtenerNombreCompleto(cert)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{cert.numeroDocumento || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{cert.correo || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{obtenerProgramaNombre(cert)}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
-                                                {cert.estado}
+                                                {cert.estado || 'Sin estado'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">

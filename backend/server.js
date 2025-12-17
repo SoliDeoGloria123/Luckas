@@ -73,19 +73,18 @@ app.use(['/tesorero', '/tesorero/*'], (req, res, next) => {
     });
 });
 
-// Proteger rutas de seminarista - solo admin, tesorero y seminarista pueden acceder
+// Proteger rutas de seminarista - solo seminarista puede acceder
 app.use(['/seminarista', '/seminarista/*'], (req, res, next) => {
     authJwt.verifyToken(req, res, () => {
-        role.checkRole('admin', 'tesorero', 'seminarista')(req, res, next);
+        role.checkRole('seminarista')(req, res, next);
     });
 });
 
-// Proteger rutas de externo - todos los roles autenticados pueden acceder
 app.use(['/externo', '/externo/*'], (req, res, next) => {
     authJwt.verifyToken(req, res, () => {
-        role.checkRole('admin', 'tesorero', 'seminarista', 'externo')(req, res, next);
+        role.checkRole('externo')(req, res, next);
     });
-});
+})
 
 // Servir archivos estáticos del frontend (carpeta `public` generada por React)
 app.use(express.static(path.join(__dirname, '../frontend/public')));
@@ -133,8 +132,22 @@ app.get('/login', (req, res) => {
 // Proteger el acceso a las páginas del panel administrativo en el servidor
 // Si el cliente no envía token, redirigimos al login para evitar que
 // usuarios sin autenticación vean el HTML del panel.
-app.get(['/admin*', '/tesorero*'], authJwt.verifyToken, role.checkRole('admin', 'tesorero'), (req, res) => {
+app.get(['/admin*'], authJwt.verifyToken, role.isAdmin, (req, res) => {
     // Servir el SPA protegido (misma página que el fallback)
+    res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
+});
+
+app.get(['/tesorero*'], authJwt.verifyToken, role.checkRole('admin', 'tesorero'), (req, res) => {
+    // Servir el SPA protegido (misma página que el fallback)
+    res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
+});
+
+// Proteger acceso a páginas de seminarista y externo
+app.get(['/seminarista*'], authJwt.verifyToken, role.checkRole('seminarista'), (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
+});
+
+app.get(['/externo*'], authJwt.verifyToken, role.checkRole('externo'), (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
 });
 

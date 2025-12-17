@@ -54,7 +54,7 @@ const PanelPrincipal = () => {
 
         if (!formPanel.email.trim()) {
             newErrors.email = "El email es requerido"
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formPanel.email)) {
+        } else if (!/^[^\s@]{1,64}@[^\s@]{1,255}$/.test(formPanel.email)) {
             newErrors.email = "Email inválido"
         }
 
@@ -85,7 +85,7 @@ const PanelPrincipal = () => {
                 }
                 break
             case 'email': {
-                const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                const isValidEmail = /^[^\s@]{1,64}@[^\s@]{1,255}$/.test(value)
                 if (value.trim().length === 0) {
                     newErrors.email = "El email es requerido"
                 } else if (isValidEmail) {

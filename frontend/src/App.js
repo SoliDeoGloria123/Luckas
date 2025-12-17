@@ -40,17 +40,21 @@ import MisReservas from "./components/Seminarista/pages/MisReservas";
 import MisSolicitudes from "./components/Seminarista/pages/MisSolicitudes";
 import NuevaSolicitud from "./components/Seminarista/pages/NuevaSolicitud";
 import Perfil from './components/Seminarista/Shared/MiPerfil';
+
+import PanelPrincipal from './components/Panel Principal/Panel';
+import CerrarSesion from './components/cerrar sesion/cerrarsesion';
+import Error404 from './components/Páginas de error/Error404';
+import Error403 from './components/Páginas de error/Error403';
+import Error400 from './components/Páginas de error/Error400';
+import Error500 from './components/Páginas de error/Error500';
+import Error503 from './components/Páginas de error/Error503';
+
 import Contactanos from './components/Pages/Contactanos';
 import AyudaOnline from './components/Pages/AyudaOnline';
 import PoliticaPrivacidad from './components/Pages/PoliticaPrivacidad';
 import TerminosUso from './components/Pages/TerminosUso';
 import SoporteTecnico from './components/Pages/SoporteTecnico';
-import PanelPrincipal from './components/Panel Principal/Panel';
-import CerrarSesion from './components/cerrar sesion/cerrarsesion';
-import Error404 from './components/Páginas de error/Error404';
-import Error400 from './components/Páginas de error/Error400';
-import Error500 from './components/Páginas de error/Error500';
-import Error503 from './components/Páginas de error/Error503';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 
 // Componente para usuarios externos
@@ -66,57 +70,59 @@ function App() {
         <Route path="/signup/registro" element={<Registro />} />
         <Route path="/Olvidar-Contraseña" element={<OlvidoPassw />} />
         {/* Rutas para Admin */}
-        <Route path="/admin/Dashboard" element={<DashboardAdmin />} />
-        <Route path="/admin/usuarios" element={<Dashboarduser />} />
-        <Route path="/admin/categorizacion" element={<GestionAcategorizacion />} />
-        <Route path="/admin/programas-academicos" element={<GestionAprogramas />} />
-        <Route path="/admin/eventos" element={<GestionAeventos />} />
-        <Route path="/admin/solicitudes" element={<GestionAsolicitud />} />
-        <Route path="/admin/inscripciones" element={<GestionAinscripcion />} />
-        <Route path="/admin/certificaciones" element={<GestionCertificacion />} />
-        <Route path="/admin/tareas" element={<GestionAtareas />} />
-        <Route path="/admin/cabanas" element={<GestionAcabanas />} />
-        <Route path="/admin/reservas" element={<GestionAreservas />} />
-        <Route path="/admin/reportes" element={<GestionAreportes />} />
-        <Route path="/admin/perfil" element={<MiPerfil />} />
+        <Route path="/admin/Dashboard" element={<ProtectedRoute Component={DashboardAdmin} allowedRoles={['admin']} />} />
+        <Route path="/admin/usuarios" element={<ProtectedRoute Component={Dashboarduser} allowedRoles={['admin']} />} />
+        <Route path="/admin/categorizacion" element={<ProtectedRoute Component={GestionAcategorizacion} allowedRoles={['admin']} />} />
+        <Route path="/admin/programas-academicos" element={<ProtectedRoute Component={GestionAprogramas} allowedRoles={['admin']} />} />
+        <Route path="/admin/eventos" element={<ProtectedRoute Component={GestionAeventos} allowedRoles={['admin']} />} />
+        <Route path="/admin/solicitudes" element={<ProtectedRoute Component={GestionAsolicitud} allowedRoles={['admin']} />} />
+        <Route path="/admin/inscripciones" element={<ProtectedRoute Component={GestionAinscripcion} allowedRoles={['admin']} />} />
+        <Route path="/admin/certificaciones" element={<ProtectedRoute Component={GestionCertificacion} allowedRoles={['admin']} />} />
+        <Route path="/admin/tareas" element={<ProtectedRoute Component={GestionAtareas} allowedRoles={['admin']} />} />
+        <Route path="/admin/cabanas" element={<ProtectedRoute Component={GestionAcabanas} allowedRoles={['admin']} />} />
+        <Route path="/admin/reservas" element={<ProtectedRoute Component={GestionAreservas} allowedRoles={['admin']} />} />
+        <Route path="/admin/reportes" element={<ProtectedRoute Component={GestionAreportes} allowedRoles={['admin']} />} />
+        <Route path="/admin/perfil" element={<ProtectedRoute Component={MiPerfil} allowedRoles={['admin']} />} />
         {/* Rutas para Tesorero */}
-        <Route path="/tesorero" element={<DashboardTesorero />} />
-        <Route path="/tesorero/usuarios" element={<GestionTusuarios />} />
-        <Route path="/tesorero/categorias" element={<GestionTcategorias />} />
-        <Route path="/tesorero/solicitudes" element={<GestionTsolicitudes />} />
-        <Route path="/tesorero/eventos" element={<GestionTeventos />} />
-        <Route path="/tesorero/programas" element={<GestionTprogramas />} />
-        <Route path="/tesorero/cabañas" element={<GestionTcabanas />} />
-        <Route path="/tesorero/reservas" element={<GestionTreservas />} />
-        <Route path="/tesorero/tarea" element={<GestionTtarea />} />
-        <Route path="/tesorero/inscripcion" element={<GestionTinscripcion />} />
-        <Route path="/tesorero/certificados" element={<GestionTcertificados />} />
-        <Route path="/tesorero/reportes" element={<GestionTreportes />} />
-        <Route path="/tesorero/perfil" element={<GestionTperfil />} />
-        <Route path='/tesorero-Gestiones' element={<GestionTesorero />} />
+        <Route path="/tesorero" element={<ProtectedRoute Component={DashboardTesorero} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/usuarios" element={<ProtectedRoute Component={GestionTusuarios} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/categorias" element={<ProtectedRoute Component={GestionTcategorias} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/solicitudes" element={<ProtectedRoute Component={GestionTsolicitudes} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/eventos" element={<ProtectedRoute Component={GestionTeventos} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/programas" element={<ProtectedRoute Component={GestionTprogramas} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/cabañas" element={<ProtectedRoute Component={GestionTcabanas} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/reservas" element={<ProtectedRoute Component={GestionTreservas} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/tarea" element={<ProtectedRoute Component={GestionTtarea} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/inscripcion" element={<ProtectedRoute Component={GestionTinscripcion} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/certificados" element={<ProtectedRoute Component={GestionTcertificados} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/reportes" element={<ProtectedRoute Component={GestionTreportes} allowedRoles={['tesorero']} />} />
+        <Route path="/tesorero/perfil" element={<ProtectedRoute Component={GestionTperfil} allowedRoles={['tesorero']} />} />
+        <Route path='/tesorero-Gestiones' element={<ProtectedRoute Component={GestionTesorero} allowedRoles={['tesorero']} />} />
         {/* Rutas para Seminarista */}
-        <Route path="/seminarista" element={<DashboardSeminarista />} />
-        <Route path="/seminarista/tareas" element={<GestionTareasSeminarista />} />
-        <Route path="/dashboard/seminarista/eventos" element={<EventosNavegables />} />
-        <Route path="/dashboard/seminarista/cabanas" element={<CabanasNavegables />} />
-        <Route path="/dashboard/seminarista/cursos" element={<CursosNavegables />} />
-        <Route path="/dashboard/seminarista/mis-inscripciones" element={<MisInscripciones />} />
-        <Route path="/dashboard/seminarista/mis-reservas" element={<MisReservas />} />
-        <Route path="/dashboard/seminarista/mis-solicitudes" element={<MisSolicitudes />} />
-        <Route path="/dashboard/seminarista/nueva-solicitud" element={<NuevaSolicitud />} />
-        <Route path="/dashboard/seminarista/Mi-Perfil" element={<Perfil />} />
+        <Route path="/seminarista" element={<ProtectedRoute Component={DashboardSeminarista} allowedRoles={['seminarista']} />} />
+        <Route path="/seminarista/tareas" element={<ProtectedRoute Component={GestionTareasSeminarista} allowedRoles={['seminarista']} />} />
+        <Route path="/dashboard/seminarista/eventos" element={<ProtectedRoute Component={EventosNavegables} allowedRoles={['seminarista']} />} />
+        <Route path="/dashboard/seminarista/cabanas" element={<ProtectedRoute Component={CabanasNavegables} allowedRoles={['seminarista']} />} />
+        <Route path="/dashboard/seminarista/cursos" element={<ProtectedRoute Component={CursosNavegables} allowedRoles={['seminarista']} />} />
+        <Route path="/dashboard/seminarista/mis-inscripciones" element={<ProtectedRoute Component={MisInscripciones} allowedRoles={['seminarista']} />} />
+        <Route path="/dashboard/seminarista/mis-reservas" element={<ProtectedRoute Component={MisReservas} allowedRoles={['seminarista']} />} />
+        <Route path="/dashboard/seminarista/mis-solicitudes" element={<ProtectedRoute Component={MisSolicitudes} allowedRoles={['seminarista']} />} />
+        <Route path="/dashboard/seminarista/nueva-solicitud" element={<ProtectedRoute Component={NuevaSolicitud} allowedRoles={['seminarista']} />} />
+        <Route path="/dashboard/seminarista/Mi-Perfil" element={<ProtectedRoute Component={Perfil} allowedRoles={['seminarista']} />} />
+        {/* Ruta para cerrar sesión */}
+        <Route path="/cerrar-sesion" element={<CerrarSesion />} />
+        {/* Rutas para páginas de error */}
+        <Route path="/error403" element={<Error403 />} />
+        <Route path="/error400" element={<Error400 />} />
+        <Route path="/error500" element={<Error500 />} />
+        <Route path="/error503" element={<Error503 />} />
+        <Route path="*" element={<Error404 />} />
+
         <Route path="/contactanos" element={<Contactanos />} />
         <Route path="/ayuda" element={<AyudaOnline />} />
         <Route path="/politica" element={<PoliticaPrivacidad />} />
         <Route path="/terminos" element={<TerminosUso />} />
         <Route path="/soporte" element={<SoporteTecnico />} />
-        {/* Ruta para cerrar sesión */}
-        <Route path="/cerrar-sesion" element={<CerrarSesion />} />
-        {/* Ruta para página de error 404 */}
-        <Route path="*" element={<Error404 />} />
-        <Route path="/error400" element={<Error400 />} />
-        <Route path="/error500" element={<Error500 />} />
-        <Route path="/error503" element={<Error503 />} />
       </Routes>
     </Router>
   );

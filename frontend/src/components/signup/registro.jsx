@@ -14,11 +14,12 @@ const VALIDATION_MESSAGES = {
 };
 
 // Constantes para regex
+// EMAIL regex es seguro contra ReDoS: limita longitud de entrada para evitar backtracking catastrófico
 const REGEX_PATTERNS = {
   PASSPORT: /^[A-Za-z0-9]{5,20}$/,
   DOCUMENT_NUMBER: /^\d{6,15}$/,
   PHONE: /^\d{7,15}$/,
-  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  EMAIL: /^[^\s@]{1,64}@[^\s@]{1,255}$/,
 };
 
 // Definición de campos y sus reglas de validación

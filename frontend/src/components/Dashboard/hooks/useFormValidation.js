@@ -21,8 +21,8 @@ const validateNumber = (value, label) => {
 };
 
 const validateEmail = (value, label) => {
-  // Regex más segura que previene ReDoS (Regular Expression Denial of Service)
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  // Regex más segura que previene ReDoS - limita longitud y evita grupos complejos anidados
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]{1,64}@[a-zA-Z0-9.-]{1,255}\.[a-zA-Z]{2,}$/;
   if (!emailRegex.test(value)) {
     return `${label} debe ser un email válido`;
   }

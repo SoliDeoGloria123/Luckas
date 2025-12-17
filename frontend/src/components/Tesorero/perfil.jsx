@@ -17,7 +17,8 @@ const CREDENTIAL_MESSAGES = {
 };
 
 // Helpers fuera del componente para reducir complejidad
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+// Regex seguro contra ReDoS: limita longitud para evitar backtracking catastrófico
+const emailRegex = /^[^\s@]{1,64}@[^\s@]{1,255}$/i;
 function validateEmailFormat(email) {
     return emailRegex.test(String(email || ''));
 }

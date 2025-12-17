@@ -540,8 +540,10 @@ const OlvidarPassword = () => {
 
         const emailTrim = (email || '').trim();
         const emailLower = emailTrim.toLowerCase();
-        const basicEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const gmailRegex = /^[^\s@]+@gmail\.com$/i;
+        // Regex seguro contra ReDoS: limita longitud para evitar backtracking catastrófico
+        const basicEmailRegex = /^[^\s@]{1,64}@[^\s@]{1,255}$/;
+        // Regex seguro para Gmail: limita dominio
+        const gmailRegex = /^[^\s@]{1,64}@gmail\.com$/i;
 
         if (!emailTrim) {
             const msg = 'Por favor ingresa un correo';

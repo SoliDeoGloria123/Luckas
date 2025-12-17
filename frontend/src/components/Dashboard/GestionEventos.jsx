@@ -1,4 +1,4 @@
-  import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { eventService } from "../../services/eventService";
 import { categorizacionService } from "../../services/categorizacionService";
 import TablaEventos from "./Tablas/EventoTabla";
@@ -10,7 +10,6 @@ import Header from './Sidebar/Header';
 import {
   Plus,
   Search,
-
 } from 'lucide-react';
 
 // ============ HELPERS CENTRALIZADOS ============
@@ -23,8 +22,8 @@ const extraerListaDeRespuesta = (respuesta) => {
   return [];
 };
 
-// Estado inicial del evento
-const EVENTO_INICIAL = {
+
+const crearEventoVacio = () => ({
   nombre: "",
   descripcion: "",
   precio: 0,
@@ -42,7 +41,7 @@ const EVENTO_INICIAL = {
   etiquetas: "",
   observaciones: "",
   imagen: ""
-};
+});
 
 // Helper para obtener imágenes desde varios formatos
 const getImagesFromEvento = (evento) => {
@@ -112,25 +111,7 @@ const GestionEventos = () => {
   const [mostrarModalDetalle, setMostrarModalDetalle] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [estadisticas, setEstadisticas] = useState({ totalEvents: 0, upcoming: 0, completed: 0, cancelled: 0 });
-  const [nuevoEvento, setNuevoEvento] = useState({
-    nombre: "",
-    descripcion: "",
-    precio: 0,
-    categoria: "",
-    fechaEvento: "",
-    horaInicio: "",
-    horaFin: "",
-    lugar: "",
-    direccion: "",
-    duracionDias: 1,
-    cuposTotales: 0,
-    cuposDisponibles: 0,
-    prioridad: "Media",
-    active: true,
-    etiquetas: "",
-    observaciones: "",
-    imagen: ""
-  });
+  const [nuevoEvento, setNuevoEvento] = useState(crearEventoVacio());
   const [categorias, setCategorias] = useState([]);
 
   // Obtener eventos y categorías
@@ -183,56 +164,60 @@ const GestionEventos = () => {
 
   // Helper para resetear estado
   const resetearEstado = () => {
-    setNuevoEvento({ ...EVENTO_INICIAL });
+    setNuevoEvento(crearEventoVacio());
     setSelectedImages([]);
     setModoEdicion(false);
     setEventoSeleccionado(null);
   };
 
-  // Funciones de modal - CRUD
-  const abrirModalCrear = () => {
-    setModoEdicion(false);
-    resetearEstado();
-    setMostrarModal(true);
+  // Helper genérico para modales - consolidado
+  const abrirModal = (tipo, evento = null) => {
+    if (tipo === 'crear') {
+      resetearEstado();
+      setModoEdicion(false);
+      setMostrarModal(true);
+    } else if (tipo === 'editar') {
+      setModoEdicion(true);
+      setEventoSeleccionado({ ...
+        evento });
+      setMostrarModal(true);
+    } else if (tipo === 'ver') {
+      setEventoDetalle(evento);
+      setMostrarModalDetalle(true);
+    }
   };
 
-  const abrirModalEditar = (evento) => {
-    setModoEdicion(true);
-    setEventoSeleccionado({ ...evento });
-    setMostrarModal(true);
-  };
+  // Aliases para mantener compatibilidad con otros usos
+  const abrirModalCrear = () => abrirModal('crear');
+  const abrirModalEditar = (evento) => abrirModal('editar', evento);
+  const abrirModalVer = (evento) => abrirModal('ver', evento);
 
-  const abrirModalVer = (evento) => {
-    setEventoDetalle(evento);
-    setMostrarModalDetalle(true);
-  };
-
-  // Helper genérico para operaciones CRUD de eventos
-  const operarEvento = async (operacion, id = null, datos = null) => {
+  // Helper genérico para operaciones CRUD de eventos - consolidado
+  const operarEvento = async (operacion, idEvento = null, datosEvento = null) => {
     try {
+      const mensajes = {
+        crear: 'Evento creado exitosamente',
+        actualizar: 'Evento actualizado exitosamente',
+        eliminar: 'Evento eliminado exitosamente'
+      };
+      
       switch (operacion) {
         case 'crear': {
-          const formData = datos instanceof FormData ? datos : prepararFormDataEvento(datos);
+          const formData = datosEvento instanceof FormData ? datosEvento : prepararFormDataEvento(datosEvento);
           await eventService.createEvent(formData, true);
-          mostrarAlerta("¡Éxito!", "Evento creado exitosamente");
           break;
         }
         case 'actualizar': {
-          await eventService.updateEvent(id || eventoSeleccionado._id, datos || eventoSeleccionado);
-          mostrarAlerta("¡Éxito!", "Evento actualizado exitosamente");
+          await eventService.updateEvent(idEvento || eventoSeleccionado._id, datosEvento || eventoSeleccionado);
           break;
         }
         case 'eliminar': {
-          const confirmado = await mostrarConfirmacion(
-            "¿Estás seguro?",
-            "Esta acción eliminará el evento de forma permanente."
-          );
-          if (!confirmado) return;
-          await eventService.deleteEvent(id);
-          mostrarAlerta("¡Éxito!", "Evento eliminado exitosamente");
+          if (!await mostrarConfirmacion("¿Estás seguro?", "Esta acción eliminará el evento de forma permanente.")) return;
+          await eventService.deleteEvent(idEvento);
           break;
         }
       }
+      mostrarAlerta("¡Éxito!", mensajes[operacion]);
       setMostrarModal(false);
       resetearEstado();
       obtenerEventos();
@@ -241,13 +226,9 @@ const GestionEventos = () => {
     }
   };
 
-  const crearEvento = (formDataFromModal = null, isFormData = false) => {
-    const datos = isFormData ? formDataFromModal : null;
-    operarEvento('crear', null, datos);
-  };
-
+  // Funciones CRUD derivadas
+  const crearEvento = (formDataFromModal = null, isFormData = false) => operarEvento('crear', null, formDataFromModal);
   const actualizarEvento = () => operarEvento('actualizar');
-
   const eliminarEvento = (id) => operarEvento('eliminar', id);
 
   // Filtrar eventos antes de la paginación
